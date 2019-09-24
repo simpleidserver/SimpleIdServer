@@ -15,9 +15,9 @@ artifacts:
   name: NuGet
 deploy:
 - provider: NuGet
-  server: https://www.myget.org/F/simpleidserver/api/v3/index.json
+  server: https://www.myget.org/F/advance-ict/api/v2/package
   api_key:
-    secure: iW1+rHmTmrADJlwbWH3QCFAKRZHJ14XxCWfDAN0b01Oov5G/N4eEjFG+RrwvppwE
+    secure: zs1JVjFHRdvB36fGq2rN8MR7QeJnCVkt7VTG4ZHT5OYDNpuh2AlGHqK+rseevn8l
   skip_symbols: true
   on:
     branch: master
