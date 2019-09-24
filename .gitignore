@@ -206,3 +206,5 @@ FakesAssemblies/
 *.opt
 
 log-*.txt
+
+docs/_build/
