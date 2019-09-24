@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SimpleIdServer.OpenID.Startup": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

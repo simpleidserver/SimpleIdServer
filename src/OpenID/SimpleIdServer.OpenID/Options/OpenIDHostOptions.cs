@@ -1,0 +1,47 @@
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Cookies;
+using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OpenID.SubjectTypeBuilders;
+using System.Collections.Generic;
+
+namespace SimpleIdServer.OpenID.Options
+{
+    public class OpenIDHostOptions
+    {
+        public OpenIDHostOptions()
+        {
+            DefaultSubjectType = PublicSubjectTypeBuilder.SUBJECT_TYPE;
+            DefaultMaxAge = null;
+            DefaultAcrValue = "sid-load-01";
+            DefaultAuthenticationContextClassReferences = new List<AuthenticationContextClassReference>();
+            AuthenticationScheme = "MultiAccount";
+            CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
+        }
+
+        /// <summary>
+        /// OAUTH2.0 client's default subject type.
+        /// </summary>
+        public string DefaultSubjectType { get; set; }
+        /// <summary>
+        ///  OAUTH2.0 client's default max age in seconds.
+        /// </summary>
+        public double? DefaultMaxAge { get; set; }
+        /// <summary>
+        /// Default ACR value.
+        /// </summary>
+        public string DefaultAcrValue { get; set; }
+        /// <summary>
+        /// Cookie name.
+        /// </summary>
+        public string CookieName { get; set; }
+        /// <summary>
+        /// Authentication scheme.
+        /// </summary>
+        public string AuthenticationScheme { get; set; }
+        /// <summary>
+        /// OPENID default ACRS.
+        /// </summary>
+        public List<AuthenticationContextClassReference> DefaultAuthenticationContextClassReferences { get; set; }
+    }
+}

@@ -1,0 +1,69 @@
+﻿@using SimpleIdServer.OpenID.Startup.Resources
+@model  SimpleIdServer.UI.Authenticate.Sms.ViewModels.AuthenticateViewModel
+
+@{
+    ViewBag.Title = Global.authenticate_sms;
+}
+
+<div>
+    <div class="card">
+        <div class="card-header">@Global.authenticate_sms</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    @if(!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+                    {
+                        <div class="alert alert-success">@Global.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
+                    }
+                    @using (Html.BeginForm("Index", "Authenticate", new { area = "sms", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ReturnUrl" />
+                        <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber">@Global.phonenumber</label>
+                            <input asp-for="PhoneNumber" type="text" class="form-control" />
+                        </div>
+                        <button type="submit" class="btn btn-primary card-link">@Global.sendconfirmationcode</button>
+                    }
+                </div>
+                <div class="col-md-6">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <ul class="list-group">
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    foreach (var error in modelState.Errors)
+                                    {
+                                        <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                    @using (Html.BeginForm("Index", "Authenticate", new { area = "sms", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ReturnUrl" />
+                        <input type="hidden" name="Action" value="AUTHENTICATE" />
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber">@Global.phonenumber</label>
+                            <input asp-for="PhoneNumber" type="text" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ConfirmationCode">@Global.confirmationcode</label>
+                            <input asp-for="ConfirmationCode" type="password" class="form-control" />
+                        </div>
+                        <div>
+                            <input type="checkbox" asp-for="RememberLogin " />
+                            <label>@Global.remember_login</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary card-link">@Global.authenticate</button>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
