@@ -1,7 +1,7 @@
 # Simpleidserver core
 
-[![Build status](https://ci.appveyor.com/api/projects/status/vy22oyi134x321ah?svg=true)](https://ci.appveyor.com/project/simpleidserver/simpleidserver-core)
-[![MyGet (dev)](https://img.shields.io/myget/simpleidserver/v/SimpleIdServer.OpenID.svg)](http://myget.org/gallery/automapperdev)
+[![Build status](https://ci.appveyor.com/api/projects/status/shtqlxhbda6gtdag?svg=true)](https://ci.appveyor.com/project/simpleidserver/simpleidserver)
+[![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenID.svg)](https://www.myget.org/feed/Packages/advance-ict)
 
 ## Contributing
 
