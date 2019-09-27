@@ -19,7 +19,7 @@ namespace SimpleIdServer.OpenID.Startup.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Global {
@@ -318,6 +318,60 @@ namespace SimpleIdServer.OpenID.Startup.Resources {
         public static string remember_login {
             get {
                 return ResourceManager.GetString("remember_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access to the address.
+        /// </summary>
+        public static string scope_address {
+            get {
+                return ResourceManager.GetString("scope_address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access to the email.
+        /// </summary>
+        public static string scope_email {
+            get {
+                return ResourceManager.GetString("scope_email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Offline access.
+        /// </summary>
+        public static string scope_offline_access {
+            get {
+                return ResourceManager.GetString("scope_offline_access", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access to user identifier.
+        /// </summary>
+        public static string scope_openid {
+            get {
+                return ResourceManager.GetString("scope_openid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access to the phone.
+        /// </summary>
+        public static string scope_phone {
+            get {
+                return ResourceManager.GetString("scope_phone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access to the profile.
+        /// </summary>
+        public static string scope_profile {
+            get {
+                return ResourceManager.GetString("scope_profile", resourceCulture);
             }
         }
         

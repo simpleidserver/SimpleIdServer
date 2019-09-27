@@ -5,13 +5,13 @@ using SimpleIdServer.OAuth.Infrastructures;
 
 namespace SimpleIdServer.OpenID
 {
-    public class OAuthHostModule : IModule
+    public class OpenIDHostModule : IModule
     {
         public string Name => "OpenIDHostModule";
 
         public void Register(IServiceCollection services)
         {
-            services.AddOpenID();
+            services.AddSIDOpenID();
         }
     }
 }

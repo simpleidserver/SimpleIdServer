@@ -11,12 +11,12 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Scopes;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
@@ -147,44 +147,45 @@ namespace SimpleIdServer.OpenID.Api.Register
                 requestObjectEncryptionEnc = A128CBCHS256EncHandler.ENC_NAME;
             }
 
-            var kvp = await BuildOAuthClient(context);
-            kvp.Key.ApplicationType = applicationType;
-            kvp.Key.SectorIdentifierUri = sectorIdentifierUri;
-            kvp.Key.SubjectType = subjectType;
-            kvp.Key.IdTokenSignedResponseAlg = idTokenSignedResponseAlg;
-            kvp.Key.IdTokenEncryptedResponseAlg = idTokenEncryptedResponseAlg;
-            kvp.Key.IdTokenEncryptedResponseEnc = idTokenEncryptedResponseEnc;
-            kvp.Key.UserInfoSignedResponseAlg = userInfoSignedResponseAlg;
-            kvp.Key.UserInfoEncryptedResponseAlg = userInfoEncryptedResponseAlg;
-            kvp.Key.UserInfoEncryptedResponseEnc = userInfoEncryptedResponseEnc;
-            kvp.Key.RequestObjectSigningAlg = requestObjectSigningAlg;
-            kvp.Key.RequestObjectEncryptionAlg = requestObjectEncryptionAlg;
-            kvp.Key.RequestObjectEncryptionEnc = requestObjectEncryptionEnc;
-            kvp.Key.DefaultMaxAge = defaultMaxAge;
-            kvp.Key.RequireAuthTime = requireAuthTime.Value;
-            kvp.Key.DefaultAcrValues = acrValues.ToList();
-            OAuthClientCommandRepository.Add(kvp.Key);
+            var openidClient = new OpenIdClient();
+            var result = await EnrichOAuthClient(context, openidClient);
+            openidClient.ApplicationType = applicationType;
+            openidClient.SectorIdentifierUri = sectorIdentifierUri;
+            openidClient.SubjectType = subjectType;
+            openidClient.IdTokenSignedResponseAlg = idTokenSignedResponseAlg;
+            openidClient.IdTokenEncryptedResponseAlg = idTokenEncryptedResponseAlg;
+            openidClient.IdTokenEncryptedResponseEnc = idTokenEncryptedResponseEnc;
+            openidClient.UserInfoSignedResponseAlg = userInfoSignedResponseAlg;
+            openidClient.UserInfoEncryptedResponseAlg = userInfoEncryptedResponseAlg;
+            openidClient.UserInfoEncryptedResponseEnc = userInfoEncryptedResponseEnc;
+            openidClient.RequestObjectSigningAlg = requestObjectSigningAlg;
+            openidClient.RequestObjectEncryptionAlg = requestObjectEncryptionAlg;
+            openidClient.RequestObjectEncryptionEnc = requestObjectEncryptionEnc;
+            openidClient.DefaultMaxAge = defaultMaxAge;
+            openidClient.RequireAuthTime = requireAuthTime.Value;
+            openidClient.DefaultAcrValues = acrValues.ToList();
+            OAuthClientCommandRepository.Add(openidClient);
             await OAuthClientCommandRepository.SaveChanges();
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.ApplicationType, applicationType);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.SectorIdentifierUri, sectorIdentifierUri);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.SubjectType, subjectType);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.IdTokenSignedResponseAlg, idTokenSignedResponseAlg);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.IdTokenEncryptedResponseAlg, idTokenEncryptedResponseAlg);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.IdTokenEncryptedResponseEnc, idTokenEncryptedResponseEnc);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.UserInfoSignedResponseAlg, userInfoSignedResponseAlg);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.UserInfoEncryptedResponseAlg, userInfoEncryptedResponseAlg);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.UserInfoEncryptedResponseEnc, userInfoEncryptedResponseEnc);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.RequestObjectSigningAlg, requestObjectSigningAlg);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.RequestObjectEncryptionAlg, requestObjectEncryptionAlg);
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.RequestObjectEncryptionEnc, requestObjectEncryptionEnc);
+            AddNotEmpty(result, RegisterRequestParameters.ApplicationType, applicationType);
+            AddNotEmpty(result, RegisterRequestParameters.SectorIdentifierUri, sectorIdentifierUri);
+            AddNotEmpty(result, RegisterRequestParameters.SubjectType, subjectType);
+            AddNotEmpty(result, RegisterRequestParameters.IdTokenSignedResponseAlg, idTokenSignedResponseAlg);
+            AddNotEmpty(result, RegisterRequestParameters.IdTokenEncryptedResponseAlg, idTokenEncryptedResponseAlg);
+            AddNotEmpty(result, RegisterRequestParameters.IdTokenEncryptedResponseEnc, idTokenEncryptedResponseEnc);
+            AddNotEmpty(result, RegisterRequestParameters.UserInfoSignedResponseAlg, userInfoSignedResponseAlg);
+            AddNotEmpty(result, RegisterRequestParameters.UserInfoEncryptedResponseAlg, userInfoEncryptedResponseAlg);
+            AddNotEmpty(result, RegisterRequestParameters.UserInfoEncryptedResponseEnc, userInfoEncryptedResponseEnc);
+            AddNotEmpty(result, RegisterRequestParameters.RequestObjectSigningAlg, requestObjectSigningAlg);
+            AddNotEmpty(result, RegisterRequestParameters.RequestObjectEncryptionAlg, requestObjectEncryptionAlg);
+            AddNotEmpty(result, RegisterRequestParameters.RequestObjectEncryptionEnc, requestObjectEncryptionEnc);
             if (defaultMaxAge != null)
             {
-                AddNotEmpty(kvp.Value, RegisterRequestParameters.DefaultMaxAge, defaultMaxAge.Value.ToString().ToLowerInvariant());
+                AddNotEmpty(result, RegisterRequestParameters.DefaultMaxAge, defaultMaxAge.Value.ToString().ToLowerInvariant());
             }
 
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.RequireAuthTime, requireAuthTime.Value.ToString().ToLowerInvariant());
-            AddNotEmpty(kvp.Value, RegisterRequestParameters.DefaultAcrValues, acrValues);
-            return kvp.Value;
+            AddNotEmpty(result, RegisterRequestParameters.RequireAuthTime, requireAuthTime.Value.ToString().ToLowerInvariant());
+            AddNotEmpty(result, RegisterRequestParameters.DefaultAcrValues, acrValues);
+            return result;
         }
 
         protected override void CheckRedirectUrl(HandlerContext context, string redirectUrl)

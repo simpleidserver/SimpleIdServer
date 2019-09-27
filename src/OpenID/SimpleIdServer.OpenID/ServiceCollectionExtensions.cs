@@ -11,37 +11,61 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
-using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Api.Authorization;
 using SimpleIdServer.OpenID.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OpenID.Api.Authorization.Validators;
 using SimpleIdServer.OpenID.Api.Register;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
-using SimpleIdServer.OpenID.ClaimsEnrichers;
-using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.OpenID.Persistence;
+using SimpleIdServer.OpenID.Persistence.InMemory;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
 using SimpleIdServer.OpenID.UI.Infrastructures;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddOpenID(this IServiceCollection services)
+        /// <summary>
+        /// Register OPENID dependencies.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services)
         {
-            return services.AddUI()
+            var builder = new SimpleIdServerOpenIDBuilder(services);
+            services.AddSIDOAuth();
+            services
+                .AddUI()
                 .AddOpenIDStore()
                 .AddOpenIDAuthorizationApi()
                 .AddRegisterApi()
                 .AddOpenIDAuthentication();
+            return builder;
         }
 
-        public static IServiceCollection AddOpenIDAuthentication(this IServiceCollection services)
+        /// <summary>
+        /// Register OPENID dependencies.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services, Action<OpenIDHostOptions> options)
+        {
+            services.Configure(options);
+            return services.AddSIDOpenID();
+        }
+
+        private static IServiceCollection AddOpenIDAuthentication(this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
             var openidHostOptions = serviceProvider.GetService<IOptionsMonitor<OpenIDHostOptions>>();
@@ -73,40 +97,35 @@ namespace SimpleIdServer.OpenID
             return services;
         }
 
-        public static IServiceCollection AddUI(this IServiceCollection services)
+        private static IServiceCollection AddUI(this IServiceCollection services)
         {
             services.AddTransient<ISessionManager, SessionManager>();
             return services;
         }
 
-        public static IServiceCollection AddAggregateHttpClaimsSource(this IServiceCollection services, AggregateHttpClaimsSourceOptions httpClaimsSourceOptions)
+        private static IServiceCollection AddOpenIDStore(this IServiceCollection services)
         {
-            services.AddTransient<IClaimsSource, AggregateHttpClaimsSource>(o => new AggregateHttpClaimsSource(httpClaimsSourceOptions, o.GetService<IJwtBuilder>(), o.GetService<IJwtParser>()));
-            return services;
-        }
-
-        public static IServiceCollection AddDistributeHttpClaimsSource(this IServiceCollection services, DistributeHttpClaimsSourceOptions distributeHttpClaimsSourceOptions)
-        {
-            services.AddTransient<IClaimsSource, DistributeHttpClaimsSource>(o => new DistributeHttpClaimsSource(distributeHttpClaimsSourceOptions));
-            return services;
-        }
-
-        public static IServiceCollection AddOpenIDStore(this IServiceCollection services)
-        {
-            services.AddSingleton<IAuthenticationContextClassReferenceQueryRepository>(o =>
+            var acrs = new List<AuthenticationContextClassReference>();
+            var clients = new List<OpenIdClient>();
+            var scopes = new List<OpenIdScope>
             {
-                var opt = o.GetService<IOptions<OpenIDHostOptions>>();
-                return new DefaultAuthenticationContextClassReferenceQueryRepository(opt.Value.DefaultAuthenticationContextClassReferences);
-            });
-            services.AddSingleton<IAuthenticationContextClassReferenceCommandRepository>(o =>
-            {
-                var opt = o.GetService<IOptions<OpenIDHostOptions>>();
-                return new DefaultAuthenticationContextClassReferenceCommandRepository(opt.Value.DefaultAuthenticationContextClassReferences);
-            });
+                SIDOpenIdConstants.StandardScopes.Address,
+                SIDOpenIdConstants.StandardScopes.Email,
+                SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
+                SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                SIDOpenIdConstants.StandardScopes.Phone,
+                SIDOpenIdConstants.StandardScopes.Profile
+            };
+            services.AddSingleton<IAuthenticationContextClassReferenceQueryRepository>(new DefaultAuthenticationContextClassReferenceQueryRepository(acrs));
+            services.AddSingleton<IAuthenticationContextClassReferenceCommandRepository>(new DefaultAuthenticationContextClassReferenceCommandRepository(acrs));
+            services.AddSingleton<IOAuthClientQueryRepository>(new DefaultOpenIdClientQueryRepository(clients));
+            services.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients));
+            services.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
+            services.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
             return services;
         }
 
-        public static IServiceCollection AddOpenIDAuthorizationApi(this IServiceCollection services)
+        private static IServiceCollection AddOpenIDAuthorizationApi(this IServiceCollection services)
         {
             services.RemoveAll<IAuthorizationRequestEnricher>();
             services.RemoveAll<IAuthorizationRequestValidator>();
@@ -116,8 +135,8 @@ namespace SimpleIdServer.OpenID
             services.AddTransient<IUserConsentFetcher, OpenIDUserConsentFetcher>();
             services.AddTransient<IAuthorizationRequestHandler, OpenIDAuthorizationRequestHandler>();
             services.AddTransient<IAuthorizationRequestValidator, OpenIDAuthorizationRequestValidator>();
-            services.AddTransient<IResponseTypeHandler, Api.Authorization.ResponseTypes.AuthorizationCodeResponseTypeHandler>();
-            services.AddTransient<IResponseTypeHandler, Api.Authorization.ResponseTypes.TokenResponseTypeHandler>();
+            services.AddTransient<IResponseTypeHandler, SimpleIdServer.OpenID.Api.Authorization.ResponseTypes.AuthorizationCodeResponseTypeHandler>();
+            services.AddTransient<IResponseTypeHandler, SimpleIdServer.OpenID.Api.Authorization.ResponseTypes.TokenResponseTypeHandler>();
             services.AddTransient<IResponseTypeHandler, IdTokenResponseTypeHandler>();
             services.AddTransient<ITokenBuilder, IdTokenBuilder>();
             services.AddTransient<IAuthorizationRequestEnricher, OpenIDAuthorizationRequestEnricher>();
@@ -127,7 +146,7 @@ namespace SimpleIdServer.OpenID
             return services;
         }
 
-        public static IServiceCollection AddRegisterApi(this IServiceCollection services)
+        private static IServiceCollection AddRegisterApi(this IServiceCollection services)
         {
             services.RemoveAll<IRegisterRequestHandler>();
             services.AddTransient<IRegisterRequestHandler, OpenIDRegisterRequestHandler>();

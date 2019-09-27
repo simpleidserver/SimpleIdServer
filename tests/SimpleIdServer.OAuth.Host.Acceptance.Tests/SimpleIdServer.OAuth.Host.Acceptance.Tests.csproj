@@ -97,7 +97,6 @@
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\OAUTHConfiguration.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>OAUTHConfiguration.feature.cs</LastGenOutput>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Register.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>

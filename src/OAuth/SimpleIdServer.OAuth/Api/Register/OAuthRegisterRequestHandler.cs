@@ -10,14 +10,14 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Scopes;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -166,13 +166,14 @@ namespace SimpleIdServer.OAuth.Api.Register
 
         protected virtual async Task<JObject> Create(HandlerContext context)
         {
-            var kvp = await BuildOAuthClient(context);
-            _oauthClientCommandRepository.Add(kvp.Key);
+            var oauthClient = new OAuthClient();
+            var jObj = await EnrichOAuthClient(context, oauthClient);
+            _oauthClientCommandRepository.Add(oauthClient);
             await _oauthClientCommandRepository.SaveChanges();
-            return kvp.Value;
+            return jObj;
         }
 
-        protected async Task<KeyValuePair<OAuthClient, JObject>> BuildOAuthClient(HandlerContext context)
+        protected async Task<JObject> EnrichOAuthClient(HandlerContext context, OAuthClient oauthClient)
         {
             var jObj = context.Request.HttpBody;
             var clientId = Guid.NewGuid().ToString();
@@ -212,51 +213,48 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
 
             var supportedScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes);
-            var client = new OAuthClient
-            {
-                ClientId = clientId,
-                TokenEndPointAuthMethod = tokenEndpointAuthMethod,
-                GrantTypes = grantTypes.ToList(),
-                ResponseTypes = responseTypes,
-                Contacts = contacts == null ? new List<string>() : contacts,
-                JwksUri = jwksUri,
-                JsonWebKeys = jwks == null ? new List<SimpleIdServer.Jwt.JsonWebKey>() : jwks.ToList(),
-                SoftwareId = softwareId,
-                SoftwareVersion = softwareVersion,
-                RedirectionUrls = redirectUris.ToList(),
-                PreferredTokenProfile = OauthHostOptions.DefaultTokenProfile,
-                AllowedScopes = supportedScopes.ToList(),
-                TokenSignedResponseAlg = tokenSignedResponseAlg,
-                TokenEncryptedResponseAlg = tokenEncryptedResponseAlg,
-                TokenEncryptedResponseEnc = tokenEncryptedResponseEnc,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30
-            };
+            oauthClient.ClientId = clientId;
+            oauthClient.TokenEndPointAuthMethod = tokenEndpointAuthMethod;
+            oauthClient.GrantTypes = grantTypes.ToList();
+            oauthClient.ResponseTypes = responseTypes;
+            oauthClient.Contacts = contacts == null ? new List<string>() : contacts.ToList();
+            oauthClient.JwksUri = jwksUri;
+            oauthClient.JsonWebKeys = jwks == null ? new List<SimpleIdServer.Jwt.JsonWebKey>() : jwks.ToList();
+            oauthClient.SoftwareId = softwareId;
+            oauthClient.SoftwareVersion = softwareVersion;
+            oauthClient.RedirectionUrls = redirectUris.ToList();
+            oauthClient.PreferredTokenProfile = OauthHostOptions.DefaultTokenProfile;
+            oauthClient.AllowedScopes = supportedScopes.ToList();
+            oauthClient.TokenSignedResponseAlg = tokenSignedResponseAlg;
+            oauthClient.TokenEncryptedResponseAlg = tokenEncryptedResponseAlg;
+            oauthClient.TokenEncryptedResponseEnc = tokenEncryptedResponseEnc;
+            oauthClient.RefreshTokenExpirationTimeInSeconds = 60 * 30;
             foreach (var kvp in clientNames)
             {
-                client.AddClientName(kvp.Key, kvp.Value);
+                oauthClient.AddClientName(kvp.Key, kvp.Value);
             }
 
             foreach (var kvp in clientUris)
             {
-                client.AddClientUri(kvp.Key, kvp.Value);
+                oauthClient.AddClientUri(kvp.Key, kvp.Value);
             }
 
             foreach (var kvp in logoUris)
             {
-                client.AddLogoUri(kvp.Key, kvp.Value);
+                oauthClient.AddLogoUri(kvp.Key, kvp.Value);
             }
 
             foreach (var kvp in tosUris)
             {
-                client.AddTosUri(kvp.Key, kvp.Value);
+                oauthClient.AddTosUri(kvp.Key, kvp.Value);
             }
 
             foreach (var kvp in policyUris)
             {
-                client.AddPolicyUri(kvp.Key, kvp.Value);
+                oauthClient.AddPolicyUri(kvp.Key, kvp.Value);
             }
 
-            client.AddSharedSecret(clientSecret);
+            oauthClient.AddSharedSecret(clientSecret);
             var currentDateTime = DateTime.UtcNow;
             var result = new JObject();
             AddNotEmpty(result, RegisterResponseParameters.ClientId, clientId);
@@ -287,7 +285,7 @@ namespace SimpleIdServer.OAuth.Api.Register
             AddNotEmpty(result, RegisterRequestParameters.SoftwareId, softwareId);
             AddNotEmpty(result, RegisterRequestParameters.SoftwareVersion, softwareVersion);
             AddNotEmpty(result, RegisterRequestParameters.SoftwareStatement, softwareStatement);
-            return new KeyValuePair<OAuthClient, JObject>(client, result);
+            return result;
         }
 
         private async Task ExtractSoftwareStatement(JObject jObj)

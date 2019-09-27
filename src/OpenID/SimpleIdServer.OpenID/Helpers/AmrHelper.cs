@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.OpenID.Persistence;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,13 +21,13 @@ namespace SimpleIdServer.OpenID.Helpers
             _openidHostOptions = openidHostOptions.Value;
         }
 
-        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, OAuthClient oauthClient)
+        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, OpenIdClient openidClient)
         {
             var acrs = new List<string>();
             acrs.AddRange(requestedAcrValues);
-            if (oauthClient.DefaultAcrValues.Any())
+            if (openidClient.DefaultAcrValues.Any())
             {
-                acrs.AddRange(oauthClient.DefaultAcrValues);
+                acrs.AddRange(openidClient.DefaultAcrValues);
             }
 
             if (!string.IsNullOrWhiteSpace(_openidHostOptions.DefaultAcrValue))

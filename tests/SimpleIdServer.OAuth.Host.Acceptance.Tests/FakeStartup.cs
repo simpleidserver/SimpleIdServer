@@ -9,11 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests.Middlewares;
-using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Options;
 using System;
 using System.Collections.Generic;
@@ -30,17 +26,18 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddModule();
-            services.AddLogging();
+            services.AddSIDOAuth(o =>
+            {
+                o.SoftwareStatementTrustedParties.Add(new SoftwareStatementTrustedParty("iss", "http://localhost/custom-jwks"));
+            })
+                .AddClients(DefaultConfiguration.Clients)
+                .AddScopes(DefaultConfiguration.Scopes)
+                .AddUsers(DefaultConfiguration.Users);
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCustomAuthentication(opts =>
                 {
                     
                 });
-            services.Configure<OAuthHostOptions>(a =>
-            {
-                a.SoftwareStatementTrustedParties.Add(new SoftwareStatementTrustedParty("iss", "http://localhost/custom-jwks"));
-            });
             services.AddAuthorization(policy =>
             {
                 policy.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
@@ -50,9 +47,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            ConfigureRepositories(app);
-            app.UseAuthentication();
-            app.UseModule();
+            app.UseSID();
         }
 
         private static void ConfigureClient(IServiceCollection services)
@@ -81,29 +76,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 });
             services.RemoveAll<IHttpClientFactory>();
             services.AddSingleton<IHttpClientFactory>(mo.Object);
-        }
-
-        private static IApplicationBuilder ConfigureRepositories(IApplicationBuilder app)
-        {
-            var oauthUserRepository = app.ApplicationServices.GetRequiredService<IOAuthUserCommandRepository>();
-            var oauthClientRepository = app.ApplicationServices.GetRequiredService<IOAuthClientCommandRepository>();
-            var oauthScopeRepository = app.ApplicationServices.GetRequiredService<IOAuthScopeCommandRepository>();
-            foreach (var user in DefaultConfiguration.Users)
-            {
-                oauthUserRepository.Add(user);
-            }
-
-            foreach (var client in DefaultConfiguration.Clients)
-            {
-                oauthClientRepository.Add(client);
-            }
-
-            foreach (var scope in DefaultConfiguration.Scopes)
-            {
-                oauthScopeRepository.Add(scope);
-            }
-
-            return app;
         }
 
         private static void HandleCustomJwks(IApplicationBuilder app)

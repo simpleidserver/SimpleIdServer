@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Api.Authorization;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Users;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OAuth.Persistence.Users;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
@@ -79,7 +79,7 @@ namespace SimpleIdServer.OpenID.UI
                 return View(new ConsentsIndexViewModel(
                     oauthClient.ClientNames.GetTranslation(defaultLanguage, oauthClient.ClientId),
                     returnUrl,
-                    oauthClient.AllowedScopes.Where(c => scopes.Contains(c.Name)).Select(s => s.Descriptions.GetTranslation(defaultLanguage, s.Name)),
+                    oauthClient.AllowedScopes.Where(c => scopes.Contains(c.Name)).Select(s => s.Name),
                     claimDescriptions,
                     cancellationUrl));
             }

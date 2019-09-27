@@ -222,4 +222,22 @@
   <data name="unknown_user" xml:space="preserve">
     <value>User is unknown</value>
   </data>
+  <data name="scope_address" xml:space="preserve">
+    <value>Access to the address</value>
+  </data>
+  <data name="scope_email" xml:space="preserve">
+    <value>Access to the email</value>
+  </data>
+  <data name="scope_offline_access" xml:space="preserve">
+    <value>Offline access</value>
+  </data>
+  <data name="scope_openid" xml:space="preserve">
+    <value>Access to user identifier</value>
+  </data>
+  <data name="scope_phone" xml:space="preserve">
+    <value>Access to the phone</value>
+  </data>
+  <data name="scope_profile" xml:space="preserve">
+    <value>Access to the profile</value>
+  </data>
 </root>

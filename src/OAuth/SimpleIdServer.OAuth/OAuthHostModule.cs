@@ -10,7 +10,7 @@ namespace SimpleIdServer.OAuth
         public string Name => "OAuthHostModule";
         public void Register(IServiceCollection services)
         {
-            services.AddOauth();
+            services.AddSIDOAuth();
         }
     }
 }

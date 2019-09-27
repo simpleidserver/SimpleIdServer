@@ -1,11 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
 
@@ -83,18 +80,13 @@ namespace $rootnamespace$
             new OAuthScope
             {
                 Name = "scope1",
-                Descriptions = new List<OAuthTranslation>
-                {
-                    new OAuthTranslation("scope_scope1", "Access to scope1", "en"),
-                    new OAuthTranslation("scope_scope1", "Accéder au scope1", "fr"),
-                },
                 IsExposedInConfigurationEdp = true
             }
         };
 
-        public static List<OAuthClient> Clients => new List<OAuthClient>
+        public static List<OpenIdClient> Clients => new List<OpenIdClient>
         {
-            new OAuthClient
+            new OpenIdClient
             {
                 ClientId = "f3d35cce-de69-45bf-958c-4a8796f8ed37",
                 Secrets = new List<ClientSecret>
@@ -112,16 +104,11 @@ namespace $rootnamespace$
                 CreateDateTime = DateTime.UtcNow,
                 TokenExpirationTimeInSeconds = 60 * 30,
                 RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                AllowedScopes = new List<OAuthScope>
+                AllowedScopes = new List<OpenIdScope>
                 {
-                    new OAuthScope
+                    new OpenIdScope
                     {
-                        Name = "scope1",
-                        Descriptions = new List<OAuthTranslation>
-                        {
-                            new OAuthTranslation("scope_scope1", "Access to scope1", "en"),
-                            new OAuthTranslation("scope_scope1", "Accéder au scope1", "fr"),
-                        }
+                        Name = "scope1"
                     }
                 },
                 GrantTypes = new List<string>
@@ -131,11 +118,6 @@ namespace $rootnamespace$
                     "authorization_code"
                 },
                 RedirectionUrls = new List<string>
-                {
-                    "http://localhost:8080",
-                    "http://localhost:1700"
-                },
-                PostLogoutRedirectUris = new List<string>
                 {
                     "http://localhost:8080",
                     "http://localhost:1700"

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Configuration
 {
-    [Route(Constants.EndPoints.OpenIDConfiguration)]
+    [Route(SIDOpenIdConstants.EndPoints.OpenIDConfiguration)]
     public class ConfigurationController : OAuth.Api.Configuration.ConfigurationController
     {
         private readonly IEnumerable<ICEKHandler> _cekHandlers;
@@ -34,7 +34,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var result = await Build();
-            result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{Constants.EndPoints.UserInfo}");
+            result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{SIDOpenIdConstants.EndPoints.UserInfo}");
             result.Add(OpenIDConfigurationNames.RequestParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestUriParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestObjectEncryptionAlgValuesSupported, JArray.FromObject(_cekHandlers.Select(r => r.AlgName)));

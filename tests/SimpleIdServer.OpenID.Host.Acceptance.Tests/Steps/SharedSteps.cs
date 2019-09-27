@@ -7,12 +7,11 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Jwks;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,7 +82,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             var claims = claim.Split(' ').Select(s =>
             {
                 var splitted = s.Split('=');
-                return new OAuthClaim(splitted.First());
+                return splitted.First();
             });
             oauthUser.Consents.Add(new OAuthConsent
             {
@@ -485,8 +484,8 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
 
             var clientRepository = (IOAuthClientQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthClientQueryRepository));
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var oauthClient = await clientRepository.FindOAuthClientById(clientId);
-            return await jwtBuilder.BuildIdentityToken(oauthClient, accessTokenPayload);
+            var oauthClient = (OpenIdClient)await clientRepository.FindOAuthClientById(clientId);
+            return await jwtBuilder.BuildClientToken(oauthClient, accessTokenPayload, oauthClient.IdTokenSignedResponseAlg, oauthClient.IdTokenEncryptedResponseAlg, oauthClient.IdTokenEncryptedResponseEnc);
         }
 
         private static bool CheckJson(string str)

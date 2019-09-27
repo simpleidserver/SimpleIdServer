@@ -56,7 +56,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
             var authCode = _grantedTokenHelper.BuildAuthorizationCode(jwsPayload);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
-            var isScopeCOntainsOfflineAccess = scopes.Contains(DTOs.OpenIDScopes.OfflineAccess);
+            var isScopeCOntainsOfflineAccess = scopes.Contains(SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeCOntainsOfflineAccess)
             {
                 _tokenBuilders.First(t => t.Name == SimpleIdServer.OAuth.DTOs.TokenResponseParameters.RefreshToken).Build(context.Request.QueryParameters.GetScopesFromAuthorizationRequest(), context, dic);

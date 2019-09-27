@@ -219,4 +219,22 @@
   <data name="unknown_user" xml:space="preserve">
     <value>L'utilisateur est inconnu</value>
   </data>
+  <data name="scope_address" xml:space="preserve">
+    <value>Accéder à l'adresse</value>
+  </data>
+  <data name="scope_email" xml:space="preserve">
+    <value>Accéder à l'email</value>
+  </data>
+  <data name="scope_offline_access" xml:space="preserve">
+    <value>Accéder en hors ligne</value>
+  </data>
+  <data name="scope_openid" xml:space="preserve">
+    <value>Accéder à l'identifiant de l'utilisateur</value>
+  </data>
+  <data name="scope_phone" xml:space="preserve">
+    <value>Accéder au téléphone</value>
+  </data>
+  <data name="scope_profile" xml:space="preserve">
+    <value>Accéder au profil</value>
+  </data>
 </root>

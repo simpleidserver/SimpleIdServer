@@ -1,20 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
-using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
-using System.Collections.Generic;
 
 namespace SimpleIdServer.OpenID.Options
 {
-    public class OpenIDHostOptions
+    public class OpenIDHostOptions : OAuthHostOptions
     {
-        public OpenIDHostOptions()
+        public OpenIDHostOptions() : base()
         {
             DefaultSubjectType = PublicSubjectTypeBuilder.SUBJECT_TYPE;
             DefaultMaxAge = null;
             DefaultAcrValue = "sid-load-01";
-            DefaultAuthenticationContextClassReferences = new List<AuthenticationContextClassReference>();
             AuthenticationScheme = "MultiAccount";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
         }
@@ -39,9 +37,5 @@ namespace SimpleIdServer.OpenID.Options
         /// Authentication scheme.
         /// </summary>
         public string AuthenticationScheme { get; set; }
-        /// <summary>
-        /// OPENID default ACRS.
-        /// </summary>
-        public List<AuthenticationContextClassReference> DefaultAuthenticationContextClassReferences { get; set; }
     }
 }

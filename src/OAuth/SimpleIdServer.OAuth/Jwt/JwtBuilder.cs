@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Jwks;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Infrastructures;
+using SimpleIdServer.OAuth.Persistence;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +15,6 @@ namespace SimpleIdServer.OAuth.Jwt
     public interface IJwtBuilder
     {
         Task<string> BuildAccessToken(OAuthClient client, JwsPayload jwsPayload);
-        Task<string> BuildIdentityToken(OAuthClient client, JwsPayload jwsPayload);
         Task<string> BuildClientToken(OAuthClient client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc);
         Task<string> Sign(JwsPayload jwsPayload, string jwsAlg);
         string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey);
@@ -42,11 +41,6 @@ namespace SimpleIdServer.OAuth.Jwt
         public Task<string> BuildAccessToken(OAuthClient client, JwsPayload jwsPayload)
         {
             return BuildClientToken(client, jwsPayload, client.TokenSignedResponseAlg, client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc);
-        }
-
-        public Task<string> BuildIdentityToken(OAuthClient client, JwsPayload jwsPayload)
-        {
-            return BuildClientToken(client, jwsPayload, client.IdTokenSignedResponseAlg, client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc);
         }
 
         public async Task<string> BuildClientToken(OAuthClient client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc)

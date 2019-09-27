@@ -5,10 +5,10 @@ using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
-using SimpleIdServer.OAuth.Domains.Clients;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
@@ -34,6 +34,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         public async Task Validate(HandlerContext context)
         {
+            var openidClient = (OpenIdClient)context.Client;
             var clientId = context.Request.QueryParameters.GetClientIdFromAuthorizationRequest();
             var scopes = context.Request.QueryParameters.GetScopesFromAuthorizationRequest();
             var acrValues = context.Request.QueryParameters.GetAcrValuesFromAuthorizationRequest();
@@ -42,12 +43,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
             }
 
-            if (!scopes.Contains("openid"))
+            if (!scopes.Contains(SIDOpenIdConstants.StandardScopes.OpenIdScope.Name))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.OPENID_SCOPE_MISSING);
             }
 
-            var unsupportedScopes = scopes.Where(s => s != "openid" && !context.Client.AllowedScopes.Any(sc => sc.Name == s));
+            var unsupportedScopes = scopes.Where(s => s != SIDOpenIdConstants.StandardScopes.OpenIdScope.Name && !context.Client.AllowedScopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
@@ -55,7 +56,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (context.User == null)
             {
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, context.Client));
+                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
             }
 
             if (!await CheckRequestParameter(context))
@@ -77,12 +78,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             {
                 if (DateTime.UtcNow > context.Request.AuthDateTime.Value.AddSeconds(maxAge.Value))
                 {
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, context.Client));
+                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
                 }
             }
-            else if (context.Client.DefaultMaxAge != null && DateTime.UtcNow > context.Request.AuthDateTime.Value.AddSeconds(context.Client.DefaultMaxAge.Value))
+            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.Request.AuthDateTime.Value.AddSeconds(openidClient.DefaultMaxAge.Value))
             {
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, context.Client));
+                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
             }
 
             if (string.IsNullOrWhiteSpace(idTokenHint) && prompt == PromptParameters.None)
@@ -107,7 +108,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             switch (prompt)
             {
                 case PromptParameters.Login:
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, context.Client));
+                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
                 case PromptParameters.Consent:
                     throw new OAuthUserConsentRequiredException();
                 case PromptParameters.SelectAccount :
@@ -165,6 +166,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         private async Task<bool> CheckRequest(HandlerContext context, string request)
         {
+            var openidClient = (OpenIdClient)context.Client;
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
@@ -190,7 +192,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
-            if (header.Alg != context.Client.RequestObjectSigningAlg)
+            if (header.Alg != openidClient.RequestObjectSigningAlg)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SIGNATURE_ALG);
             }
@@ -242,7 +244,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             return true;
         }
 
-        private async Task<string> GetFirstAmr(IEnumerable<string> acrValues, OAuthClient client)
+        private async Task<string> GetFirstAmr(IEnumerable<string> acrValues, OpenIdClient client)
         {
             var acr = await _amrHelper.FetchDefaultAcr(acrValues, client);
             if (acr == null)

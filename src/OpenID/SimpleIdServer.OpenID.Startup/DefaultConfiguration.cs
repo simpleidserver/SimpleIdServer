@@ -1,11 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OpenID.Domains.ACRs;
+using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
 
@@ -51,10 +48,10 @@ namespace SimpleIdServer.OpenID.Startup
                 },
                 Claims = new Dictionary<string, string>
                 {
-                    { Jwt.Constants.UserClaims.Subject, "administrator" },
-                    { Jwt.Constants.UserClaims.Name, "Administrator" },
-                    { Jwt.Constants.UserClaims.Email, "administrator@hotmail.fr" },
-                    { Jwt.Constants.UserClaims.PhoneNumber, "01" }
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator" },
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Administrator" },
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Email, "administrator@hotmail.fr" },
+                    { SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "01" }
                 }
             },
             new OAuthUser
@@ -70,10 +67,10 @@ namespace SimpleIdServer.OpenID.Startup
                 },
                 Claims = new Dictionary<string, string>
                 {
-                    { Jwt.Constants.UserClaims.Subject, "thabart" },
-                    { Jwt.Constants.UserClaims.Name, "Thierry Habart" },
-                    { Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr" },
-                    { Jwt.Constants.UserClaims.PhoneNumber, "02" }
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "thabart" },
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart" },
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr" },
+                    { SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "02" }
                 }
             }
         };
@@ -83,18 +80,13 @@ namespace SimpleIdServer.OpenID.Startup
             new OAuthScope
             {
                 Name = "scope1",
-                Descriptions = new List<OAuthTranslation>
-                {
-                    new OAuthTranslation("scope_scope1", "Access to scope1", "en"),
-                    new OAuthTranslation("scope_scope1", "Accéder au scope1", "fr"),
-                },
                 IsExposedInConfigurationEdp = true
             }
         };
 
-        public static List<OAuthClient> Clients => new List<OAuthClient>
+        public static List<OpenIdClient> Clients => new List<OpenIdClient>
         {
-            new OAuthClient
+            new OpenIdClient
             {
                 ClientId = "f3d35cce-de69-45bf-958c-4a8796f8ed37",
                 Secrets = new List<ClientSecret>
@@ -112,16 +104,11 @@ namespace SimpleIdServer.OpenID.Startup
                 CreateDateTime = DateTime.UtcNow,
                 TokenExpirationTimeInSeconds = 60 * 30,
                 RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                AllowedScopes = new List<OAuthScope>
+                AllowedScopes = new List<OpenIdScope>
                 {
-                    new OAuthScope
+                    new OpenIdScope
                     {
-                        Name = "scope1",
-                        Descriptions = new List<OAuthTranslation>
-                        {
-                            new OAuthTranslation("scope_scope1", "Access to scope1", "en"),
-                            new OAuthTranslation("scope_scope1", "Accéder au scope1", "fr"),
-                        }
+                        Name = "scope1"
                     }
                 },
                 GrantTypes = new List<string>
@@ -131,11 +118,6 @@ namespace SimpleIdServer.OpenID.Startup
                     "authorization_code"
                 },
                 RedirectionUrls = new List<string>
-                {
-                    "http://localhost:8080",
-                    "http://localhost:1700"
-                },
-                PostLogoutRedirectUris = new List<string>
                 {
                     "http://localhost:8080",
                     "http://localhost:1700"

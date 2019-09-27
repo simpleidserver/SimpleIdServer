@@ -1,9 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains.Clients;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +24,7 @@ namespace SimpleIdServer.OAuth.Authenticate
         private readonly IOAuthClientQueryRepository _oauthClientRepository;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _handlers;
 
-        public AuthenticateClient(IJwsGenerator jwsGenerator, IJwtParser jwtParser, IOAuthClientQueryRepository oauthClientRepository,
-            IEnumerable<IOAuthClientAuthenticationHandler> handlers)
+        public AuthenticateClient(IJwsGenerator jwsGenerator, IJwtParser jwtParser, IOAuthClientQueryRepository oauthClientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers)
         {
             _jwsGenerator = jwsGenerator;
             _jwtParser = jwtParser;
@@ -51,7 +51,7 @@ namespace SimpleIdServer.OAuth.Authenticate
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             }
 
-            if (isAuthorizationCodeGrantType && client.RequirePkce)
+            if (isAuthorizationCodeGrantType)
             {
                 return client;
             }

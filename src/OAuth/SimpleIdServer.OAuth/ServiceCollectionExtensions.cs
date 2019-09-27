@@ -1,9 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.Jwt.Jwe.CEKHandlers;
 using SimpleIdServer.Jwt.Jws;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
@@ -19,21 +20,31 @@ using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Authenticate;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Jwks;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OAuth.Persistence.InMemory;
+using SimpleIdServer.OAuth.Persistence.Users;
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 
-namespace SimpleIdServer.OAuth
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddOauth(this IServiceCollection services)
+        /// <summary>
+        /// Register OAUTH2.0 dependencies.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static SimpleIdServerOAuthBuilder AddSIDOAuth(this IServiceCollection services)
         {
+            services.AddMvc();
+            services.AddDataProtection();
             services.AddOAuthStore()
                 .AddResponseModeHandlers()
                 .AddOAuthClientAuthentication()
@@ -51,7 +62,19 @@ namespace SimpleIdServer.OAuth
             {
                 policy.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
             });
-            return services;
+            return new SimpleIdServerOAuthBuilder(services);
+        }
+
+        /// <summary>
+        /// Register OAUTH2.0 dependencies.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static SimpleIdServerOAuthBuilder AddSIDOAuth(this IServiceCollection services, Action<OAuthHostOptions> options)
+        {
+            services.Configure(options);
+            return services.AddSIDOAuth();
         }
 
         private static IServiceCollection AddResponseModeHandlers(this IServiceCollection services)
@@ -66,46 +89,43 @@ namespace SimpleIdServer.OAuth
 
         private static IServiceCollection AddOAuthStore(this IServiceCollection services)
         {
-            services.AddSingleton<IJsonWebKeyQueryRepository>(o =>
+            var jwsGenerator = new JwsGeneratorFactory().BuildJwsGenerator();
+            JsonWebKey sigJsonWebKey;
+            JsonWebKey encJsonWebKey;
+            using (var rsa = RSA.Create())
             {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultJsonWebKeyQueryRepository(opt.Value.DefaultJsonWebKeys);
-            });
-            services.AddSingleton<IJsonWebKeyCommandRepository>(o =>
+                sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
+                {
+                    KeyOperations.Sign,
+                    KeyOperations.Verify
+                }).SetAlg(rsa, "RS256").Build();
+            }
+
+            using (var rsa = RSA.Create())
             {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultJsonWebKeyCommandRepository(opt.Value.DefaultJsonWebKeys);
-            });
-            services.AddSingleton<IOAuthClientQueryRepository>(o =>
+                encJsonWebKey = new JsonWebKeyBuilder().NewSign("2", new[]
+                {
+                    KeyOperations.Encrypt,
+                    KeyOperations.Decrypt
+                }).SetAlg(rsa, RSAOAEPCEKHandler.ALG_NAME).Build();
+            }
+
+            var jsonWebKeys = new List<JsonWebKey>
             {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultOAuthClientRepository(opt.Value.DefaultOAuthClients);
-            });
-            services.AddSingleton<IOAuthClientCommandRepository>(o =>
-            {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultOAuthClientCommandRepository(opt.Value.DefaultOAuthClients);
-            });
-            services.AddSingleton<IOAuthUserQueryRepository>(o =>
-            {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultOAuthUserQueryRepository(opt.Value.DefaultUsers);
-            });
-            services.AddSingleton<IOAuthUserCommandRepository>(o =>
-            {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultOAuthUserCommandRepository(opt.Value.DefaultUsers);
-            });
-            services.AddSingleton<IOAuthScopeQueryRepository>(o =>
-            {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultOAuthScopeQueryRepository(opt.Value.DefaultOAuthScopes);
-            });
-            services.AddSingleton<IOAuthScopeCommandRepository>(o =>
-            {
-                var opt = o.GetService<IOptions<OAuthHostOptions>>();
-                return new DefaultOAuthScopeCommandRepository(opt.Value.DefaultOAuthScopes);
-            });
+                sigJsonWebKey,
+                encJsonWebKey
+            };
+            var clients = new List<OAuthClient>();
+            var users = new List<OAuthUser>();
+            var scopes = new List<OAuthScope>();
+            services.TryAddSingleton<IJsonWebKeyQueryRepository>(new DefaultJsonWebKeyQueryRepository(jsonWebKeys));
+            services.TryAddSingleton<IJsonWebKeyCommandRepository>(new DefaultJsonWebKeyCommandRepository(jsonWebKeys));
+            services.TryAddSingleton<IOAuthClientQueryRepository>(new DefaultOAuthClientQueryRepository(clients));
+            services.TryAddSingleton<IOAuthClientCommandRepository>(new DefaultOAuthClientCommandRepository(clients));
+            services.TryAddSingleton<IOAuthUserQueryRepository>(new DefaultOAuthUserQueryRepository(users));
+            services.TryAddSingleton<IOAuthUserCommandRepository>(new DefaultOAuthUserCommandRepository(users));
+            services.TryAddSingleton<IOAuthScopeQueryRepository>(new DefaultOAuthScopeQueryRepository(scopes));
+            services.TryAddSingleton<IOAuthScopeCommandRepository>(new DefaultOAuthScopeCommandRepository(scopes));
             return services;
         }
 
@@ -117,7 +137,6 @@ namespace SimpleIdServer.OAuth
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretPostAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsAuthenticationHandler>();
             return services;
         }
 

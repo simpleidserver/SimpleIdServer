@@ -2,8 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Authorization;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
@@ -35,7 +34,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
                 {
                     Name = s
                 }),
-                Claims = claims.Select(c => new OAuthClaim(c.Name))
+                Claims = claims.Select(c => c.Name)
             };
         }
     }

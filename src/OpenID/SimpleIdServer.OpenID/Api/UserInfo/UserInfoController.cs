@@ -5,15 +5,14 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
-using SimpleIdServer.OAuth.Domains.Clients;
-using SimpleIdServer.OAuth.Domains.Scopes;
-using SimpleIdServer.OAuth.Domains.Users;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using System.Collections.Generic;
@@ -24,7 +23,7 @@ using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Api.UserInfo
 {
-    [Route(Constants.EndPoints.UserInfo)]
+    [Route(SIDOpenIdConstants.EndPoints.UserInfo)]
     public class UserInfoController : Controller
     {
         private readonly IJwtParser _jwtParser;
@@ -74,13 +73,13 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.INVALID_AUDIENCE);
                 }
 
-                var oauthClient = filteredClients.First();
+                var oauthClient = (OpenIdClient)filteredClients.First();
                 if (!user.HasOpenIDConsent(oauthClient.ClientId, scopes, claims, AuthorizationRequestClaimTypes.UserInfo))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
                 }
 
-                var oauthScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes);
+                var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes)).Cast<OpenIdScope>();
                 var payload = new JwsPayload
                 {
                     { UserClaims.Subject, user.Id },

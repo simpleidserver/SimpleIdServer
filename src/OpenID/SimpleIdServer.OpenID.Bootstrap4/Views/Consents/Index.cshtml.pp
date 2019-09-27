@@ -3,9 +3,8 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
- ViewBag.Title = Global.consents;
+	ViewBag.Title = Global.consents;
 }
-
 
 @using (Html.BeginForm("Index", "Consents", FormMethod.Post))
 {
@@ -32,9 +31,9 @@
         <div class="card-body">
             <h5 class="card-title">@Global.scopes</h5>
             <ul class="list-group">
-                @foreach (var scope in Model.ScopeDescriptions)
+                @foreach (var scopeName in Model.ScopeNames)
                 {
-                    <li class="list-group-item">@scope</li>
+                    <li class="list-group-item">@Global.ResourceManager.GetString($"scope_{scopeName}")</li>
                 }
             </ul>
             <h5 class="card-title">@Global.claims</h5>

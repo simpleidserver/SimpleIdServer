@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains.Clients;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace SimpleIdServer.OpenID.ClaimsEnrichers
             _jwtParser = jwtParser;
         }
 
-        public async Task Enrich(JwsPayload jwsPayload, OAuthClient client)
+        public async Task Enrich(JwsPayload jwsPayload, OpenIdClient client)
         {
             var subject = jwsPayload.GetClaimValue(Jwt.Constants.UserClaims.Subject);
             using (var httpClient = new HttpClient())
@@ -51,7 +51,7 @@ namespace SimpleIdServer.OpenID.ClaimsEnrichers
                     if (kvp.Value.Any(v => v.Contains("application/json")))
                     {
                         jObj = JsonConvert.DeserializeObject<JwsPayload>(json);
-                        jwt = await _jwtBuilder.BuildIdentityToken(client, jObj);
+                        jwt = await _jwtBuilder.BuildClientToken(client, jObj, client.IdTokenSignedResponseAlg, client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc);
                     }
                     else if (kvp.Value.Any(v => v.Contains("application/jwt")))
                     {

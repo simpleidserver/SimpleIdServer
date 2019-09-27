@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,9 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Infrastructures;
-using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Host.Acceptance.Tests.Middlewares;
 using System;
 using System.Collections.Generic;
@@ -25,15 +24,10 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<OAuthHostOptions>(a =>
-            {
-                a.DefaultOAuthScopes = DefaultConfiguration.Scopes;
-                a.DefaultUsers = DefaultConfiguration.Users;
-            });
-            services.AddModule();
-            // ConfigureDistributedClaims(services);
-            // ConfigureAggregateClaimsSource(services);
-            services.AddLogging();
+            services.AddSIDOpenID()
+                .AddScopes(DefaultConfiguration.Scopes)
+                .AddUsers(DefaultConfiguration.Users)
+                .AddJsonWebKeys(new List<Jwt.JsonWebKey>());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCustomAuthentication(opts =>
                 {
@@ -48,19 +42,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseAuthentication();
-            app.UseModule();
-        }
-
-        private static void ConfigureDistributedClaims(IServiceCollection services)
-        {
-            services.AddAggregateHttpClaimsSource(new AggregateHttpClaimsSourceOptions("posts", "https://samples.openweathermap.org/data/2.5/weather?q=London,uk&appid=b6907d289e10d714a6e88b30761fae22"));
-        }
-
-        private static void ConfigureAggregateClaimsSource(IServiceCollection services)
-        {
-            services.AddDistributeHttpClaimsSource(new ClaimsEnrichers.DistributeHttpClaimsSourceOptions("name_1", "url_1", "apitoken_1", new[] { "str1" }));
-            services.AddDistributeHttpClaimsSource(new ClaimsEnrichers.DistributeHttpClaimsSourceOptions("name_2", "url_2", "apitoken_2", new[] { "str2" }));
+            app.UseSID();
         }
 
         private static void ConfigureClient(IServiceCollection services)

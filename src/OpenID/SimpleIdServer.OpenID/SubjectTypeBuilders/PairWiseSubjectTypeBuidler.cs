@@ -4,6 +4,7 @@ using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Infrastructures;
+using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -26,17 +27,18 @@ namespace SimpleIdServer.OpenID.SubjectTypeBuilders
 
         public async Task<string> Build(HandlerContext context)
         {
+            var openidClient = (OpenIdClient)context.Client;
             var redirectUri = context.Request.QueryParameters.GetRedirectUriFromAuthorizationRequest();
             var url = redirectUri;
-            var sectorIdentifierUrls = await context.Client.GetSectorIdentifierUrls(_httpClientFactory);
+            var sectorIdentifierUrls = await openidClient.GetSectorIdentifierUrls(_httpClientFactory);
             if (sectorIdentifierUrls.Contains(url))
             {
-                url = context.Client.SectorIdentifierUri;
+                url = openidClient.SectorIdentifierUri;
             }
 
             var uri = new Uri(url);
             var host = uri.Host;
-            var str = $"{host}{context.User.Id}{context.Client.PairWiseIdentifierSalt}";
+            var str = $"{host}{context.User.Id}{openidClient.PairWiseIdentifierSalt}";
             using (var sha256 = SHA256.Create())
             {
                 return sha256.ComputeHash(Encoding.UTF8.GetBytes(str)).Base64EncodeBytes();
