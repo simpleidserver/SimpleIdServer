@@ -75,15 +75,6 @@ namespace $rootnamespace$
             }
         };
 
-        public static ICollection<OAuthScope> Scopes => new List<OAuthScope>
-        {
-            new OAuthScope
-            {
-                Name = "scope1",
-                IsExposedInConfigurationEdp = true
-            }
-        };
-
         public static List<OpenIdClient> Clients => new List<OpenIdClient>
         {
             new OpenIdClient
@@ -108,7 +99,7 @@ namespace $rootnamespace$
                 {
                     new OpenIdScope
                     {
-                        Name = "scope1"
+                        Name = SimpleIdServer.OpenID.SIDOpenIdConstants.StandardScopes.Profile.Name
                     }
                 },
                 GrantTypes = new List<string>

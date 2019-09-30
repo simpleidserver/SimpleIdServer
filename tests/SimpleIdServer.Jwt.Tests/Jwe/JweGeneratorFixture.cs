@@ -15,14 +15,13 @@ namespace SimpleIdServer.Jwt.Tests.Jwe
         [Fact]
         public void When_Build_Jwe_Then_Can_Decrypt_Into_Jws()
         {
-            // https://github.com/dvsekhvalnov/jose-jwt/search?q=A192CBC_HS384&unscoped_q=A192CBC_HS384
             const string payload = "xml";
             // ARRANGE
             InitializeFakeObjects();
             JsonWebKey rsaJsonWebKey;
             using (var rsa = RSA.Create())
             {
-                rsaJsonWebKey = new JsonWebKeyBuilder().NewSign("keyId", new[]
+                rsaJsonWebKey = new JsonWebKeyBuilder().NewEnc("keyId", new[]
                 {
                     KeyOperations.Encrypt
                 }).SetAlg(rsa, RSAOAEPCEKHandler.ALG_NAME).Build();

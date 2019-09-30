@@ -13,8 +13,17 @@ namespace SimpleIdServer.OpenID.Domains
             AuthenticationMethodReferences = new List<string>();
         }
 
+        /// <summary>
+        /// Name of the Authentication Context Reference.
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Human-readable Authentication Context Reference.
+        /// </summary>
         public string DisplayName { get; set; }
+        /// <summary>
+        /// Array of strings that specifies the authentication methods.
+        /// </summary>
         public IEnumerable<string> AuthenticationMethodReferences { get; set; }
 
         public object Clone()

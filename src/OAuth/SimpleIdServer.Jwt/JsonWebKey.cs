@@ -92,7 +92,7 @@ namespace SimpleIdServer.Jwt
         private static IEnumerable<KeyOperations> PUBLIC_KEY_OPERATIONS = new[]
         {
             KeyOperations.Verify,
-            KeyOperations.Decrypt,
+            KeyOperations.Encrypt,
             KeyOperations.UnWrapKey,
             KeyOperations.DeriveBits
         };

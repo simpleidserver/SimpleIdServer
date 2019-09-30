@@ -16,6 +16,9 @@ namespace SimpleIdServer.OpenID.Domains
             Claims = new List<string>();
         }
 
+        /// <summary>
+        /// Array of strings that specifies the claims.
+        /// </summary>
         public ICollection<string> Claims { get; set; }
 
         public override object Clone()

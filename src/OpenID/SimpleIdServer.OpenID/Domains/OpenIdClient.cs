@@ -18,7 +18,7 @@ namespace SimpleIdServer.OpenID.Domains
         }
 
         /// <summary>
-        /// Gets or sets the type of application
+        /// Kind of the application. The default, if omitted, is web. The defined values are “native” or “web”. 
         /// </summary>
         public string ApplicationType { get; set; }
 
@@ -33,67 +33,67 @@ namespace SimpleIdServer.OpenID.Domains
         public string IdTokenEncryptedResponseEnc { get; set; }
 
         /// <summary>
-        /// Content encryption algorithm used perform authenticated encryption on the JWS identity token.
+        /// Cryptographic algorithm used to secure the JWS identity token. 
         /// </summary>
         public string IdTokenSignedResponseAlg { get; set; }
 
         /// <summary>
-        /// Gets or sets the user info signed response algorithm
+        /// Required for signing UserInfo responses.
         /// </summary>
         public string UserInfoSignedResponseAlg { get; set; }
 
         /// <summary>
-        /// Gets or sets the user info encrypted response algorithm
+        /// Required for encrypting the identity token issued to this client.
         /// </summary>
         public string UserInfoEncryptedResponseAlg { get; set; }
 
         /// <summary>
-        /// Gets or sets the user info encrypted response enc
+        /// Required for encrypting the identity token issued to this client.
         /// </summary>
         public string UserInfoEncryptedResponseEnc { get; set; }
 
         /// <summary>
-        /// Gets or sets the request objects signing algorithm
+        /// Must be used for signing Request Objects sent to the OpenID provider.
         /// </summary>
         public string RequestObjectSigningAlg { get; set; }
 
         /// <summary>
-        /// Gets or sets the request object encryption algorithm
+        /// JWE alg algorithm the relying party is declaring that it may use for encrypting Request Objects sent to the OpenID provider
         /// </summary>
         public string RequestObjectEncryptionAlg { get; set; }
 
         /// <summary>
-        /// Gets or sets the request object encryption enc
+        /// JWE enc algorithm the relying party is declaring that it may use for encrypting request objects sent to the OpenID provider.
         /// </summary>
         public string RequestObjectEncryptionEnc { get; set; }
 
         /// <summary>
-        /// Gets or sets the subject type
+        /// subject_type requested for responses to this client. Possible values are “pairwise” or “public”.
         /// </summary>
         public string SubjectType { get; set; }
 
         /// <summary>
-        /// Gets or sets the default max age
+        /// Default Maximum Authentication Age.
         /// </summary>
         public double? DefaultMaxAge { get; set; }
 
         /// <summary>
-        /// Gets or sets the default acr values
+        /// Default requested Authentication Context Class Reference values.
         /// </summary>
         public ICollection<string> DefaultAcrValues { get; set; }
 
         /// <summary>
-        /// Gets or sets the require authentication time
+        /// Default requested Authentication Context Class Reference values.
         /// </summary>
         public bool RequireAuthTime { get; set; }
 
         /// <summary>
-        /// Get or set the sector identifier uri
+        /// URI using the HTTPS scheme to be used in calculating Pseudonymous Identifiers by the OpenID provider.
         /// </summary>
         public string SectorIdentifierUri { get; set; }
 
         /// <summary>
-        /// Get or set the pair wise salt.
+        /// SALT used to calculate the pairwise.
         /// </summary>
         public string PairWiseIdentifierSalt { get; set; }
 

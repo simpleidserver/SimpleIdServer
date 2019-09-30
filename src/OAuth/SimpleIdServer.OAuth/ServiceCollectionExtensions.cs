@@ -103,7 +103,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             using (var rsa = RSA.Create())
             {
-                encJsonWebKey = new JsonWebKeyBuilder().NewSign("2", new[]
+                encJsonWebKey = new JsonWebKeyBuilder().NewEnc("2", new[]
                 {
                     KeyOperations.Encrypt,
                     KeyOperations.Decrypt

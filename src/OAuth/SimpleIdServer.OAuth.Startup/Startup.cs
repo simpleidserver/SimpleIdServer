@@ -17,8 +17,8 @@ namespace SimpleIdServer.OAuth.Startup
             {
                 o.ClientSecretExpirationInSeconds = 2;
             })
-                .AddClients(DefaultConfiguration.Clients)
-                .AddScopes(DefaultConfiguration.Scopes);
+            .AddClients(DefaultConfiguration.Clients)
+            .AddScopes(DefaultConfiguration.Scopes);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
