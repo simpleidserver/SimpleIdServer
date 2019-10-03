@@ -36,10 +36,13 @@ namespace SimpleIdServer.Scim
                     .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                     .AddComplexAttribute("name", c =>
                     {
-                        c.AddStringAttribute("formatted");
-                        c.AddStringAttribute("familyName");
-                        c.AddStringAttribute("givenName");
-                    }, mutability: SCIMSchemaAttributeMutabilities.WRITEONLY)
+                        c.AddStringAttribute("formatted", description: "The full name");
+                        c.AddStringAttribute("familyName", description: "The family name");
+                        c.AddStringAttribute("givenName", description: "The given name");
+                    }, description: "The components of the user's real name.")
+                    .AddComplexAttribute("groups", opt => {
+                        opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                    }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                     .Build()
             };
             public static SCIMSchema ErrorSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:Error", "Error", "SCIM errors")

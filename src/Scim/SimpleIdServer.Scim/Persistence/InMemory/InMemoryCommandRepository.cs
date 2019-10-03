@@ -28,6 +28,12 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return true;
         }
 
+        public bool Delete(T data)
+        {
+            _lstData.Remove(_lstData.First(l => l.Equals(data)));
+            return true;
+        }
+
         public Task<int> SaveChanges()
         {
             return Task.FromResult(1);

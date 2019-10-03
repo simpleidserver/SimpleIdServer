@@ -43,6 +43,7 @@ task compile -depends clean {
 }
 
 task pack -depends compile {
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -69,6 +70,14 @@ task test {
     }
 
     Push-Location -Path $base_dir\tests\SimpleIdServer.OpenID.Host.Acceptance.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.Scim.Host.Acceptance.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }

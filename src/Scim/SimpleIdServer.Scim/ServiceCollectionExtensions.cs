@@ -5,23 +5,43 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.InMemory;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSIDScim(this IServiceCollection services)
+        /// <summary>
+        /// Register SCIM dependencies.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services)
         {
+            var builder = new SimpleIdServerSCIMBuilder(services);
             services.AddMvc();
             services.AddCommandHandlers()
                 .AddSCIMRepository();
-            return services;
+            return builder;
+        }
+
+        /// <summary>
+        /// Register SCIM dependencies.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static SimpleIdServerSCIMBuilder AddSIDOpenID(this IServiceCollection services, Action<SCIMHostOptions> options)
+        {
+            services.Configure(options);
+            return services.AddSIDScim();
         }
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
         {
             services.AddTransient<IAddRepresentationCommandHandler, AddRepresentationCommandHandler>();
+            services.AddTransient<IDeleteRepresentationCommandHandler, DeleteRepresentationCommandHandler>();
             services.AddTransient<ISCIMRepresentationHelper, SCIMRepresentationHelper>();
             return services;
         }

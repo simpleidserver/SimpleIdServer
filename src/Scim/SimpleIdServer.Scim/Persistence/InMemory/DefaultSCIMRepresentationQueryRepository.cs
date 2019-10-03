@@ -19,6 +19,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(_representations.FirstOrDefault(r => r.Id == representationId));
         }
 
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
+        {
+            return Task.FromResult(_representations.FirstOrDefault(r => r.Id == representationId && r.ResourceType == resourceType));
+        }
+
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, string value, string endpoint = null)
         {
             return Task.FromResult(_representations.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == attributeId && a.ValuesString.Contains(value))));

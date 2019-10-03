@@ -50,3 +50,23 @@ Scenario: Error is returned when trying to add two resources with the same uniqu
 	Then JSON 'response.status'='409'
 	Then JSON 'response.scimType'='uniqueness'
 	Then JSON 'response.detail'='One or more of the attribute values are already in use or are reserved.'
+
+Scenario: Error is returned when the user doesn't exist
+	When execute HTTP GET request 'http://localhost/Users/1'
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '404'
+	Then JSON 'status'='404'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.detail'='Resource 1 not found.'
+
+Scenario: Error is returned when trying to remove an unknown user
+	When execute HTTP DELETE request 'http://localhost/Users/1'
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '404'
+	Then JSON 'status'='404'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.detail'='Resource 1 not found.'

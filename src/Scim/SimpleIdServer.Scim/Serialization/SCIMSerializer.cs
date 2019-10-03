@@ -37,10 +37,16 @@ namespace SimpleIdServer.Scim.Serialization
                     continue;
                 }
 
+                var obj = property.GetValue(instance);
+                if (obj == null || string.IsNullOrWhiteSpace(obj.ToString()))
+                {
+                    continue;
+                }
+
                 var propAttr = (SCIMSchemaPropertyAttribute)properties.First();
                 if (property.PropertyType.IsGenericType && typeof(ICollection<>).IsAssignableFrom(property.PropertyType.GetGenericTypeDefinition()) || property.PropertyType.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>)))
                 {
-                    var arr = (IEnumerable<object>)property.GetValue(instance);
+                    var arr = (IEnumerable<object>)obj;
                     var genericArgument = property.PropertyType.GetGenericArguments().First();
                     if (genericArgument.IsGenericType || genericArgument == typeof(string))
                     {

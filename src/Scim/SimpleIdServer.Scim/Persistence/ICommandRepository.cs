@@ -7,6 +7,7 @@ namespace SimpleIdServer.Scim.Persistence
     {
         bool Add(T data);
         bool Update(T data);
+        bool Delete(T data);
         Task<int> SaveChanges();
     }
 }

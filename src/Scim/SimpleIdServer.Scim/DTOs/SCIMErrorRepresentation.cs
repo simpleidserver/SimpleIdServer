@@ -1,16 +1,15 @@
 ﻿using SimpleIdServer.Scim.Serialization;
-using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.DTOs
 {
     [SCIMSchema("urn:ietf:params:scim:api:messages:2.0:Error")]
     public class SCIMErrorRepresentation
     {
-        public SCIMErrorRepresentation(string status, string scimType, string detail)
+        public SCIMErrorRepresentation(string status, string detail, string scimType)
         {
             Status = status;
-            ScimType = scimType;
             Detail = detail;
+            ScimType = scimType;
         }
 
         [SCIMSchemaProperty("status")]

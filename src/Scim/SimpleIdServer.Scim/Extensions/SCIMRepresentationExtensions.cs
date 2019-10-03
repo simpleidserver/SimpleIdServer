@@ -35,7 +35,9 @@ namespace SimpleIdServer.Scim.Domain
         {
             foreach (var representationAttr in attributes)
             {
-                if (representationAttr.SchemaAttribute.Returned == SCIMSchemaAttributeReturned.NEVER || representationAttr.SchemaAttribute.Returned == SCIMSchemaAttributeReturned.REQUEST && isGetRequest)
+                if (representationAttr.SchemaAttribute.Returned == SCIMSchemaAttributeReturned.NEVER 
+                    || representationAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY
+                    || representationAttr.SchemaAttribute.Returned == SCIMSchemaAttributeReturned.REQUEST && isGetRequest)
                 {
                     continue;
                 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
@@ -29,7 +30,13 @@ namespace SimpleIdServer.Scim.Domain
 
         public object Clone()
         {
-            throw new NotImplementedException();
+            return new SCIMSchema
+            {
+                Id = Id,
+                Name = Name,
+                Description = Description,
+                Attributes = Attributes.Select(a => (SCIMSchemaAttribute)a.Clone()).ToList()
+            };
         }
     }
 }

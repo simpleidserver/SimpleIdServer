@@ -8,13 +8,13 @@ namespace SimpleIdServer.Scim.Extensions
 {
     public static class ControllerExtensions
     {
-        public static IActionResult BuildError(this Controller controller, HttpStatusCode code, string scimType, string detail)
+        public static IActionResult BuildError(this Controller controller, HttpStatusCode code, string detail, string scimType = null)
         {
             var serializer = new SCIMSerializer();
             var result = new JObject
             {
                 { "status", ((int)code).ToString() },
-                { "response",  serializer.Serialize(new SCIMErrorRepresentation(((int)code).ToString(), scimType, detail)) }
+                { "response",  serializer.Serialize(new SCIMErrorRepresentation(((int)code).ToString(), detail, scimType)) }
             };
             return new ContentResult
             {

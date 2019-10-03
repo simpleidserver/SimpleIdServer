@@ -16,6 +16,8 @@ namespace SimpleIdServer.Scim.Domain
             Returned = SCIMSchemaAttributeReturned.DEFAULT;
             MultiValued = false;
             Required = false;
+            DefaultValueString = new List<string>();
+            DefaultValueInt = new List<int>();
         }
 
         public string Id { get; set; }
@@ -64,14 +66,23 @@ namespace SimpleIdServer.Scim.Domain
         /// </summary>
         public SCIMSchemaAttributeUniqueness Uniqueness { get; set; }
         /// <summary>
-        /// A  A multi-valued array of JSON strings that indicate the SCIM resource types that may be referenced.
+        /// A multi-valued array of JSON strings that indicate the SCIM resource types that may be referenced.
         /// </summary>
         public ICollection<string> ReferenceTypes { get; set; }
+        /// <summary>
+        /// Default value (string)
+        /// </summary>
+        public ICollection<string> DefaultValueString { get; set; }
+        /// <summary>
+        /// Default value (int)
+        /// </summary>
+        public ICollection<int> DefaultValueInt { get; set; }
 
         public object Clone()
         {
             return new SCIMSchemaAttribute(Id)
             {
+                Id = Id,
                 CanonicalValues = CanonicalValues.ToList(),
                 CaseExact = CaseExact,
                 Description = Description,
@@ -83,7 +94,9 @@ namespace SimpleIdServer.Scim.Domain
                 Returned = Returned,
                 SubAttributes = SubAttributes.Select(s => (SCIMSchemaAttribute)s.Clone()).ToList(),
                 Type = Type,
-                Uniqueness = Uniqueness
+                Uniqueness = Uniqueness,
+                DefaultValueInt = DefaultValueInt == null ? new List<int>() : DefaultValueInt.ToList(),
+                DefaultValueString = DefaultValueString == null ? new List<string>() : DefaultValueString.ToList()
             };
         }
     }

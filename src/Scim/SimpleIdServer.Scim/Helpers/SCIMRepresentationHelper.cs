@@ -25,7 +25,7 @@ namespace SimpleIdServer.Scim.Helpers
             var result = new List<SCIMRepresentationAttribute>();
             foreach (var jsonProperty in json)
             {
-                if (jsonProperty.Key == "schemas")
+                if (jsonProperty.Key == SCIMConstants.StandardSCIMRepresentationAttributes.Schemas)
                 {
                     continue;
                 }
@@ -57,6 +57,51 @@ namespace SimpleIdServer.Scim.Helpers
                 else
                 {
                     result.Add(BuildAttribute(jsonProperty.Value, attrSchema));
+                }
+            }
+
+            var defaultAttributes = attrsSchema.Where(a => !json.ContainsKey(a.Name) && a.Mutability == SCIMSchemaAttributeMutabilities.READWRITE);
+            foreach(var defaultAttr in defaultAttributes)
+            {
+                var attr = new SCIMRepresentationAttribute(defaultAttr);
+                switch (defaultAttr.Type)
+                {
+                    case SCIMSchemaAttributeTypes.STRING:
+                        if (defaultAttr.DefaultValueString.Any())
+                        {
+                            var defaultValueStr = defaultAttr.DefaultValueString;
+                            if (!defaultAttr.MultiValued)
+                            {
+                                defaultValueStr = new List<string> { defaultValueStr.First() };
+                            }
+
+                            foreach(var str in defaultValueStr)
+                            {
+                                attr.ValuesString.Add(str);
+                            }
+
+                            result.Add(attr);
+                        }
+
+                        break;
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        if (defaultAttr.DefaultValueInt.Any())
+                        {
+                            var defaultValueInt = defaultAttr.DefaultValueInt;
+                            if (!defaultAttr.MultiValued)
+                            {
+                                defaultValueInt = new List<int> { defaultValueInt.First() };
+                            }
+
+                            foreach (var i in defaultValueInt)
+                            {
+                                attr.ValuesInteger.Add(i);
+                            }
+
+                            result.Add(attr);
+                        }
+
+                        break;
                 }
             }
 
