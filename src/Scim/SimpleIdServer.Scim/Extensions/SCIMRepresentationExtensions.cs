@@ -31,13 +31,12 @@ namespace SimpleIdServer.Scim.Domain
             return jObj;
         }
 
-        private static void EnrichResponse(ICollection<SCIMRepresentationAttribute> attributes, JObject jObj, bool isGetRequest = false)
+        public static void EnrichResponse(ICollection<SCIMRepresentationAttribute> attributes, JObject jObj, bool isGetRequest = false)
         {
-            foreach (var representationAttr in attributes)
+            foreach (var kvp in attributes.GroupBy(a => a.SchemaAttribute.Name))
             {
-                if (representationAttr.SchemaAttribute.Returned == SCIMSchemaAttributeReturned.NEVER 
-                    || representationAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY
-                    || representationAttr.SchemaAttribute.Returned == SCIMSchemaAttributeReturned.REQUEST && isGetRequest)
+                var representationAttr = kvp.First();
+                if (!representationAttr.IsReadable(isGetRequest))
                 {
                     continue;
                 }
@@ -57,9 +56,24 @@ namespace SimpleIdServer.Scim.Domain
                         jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesDateTime) : representationAttr.ValuesDateTime.First());
                         break;
                     case SCIMSchemaAttributeTypes.COMPLEX:
-                        var jObjVal = new JObject();
-                        EnrichResponse(representationAttr.Values, jObjVal, isGetRequest);
-                        jObj.Add(representationAttr.SchemaAttribute.Name, jObjVal);
+                        if (representationAttr.SchemaAttribute.MultiValued == false)
+                        {
+                            var jObjVal = new JObject();
+                            EnrichResponse(representationAttr.Values, jObjVal, isGetRequest);
+                            jObj.Add(representationAttr.SchemaAttribute.Name, jObjVal);
+                        }
+                        else
+                        {
+                            var jArr = new JArray();
+                            foreach(var attr in kvp)
+                            {
+                                var jObjVal = new JObject();
+                                EnrichResponse(representationAttr.Values, jObjVal, isGetRequest);
+                                jArr.Add(jObjVal);
+                            }
+
+                            jObj.Add(representationAttr.SchemaAttribute.Name, jArr);
+                        }
                         break;
                 }
             }

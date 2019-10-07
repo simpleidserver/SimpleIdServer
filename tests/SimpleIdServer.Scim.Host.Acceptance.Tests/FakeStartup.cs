@@ -23,6 +23,11 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                {
                    opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
+               .AddComplexAttribute("phones", opt =>
+               {
+                   opt.AddStringAttribute("phoneNumber", description: "Phone number");
+                   opt.AddStringAttribute("type", description: "Type");
+               }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddStringAttribute("org", defaultValue: new List<string> { "ENTREPRISE" }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .Build();
             services.AddSIDScim().AddSchemas(new List<SCIMSchema>

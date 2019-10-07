@@ -1,4 +1,6 @@
 ﻿using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,6 +34,19 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, int value, string endpoint = null)
         {
             return Task.FromResult(_representations.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == attributeId && a.ValuesInteger.Contains(value))));
+        }
+
+        public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
+        {
+            var queryableRepresentations = _representations.AsQueryable();
+            if (parameter.Filter != null)
+            {
+                var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
+                queryableRepresentations = (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
+            }
+
+            int totalResults = queryableRepresentations.Count();
+            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList()));
         }
     }
 }

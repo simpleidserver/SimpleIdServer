@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Startup
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Host.Acceptance.Tests", "tests\SimpleIdServer.Scim.Host.Acceptance.Tests\SimpleIdServer.Scim.Host.Acceptance.Tests.csproj", "{C3E22928-FC40-47EF-A886-B37B7B96D9B4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Tests", "tests\SimpleIdServer.Scim.Tests\SimpleIdServer.Scim.Tests.csproj", "{7DF81302-13C8-42F6-9AA4-F1E21071D19A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DF81302-13C8-42F6-9AA4-F1E21071D19A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DF81302-13C8-42F6-9AA4-F1E21071D19A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DF81302-13C8-42F6-9AA4-F1E21071D19A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DF81302-13C8-42F6-9AA4-F1E21071D19A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,6 +47,7 @@ Global
 		{4B26792A-6960-4270-92C1-65C4C1FD59F3} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 		{A1C64BA0-42BE-4BF2-B06E-663D7122AD48} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{C3E22928-FC40-47EF-A886-B37B7B96D9B4} = {E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}
+		{7DF81302-13C8-42F6-9AA4-F1E21071D19A} = {E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

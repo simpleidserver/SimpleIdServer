@@ -23,5 +23,17 @@ namespace SimpleIdServer.Scim.Extensions
                 ContentType = "application/json"
             };
         }
+
+        public static JObject SerializeQuery(this Controller controller)
+        {
+            var query = controller.Request.Query;
+            var result = new JObject();
+            foreach(var record in query)
+            {
+                result.Add(record.Key, JToken.FromObject(record));
+            }
+
+            return result;
+        }
     }
 }

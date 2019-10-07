@@ -77,7 +77,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                             foreach(var str in defaultValueStr)
                             {
-                                attr.ValuesString.Add(str);
+                                attr.Add(str);
                             }
 
                             result.Add(attr);
@@ -95,7 +95,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                             foreach (var i in defaultValueInt)
                             {
-                                attr.ValuesInteger.Add(i);
+                                attr.Add(i);
                             }
 
                             result.Add(attr);
@@ -114,16 +114,16 @@ namespace SimpleIdServer.Scim.Helpers
             switch (schemaAttribute.Type)
             {
                 case SCIMSchemaAttributeTypes.BOOLEAN:
-                    result.ValuesBoolean.Add(bool.Parse(jsonProperty.ToString()));
+                    result.Add(bool.Parse(jsonProperty.ToString()));
                     break;
                 case SCIMSchemaAttributeTypes.INTEGER:
-                    result.ValuesInteger.Add(int.Parse(jsonProperty.ToString()));
+                    result.Add(int.Parse(jsonProperty.ToString()));
                     break;
                 case SCIMSchemaAttributeTypes.DATETIME:
-                    result.ValuesDateTime.Add(DateTime.Parse(jsonProperty.ToString()));
+                    result.Add(DateTime.Parse(jsonProperty.ToString()));
                     break;
                 case SCIMSchemaAttributeTypes.STRING:
-                    result.ValuesString.Add(jsonProperty.ToString());
+                    result.Add(jsonProperty.ToString());
                     break;
                 case SCIMSchemaAttributeTypes.COMPLEX:
                     result.Values = ResolveAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes);
