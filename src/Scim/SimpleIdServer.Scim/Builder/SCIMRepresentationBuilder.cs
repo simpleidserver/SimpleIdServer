@@ -7,10 +7,10 @@ namespace SimpleIdServer.Scim.Builder
 {
     public class SCIMRepresentationBuilder
     {
-        private readonly IEnumerable<SCIMSchema> _schemas;
+        private readonly ICollection<SCIMSchema> _schemas;
         private readonly ICollection<SCIMRepresentationAttribute> _attributes;
 
-        private SCIMRepresentationBuilder(IEnumerable<SCIMSchema> schemas)
+        private SCIMRepresentationBuilder(ICollection<SCIMSchema> schemas)
         {
             _schemas = schemas;
             _attributes = new List<SCIMRepresentationAttribute>();
@@ -19,7 +19,8 @@ namespace SimpleIdServer.Scim.Builder
         public SCIMRepresentationBuilder AddAttribute(string name, string schemaId, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null)
         {
             var schemaAttribute = _schemas.First(s => s.Id == schemaId).Attributes.FirstOrDefault(a => a.Name == name);
-            _attributes.Add(new SCIMRepresentationAttribute(schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime));
+            var id = Guid.NewGuid().ToString();
+            _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime));
             return this;
         }
 
@@ -48,7 +49,14 @@ namespace SimpleIdServer.Scim.Builder
             var schemaAttribute = _schemas.First(s => s.Id == schemaId).Attributes.FirstOrDefault(a => a.Name == name);
             var builder = new SCIMRepresentationAttributeBuilder(schemaAttribute);
             callback(builder);
-            _attributes.Add(new SCIMRepresentationAttribute(schemaAttribute, builder.Build()));
+            var id = Guid.NewGuid().ToString();
+            var newAttribute = new SCIMRepresentationAttribute(id, schemaAttribute);
+            foreach(var subAttribute in builder.Build())
+            {
+                newAttribute.Add(subAttribute);
+            }
+
+            _attributes.Add(newAttribute);
             return this;
         }
 
@@ -57,7 +65,7 @@ namespace SimpleIdServer.Scim.Builder
             return new SCIMRepresentation(_schemas, _attributes);
         }
 
-        public static SCIMRepresentationBuilder Create(IEnumerable<SCIMSchema> schemas)
+        public static SCIMRepresentationBuilder Create(ICollection<SCIMSchema> schemas)
         {
             return new SCIMRepresentationBuilder(schemas);
         }

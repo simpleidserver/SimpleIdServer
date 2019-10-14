@@ -1,71 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
+    [DebuggerDisplay("Attribute = {SchemaAttribute.Name}")]
     public class SCIMRepresentationAttribute : ICloneable
     {
-        private ICollection<int> _valuesInteger;
-        private ICollection<bool> _valuesBoolean;
-        private ICollection<string> _valuesString;
-        private ICollection<DateTime> _valuesDateTime;
-
         public SCIMRepresentationAttribute()
         {
-            _valuesInteger = new List<int>();
-            _valuesBoolean = new List<bool>();
-            _valuesString = new List<string>();
-            _valuesDateTime = new List<DateTime>();
+            ValuesInteger = new List<int>();
+            ValuesBoolean = new List<bool>();
+            ValuesString = new List<string>();
+            ValuesDateTime = new List<DateTime>();
             ValuesReference = new List<string>();
             Values = new List<SCIMRepresentationAttribute>();
         }
 
-        public SCIMRepresentationAttribute(SCIMSchemaAttribute schemaAttribute) : this()
+        public SCIMRepresentationAttribute(string id) : this()
+        {
+            Id = id;
+        }
+
+        public SCIMRepresentationAttribute(string id, SCIMSchemaAttribute schemaAttribute, List<int> valuesInteger = null, List<bool> valuesBoolean = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null) : this(id)
         {
             SchemaAttribute = schemaAttribute;
-        }
-
-        public SCIMRepresentationAttribute(SCIMSchemaAttribute scimSchemaAttribute, ICollection<SCIMRepresentationAttribute> values) : this(scimSchemaAttribute)
-        {
-            Values = values;
-        }
-
-        public SCIMRepresentationAttribute(SCIMSchemaAttribute scimSchemaAttribute, List<int> valuesInteger, List<bool> valuesBoolean, List<string> valuesString, List<DateTime> valuesDateTime) : this(scimSchemaAttribute)
-        {
-            _valuesInteger = valuesInteger;
-            _valuesBoolean = valuesBoolean;
-            _valuesString = valuesString;
-            _valuesDateTime = valuesDateTime;
+            ValuesInteger = valuesInteger == null ? new List<int>() : valuesInteger;
+            ValuesBoolean = valuesBoolean == null ? new List<bool>() : valuesBoolean;
+            ValuesString = valuesString == null ? new List<string>() : valuesString;
+            ValuesDateTime = valuesDateTime == null ? new List<DateTime>() : valuesDateTime;
         }
 
         public string Id { get; set; }
-        public IQueryable<string> ValuesString { get => _valuesString.AsQueryable(); }
-        public virtual IQueryable<bool> ValuesBoolean { get => _valuesBoolean.AsQueryable(); }
-        public virtual IQueryable<int> ValuesInteger { get => _valuesInteger.AsQueryable(); }
-        public virtual IQueryable<DateTime> ValuesDateTime { get => _valuesDateTime.AsQueryable(); }
-        public ICollection<string> ValuesReference { get; set; }
-        public ICollection<SCIMRepresentationAttribute> Values { get; set; }
-        public SCIMSchemaAttribute SchemaAttribute { get; set; }
+        public IQueryable<string> QueryableValuesString { get => ValuesString.AsQueryable(); }
+        public IQueryable<int> QueryableValuesInt { get => ValuesInteger.AsQueryable(); }
+        public IQueryable<bool> QueryableValuesBoolean { get => ValuesBoolean.AsQueryable(); }
+        public IQueryable<DateTime> QueryableValuesDateTime { get => ValuesDateTime.AsQueryable(); }
+        public virtual ICollection<string> ValuesString { get; set; }
+        public virtual ICollection<bool> ValuesBoolean { get; set; }
+        public virtual ICollection<int> ValuesInteger { get; set; }
+        public virtual ICollection<DateTime> ValuesDateTime { get; set; }
+        public virtual ICollection<string> ValuesReference { get; set; }
+        public virtual ICollection<SCIMRepresentationAttribute> Values { get; set; }
+        public virtual SCIMRepresentationAttribute Parent { get; set; }
+        public virtual SCIMSchemaAttribute SchemaAttribute { get; set; }
 
         public void Add(int value)
         {
-            _valuesInteger.Add(value);
+            ValuesInteger.Add(value);
         }
 
         public void Add(string value)
         {
-            _valuesString.Add(value);
+            ValuesString.Add(value);
         }
 
         public void Add(DateTime value)
         {
-            _valuesDateTime.Add(value);
+            ValuesDateTime.Add(value);
         }
 
         public void Add(bool value)
         {
-            _valuesBoolean.Add(value);
+            ValuesBoolean.Add(value);
+        }
+
+        public void Add(SCIMRepresentationAttribute value)
+        {
+            Values.Add(value);
+            value.Parent = this;
         }
 
         public bool IsReadable(bool isGetRequest = false)
@@ -82,17 +86,22 @@ namespace SimpleIdServer.Scim.Domain
 
         public object Clone()
         {
-            return new SCIMRepresentationAttribute
+            var result = new SCIMRepresentationAttribute(Id)
             {
                 Id = Id,
-                _valuesString = _valuesString.ToList(),
-                _valuesBoolean = _valuesBoolean.ToList(),
-                _valuesDateTime = _valuesDateTime.ToList(),
-                _valuesInteger = _valuesInteger.ToList(),
+                ValuesString = ValuesString.ToList(),
+                ValuesBoolean = ValuesBoolean.ToList(),
+                ValuesDateTime = ValuesDateTime.ToList(),
+                ValuesInteger = ValuesInteger.ToList(),
                 ValuesReference = ValuesReference.ToList(),
-                Values = Values.Select(v => (SCIMRepresentationAttribute)v.Clone()).ToList(),
                 SchemaAttribute = (SCIMSchemaAttribute)SchemaAttribute.Clone()
             };
+            foreach(var cloneAttribute in Values.Select(v => (SCIMRepresentationAttribute)v.Clone()).ToList())
+            {
+                result.Add(cloneAttribute);
+            }
+
+            return result;
         }
     }
 }

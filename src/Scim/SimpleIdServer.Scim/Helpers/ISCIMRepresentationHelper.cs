@@ -6,6 +6,6 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public interface ISCIMRepresentationHelper
     {
-        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, IEnumerable<SCIMSchema> schemas);
+        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, ICollection<SCIMSchema> schemas);
     }
 }

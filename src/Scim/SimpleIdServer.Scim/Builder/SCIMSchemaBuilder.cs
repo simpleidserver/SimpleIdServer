@@ -50,8 +50,8 @@ namespace SimpleIdServer.Scim.Builder
                 Uniqueness = uniqueness,
                 Type = type,
                 Description = description,
-                DefaultValueInt = defaultValueInt,
-                DefaultValueString = defaulValueStr
+                DefaultValueInt = defaultValueInt == null ? new List<int>() : defaultValueInt,
+                DefaultValueString = defaulValueStr == null ? new List<string>() : defaulValueStr
             });
             if (callback != null)
             {

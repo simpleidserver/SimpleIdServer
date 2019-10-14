@@ -15,6 +15,7 @@ namespace SimpleIdServer.Scim
             public const string TotalResults = "totalResults";
             public const string StartIndex = "startIndex";
             public const string ItemsPerPage = "itemsPerPage";
+            public const string Resources = "Resources";
         }
 
         public static class StandardSCIMMetaAttributes
@@ -40,6 +41,9 @@ namespace SimpleIdServer.Scim
         public static class SCIMEndpoints
         {
             public const string Users = "Users";
+            public const string Groups = "Groups";
+            public const string ServiceProviderConfig = "ServiceProviderConfig";
+            public const string Bulk = "Bulk";
         }
 
         public static class StandardSchemas
@@ -64,7 +68,48 @@ namespace SimpleIdServer.Scim
                     .AddStringAttribute("scimType")
                     .AddStringAttribute("detail")
                     .Build();
-            public static SCIMSchema ListResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:ListResponse", "Response", "List response")
+            public static SCIMSchema ListResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:ListResponse", "SearchResponse", "List response")
+                .Build();
+            public static SCIMSchema PatchRequestSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:PatchOp", "Patch", "Patch representation")
+                .Build();
+            public static SCIMSchema ServiceProvideConfigSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig", "Service Provider Configuration", "Schema for representing the service provider's configuration")
+                .AddStringAttribute("documentationUrl")
+                .AddComplexAttribute("patch", callback: c =>
+                {
+                    c.AddBooleanAttribute("supported");
+                })
+                .AddComplexAttribute("bulk", callback: c =>
+                {
+                    c.AddBooleanAttribute("supported");
+                    c.AddIntAttribute("maxOperations", description: "An integer value specifying the maximum number of operations.");
+                    c.AddIntAttribute("maxPayloadSize", description: "An integer value specifying the maximum payload size in bytes.");
+                })
+                .AddComplexAttribute("filter", callback: c =>
+                {
+                    c.AddBooleanAttribute("supported");
+                    c.AddIntAttribute("maxResults", description: "An integer value specifying the maximum number of resources returned in a response.");
+                })
+                .AddComplexAttribute("changePassword", callback: c =>
+                {
+                    c.AddBooleanAttribute("supported");
+                })
+                .AddComplexAttribute("sort", callback: c =>
+                {
+                    c.AddBooleanAttribute("supported");
+                })
+                .AddComplexAttribute("etag", callback: c =>
+                {
+                    c.AddBooleanAttribute("supported");
+                })
+                .AddComplexAttribute("authenticationSchemes", callback: c =>
+                {
+                    c.AddStringAttribute("name");
+                    c.AddStringAttribute("description");
+                    c.AddStringAttribute("specUri");
+                    c.AddStringAttribute("documentationUri");
+                    c.AddStringAttribute("type");
+                    c.AddBooleanAttribute("primary");
+                }, multiValued: true)
                 .Build();
         }
     }

@@ -54,6 +54,64 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
+        [When("execute HTTP PUT JSON request '(.*)'")]
+        public async Task WhenExecuteHTTPPutJSONRequest(string url, Table table)
+        {
+            var jObj = new JObject();
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = record["Value"];
+                try
+                {
+                    jObj.Add(key, JToken.Parse(value));
+                }
+                catch
+                {
+                    jObj.Add(key, value.ToString());
+                }
+            }
+
+            url = Parse(url);
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(url),
+                Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
+            };
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("execute HTTP PATCH JSON request '(.*)'")]
+        public async Task WhenExecuteHTTPPatchJSONRequest(string url, Table table)
+        {
+            var jObj = new JObject();
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = record["Value"];
+                try
+                {
+                    jObj.Add(key, JToken.Parse(value));
+                }
+                catch
+                {
+                    jObj.Add(key, value.ToString());
+                }
+            }
+
+            url = Parse(url);
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = new Uri(url),
+                Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
+            };
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("execute HTTP GET request '(.*)'")]
         public async Task WhenExecuteHTTPGETRequest(string url)
         {
@@ -126,7 +184,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         public void ThenJSONEqualsTo(string key, string value)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
-            Assert.Equal(value, jsonHttpBody.SelectToken(key).ToString());
+            Assert.Equal(value, jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
         }
 
         [Then("HTTP HEADER contains '(.*)'")]

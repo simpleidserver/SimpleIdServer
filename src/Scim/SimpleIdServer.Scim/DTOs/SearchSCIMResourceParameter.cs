@@ -59,8 +59,8 @@ namespace SimpleIdServer.Scim.DTOs
         {
             var result = new SearchSCIMResourceParameter
             {
-                Attributes = jObj.GetArray(SCIMConstants.StandardSCIMSearchAttributes.Attributes),
-                ExcludedAttributes = jObj.GetArray(SCIMConstants.StandardSCIMSearchAttributes.ExcludedAttributes),
+                Attributes = jObj.GetCombinedArray(SCIMConstants.StandardSCIMSearchAttributes.Attributes),
+                ExcludedAttributes = jObj.GetCombinedArray(SCIMConstants.StandardSCIMSearchAttributes.ExcludedAttributes),
                 SortBy = jObj.GetString(SCIMConstants.StandardSCIMSearchAttributes.SortBy)
             };
 

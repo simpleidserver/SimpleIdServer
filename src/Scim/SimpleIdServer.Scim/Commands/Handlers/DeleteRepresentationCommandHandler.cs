@@ -16,7 +16,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
         }
 
-        public async Task Handle(DeleteRepresentationCommand request)
+        public async Task<bool> Handle(DeleteRepresentationCommand request)
         {
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(request.Id, request.ResourceType);
             if (representation == null)
@@ -26,6 +26,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
             _scimRepresentationCommandRepository.Delete(representation);
             await _scimRepresentationCommandRepository.SaveChanges();
+            return true;
         }
     }
 }

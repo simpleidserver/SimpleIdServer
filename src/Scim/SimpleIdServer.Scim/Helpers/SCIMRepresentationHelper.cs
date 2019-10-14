@@ -9,19 +9,20 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public class SCIMRepresentationHelper : ISCIMRepresentationHelper
     {
-        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, IEnumerable<SCIMSchema> schemas)
+        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, ICollection<SCIMSchema> schemas)
         {
-            return new SCIMRepresentation(schemas, ResolveAttributes(json, schemas.SelectMany(s => s.Attributes)));
-        }
-
-        private static ICollection<SCIMRepresentationAttribute> ResolveAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema)
-        {
+            var attrsSchema = schemas.SelectMany(s => s.Attributes);
             var missingRequiredAttributes = attrsSchema.Where(a => a.Required && !json.ContainsKey(a.Name));
             if (missingRequiredAttributes.Any())
             {
                 throw new SCIMSchemaViolatedException("missingRequiredAttribute", $"required attributes {string.Join(",", missingRequiredAttributes.Select(a => a.Name))} are missing");
             }
 
+            return new SCIMRepresentation(schemas, BuildRepresentationAttributes(json, attrsSchema));
+        }
+
+        public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema)
+        {
             var result = new List<SCIMRepresentationAttribute>();
             foreach (var jsonProperty in json)
             {
@@ -61,9 +62,9 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             var defaultAttributes = attrsSchema.Where(a => !json.ContainsKey(a.Name) && a.Mutability == SCIMSchemaAttributeMutabilities.READWRITE);
-            foreach(var defaultAttr in defaultAttributes)
+            foreach (var defaultAttr in defaultAttributes)
             {
-                var attr = new SCIMRepresentationAttribute(defaultAttr);
+                var attr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), defaultAttr);
                 switch (defaultAttr.Type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
@@ -75,7 +76,7 @@ namespace SimpleIdServer.Scim.Helpers
                                 defaultValueStr = new List<string> { defaultValueStr.First() };
                             }
 
-                            foreach(var str in defaultValueStr)
+                            foreach (var str in defaultValueStr)
                             {
                                 attr.Add(str);
                             }
@@ -110,7 +111,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static SCIMRepresentationAttribute BuildAttribute(JToken jsonProperty, SCIMSchemaAttribute schemaAttribute)
         {
-            var result = new SCIMRepresentationAttribute(schemaAttribute);
+            var result = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(),schemaAttribute);
             switch (schemaAttribute.Type)
             {
                 case SCIMSchemaAttributeTypes.BOOLEAN:
@@ -126,7 +127,7 @@ namespace SimpleIdServer.Scim.Helpers
                     result.Add(jsonProperty.ToString());
                     break;
                 case SCIMSchemaAttributeTypes.COMPLEX:
-                    result.Values = ResolveAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes);
+                    result.Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes);
                     break;
                 case SCIMSchemaAttributeTypes.REFERENCE:
                     // REFERENCE.

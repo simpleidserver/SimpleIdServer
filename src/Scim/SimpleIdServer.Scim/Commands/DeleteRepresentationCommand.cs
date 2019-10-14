@@ -1,6 +1,8 @@
-﻿namespace SimpleIdServer.Scim.Commands
+﻿using SimpleIdServer.Scim.Infrastructure;
+
+namespace SimpleIdServer.Scim.Commands
 {
-    public class DeleteRepresentationCommand
+    public class DeleteRepresentationCommand : ISCIMCommand<bool>
     {
         public DeleteRepresentationCommand(string id, string resourceType)
         {

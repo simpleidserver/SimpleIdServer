@@ -58,7 +58,7 @@ namespace SimpleIdServer.Scim.Builder
         {
             var builder = new SCIMSchemaAttributeBuilder(new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
             callback(builder);
-            _scimSchemaAttribute.SubAttributes.Add(builder.Build());
+            _scimSchemaAttribute.AddSubAttribute(builder.Build());
             return this;
         }
 
@@ -84,7 +84,7 @@ namespace SimpleIdServer.Scim.Builder
                 callback(builder);
             }
 
-            _scimSchemaAttribute.SubAttributes.Add(builder.Build());
+            _scimSchemaAttribute.AddSubAttribute(builder.Build());
             return this;
         }
 

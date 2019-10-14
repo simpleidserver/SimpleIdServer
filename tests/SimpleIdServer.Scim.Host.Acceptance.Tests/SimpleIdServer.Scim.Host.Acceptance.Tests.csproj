@@ -4,6 +4,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Users - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\UsersErrors - Copy.feature.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -21,11 +22,18 @@
     <ProjectReference Include="..\..\src\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Features\ServiceProviderConfig.feature.cs">
+      <DependentUpon>ServiceProviderConfig.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Users.feature.cs">
       <DependentUpon>Users.feature</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\ServiceProviderConfig.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Users.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

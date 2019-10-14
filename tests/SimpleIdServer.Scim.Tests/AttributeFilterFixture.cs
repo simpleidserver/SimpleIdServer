@@ -1,7 +1,7 @@
-﻿using SimpleIdServer.Persistence.Filters.SCIMExpressions;
+﻿using Newtonsoft.Json.Linq;
+using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using System.Collections.Generic;
 using Xunit;
@@ -36,10 +36,23 @@ namespace SimpleIdServer.Scim.Tests
                 .Build();
 
             var firstFilter = SCIMFilterParser.Parse("phones.phoneNumber");
+            var secondFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]");
+            var thirdFilter = SCIMFilterParser.Parse("userName");
+            var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber");
+            var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]");
 
-            var firstJson = (new List<SCIMExpression> { firstFilter }).Serialize(userRepresentation);
+            var firstJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { firstFilter });
+            var secondJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { secondFilter });
+            var thirdJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { thirdFilter }, "http://localhost");
+            var fourthJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { fourthFilter }, "http://localhost");
+            var fifthJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { fifthFilter }, "http://localhost");
 
-            Assert.Equal("01", firstJson.SelectToken("phones[0].phoneNumber").ToString());
+            Assert.Equal("01", firstJSON.SelectToken("phones[0].phoneNumber").ToString());
+            Assert.Equal("02", secondJSON.SelectToken("phones[0].phoneNumber").ToString());
+            Assert.Equal("home", secondJSON.SelectToken("phones[0].type").ToString());
+            Assert.Null(thirdJSON.SelectToken("userName"));
+            Assert.Null(fourthJSON.SelectToken("phones[0].phoneNumber"));
+            Assert.True((fifthJSON.SelectToken("phones") as JArray).Count == 1);
         }
     }
 }

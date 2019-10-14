@@ -12,7 +12,7 @@ namespace SimpleIdServer.Scim.Domain
             Attributes = new List<SCIMRepresentationAttribute>();
         }
 
-        public SCIMRepresentation(IEnumerable<SCIMSchema> schemas, ICollection<SCIMRepresentationAttribute> attributes)
+        public SCIMRepresentation(ICollection<SCIMSchema> schemas, ICollection<SCIMRepresentationAttribute> attributes)
         {
             Schemas = schemas;
             Attributes = attributes;
@@ -30,8 +30,8 @@ namespace SimpleIdServer.Scim.Domain
         public string Version { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
-        public ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
-        public IEnumerable<SCIMSchema> Schemas { get; set; }
+        public virtual ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
+        public virtual ICollection<SCIMSchema> Schemas { get; set; }
 
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {
@@ -49,7 +49,7 @@ namespace SimpleIdServer.Scim.Domain
                 Created = Created,
                 LastModified = LastModified,
                 Attributes = Attributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList(),
-                Schemas = Schemas.Select(a => (SCIMSchema)a.Clone())
+                Schemas = Schemas.Select(a => (SCIMSchema)a.Clone()).ToList()
             };
         }
     }

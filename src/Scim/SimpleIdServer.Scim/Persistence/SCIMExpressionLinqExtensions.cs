@@ -25,7 +25,22 @@ namespace SimpleIdServer.Scim.Extensions
             return finalSelectRequestBody;
         }
 
-        private static Expression Evaluate(this SCIMExpression expression, ParameterExpression parameterExpression, bool isRoot = false)
+        public static LambdaExpression Evaluate(this SCIMExpression expression, IQueryable<SCIMRepresentationAttribute> attributes)
+        {
+            var representationAttributeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "rp");
+            var anyLambdaExpression = expression.Evaluate(representationAttributeParameter, false);
+            var enumarableType = typeof(Queryable);
+            var whereMethod = enumarableType.GetMethods()
+                 .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
+                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
+            var equalLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(anyLambdaExpression, representationAttributeParameter);
+            var whereExpr = Expression.Call(whereMethod, Expression.Constant(attributes), equalLambda);
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentationAttribute>), "f");
+            var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
+            return finalSelectRequestBody;
+        }
+
+        public static Expression Evaluate(this SCIMExpression expression, ParameterExpression parameterExpression, bool isRoot = false)
         {
             var compAttrExpression = expression as SCIMComparisonExpression;
             var attrExpression = expression as SCIMAttributeExpression;
@@ -157,10 +172,10 @@ namespace SimpleIdServer.Scim.Extensions
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
-            var propertyValuesString = Expression.Property(representationAttrExpr, "ValuesString");
-            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
-            var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
-            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
+            var propertyValuesString = Expression.Property(representationAttrExpr, "QueryableValuesString");
+            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "QueryableValuesBoolean");
+            var propertyValuesInt = Expression.Property(representationAttrExpr, "QueryableValuesInt");
+            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "QueryableValuesDateTime");
             var attrInteger = Expression.Parameter(typeof(int), "prop");
             var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
             var attrString = Expression.Parameter(typeof(string), "prop");
@@ -185,10 +200,10 @@ namespace SimpleIdServer.Scim.Extensions
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
-            var propertyValuesString = Expression.Property(representationAttrExpr, "ValuesString");
-            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
-            var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
-            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
+            var propertyValuesString = Expression.Property(representationAttrExpr, "QueryableValuesString");
+            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "QueryableValuesBoolean");
+            var propertyValuesInt = Expression.Property(representationAttrExpr, "QueryableValuesInt");
+            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "QueryableValuesDateTime");
             var attrInteger = Expression.Parameter(typeof(int), "prop");
             var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
             var attrString = Expression.Parameter(typeof(string), "prop");

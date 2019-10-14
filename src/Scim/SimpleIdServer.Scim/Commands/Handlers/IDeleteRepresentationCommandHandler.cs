@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using SimpleIdServer.Scim.Infrastructure;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
 {
-    public interface IDeleteRepresentationCommandHandler
+    public interface IDeleteRepresentationCommandHandler : ISCIMCommandHandler<DeleteRepresentationCommand, bool>
     {
-        Task Handle(DeleteRepresentationCommand request);
     }
 }

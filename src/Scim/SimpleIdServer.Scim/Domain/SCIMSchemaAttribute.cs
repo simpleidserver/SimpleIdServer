@@ -8,6 +8,7 @@ namespace SimpleIdServer.Scim.Domain
     {
         public SCIMSchemaAttribute(string id)
         {
+            Id = id;
             SubAttributes = new List<SCIMSchemaAttribute>();
             CanonicalValues = new List<string>();
             ReferenceTypes = new List<string>();
@@ -36,7 +37,7 @@ namespace SimpleIdServer.Scim.Domain
         /// <summary>
         /// When an attribute is of type "complex", "subAttributes" defines a set of sub-attributes. "subAttributes" has the same schema sub-attributes as "attributes".
         /// </summary>
-        public ICollection<SCIMSchemaAttribute> SubAttributes { get; set; }
+        public virtual ICollection<SCIMSchemaAttribute> SubAttributes { get; private set; }
         /// <summary>
         /// The attribute's human-readable description.  When applicable, service providers MUST specify the description.
         /// </summary>
@@ -78,11 +79,15 @@ namespace SimpleIdServer.Scim.Domain
         /// </summary>
         public ICollection<int> DefaultValueInt { get; set; }
 
+        public void AddSubAttribute(SCIMSchemaAttribute subAttribute)
+        {
+            SubAttributes.Add(subAttribute);
+        }
+
         public object Clone()
         {
             return new SCIMSchemaAttribute(Id)
             {
-                Id = Id,
                 CanonicalValues = CanonicalValues.ToList(),
                 CaseExact = CaseExact,
                 Description = Description,
@@ -96,7 +101,8 @@ namespace SimpleIdServer.Scim.Domain
                 Type = Type,
                 Uniqueness = Uniqueness,
                 DefaultValueInt = DefaultValueInt == null ? new List<int>() : DefaultValueInt.ToList(),
-                DefaultValueString = DefaultValueString == null ? new List<string>() : DefaultValueString.ToList()
+                DefaultValueString = DefaultValueString == null ? new List<string>() : DefaultValueString.ToList(),
+                Id = Id
             };
         }
     }

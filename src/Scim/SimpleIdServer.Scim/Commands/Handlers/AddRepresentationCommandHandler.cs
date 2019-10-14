@@ -45,7 +45,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadRequestException("invalidRequest", $"{string.Join(",", unsupportedSchemas)} schemas are unknown");
             }
 
-            var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation, schemas);
+            var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation, schemas.ToList());
             var uniqueServerAttributeIds = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
             var uniqueGlobalAttributes = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);

@@ -26,7 +26,7 @@ namespace SimpleIdServer.Scim.Domain
         /// <summary>
         ///   A complex type that defines service provider attributes and their qualities.
         /// </summary>
-        public ICollection<SCIMSchemaAttribute> Attributes { get; set; }
+        public virtual ICollection<SCIMSchemaAttribute> Attributes { get; set; }
 
         public object Clone()
         {

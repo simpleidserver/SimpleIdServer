@@ -38,7 +38,7 @@ namespace SimpleIdServer.Scim.Extensions
                 return false;
             }
 
-            var enumName = Enum.GetNames(typeof(T)).FirstOrDefault(n => n.ToLowerInvariant() == r.ToLowerInvariant());
+            var enumName = Enum.GetNames(typeof(T)).FirstOrDefault(n => n.Equals(r, StringComparison.InvariantCultureIgnoreCase));
             if (string.IsNullOrWhiteSpace(enumName))
             {
                 return false;
@@ -68,6 +68,16 @@ namespace SimpleIdServer.Scim.Extensions
             }
 
             return jObj[name].ToString();
+        }
+
+        public static IEnumerable<string> GetCombinedArray(this JObject jObj, string name, char separator = ',')
+        {
+            if (!jObj.ContainsKey(name))
+            {
+                return new string[0];
+            }
+
+            return jObj[name].ToString().Split(separator);
         }
 
         public static IEnumerable<string> GetArray(this JObject jObj, string name)
