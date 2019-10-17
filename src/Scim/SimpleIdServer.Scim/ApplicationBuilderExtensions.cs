@@ -9,6 +9,7 @@
         /// <returns></returns>
         public static IApplicationBuilder UseSID(this IApplicationBuilder applicationBuilder)
         {
+            applicationBuilder.UseAuthentication();
             applicationBuilder.UseMvc();
             return applicationBuilder;
         }

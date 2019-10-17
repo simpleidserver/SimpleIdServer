@@ -28,9 +28,13 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
         {
             var dic = new Dictionary<string, object>
             {
-                { UserClaims.Subject, context.User.Id },
-                { OAuthClaims.AuthenticationTime, context.Request.AuthDateTime.Value.ConvertToUnixTimestamp() }
+                { UserClaims.Subject, context.User.Id }
             };
+            if (context.Request.AuthDateTime != null)
+            {
+                dic.Add(OAuthClaims.AuthenticationTime, context.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
+            }
+
             if (context.Request.QueryParameters.ContainsKey(AuthorizationRequestParameters.Claims))
             {
                 dic.Add(OAuthClaims.Claims, context.Request.QueryParameters[AuthorizationRequestParameters.Claims]);

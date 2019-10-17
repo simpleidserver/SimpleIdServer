@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
     {
         private static Dictionary<IEnumerable<string>, string> MAPPING_RESPONSETYPES_TO_RESPONSEMODE = new Dictionary<IEnumerable<string>, string>
         {
-            { new [] { "code" }, "query" }
+            { new [] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }, QueryResponseModeHandler.NAME },
+            { new [] { TokenResponseTypeHandler.RESPONSE_TYPE, "id_token" }, FragmentResponseModeHandler.NAME }
         };
         private readonly IEnumerable<IOAuthResponseModeHandler> _oauthResponseModeHandlers;
 

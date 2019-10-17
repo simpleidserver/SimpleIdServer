@@ -107,7 +107,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
             var scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
             EnrichWithScopeParameter(result, scopes, context.User);
-            EnrichWithClaimsParameter(result, requestedClaims, context.User, context.Request.AuthDateTime.Value);
+            EnrichWithClaimsParameter(result, requestedClaims, context.User, context.Request.AuthDateTime);
             foreach(var claimsSource in _claimsSources)
             {
                 await claimsSource.Enrich(result, openidClient).ConfigureAwait(false);

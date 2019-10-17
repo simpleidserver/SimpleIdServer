@@ -8,5 +8,6 @@ namespace SimpleIdServer.Scim.Persistence
     {
         Task<SCIMSchema> FindSCIMSchemaById(string schemaId);
         Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers);
+        Task<IEnumerable<SCIMSchema>> GetAll();
     }
 }

@@ -1,7 +1,6 @@
 <Project>
     <PropertyGroup>
         <VersionPrefix>1.0.0</VersionPrefix>
-        <VersionSuffix>local-ci</VersionSuffix>
         <Authors>SimpleIdServer</Authors>
         <Owners>SimpleIdServer</Owners>
     </PropertyGroup>

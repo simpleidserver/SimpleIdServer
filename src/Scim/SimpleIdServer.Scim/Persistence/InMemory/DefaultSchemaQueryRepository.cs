@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SimpleIdServer.Scim.Domain;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SimpleIdServer.Scim.Domain;
 
 namespace SimpleIdServer.Scim.Persistence.InMemory
 {
@@ -22,6 +22,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers)
         {
             return Task.FromResult(_schemas.Where(s => schemaIdentifiers.Contains(s.Id)));
+        }
+
+        public Task<IEnumerable<SCIMSchema>> GetAll()
+        {
+            return Task.FromResult((IEnumerable<SCIMSchema>)_schemas);
         }
     }
 }

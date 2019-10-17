@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Commands;
@@ -41,6 +42,7 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet]
+        [Authorize("QueryScimResource")]
         public async Task<IActionResult> Get()
         {
             var searchRequest = SearchSCIMResourceParameter.Create(Request.Query);
@@ -85,7 +87,7 @@ namespace SimpleIdServer.Scim.Api
                 {
                     StatusCode = (int)HttpStatusCode.OK,
                     Content = jObj.ToString(),
-                    ContentType = "application/scim+json"
+                    ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
                 };
             }
             catch(SCIMFilterException ex)
@@ -95,12 +97,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet("{id}")]
+        [Authorize("QueryScimResource")]
         public Task<IActionResult> Get(string id)
         {
             return InternalGet(id);
         }
 
-        [HttpGet("Me/{id}")]
+        [HttpGet("Me")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> GetMe(string id)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -110,12 +114,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpPost]
+        [Authorize("AddScimResource")]
         public Task<IActionResult> Add([FromBody] JObject jobj)
         {
             return InternalAdd(jobj);
         }
 
         [HttpPost("Me")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> AddMe([FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -125,12 +131,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpDelete("{id}")]
+        [Authorize("DeleteScimResource")]
         public Task<IActionResult> Delete(string id)
         {
             return InternalDelete(id);
         }
 
         [HttpDelete("Me/{id}")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> DeleteMe(string id)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -140,12 +148,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpPut("{id}")]
+        [Authorize("UpdateScimResource")]
         public Task<IActionResult> Update(string id, [FromBody] JObject jObj)
         {
             return InternalUpdate(id, jObj);
         }
 
         [HttpPut("Me/{id}")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> UpdateMe(string id, [FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -155,12 +165,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpPatch("{id}")]
+        [Authorize("UpdateScimResource")]
         public Task<IActionResult> Patch(string id, [FromBody] JObject jObj)
         {
             return InternalPatch(id, jObj);
         }
 
         [HttpPatch("Me/{id}")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> PatchMe(string id, [FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -269,7 +281,7 @@ namespace SimpleIdServer.Scim.Api
             {
                 StatusCode = (int)status,
                 Content = representation.ToResponse(location, isGetRequest).ToString(),
-                ContentType = "application/scim+json"
+                ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
             };
         }
     }

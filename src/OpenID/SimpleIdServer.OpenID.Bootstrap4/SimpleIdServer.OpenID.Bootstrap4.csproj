@@ -2,7 +2,7 @@
   <PropertyGroup>    
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>SimpleIdServer.OpenID.Bootstrap4.nuspec</NuspecFile>
-    <NuspecProperties>$(NuspecProperties);version=$(VersionPrefix)-$(VersionSuffix)</NuspecProperties>
+    <NuspecProperties>$(NuspecProperties);version=$(VersionPrefix)</NuspecProperties>
     <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
     <NuspecProperties>$(NuspecProperties);owners=$(Owners)</NuspecProperties>
   </PropertyGroup>

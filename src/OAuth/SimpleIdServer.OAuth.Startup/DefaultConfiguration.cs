@@ -13,7 +13,27 @@ namespace SimpleIdServer.OAuth.Startup
         {
             new OAuthScope
             {
-                Name = "scope1",
+                Name = "query_scim_resource",
+                IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "add_scim_resource",
+                IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "delete_scim_resource",
+                IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "update_scim_resource",
+                IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "bulk_scim_resource",
                 IsExposedInConfigurationEdp = true
             }
         };
@@ -22,37 +42,47 @@ namespace SimpleIdServer.OAuth.Startup
         {
             new OAuthClient
             {
-                ClientId = "clientid",
+                ClientId = "scimClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "BankCvSecret")
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("scimClientSecret"))
                 },
                 ClientNames = new []
                 {
-                    new OAuthTranslation("f3d35cce-de69-45bf-958c-4a8796f8ed37_client_name", "BankCV website", string.Empty)
+                    new OAuthTranslation("scimClient_client_name", "SCIMClient", "fr")
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow,
                 TokenExpirationTimeInSeconds = 60 * 30,
                 RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
                     new OAuthScope
                     {
-                        Name = "scope1"
+                        Name = "query_scim_resource"
+                    },
+                    new OAuthScope
+                    {
+                        Name = "add_scim_resource"
+                    },
+                    new OAuthScope
+                    {
+                        Name = "delete_scim_resource"
+                    },
+                    new OAuthScope
+                    {
+                        Name = "update_scim_resource"
+                    },
+                    new OAuthScope
+                    {
+                        Name = "bulk_scim_resource"
                     }
                 },
                 GrantTypes = new List<string>
                 {
-                    "client_credentials",
-                    "refresh_token",
-                    "authorization_code"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "http://localhost:8080",
-                    "http://localhost:1700"
+                    "client_credentials"
                 },
                 PreferredTokenProfile = "Bearer"
             }

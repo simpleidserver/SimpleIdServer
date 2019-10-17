@@ -184,7 +184,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         public void ThenJSONEqualsTo(string key, string value)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
-            Assert.Equal(value, jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
+            Assert.Equal(value.ToLowerInvariant(), jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
         }
 
         [Then("HTTP HEADER contains '(.*)'")]

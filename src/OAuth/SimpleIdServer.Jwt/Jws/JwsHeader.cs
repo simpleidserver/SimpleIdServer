@@ -1,7 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using System.Runtime.Serialization;
+
 namespace SimpleIdServer.Jwt.Jws
 {
+    [DataContract]
     public class JwsHeader
     {
         public JwsHeader() { }
@@ -17,8 +21,11 @@ namespace SimpleIdServer.Jwt.Jws
             Kid = kid;
         }
 
+        [DataMember(Name = "typ")]
         public string Type { get; set; }
+        [DataMember(Name = "alg")]
         public string Alg { get; set; }
+        [DataMember(Name = "kid")]
         public string Kid { get; set; }
     }
 }

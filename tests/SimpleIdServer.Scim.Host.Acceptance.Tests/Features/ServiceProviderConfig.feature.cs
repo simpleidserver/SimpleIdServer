@@ -96,7 +96,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 11
  testRunner.Then("JSON \'patch.supported\'=\'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 12
- testRunner.Then("JSON \'bulk.maxOperations\'=\'1000\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'bulk.maxOperations\'=\'3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 13
  testRunner.Then("JSON \'bulk.maxPayloadSize\'=\'1048576\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 14

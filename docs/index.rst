@@ -1,18 +1,41 @@
 Welcome to SimpleIdServer
 =========================
 
-SimpleIdServer is an open source identity and access management solution.
+SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0 and SCIM2.0. 
+It streamlines development, configuration and deployment of custom access control servers. 
+Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more. 
+
+Github: https://github.com/simpleidserver/SimpleIdServer 
+
+Nuget feed: https://www.myget.org/F/advance-ict/api/v3/index.json 
 
 .. toctree::
    :maxdepth: 3
    :hidden:
-   :caption: OpenId
+   :caption: Getting started
 
-   openid/getting_started
+   intro/getting-started-with-oauth
+   intro/getting-started-with-openid
+   intro/getting-started-with-scim
    
 .. toctree::
    :maxdepth: 3
    :hidden:
-   :caption: OAUTH2.0
+   :caption: Topics
 
-   oauth/getting_started
+   topics/build-json-web-key
+   
+.. toctree::
+   :maxdepth: 3
+   :hidden:
+   :caption: Reference
+   
+   reference/oauthhostoptions
+   reference/oauthclient
+   reference/oauthscope
+   reference/oauthuser
+   reference/openidhostoptions
+   reference/openidclient
+   reference/openidscope
+   reference/authenticationcontextclassreference
+   reference/scimhostoptions

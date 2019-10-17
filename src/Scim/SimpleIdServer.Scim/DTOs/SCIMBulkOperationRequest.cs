@@ -1,4 +1,6 @@
-﻿namespace SimpleIdServer.Scim.DTOs
+﻿using Newtonsoft.Json.Linq;
+
+namespace SimpleIdServer.Scim.DTOs
 {
     public class SCIMBulkOperationRequest
     {
@@ -11,5 +13,6 @@
         public string BulkIdentifier { get; set; }
         public string Version { get; set; }
         public string Path { get; set; }
+        public JToken Data { get; set; }
     }
 }
