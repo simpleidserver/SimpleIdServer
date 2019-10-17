@@ -7,7 +7,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
 {
     public class QueryResponseModeHandler : IOAuthResponseModeHandler
     {
-        public string ResponseMode => "query";
+        public static string NAME = "query";
+        public string ResponseMode => NAME;
 
         public void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {

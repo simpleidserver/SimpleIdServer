@@ -4,6 +4,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using SimpleIdServer.Jwt;
+using SimpleIdServer.Jwt.Extensions;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Scim.Startup
 {
@@ -13,11 +20,37 @@ namespace SimpleIdServer.Scim.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSIDScim();
+            var json = File.ReadAllText("oauth_puk.txt");
+            var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            var rsaParameters = new RSAParameters
+            {
+                Modulus = dic.TryGet(RSAFields.Modulus),
+                Exponent = dic.TryGet(RSAFields.Exponent)
+            };
+            var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
+            services.AddLogging();
+            services.AddSIDScim()
+                .AddAuthentication(c =>
+                {
+                    c.AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
+                    {
+                        cfg.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidIssuer = "http://localhost:60000",
+                            ValidAudiences = new List<string>
+                            {
+                                "scimClient"
+                            },
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = oauthRsaSecurityKey
+                        };
+                    });
+                });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddConsole(LogLevel.Trace);
             app.UseSID();
         }
     }

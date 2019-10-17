@@ -4,6 +4,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Bulk - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Users - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\UsersErrors - Copy.feature.cs" />
   </ItemGroup>
@@ -22,15 +23,36 @@
     <ProjectReference Include="..\..\src\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Features\Schemas.feature.cs">
+      <DependentUpon>Schemas.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\BulkErrors.feature.cs">
+      <DependentUpon>BulkErrors.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\ServiceProviderConfig.feature.cs">
       <DependentUpon>ServiceProviderConfig.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\Bulk.feature.cs">
+      <DependentUpon>Bulk.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\Users.feature.cs">
       <DependentUpon>Users.feature</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Schemas.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\BulkErrors.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\ServiceProviderConfig.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\Bulk.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

@@ -9,7 +9,7 @@ Scenario: Check informations returned by ServiceProviderConfig endpoint
 	Then HTTP status code equals to '200'	
 	Then JSON exists 'authenticationSchemes'
 	Then JSON 'patch.supported'='true'
-	Then JSON 'bulk.maxOperations'='1000'
+	Then JSON 'bulk.maxOperations'='3'
 	Then JSON 'bulk.maxPayloadSize'='1048576'
 	Then JSON 'filter.supported'='true'
 	Then JSON 'filter.maxResults'='200'

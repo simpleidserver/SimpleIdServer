@@ -15,4 +15,10 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="oauth_key.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

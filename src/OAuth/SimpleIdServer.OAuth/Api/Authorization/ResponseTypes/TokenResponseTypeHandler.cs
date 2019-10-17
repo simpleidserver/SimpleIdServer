@@ -10,6 +10,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 {
     public class TokenResponseTypeHandler : IResponseTypeHandler
     {
+        public static string RESPONSE_TYPE = "token";
+
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
         public TokenResponseTypeHandler(IEnumerable<ITokenBuilder> tokenBuilders)
@@ -18,7 +20,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
         }
 
         public string GrantType => "implicit";
-        public string ResponseType => "token";
+        public string ResponseType => RESPONSE_TYPE;
         public int Order => 2;
 
         public void Enrich(HandlerContext context)

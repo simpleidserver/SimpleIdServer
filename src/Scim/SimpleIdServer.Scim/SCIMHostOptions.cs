@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim
 {
@@ -6,13 +7,19 @@ namespace SimpleIdServer.Scim
     {
         public SCIMHostOptions()
         {
-            UserSchemasIds = new List<string> { "urn:ietf:params:scim:schemas:core:2.0:User" };
+            AuthenticationScheme = SCIMConstants.AuthenticationScheme;
+            UserSchemasIds = SCIMConstants.StandardSchemas.UserSchemas.Select(u => u.Id).ToList();
+            GroupSchemaIds = SCIMConstants.StandardSchemas.GroupSchemas.Select(u => u.Id).ToList();
             SCIMIdClaimName = "scim_id";
             MaxOperations = 1000;
             MaxPayloadSize = 1048576;
             MaxResults = 200;
         }
 
+        /// <summary>
+        /// Authentication scheme.
+        /// </summary>
+        public string AuthenticationScheme { get; set; }
         /// <summary>
         /// User schemas URLS.
         /// </summary>

@@ -7,12 +7,14 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
 {
     public class FragmentResponseModeHandler : IOAuthResponseModeHandler
     {
-        public string ResponseMode => "fragment";
+        public static string NAME = "fragment";
+        public string ResponseMode => NAME;
 
         public void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
             var queryBuilder = new QueryBuilder(authorizationResponse.QueryParameters);
-            httpContext.Response.Redirect($"{authorizationResponse.RedirectUrl}#{queryBuilder.ToQueryString()}");
+            var redirectUrl = $"{authorizationResponse.RedirectUrl}#{queryBuilder.ToQueryString().ToString().TrimStart('?')}";
+            httpContext.Response.Redirect(redirectUrl);
         }
     }
 }

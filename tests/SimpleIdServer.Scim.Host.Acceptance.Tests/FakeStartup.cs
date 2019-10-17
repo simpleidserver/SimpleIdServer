@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
+using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Host.Acceptance.Tests
@@ -31,15 +33,32 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddStringAttribute("org", defaultValue: new List<string> { "ENTREPRISE" }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .Build();
-            services.AddSIDScim().AddSchemas(new List<SCIMSchema>
+            var schemas = new List<SCIMSchema>
             {
                 userSchema
-            });
+            };
+            schemas.AddRange(SCIMConstants.StandardSchemas.GroupSchemas);
+            services.AddSIDScim(o =>
+            {
+                o.MaxOperations = 3;
+            }).AddAuthentication(a =>
+            {
+                a.AddCustomAuthentication(c => { });
+            }).AddSchemas(schemas);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseSID();
+        }
+    }
+
+    public static class ServiceCollectionExtensions
+    {
+        public static AuthenticationBuilder AddCustomAuthentication(this AuthenticationBuilder authBuilder, Action<AuthenticationSchemeOptions> callback)
+        {
+            authBuilder.AddScheme<AuthenticationSchemeOptions, CustomAuthenticationHandler>(SCIMConstants.AuthenticationScheme, SCIMConstants.AuthenticationScheme, callback);
+            return authBuilder;
         }
     }
 }

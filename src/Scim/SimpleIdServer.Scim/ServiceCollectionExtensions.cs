@@ -22,7 +22,8 @@ namespace Microsoft.Extensions.DependencyInjection
             var builder = new SimpleIdServerSCIMBuilder(services);
             services.AddMvc();
             services.AddCommandHandlers()
-                .AddSCIMRepository();
+                .AddSCIMRepository()
+                .AddSCIMAuthorization();
             return builder;
         }
 
@@ -32,10 +33,24 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerSCIMBuilder AddSIDOpenID(this IServiceCollection services, Action<SCIMHostOptions> options)
+        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services, Action<SCIMHostOptions> options)
         {
             services.Configure(options);
             return services.AddSIDScim();
+        }
+
+        private static IServiceCollection AddSCIMAuthorization(this IServiceCollection services)
+        {
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("QueryScimResource", p => p.RequireClaim("scope", "query_scim_resource"));
+                opts.AddPolicy("AddScimResource", p => p.RequireClaim("scope", "add_scim_resource"));
+                opts.AddPolicy("DeleteScimResource", p => p.RequireClaim("scope", "delete_scim_resource"));
+                opts.AddPolicy("UpdateScimResource", p => p.RequireClaim("scope", "update_scim_resource"));
+                opts.AddPolicy("BulkScimResource", p => p.RequireClaim("scope", "bulk_scim_resource"));
+                opts.AddPolicy("UserAuthenticated", p => p.RequireAuthenticatedUser());
+            });
+            return services;
         }
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
@@ -53,6 +68,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var representations = new List<SCIMRepresentation>();
             var schemas = new List<SCIMSchema>();
             schemas.AddRange(SCIMConstants.StandardSchemas.UserSchemas);
+            schemas.AddRange(SCIMConstants.StandardSchemas.GroupSchemas);
             services.TryAddSingleton<ISCIMRepresentationCommandRepository>(new DefaultSCIMRepresentationCommandRepository(representations));
             services.TryAddSingleton<ISCIMRepresentationQueryRepository>(new DefaultSCIMRepresentationQueryRepository(representations));
             services.TryAddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));
