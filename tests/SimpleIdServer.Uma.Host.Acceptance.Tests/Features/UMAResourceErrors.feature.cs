@@ -110,11 +110,11 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
 #line 13
- testRunner.When("execute HTTP POST JSON request \'http://localhost/rreguri\'", ((string)(null)), table4, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/rreguri\'", ((string)(null)), table10, "When ");
 #line 16
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 18
@@ -137,14 +137,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table5.AddRow(new string[] {
+            table11.AddRow(new string[] {
                         "resource_scopes",
                         "[ \"scope1\" ]"});
 #line 23
- testRunner.When("execute HTTP POST JSON request \'http://localhost/rreguri\'", ((string)(null)), table5, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/rreguri\'", ((string)(null)), table11, "When ");
 #line 27
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 29
@@ -170,11 +170,11 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
 #line 34
- testRunner.When("execute HTTP PUT JSON request \'http://localhost/rreguri/id\'", ((string)(null)), table6, "When ");
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/rreguri/id\'", ((string)(null)), table12, "When ");
 #line 37
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 39
@@ -197,14 +197,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table7.AddRow(new string[] {
+            table13.AddRow(new string[] {
                         "resource_scopes",
                         "[ \"scope1\" ]"});
 #line 44
- testRunner.When("execute HTTP PUT JSON request \'http://localhost/rreguri/id\'", ((string)(null)), table7, "When ");
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/rreguri/id\'", ((string)(null)), table13, "When ");
 #line 48
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 50
@@ -231,6 +231,106 @@ this.ScenarioInitialize(scenarioInfo);
 #line 58
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 59
+ testRunner.Then("JSON \'error\'=\'not_found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when permissions parameter is not passed in the HTTP PUT reques" +
+            "t")]
+        [Xunit.TraitAttribute("FeatureTitle", "UmaResourceErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when permissions parameter is not passed in the HTTP PUT reques" +
+            "t")]
+        public virtual void ErrorIsReturnedWhenPermissionsParameterIsNotPassedInTheHTTPPUTRequest()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when permissions parameter is not passed in the HTTP PUT reques" +
+                    "t", null, ((string[])(null)));
+#line 61
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+#line 62
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/rreguri/id/permissions\'", ((string)(null)), table14, "When ");
+#line 65
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 67
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 68
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 69
+ testRunner.Then("JSON \'error_description\'=\'parameter permissions is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to add permissions to unknown resource")]
+        [Xunit.TraitAttribute("FeatureTitle", "UmaResourceErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to add permissions to unknown resource")]
+        public virtual void ErrorIsReturnedWhenTryingToAddPermissionsToUnknownResource()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add permissions to unknown resource", null, ((string[])(null)));
+#line 71
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table15.AddRow(new string[] {
+                        "permissions",
+                        "[ { subject: \"user1\", scopes: [ \"scope\" ]]"});
+#line 72
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/rreguri/id/permissions\'", ((string)(null)), table15, "When ");
+#line 76
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 78
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 79
+ testRunner.Then("JSON \'error\'=\'not_found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to remove permissions from unknown resource")]
+        [Xunit.TraitAttribute("FeatureTitle", "UmaResourceErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to remove permissions from unknown resource")]
+        public virtual void ErrorIsReturnedWhenTryingToRemovePermissionsFromUnknownResource()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to remove permissions from unknown resource", null, ((string[])(null)));
+#line 81
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 82
+ testRunner.When("execute HTTP DELETE request \'http://localhost/rreguri/id/permissions\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 84
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 86
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 87
+ testRunner.Then("JSON \'error\'=\'not_found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to get permissions from unknown resource")]
+        [Xunit.TraitAttribute("FeatureTitle", "UmaResourceErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get permissions from unknown resource")]
+        public virtual void ErrorIsReturnedWhenTryingToGetPermissionsFromUnknownResource()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get permissions from unknown resource", null, ((string[])(null)));
+#line 89
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 90
+ testRunner.When("execute HTTP GET request \'http://localhost/rreguri/id/permissions\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 92
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 94
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 95
  testRunner.Then("JSON \'error\'=\'not_found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

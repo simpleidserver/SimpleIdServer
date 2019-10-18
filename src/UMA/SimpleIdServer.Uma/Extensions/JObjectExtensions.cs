@@ -40,5 +40,14 @@ namespace SimpleIdServer.Uma.Extensions
         }
 
         #endregion
+
+        #region Token request
+
+        public static string GetTicket(this JObject jObj)
+        {
+            return jObj.GetStr(TokenRequestParameters.ClientSecret);
+        }
+
+        #endregion
     }
 }

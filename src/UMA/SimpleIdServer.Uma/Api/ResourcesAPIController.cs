@@ -123,21 +123,60 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpPut("{id}/permissions")]
-        public async Task<IActionResult> AddPermissions()
+        public async Task<IActionResult> AddPermissions(string id, [FromBody] JObject jObj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var permissions = BuildUMAResourcePermissions(jObj);
+                var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+                if (umaResource == null)
+                {
+                    return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                }
+
+                umaResource.Permissions = permissions;
+                _umaResourceCommandRepository.Update(umaResource);
+                await _umaResourceCommandRepository.SaveChanges();
+                var result = new JObject
+                {
+                    { UMAResourceNames.Id, umaResource.Id }
+                };
+                return new ContentResult
+                {
+                    ContentType = "application/json",
+                    Content = result.ToString(),
+                    StatusCode = (int)HttpStatusCode.OK
+                };
+            }
+            catch (UMAInvalidRequestException ex)
+            {
+                return this.BuildError(HttpStatusCode.BadRequest, "invalid_request", ex.Message);
+            }
         }
 
         [HttpGet("{id}/permissions")]
-        public async Task<IActionResult> GetPermissions()
+        public async Task<IActionResult> GetPermissions(string id)
         {
-            throw new NotImplementedException();
+            var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+            if (umaResource == null)
+            {
+                return this.BuildError(HttpStatusCode.NotFound, "not_found");
+            }
+
+            return new OkObjectResult(Serialize(umaResource.Permissions));
         }
 
         [HttpDelete("{id}/permissions")]
-        public async Task<IActionResult> DeletePermissions()
+        public async Task<IActionResult> DeletePermissions(string id)
         {
-            throw new NotImplementedException();
+            var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+            if (umaResource == null)
+            {
+                return this.BuildError(HttpStatusCode.NotFound, "not_found");
+            }
+
+            umaResource.Permissions = new List<UMAResourcePermission>();
+            return new NoContentResult();
         }
 
         public static JObject Serialize(UMAResource umaResource)
@@ -152,6 +191,23 @@ namespace SimpleIdServer.Uma.Api
             Enrich(result, UMAResourceNames.Type, umaResource.Type);
             Enrich(result, UMAResourceNames.Description, umaResource.Descriptions);
             Enrich(result, UMAResourceNames.Name, umaResource.Names);
+            return result;
+        }
+
+        public static JObject Serialize(ICollection<UMAResourcePermission> permissions)
+        {
+            var result = new JObject();
+            var jArr = new JArray();
+            foreach(var permission in permissions)
+            {
+                jArr.Add(new JObject
+                {
+                    { UMAResourcePermissionNames.Subject, permission.Subject },
+                    { UMAResourcePermissionNames.Scopes, new JArray(permission.Scopes) }
+                });
+            }
+
+            result.Add(UMAResourcePermissionNames.Permissions, jArr);
             return result;
         }
 
@@ -209,6 +265,35 @@ namespace SimpleIdServer.Uma.Api
             result.Type = type;
             result.IconUri = iconUri;
             result.Scopes = scopes.ToList();
+            return result;
+        }
+
+        private static ICollection<UMAResourcePermission> BuildUMAResourcePermissions(JObject jObj)
+        {
+            var result = new List<UMAResourcePermission>();
+            var permissionsToken = jObj.SelectToken(UMAResourcePermissionNames.Permissions);
+            if (permissionsToken == null)
+            {
+                throw new UMAInvalidRequestException($"parameter {UMAResourcePermissionNames.Permissions} is missing");
+            }
+            
+            foreach(JObject permissionValue in permissionsToken)
+            {
+                var subjectToken = permissionValue.SelectToken(UMAResourcePermissionNames.Subject);
+                var scopesToken = permissionValue.SelectToken(UMAResourcePermissionNames.Scopes);
+                if (subjectToken == null)
+                {
+                    throw new UMAInvalidRequestException($"parameter {UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Subject} is missing");
+                }
+
+                if (scopesToken == null)
+                {
+                    throw new UMAInvalidRequestException($"parameter {UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Scopes} is missing");
+                }
+
+                result.Add(new UMAResourcePermission(subjectToken.ToString(), scopesToken.Values<string>().ToList()));
+            }
+
             return result;
         }
     }

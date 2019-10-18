@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SimpleIdServer.Uma.Domains
 {
-    public class UMAResource : ICloneable
+    public class UMAResource : ICloneable, IEquatable<UMAResource>
     {
         public UMAResource(string id)
         {
@@ -13,6 +13,7 @@ namespace SimpleIdServer.Uma.Domains
             Scopes = new List<string>();
             Descriptions = new List<OAuthTranslation>();
             Names = new List<OAuthTranslation>();
+            Permissions = new List<UMAResourcePermission>();
         }
 
         public string Id { get; set; }
@@ -22,6 +23,7 @@ namespace SimpleIdServer.Uma.Domains
         public ICollection<OAuthTranslation> Names { get; set; }
         public string Type { get; set; }
         public string Subject { get; set; }
+        public ICollection<UMAResourcePermission> Permissions { get; set; }
 
         public void AddDescription(string language, string value)
         {
@@ -42,8 +44,24 @@ namespace SimpleIdServer.Uma.Domains
                 IconUri = IconUri,
                 Names = Names.Select(d => (OAuthTranslation)d.Clone()).ToList(),
                 Type = Type,
-                Subject = Subject
+                Subject = Subject,
+                Permissions = Permissions.Select(p => (UMAResourcePermission)p.Clone()).ToList()
             };
+        }
+
+        public bool Equals(UMAResource other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 }

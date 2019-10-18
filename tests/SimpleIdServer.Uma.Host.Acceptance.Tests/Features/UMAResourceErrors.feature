@@ -57,3 +57,39 @@ Scenario: Error is returned when trying to remove an unknown UMA resource
 
 	Then HTTP status code equals to '404'
 	Then JSON 'error'='not_found'
+
+Scenario: Error is returned when permissions parameter is not passed in the HTTP PUT request
+	When execute HTTP PUT JSON request 'http://localhost/rreguri/id/permissions'
+	| Key | Value |
+
+	And extract JSON from body
+		
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='parameter permissions is missing'	
+
+Scenario: Error is returned when trying to add permissions to unknown resource
+	When execute HTTP PUT JSON request 'http://localhost/rreguri/id/permissions'
+	| Key         | Value                                      |
+	| permissions | [ { subject: "user1", scopes: [ "scope" ]] |
+
+	And extract JSON from body
+		
+	Then HTTP status code equals to '404'
+	Then JSON 'error'='not_found'
+
+Scenario: Error is returned when trying to remove permissions from unknown resource
+	When execute HTTP DELETE request 'http://localhost/rreguri/id/permissions'
+
+	And extract JSON from body
+		
+	Then HTTP status code equals to '404'
+	Then JSON 'error'='not_found'
+
+Scenario: Error is returned when trying to get permissions from unknown resource
+	When execute HTTP GET request 'http://localhost/rreguri/id/permissions'
+
+	And extract JSON from body
+		
+	Then HTTP status code equals to '404'
+	Then JSON 'error'='not_found'
