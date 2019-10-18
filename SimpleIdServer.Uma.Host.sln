@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core Layer", "01. Core Layer", "{8C081D0A-A448-42F4-8B80-FC2BBCCE5727}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. UI Layer", "02. UI Layer", "{EF556329-4FE6-466A-A298-40E7B674EE11}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Startup Layer", "03. Startup Layer", "{0DBE9C34-2ADA-4EA3-A347-6AFB0ECB5109}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OAuth", "src\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj", "{292710B2-2FAE-41A1-ACD8-95450155E4BD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Jwt", "src\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj", "{E90E84DA-7B1A-45E1-A183-06B400B624CF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Uma", "src\UMA\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj", "{B3A24DF6-6563-410A-811C-63975F011530}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Uma.Startup", "src\UMA\SimpleIdServer.Uma.Startup\SimpleIdServer.Uma.Startup.csproj", "{D6F9D277-6E44-4144-86D1-D76D36784D91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. Testing Layer", "04. Testing Layer", "{CFB90257-1765-4CD2-8BE0-F5B1B7529197}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Uma.Host.Acceptance.Tests", "tests\SimpleIdServer.Uma.Host.Acceptance.Tests\SimpleIdServer.Uma.Host.Acceptance.Tests.csproj", "{2D0FEABC-6267-481D-9C79-AC92AAA11126}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{292710B2-2FAE-41A1-ACD8-95450155E4BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{292710B2-2FAE-41A1-ACD8-95450155E4BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{292710B2-2FAE-41A1-ACD8-95450155E4BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{292710B2-2FAE-41A1-ACD8-95450155E4BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E90E84DA-7B1A-45E1-A183-06B400B624CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E90E84DA-7B1A-45E1-A183-06B400B624CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E90E84DA-7B1A-45E1-A183-06B400B624CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E90E84DA-7B1A-45E1-A183-06B400B624CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3A24DF6-6563-410A-811C-63975F011530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3A24DF6-6563-410A-811C-63975F011530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3A24DF6-6563-410A-811C-63975F011530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3A24DF6-6563-410A-811C-63975F011530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6F9D277-6E44-4144-86D1-D76D36784D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6F9D277-6E44-4144-86D1-D76D36784D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6F9D277-6E44-4144-86D1-D76D36784D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6F9D277-6E44-4144-86D1-D76D36784D91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D0FEABC-6267-481D-9C79-AC92AAA11126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D0FEABC-6267-481D-9C79-AC92AAA11126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D0FEABC-6267-481D-9C79-AC92AAA11126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D0FEABC-6267-481D-9C79-AC92AAA11126}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{292710B2-2FAE-41A1-ACD8-95450155E4BD} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}
+		{E90E84DA-7B1A-45E1-A183-06B400B624CF} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}
+		{B3A24DF6-6563-410A-811C-63975F011530} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}
+		{D6F9D277-6E44-4144-86D1-D76D36784D91} = {0DBE9C34-2ADA-4EA3-A347-6AFB0ECB5109}
+		{2D0FEABC-6267-481D-9C79-AC92AAA11126} = {CFB90257-1765-4CD2-8BE0-F5B1B7529197}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE79876A-D56B-4202-8E04-DB2A196867BB}
+	EndGlobalSection
+EndGlobal

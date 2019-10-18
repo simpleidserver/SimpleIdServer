@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>UMA2.0 implementation.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj" />
+  </ItemGroup>
+</Project>

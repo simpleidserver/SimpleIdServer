@@ -35,6 +35,13 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return Task.FromResult(1);
         }
 
+        public bool Delete(T data)
+        {
+            var record = _lstData.First(l => l.Equals(data));
+            _lstData.Remove(record);
+            return true;
+        }
+
         public void Dispose()
         {
         }
