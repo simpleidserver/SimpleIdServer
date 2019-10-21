@@ -2,11 +2,10 @@
 
 namespace SimpleIdServer.Uma.UI
 {
-    [Route(UMAConstants.EndPoints.ResourcesUI)]
-    public class ResourcesUIController : Controller
+    public class HomeController : Controller
     {
         [HttpGet]
-        public IActionResult Edit(string id)
+        public IActionResult Index()
         {
             return View();
         }

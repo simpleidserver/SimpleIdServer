@@ -7,7 +7,7 @@ namespace SimpleIdServer.Uma.Domains
 {
     public class UMAResource : ICloneable, IEquatable<UMAResource>
     {
-        public UMAResource(string id)
+        public UMAResource(string id, DateTime createDateTime)
         {
             Id = id;
             Scopes = new List<string>();
@@ -24,6 +24,7 @@ namespace SimpleIdServer.Uma.Domains
         public string Type { get; set; }
         public string Subject { get; set; }
         public ICollection<UMAResourcePermission> Permissions { get; set; }
+        public DateTime CreateDateTime { get; set; }
 
         public void AddDescription(string language, string value)
         {
@@ -37,7 +38,7 @@ namespace SimpleIdServer.Uma.Domains
 
         public object Clone()
         {
-            return new UMAResource(Id)
+            return new UMAResource(Id, CreateDateTime)
             {
                 Scopes = Scopes.ToList(),
                 Descriptions = Descriptions.Select(d => (OAuthTranslation)d.Clone()).ToList(),

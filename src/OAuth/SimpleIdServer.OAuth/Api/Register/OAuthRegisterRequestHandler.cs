@@ -116,11 +116,14 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
 
             var supportedResponseTypeHandlers = _responseTypeHandlers.Where(r => grantTypes.Contains(r.GrantType));
-            var supportedResponseTypes = supportedResponseTypeHandlers.Select(s => s.ResponseType);
-            var unSupportedResponseTypes = responseTypes.Where(r => !supportedResponseTypes.Contains(r));
-            if (unSupportedResponseTypes.Any())
+            if (supportedResponseTypeHandlers.Any())
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.BAD_RESPONSE_TYPES, string.Join(",", unSupportedResponseTypes)));
+                var supportedResponseTypes = supportedResponseTypeHandlers.Select(s => s.ResponseType);
+                var unSupportedResponseTypes = responseTypes.Where(r => !supportedResponseTypes.Contains(r));
+                if (unSupportedResponseTypes.Any())
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.BAD_RESPONSE_TYPES, string.Join(",", unSupportedResponseTypes)));
+                }
             }
 
             foreach (var kvp in supportedResponseTypeHandlers.GroupBy(k => k.GrantType))
@@ -229,6 +232,7 @@ namespace SimpleIdServer.OAuth.Api.Register
             oauthClient.TokenEncryptedResponseAlg = tokenEncryptedResponseAlg;
             oauthClient.TokenEncryptedResponseEnc = tokenEncryptedResponseEnc;
             oauthClient.RefreshTokenExpirationTimeInSeconds = 60 * 30;
+            oauthClient.TokenExpirationTimeInSeconds = 60 * 30;
             foreach (var kvp in clientNames)
             {
                 oauthClient.AddClientName(kvp.Key, kvp.Value);

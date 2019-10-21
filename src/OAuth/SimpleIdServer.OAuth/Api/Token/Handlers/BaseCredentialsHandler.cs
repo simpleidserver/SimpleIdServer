@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -20,7 +22,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         }
 
         public abstract string GrantType { get; }
-        public abstract Task<JObject> Handle(HandlerContext context);
+        public abstract Task<IActionResult> Handle(HandlerContext context);
 
         protected async Task<OAuthClient> AuthenticateClient(HandlerContext context)
         {
@@ -39,6 +41,21 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             {
                 { TokenResponseParameters.ExpiresIn, context.Client.TokenExpirationTimeInSeconds },
                 { TokenResponseParameters.Scope, new JArray(scopes) }
+            };
+        }
+
+        public static IActionResult BuildError(HttpStatusCode httpStatusCode, string error, string errorMessage)
+        {
+            var jObj = new JObject
+            {
+                { ErrorResponseParameters.Error, error },
+                { ErrorResponseParameters.ErrorDescription, errorMessage}
+            };
+            return new ContentResult
+            {
+                ContentType = "application/json",
+                Content = jObj.ToString(),
+                StatusCode = (int)httpStatusCode
             };
         }
     }

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.Uma.Domains;
 using SimpleIdServer.Uma.DTOs;
 using SimpleIdServer.Uma.Exceptions;
@@ -15,13 +18,13 @@ using System.Threading.Tasks;
 namespace SimpleIdServer.Uma.Api
 {
     [Route(UMAConstants.EndPoints.ResourcesAPI)]
-    public class ResourcesAPIController : Controller
+    public class ResourcesAPIController : BaseAPIController
     {
         public const string UserAccessPolicyUri = "user_access_policy_uri";
         private readonly IUMAResourceCommandRepository _umaResourceCommandRepository;
         private readonly IUMAResourceQueryRepository _umaResourceQueryRepository;
 
-        public ResourcesAPIController(IUMAResourceCommandRepository umaResourceCommandRepository, IUMAResourceQueryRepository umaResourceQueryRepository)
+        public ResourcesAPIController(IUMAResourceCommandRepository umaResourceCommandRepository, IUMAResourceQueryRepository umaResourceQueryRepository, IJwtParser jwtParser, IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
         {
             _umaResourceCommandRepository = umaResourceCommandRepository;
             _umaResourceQueryRepository = umaResourceQueryRepository;
@@ -30,17 +33,36 @@ namespace SimpleIdServer.Uma.Api
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             var result = await _umaResourceQueryRepository.GetAll();
             return new OkObjectResult(result.Select(r => r.Id));
+        }
+
+        [HttpGet(".search/me")]
+        public Task<IActionResult> SearchMe()
+        {
+            return CallOperationWithAuthenticatedUser((sub, payload) =>
+            {
+                return InternalSearch(sub);                
+            });
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string id)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             var result = await _umaResourceQueryRepository.FindByIdentifier(id);
             if (result == null)
             {
-                return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
             }
 
             return new OkObjectResult(Serialize(result));
@@ -49,6 +71,11 @@ namespace SimpleIdServer.Uma.Api
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] JObject jObj)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             try
             {
                 var umaResource = BuildUMAResource(jObj, true);
@@ -57,7 +84,7 @@ namespace SimpleIdServer.Uma.Api
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, umaResource.Id },
-                    { UserAccessPolicyUri, Url.Action("Edit", "ResourcesUI", new { id = umaResource.Id }) }
+                    { UserAccessPolicyUri, Url.Action("Edit", "Resources", new { id = umaResource.Id }) }
                 };
                 return new ContentResult
                 {
@@ -68,20 +95,25 @@ namespace SimpleIdServer.Uma.Api
             }
             catch(UMAInvalidRequestException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "invalid_request", ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ex.Message);
             }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] JObject jObj)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             try
             {
                 var receivedUmaResource = BuildUMAResource(jObj);
                 var actualUmaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
                 if (actualUmaResource == null)
                 {
-                    return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                    return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
                 }
 
                 actualUmaResource.IconUri = receivedUmaResource.IconUri;
@@ -104,17 +136,22 @@ namespace SimpleIdServer.Uma.Api
             }
             catch (UMAInvalidRequestException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "invalid_request", ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             var actualUmaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
             if (actualUmaResource == null)
             {
-                return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
             }
 
             _umaResourceCommandRepository.Delete(actualUmaResource);
@@ -125,13 +162,18 @@ namespace SimpleIdServer.Uma.Api
         [HttpPut("{id}/permissions")]
         public async Task<IActionResult> AddPermissions(string id, [FromBody] JObject jObj)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             try
             {
                 var permissions = BuildUMAResourcePermissions(jObj);
                 var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
                 if (umaResource == null)
                 {
-                    return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                    return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
                 }
 
                 umaResource.Permissions = permissions;
@@ -150,17 +192,22 @@ namespace SimpleIdServer.Uma.Api
             }
             catch (UMAInvalidRequestException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "invalid_request", ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ex.Message);
             }
         }
 
         [HttpGet("{id}/permissions")]
         public async Task<IActionResult> GetPermissions(string id)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
             if (umaResource == null)
             {
-                return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
             }
 
             return new OkObjectResult(Serialize(umaResource.Permissions));
@@ -169,14 +216,35 @@ namespace SimpleIdServer.Uma.Api
         [HttpDelete("{id}/permissions")]
         public async Task<IActionResult> DeletePermissions(string id)
         {
+            if (!await IsPATAuthorized())
+            {
+                return new UnauthorizedResult();
+            }
+
             var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
             if (umaResource == null)
             {
-                return this.BuildError(HttpStatusCode.NotFound, "not_found");
+                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
             }
 
             umaResource.Permissions = new List<UMAResourcePermission>();
             return new NoContentResult();
+        }
+
+        private async Task<IActionResult> InternalSearch(string subject = null)
+        {
+            var searchUMAResourceParameter = new SearchUMAResourceParameter();
+            EnrichSearchRequestParameter(searchUMAResourceParameter);
+            searchUMAResourceParameter.Subject = subject;
+            var searchResult = await _umaResourceQueryRepository.Find(searchUMAResourceParameter);
+            var result = new JObject
+            {
+                { "totalResults", searchResult.TotalResults },
+                { "count", searchUMAResourceParameter.Count },
+                { "startIndex", searchUMAResourceParameter.StartIndex },
+                { "data", new JArray(searchResult.Records.Select(rec => Serialize(rec))) }
+            };
+            return new OkObjectResult(result);
         }
 
         public static JObject Serialize(UMAResource umaResource)
@@ -202,8 +270,14 @@ namespace SimpleIdServer.Uma.Api
             {
                 jArr.Add(new JObject
                 {
-                    { UMAResourcePermissionNames.Subject, permission.Subject },
-                    { UMAResourcePermissionNames.Scopes, new JArray(permission.Scopes) }
+                    { UMAResourcePermissionNames.Scopes, new JArray(permission.Scopes) },
+                    { UMAResourcePermissionNames.Claims, new JArray(permission.Claims.Select(cl => new JObject
+                    {
+                        { UMAResourcePermissionNames.ClaimFriendlyName, cl.FriendlyName },
+                        { UMAResourcePermissionNames.ClaimName, cl.Name },
+                        { UMAResourcePermissionNames.ClaimType, cl.ClaimType },
+                        { UMAResourcePermissionNames.ClaimValue, cl.Value }
+                    })) }
                 });
             }
 
@@ -230,7 +304,7 @@ namespace SimpleIdServer.Uma.Api
         private static UMAResource BuildUMAResource(JObject jObj, bool isHttpPost = false)
         {
             var id = Guid.NewGuid().ToString();
-            var result = new UMAResource(id);
+            var result = new UMAResource(id, DateTime.UtcNow);
             var scopes = jObj.GetUMAScopesFromRequest();
             var descriptions = jObj.GetUMADescriptionFromRequest();
             var iconUri = jObj.GetUMAIconURIFromRequest();
@@ -238,7 +312,7 @@ namespace SimpleIdServer.Uma.Api
             var type = jObj.GetUMATypeFromRequest();
             if (!scopes.Any())
             {
-                throw new UMAInvalidRequestException($"parameter {UMAResourceNames.ResourceScopes} is missing");
+                throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, UMAPermissionNames.ResourceScopes));
             }
 
             if (isHttpPost)
@@ -246,7 +320,7 @@ namespace SimpleIdServer.Uma.Api
                 var subject = jObj.GetUMASubjectFromRequest();
                 if (string.IsNullOrWhiteSpace(subject))
                 {
-                    throw new UMAInvalidRequestException($"parameter {UMAResourceNames.Subject} is missing");
+                    throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, UMAResourceNames.Subject));
                 }
 
                 result.Subject = subject;
@@ -274,24 +348,53 @@ namespace SimpleIdServer.Uma.Api
             var permissionsToken = jObj.SelectToken(UMAResourcePermissionNames.Permissions);
             if (permissionsToken == null)
             {
-                throw new UMAInvalidRequestException($"parameter {UMAResourcePermissionNames.Permissions} is missing");
+                throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, UMAResourcePermissionNames.Permissions));
             }
             
             foreach(JObject permissionValue in permissionsToken)
             {
-                var subjectToken = permissionValue.SelectToken(UMAResourcePermissionNames.Subject);
+                var claimsToken = permissionValue.SelectToken(UMAResourcePermissionNames.Claims);
                 var scopesToken = permissionValue.SelectToken(UMAResourcePermissionNames.Scopes);
-                if (subjectToken == null)
+                if (claimsToken == null)
                 {
-                    throw new UMAInvalidRequestException($"parameter {UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Subject} is missing");
+                    throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.Claims}"));
                 }
 
                 if (scopesToken == null)
                 {
-                    throw new UMAInvalidRequestException($"parameter {UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Scopes} is missing");
+                    throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Permissions}.{UMAResourcePermissionNames.Scopes}"));
                 }
 
-                result.Add(new UMAResourcePermission(subjectToken.ToString(), scopesToken.Values<string>().ToList()));
+                var permissionClaims = new List<UMAResourcePermissionClaim>();
+                foreach (var claimToken in claimsToken)
+                {
+                    var claimNameToken = claimToken.SelectToken(UMAResourcePermissionNames.ClaimName);
+                    var claimValue = claimToken.SelectToken(UMAResourcePermissionNames.ClaimValue);
+                    var claimTypeToken = claimToken.SelectToken(UMAResourcePermissionNames.ClaimType);
+                    var claimFriendlyNameToken = claimToken.SelectToken(UMAResourcePermissionNames.ClaimFriendlyName);
+                    if (claimNameToken == null)
+                    {
+                        throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.ClaimName}"));
+                    }
+
+                    if (claimValue == null)
+                    {
+                        throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, $"{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.Claims}.{UMAResourcePermissionNames.ClaimValue}"));
+                    }
+
+                    permissionClaims.Add(new UMAResourcePermissionClaim
+                    {
+                        Name = claimNameToken.ToString(),
+                        Value = claimValue.ToString(),
+                        ClaimType = claimTypeToken?.ToString(),
+                        FriendlyName = claimFriendlyNameToken?.ToString()
+                    });
+                }
+
+                result.Add(new UMAResourcePermission(Guid.NewGuid().ToString(), DateTime.UtcNow, scopesToken.Values<string>().ToList())
+                {
+                    Claims = permissionClaims
+                });
             }
 
             return result;

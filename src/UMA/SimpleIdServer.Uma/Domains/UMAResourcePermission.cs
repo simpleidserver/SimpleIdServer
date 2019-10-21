@@ -6,25 +6,29 @@ namespace SimpleIdServer.Uma.Domains
 {
     public class UMAResourcePermission : ICloneable, IEquatable<UMAResourcePermission>
     {
-        public UMAResourcePermission()
+        public UMAResourcePermission(string id, DateTime createDateTime)
         {
+            Id = id;
+            CreateDateTime = createDateTime;
+            Claims = new List<UMAResourcePermissionClaim>();
             Scopes = new List<string>();
         }
 
-        public UMAResourcePermission(string subject, ICollection<string> scopes)
+        public UMAResourcePermission(string id, DateTime createDatTime, ICollection<string> scopes)  : this(id, createDatTime)
         {
-            Subject = subject;
             Scopes = scopes;
         }
-
-        public string Subject { get; set; }
+        
+        public string Id { get; set; }
+        public ICollection<UMAResourcePermissionClaim> Claims { get; set; }
         public ICollection<string> Scopes { get; set; }
+        public DateTime CreateDateTime { get; set; }
 
         public object Clone()
         {
-            return new UMAResourcePermission
+            return new UMAResourcePermission(Id, CreateDateTime)
             {
-                Subject = Subject,
+                Claims = Claims.Select(c => (UMAResourcePermissionClaim)c.Clone()).ToList(),
                 Scopes = Scopes.ToList()
             };
         }
@@ -41,7 +45,7 @@ namespace SimpleIdServer.Uma.Domains
 
         public override int GetHashCode()
         {
-            return Subject.GetHashCode();
+            return Id.GetHashCode();
         }
     }
 }

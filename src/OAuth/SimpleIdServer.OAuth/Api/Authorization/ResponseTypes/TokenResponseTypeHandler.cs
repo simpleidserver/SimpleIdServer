@@ -19,7 +19,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
             _tokenBuilders = tokenBuilders;
         }
 
-        public string GrantType => "implicit";
+        public virtual string GrantType => "implicit";
         public string ResponseType => RESPONSE_TYPE;
         public int Order => 2;
 

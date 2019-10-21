@@ -8,7 +8,10 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSIDUma();
+            services.AddSIDUma(o =>
+            {
+                o.OpenIdJsonWebKeySignature = JwksStore.GetInstance().GetJsonWebKey();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

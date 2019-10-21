@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.Uma.Domains;
 using SimpleIdServer.Uma.Persistence;
 using SimpleIdServer.Uma.Persistence.InMemory;
+using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.Uma

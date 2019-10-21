@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Builder
                   template: "{area}/{controller}/{action=Index}/{id?}");
                 routes.MapRoute(
                     name: "DefaultRoute",
-                    template: "{controller}/{action}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
             return applicationBuilder;
         }

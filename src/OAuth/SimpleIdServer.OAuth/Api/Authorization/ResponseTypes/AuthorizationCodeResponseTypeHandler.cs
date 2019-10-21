@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 {

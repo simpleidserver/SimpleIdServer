@@ -1,14 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.DTOs;
+using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -27,27 +29,35 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
         }
 
-        public override string GrantType { get => "client_credentials"; }
+        public const string GRANT_TYPE = "client_credentials";
+        public override string GrantType { get => GRANT_TYPE; }
 
-        public override async Task<JObject> Handle(HandlerContext context)
+        public override async Task<IActionResult> Handle(HandlerContext context)
         {
-            _clientCredentialsGrantTypeValidator.Validate(context);
-            var oauthClient = await AuthenticateClient(context);
-            context.SetClient(oauthClient);
-            var scopes = ScopeHelper.Validate(context.Request.HttpBody.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
-            var result = BuildResult(context, scopes);
-            foreach (var tokenBuilder in _tokenBuilders)
+            try
             {
-                await tokenBuilder.Build(scopes, context).ConfigureAwait(false);
-            }
+                _clientCredentialsGrantTypeValidator.Validate(context);
+                var oauthClient = await AuthenticateClient(context);
+                context.SetClient(oauthClient);
+                var scopes = ScopeHelper.Validate(context.Request.HttpBody.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
+                var result = BuildResult(context, scopes);
+                foreach (var tokenBuilder in _tokenBuilders)
+                {
+                    await tokenBuilder.Build(scopes, context).ConfigureAwait(false);
+                }
 
-            _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
-            foreach(var kvp in context.Response.Parameters)
+                _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
+                foreach (var kvp in context.Response.Parameters)
+                {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+
+                return new OkObjectResult(result);
+            }
+            catch(OAuthException ex)
             {
-                result.Add(kvp.Key, kvp.Value);
+                return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
-
-            return result;
         }
     }
 }

@@ -45,7 +45,41 @@ namespace SimpleIdServer.Uma.Extensions
 
         public static string GetTicket(this JObject jObj)
         {
-            return jObj.GetStr(TokenRequestParameters.ClientSecret);
+            return jObj.GetStr(UMATokenRequestParameters.Ticket);
+        }
+
+        public static string GetClaimToken(this JObject jObj)
+        {
+            return jObj.GetStr(UMATokenRequestParameters.ClaimToken);
+        }
+
+        public static string GetClaimTokenFormat(this JObject jObj)
+        {
+            return jObj.GetStr(UMATokenRequestParameters.ClaimTokenFormat);
+        }
+
+        public static string GetPct(this JObject jObj)
+        {
+            return jObj.GetStr(UMATokenRequestParameters.Pct);
+        }
+
+        public static string GetRpt(this JObject jObj)
+        {
+            return jObj.GetStr(UMATokenRequestParameters.Rpt);
+        }
+
+        #endregion
+
+        #region Ticket request
+
+        public static string GetResourceId(this JObject jObj)
+        {
+            return jObj.GetStr(UMAPermissionNames.ResourceId);
+        }
+
+        public static IEnumerable<string> GetResourceScopes(this JObject jObj)
+        {
+            return jObj.GetArray(UMAPermissionNames.ResourceScopes);
         }
 
         #endregion
