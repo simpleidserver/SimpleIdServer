@@ -11,6 +11,7 @@ namespace SimpleIdServer.OAuth
             public const string Authorization = "authorization";
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
+            public const string Form = "form";
         }
     }
 }

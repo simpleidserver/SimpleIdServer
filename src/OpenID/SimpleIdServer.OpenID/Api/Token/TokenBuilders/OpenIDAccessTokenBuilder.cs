@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth.Api;
+using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
@@ -8,14 +10,14 @@ using SimpleIdServer.OAuth.Jwt;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
+namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
-    public class AccessTokenBuilder : ITokenBuilder
+    public class OpenIDAccessTokenBuilder : ITokenBuilder
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
 
-        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder)
+        public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;

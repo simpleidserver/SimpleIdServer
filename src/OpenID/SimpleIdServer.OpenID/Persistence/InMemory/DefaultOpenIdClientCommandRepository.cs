@@ -32,6 +32,12 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return true;
         }
 
+        public bool Delete(OAuthClient data)
+        {
+            _clients.Remove(_clients.First(c => c.ClientId == data.ClientId));
+            return true;
+        }
+
         public Task<int> SaveChanges()
         {
             return Task.FromResult(1);

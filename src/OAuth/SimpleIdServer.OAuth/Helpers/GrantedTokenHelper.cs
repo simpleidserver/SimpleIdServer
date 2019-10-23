@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Extensions;
 using System;
@@ -16,11 +17,11 @@ namespace SimpleIdServer.OAuth.Helpers
         JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
         JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
         void RefreshAccessToken(JwsPayload jwsPayload, double validityPeriodsInSeconds);
-        string BuildRefreshToken(JwsPayload jwsPayload, double validityPeriodsInSeconds);
-        JwsPayload GetRefreshToken(string refreshToken);
+        string BuildRefreshToken(JObject jwsPayload, double validityPeriodsInSeconds);
+        JObject GetRefreshToken(string refreshToken);
         void RemoveRefreshToken(string refreshToken);
-        string BuildAuthorizationCode(JwsPayload jwsPayload);
-        JwsPayload GetAuthorizationCode(string code);
+        string BuildAuthorizationCode(JObject authorizationRequest);
+        JObject GetAuthorizationCode(string code);
         void RemoveAuthorizationCode(string code);
     }
 
@@ -58,18 +59,17 @@ namespace SimpleIdServer.OAuth.Helpers
             jwsPayload[OAuthClaims.ExpirationTime] = expirationDateTime.ConvertToUnixTimestamp();
         }
 
-        public string BuildRefreshToken(JwsPayload jwsPayload, double validityPeriodsInSeconds)
+        public string BuildRefreshToken(JObject request, double validityPeriodsInSeconds)
         {
             var refreshToken = Guid.NewGuid().ToString();
-            var json = JsonConvert.SerializeObject(jwsPayload);
-            _distributedCache.Set(refreshToken, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
+            _distributedCache.Set(refreshToken, Encoding.UTF8.GetBytes(request.ToString()), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             });
             return refreshToken;
         }
 
-        public JwsPayload GetRefreshToken(string refreshToken)
+        public JObject GetRefreshToken(string refreshToken)
         {
             var cache = _distributedCache.Get(refreshToken);
             if (cache == null)
@@ -77,7 +77,7 @@ namespace SimpleIdServer.OAuth.Helpers
                 return null;
             }
 
-            return JsonConvert.DeserializeObject<JwsPayload>(Encoding.UTF8.GetString(cache));
+            return JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(cache));
         }
 
         public void RemoveRefreshToken(string refreshToken)
@@ -85,15 +85,14 @@ namespace SimpleIdServer.OAuth.Helpers
             _distributedCache.Remove(refreshToken);
         }
 
-        public string BuildAuthorizationCode(JwsPayload jwsPayload)
+        public string BuildAuthorizationCode(JObject request)
         {
-            var json = JsonConvert.SerializeObject(jwsPayload);
             var code = Guid.NewGuid().ToString();
-            _distributedCache.Set(code, Encoding.UTF8.GetBytes(json));
+            _distributedCache.Set(code, Encoding.UTF8.GetBytes(request.ToString()));
             return code;
         }
 
-        public JwsPayload GetAuthorizationCode(string code)
+        public JObject GetAuthorizationCode(string code)
         {
             var cache = _distributedCache.Get(code);
             if (cache == null)
@@ -101,7 +100,7 @@ namespace SimpleIdServer.OAuth.Helpers
                 return null;
             }
 
-            return JsonConvert.DeserializeObject<JwsPayload>(Encoding.UTF8.GetString(cache));
+            return JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(cache));
         }
 
         public void RemoveAuthorizationCode(string code)

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
@@ -26,7 +27,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
         public void Enrich(HandlerContext context)
         {
-            var dic = new Dictionary<string, object>
+            var dic = new JObject
             {
                 { UserClaims.Subject, context.User.Id }
             };

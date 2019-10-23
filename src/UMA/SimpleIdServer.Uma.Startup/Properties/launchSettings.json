@@ -2,6 +2,8 @@
   "profiles": {
     "SimpleIdServer.Uma.Startup": {
       "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:60003",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

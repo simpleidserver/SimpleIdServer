@@ -22,6 +22,7 @@ namespace SimpleIdServer.OpenID
                 {
                     Jwt.Constants.UserClaims.Name,
                     Jwt.Constants.UserClaims.FamilyName,
+                    Jwt.Constants.UserClaims.UniqueName,
                     Jwt.Constants.UserClaims.GivenName,
                     Jwt.Constants.UserClaims.MiddleName,
                     Jwt.Constants.UserClaims.NickName,

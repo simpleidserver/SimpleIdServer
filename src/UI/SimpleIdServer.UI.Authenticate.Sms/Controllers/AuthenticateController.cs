@@ -2,12 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
-using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.Sms.Services;
 using SimpleIdServer.UI.Authenticate.Sms.ViewModels;
@@ -21,7 +19,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
     {
         private readonly ISmsAuthService _smsAuthService;
 
-        public AuthenticateController(IDataProtectionProvider dataProtectionProvider, IOAuthClientQueryRepository oauthClientRepository, IAmrHelper amrHelper, ISmsAuthService smsAuthService, IOptions<OpenIDHostOptions> options) : base(dataProtectionProvider, oauthClientRepository, amrHelper, options)
+        public AuthenticateController(IDataProtectionProvider dataProtectionProvider, IOAuthClientQueryRepository oauthClientRepository, IAmrHelper amrHelper, ISmsAuthService smsAuthService) : base(dataProtectionProvider, oauthClientRepository, amrHelper)
         {
             _smsAuthService = smsAuthService;
         }

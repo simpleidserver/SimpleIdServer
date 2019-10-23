@@ -30,7 +30,7 @@ namespace SimpleIdServer.OpenID.Extensions
                     .All(cl => c.Claims.Any(scl => scl == cl.Name)))));
         }
 
-        public static ClaimsPrincipal ToClaimsPrincipal(this OAuthUser oauthUser)
+        public static List<Claim> ToClaims(this OAuthUser oauthUser)
         {
             var claims = new List<Claim>();
             foreach (var cl in oauthUser.Claims)
@@ -43,8 +43,7 @@ namespace SimpleIdServer.OpenID.Extensions
                 claims.Add(new Claim(CLAIM_MAPPINGS[cl.Key], cl.Value));
             }
 
-            var claimsIdentity = new ClaimsIdentity(claims, "pwd");
-            return new ClaimsPrincipal(claimsIdentity);
+            return claims;
         }
     }
 }

@@ -9,11 +9,11 @@ using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 {
-    public class RefreshTokenBuilder : ITokenBuilder
+    public class OpenIDRefreshTokenBuilder : ITokenBuilder
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
 
-        public RefreshTokenBuilder(IGrantedTokenHelper grantedTokenHelper)
+        public OpenIDRefreshTokenBuilder(IGrantedTokenHelper grantedTokenHelper)
         {
             _grantedTokenHelper = grantedTokenHelper;
         }

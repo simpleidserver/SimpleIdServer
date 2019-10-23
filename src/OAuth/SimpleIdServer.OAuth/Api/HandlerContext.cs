@@ -99,5 +99,10 @@ namespace SimpleIdServer.OAuth.Api
         {
             Response = response;
         }
+
+        public void SetRequest(HandlerContextRequest request)
+        {
+            Request = request;
+        }
     }
 }

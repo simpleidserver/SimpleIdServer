@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
@@ -30,36 +31,27 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
         public void Enrich(HandlerContext context)
         {
-            var dic = new Dictionary<string, object>
+            var dic = new JObject
             {
                 { UserClaims.Subject, context.User.Id }
             };
+
             if (context.Request.AuthDateTime != null)
             {
                 dic.Add(OAuthClaims.AuthenticationTime, context.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
             }
 
-            if (context.Request.QueryParameters.ContainsKey(DTOs.AuthorizationRequestParameters.Claims))
+            foreach(var record in context.Request.QueryParameters)
             {
-                dic.Add(Jwt.Constants.OAuthClaims.Claims, context.Request.QueryParameters[DTOs.AuthorizationRequestParameters.Claims]);
+                dic.Add(record.Key, record.Value);
             }
 
-            var scopes = context.Request.QueryParameters.GetScopesFromAuthorizationRequest();
-            var jwsPayload = _grantedTokenHelper.BuildAccessToken(
-                    new[] { context.Client.ClientId },
-                    scopes, context.Request.IssuerName, context.Client.TokenExpirationTimeInSeconds
-            );
-            foreach(var kvp in dic)
-            {
-                jwsPayload.Add(kvp.Key, kvp.Value);
-            }
-
-            var authCode = _grantedTokenHelper.BuildAuthorizationCode(jwsPayload);
+            var authCode = _grantedTokenHelper.BuildAuthorizationCode(dic);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
-            var isScopeCOntainsOfflineAccess = scopes.Contains(SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name);
+            var isScopeCOntainsOfflineAccess = context.Request.QueryParameters.GetScopesFromAuthorizationRequest().Contains(SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeCOntainsOfflineAccess)
             {
-                _tokenBuilders.First(t => t.Name == SimpleIdServer.OAuth.DTOs.TokenResponseParameters.RefreshToken).Build(context.Request.QueryParameters.GetScopesFromAuthorizationRequest(), context, dic);
+                _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(context.Request.QueryParameters.GetScopesFromAuthorizationRequest(), context, dic);
             }
         }
     }

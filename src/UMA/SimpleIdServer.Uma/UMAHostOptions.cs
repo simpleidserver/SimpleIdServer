@@ -7,6 +7,8 @@ namespace SimpleIdServer.Uma
     {
         public UMAHostOptions()
         {
+            SignInScheme = UMAConstants.SignInScheme;
+            ChallengeAuthenticationScheme = UMAConstants.ChallengeAuthenticationScheme;
             ValidityPeriodPermissionTicketInSeconds = 5 * 60;
             OpenIdJsonWebKeySignature = new JsonWebKey();
             DefaultClaimTokenFormat = OpenIDClaimTokenFormat.NAME;
@@ -15,9 +17,13 @@ namespace SimpleIdServer.Uma
         }
 
         /// <summary>
-        /// Authentication scheme.
+        /// Sign in scheme
         /// </summary>
-        public string AuthenticationScheme { get; set; }
+        public string SignInScheme { get; set; }
+        /// <summary>
+        /// Challenge authentication scheme.
+        /// </summary>
+        public string ChallengeAuthenticationScheme { get; set; }
         /// <summary>
         /// The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint. 
         /// </summary>

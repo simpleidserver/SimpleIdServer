@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Api;
@@ -7,6 +8,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
@@ -29,18 +31,20 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         private readonly IEnumerable<IClaimsSource> _claimsSources;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly IAmrHelper _amrHelper;
+        private readonly IOAuthUserQueryRepository _oauthUserRepository;
 
-        public IdTokenBuilder(IJwtBuilder jwtBuilder, IEnumerable<IClaimsSource> claimsSources, IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IAmrHelper amrHelper)
+        public IdTokenBuilder(IJwtBuilder jwtBuilder, IEnumerable<IClaimsSource> claimsSources, IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IAmrHelper amrHelper, IOAuthUserQueryRepository oauthUserQueryRepository)
         {
             _jwtBuilder = jwtBuilder;
             _claimsSources = claimsSources;
             _subjectTypeBuilders = subjectTypeBuilders;
             _amrHelper = amrHelper;
+            _oauthUserRepository = oauthUserQueryRepository;
         }
 
         public string Name => TokenResponseParameters.IdToken;
 
-        public async Task Build(IEnumerable<string> scopes, HandlerContext context, Dictionary<string, object> claims = null)
+        public async Task Build(IEnumerable<string> scopes, HandlerContext context, JObject claims = null)
         {
             if (!scopes.Contains(SIDOpenIdConstants.StandardScopes.OpenIdScope.Name) || context.User == null)
             {
@@ -48,54 +52,63 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             }
 
             var openidClient = (OpenIdClient)context.Client;
-            var payload = await BuildIdToken(context).ConfigureAwait(false);
+            var payload = await BuildIdToken(context, context.Request.QueryParameters).ConfigureAwait(false);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
             context.Response.Add(Name, idToken);
         }
 
-        public Task Build(JwsPayload jwsPayload, HandlerContext handlerContext)
+        public async Task Refresh(JObject previousQueryParameters, HandlerContext currentContext)
         {
-            return Task.FromResult(0);
+            if (!previousQueryParameters.ContainsKey(UserClaims.Subject))
+            {
+                return;
+            }
+
+            currentContext.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(previousQueryParameters[UserClaims.Subject].ToString()));
+            var openidClient = (OpenIdClient)currentContext.Client;
+            var payload = await BuildIdToken(currentContext, previousQueryParameters).ConfigureAwait(false);
+            var idToken = await _jwtBuilder.BuildClientToken(currentContext.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
+            currentContext.Response.Add(Name, idToken);
         }
 
-        private async Task<JwsPayload> BuildIdToken(HandlerContext context)
+        private async Task<JwsPayload> BuildIdToken(HandlerContext currentContext, JObject queryParameters)
         {
-            var openidClient = (OpenIdClient)context.Client;
+            var openidClient = (OpenIdClient)currentContext.Client;
             var result = new JwsPayload
             {
-                { OAuthClaims.Audiences, new [] { openidClient.ClientId, context.Request.IssuerName } },
-                { OAuthClaims.Issuer, context.Request.IssuerName },
+                { OAuthClaims.Audiences, new [] { openidClient.ClientId, currentContext.Request.IssuerName } },
+                { OAuthClaims.Issuer, currentContext.Request.IssuerName },
                 { OAuthClaims.Iat, DateTime.UtcNow.ConvertToUnixTimestamp() },
                 { OAuthClaims.ExpirationTime, DateTime.UtcNow.AddSeconds(openidClient.TokenExpirationTimeInSeconds).ConvertToUnixTimestamp() },
                 { OAuthClaims.Azp, openidClient.ClientId }
             };
+            var maxAge = queryParameters.GetMaxAgeFromAuthorizationRequest();
+            var nonce = queryParameters.GetNonceFromAuthorizationRequest();
+            var acrValues = queryParameters.GetAcrValuesFromAuthorizationRequest();
+            var requestedClaims = queryParameters.GetClaimsFromAuthorizationRequest();
+            var requestedScopes = queryParameters.GetScopesFromAuthorizationRequest();
             var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.SubjectType));
-            var subject = await subjectTypeBuilder.Build(context);
+            var subject = await subjectTypeBuilder.Build(currentContext);
             result.Add(UserClaims.Subject, subject);
-            var maxAge = context.Request.QueryParameters.GetMaxAgeFromAuthorizationRequest();
-            var nonce = context.Request.QueryParameters.GetNonceFromAuthorizationRequest();
-            var acrValues = context.Request.QueryParameters.GetAcrValuesFromAuthorizationRequest();
-            var requestedScopes = context.Request.QueryParameters.GetScopesFromAuthorizationRequest();
-            var requestedClaims = context.Request.QueryParameters.GetClaimsFromAuthorizationRequest();
+            string accessToken, code;
+            if (currentContext.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.AccessToken, out accessToken))
+            {
+                result.Add(OAuthClaims.AtHash, ComputeHash(accessToken));
+            }
+
+            if (currentContext.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.Code, out code))
+            {
+                result.Add(OAuthClaims.CHash, ComputeHash(code));
+            }
+
             if (maxAge != null)
             {
-                result.Add(OAuthClaims.AuthenticationTime, context.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
+                result.Add(OAuthClaims.AuthenticationTime, currentContext.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
             }
 
             if (!string.IsNullOrWhiteSpace(nonce))
             {
                 result.Add(OAuthClaims.Nonce, nonce);
-            }
-
-            string accessToken, code;
-            if (context.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.AccessToken, out accessToken))
-            {
-                result.Add(OAuthClaims.AtHash, ComputeHash(accessToken));
-            }
-
-            if (context.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.Code, out code))
-            {
-                result.Add(OAuthClaims.CHash, ComputeHash(code));
             }
 
             var acr = await _amrHelper.FetchDefaultAcr(acrValues, openidClient);
@@ -106,9 +119,9 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             }
 
             var scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
-            EnrichWithScopeParameter(result, scopes, context.User);
-            EnrichWithClaimsParameter(result, requestedClaims, context.User, context.Request.AuthDateTime);
-            foreach(var claimsSource in _claimsSources)
+            EnrichWithScopeParameter(result, scopes, currentContext.User);
+            EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.Request.AuthDateTime);
+            foreach (var claimsSource in _claimsSources)
             {
                 await claimsSource.Enrich(result, openidClient).ConfigureAwait(false);
             }

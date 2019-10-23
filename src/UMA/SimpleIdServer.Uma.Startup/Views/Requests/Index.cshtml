@@ -1,8 +1,39 @@
 ﻿@using SimpleIdServer.Uma.Startup.Resources
-
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "My requests";
 }
 
-<h1>My requests</h1>
+<div class="container">
+    <h1>My resources</h1>
+    <table class="table table-striped table-bordered" id="my-requests">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Scopes</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#my-requests").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "@Url.Action("SearchMe", "ResourcesAPI")",
+                    "type": "GET",
+                    "data": function (d) {
+                        var query = "startIndex=" + d.start + "&count=" + d.length;
+                        return query;
+                    }
+                }
+            });
+        });
+    </script>
+}

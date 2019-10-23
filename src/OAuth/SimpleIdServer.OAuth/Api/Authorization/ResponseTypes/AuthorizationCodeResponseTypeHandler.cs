@@ -1,11 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
-using System.Collections.Generic;
 
 namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 {
@@ -25,12 +23,13 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 
         public void Enrich(HandlerContext context)
         {
-            JwsPayload jwsPayload = _grantedTokenHelper.BuildAccessToken(
-                    new[] { context.Client.ClientId },
-                    context.Request.QueryParameters.GetScopesFromAuthorizationRequest(),
-                    context.Request.IssuerName, context.Client.TokenExpirationTimeInSeconds
-            );
-            var authCode = _grantedTokenHelper.BuildAuthorizationCode(jwsPayload);
+            var dic = new JObject();
+            foreach (var record in context.Request.QueryParameters)
+            {
+                dic.Add(record.Key, record.Value);
+            }
+
+            var authCode = _grantedTokenHelper.BuildAuthorizationCode(dic);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
         }
     }

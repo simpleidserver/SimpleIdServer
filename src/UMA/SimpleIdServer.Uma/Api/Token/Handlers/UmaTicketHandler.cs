@@ -186,7 +186,7 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Build(scopes, context, new Dictionary<string, object>
+                    await tokenBuilder.Build(scopes, context, new JObject
                     {
                         { "permissions", jArr }
                     }).ConfigureAwait(false);

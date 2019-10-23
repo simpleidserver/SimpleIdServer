@@ -80,9 +80,11 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddResponseModeHandlers(this IServiceCollection services)
         {
             services.AddTransient<IOAuthResponseMode, QueryResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, QueryResponseModeHandler>();
             services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, FormPostResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, QueryResponseModeHandler>();
             services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, FormPostResponseModeHandler>();
             services.AddTransient<IResponseModeHandler, ResponseModeHandler>();
             return services;
         }

@@ -81,8 +81,27 @@ namespace SimpleIdServer.Uma.Api
                     });
                 }
 
+                _umaPendingRequestCommandRepository.Delete(pendingRequest);
                 _umaResourceCommandRepository.Update(resource);
                 await _umaResourceCommandRepository.SaveChanges();
+                await _umaPendingRequestCommandRepository.SaveChanges();
+                return new NoContentResult();
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public Task<IActionResult> Remove(string id)
+        {
+            return CallOperationWithAuthenticatedUser(async (sub, payload) =>
+            {
+                var pendingRequest = await _umaPendingRequestQueryRepository.FindByTicketIdentifierAndOwner(id, sub);
+                if (pendingRequest == null)
+                {
+                    return this.BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED);
+                }
+
+                _umaPendingRequestCommandRepository.Delete(pendingRequest);
+                await _umaPendingRequestCommandRepository.SaveChanges();
                 return new NoContentResult();
             });
         }

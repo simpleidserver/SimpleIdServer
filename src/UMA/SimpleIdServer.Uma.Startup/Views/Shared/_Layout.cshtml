@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SimpleIdServer - @ViewBag.Title</title>
     <link rel="stylesheet" href="@Url.Content("~/lib/twitter-bootstrap/css/bootstrap.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/lib/dataTables/css/dataTables.bootstrap4.css")" />
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -39,7 +40,7 @@
                 else
                 {
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Authenticate</a>
+                        <a class="nav-link" href="@Url.Action("Login", "Home")">Authenticate</a>
                     </li>
                 }
             </ul>
@@ -53,7 +54,10 @@
             @RenderBody()
         </div>
     </div>
+    <script type="text/javascript" src="@Url.Content("~/lib/jquery/jquery.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/lib/twitter-bootstrap/js/bootstrap.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/dataTables/js/jquery.dataTables.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/dataTables/js/dataTables.bootstrap4.js")"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

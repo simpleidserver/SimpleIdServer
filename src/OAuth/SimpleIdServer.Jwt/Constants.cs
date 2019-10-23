@@ -59,6 +59,7 @@ namespace SimpleIdServer.Jwt
             public static string Role = "role";
             public static string ScimId = "scim_id";
             public static string ScimLocation = "scim_location";
+            public static string UniqueName = "unique_name";
         }
 
         public static ICollection<string> USER_CLAIMS = new List<string>

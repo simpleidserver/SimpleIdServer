@@ -27,8 +27,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly IDataProtector _dataProtector;
 
-        public AuthorizationController(IAuthorizationRequestHandler authorizationRequestHandler, IResponseModeHandler responseModeHandler,
-            IDataProtectionProvider dataProtectionProvider)
+        public AuthorizationController(IAuthorizationRequestHandler authorizationRequestHandler, IResponseModeHandler responseModeHandler, IDataProtectionProvider dataProtectionProvider)
         {
             _authorizationRequestHandler = authorizationRequestHandler;
             _responseModeHandler = responseModeHandler;

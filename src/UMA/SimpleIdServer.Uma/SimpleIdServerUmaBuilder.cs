@@ -26,6 +26,20 @@ namespace SimpleIdServer.Uma
             _serviceCollection.AddSingleton<IUMAResourceCommandRepository>(new DefaultUMAResourceCommandRepository(umaResources));
             _serviceCollection.AddSingleton<IUMAResourceQueryRepository>(new DefaultUMAResourceQueryRepository(umaResources));
             return this;
+        }        
+
+        public SimpleIdServerUmaBuilder AddAuthentication(Action<AuthenticationBuilder> callback)
+        {
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            var umaHostOptions = serviceProvider.GetService<IOptionsMonitor<UMAHostOptions>>().CurrentValue;
+            var authenticationBuilder = _serviceCollection.AddAuthentication(opts =>
+            {
+                opts.DefaultAuthenticateScheme = umaHostOptions.SignInScheme;
+                opts.DefaultSignInScheme = umaHostOptions.SignInScheme;
+                opts.DefaultChallengeScheme = umaHostOptions.ChallengeAuthenticationScheme;
+            });
+            callback(authenticationBuilder);
+            return this;
         }
     }
 }

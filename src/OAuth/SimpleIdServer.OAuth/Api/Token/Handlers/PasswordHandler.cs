@@ -49,7 +49,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var user = await _oauthUserQueryRepository.FindOAuthUserByLoginAndCredential(userName, "pwd", PasswordHelper.ComputeHash(password));
                 if (user == null)
                 {
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
+                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
                 }
 
                 context.SetUser(user);

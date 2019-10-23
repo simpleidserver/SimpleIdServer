@@ -101,3 +101,173 @@ Scenario: Get received pending requests
 	Then JSON 'data[0].resource.description#en'='descriptionEN'
 	Then JSON 'data[0].resource.name#fr'='nom'
 	Then JSON 'data[0].resource.name#en'='name'
+
+Scenario: Confirm pending request
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                        | Value                  |
+	| redirect_uris              | ["https://web.com"]    |
+	| grant_types                | ["client_credentials"] |
+	| token_endpoint_auth_method | client_secret_post     |
+	| scope                      | uma_protection         |
+
+	And extract JSON from body
+	And extract 'client_id' from JSON body
+	And extract 'client_secret' from JSON body
+
+	And execute HTTP POST request 'http://localhost/token'
+	| Key           | Value              |
+	| client_id     | $client_id$        |
+	| client_secret | $client_secret$    |
+	| scope         | uma_protection     |
+	| grant_type    | client_credentials |
+
+	And extract JSON from body
+	And extract 'access_token' from JSON body
+
+	And execute HTTP POST JSON request 'http://localhost/rreguri'
+	| Key             | Value                 |
+	| resource_scopes | [ "scope1" ]          |
+	| subject         | owner                 |
+	| icon_uri        | icon                  |
+	| name#fr         | nom                   |
+	| name#en         | name                  |
+	| description#fr  | descriptionFR         |
+	| description#en  | descriptionEN         |
+	| type            | type                  |
+	| Authorization   | Bearer $access_token$ |
+	
+	And extract JSON from body
+	And extract '_id' from JSON body
+
+	And execute HTTP PUT JSON request 'http://localhost/rreguri/$_id$/permissions'
+	| Key           | Value                                                                                                                  |
+	| permissions   | [ { claims: [ { name: "sub", value: "user" }, { name: "email", value: "user@hotmail.com" } ], scopes: [ "scope1" ] } ] |
+	| Authorization | Bearer $access_token$                                                                                                  |
+
+	And execute HTTP POST JSON request 'http://localhost/perm'
+	| Key             | Value                 |
+	| resource_id     | $_id$                 |
+	| resource_scopes | [ "scope1"]           |
+	| Authorization   | Bearer $access_token$ |
+
+	And extract JSON from body
+	And extract 'ticket' from JSON body
+
+	And execute HTTP POST JSON request 'http://localhost/register'
+	| Key							| Value												|
+	| redirect_uris					| ["https://web.com"]								|
+	| grant_types					| ["urn:ietf:params:oauth:grant-type:uma-ticket"]	|
+	| response_types				| ["token"]											|
+	| token_endpoint_auth_method	| client_secret_post								|
+	
+	And extract JSON from body
+	And extract 'client_id' from JSON body
+	And extract 'client_secret' from JSON body
+
+	And build claim_token
+	| Key   | Value           |
+	| sub   | badrequester    |
+	| email | user@hotmail.fr |
+	
+	And execute HTTP POST request 'http://localhost/token'
+	| Key                | Value                                                        |
+	| client_id          | $client_id$                                                  |
+	| client_secret      | $client_secret$                                              |
+	| grant_type         | urn:ietf:params:oauth:grant-type:uma-ticket                  |
+	| ticket             | $ticket$                                                     |
+	| claim_token        | $claim_token$                                                |
+	| claim_token_format | http://openid.net/specs/openid-connect-core-1_0.html#IDToken |
+	| scope              | scope1                                                       |	
+	
+	And build claim_token
+	| Key   | Value           |
+	| sub   | owner			  |
+
+	And execute HTTP GET against 'http://localhost/reqs/confirm/$ticket$' and pass authorization header 'Bearer $claim_token$'
+	
+	Then HTTP status code equals to '204'
+
+Scenario: Delete pending request
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                        | Value                  |
+	| redirect_uris              | ["https://web.com"]    |
+	| grant_types                | ["client_credentials"] |
+	| token_endpoint_auth_method | client_secret_post     |
+	| scope                      | uma_protection         |
+
+	And extract JSON from body
+	And extract 'client_id' from JSON body
+	And extract 'client_secret' from JSON body
+
+	And execute HTTP POST request 'http://localhost/token'
+	| Key           | Value              |
+	| client_id     | $client_id$        |
+	| client_secret | $client_secret$    |
+	| scope         | uma_protection     |
+	| grant_type    | client_credentials |
+
+	And extract JSON from body
+	And extract 'access_token' from JSON body
+
+	And execute HTTP POST JSON request 'http://localhost/rreguri'
+	| Key             | Value                 |
+	| resource_scopes | [ "scope1" ]          |
+	| subject         | owner                 |
+	| icon_uri        | icon                  |
+	| name#fr         | nom                   |
+	| name#en         | name                  |
+	| description#fr  | descriptionFR         |
+	| description#en  | descriptionEN         |
+	| type            | type                  |
+	| Authorization   | Bearer $access_token$ |
+	
+	And extract JSON from body
+	And extract '_id' from JSON body
+
+	And execute HTTP PUT JSON request 'http://localhost/rreguri/$_id$/permissions'
+	| Key           | Value                                                                                                                  |
+	| permissions   | [ { claims: [ { name: "sub", value: "user" }, { name: "email", value: "user@hotmail.com" } ], scopes: [ "scope1" ] } ] |
+	| Authorization | Bearer $access_token$                                                                                                  |
+
+	And execute HTTP POST JSON request 'http://localhost/perm'
+	| Key             | Value                 |
+	| resource_id     | $_id$                 |
+	| resource_scopes | [ "scope1"]           |
+	| Authorization   | Bearer $access_token$ |
+
+	And extract JSON from body
+	And extract 'ticket' from JSON body
+
+	And execute HTTP POST JSON request 'http://localhost/register'
+	| Key							| Value												|
+	| redirect_uris					| ["https://web.com"]								|
+	| grant_types					| ["urn:ietf:params:oauth:grant-type:uma-ticket"]	|
+	| response_types				| ["token"]											|
+	| token_endpoint_auth_method	| client_secret_post								|
+	
+	And extract JSON from body
+	And extract 'client_id' from JSON body
+	And extract 'client_secret' from JSON body
+
+	And build claim_token
+	| Key   | Value           |
+	| sub   | badrequester    |
+	| email | user@hotmail.fr |
+	
+	And execute HTTP POST request 'http://localhost/token'
+	| Key                | Value                                                        |
+	| client_id          | $client_id$                                                  |
+	| client_secret      | $client_secret$                                              |
+	| grant_type         | urn:ietf:params:oauth:grant-type:uma-ticket                  |
+	| ticket             | $ticket$                                                     |
+	| claim_token        | $claim_token$                                                |
+	| claim_token_format | http://openid.net/specs/openid-connect-core-1_0.html#IDToken |
+	| scope              | scope1                                                       |	
+	
+	And build claim_token
+	| Key   | Value           |
+	| sub   | owner			  |
+
+	And execute HTTP DELETE against 'http://localhost/reqs/$ticket$' and pass authorization header 'Bearer $claim_token$'
+	
+	Then HTTP status code equals to '204'

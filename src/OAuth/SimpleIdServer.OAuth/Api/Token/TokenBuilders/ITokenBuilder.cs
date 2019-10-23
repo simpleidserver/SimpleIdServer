@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,13 +16,13 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         /// <param name="handlerContext"></param>
         /// <param name="claims"></param>
         /// <returns></returns>
-        Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, Dictionary<string, object> claims = null);
+        Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null);
         /// <summary>
-        /// Build token from previous one.
+        /// Refresh token from previous one.
         /// </summary>
-        /// <param name="jwsPayload"></param>
+        /// <param name="previousQueryParameters"></param>
         /// <param name="handlerContext"></param>
         /// <returns></returns>
-        Task Build(JwsPayload jwsPayload, HandlerContext handlerContext);
+        Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext);
     }
 }

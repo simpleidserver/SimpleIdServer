@@ -8,6 +8,8 @@ using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Persistence;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,14 +23,16 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly IOAuthUserQueryRepository _oauthUserRepository;
 
         public RefreshTokenHandler(IRefreshTokenGrantTypeValidator refreshTokenGrantTypeValidator, IGrantedTokenHelper grantedTokenHelper, IEnumerable<ITokenProfile> tokenProfiles,
-            IEnumerable<ITokenBuilder> tokenBuilders, IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
+            IEnumerable<ITokenBuilder> tokenBuilders, IClientAuthenticationHelper clientAuthenticationHelper, IOAuthUserQueryRepository oauthUserQueryRepository) : base(clientAuthenticationHelper)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
+            _oauthUserRepository = oauthUserQueryRepository;
         }
 
         public const string GRANT_TYPE = "refresh_token";
@@ -48,17 +52,17 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_REFRESH_TOKEN);
                 }
 
-                if (!jwsPayload.GetAudiences().Contains(oauthClient.ClientId))
+                if (!jwsPayload.GetClientIdFromAuthorizationRequest().Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
                 }
 
                 _grantedTokenHelper.RemoveRefreshToken(refreshToken);
-                var scopes = jwsPayload.GetScopes();
+                var scopes = jwsPayload.GetScopesFromAuthorizationRequest();
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Build(jwsPayload, context).ConfigureAwait(false);
+                    await tokenBuilder.Refresh(jwsPayload, context).ConfigureAwait(false);
                 }
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

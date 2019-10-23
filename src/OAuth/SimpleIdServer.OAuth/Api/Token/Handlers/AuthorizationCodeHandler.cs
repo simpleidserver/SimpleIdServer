@@ -8,6 +8,7 @@ using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -42,23 +43,24 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var oauthClient = await AuthenticateClient(context);
                 context.SetClient(oauthClient);
                 var code = context.Request.HttpBody.GetAuthorizationCode();
-                var jwsPayload = _grantedTokenHelper.GetAuthorizationCode(code);
-                if (jwsPayload == null)
+                var previousRequest = _grantedTokenHelper.GetAuthorizationCode(code);
+                if (previousRequest == null)
                 {
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_AUTHORIZATION_CODE);
                 }
 
-                if (!jwsPayload.GetAudiences().Contains(oauthClient.ClientId))
+                var previousClientId = previousRequest.GetClientId();
+                if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
                 }
 
                 _grantedTokenHelper.RemoveAuthorizationCode(code);
-                var scopes = jwsPayload.GetScopes();
+                var scopes = previousRequest.GetScopesFromAuthorizationRequest();
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Build(jwsPayload, context).ConfigureAwait(false);
+                    await tokenBuilder.Refresh(previousRequest, context).ConfigureAwait(false);
                 }
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

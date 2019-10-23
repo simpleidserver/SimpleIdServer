@@ -5,7 +5,8 @@ namespace SimpleIdServer.Uma
 {
     public static class UMAConstants
     {
-        public const string AuthenticationScheme = "SimpleIdServerUMA";
+        public const string SignInScheme = "SimpleIdServerUMA";
+        public const string ChallengeAuthenticationScheme = "SimpleIdServerUMA.Challenge";
 
         public static class EndPoints
         {

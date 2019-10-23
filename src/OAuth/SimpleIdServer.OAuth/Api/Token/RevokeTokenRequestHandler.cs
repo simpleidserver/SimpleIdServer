@@ -7,6 +7,7 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace SimpleIdServer.OAuth.Api.Token
             _revokeTokenValidator.Validate(jObjBody);
             var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(jObjBody, jObjBody, issuerName).ConfigureAwait(false);
             var refreshToken = _grantedTokenHelper.GetRefreshToken(jObjBody.GetStr(RevokeTokenRequestParameters.Token));
-            if (refreshToken != null && !refreshToken.GetAudiences().Contains(oauthClient.ClientId))
+            if (refreshToken != null && !refreshToken.GetClientIdFromAuthorizationRequest().Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
             }

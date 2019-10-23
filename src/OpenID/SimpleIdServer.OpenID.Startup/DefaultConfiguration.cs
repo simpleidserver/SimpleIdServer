@@ -63,6 +63,24 @@ namespace SimpleIdServer.OpenID.Startup
                     { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser" },
                     { "scim_id", "1" }
                 }
+            },
+            new OAuthUser
+            {
+                Id = "umaUser",
+                Credentials = new List<OAuthUserCredential>
+                {
+                    new OAuthUserCredential
+                    {
+                        CredentialType = "pwd",
+                        Value = PasswordHelper.ComputeHash("password")
+                    }
+                },
+                Claims = new Dictionary<string, string>
+                {
+                    { Jwt.Constants.UserClaims.Subject, "umaUser" },
+                    { Jwt.Constants.UserClaims.Name, "User" },
+                    { Jwt.Constants.UserClaims.UniqueName, "User" }
+                }
             }
         };
 
@@ -108,6 +126,43 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     "token",
                     "id_token"
+                }
+            },
+            new OpenIdClient
+            {
+                ClientId = "umaClient",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("umaClientSecret"))
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.Profile,
+                    SIDOpenIdConstants.StandardScopes.Email
+                },
+                GrantTypes = new List<string>
+                {
+                    "implicit",
+                    "authorization_code"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "https://localhost:60003/signin-oidc"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "token",
+                    "id_token",
+                    "code"
                 }
             }
         };
