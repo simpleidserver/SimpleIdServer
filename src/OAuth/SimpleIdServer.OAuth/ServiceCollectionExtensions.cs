@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe.CEKHandlers;
@@ -43,7 +44,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static SimpleIdServerOAuthBuilder AddSIDOAuth(this IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
+            services.AddMvc()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix, opts => { opts.ResourcesPath = "Resources"; })
+                .AddDataAnnotationsLocalization();
             services.AddDataProtection();
             services.AddOAuthStore()
                 .AddResponseModeHandlers()

@@ -1,4 +1,6 @@
-﻿namespace SimpleIdServer.Uma
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+namespace SimpleIdServer.Uma
 {
     public static class UMAErrorMessages
     {
@@ -6,6 +8,7 @@
         public const string INVALID_TICKET = "permission ticket is not correct";
         public const string MISSING_PARAMETER = "parameter {0} is missing";
         public const string BAD_CLAIM_TOKEN = "claim_token parameter is not a JWS token";
+        public const string REQUEST_CANNOT_BE_CONFIRMED = "request has already been confirmed or rejected";
         public const string INVALID_RESOURCE_ID = "At least one of the provided resource identifiers was not found at the authorization server.";
         public const string REQUEST_NEEDINFO = "The authorization server needs additional information in order for a request to succeed, for example, a provided claim token was invalid or expired, or had an incorrect format, or additional claims are needed to complete the authorization assessment.";
         public const string REQUEST_DENIED = "The client is not authorized to have these permissions.";

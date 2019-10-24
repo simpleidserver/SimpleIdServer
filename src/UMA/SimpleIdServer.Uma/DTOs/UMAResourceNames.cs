@@ -1,4 +1,6 @@
-﻿namespace SimpleIdServer.Uma.DTOs
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+namespace SimpleIdServer.Uma.DTOs
 {
     public class UMAResourceNames
     {
@@ -9,5 +11,6 @@
         public const string Name = "name";
         public const string Type = "type";
         public const string Subject = "subject";
+        public const string CreateDateTime = "create_datetime";
     }
 }

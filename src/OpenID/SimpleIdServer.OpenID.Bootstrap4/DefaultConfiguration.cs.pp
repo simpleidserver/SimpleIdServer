@@ -10,6 +10,18 @@ namespace $rootnamespace$
 {
     public class DefaultConfiguration
     {
+        public static List<OpenIdScope> Scopes = new List<OpenIdScope>
+        {
+            new OpenIdScope
+            {
+                Name = "scim",
+                Claims = new List<string>
+                {
+                    "scim_id"
+                }
+            }
+        };
+
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
         {
             new AuthenticationContextClassReference
@@ -37,7 +49,7 @@ namespace $rootnamespace$
         {
             new OAuthUser
             {
-                Id = "administrator",
+                Id = "scimUser",
                 Credentials = new List<OAuthUserCredential>
                 {
                     new OAuthUserCredential
@@ -48,15 +60,13 @@ namespace $rootnamespace$
                 },
                 Claims = new Dictionary<string, string>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Administrator" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Email, "administrator@hotmail.fr" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "01" }
+                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser" },
+                    { "scim_id", "1" }
                 }
             },
             new OAuthUser
             {
-                Id = "thabart",
+                Id = "umaUser",
                 Credentials = new List<OAuthUserCredential>
                 {
                     new OAuthUserCredential
@@ -67,10 +77,9 @@ namespace $rootnamespace$
                 },
                 Claims = new Dictionary<string, string>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "thabart" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "02" }
+                    { Jwt.Constants.UserClaims.Subject, "umaUser" },
+                    { Jwt.Constants.UserClaims.Name, "User" },
+                    { Jwt.Constants.UserClaims.UniqueName, "User" }
                 }
             }
         };
@@ -79,15 +88,10 @@ namespace $rootnamespace$
         {
             new OpenIdClient
             {
-                ClientId = "f3d35cce-de69-45bf-958c-4a8796f8ed37",
+                ClientId = "scimClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("BankCvSecret"))
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("f3d35cce-de69-45bf-958c-4a8796f8ed37_client_name", "BankCV site", "fr"),
-                    new OAuthTranslation("f3d35cce-de69-45bf-958c-4a8796f8ed37_client_name", "BankCV website", "en")
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("scimClientSecret"))
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -95,18 +99,22 @@ namespace $rootnamespace$
                 CreateDateTime = DateTime.UtcNow,
                 TokenExpirationTimeInSeconds = 60 * 30,
                 RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OpenIdScope>
                 {
                     new OpenIdScope
                     {
-                        Name = SimpleIdServer.OpenID.SIDOpenIdConstants.StandardScopes.Profile.Name
+                        Name = "scim",
+                        Claims = new List<string>
+                        {
+                            "scim_id"
+                        }
                     }
                 },
                 GrantTypes = new List<string>
                 {
-                    "client_credentials",
-                    "refresh_token",
-                    "authorization_code"
+                    "implicit",
                 },
                 RedirectionUrls = new List<string>
                 {
@@ -116,6 +124,44 @@ namespace $rootnamespace$
                 PreferredTokenProfile = "Bearer",
                 ResponseTypes = new List<string>
                 {
+                    "token",
+                    "id_token"
+                }
+            },
+            new OpenIdClient
+            {
+                ClientId = "umaClient",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("umaClientSecret"))
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.Profile,
+                    SIDOpenIdConstants.StandardScopes.Email
+                },
+                GrantTypes = new List<string>
+                {
+                    "implicit",
+                    "authorization_code"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "https://localhost:60003/signin-oidc"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "token",
+                    "id_token",
                     "code"
                 }
             }

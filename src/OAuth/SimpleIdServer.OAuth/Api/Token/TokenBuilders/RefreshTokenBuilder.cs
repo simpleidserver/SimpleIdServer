@@ -5,7 +5,6 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 {
@@ -18,30 +17,18 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             _grantedTokenHelper = grantedTokenHelper;
         }
 
+        protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
         public string Name => TokenResponseParameters.RefreshToken;
 
-        public Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
+        public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
         {
             var dic = new JObject();
-            if (handlerContext.Request.HttpBody != null)
+            if (handlerContext.Request.Data != null)
             {
-                foreach (var record in handlerContext.Request.HttpBody)
+                foreach (var record in handlerContext.Request.Data)
                 {
                     dic.Add(record.Key, record.Value);
                 }
-            }
-
-            if (handlerContext.Request.QueryParameters != null)
-            {
-                foreach (var record in handlerContext.Request.QueryParameters)
-                {
-                    dic.Add(record.Key, record.Value);
-                }
-            }
-
-            if (handlerContext.User != null)
-            {
-                dic.Add(UserClaims.Subject, handlerContext.User.Id);
             }
 
             var refreshToken = _grantedTokenHelper.BuildRefreshToken(dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds);
@@ -49,7 +36,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             return Task.FromResult(0);
         }
 
-        public Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext)
+        public virtual Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext)
         {
             var refreshToken = _grantedTokenHelper.BuildRefreshToken(previousQueryParameters, handlerContext.Client.RefreshTokenExpirationTimeInSeconds);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);

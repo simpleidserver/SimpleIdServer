@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.Uma.Api.Token.Fetchers;
 using SimpleIdServer.Uma.Domains;
@@ -65,6 +68,11 @@ namespace SimpleIdServer.Uma.Api
                     return this.BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED);
                 }
 
+                if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                {
+                    return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, UMAErrorMessages.REQUEST_CANNOT_BE_CONFIRMED);
+                }
+
                 var resource = await _umaResourceQueryRepository.FindByIdentifier(pendingRequest.Resource.Id);
                 foreach(var claimTokenFormat in _claimTokenFormats)
                 {
@@ -81,7 +89,8 @@ namespace SimpleIdServer.Uma.Api
                     });
                 }
 
-                _umaPendingRequestCommandRepository.Delete(pendingRequest);
+                pendingRequest.Confirm();
+                _umaPendingRequestCommandRepository.Update(pendingRequest);
                 _umaResourceCommandRepository.Update(resource);
                 await _umaResourceCommandRepository.SaveChanges();
                 await _umaPendingRequestCommandRepository.SaveChanges();
@@ -90,7 +99,7 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpDelete("{id}")]
-        public Task<IActionResult> Remove(string id)
+        public Task<IActionResult> Reject(string id)
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
@@ -100,7 +109,13 @@ namespace SimpleIdServer.Uma.Api
                     return this.BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED);
                 }
 
-                _umaPendingRequestCommandRepository.Delete(pendingRequest);
+                if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                {
+                    return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, UMAErrorMessages.REQUEST_CANNOT_BE_CONFIRMED);
+                }
+
+                pendingRequest.Reject();
+                _umaPendingRequestCommandRepository.Update(pendingRequest);
                 await _umaPendingRequestCommandRepository.SaveChanges();
                 return new NoContentResult();
             });
@@ -125,7 +140,9 @@ namespace SimpleIdServer.Uma.Api
                 { "requester", umaPendingRequest.Requester },
                 { "owner", umaPendingRequest.Owner },
                 { "create_datetime", umaPendingRequest.CreateDateTime },
+                { "ticket", umaPendingRequest.TicketId },
                 { "scopes", new JArray(umaPendingRequest.Scopes) },
+                { "status", umaPendingRequest.Status.ToString().ToLowerInvariant() },
                 { "resource", ResourcesAPIController.Serialize(umaPendingRequest.Resource)}
             };
             return result;

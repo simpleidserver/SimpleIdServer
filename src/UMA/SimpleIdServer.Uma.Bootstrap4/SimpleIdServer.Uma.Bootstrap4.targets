@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(MSBuildThisFileDirectory)Nuget.Transform.MSBuild.Task.dll" />
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\contentFiles\oauth_puk.txt">
+      <Link>oauth_puk.txt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="CopyContentFiles" AfterTargets="ResolveNuGetPackageAssets">
+    <Message Text="Copying content files" />
+    <ItemGroup>
+      <_CopyItems Include="$(MSBuildThisFileDirectory)..\contentFiles\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems -> '$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="!Exists('$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="CopyAndTransformContentFiles" AfterTargets="CopyContentFiles">
+    <Message Text="Transform content files" />
+    <TransformTask />
+  </Target>
+</Project>

@@ -23,7 +23,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.AccessToken;
 
-        public async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
+        public async virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
         {
             var jwsPayload = _grantedTokenHelper.BuildAccessToken(new[]
             {
@@ -41,7 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }
 
-        public Task Refresh(JObject previousRequest, HandlerContext currentContext)
+        public virtual Task Refresh(JObject previousRequest, HandlerContext currentContext)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             return Build(scopes, currentContext);

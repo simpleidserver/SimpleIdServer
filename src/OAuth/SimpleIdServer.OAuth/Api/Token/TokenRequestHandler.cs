@@ -26,7 +26,7 @@ namespace SimpleIdServer.OAuth.Api.Token
 
         public Task<IActionResult> Handle(HandlerContext context)
         {
-            var handler = _handlers.FirstOrDefault(h => h.GrantType == context.Request.HttpBody.GetGrantType());
+            var handler = _handlers.FirstOrDefault(h => h.GrantType == context.Request.Data.GetGrantType());
             if (handler == null)
             {
                 return Task.FromResult(BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_GRANT_TYPE));

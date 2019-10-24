@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth;
@@ -66,6 +68,21 @@ namespace SimpleIdServer.Uma.Api
             }
 
             return new OkObjectResult(Serialize(result));
+        }
+
+        [HttpGet("me/{id}")]
+        public Task<IActionResult> GetMe(string id)
+        {
+            return CallOperationWithAuthenticatedUser(async (sub, payload) =>
+            {
+                var result = await _umaResourceQueryRepository.FindByIdentifier(id);
+                if (result == null)
+                {
+                    return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
+                }
+
+                return new OkObjectResult(Serialize(result));
+            });
         }
 
         [HttpPost]
@@ -253,7 +270,8 @@ namespace SimpleIdServer.Uma.Api
             {
                 { UMAResourceNames.Id, umaResource.Id },
                 { UMAResourceNames.ResourceScopes, new JArray(umaResource.Scopes) },
-                { UMAResourceNames.IconUri, umaResource.IconUri }
+                { UMAResourceNames.IconUri, umaResource.IconUri },
+                { UMAResourceNames.CreateDateTime, umaResource.CreateDateTime }
             };
 
             Enrich(result, UMAResourceNames.Type, umaResource.Type);

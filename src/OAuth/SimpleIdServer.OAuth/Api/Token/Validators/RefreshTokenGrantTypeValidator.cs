@@ -15,7 +15,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Validators
     {
         public void Validate(HandlerContext context)
         {
-            if (string.IsNullOrWhiteSpace(context.Request.HttpBody.GetStr(TokenRequestParameters.RefreshToken)))
+            if (string.IsNullOrWhiteSpace(context.Request.Data.GetStr(TokenRequestParameters.RefreshToken)))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, "scope"));
             }

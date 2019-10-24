@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth;
@@ -59,14 +61,14 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                 _umaTicketGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context);
                 context.SetClient(oauthClient);
-                var ticket = context.Request.HttpBody.GetTicket();
-                var claimTokenFormat = context.Request.HttpBody.GetClaimTokenFormat();
+                var ticket = context.Request.Data.GetTicket();
+                var claimTokenFormat = context.Request.Data.GetClaimTokenFormat();
                 if (string.IsNullOrWhiteSpace(claimTokenFormat))
                 {
                     claimTokenFormat = _umaHostOptions.DefaultClaimTokenFormat;
                 }
 
-                var scopes = context.Request.HttpBody.GetScopesFromAuthorizationRequest();
+                var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
                 var permissionTicket = await _umaPermissionTicketHelper.GetTicket(ticket);
                 if (permissionTicket == null)
                 {

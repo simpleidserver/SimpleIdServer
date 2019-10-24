@@ -36,12 +36,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
                 dic.Add(OAuthClaims.AuthenticationTime, context.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
             }
 
-            if (context.Request.QueryParameters.ContainsKey(AuthorizationRequestParameters.Claims))
+            if (context.Request.Data.ContainsKey(AuthorizationRequestParameters.Claims))
             {
-                dic.Add(OAuthClaims.Claims, context.Request.QueryParameters[AuthorizationRequestParameters.Claims]);
+                dic.Add(OAuthClaims.Claims, context.Request.Data[AuthorizationRequestParameters.Claims]);
             }
 
-            _tokenBuilders.First(t => t.Name == OAuth.DTOs.AuthorizationResponseParameters.AccessToken).Build(context.Request.QueryParameters.GetScopesFromAuthorizationRequest(), context, dic);
+            _tokenBuilders.First(t => t.Name == OAuth.DTOs.AuthorizationResponseParameters.AccessToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context, dic);
         }
     }
 }

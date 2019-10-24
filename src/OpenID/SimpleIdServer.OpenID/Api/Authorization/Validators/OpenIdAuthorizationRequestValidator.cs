@@ -35,9 +35,9 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
         public async Task Validate(HandlerContext context)
         {
             var openidClient = (OpenIdClient)context.Client;
-            var clientId = context.Request.QueryParameters.GetClientIdFromAuthorizationRequest();
-            var scopes = context.Request.QueryParameters.GetScopesFromAuthorizationRequest();
-            var acrValues = context.Request.QueryParameters.GetAcrValuesFromAuthorizationRequest();
+            var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
+            var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
+            var acrValues = context.Request.Data.GetAcrValuesFromAuthorizationRequest();
             if (!scopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
@@ -64,11 +64,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 await CheckRequestUriParameter(context);
             }
 
-            var redirectUri = context.Request.QueryParameters.GetRedirectUriFromAuthorizationRequest();
-            var claims = context.Request.QueryParameters.GetClaimsFromAuthorizationRequest();
-            var maxAge = context.Request.QueryParameters.GetMaxAgeFromAuthorizationRequest();
-            var prompt = context.Request.QueryParameters.GetPromptFromAuthorizationRequest();
-            var idTokenHint = context.Request.QueryParameters.GetIdTokenHintFromAuthorizationRequest();
+            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
+            var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
+            var maxAge = context.Request.Data.GetMaxAgeFromAuthorizationRequest();
+            var prompt = context.Request.Data.GetPromptFromAuthorizationRequest();
+            var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(redirectUri))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.RedirectUri));
@@ -133,7 +133,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         private Task<bool> CheckRequestParameter(HandlerContext context)
         {
-            var request = context.Request.QueryParameters.GetRequestFromAuthorizationRequest();
+            var request = context.Request.Data.GetRequestFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(request))
             {
                 return Task.FromResult(false);
@@ -144,7 +144,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         private async Task<bool> CheckRequestUriParameter(HandlerContext context)
         {
-            var requestUri = context.Request.QueryParameters.GetRequestUriFromAuthorizationRequest();
+            var requestUri = context.Request.Data.GetRequestUriFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(requestUri))
             {
                 return false;
@@ -230,7 +230,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_CLIENT_ID_CLAIM);
             }
 
-            if (!jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ResponseType].ToString().Split(' ').OrderBy(s => s).SequenceEqual(context.Request.QueryParameters.GetResponseTypesFromAuthorizationRequest()))
+            if (!jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ResponseType].ToString().Split(' ').OrderBy(s => s).SequenceEqual(context.Request.Data.GetResponseTypesFromAuthorizationRequest()))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_RESPONSE_TYPE_CLAIM);
             }
@@ -240,7 +240,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_ID_CLAIM);
             }
 
-            context.Request.SetQueryParameters(JObject.FromObject(jwsPayload));
+            context.Request.SetData(JObject.FromObject(jwsPayload));
             return true;
         }
 

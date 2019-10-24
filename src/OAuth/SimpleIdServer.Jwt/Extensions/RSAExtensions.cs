@@ -37,17 +37,24 @@ namespace SimpleIdServer.Jwt.Extensions
 
         public static Dictionary<string, string> ExtractPrivateKey(this RSA rsa)
         {
-            var parameters = rsa.ExportParameters(true);
-            var result = new Dictionary<string, string>
+            try
             {
-                { RSAFields.D, Convert.ToBase64String(parameters.D) },
-                { RSAFields.P, Convert.ToBase64String(parameters.P) },
-                { RSAFields.Q, Convert.ToBase64String(parameters.Q) },
-                { RSAFields.DP, Convert.ToBase64String(parameters.DP) },
-                { RSAFields.DQ, Convert.ToBase64String(parameters.DQ) },
-                { RSAFields.InverseQ, Convert.ToBase64String(parameters.InverseQ) }
-            };
-            return result;
+                var parameters = rsa.ExportParameters(true);
+                var result = new Dictionary<string, string>
+                {
+                    { RSAFields.D, Convert.ToBase64String(parameters.D) },
+                    { RSAFields.P, Convert.ToBase64String(parameters.P) },
+                    { RSAFields.Q, Convert.ToBase64String(parameters.Q) },
+                    { RSAFields.DP, Convert.ToBase64String(parameters.DP) },
+                    { RSAFields.DQ, Convert.ToBase64String(parameters.DQ) },
+                    { RSAFields.InverseQ, Convert.ToBase64String(parameters.InverseQ) }
+                };
+                return result;
+            }
+            catch
+            {
+                return new Dictionary<string, string>();
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SimpleIdServer.Uma.Domains;

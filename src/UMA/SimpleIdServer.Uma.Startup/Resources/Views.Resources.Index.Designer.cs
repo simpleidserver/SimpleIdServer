@@ -22,14 +22,14 @@ namespace SimpleIdServer.Uma.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Global {
+    public class Views_Resources_Index {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Global() {
+        internal Views_Resources_Index() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.Uma.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.Uma.Startup.Resources.Global", typeof(Global).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.Uma.Startup.Resources.Views.Resources.Index", typeof(Views_Resources_Index).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,20 +61,47 @@ namespace SimpleIdServer.Uma.Startup.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disconnect.
+        ///   Looks up a localized string similar to Creation datetime.
         /// </summary>
-        public static string disconnect {
+        public static string creation_datetime {
             get {
-                return ResourceManager.GetString("disconnect", resourceCulture);
+                return ResourceManager.GetString("creation_datetime", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resource.
+        ///   Looks up a localized string similar to Description.
         /// </summary>
-        public static string home {
+        public static string description {
             get {
-                return ResourceManager.GetString("home", resourceCulture);
+                return ResourceManager.GetString("description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to My resources.
+        /// </summary>
+        public static string my_resources_title {
+            get {
+                return ResourceManager.GetString("my_resources_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string name {
+            get {
+                return ResourceManager.GetString("name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scopes.
+        /// </summary>
+        public static string scopes {
+            get {
+                return ResourceManager.GetString("scopes", resourceCulture);
             }
         }
     }

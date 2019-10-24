@@ -45,7 +45,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _refreshTokenGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context);
                 context.SetClient(oauthClient);
-                var refreshToken = context.Request.HttpBody.GetRefreshToken();
+                var refreshToken = context.Request.Data.GetRefreshToken();
                 var jwsPayload = _grantedTokenHelper.GetRefreshToken(refreshToken);
                 if (jwsPayload == null)
                 {

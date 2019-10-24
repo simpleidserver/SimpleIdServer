@@ -27,7 +27,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             try
             {
                 var result = await base.BuildResponse(context);
-                var display = context.Request.QueryParameters.GetDisplayFromAuthorizationRequest();
+                var display = context.Request.Data.GetDisplayFromAuthorizationRequest();
                 if (!string.IsNullOrWhiteSpace(display))
                 {
                     context.Response.Add(AuthorizationRequestParameters.Display, display);
@@ -37,18 +37,18 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             }
             catch(OAuthUserConsentRequiredException)
             {
-                context.Request.QueryParameters.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Consents", context.Request.QueryParameters);
+                context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
+                return new RedirectActionAuthorizationResponse("Index", "Consents", context.Request.Data);
             }
             catch (OAuthLoginRequiredException ex)
             {
-                context.Request.QueryParameters.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.QueryParameters, ex.Area);
+                context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.Data, ex.Area);
             }
             catch (OAuthSelectAccountRequiredException)
             {
-                context.Request.QueryParameters.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Accounts", context.Request.QueryParameters);
+                context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
+                return new RedirectActionAuthorizationResponse("Index", "Accounts", context.Request.Data);
             }
         }
     }

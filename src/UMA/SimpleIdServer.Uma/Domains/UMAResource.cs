@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.OAuth.Domains;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.OAuth.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,7 @@ namespace SimpleIdServer.Uma.Domains
         public UMAResource(string id, DateTime createDateTime)
         {
             Id = id;
+            CreateDateTime = createDateTime;
             Scopes = new List<string>();
             Descriptions = new List<OAuthTranslation>();
             Names = new List<OAuthTranslation>();

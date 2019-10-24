@@ -1,7 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Project InitialTargets="CopyContentFiles">
+<Project>
   <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(MSBuildThisFileDirectory)Nuget.Transform.MSBuild.Task.dll" />
-  <Target Name="CopyContentFiles">
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\contentFiles\oauth_key.txt">
+      <Link>oauth_key.txt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="CopyContentFiles" AfterTargets="ResolveNuGetPackageAssets">
     <Message Text="Copying content files" />
     <ItemGroup>
       <_CopyItems Include="$(MSBuildThisFileDirectory)..\contentFiles\**\*.*" />

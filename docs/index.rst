@@ -17,6 +17,7 @@ Nuget feed: https://www.myget.org/F/advance-ict/api/v3/index.json
    intro/getting-started-with-oauth
    intro/getting-started-with-openid
    intro/getting-started-with-scim
+   intro/getting-started-with-uma
    
 .. toctree::
    :maxdepth: 3

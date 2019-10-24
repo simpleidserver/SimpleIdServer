@@ -117,10 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="disconnect" xml:space="preserve">
-    <value>Disconnect</value>
+  <data name="creation_datetime" xml:space="preserve">
+    <value>Creation datetime</value>
   </data>
-  <data name="home" xml:space="preserve">
-    <value>Resource</value>
+  <data name="description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="my_resources_title" xml:space="preserve">
+    <value>My resources</value>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="scopes" xml:space="preserve">
+    <value>Scopes</value>
   </data>
 </root>

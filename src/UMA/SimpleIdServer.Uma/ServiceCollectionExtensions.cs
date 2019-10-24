@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Uma;
+using SimpleIdServer.Uma.Api.Configuration;
 using SimpleIdServer.Uma.Api.Token.Fetchers;
 using SimpleIdServer.Uma.Api.Token.Handlers;
 using SimpleIdServer.Uma.Api.Token.Validators;
@@ -31,7 +33,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScopes(new List<OAuthScope> { UMAConstants.StandardUMAScopes.UmaProtection });
             services.AddUMAStore()
                 .AddUMATokenApi()
-                .AddUMAHelpers();
+                .AddUMAHelpers()
+                .AddUMAConfiguration()
+                .AddAuthorization(a =>
+                {
+                    a.AddPolicy("IsAuthenticated", p => p.RequireAuthenticatedUser());
+                });
             return builder;
         }
 
@@ -74,6 +81,13 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddUMAHelpers(this IServiceCollection services)
         {
             services.AddTransient<IUMAPermissionTicketHelper, UMAPermissionTicketHelper>();
+            return services;
+        }
+
+        private static IServiceCollection AddUMAConfiguration(this IServiceCollection services)
+        {
+            services.RemoveAll<IConfigurationRequestHandler>();
+            services.AddTransient<IConfigurationRequestHandler, UMAConfigurationRequestHandler>();
             return services;
         }
     }

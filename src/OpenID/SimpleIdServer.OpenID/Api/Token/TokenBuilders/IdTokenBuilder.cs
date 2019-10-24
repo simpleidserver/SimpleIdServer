@@ -52,7 +52,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             }
 
             var openidClient = (OpenIdClient)context.Client;
-            var payload = await BuildIdToken(context, context.Request.QueryParameters).ConfigureAwait(false);
+            var payload = await BuildIdToken(context, context.Request.Data).ConfigureAwait(false);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
             context.Response.Add(Name, idToken);
         }

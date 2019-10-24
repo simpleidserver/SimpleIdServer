@@ -19,6 +19,8 @@
       <file src="**\*.cs.pp" target="contentFiles" />
       <file src="**\*.resx" target="contentFiles" />
       <file src="**\*.cshtml.pp" target="contentFiles" />
+      <file src="oauth_key.txt" target="content" />
+      <file src="oauth_key.txt" target="contentFiles" />
       <file src="libman.json" target="contentFiles\libman.json" />
       <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\Nuget.Transform.MSBuild.Task.dll" target="build"/>
       <file src="SimpleIdServer.OpenID.Bootstrap4.targets" target="build"/>

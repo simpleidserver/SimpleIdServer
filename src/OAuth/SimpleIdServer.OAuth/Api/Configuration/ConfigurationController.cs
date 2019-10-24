@@ -39,7 +39,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
                 { OAuthConfigurationNames.RevocationEndpoint, $"{issuer}/{Constants.EndPoints.Token}/revoke" },
                 { OAuthConfigurationNames.JwksUri, $"{issuer}/{Constants.EndPoints.Jwks}" }
             };
-            await _configurationRequestHandler.Enrich(jObj);
+            await _configurationRequestHandler.Enrich(jObj, issuer);
             return jObj;
         }
     }

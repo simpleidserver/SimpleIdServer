@@ -48,7 +48,7 @@ namespace SimpleIdServer.OpenID.Api.Register
 
         protected override Task Check(HandlerContext handlerContext)
         {
-            var jObj = handlerContext.Request.HttpBody;
+            var jObj = handlerContext.Request.Data;
             var applicationType = jObj.GetApplicationTypeFromRegisterRequest();
             var sectorIdentifierUri = jObj.GetSectorIdentifierUriFromRegisterRequest();
             var subjectType = jObj.GetSubjectTypeFromRegisterRequest();
@@ -96,7 +96,7 @@ namespace SimpleIdServer.OpenID.Api.Register
 
         protected override async Task<JObject> Create(HandlerContext context)
         {
-            var jObj = context.Request.HttpBody;
+            var jObj = context.Request.Data;
             var applicationType = GetDefaultApplicationType(jObj);
             var sectorIdentifierUri = jObj.GetSectorIdentifierUriFromRegisterRequest();
             var subjectType = jObj.GetSubjectTypeFromRegisterRequest();
@@ -190,7 +190,7 @@ namespace SimpleIdServer.OpenID.Api.Register
 
         protected override void CheckRedirectUrl(HandlerContext context, string redirectUrl)
         {
-            var jObj = context.Request.HttpBody;
+            var jObj = context.Request.Data;
             var applicationType = GetDefaultApplicationType(jObj);
             if (!Uri.IsWellFormedUriString(redirectUrl, UriKind.Absolute))
             {

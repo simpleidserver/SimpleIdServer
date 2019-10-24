@@ -75,14 +75,14 @@ namespace SimpleIdServer.OAuth.Api.Register
 
         public async Task<JObject> Handle(HandlerContext handlerContext)
         {
-            await ExtractSoftwareStatement(handlerContext.Request.HttpBody);
+            await ExtractSoftwareStatement(handlerContext.Request.Data);
             await Check(handlerContext);
             return await Create(handlerContext);
         }
 
         protected virtual async Task Check(HandlerContext context)
         {
-            var jObj = context.Request.HttpBody;
+            var jObj = context.Request.Data;
             var grantTypes = GetDefaultGrantTypes(jObj);
             var scopes = GetDefaultScopes(jObj);
             var tokenEndpointAuthMethod = GetDefaultTokenAuthMethod(jObj);
@@ -178,7 +178,7 @@ namespace SimpleIdServer.OAuth.Api.Register
 
         protected async Task<JObject> EnrichOAuthClient(HandlerContext context, OAuthClient oauthClient)
         {
-            var jObj = context.Request.HttpBody;
+            var jObj = context.Request.Data;
             var clientId = Guid.NewGuid().ToString();
             var clientSecret = Guid.NewGuid().ToString();
             var grantTypes = GetDefaultGrantTypes(jObj);

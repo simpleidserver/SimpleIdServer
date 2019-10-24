@@ -56,17 +56,17 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
             catch (OAuthUserConsentRequiredException)
             {
-                return new RedirectActionAuthorizationResponse("Index", "Consents", context.Request.QueryParameters);
+                return new RedirectActionAuthorizationResponse("Index", "Consents", context.Request.Data);
             }
             catch (OAuthLoginRequiredException ex)
             {
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.QueryParameters, ex.Area);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.Data, ex.Area);
             }
         }
 
         protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context)
         {
-            var requestedResponseTypes = context.Request.QueryParameters.GetResponseTypesFromAuthorizationRequest();
+            var requestedResponseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
             if (!requestedResponseTypes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ResponseType));
@@ -79,15 +79,15 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
             }
 
-            context.SetClient(await Validate(context.Request.QueryParameters));
+            context.SetClient(await Validate(context.Request.Data));
             context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject));
             foreach (var validator in _authorizationRequestValidators)
             {
                 await validator.Validate(context);
             }
 
-            var state = context.Request.QueryParameters.GetStateFromAuthorizationRequest();
-            var redirectUri = context.Request.QueryParameters.GetRedirectUriFromAuthorizationRequest();
+            var state = context.Request.Data.GetStateFromAuthorizationRequest();
+            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(state))
             {
                 context.Response.Add(AuthorizationResponseParameters.State, state);

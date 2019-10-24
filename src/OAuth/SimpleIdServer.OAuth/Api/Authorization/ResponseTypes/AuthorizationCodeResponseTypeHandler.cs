@@ -24,7 +24,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
         public void Enrich(HandlerContext context)
         {
             var dic = new JObject();
-            foreach (var record in context.Request.QueryParameters)
+            foreach (var record in context.Request.Data)
             {
                 dic.Add(record.Key, record.Value);
             }

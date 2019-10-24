@@ -41,6 +41,7 @@ task compile -depends clean {
     exec { dotnet build .\SimpleIdServer.OAuth.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.OpenId.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
+    exec { dotnet build .\SimpleIdServer.Uma.Host.sln -c $config --version-suffix=$buildSuffix }
 }
  
 task pack -depends compile {
@@ -51,6 +52,8 @@ task pack -depends compile {
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.Bootstrap4\SimpleIdServer.Uma.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
 task test {
@@ -87,6 +90,14 @@ task test {
     }
 
     Push-Location -Path $base_dir\tests\SimpleIdServer.Scim.Host.Acceptance.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.Uma.Host.Acceptance.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }

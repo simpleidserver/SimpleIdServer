@@ -23,14 +23,14 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException();
             }
 
-            var scopes = context.Request.QueryParameters.GetScopesFromAuthorizationRequest();
+            var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
             var unsupportedScopes = scopes.Where(s => !context.Client.AllowedScopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
             }
 
-            var consent = _userConsentFetcher.FetchFromAuthorizationRequest(context.User, context.Request.QueryParameters);
+            var consent = _userConsentFetcher.FetchFromAuthorizationRequest(context.User, context.Request.Data);
             if (consent == null)
             {
                 throw new OAuthUserConsentRequiredException();

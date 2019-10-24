@@ -43,9 +43,9 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _passwordGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context).ConfigureAwait(false);
                 context.SetClient(oauthClient);
-                var scopes = ScopeHelper.Validate(context.Request.HttpBody.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
-                var userName = context.Request.HttpBody.GetStr(TokenRequestParameters.Username);
-                var password = context.Request.HttpBody.GetStr(TokenRequestParameters.Password);
+                var scopes = ScopeHelper.Validate(context.Request.Data.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
+                var userName = context.Request.Data.GetStr(TokenRequestParameters.Username);
+                var password = context.Request.Data.GetStr(TokenRequestParameters.Password);
                 var user = await _oauthUserQueryRepository.FindOAuthUserByLoginAndCredential(userName, "pwd", PasswordHelper.ComputeHash(password));
                 if (user == null)
                 {

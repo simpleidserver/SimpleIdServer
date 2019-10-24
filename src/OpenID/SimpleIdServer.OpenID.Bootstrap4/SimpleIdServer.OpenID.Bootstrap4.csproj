@@ -2,7 +2,8 @@
   <PropertyGroup>    
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>SimpleIdServer.OpenID.Bootstrap4.nuspec</NuspecFile>
-    <NuspecProperties>$(NuspecProperties);version=$(VersionPrefix)</NuspecProperties>
+    <NuspecProperties Condition="'$(VersionSuffix)' == ''">$(NuspecProperties);version=$(VersionPrefix)</NuspecProperties>
+    <NuspecProperties Condition="'$(VersionSuffix)' != ''">$(NuspecProperties);version=$(VersionPrefix)-$(VersionSuffix)</NuspecProperties>
     <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
     <NuspecProperties>$(NuspecProperties);owners=$(Owners)</NuspecProperties>
   </PropertyGroup>
@@ -31,5 +32,11 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Global.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="oauth_key.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

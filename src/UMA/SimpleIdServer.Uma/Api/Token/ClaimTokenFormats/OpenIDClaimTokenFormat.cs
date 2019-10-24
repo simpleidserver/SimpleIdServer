@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Exceptions;
@@ -25,7 +27,7 @@ namespace SimpleIdServer.Uma.Api.Token.Fetchers
 
         public Task<ClaimTokenFormatFetcherResult> Fetch(HandlerContext context)
         {
-            var claimToken = context.Request.HttpBody.GetClaimToken();
+            var claimToken = context.Request.Data.GetClaimToken();
             if (!_jwtParser.IsJwsToken(claimToken))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, UMAErrorMessages.BAD_CLAIM_TOKEN);

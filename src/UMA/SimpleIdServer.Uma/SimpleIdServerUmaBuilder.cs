@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth;
@@ -27,6 +29,13 @@ namespace SimpleIdServer.Uma
             _serviceCollection.AddSingleton<IUMAResourceQueryRepository>(new DefaultUMAResourceQueryRepository(umaResources));
             return this;
         }        
+        
+        public SimpleIdServerUmaBuilder AddUMARequests(List<UMAPendingRequest> umaPendingRequests)
+        {
+            _serviceCollection.AddSingleton<IUMAPendingRequestCommandRepository>(new DefaultUMAPendingRequestCommandRepository(umaPendingRequests));
+            _serviceCollection.AddSingleton<IUMAPendingRequestQueryRepository>(new DefaultUMAPendingRequestQueryRepository(umaPendingRequests));
+            return this;
+        }
 
         public SimpleIdServerUmaBuilder AddAuthentication(Action<AuthenticationBuilder> callback)
         {

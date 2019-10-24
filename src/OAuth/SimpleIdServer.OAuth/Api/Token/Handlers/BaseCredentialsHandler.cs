@@ -26,7 +26,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
 
         protected async Task<OAuthClient> AuthenticateClient(HandlerContext context)
         {
-            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.HttpBody, context.Request.IssuerName).ConfigureAwait(false);
+            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.Data, context.Request.IssuerName).ConfigureAwait(false);
             if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.BAD_CLIENT_GRANT_TYPE, GrantType));

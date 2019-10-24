@@ -132,6 +132,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.RemoveAll<IResponseTypeHandler>();
             services.RemoveAll<IAuthorizationRequestHandler>();
             services.RemoveAll<IUserConsentFetcher>();
+            services.RemoveAll<ITokenBuilder>();
             services.AddTransient<IUserConsentFetcher, OpenIDUserConsentFetcher>();
             services.AddTransient<IAuthorizationRequestHandler, OpenIDAuthorizationRequestHandler>();
             services.AddTransient<IAuthorizationRequestValidator, OpenIDAuthorizationRequestValidator>();
@@ -139,6 +140,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IResponseTypeHandler, SimpleIdServer.OpenID.Api.Authorization.ResponseTypes.TokenResponseTypeHandler>();
             services.AddTransient<IResponseTypeHandler, IdTokenResponseTypeHandler>();
             services.AddTransient<ITokenBuilder, IdTokenBuilder>();
+            services.AddTransient<ITokenBuilder, OpenIDAccessTokenBuilder>();
+            services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();
             services.AddTransient<IAuthorizationRequestEnricher, OpenIDAuthorizationRequestEnricher>();
             services.AddTransient<ISubjectTypeBuilder, PublicSubjectTypeBuilder>();
             services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();

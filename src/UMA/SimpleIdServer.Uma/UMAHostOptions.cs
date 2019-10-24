@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Jwt;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Jwt;
 using SimpleIdServer.Uma.Api.Token.Fetchers;
 
 namespace SimpleIdServer.Uma

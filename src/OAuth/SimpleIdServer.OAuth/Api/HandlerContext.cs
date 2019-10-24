@@ -48,27 +48,26 @@ namespace SimpleIdServer.OAuth.Api
             AuthDateTime = authDateTime;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject queryParameters) : this(issuerName, userSubject, authDateTime)
+        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data) : this(issuerName, userSubject, authDateTime)
         {
-            QueryParameters = queryParameters;
+            Data = data;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject httpBody, JObject httpHeader) : this(issuerName, userSubject, authDateTime)
+        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data, JObject httpHeader) : this(issuerName, userSubject, authDateTime)
         {
-            HttpBody = httpBody;
+            Data = data;
             HttpHeader = httpHeader;
         }
 
         public string IssuerName { get; private set; }
         public string UserSubject { get; private set; }
         public DateTime? AuthDateTime { get; private set; }
-        public JObject QueryParameters { get; private set; }
-        public JObject HttpBody { get; private set; }
+        public JObject Data { get; private set; }
         public JObject HttpHeader { get; private set; }
 
-        public void SetQueryParameters(JObject queryParameters)
+        public void SetData(JObject data)
         {
-            QueryParameters = queryParameters;
+            Data = data;
         }
     }
 

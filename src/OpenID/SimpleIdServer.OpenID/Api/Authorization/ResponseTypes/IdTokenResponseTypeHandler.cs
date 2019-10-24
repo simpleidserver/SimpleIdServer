@@ -25,7 +25,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
         public void Enrich(HandlerContext context)
         {
-            _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(context.Request.QueryParameters.GetScopesFromAuthorizationRequest(), context);
+            _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context);
         }
     }
 }

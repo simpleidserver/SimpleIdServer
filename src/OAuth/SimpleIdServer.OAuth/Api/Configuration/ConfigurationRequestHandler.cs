@@ -16,7 +16,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
 {
     public interface IConfigurationRequestHandler
     {
-        Task Enrich(JObject jObj);
+        Task Enrich(JObject jObj, string issuer);
     }
 
     public class ConfigurationRequestHandler : IConfigurationRequestHandler
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             _signHandlers = signHandlers;
         }
 
-        public async Task Enrich(JObject jObj)
+        public virtual async Task Enrich(JObject jObj, string issuer)
         {
             jObj.Add(OAuthConfigurationNames.ScopesSupported, JArray.FromObject((await _oauthScopeRepository.GetAllOAuthScopesExposed()).Select(s => s.Name).ToList()));
             jObj.Add(OAuthConfigurationNames.ResponseTypesSupported, JArray.FromObject(_authorizationGrantTypeHandlers.Select(s => s.ResponseType).Distinct()));

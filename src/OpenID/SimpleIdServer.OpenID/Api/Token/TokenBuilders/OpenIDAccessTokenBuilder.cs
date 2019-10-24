@@ -3,50 +3,28 @@
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
-using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
-    public class OpenIDAccessTokenBuilder : ITokenBuilder
+    public class OpenIDAccessTokenBuilder : AccessTokenBuilder
     {
-        private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IJwtBuilder _jwtBuilder;
+        public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder) : base(grantedTokenHelper, jwtBuilder) { }        
 
-        public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder)
-        {
-            _grantedTokenHelper = grantedTokenHelper;
-            _jwtBuilder = jwtBuilder;
-        }
-
-        public string Name => TokenResponseParameters.AccessToken;
-
-        public async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
-        {
-            var jwsPayload = _grantedTokenHelper.BuildAccessToken(new[]
-            {
-                handlerContext.Client.ClientId
-            }, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
-            if (claims != null)
-            {
-                foreach(var cl in claims)
-                {
-                    jwsPayload.Add(cl.Key, cl.Value);
-                }
-            }
-
-            var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, jwsPayload);
-            handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
-        }
-
-        public Task Refresh(JObject previousRequest, HandlerContext currentContext)
+        public override Task Refresh(JObject previousRequest, HandlerContext currentContext)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
-            return Build(scopes, currentContext);
+            var jObj = new JObject();
+            if (previousRequest.ContainsKey(UserClaims.Subject))
+            {
+                jObj.Add(UserClaims.Subject, previousRequest[UserClaims.Subject].ToString());
+            }
+
+            return Build(scopes, currentContext, jObj);
         }
     }
 }
