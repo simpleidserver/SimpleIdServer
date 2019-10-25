@@ -1,13 +1,19 @@
 ﻿using Microsoft.Build.Execution;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Nuget.Transform.MSBuild.Task
 {
     public class TransformTask : Microsoft.Build.Utilities.Task
     {
+        private const string LOCK_FILE_NAME = "Nuget.Transform.MSBuild.Task.lock";
+        private static string MANAGED_DLL_DIRECTORY = Path.GetDirectoryName(new Uri(typeof(TransformTask).GetTypeInfo().Assembly.CodeBase).LocalPath);
+
         public override bool Execute()
         {
             var projectInstance = this.GetProjectInstance();
@@ -17,18 +23,38 @@ namespace Nuget.Transform.MSBuild.Task
                 throw new Exception("Rootnamespace cannot be found");
             }
 
-            var fileItems = projectInstance.Items.Where(i => i.EvaluatedInclude.EndsWith(".pp")).ToList();
-            foreach (var fileItem in fileItems)
+            var lockFilePath = Path.Combine(projectInstance.Directory, LOCK_FILE_NAME);
+            var lockFiles = DeserializeLockFile(projectInstance.Directory);
+            foreach (var filePath in Directory.GetFiles(projectInstance.Directory, "*.pp", SearchOption.AllDirectories))
             {
-                var filePath = Path.Combine(projectInstance.Directory, fileItem.EvaluatedInclude);
                 var text = File.ReadAllText(filePath);
                 text = text.Replace("$rootnamespace$", rootNamespace.EvaluatedValue);
-                var extension = Path.GetExtension(filePath).Replace(".pp", "");
-                File.WriteAllText(Path.ChangeExtension(filePath, extension), text);
-                File.Delete(filePath);
-                projectInstance.RemoveItem(fileItem);
+                using (var sha256 = SHA256.Create())
+                {
+                    var hashPayload = sha256.ComputeHash(Encoding.UTF8.GetBytes((text)));
+                    var hashContent = Convert.ToBase64String(hashPayload.Take(100).ToArray());
+                    var extension = Path.GetExtension(filePath).Replace(".pp", "");
+                    var newFilePath = Path.ChangeExtension(filePath, extension);
+                    if (lockFiles.ContainsKey(newFilePath) && lockFiles[newFilePath] == hashContent)
+                    {
+                        continue;
+                    }
+
+                    if (lockFiles.ContainsKey(newFilePath))
+                    {
+                        lockFiles[newFilePath] = hashContent;
+                    }
+                    else
+                    {
+                        lockFiles.Add(newFilePath, hashContent);
+                    }
+
+                    File.WriteAllText(newFilePath, text);
+                    File.Delete(filePath);
+                }
             }
 
+            SerializeLockFile(projectInstance.Directory, lockFiles);
             return true;
         }
 
@@ -50,6 +76,36 @@ namespace Nuget.Transform.MSBuild.Task
             if (fieldInfo2 == null)
                 throw new Exception("Could not extract projectInstance from " + type2.FullName);
             return (ProjectInstance)fieldInfo2.GetValue(obj);
+        }
+
+        private static Dictionary<string, string> DeserializeLockFile(string directory)
+        {
+            var result = new Dictionary<string, string>();
+            var filePath = Path.Combine(directory, LOCK_FILE_NAME);
+            if (File.Exists(filePath))
+            {
+                var fileText = File.ReadAllText(filePath);
+                foreach(var line in fileText.Split(';'))
+                {
+                    var splittedLine = line.Split('$');
+                    result.Add(splittedLine.First(), splittedLine.Last());
+                }
+            }
+
+            return result;
+        }
+
+        private static void SerializeLockFile(string directory, Dictionary<string, string> content)
+        {
+            var filePath = Path.Combine(directory, LOCK_FILE_NAME);
+            var lst = new List<string>();
+            foreach(var kvp in content)
+            {
+                lst.Add($"{kvp.Key}${kvp.Value}");
+            }
+
+            var serialized = string.Join(";", lst);
+            File.WriteAllText(filePath, serialized);
         }
     }
 }

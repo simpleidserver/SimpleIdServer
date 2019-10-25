@@ -10,7 +10,7 @@
 	    <dependencies>
 		    <group targetFramework=".NETStandard2.0">
 			    <dependency id="SimpleIdServer.Uma" version="$version$" exclude="Build,Analyzers" />
-				  <dependency id="Microsoft.Web.LibraryManager.Build" version="2.0.76" />
+			    <dependency id="Microsoft.Web.LibraryManager.Build" version="2.0.76" />
 		    </group>
 	    </dependencies>
     </metadata>
@@ -22,7 +22,8 @@
       <file src="oauth_puk.txt" target="content" />
       <file src="oauth_puk.txt" target="contentFiles" />
       <file src="libman.json" target="contentFiles\libman.json" />
-      <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\Nuget.Transform.MSBuild.Task.dll" target="build"/>
       <file src="SimpleIdServer.Uma.Bootstrap4.targets" target="build"/>
+      <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\netcoreapp2.2\publish\**\*.dll" target="build\netcoreapp2.2"/>
+      <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\net472\publish\**\*.dll" target="build\net472"/>
     </files>
 </package>

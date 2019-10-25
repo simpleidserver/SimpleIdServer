@@ -1,13 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project>
-  <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(MSBuildThisFileDirectory)Nuget.Transform.MSBuild.Task.dll" />
+  <PropertyGroup>
+    <CustomTaskAssembly Condition=" '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp2.2\Nuget.Transform.MSBuild.Task.dll</CustomTaskAssembly>
+    <CustomTaskAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net472\Nuget.Transform.MSBuild.Task.dll</CustomTaskAssembly>
+  </PropertyGroup>
+  <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(CustomTaskAssembly)" />
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)..\contentFiles\oauth_puk.txt">
       <Link>oauth_puk.txt</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Target Name="CopyContentFiles" AfterTargets="ResolveNuGetPackageAssets">
+  <Target Name="CopyContentFiles" AfterTargets="Build">
     <Message Text="Copying content files" />
     <ItemGroup>
       <_CopyItems Include="$(MSBuildThisFileDirectory)..\contentFiles\**\*.*" />
