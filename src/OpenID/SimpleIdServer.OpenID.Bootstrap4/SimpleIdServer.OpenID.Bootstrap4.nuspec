@@ -9,9 +9,8 @@
     <description>OPENID provider with bootstrap4 style</description>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-  	    <dependency id="SimpleIdServer.OpenID" version="$version$" exclude="Build,Analyzers" />
+  	<dependency id="SimpleIdServer.OpenID" version="$version$" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Web.LibraryManager.Build" version="2.0.76" />
-        <dependency id="Nuget.Transform.MSBuild.Task" version="$version$" />
       </group>
     </dependencies>
   </metadata>
@@ -20,8 +19,8 @@
     <file src="**\*.cs.pp" target="contentFiles" />
     <file src="**\*.resx" target="contentFiles" />
     <file src="**\*.cshtml.pp" target="contentFiles" />
-    <file src="oauth_key.txt" target="content" />
-    <file src="oauth_key.txt" target="contentFiles" />
+    <file src="openid_key.txt" target="content" />
+    <file src="openid_key.txt" target="contentFiles" />
     <file src="libman.json" target="contentFiles\libman.json" />
     <file src="SimpleIdServer.OpenID.Bootstrap4.targets" target="build"/>
     <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\netcoreapp2.2\publish\**\*.dll" target="build\netcoreapp2.2"/>

@@ -11,6 +11,9 @@ namespace SimpleIdServer.OpenID
         {
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
             public const string UserInfo = "userinfo";
+            public const string CheckSession = "check_session";
+            public const string EndSession = "end_session";
+            public const string EndSessionCallback = "end_session_callback";
         }
 
         public static class StandardScopes

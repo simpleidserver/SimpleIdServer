@@ -3,29 +3,30 @@
 
 Scenario: Create client
 	When execute HTTP POST JSON request 'http://localhost/register'
-	| Key									| Value													|
-	| redirect_uris							| [https://web.com]										|
-	| response_types						| [token]												|
-	| grant_types							| [implicit]											|
-	| client_name							| name													|
-	| client_name#fr						| nom													|
-	| client_name#en						| name													|
-	| application_type						| web													|
-	| token_endpoint_auth_method			| client_secret_jwt										|
-	| sector_identifier_uri					| https://localhost/sector								|
-	| subject_type							| public												|
-	| id_token_signed_response_alg			| RS256													|
-	| id_token_encrypted_response_alg		| RSA-OAEP-256											|
-	| id_token_encrypted_response_enc		| A256CBC-HS512											|
-	| userinfo_signed_response_alg			| RS256													|
-	| userinfo_encrypted_response_alg		| RSA-OAEP-256											|
-	| userinfo_encrypted_response_enc		| A256CBC-HS512											|
-	| request_object_signing_alg			| RS256													|
-	| request_object_encryption_alg			| RSA-OAEP-256											|
-	| request_object_encryption_enc			| A256CBC-HS512											|
-	| default_max_age						| 2														|
-	| require_auth_time						| true													|
-	| default_acr_values					| [a,b]													|
+	| Key                             | Value                     |
+	| redirect_uris                   | [https://web.com]         |
+	| response_types                  | [token]                   |
+	| grant_types                     | [implicit]                |
+	| client_name                     | name                      |
+	| client_name#fr                  | nom                       |
+	| client_name#en                  | name                      |
+	| application_type                | web                       |
+	| token_endpoint_auth_method      | client_secret_jwt         |
+	| sector_identifier_uri           | https://localhost/sector  |
+	| subject_type                    | public                    |
+	| id_token_signed_response_alg    | RS256                     |
+	| id_token_encrypted_response_alg | RSA-OAEP-256              |
+	| id_token_encrypted_response_enc | A256CBC-HS512             |
+	| userinfo_signed_response_alg    | RS256                     |
+	| userinfo_encrypted_response_alg | RSA-OAEP-256              |
+	| userinfo_encrypted_response_enc | A256CBC-HS512             |
+	| request_object_signing_alg      | RS256                     |
+	| request_object_encryption_alg   | RSA-OAEP-256              |
+	| request_object_encryption_enc   | A256CBC-HS512             |
+	| default_max_age                 | 2                         |
+	| require_auth_time               | true                      |
+	| default_acr_values              | [a,b]                     |
+	| post_logout_redirect_uris       | [http://localhost/logout] |
 
 	And extract JSON from body
 	
@@ -37,6 +38,7 @@ Scenario: Create client
 	Then JSON contains 'redirect_uris'
 	Then JSON contains 'response_types'
 	Then JSON contains 'default_acr_values'
+	Then JSON contains 'post_logout_redirect_uris'
 	Then JSON 'token_endpoint_auth_method'='client_secret_jwt'
 	Then JSON 'client_name'='name'
 	Then JSON 'client_name#fr'='nom'

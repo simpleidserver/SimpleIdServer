@@ -3,7 +3,7 @@
     "SimpleIdServer.Uma.Startup": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:60003",
+      "applicationUrl": "https://localhost:60001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

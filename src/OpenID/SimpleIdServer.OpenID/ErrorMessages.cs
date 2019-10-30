@@ -6,9 +6,11 @@ namespace SimpleIdServer.OpenID
     {
         public const string OPENID_SCOPE_MISSING = "openid scope is missing";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
+        public const string INVALID_POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri parameter is invalid";
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
+        public const string POST_LOGOUT_REDIRECT_URI_IS_INVALID = "post_logout_redirect_uri {0} is invalid";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_REQUEST_URI_PARAMETER = "request uri parameter is invalid";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
@@ -32,6 +34,7 @@ namespace SimpleIdServer.OpenID
         public const string UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG = "request_object_signing_alg is not supported";
         public const string UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG = "request_object_encryption_alg is not supported";
         public const string UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC = "request_object_encryption_enc is not supported";
+        public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
         public const string MISSING_TOKEN = "missing token";
         public const string MISSING_ISSUER_CLAIM = "the issuer claim is missing";
         public const string MISSING_AUD_CLAIM = "the audience claim is missing";

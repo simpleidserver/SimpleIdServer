@@ -19,8 +19,10 @@
       <file src="**\*.cs.pp" target="contentFiles" />
       <file src="**\*.resx" target="contentFiles" />
       <file src="**\*.cshtml.pp" target="contentFiles" />
-      <file src="oauth_puk.txt" target="content" />
-      <file src="oauth_puk.txt" target="contentFiles" />
+      <file src="oauth_key.txt" target="content" />
+      <file src="oauth_key.txt" target="contentFiles" />
+      <file src="openid_puk.txt" target="content" />
+      <file src="openid_puk.txt" target="contentFiles" />
       <file src="libman.json" target="contentFiles\libman.json" />
       <file src="SimpleIdServer.Uma.Bootstrap4.targets" target="build"/>
       <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\netcoreapp2.2\publish\**\*.dll" target="build\netcoreapp2.2"/>

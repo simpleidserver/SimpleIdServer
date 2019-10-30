@@ -87,6 +87,11 @@ namespace SimpleIdServer.OpenID.Extensions
             return jObj.GetArray(RegisterRequestParameters.DefaultAcrValues);
         }
 
+        public static IEnumerable<string> GetPostLogoutRedirectUrisFromRegisterRequest(this JObject jObj)
+        {
+            return jObj.GetArray(RegisterRequestParameters.PostLogoutRedirectUris);
+        }
+
         #endregion
 
         #region Authorization request
@@ -180,6 +185,25 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             return scope.Split(' ');
+        }
+
+        #endregion
+
+        #region RP-Initiated logout
+        
+        public static string GetIdTokenHintFromRpInitiatedLogoutRequest(this JObject jObj)
+        {
+            return jObj.GetStr(RPInitiatedLogoutRequest.IdTokenHint);
+        }
+
+        public static string GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest(this JObject jObj)
+        {
+            return jObj.GetStr(RPInitiatedLogoutRequest.PostLogoutRedirectUri);
+        }
+
+        public static string GetStateFromRpInitiatedLogoutRequest(this JObject jObj)
+        {
+            return jObj.GetStr(RPInitiatedLogoutRequest.State);
         }
 
         #endregion

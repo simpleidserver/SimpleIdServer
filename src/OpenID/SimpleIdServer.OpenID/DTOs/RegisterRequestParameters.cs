@@ -19,5 +19,6 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string DefaultMaxAge = "default_max_age";
         public const string RequireAuthTime = "require_auth_time";
         public const string DefaultAcrValues = "default_acr_values";
+        public const string PostLogoutRedirectUris = "post_logout_redirect_uris";
     }
 }

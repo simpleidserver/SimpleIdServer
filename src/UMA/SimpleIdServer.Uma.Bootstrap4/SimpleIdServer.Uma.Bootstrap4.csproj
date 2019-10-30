@@ -7,9 +7,4 @@
     <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
     <NuspecProperties>$(NuspecProperties);owners=$(Owners)</NuspecProperties>
   </PropertyGroup>
-  <ItemGroup>
-    <None Update="oauth_puk.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>

@@ -423,7 +423,7 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
         }
 
-        private static void CheckUris(IDictionary<string, string> dic, string errorMessage)
+        protected static void CheckUris(IDictionary<string, string> dic, string errorMessage)
         {
             if (dic == null || !dic.Any())
             {

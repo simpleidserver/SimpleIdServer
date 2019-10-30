@@ -15,14 +15,19 @@ namespace $rootnamespace$
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
+        private readonly IHostingEnvironment _env;
+
+        public Startup(IHostingEnvironment env)
+        {
+            _env = env;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
             JsonWebKey sigJsonWebKey;
             using (var rsa = RSA.Create())
             {
-                var json = File.ReadAllText("oauth_key.txt");
+                var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "openid_key.txt"));
                 var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 rsa.Import(dic);
                 sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]

@@ -28,29 +28,28 @@ namespace Nuget.Transform.MSBuild.Task
             foreach (var filePath in Directory.GetFiles(projectInstance.Directory, "*.pp", SearchOption.AllDirectories))
             {
                 var text = File.ReadAllText(filePath);
-                text = text.Replace("$rootnamespace$", rootNamespace.EvaluatedValue);
                 using (var sha256 = SHA256.Create())
                 {
                     var hashPayload = sha256.ComputeHash(Encoding.UTF8.GetBytes((text)));
                     var hashContent = Convert.ToBase64String(hashPayload.Take(100).ToArray());
-                    var extension = Path.GetExtension(filePath).Replace(".pp", "");
-                    var newFilePath = Path.ChangeExtension(filePath, extension);
-                    if (lockFiles.ContainsKey(newFilePath) && lockFiles[newFilePath] == hashContent)
+                    if (lockFiles.ContainsKey(filePath) && lockFiles[filePath] == hashContent)
                     {
                         continue;
                     }
 
-                    if (lockFiles.ContainsKey(newFilePath))
+                    if (lockFiles.ContainsKey(filePath))
                     {
-                        lockFiles[newFilePath] = hashContent;
+                        lockFiles[filePath] = hashContent;
                     }
                     else
                     {
-                        lockFiles.Add(newFilePath, hashContent);
+                        lockFiles.Add(filePath, hashContent);
                     }
 
+                    text = text.Replace("$rootnamespace$", rootNamespace.EvaluatedValue);
+                    var extension = Path.GetExtension(filePath).Replace(".pp", "");
+                    var newFilePath = Path.ChangeExtension(filePath, extension);
                     File.WriteAllText(newFilePath, text);
-                    File.Delete(filePath);
                 }
             }
 
