@@ -1,5 +1,5 @@
 OpenIDHostOptions
-================
+=================
 
 OPENID options inherits properties from OAUTH2.0 options.
 

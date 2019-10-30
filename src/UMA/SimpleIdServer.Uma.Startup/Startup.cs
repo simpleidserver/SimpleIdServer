@@ -19,11 +19,17 @@ namespace SimpleIdServer.Uma.Startup
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
+        private readonly IHostingEnvironment _env;
+
+        public Startup(IHostingEnvironment env)
+        {
+            _env = env;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var sigJsonWebKey = ExtractJsonWebKey();
+            var openidJsonWebKey = ExtractOpenIDJsonWebKey();
+            var oauthJsonWebKey = ExtractOAuthJsonWebKey();
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 var supportedCultures = new List<CultureInfo>
@@ -38,7 +44,7 @@ namespace SimpleIdServer.Uma.Startup
             services.AddLogging();
             services.AddSIDUma(options =>
             {
-                options.OpenIdJsonWebKeySignature = sigJsonWebKey;
+                options.OpenIdJsonWebKeySignature = openidJsonWebKey;
             })
             .AddAuthentication(c =>
                 {
@@ -53,7 +59,10 @@ namespace SimpleIdServer.Uma.Startup
                      });
                 })
             .AddUmaResources(DefaultConfiguration.Resources)
-            .AddUMARequests(DefaultConfiguration.PendingRequests);
+            .AddUMARequests(DefaultConfiguration.PendingRequests)
+            .AddClients(DefaultConfiguration.DefaultClients)
+            .AddScopes(DefaultConfiguration.DefaultScopes)
+            .AddJsonWebKeys(new List<JsonWebKey> { oauthJsonWebKey });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -64,9 +73,24 @@ namespace SimpleIdServer.Uma.Startup
             app.UseSID();
         }
 
-        private static JsonWebKey ExtractJsonWebKey()
+        private JsonWebKey ExtractOAuthJsonWebKey()
         {
-            var json = File.ReadAllText("oauth_puk.txt");
+            using (var rsa = RSA.Create())
+            {
+                var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "oauth_key.txt"));
+                var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                rsa.Import(dic);
+                return new JsonWebKeyBuilder().NewSign("1", new[]
+                {
+                    KeyOperations.Sign,
+                    KeyOperations.Verify
+                }).SetAlg(rsa, "RS256").Build();
+            }
+        }
+
+        private JsonWebKey ExtractOpenIDJsonWebKey()
+        {
+            var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "openid_puk.txt"));
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
             var rsaParameters = new RSAParameters
             {

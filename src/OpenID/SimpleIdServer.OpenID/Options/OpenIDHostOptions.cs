@@ -15,6 +15,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultAcrValue = "sid-load-01";
             AuthenticationScheme = "MultiAccount";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
+            SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
         }
 
         /// <summary>
@@ -37,5 +38,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Authentication scheme.
         /// </summary>
         public string AuthenticationScheme { get; set; }
+        /// <summary>
+        /// Session cookie name.
+        /// </summary>
+        public string SessionCookieName { get; set; }
     }
 }

@@ -6,19 +6,57 @@
   </PropertyGroup>
   <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(CustomTaskAssembly)" />
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\contentFiles\oauth_puk.txt">
-      <Link>oauth_puk.txt</Link>
+    <None Include="$(ProjectDir)oauth_key.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="$(ProjectDir)openid_puk.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Home.Index.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Home.Index.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Requests.Index.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Requests.Index.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Requests.Received.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Requests.Received.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Resources.Edit.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Resources.Edit.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Resources.Index.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>    
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Resources.Index.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>    
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Shared._Layout.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>    
+    <EmbeddedResource Update="$(ProjectDir)Resources\Views.Shared._Layout.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
-  <Target Name="CopyContentFiles" AfterTargets="Build">
+  <Target Name="CopyUmaBootstrap4ContentFiles"  AfterTargets="Compile">
     <Message Text="Copying content files" />
     <ItemGroup>
       <_CopyItems Include="$(MSBuildThisFileDirectory)..\contentFiles\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems -> '$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="!Exists('$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
-  <Target Name="CopyAndTransformContentFiles" AfterTargets="CopyContentFiles">
+  <Target Name="CopyAndTransformContentFiles" AfterTargets="CopyUmaBootstrap4ContentFiles">
     <Message Text="Transform content files" />
     <TransformTask />
   </Target>

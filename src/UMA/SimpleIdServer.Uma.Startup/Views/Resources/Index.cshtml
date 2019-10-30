@@ -41,7 +41,7 @@
                         let orderColumnSort = d.order[0].dir;
                         let orderColumnIndex = d.order[0].column;
                         let orderColumnName = d.columns[orderColumnIndex].name;
-                        var query = "startIndex=" + d.start + "&count=" + d.length + "&sort=" + orderColumnName + "&order=" + orderColumnSort;
+                        var query = "start_index=" + d.start + "&count=" + d.length + "&sort=" + orderColumnName + "&order=" + orderColumnSort;
                         return query;
                     },
                     "beforeSend": function (xhr) {
@@ -77,7 +77,7 @@
                         var result = {
                             data: newData,
                             recordsTotal: json.totalResults,
-                            recordsFiltered: json.count
+                            recordsFiltered: json.totalResults
                         };
                         return JSON.stringify(result);
                     }

@@ -237,4 +237,7 @@
   <data name="scope_profile" xml:space="preserve">
     <value>Accéder au profil</value>
   </data>
+  <data name="revoke_session_title" xml:space="preserve">
+    <value>Révoquer la session</value>
+  </data>
 </root>

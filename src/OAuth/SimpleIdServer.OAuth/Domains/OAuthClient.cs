@@ -42,6 +42,7 @@ namespace SimpleIdServer.OAuth.Domains
             RedirectionUrls = new List<string>();
             ResponseTypes = new List<string>();
             Contacts = new List<string>();
+            PostLogoutRedirectUris = new List<string>();
             Secrets = new List<ClientSecret>();
             AllowedScopes = new List<OAuthScope>();
             JsonWebKeys = new List<JsonWebKey>();
@@ -126,6 +127,11 @@ namespace SimpleIdServer.OAuth.Domains
         /// Array of redirection URIS for use in redirect-based flows.
         /// </summary>
         public ICollection<string> RedirectionUrls { get; set; }
+
+        /// <summary>
+        /// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
+        /// </summary>
+        public ICollection<string> PostLogoutRedirectUris { get; set; }
 
         /// <summary>
         /// URI string referencing the client’s JSON Web Key (JWK) Set document, which contains the client’s public keys.
@@ -270,7 +276,8 @@ namespace SimpleIdServer.OAuth.Domains
                 ResponseTypes = ResponseTypes.ToList(),
                 Contacts = Contacts.ToList(),
                 SoftwareId = SoftwareId,
-                SoftwareVersion = SoftwareVersion
+                SoftwareVersion = SoftwareVersion,
+                PostLogoutRedirectUris = PostLogoutRedirectUris.ToList()
             };
         }
 

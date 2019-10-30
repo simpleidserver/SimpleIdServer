@@ -25,6 +25,7 @@ Nuget feed: https://www.myget.org/F/advance-ict/api/v3/index.json
    :caption: Topics
 
    topics/build-json-web-key
+   topics/use-uma-to-protect-api
    
 .. toctree::
    :maxdepth: 3
@@ -40,3 +41,4 @@ Nuget feed: https://www.myget.org/F/advance-ict/api/v3/index.json
    reference/openidscope
    reference/authenticationcontextclassreference
    reference/scimhostoptions
+   reference/umahostoptions

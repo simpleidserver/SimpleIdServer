@@ -22,7 +22,7 @@ namespace SimpleIdServer.OpenID.Startup
             JsonWebKey sigJsonWebKey;
             using (var rsa = RSA.Create())
             {
-                var json = File.ReadAllText("oauth_key.txt");
+                var json = File.ReadAllText("openid_key.txt");
                 var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 rsa.Import(dic);
                 sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
@@ -32,6 +32,9 @@ namespace SimpleIdServer.OpenID.Startup
                 }).SetAlg(rsa, "RS256").Build();
             }
 
+            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()));
             services.AddSIDOpenID()
                 .AddClients(DefaultConfiguration.Clients)
                 .AddAcrs(DefaultConfiguration.AcrLst)
@@ -43,6 +46,7 @@ namespace SimpleIdServer.OpenID.Startup
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors("AllowAll");
             app.UseSID();
         }
     }

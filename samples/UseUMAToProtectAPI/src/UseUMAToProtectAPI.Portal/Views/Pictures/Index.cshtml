@@ -1,0 +1,27 @@
+﻿@model UseUMAToProtectAPI.Portal.ViewModels.IndexPicturesViewModel
+
+@{
+    ViewData["Title"] = "Resources";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>My pictures</h1>
+        <ul class="list-group">
+            @foreach (var myPicture in Model.MyPictures)
+            {
+                <li class="list-group-item"><a href="@Url.Action("Display", "Pictures", new { id = myPicture })">@myPicture</a></li>
+            }
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h1>Other pictures</h1>
+        <ul class="list-group">
+            @foreach(var otherPicture in Model.OtherPictures)
+            {
+                <li class="list-group-item"><a href="@Url.Action("Visit", "Pictures", new { id = otherPicture })">@otherPicture</a></li>
+            }
+        </ul>
+    </div>
+</div>

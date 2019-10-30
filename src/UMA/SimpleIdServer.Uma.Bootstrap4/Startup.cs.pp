@@ -20,11 +20,17 @@ namespace $rootnamespace$
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
+        private readonly IHostingEnvironment _env;
+
+        public Startup(IHostingEnvironment env)
+        {
+            _env = env;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var sigJsonWebKey = ExtractJsonWebKey();
+            var openidJsonWebKey = ExtractOpenIDJsonWebKey();
+            var oauthJsonWebKey = ExtractOAuthJsonWebKey();
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 var supportedCultures = new List<CultureInfo>
@@ -36,34 +42,53 @@ namespace $rootnamespace$
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
+            services.AddLogging();
             services.AddSIDUma(options =>
             {
-                options.OpenIdJsonWebKeySignature = sigJsonWebKey;
+                options.OpenIdJsonWebKeySignature = openidJsonWebKey;
             })
             .AddAuthentication(c =>
-            {
-                c.AddCookie(UMAConstants.SignInScheme);
-                c.AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
                 {
-                    options.ClientId = "umaClient";
-                    options.ClientSecret = "umaClientSecret";
-                    options.Authority = "https://localhost:60000";
-                    options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
-                    options.SaveTokens = true;
-                });
-            });
+                    c.AddCookie(UMAConstants.SignInScheme);
+                    c.AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
+                     {
+                         options.ClientId = "umaClient";
+                         options.ClientSecret = "umaClientSecret";
+                         options.Authority = "https://localhost:60000";
+                         options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                         options.SaveTokens = true;
+                     });
+                })
+            .AddScopes(DefaultConfiguration.DefaultScopes)
+            .AddJsonWebKeys(new List<JsonWebKey> { oauthJsonWebKey });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddConsole(LogLevel.Information);
             var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(options.Value);
             app.UseSID();
         }
 
-        private static JsonWebKey ExtractJsonWebKey()
+        private JsonWebKey ExtractOAuthJsonWebKey()
         {
-            var json = File.ReadAllText("oauth_puk.txt");
+            using (var rsa = RSA.Create())
+            {
+                var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "oauth_key.txt"));
+                var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                rsa.Import(dic);
+                return new JsonWebKeyBuilder().NewSign("1", new[]
+                {
+                    KeyOperations.Sign,
+                    KeyOperations.Verify
+                }).SetAlg(rsa, "RS256").Build();
+            }
+        }
+
+        private JsonWebKey ExtractOpenIDJsonWebKey()
+        {
+            var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "openid_puk.txt"));
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
             var rsaParameters = new RSAParameters
             {

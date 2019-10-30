@@ -106,4 +106,12 @@ task test {
     } finally {
         Pop-Location
     }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.OpenID.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
 }

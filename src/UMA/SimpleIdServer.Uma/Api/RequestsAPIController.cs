@@ -82,10 +82,11 @@ namespace SimpleIdServer.Uma.Api
                         {
                             new UMAResourcePermissionClaim
                             {
-                                Name = claimTokenFormat.Name,
-                                Value = sub
+                                Name = claimTokenFormat.GetSubjectName(),
+                                Value = pendingRequest.Requester
                             }
-                        }
+                        },
+                        Scopes = pendingRequest.Scopes.ToList()
                     });
                 }
 

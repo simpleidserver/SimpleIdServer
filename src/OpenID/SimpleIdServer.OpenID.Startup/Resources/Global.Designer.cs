@@ -322,6 +322,15 @@ namespace SimpleIdServer.OpenID.Startup.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Revoke session.
+        /// </summary>
+        public static string revoke_session_title {
+            get {
+                return ResourceManager.GetString("revoke_session_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Access to the address.
         /// </summary>
         public static string scope_address {

@@ -10,5 +10,7 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string RequestObjectEncryptionAlgValuesSupported = "request_object_encryption_alg_values_supported";
         public const string RequestObjectEncryptionEncValuesSupported = "request_object_encryption_enc_values_supported";
         public const string SubjectTypesSupported = "subject_types_supported";
+        public const string CheckSessionIframe = "check_session_iframe";
+        public const string EndSessionEndpoint = "check_session_endpoint";
     }
 }

@@ -112,6 +112,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             var defaultMaxAge = jObj.GetDefaultMaxAgeFromRegisterRequest();
             var requireAuthTime = jObj.GetRequireAuhTimeFromRegisterRequest();
             var acrValues = jObj.GetDefaultAcrValuesFromRegisterRequest();
+            var postLogoutRedirectUris = jObj.GetPostLogoutRedirectUrisFromRegisterRequest();
             if (string.IsNullOrWhiteSpace(subjectType))
             {
                 subjectType = _openIDHostOptions.DefaultSubjectType;
@@ -164,6 +165,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             openidClient.DefaultMaxAge = defaultMaxAge;
             openidClient.RequireAuthTime = requireAuthTime.Value;
             openidClient.DefaultAcrValues = acrValues.ToList();
+            openidClient.PostLogoutRedirectUris = postLogoutRedirectUris.ToList();
             OAuthClientCommandRepository.Add(openidClient);
             await OAuthClientCommandRepository.SaveChanges();
             AddNotEmpty(result, RegisterRequestParameters.ApplicationType, applicationType);
@@ -185,6 +187,7 @@ namespace SimpleIdServer.OpenID.Api.Register
 
             AddNotEmpty(result, RegisterRequestParameters.RequireAuthTime, requireAuthTime.Value.ToString().ToLowerInvariant());
             AddNotEmpty(result, RegisterRequestParameters.DefaultAcrValues, acrValues);
+            AddNotEmpty(result, RegisterRequestParameters.PostLogoutRedirectUris, postLogoutRedirectUris);
             return result;
         }
 

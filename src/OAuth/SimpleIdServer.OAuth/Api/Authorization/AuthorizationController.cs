@@ -47,7 +47,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 authTime = auth;
             }
 
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, authTime, jObjBody));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, authTime, jObjBody, null, Request.Cookies), new HandlerContextResponse(Response.Cookies));
             try
             {
                 string url;

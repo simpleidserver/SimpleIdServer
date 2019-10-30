@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
 using System;
@@ -14,6 +15,12 @@ namespace SimpleIdServer.OAuth.Api
             Parameters = new Dictionary<string, string>();
         }
 
+        public HandlerContextResponse(IResponseCookies cookies) : this()
+        {
+            Cookies = cookies;
+        }
+
+        public IResponseCookies Cookies { get; set; }
         public Dictionary<string, string> Parameters { get; private set; }
 
         /// <summary>
@@ -53,10 +60,14 @@ namespace SimpleIdServer.OAuth.Api
             Data = data;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data, JObject httpHeader) : this(issuerName, userSubject, authDateTime)
+        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data, JObject httpHeader) : this(issuerName, userSubject, authDateTime, data)
         {
-            Data = data;
             HttpHeader = httpHeader;
+        }
+
+        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data, JObject httpHeader, IRequestCookieCollection cookies): this(issuerName, userSubject, authDateTime, data, httpHeader)
+        {
+            Cookies = cookies;
         }
 
         public string IssuerName { get; private set; }
@@ -64,6 +75,7 @@ namespace SimpleIdServer.OAuth.Api
         public DateTime? AuthDateTime { get; private set; }
         public JObject Data { get; private set; }
         public JObject HttpHeader { get; private set; }
+        public IRequestCookieCollection Cookies { get; set; }
 
         public void SetData(JObject data)
         {
@@ -77,6 +89,11 @@ namespace SimpleIdServer.OAuth.Api
         {
             Request = request;
             Response = new HandlerContextResponse();
+        }
+
+        public HandlerContext(HandlerContextRequest request, HandlerContextResponse response) : this(request)
+        {
+            Response = response;
         }
 
         public OAuthUser User { get; private set; }
