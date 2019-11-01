@@ -32,20 +32,18 @@ namespace Nuget.Transform.MSBuild.Task
                 {
                     var hashPayload = sha256.ComputeHash(Encoding.UTF8.GetBytes((text)));
                     var hashContent = Convert.ToBase64String(hashPayload.Take(100).ToArray());
-                    if (lockFiles.ContainsKey(filePath) && lockFiles[filePath] == hashContent)
+                    var kvp = lockFiles.FirstOrDefault(k => k.Key.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
+                    if (!kvp.Equals(default(KeyValuePair<string, string>)) && kvp.Value.Equals(hashContent, StringComparison.InvariantCultureIgnoreCase))
                     {
                         continue;
                     }
 
-                    if (lockFiles.ContainsKey(filePath))
+                    if (!kvp.Equals(default(KeyValuePair<string, string>)))
                     {
-                        lockFiles[filePath] = hashContent;
-                    }
-                    else
-                    {
-                        lockFiles.Add(filePath, hashContent);
+                        lockFiles.Remove(kvp.Key);
                     }
 
+                    lockFiles.Add(filePath, hashContent);
                     text = text.Replace("$rootnamespace$", rootNamespace.EvaluatedValue);
                     var extension = Path.GetExtension(filePath).Replace(".pp", "");
                     var newFilePath = Path.ChangeExtension(filePath, extension);

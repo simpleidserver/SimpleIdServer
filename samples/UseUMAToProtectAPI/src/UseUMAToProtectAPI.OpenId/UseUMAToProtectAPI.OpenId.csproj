@@ -5,8 +5,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="SimpleIdServer.OpenID.Bootstrap4" Version="1.0.1" />
-    <PackageReference Include="SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4" Version="1.0.1" />
+    <PackageReference Include="SimpleIdServer.OpenID.Bootstrap4" Version="1.0.2" />
+    <PackageReference Include="SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Global.Designer.cs">

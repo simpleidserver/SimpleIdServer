@@ -1,5 +1,5 @@
 ﻿@model SimpleIdServer.OpenID.UI.ViewModels.RevokeSessionViewModel
-@using SimpleIdServer.OpenID.Startup.Resources
+@using $rootnamespace$.Resources
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";

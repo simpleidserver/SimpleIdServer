@@ -27,7 +27,7 @@ namespace $rootnamespace$
             JsonWebKey sigJsonWebKey;
             using (var rsa = RSA.Create())
             {
-                var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "oauth_key.txt"));
+                var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "openid_key.txt"));
                 var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 rsa.Import(dic);
                 sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
