@@ -4,7 +4,7 @@ How to protect resources with UMA2.0 ?
 The UMA 2.0 server offers to the end-user a way to manage access to his resources. 
 For example, a user can decide who can access his pictures. Protected resources must be registered in the UMA2.0 server and their identifiers should be stored by the pictures API.
 
-The **UseUMAToProtectAPI** sample project explains how to use UMA 2.0 to protect pictures, its code source can be downloaded here : https://github.com/simpleidserver/SimpleIdServer/samples/UseUMAToProtectAPI/.
+The **UseUMAToProtectAPI** sample project explains how to use UMA 2.0 to protect pictures, its code source can be downloaded `here`_.
 The diagram below lists the components present in the project :
 
 1. **Portal** : web portal where end-users can manage their pictures.
@@ -126,3 +126,5 @@ The web page lists the pending requests, they can be confirmed or rejected by th
 2. **Confirm pending requests** : Update authorization policies of the given UMA resources.
 
 Now authorization policies have been updated, the second scenario can be re-executed. At the end the picture should be displayed.
+
+.. _here: https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/UseUMAToProtectAPI

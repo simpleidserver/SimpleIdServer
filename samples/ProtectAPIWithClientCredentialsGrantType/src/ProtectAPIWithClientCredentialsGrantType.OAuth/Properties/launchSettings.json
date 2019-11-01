@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "ProtectAPIWithClientCredentialsGrantType.OAuth": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60001/"
+    }
+  }
+}

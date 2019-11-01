@@ -25,6 +25,7 @@ Nuget feed: https://www.myget.org/F/advance-ict/api/v3/index.json
    :caption: Topics
 
    topics/build-json-web-key
+   topics/protect-api-client-credentials-grant-type
    topics/use-uma-to-protect-api
    
 .. toctree::
