@@ -11,5 +11,7 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string State = "state";
         public const string ResponseMode = "response_mode";
         public const string UILocales = "ui_locales";
+        public const string CodeChallenge = "code_challenge";
+        public const string CodeChallengeMethod = "code_challenge_method";
     }
 }

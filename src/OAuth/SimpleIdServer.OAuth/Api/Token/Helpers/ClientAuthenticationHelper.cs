@@ -46,7 +46,8 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
                 ClientSecretFromHttpRequestBody = jObjBody.GetClientSecret(),
                 ClientIdFromAuthorizationHeader = clientCredential == null ? null : clientCredential.ClientId,
                 ClientSecretFromAuthorizationHeader = clientCredential == null ? null : clientCredential.ClientSecret,
-                Certificate = null
+                Certificate = null,
+                RequestData = jObjBody
             };
         }
     }

@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtectAPIFromUndesirableUsers.OpenId", "src\ProtectAPIFromUndesirableUsers.OpenId\ProtectAPIFromUndesirableUsers.OpenId.csproj", "{879E248D-CE6C-4888-ABFC-4A45F7532370}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtectAPIFromUndesirableUsers.Api", "src\ProtectAPIFromUndesirableUsers.Api\ProtectAPIFromUndesirableUsers.Api.csproj", "{0D5FDE7B-CB32-41E0-9F0D-B8ED031C8877}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtectAPIFromUndesirableUsers.TraditionalWebsite", "src\ProtectAPIFromUndesirableUsers.TraditionalWebsite\ProtectAPIFromUndesirableUsers.TraditionalWebsite.csproj", "{C88B824D-F3AE-4CE5-B4D0-7618F6B3B249}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtectAPIFromUndesirableUsers.Native", "src\ProtectAPIFromUndesirableUsers.Native\ProtectAPIFromUndesirableUsers.Native.csproj", "{FFD74E90-B4E2-4470-B755-67BD785B0AE0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{879E248D-CE6C-4888-ABFC-4A45F7532370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{879E248D-CE6C-4888-ABFC-4A45F7532370}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{879E248D-CE6C-4888-ABFC-4A45F7532370}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{879E248D-CE6C-4888-ABFC-4A45F7532370}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D5FDE7B-CB32-41E0-9F0D-B8ED031C8877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5FDE7B-CB32-41E0-9F0D-B8ED031C8877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5FDE7B-CB32-41E0-9F0D-B8ED031C8877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5FDE7B-CB32-41E0-9F0D-B8ED031C8877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C88B824D-F3AE-4CE5-B4D0-7618F6B3B249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C88B824D-F3AE-4CE5-B4D0-7618F6B3B249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C88B824D-F3AE-4CE5-B4D0-7618F6B3B249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C88B824D-F3AE-4CE5-B4D0-7618F6B3B249}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFD74E90-B4E2-4470-B755-67BD785B0AE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFD74E90-B4E2-4470-B755-67BD785B0AE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFD74E90-B4E2-4470-B755-67BD785B0AE0}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{FFD74E90-B4E2-4470-B755-67BD785B0AE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFD74E90-B4E2-4470-B755-67BD785B0AE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFD74E90-B4E2-4470-B755-67BD785B0AE0}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1FF95D88-F5B5-471B-ACFF-6AA4E4506A38}
+	EndGlobalSection
+EndGlobal

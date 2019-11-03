@@ -1,5 +1,6 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using $rootnamespace$.Resources
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,14 +19,14 @@
             <ul class="navbar-nav mr-auto">
                 @if (User.Identity.IsAuthenticated)
                 {
-                <li class="nav-item">
-                    <a class="nav-link">
-                        Welcome @User.Identity.Name
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="@Url.Action("Disconnect", "Home", new { area = "" })">@Global.disconnect</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link">
+                            Welcome @User.Identity.Name
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Disconnect", "Home", new { area = "" })">@Global.disconnect</a>
+                    </li>
                 }
             </ul>
         </div>
@@ -38,6 +39,7 @@
             @RenderBody()
         </div>
     </div>
+    <script type="text/javascript" src="@Url.Content("~/lib/jquery/jquery.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/lib/twitter-bootstrap/js/bootstrap.js")"></script>
     @RenderSection("Scripts", required: false)
 </body>

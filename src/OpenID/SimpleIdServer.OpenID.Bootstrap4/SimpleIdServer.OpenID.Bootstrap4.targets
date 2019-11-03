@@ -21,7 +21,7 @@
     <ItemGroup>
       <_CopyItems Include="$(MSBuildThisFileDirectory)..\contentFiles\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems -> '$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="!Exists('$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+	<Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems -> '$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="!Exists('$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
   <Target Name="CopyAndTransformContentFiles" AfterTargets="CopyOpenIdBootstrap4ContentFiles">
     <Message Text="Transform content files" />

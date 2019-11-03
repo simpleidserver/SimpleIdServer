@@ -93,3 +93,55 @@ Scenario: Error is returned when scope is not supported by the client
 
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='scopes role are not supported'
+
+Scenario: Error is returned when the code_challenge parameter is missing
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key							| Value					|
+	| redirect_uris					| [http://localhost]	|
+	| token_endpoint_auth_method	| pkce					|
+	| response_types				| [code]				|
+	| grant_types					| [authorization_code]	|
+	| scope							| scope1				|
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body	
+	And add user consent : user='administrator', scope='scope1', clientId='$client_id$'
+	
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key				| Value				|
+	| response_type		| code				|
+	| client_id			| $client_id$		|
+	| state				| state				|
+	| scope				| scope1			|
+	
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='missing parameter code_challenge'
+
+Scenario: Error is returned when the code_challenge_method parameter is invalid
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key							| Value					|
+	| redirect_uris					| [http://localhost]	|
+	| token_endpoint_auth_method	| pkce					|
+	| response_types				| [code]				|
+	| grant_types					| [authorization_code]	|
+	| scope							| scope1				|
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body	
+	And add user consent : user='administrator', scope='scope1', clientId='$client_id$'
+	
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key					| Value				|
+	| response_type			| code				|
+	| client_id				| $client_id$		|
+	| state					| state				|
+	| scope					| scope1			|
+	| code_challenge		| code_challenge	|
+	| code_challenge_method	| invalid			|
+	
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='transform algorithm invalid is not supported'

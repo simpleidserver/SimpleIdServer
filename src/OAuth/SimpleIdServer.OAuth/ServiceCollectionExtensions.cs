@@ -16,6 +16,7 @@ using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Token;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
+using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
@@ -143,6 +144,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretPostAuthenticationHandler>();
+            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthPKCEAuthenticationHandler>();
             return services;
         }
 
@@ -171,6 +173,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenProfile, MacTokenProfile>();
             services.AddTransient<ITokenBuilder, AccessTokenBuilder>();
             services.AddTransient<ITokenBuilder, RefreshTokenBuilder>();
+            services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
+            services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
             return services;
         }
 

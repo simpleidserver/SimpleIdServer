@@ -7,7 +7,7 @@
 }
 
 <div>
-    <div class="card">
+    <div class="card" id="loginpwd-card">
         <div class="card-header">@Global.authenticate_pwd</div>
         @using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
         {
@@ -47,3 +47,13 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#loginpwd-card form input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}
