@@ -123,3 +123,43 @@ Scenario: Revoke refresh_token
 	| client_secret | BankCvSecret											|
 	
 	Then HTTP status code equals to '200'
+
+Scenario: Use authorization_code grant type to get an access token (PKCE)
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key							| Value						|
+	| token_endpoint_auth_method	| pkce						|
+	| response_types				| [code]					|
+	| grant_types					| [authorization_code]		|
+	| scope							| scope1					|
+	| redirect_uris					| [http://localhost:8080]	|	
+
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body	
+	And add user consent : user='administrator', scope='scope1', clientId='$client_id$'
+	
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key					| Value											|
+	| response_type			| code											|
+	| client_id				| $client_id$									|
+	| state					| state											|
+	| scope					| scope1										|
+	| code_challenge		| VpTQii5T_8rgwxA-Wtb2B2q9lg6x-KVldwQLwQKPcCs	|
+	| code_challenge_method	| S256											|	
+	
+	And extract parameter 'code' from redirect url	
+
+	And execute HTTP POST request 'http://localhost/token'
+	| Key			| Value						|
+	| client_id		| $client_id$				|
+	| client_secret | BankCvSecret				|
+	| grant_type	| authorization_code		|
+	| code			| $code$					|
+	| code_verifier | code					|
+	| redirect_uri  | http://localhost:8080		|
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON exists 'access_token'
+	Then JSON exists 'refresh_token'
+	Then JSON 'token_type'='Bearer'

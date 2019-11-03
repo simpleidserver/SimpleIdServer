@@ -164,6 +164,77 @@ namespace SimpleIdServer.OpenID.Startup
                     "id_token",
                     "code"
                 }
+            },
+            new OpenIdClient
+            {
+                ClientId = "tradWebsite",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("tradWebsiteSecret"))
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                    SIDOpenIdConstants.StandardScopes.Profile
+                },
+                GrantTypes = new List<string>
+                {
+                    "authorization_code",
+                    "password"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "https://localhost:5001/signin-oidc"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "code",
+                    "token",
+                    "id_token"
+                }
+            },
+            new OpenIdClient
+            {
+                ClientId = "native",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("nativeSecret"))
+                },
+                TokenEndPointAuthMethod = "pkce",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.Profile,
+                    SIDOpenIdConstants.StandardScopes.Email
+                },
+                GrantTypes = new List<string>
+                {
+                    "authorization_code"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "sid:/oauth2redirect"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "code"
+                }
             }
         };
     }

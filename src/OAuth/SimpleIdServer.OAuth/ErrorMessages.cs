@@ -4,7 +4,9 @@ namespace SimpleIdServer.OAuth
 {
     public class ErrorMessages
     {
+        public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";
         public const string MISSING_PARAMETER = "missing parameter {0}";
+        public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";

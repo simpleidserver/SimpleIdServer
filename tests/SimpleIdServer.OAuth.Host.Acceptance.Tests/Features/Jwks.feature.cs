@@ -86,11 +86,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'http://localhost/jwks\'", ((string)(null)), table9, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/jwks\'", ((string)(null)), table13, "When ");
 #line 8
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

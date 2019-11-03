@@ -27,6 +27,16 @@ namespace SimpleIdServer.OAuth.Extensions
     {
         #region Authorization request
 
+        public static string GetCodeChallengeFromAuthorizationRequest(this JObject jObj)
+        {
+            return jObj.GetStr(AuthorizationRequestParameters.CodeChallenge);
+        }
+
+        public static string GetCodeChallengeMethodFromAuthorizationRequest(this JObject jObj)
+        {
+            return jObj.GetStr(AuthorizationRequestParameters.CodeChallengeMethod);
+        }
+
         public static string GetStateFromAuthorizationRequest(this JObject jObj)
         {
             return jObj.GetStr(AuthorizationRequestParameters.State);
@@ -117,6 +127,11 @@ namespace SimpleIdServer.OAuth.Extensions
         public static string GetAuthorizationCode(this JObject jObj)
         {
             return jObj.GetStr(TokenRequestParameters.Code);
+        }
+
+        public static string GetCodeVerifier(this JObject jObj)
+        {
+            return jObj.GetStr(TokenRequestParameters.CodeVerifier);
         }
 
         public static ClientCredentials GetClientCredentials(this JObject jObj)
