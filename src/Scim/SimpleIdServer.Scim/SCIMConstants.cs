@@ -1,6 +1,7 @@
-﻿using SimpleIdServer.Scim.Builder;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
-using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim
 {
@@ -71,8 +72,19 @@ namespace SimpleIdServer.Scim
 
         public static class StandardSchemas
         {
-            public static ICollection<SCIMSchema> UserSchemas = new List<SCIMSchema>
-            {
+            public static SCIMSchema CommonSchema =
+                SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Common", "Common", "Common")
+                    .AddComplexAttribute(StandardSCIMRepresentationAttributes.Meta, (c) =>
+                    {
+                        c.AddStringAttribute(StandardSCIMMetaAttributes.ResourceType, mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                        c.AddStringAttribute(StandardSCIMMetaAttributes.Version, mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                        c.AddStringAttribute(StandardSCIMMetaAttributes.Location, mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                        c.AddDateTimeAttribute(StandardSCIMMetaAttributes.Created, mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                        c.AddDateTimeAttribute(StandardSCIMMetaAttributes.LastModified, mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                        c.AddDateTimeAttribute(StandardSCIMRepresentationAttributes.ExternalId, mutability: SCIMSchemaAttributeMutabilities.READWRITE);
+                    })
+                    .Build();
+            public static SCIMSchema UserSchema =
                  SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", "User Account")
                     .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                     .AddComplexAttribute("name", c =>
@@ -161,14 +173,13 @@ namespace SimpleIdServer.Scim
                         c.AddStringAttribute("type");
                         c.AddBooleanAttribute("primary");
                     }, multiValued: true)
-                    .AddComplexAttribute("groups", opt => {
+                    .AddComplexAttribute("groups", opt =>
+                    {
                         opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
                     }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
-                    .Build()
-            };
-            public static ICollection<SCIMSchema> GroupSchemas = new List<SCIMSchema>
-            {
-                 SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", "Group")
+                    .Build();
+
+            public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", "Group")
                     .AddStringAttribute("displayName")
                     .AddComplexAttribute("members", c =>
                     {
@@ -176,8 +187,7 @@ namespace SimpleIdServer.Scim
                         c.AddStringAttribute("$ref");
                         c.AddStringAttribute("type");
                     }, multiValued: true)
-                    .Build()
-            };
+                    .Build();
             public static SCIMSchema ErrorSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:Error", "Error", "SCIM errors")
                     .AddStringAttribute("status", required: true)
                     .AddStringAttribute("scimType")

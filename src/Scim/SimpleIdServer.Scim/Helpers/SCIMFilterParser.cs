@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Persistence.Filters;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
@@ -17,7 +19,48 @@ namespace SimpleIdServer.Scim.Helpers
 
         public SCIMExpression Expression { get; private set; }
 
-        public static SCIMExpression Parse(string filterString)
+        public static SCIMExpression Parse(string filterString, ICollection<SCIMSchema> scimSchemas)
+        {
+            var scimExpression = Parse(filterString);
+            Parse(scimExpression, scimSchemas.SelectMany(s => s.Attributes).ToList());
+            return scimExpression;
+        }
+
+        private static void Parse(SCIMExpression expression, ICollection<SCIMSchemaAttribute> scimSchemaAttributes)
+        {
+            var compAttrExpression = expression as SCIMComparisonExpression;
+            var attrExpression = expression as SCIMAttributeExpression;
+            var logicalExpression = expression as SCIMLogicalExpression;
+            var notExpression = expression as SCIMNotExpression;
+            var presentExpression = expression as SCIMPresentExpression;
+            if (compAttrExpression != null)
+            {
+                var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == compAttrExpression.LeftExpression.Name);
+                if (schemaAttr != null && compAttrExpression.LeftExpression.Child != null && schemaAttr.MultiValued && schemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && compAttrExpression.LeftExpression.Child == null)
+                {
+                    compAttrExpression.LeftExpression.Child = new SCIMAttributeExpression("value");
+                }
+
+                Parse(compAttrExpression.LeftExpression, scimSchemaAttributes);
+            }
+            else if (logicalExpression != null)
+            {
+                Parse(logicalExpression.LeftExpression, scimSchemaAttributes);
+                Parse(logicalExpression.RightExpression, scimSchemaAttributes);
+            }
+            else if (attrExpression != null)
+            {
+                var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == attrExpression.Name);
+                if (schemaAttr == null)
+                {
+                    return;
+                }
+
+                Parse(attrExpression.Child, schemaAttr.SubAttributes);
+            }
+        }
+
+        private static SCIMExpression Parse(string filterString)
         {
             if (string.IsNullOrWhiteSpace(filterString))
             {
@@ -130,7 +173,7 @@ namespace SimpleIdServer.Scim.Helpers
                 throw new SCIMFilterException("bad_filter", $"the comparison operator {scimOperator} is not supported");
             }
 
-            return new SCIMComparisonExpression(op, leftExpression, filters.Last());
+            return new SCIMComparisonExpression(op, leftExpression, filters.Last().Trim('"'));
         }
 
         private static SCIMExpression TransformStringFiltersIntoSCIMNavigationExpression(IEnumerable<string> filters)
@@ -267,7 +310,7 @@ namespace SimpleIdServer.Scim.Helpers
                 if ((level == 0 && (groupingIsClosed || isTokenSeparatorDetected)) || IsStandardOperand(filterBuilder.ToString()) || i == filterString.Count() - 1)
                 {
                     var record = filterBuilder.ToString();
-                    result.Add(filterBuilder.ToString());
+                    result.Add(CleanFilter(filterBuilder.ToString()));
                     filterBuilder.Clear();
                     groupingIsClosed = false;
                     isTokenSeparatorDetected = false;
@@ -310,6 +353,16 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             return groupedResult;
+        }
+
+        private static string CleanFilter(string filter)
+        {
+            if (filter.StartsWith("(") && filter.EndsWith(")"))
+            {
+                return filter.TrimStart('(').TrimEnd(')');
+            }
+
+            return filter;
         }
 
         private static bool IsStandardOperand(string str)

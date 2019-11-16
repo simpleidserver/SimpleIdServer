@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -18,7 +20,7 @@ namespace SimpleIdServer.Scim.Domain
             var queryableRepresentationAttributes = representation.Attributes.AsQueryable();
             foreach (var patch in patches)
             {
-                var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, SCIMFilterParser.Parse(patch.Path)).ToList();
+                var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, SCIMFilterParser.Parse(patch.Path, representation.Schemas)).ToList();
                 if (!attributes.Any())
                 {
                     throw new SCIMAttributeException("PATCH can be applied only on existing attributes");
@@ -72,23 +74,23 @@ namespace SimpleIdServer.Scim.Domain
             var jObj = new JObject
             {
                 { SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id },
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(representation.Schemas.Select(s => s.Id)) },
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
-                {
-                    { SCIMConstants.StandardSCIMMetaAttributes.Created, representation.Created },
-                    { SCIMConstants.StandardSCIMMetaAttributes.LastModified, representation.LastModified },
-                    { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, representation.ResourceType },
-                    { SCIMConstants.StandardSCIMMetaAttributes.Version, representation.Version },
-                    { SCIMConstants.StandardSCIMMetaAttributes.Location, location }
-                } }
+                { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(representation.Schemas.Select(s => s.Id)) }
             };
 
-            if (!string.IsNullOrWhiteSpace(representation.ExternalId))
+            EnrichResponse(representation.Attributes.AsQueryable(), jObj, isGetRequest);
+            var metaObj = (JObject)jObj.SelectToken(SCIMConstants.StandardSCIMRepresentationAttributes.Meta);
+            if (metaObj == null)
             {
-                jObj.Add(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, representation.ExternalId);
+                jObj.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
+                {
+                    { SCIMConstants.StandardSCIMMetaAttributes.Location, location }
+                });
+            }
+            else
+            {
+                metaObj.Add(SCIMConstants.StandardSCIMMetaAttributes.Location, location);
             }
 
-            EnrichResponse(representation.Attributes.AsQueryable(), jObj, isGetRequest);
             return jObj;
         }
 

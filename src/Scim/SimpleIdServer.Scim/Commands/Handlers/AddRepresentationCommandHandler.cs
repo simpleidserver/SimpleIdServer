@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Scim.Domain;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
@@ -33,7 +35,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
-            if (!addRepresentationCommand.SchemaIds.SequenceEqual(requestedSchemas))
+            if (!addRepresentationCommand.SchemaIds.Any(s => requestedSchemas.Contains(s)))
             {
                 throw new SCIMBadRequestException("invalidRequest", $"some schemas are not recognized by the endpoint");
             }
@@ -45,16 +47,17 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadRequestException("invalidRequest", $"{string.Join(",", unsupportedSchemas)} schemas are unknown");
             }
 
+            var version = Guid.NewGuid().ToString();
             var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation, schemas.ToList());
+            scimRepresentation.Id = Guid.NewGuid().ToString();
+            scimRepresentation.SetCreated(DateTime.UtcNow);
+            scimRepresentation.SetUpdated(DateTime.UtcNow);
+            scimRepresentation.SetVersion(version);
+            scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             var uniqueServerAttributeIds = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
             var uniqueGlobalAttributes = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
-            scimRepresentation.Id = Guid.NewGuid().ToString();
-            scimRepresentation.Version = Guid.NewGuid().ToString();
-            scimRepresentation.Created = DateTime.UtcNow;
-            scimRepresentation.LastModified = DateTime.UtcNow;
-            scimRepresentation.ResourceType = addRepresentationCommand.ResourceType;
             _scimRepresentationCommandRepository.Add(scimRepresentation);
             await _scimRepresentationCommandRepository.SaveChanges();
             return scimRepresentation;

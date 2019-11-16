@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Scim.Domain;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domain;
 using System;
 using System.Collections.Generic;
 
@@ -25,6 +27,14 @@ namespace SimpleIdServer.Scim.Builder
         public SCIMSchemaBuilder(string id, string name, string description) : this(id)
         {
             _description = description;
+        }
+
+        public SCIMSchemaBuilder(SCIMSchema scimSchema)
+        {
+            _id = scimSchema.Id;
+            _attributes = scimSchema.Attributes;
+            _name = scimSchema.Name;
+            _description = scimSchema.Description;
         }
 
         public SCIMSchemaBuilder AddAttribute(string name)
@@ -125,6 +135,12 @@ namespace SimpleIdServer.Scim.Builder
         public static SCIMSchemaBuilder Create(string id)
         {
             var result = new SCIMSchemaBuilder(id);
+            return result;
+        }
+
+        public static SCIMSchemaBuilder Load(SCIMSchema scimSchema)
+        {
+            var result = new SCIMSchemaBuilder((SCIMSchema)scimSchema.Clone());
             return result;
         }
 

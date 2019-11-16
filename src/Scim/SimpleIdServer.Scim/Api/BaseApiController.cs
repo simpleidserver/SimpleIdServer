@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
@@ -21,7 +23,7 @@ namespace SimpleIdServer.Scim.Api
     public class BaseApiController : Controller
     {
         private readonly string _scimEndpoint;
-        private readonly ICollection<string> _schemaIds;
+        private readonly ICollection<SCIMSchema> _schemas;
         private readonly IAddRepresentationCommandHandler _addRepresentationCommandHandler;
         private readonly IDeleteRepresentationCommandHandler _deleteRepresentationCommandHandler;
         private readonly IReplaceRepresentationCommandHandler _replaceRepresentationCommandHandler;
@@ -29,10 +31,10 @@ namespace SimpleIdServer.Scim.Api
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly SCIMHostOptions _options;
 
-        public BaseApiController(string scimEndpoint, ICollection<string> schemaIds, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, IOptionsMonitor<SCIMHostOptions> options)
+        public BaseApiController(string scimEndpoint, ICollection<SCIMSchema> schemas, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, IOptionsMonitor<SCIMHostOptions> options)
         {
             _scimEndpoint = scimEndpoint;
-            _schemaIds = schemaIds;
+            _schemas = schemas;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
             _deleteRepresentationCommandHandler = deleteRepresentationCommandHandler;
             _replaceRepresentationCommandHandler = replaceRepresentationCommandHandler;
@@ -53,7 +55,7 @@ namespace SimpleIdServer.Scim.Api
                     searchRequest.Count = _options.MaxResults;
                 }
 
-                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(searchRequest.StartIndex, searchRequest.Count, searchRequest.SortBy, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter)));
+                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_scimEndpoint, searchRequest.StartIndex, searchRequest.Count, searchRequest.SortBy, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, _schemas)));
                 var jObj = new JObject
                 {
                     { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },
@@ -68,11 +70,11 @@ namespace SimpleIdServer.Scim.Api
                     var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{_scimEndpoint}/{record.Id}";
                     if (searchRequest.Attributes.Any())
                     {
-                        newJObj = record.ToResponseWithIncludedAttributes(searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a)).ToList());
+                        newJObj = record.ToResponseWithIncludedAttributes(searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, _schemas)).ToList());
                     }
                     else if (searchRequest.ExcludedAttributes.Any())
                     {
-                        newJObj = record.ToResponseWithExcludedAttributes(searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a)).ToList(), location);
+                        newJObj = record.ToResponseWithExcludedAttributes(searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, _schemas)).ToList(), location);
                     }
                     else
                     {
@@ -196,7 +198,7 @@ namespace SimpleIdServer.Scim.Api
         {
             try
             {
-                var command = new AddRepresentationCommand(_scimEndpoint, _schemaIds, jobj);
+                var command = new AddRepresentationCommand(_scimEndpoint, _schemas.Select(s => s.Id).ToList(), jobj);
                 var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
                 return BuildHTTPResult(scimRepresentation, HttpStatusCode.Created, false);
             }
@@ -227,7 +229,7 @@ namespace SimpleIdServer.Scim.Api
         {
             try
             {
-                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _schemaIds, jObj));
+                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _schemas.Select(s => s.Id).ToList(), jObj));
                 return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
             }
             catch (SCIMBadRequestException)

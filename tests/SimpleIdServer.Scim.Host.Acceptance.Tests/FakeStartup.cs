@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,11 +37,22 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .Build();
             var schemas = new List<SCIMSchema>
             {
-                userSchema
+                userSchema,
+                SCIMConstants.StandardSchemas.GroupSchema,
+                SCIMConstants.StandardSchemas.CommonSchema
             };
-            schemas.AddRange(SCIMConstants.StandardSchemas.GroupSchemas);
             services.AddSIDScim(o =>
             {
+                o.UserSchemas = new List<SCIMSchema>
+                {
+                    userSchema,
+                    SCIMConstants.StandardSchemas.CommonSchema
+                };
+                o.GroupSchemas = new List<SCIMSchema>
+                {
+                    SCIMConstants.StandardSchemas.GroupSchema,
+                    SCIMConstants.StandardSchemas.CommonSchema
+                };
                 o.MaxOperations = 3;
             }).AddAuthentication(a =>
             {

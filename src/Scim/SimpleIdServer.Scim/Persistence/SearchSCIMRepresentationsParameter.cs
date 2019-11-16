@@ -1,12 +1,15 @@
-﻿using SimpleIdServer.Persistence.Filters;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 
 namespace SimpleIdServer.Scim.Persistence
 {
     public class SearchSCIMRepresentationsParameter
     {
-        public SearchSCIMRepresentationsParameter(int startIndex, int count, string sortBy, SearchSCIMRepresentationOrders? sortOrder = null, SCIMExpression filter = null)
+        public SearchSCIMRepresentationsParameter(string resourceType, int startIndex, int count, string sortBy, SearchSCIMRepresentationOrders? sortOrder = null, SCIMExpression filter = null)
         {
+            ResourceType = resourceType;
             StartIndex = startIndex;
             Count = count;
             SortBy = sortBy;
@@ -14,6 +17,7 @@ namespace SimpleIdServer.Scim.Persistence
             Filter = filter;
         }
 
+        public string ResourceType { get; set; }
         public int StartIndex { get; set; }
         public int Count { get; set; }
         public string SortBy { get; set; }

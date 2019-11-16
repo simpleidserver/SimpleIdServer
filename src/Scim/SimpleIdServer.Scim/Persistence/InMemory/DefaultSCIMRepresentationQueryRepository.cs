@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.Scim.Domain;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Extensions;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +39,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            var queryableRepresentations = _representations.AsQueryable();
+            var queryableRepresentations = _representations.AsQueryable().Where(r => r.ResourceType == parameter.ResourceType);
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
@@ -35,11 +37,11 @@ namespace SimpleIdServer.Scim.Tests
                 })
                 .Build();
 
-            var firstFilter = SCIMFilterParser.Parse("phones.phoneNumber");
-            var secondFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]");
-            var thirdFilter = SCIMFilterParser.Parse("userName");
-            var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber");
-            var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]");
+            var firstFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
+            var secondFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema });
+            var thirdFilter = SCIMFilterParser.Parse("userName", new List<SCIMSchema> { userSchema });
+            var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
+            var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema });
 
             var firstJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { firstFilter });
             var secondJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { secondFilter });

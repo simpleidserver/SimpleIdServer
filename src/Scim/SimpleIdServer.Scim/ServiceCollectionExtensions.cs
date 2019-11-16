@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domain;
@@ -67,8 +69,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var representations = new List<SCIMRepresentation>();
             var schemas = new List<SCIMSchema>();
-            schemas.AddRange(SCIMConstants.StandardSchemas.UserSchemas);
-            schemas.AddRange(SCIMConstants.StandardSchemas.GroupSchemas);
+            schemas.AddRange(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, SCIMConstants.StandardSchemas.GroupSchema, SCIMConstants.StandardSchemas.CommonSchema });
             services.TryAddSingleton<ISCIMRepresentationCommandRepository>(new DefaultSCIMRepresentationCommandRepository(representations));
             services.TryAddSingleton<ISCIMRepresentationQueryRepository>(new DefaultSCIMRepresentationQueryRepository(representations));
             services.TryAddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));

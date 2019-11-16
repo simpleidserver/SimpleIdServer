@@ -22,12 +22,9 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer
         private static void EnsureSeedData(SCIMDbContext context)
         {
             Console.WriteLine("Seeding database...");
-            var userSchemas = SCIMConstants.StandardSchemas.UserSchemas;
-            foreach (var userSchema in SCIMConstants.StandardSchemas.UserSchemas)
-            {
-                context.SCIMSchemaLst.Add(userSchema);
-            }
-
+            context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.GroupSchema);
+            context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.UserSchema);
+            context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.CommonSchema);
             context.SaveChanges();
         }
     }
