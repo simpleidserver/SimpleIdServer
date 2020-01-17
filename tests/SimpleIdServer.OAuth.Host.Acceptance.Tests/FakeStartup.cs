@@ -26,6 +26,13 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
+            services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCustomAuthentication(opts =>
+                {
+
+                });
             services.AddSIDOAuth(o =>
             {
                 o.SoftwareStatementTrustedParties.Add(new SoftwareStatementTrustedParty("iss", "http://localhost/custom-jwks"));
@@ -33,21 +40,13 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddClients(DefaultConfiguration.Clients)
                 .AddScopes(DefaultConfiguration.Scopes)
                 .AddUsers(DefaultConfiguration.Users);
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCustomAuthentication(opts =>
-                {
-                    
-                });
-            services.AddAuthorization(policy =>
-            {
-                policy.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
-            });
             ConfigureClient(services);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseMvc();
         }
 
         private static void ConfigureClient(IServiceCollection services)

@@ -19,13 +19,13 @@ For example, login password authentication with Bootstrap4 theme can be installe
 
 3)	In the **Startup.cs** file, insert the following line at the end of **ConfigureServices** method : **services.AddSIDOpenID().AddLoginPasswordAuthentication()**. 
 
-4)	Run the application and browse the URL https://localhost:<sslPort>/authorization?client_id=f3d35cce-de69-45bf-958c-4a8796f8ed37&redirect_uri=http://localhost:8080&response_type=code&scope=openid profile&state=state.
+4)	Run the application and browse the URL https://localhost:<sslPort>/authorization?client_id=umaClient&redirect_uri=https://localhost:60001/signin-oidc&response_type=code&scope=openid profile&state=state.
 
-6)	Authenticate with the credentials : Login : administrator, Password : password
+6)	Authenticate with the credentials : Login : umaUser, Password : password
 
 7)	Confirm the consent.
 
-8)	User agent will be redirected to the callback url http://localhost:8080, the authorization code is passed in the query.
+8)	User agent will be redirected to the callback url https://localhost:60001, the authorization code is passed in the query.
 
 OPENID server is similar to OAUTH2.0 server, in fact by default clients, scopes, users and JSON Web Keys are stored in memory.
 OPENID introduces the concept of **Authentication Context Class Reference** (ACR), default values can be overridden like this::

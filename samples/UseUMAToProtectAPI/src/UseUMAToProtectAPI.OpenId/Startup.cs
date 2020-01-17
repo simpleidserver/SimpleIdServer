@@ -1,5 +1,6 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,12 @@ namespace UseUMAToProtectAPI.OpenId
                 }).SetAlg(rsa, "RS256").Build();
             }
 
+            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()));
+            services.AddMvc();
+            services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSIDOpenID()
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddClients(DefaultConfiguration.Clients)
@@ -48,7 +55,18 @@ namespace UseUMAToProtectAPI.OpenId
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            app.UseSID();
+            app.UseCors("AllowAll");
+            app.UseAuthentication();
+            app.UseStaticFiles();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                  name: "AreaRoute",
+                  template: "{area}/{controller}/{action=Index}/{id?}");
+                routes.MapRoute(
+                    name: "DefaultRoute",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

@@ -24,6 +24,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
             services.AddSIDOpenID()
                 .AddScopes(DefaultConfiguration.Scopes)
                 .AddUsers(DefaultConfiguration.Users)
@@ -42,7 +43,16 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                  name: "AreaRoute",
+                  template: "{area}/{controller}/{action=Index}/{id?}");
+                routes.MapRoute(
+                    name: "DefaultRoute",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
 
         private static void ConfigureClient(IServiceCollection services)

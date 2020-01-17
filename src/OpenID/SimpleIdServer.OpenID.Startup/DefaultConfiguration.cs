@@ -155,7 +155,7 @@ namespace SimpleIdServer.OpenID.Startup
                 },
                 RedirectionUrls = new List<string>
                 {
-                    "https://localhost:60003/signin-oidc"
+                    "https://localhost:60001/signin-oidc"
                 },
                 PreferredTokenProfile = "Bearer",
                 ResponseTypes = new List<string>

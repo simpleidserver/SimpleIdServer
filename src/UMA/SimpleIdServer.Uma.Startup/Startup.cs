@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,22 +43,27 @@ namespace SimpleIdServer.Uma.Startup
                 options.SupportedUICultures = supportedCultures;
             });
             services.AddLogging();
+            services.AddMvc()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix, opts => { opts.ResourcesPath = "Resources"; })
+                .AddDataAnnotationsLocalization();
+            services.AddAuthentication(opts =>
+            {
+                opts.DefaultAuthenticateScheme = UMAConstants.SignInScheme;
+                opts.DefaultSignInScheme = UMAConstants.SignInScheme;
+                opts.DefaultChallengeScheme = UMAConstants.ChallengeAuthenticationScheme;
+            }).AddCookie(UMAConstants.SignInScheme).AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
+            {
+                options.ClientId = "umaClient";
+                options.ClientSecret = "umaClientSecret";
+                options.Authority = "https://localhost:60000";
+                options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
+                options.SaveTokens = true;
+            });
+            services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
             services.AddSIDUma(options =>
             {
                 options.OpenIdJsonWebKeySignature = openidJsonWebKey;
             })
-            .AddAuthentication(c =>
-                {
-                    c.AddCookie(UMAConstants.SignInScheme);
-                    c.AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
-                     {
-                         options.ClientId = "umaClient";
-                         options.ClientSecret = "umaClientSecret";
-                         options.Authority = "https://localhost:60000";
-                         options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
-                         options.SaveTokens = true;
-                     });
-                })
             .AddUmaResources(DefaultConfiguration.Resources)
             .AddUMARequests(DefaultConfiguration.PendingRequests)
             .AddClients(DefaultConfiguration.DefaultClients)
@@ -70,7 +76,17 @@ namespace SimpleIdServer.Uma.Startup
             loggerFactory.AddConsole(LogLevel.Information);
             var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(options.Value);
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseStaticFiles();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                  name: "AreaRoute",
+                  template: "{area}/{controller}/{action=Index}/{id?}");
+                routes.MapRoute(
+                    name: "DefaultRoute",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
 
         private JsonWebKey ExtractOAuthJsonWebKey()

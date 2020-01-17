@@ -28,30 +28,31 @@ namespace SimpleIdServer.Scim.Startup
                 Exponent = dic.TryGet(RSAFields.Exponent)
             };
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
+            services.AddMvc();
             services.AddLogging();
-            services.AddSIDScim()
-                .AddAuthentication(c =>
+            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            services.AddAuthentication(SCIMConstants.AuthenticationScheme)
+                .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
                 {
-                    c.AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
+                    cfg.TokenValidationParameters = new TokenValidationParameters
                     {
-                        cfg.TokenValidationParameters = new TokenValidationParameters
+                        ValidIssuer = "http://localhost:60000",
+                        ValidAudiences = new List<string>
                         {
-                            ValidIssuer = "http://localhost:60000",
-                            ValidAudiences = new List<string>
-                            {
-                                "scimClient"
-                            },
-                            ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = oauthRsaSecurityKey
-                        };
-                    });
+                            "scimClient"
+                        },
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = oauthRsaSecurityKey
+                    };
                 });
+            services.AddSIDScim();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(LogLevel.Trace);
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseMvc();
         }
     }
 }
