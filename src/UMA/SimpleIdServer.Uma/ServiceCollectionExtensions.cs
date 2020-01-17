@@ -34,11 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddUMAStore()
                 .AddUMATokenApi()
                 .AddUMAHelpers()
-                .AddUMAConfiguration()
-                .AddAuthorization(a =>
-                {
-                    a.AddPolicy("IsAuthenticated", p => p.RequireAuthenticatedUser());
-                });
+                .AddUMAConfiguration();
             return builder;
         }
 

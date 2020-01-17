@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,9 @@ namespace SimpleIdServer.OAuth.Startup
                 }).SetAlg(rsa, "RS256").Build();
             }
 
+            services.AddMvc();
+            services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSIDOAuth(o =>
             {
                 o.ClientSecretExpirationInSeconds = 2;
@@ -43,7 +47,8 @@ namespace SimpleIdServer.OAuth.Startup
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseMvc();
         }
     }
 }

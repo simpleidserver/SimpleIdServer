@@ -45,11 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static SimpleIdServerOAuthBuilder AddSIDOAuth(this IServiceCollection services)
         {
-            services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
-            services.AddMvc()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix, opts => { opts.ResourcesPath = "Resources"; })
-                .AddDataAnnotationsLocalization();
-            services.AddDataProtection();
+            services.AddDistributedMemoryCache();
             services.AddOAuthStore()
                 .AddResponseModeHandlers()
                 .AddOAuthClientAuthentication()
@@ -62,11 +58,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddJwt()
                 .AddRegisterApi()
                 .AddConfigurationApi();
-            services.AddDataProtection();
-            services.AddAuthorization(policy =>
-            {
-                policy.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
-            });
             return new SimpleIdServerOAuthBuilder(services);
         }
 

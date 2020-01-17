@@ -11,6 +11,7 @@
 		    <group targetFramework=".NETStandard2.0">
 			    <dependency id="SimpleIdServer.Uma" version="$version$" exclude="Build,Analyzers" />
 			    <dependency id="Microsoft.Web.LibraryManager.Build" version="2.0.76" />
+          <dependency id="Microsoft.AspNetCore.Authentication.OpenIdConnect" version="2.2.0" />
 		    </group>
 	    </dependencies>
     </metadata>

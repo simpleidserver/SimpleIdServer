@@ -92,7 +92,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 };
                 var payload = Encoding.UTF8.GetBytes(jObj.ToString());
                 HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                HttpContext.Response.Body.Write(payload, 0, payload.Length);
+                await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
             }
         }
     }

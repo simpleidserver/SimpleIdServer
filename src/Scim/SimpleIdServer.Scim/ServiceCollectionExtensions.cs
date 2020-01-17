@@ -22,10 +22,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services)
         {
             var builder = new SimpleIdServerSCIMBuilder(services);
-            services.AddMvc();
             services.AddCommandHandlers()
-                .AddSCIMRepository()
-                .AddSCIMAuthorization();
+                .AddSCIMRepository();
             return builder;
         }
 
@@ -39,20 +37,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.Configure(options);
             return services.AddSIDScim();
-        }
-
-        private static IServiceCollection AddSCIMAuthorization(this IServiceCollection services)
-        {
-            services.AddAuthorization(opts =>
-            {
-                opts.AddPolicy("QueryScimResource", p => p.RequireClaim("scope", "query_scim_resource"));
-                opts.AddPolicy("AddScimResource", p => p.RequireClaim("scope", "add_scim_resource"));
-                opts.AddPolicy("DeleteScimResource", p => p.RequireClaim("scope", "delete_scim_resource"));
-                opts.AddPolicy("UpdateScimResource", p => p.RequireClaim("scope", "update_scim_resource"));
-                opts.AddPolicy("BulkScimResource", p => p.RequireClaim("scope", "bulk_scim_resource"));
-                opts.AddPolicy("UserAuthenticated", p => p.RequireAuthenticatedUser());
-            });
-            return services;
         }
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)

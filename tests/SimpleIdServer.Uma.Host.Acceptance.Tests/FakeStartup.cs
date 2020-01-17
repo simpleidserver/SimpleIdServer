@@ -8,6 +8,8 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
+            services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
             services.AddSIDUma(o =>
             {
                 o.OpenIdJsonWebKeySignature = JwksStore.GetInstance().GetJsonWebKey();
@@ -16,7 +18,17 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseStaticFiles();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                  name: "AreaRoute",
+                  template: "{area}/{controller}/{action=Index}/{id?}");
+                routes.MapRoute(
+                    name: "DefaultRoute",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

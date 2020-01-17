@@ -41,6 +41,9 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 SCIMConstants.StandardSchemas.GroupSchema,
                 SCIMConstants.StandardSchemas.CommonSchema
             };
+            services.AddMvc();
+            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
             services.AddSIDScim(o =>
             {
                 o.UserSchemas = new List<SCIMSchema>
@@ -54,15 +57,13 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     SCIMConstants.StandardSchemas.CommonSchema
                 };
                 o.MaxOperations = 3;
-            }).AddAuthentication(a =>
-            {
-                a.AddCustomAuthentication(c => { });
             }).AddSchemas(schemas);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseSID();
+            app.UseAuthentication();
+            app.UseMvc();
         }
     }
 

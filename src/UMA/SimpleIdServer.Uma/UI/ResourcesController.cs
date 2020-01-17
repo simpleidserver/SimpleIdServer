@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.UI
 {
-    [Authorize("IsAuthenticated")]
+    [Authorize("IsConnected")]
     public class ResourcesController : Controller
     {
         [HttpGet]
