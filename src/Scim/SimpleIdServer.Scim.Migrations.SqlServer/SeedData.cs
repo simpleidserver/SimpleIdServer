@@ -24,7 +24,6 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer
             Console.WriteLine("Seeding database...");
             context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.GroupSchema);
             context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.UserSchema);
-            context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.CommonSchema);
             context.SaveChanges();
         }
     }

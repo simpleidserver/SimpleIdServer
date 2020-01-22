@@ -12,13 +12,11 @@ namespace SimpleIdServer.Scim
             AuthenticationScheme = SCIMConstants.AuthenticationScheme;
             UserSchemas = new List<SCIMSchema>
             {
-                SCIMConstants.StandardSchemas.UserSchema,
-                SCIMConstants.StandardSchemas.CommonSchema
+                SCIMConstants.StandardSchemas.UserSchema
             };
             GroupSchemas = new List<SCIMSchema>
             {
-                SCIMConstants.StandardSchemas.GroupSchema,
-                SCIMConstants.StandardSchemas.CommonSchema
+                SCIMConstants.StandardSchemas.GroupSchema
             };
             SCIMIdClaimName = "scim_id";
             MaxOperations = 1000;

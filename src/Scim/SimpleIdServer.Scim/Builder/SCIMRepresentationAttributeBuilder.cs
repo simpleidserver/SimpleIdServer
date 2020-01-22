@@ -21,7 +21,12 @@ namespace SimpleIdServer.Scim.Builder
         public SCIMRepresentationAttributeBuilder AddAttribute(string name, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null)
         {
             var id = Guid.NewGuid().ToString();
-            var schemaAttribute = _scimSchemaAttribute.SubAttributes.FirstOrDefault(a => a.Name == name);
+            SCIMSchemaAttribute schemaAttribute = null;
+            if (_scimSchemaAttribute != null && _scimSchemaAttribute.SubAttributes != null)
+            {
+                schemaAttribute = _scimSchemaAttribute.SubAttributes.FirstOrDefault(a => a.Name == name);
+            }
+
             _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime));
             return this;
         }

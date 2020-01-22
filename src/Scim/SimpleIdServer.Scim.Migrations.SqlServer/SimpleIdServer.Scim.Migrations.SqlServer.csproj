@@ -14,9 +14,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="appsettings.json" />
   </ItemGroup>
 </Project>

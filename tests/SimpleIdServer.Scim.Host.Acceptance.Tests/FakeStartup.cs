@@ -38,8 +38,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             var schemas = new List<SCIMSchema>
             {
                 userSchema,
-                SCIMConstants.StandardSchemas.GroupSchema,
-                SCIMConstants.StandardSchemas.CommonSchema
+                SCIMConstants.StandardSchemas.GroupSchema
             };
             services.AddMvc();
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
@@ -48,13 +47,11 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             {
                 o.UserSchemas = new List<SCIMSchema>
                 {
-                    userSchema,
-                    SCIMConstants.StandardSchemas.CommonSchema
+                    userSchema
                 };
                 o.GroupSchemas = new List<SCIMSchema>
                 {
-                    SCIMConstants.StandardSchemas.GroupSchema,
-                    SCIMConstants.StandardSchemas.CommonSchema
+                    SCIMConstants.StandardSchemas.GroupSchema
                 };
                 o.MaxOperations = 3;
             }).AddSchemas(schemas);

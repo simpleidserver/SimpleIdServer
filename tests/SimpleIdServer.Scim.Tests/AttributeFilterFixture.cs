@@ -42,12 +42,20 @@ namespace SimpleIdServer.Scim.Tests
             var thirdFilter = SCIMFilterParser.Parse("userName", new List<SCIMSchema> { userSchema });
             var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
             var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema });
+            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema });
+            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema });
+            var eightFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
+            var nineFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
 
             var firstJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { firstFilter });
             var secondJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { secondFilter });
             var thirdJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { thirdFilter }, "http://localhost");
             var fourthJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { fourthFilter }, "http://localhost");
             var fifthJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { fifthFilter }, "http://localhost");
+            var sixJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { sixFilter });
+            var sevenJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { sevenFilter }, "http://localhost");
+            var eightJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { eightFilter }, "http://localhost");
+            var nineJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { nineFilter });
 
             Assert.Equal("01", firstJSON.SelectToken("phones[0].phoneNumber").ToString());
             Assert.Equal("02", secondJSON.SelectToken("phones[0].phoneNumber").ToString());
@@ -55,6 +63,10 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Null(thirdJSON.SelectToken("userName"));
             Assert.Null(fourthJSON.SelectToken("phones[0].phoneNumber"));
             Assert.True((fifthJSON.SelectToken("phones") as JArray).Count == 1);
+            Assert.NotNull(sixJSON.SelectToken("meta.lastModified"));
+            Assert.Null(sevenJSON.SelectToken("meta.lastModified"));
+            Assert.Null(eightJSON.SelectToken("id"));
+            Assert.NotNull(nineJSON.SelectToken("id"));
         }
     }
 }

@@ -4,6 +4,7 @@ using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -11,6 +12,16 @@ namespace SimpleIdServer.Scim.Extensions
 {
     public static class SCIMExpressionLinqExtensions
     {
+        private static Dictionary<string, string> MAPPING_PATH_TO_PROPERTYNAMES = new Dictionary<string, string>
+        {
+            { SCIMConstants.StandardSCIMRepresentationAttributes.Id, "Id" },
+            { SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, "ExternalId" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}", "ResourceType" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}", "Created" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}", "LastModified" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}", "Version" },
+        };
+
         public static LambdaExpression Evaluate(this SCIMExpression expression, IQueryable<SCIMRepresentation> representations)
         {
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
@@ -65,6 +76,12 @@ namespace SimpleIdServer.Scim.Extensions
         {
             if(parameterExpression.Type == typeof(SCIMRepresentation))
             {
+                var commonAttribute = GetCommonAttribute(presentExpression.Content, parameterExpression);
+                if (commonAttribute != null)
+                {
+                    return Expression.Equal(Expression.Constant(true), Expression.Constant(true));
+                }
+
                 var resourceAttrParameterExpr = Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
                 var anyLambdaExpression = presentExpression.Content.Evaluate(resourceAttrParameterExpr, (param) => BuildPresent(param));
                 var attributesProperty = Expression.Property(parameterExpression, "Attributes");
@@ -80,13 +97,32 @@ namespace SimpleIdServer.Scim.Extensions
             if (parameterExpression.Type == typeof(SCIMRepresentation))
             {
                 var raExpression = Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
-                var leftExpression = logicalExpression.LeftExpression.Evaluate(raExpression);
-                var rightExpression = logicalExpression.RightExpression.Evaluate(raExpression);
-                var anyLeftLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(leftExpression, raExpression);
-                var anyRightLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(rightExpression, raExpression);
                 var attributesProperty = Expression.Property(parameterExpression, "Attributes");
-                var leftCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLeftLambda);
-                var rightCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyRightLambda);
+                Expression leftCall;
+                Expression rightCall;
+                if (logicalExpression.LeftExpression is SCIMComparisonExpression && IsCommonAttribute(((SCIMComparisonExpression)logicalExpression.LeftExpression).LeftExpression))
+                {
+                    leftCall = logicalExpression.LeftExpression.Evaluate(parameterExpression);
+                }
+                else
+                {
+                    var leftExpression = logicalExpression.LeftExpression.Evaluate(raExpression);
+                    var anyLeftLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(leftExpression, raExpression);
+                    leftCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLeftLambda);
+                }
+
+                Expression rightExpression;
+                if (logicalExpression.RightExpression is SCIMComparisonExpression && IsCommonAttribute(((SCIMComparisonExpression)logicalExpression.RightExpression).LeftExpression))
+                {
+                    rightCall = logicalExpression.RightExpression.Evaluate(parameterExpression);
+                }
+                else
+                {
+                    rightExpression = logicalExpression.RightExpression.Evaluate(raExpression);
+                    var anyRightLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(rightExpression, raExpression);
+                    rightCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyRightLambda);
+                }
+
                 if (logicalExpression.LogicalOperator == SCIMLogicalOperators.AND)
                 {
                     return Expression.AndAlso(leftCall, rightCall);
@@ -205,10 +241,16 @@ namespace SimpleIdServer.Scim.Extensions
             var originalParameterExpression = parameterExpression;
             if (parameterExpression.Type == typeof(SCIMRepresentation))
             {
+                var commonAttribute = GetCommonAttribute(comparisonExpression.LeftExpression, parameterExpression);
+                if (commonAttribute != null)
+                {
+                    return BuildComparison(comparisonExpression, commonAttribute);
+                }
+
                 parameterExpression = Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
             }
 
-            var result = comparisonExpression.LeftExpression.Evaluate(parameterExpression, (param) => BuildComparison(comparisonExpression, param));
+            var result = comparisonExpression.LeftExpression.Evaluate(parameterExpression, (param) => BuildAttributeComparison(comparisonExpression, param));
             if (originalParameterExpression.Type == typeof(SCIMRepresentation))
             {
                 var attributesProperty = Expression.Property(originalParameterExpression, "Attributes");
@@ -247,7 +289,107 @@ namespace SimpleIdServer.Scim.Extensions
             );
         }
 
-        private static Expression BuildComparison(SCIMComparisonExpression comparisonExpression, Expression representationAttrExpr)
+        private static Expression BuildComparison(SCIMComparisonExpression comparisonExpression, MemberExpression representationExpr)
+        {
+            switch (comparisonExpression.ComparisonOperator)
+            {
+                case SCIMComparisonOperators.NE:
+                    if (representationExpr.Type == typeof(DateTime))
+                    {
+                        return Expression.NotEqual(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(int))
+                    {
+                        return Expression.NotEqual(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(bool))
+                    {
+                        return Expression.NotEqual(representationExpr, Expression.Constant(ParseBoolean(comparisonExpression.Value)));
+                    }
+
+                    return Expression.NotEqual(representationExpr, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.GT:
+                    if (representationExpr.Type == typeof(DateTime))
+                    {
+                        return Expression.GreaterThan(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(int))
+                    {
+                        return Expression.GreaterThan(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    return Expression.GreaterThan(representationExpr, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.GE:
+                    if (representationExpr.Type == typeof(DateTime))
+                    {
+                        return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(int))
+                    {
+                        return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.LE:
+                    if (representationExpr.Type == typeof(DateTime))
+                    {
+                        return Expression.LessThanOrEqual(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(int))
+                    {
+                        return Expression.LessThanOrEqual(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    return Expression.LessThanOrEqual(representationExpr, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.LT:
+                    if (representationExpr.Type == typeof(DateTime))
+                    {
+                        return Expression.LessThan(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(int))
+                    {
+                        return Expression.LessThan(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    return Expression.LessThan(representationExpr, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.EQ:
+                    if (representationExpr.Type == typeof(DateTime))
+                    {
+                        return Expression.Equal(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(int))
+                    {
+                        return Expression.Equal(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(bool))
+                    {
+                        return Expression.Equal(representationExpr, Expression.Constant(ParseBoolean(comparisonExpression.Value)));
+                    }
+
+                    return Expression.Equal(representationExpr, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.SW:
+                    var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
+                    return Expression.Call(representationExpr, startWith, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.EW:
+                    var endWith = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
+                    return Expression.Call(representationExpr, endWith, Expression.Constant(comparisonExpression.Value));
+                case SCIMComparisonOperators.CO:
+                    var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    return Expression.Call(representationExpr, contains, Expression.Constant(comparisonExpression.Value));
+            }
+
+            return null;
+        }
+
+        private static Expression BuildAttributeComparison(SCIMComparisonExpression comparisonExpression, Expression representationAttrExpr)
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
@@ -358,6 +500,22 @@ namespace SimpleIdServer.Scim.Extensions
             }
 
             return default(int);
+        }
+
+        private static bool IsCommonAttribute(SCIMAttributeExpression scimAttributeExpression)
+        {
+            return MAPPING_PATH_TO_PROPERTYNAMES.ContainsKey(scimAttributeExpression.GetFullPath());
+        }
+
+        private static MemberExpression GetCommonAttribute(SCIMAttributeExpression scimAttributeExpression, ParameterExpression parameterExpression)
+        {
+            var fullPath = scimAttributeExpression.GetFullPath();
+            if (!MAPPING_PATH_TO_PROPERTYNAMES.ContainsKey(fullPath))
+            {
+                return null;
+            }
+
+            return Expression.Property(parameterExpression, MAPPING_PATH_TO_PROPERTYNAMES[fullPath]);
         }
     }
 }

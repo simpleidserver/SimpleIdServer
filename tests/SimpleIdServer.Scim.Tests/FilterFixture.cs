@@ -16,7 +16,7 @@ namespace SimpleIdServer.Scim.Tests
         [Fact]
         public void When_Parse_And_Execute_Filter()
         {
-            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, SCIMConstants.StandardSchemas.CommonSchema })
+            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "bjensen" })
                 .AddBooleanAttribute("active", "urn:ietf:params:scim:schemas:core:2.0:User", new List<bool> { true })
                 .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
@@ -34,12 +34,10 @@ namespace SimpleIdServer.Scim.Tests
                 {
                     r.AddStringAttribute("familyName", new List<string> { "O'Malley" });
                 })
-                .AddComplexAttribute("meta", SCIMConstants.StandardSchemas.CommonSchema.Id, (r) =>
-                {
-                    r.AddDateTimeAttribute("lastModified", new List<DateTime> { DateTime.Parse("2012-05-13T04:42:34Z") });
-                })
                 .Build();
-            var secondRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, SCIMConstants.StandardSchemas.CommonSchema })
+            firstRepresentation.LastModified = DateTime.Parse("2012-05-13T04:42:34Z");
+            firstRepresentation.Version = "2";
+            var secondRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Justine" })
                 .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
                 .AddStringAttribute("userType", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Intern" })
@@ -52,12 +50,8 @@ namespace SimpleIdServer.Scim.Tests
                 {
                     c.AddStringAttribute("value", new List<string> { "example.be" });
                 })
-                .AddComplexAttribute("meta", SCIMConstants.StandardSchemas.CommonSchema.Id, (r) =>
-                {
-                    r.AddDateTimeAttribute("lastModified", new List<DateTime> { DateTime.Parse("2010-05-13T04:42:34Z") });
-                })
                 .Build();
-            secondRepresentation.LastModified = DateTime.Now;
+            secondRepresentation.LastModified = DateTime.Parse("2010-05-13T04:42:34Z");
             var representations = new List<SCIMRepresentation>
             {
                 firstRepresentation,
@@ -80,7 +74,9 @@ namespace SimpleIdServer.Scim.Tests
             var thirteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and (emails.type eq \"work\")");
             var fourteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and emails[type eq \"work\" and value co \"example.com\"]");
             var fifteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "emails[type eq \"work\" and value co \"example.com\"] or ims[type eq \"xmpp\" and value co \"foo.com\"]");
-            
+            var sixteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\" and meta.version eq \"2\"");
+            var seventeenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified pr");
+
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
             Assert.Equal(1, thirdResult.Count());
@@ -96,11 +92,13 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(1, thirteenResult.Count());
             Assert.Equal(1, fourteenResult.Count());
             Assert.Equal(2, fifteenResult.Count());
+            Assert.Equal(1, sixteenResult.Count());
+            Assert.Equal(2, seventeenResult.Count());
         }
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter)
         {
-            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, SCIMConstants.StandardSchemas.CommonSchema });
+            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema });
             var evaluatedExpression = parsed.Evaluate(representations);
             return (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(representations);
         }

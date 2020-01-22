@@ -10,14 +10,14 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20191014135254_Init")]
-    partial class Init
+    [Migration("20200122193426_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -46,7 +46,7 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("SCIMRepresentationAttributeId");
+                    b.Property<string>("ParentId");
 
                     b.Property<string>("SCIMRepresentationId");
 
@@ -64,7 +64,7 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SCIMRepresentationAttributeId");
+                    b.HasIndex("ParentId");
 
                     b.HasIndex("SCIMRepresentationId");
 
@@ -137,9 +137,9 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute", b =>
                 {
-                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute")
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute", "Parent")
                         .WithMany("Values")
-                        .HasForeignKey("SCIMRepresentationAttributeId");
+                        .HasForeignKey("ParentId");
 
                     b.HasOne("SimpleIdServer.Scim.Domain.SCIMRepresentation")
                         .WithMany("Attributes")

@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 {
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -91,16 +91,16 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
                     ValuesInteger = table.Column<string>(nullable: true),
                     ValuesDateTime = table.Column<string>(nullable: true),
                     ValuesReference = table.Column<string>(nullable: true),
+                    ParentId = table.Column<string>(nullable: true),
                     SchemaAttributeId = table.Column<string>(nullable: true),
-                    SCIMRepresentationAttributeId = table.Column<string>(nullable: true),
                     SCIMRepresentationId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SCIMRepresentationAttribute", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SCIMRepresentationAttribute_SCIMRepresentationAttribute_SCIMRepresentationAttributeId",
-                        column: x => x.SCIMRepresentationAttributeId,
+                        name: "FK_SCIMRepresentationAttribute_SCIMRepresentationAttribute_ParentId",
+                        column: x => x.ParentId,
                         principalTable: "SCIMRepresentationAttribute",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -119,9 +119,9 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_SCIMRepresentationAttribute_SCIMRepresentationAttributeId",
+                name: "IX_SCIMRepresentationAttribute_ParentId",
                 table: "SCIMRepresentationAttribute",
-                column: "SCIMRepresentationAttributeId");
+                column: "ParentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationAttribute_SCIMRepresentationId",

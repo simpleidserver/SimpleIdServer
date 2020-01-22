@@ -20,12 +20,27 @@ namespace SimpleIdServer.Scim.Helpers
                 throw new SCIMSchemaViolatedException("missingRequiredAttribute", $"required attributes {string.Join(",", missingRequiredAttributes.Select(a => a.Name))} are missing");
             }
 
-            return new SCIMRepresentation(schemas, BuildRepresentationAttributes(json, attrsSchema));
+            return BuildRepresentation(json, attrsSchema, schemas);
+        }
+
+        public static SCIMRepresentation BuildRepresentation(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, ICollection<SCIMSchema> schemas)
+        {
+            var result = new SCIMRepresentation();
+            var externalId = json.SelectToken(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
+            if (externalId != null)
+            {
+                result.ExternalId = externalId.ToString();
+                json.Remove(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
+            }
+
+            result.Schemas = schemas;
+            result.Attributes = BuildRepresentationAttributes(json, attrsSchema);
+            return result;
         }
 
         public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema)
         {
-            var result = new List<SCIMRepresentationAttribute>();
+            var attributes = new List<SCIMRepresentationAttribute>();
             foreach (var jsonProperty in json)
             {
                 if (jsonProperty.Key == SCIMConstants.StandardSCIMRepresentationAttributes.Schemas)
@@ -54,12 +69,12 @@ namespace SimpleIdServer.Scim.Helpers
 
                     foreach (var subJson in jArr)
                     {
-                        result.Add(BuildAttribute(subJson, attrSchema));
+                        attributes.Add(BuildAttribute(subJson, attrSchema));
                     }
                 }
                 else
                 {
-                    result.Add(BuildAttribute(jsonProperty.Value, attrSchema));
+                    attributes.Add(BuildAttribute(jsonProperty.Value, attrSchema));
                 }
             }
 
@@ -83,7 +98,7 @@ namespace SimpleIdServer.Scim.Helpers
                                 attr.Add(str);
                             }
 
-                            result.Add(attr);
+                            attributes.Add(attr);
                         }
 
                         break;
@@ -101,14 +116,14 @@ namespace SimpleIdServer.Scim.Helpers
                                 attr.Add(i);
                             }
 
-                            result.Add(attr);
+                            attributes.Add(attr);
                         }
 
                         break;
                 }
             }
 
-            return result;
+            return attributes;
         }
 
         private static SCIMRepresentationAttribute BuildAttribute(JToken jsonProperty, SCIMSchemaAttribute schemaAttribute)

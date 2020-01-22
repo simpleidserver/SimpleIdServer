@@ -54,6 +54,23 @@ namespace SimpleIdServer.Scim.Builder
         {
             return AddAttribute(name, schemaId, valuesDateTime: valuesDateTime);
         }
+
+        public SCIMRepresentationBuilder AddComplexAttribute(string name, Action<SCIMRepresentationAttributeBuilder> callback)
+        {
+            var builder = new SCIMRepresentationAttributeBuilder(null);
+            callback(builder);
+            var id = Guid.NewGuid().ToString();
+            var newAttribute = new SCIMRepresentationAttribute(id, null);
+            foreach (var subAttribute in builder.Build())
+            {
+                newAttribute.Add(subAttribute);
+            }
+
+            _attributes.Add(newAttribute);
+            return this;
+        }
+
+
         public SCIMRepresentationBuilder AddComplexAttribute(string name, string schemaId, Action<SCIMRepresentationAttributeBuilder> callback)
         {
             var schemaAttribute = _schemas.First(s => s.Id == schemaId).Attributes.FirstOrDefault(a => a.Name == name);

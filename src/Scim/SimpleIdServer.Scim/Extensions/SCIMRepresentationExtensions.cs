@@ -15,6 +15,16 @@ namespace SimpleIdServer.Scim.Domain
 {
     public static class SCIMRepresentationExtensions
     {
+        private static List<string> COMMNON_PROPERTY_NAMES = new List<string>
+        {
+            { SCIMConstants.StandardSCIMRepresentationAttributes.Id },
+            { SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}" },
+            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}" }
+        };
+
         public static void ApplyPatches(this SCIMRepresentation representation, ICollection<SCIMPatchOperationRequest> patches)
         {
             var queryableRepresentationAttributes = representation.Attributes.AsQueryable();
@@ -71,26 +81,27 @@ namespace SimpleIdServer.Scim.Domain
 
         public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false)
         {
+            var meta = new JObject
+            {
+                { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, representation.ResourceType },
+                { SCIMConstants.StandardSCIMMetaAttributes.Created, representation.Created },
+                { SCIMConstants.StandardSCIMMetaAttributes.LastModified, representation.LastModified },
+                { SCIMConstants.StandardSCIMMetaAttributes.Version, representation.Version },
+                { SCIMConstants.StandardSCIMMetaAttributes.Location, location }
+            };
             var jObj = new JObject
             {
                 { SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id },
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(representation.Schemas.Select(s => s.Id)) }
+                { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(representation.Schemas.Select(s => s.Id)) },
+                { SCIMConstants.StandardSCIMRepresentationAttributes.Meta, meta }
             };
 
-            EnrichResponse(representation.Attributes.AsQueryable(), jObj, isGetRequest);
-            var metaObj = (JObject)jObj.SelectToken(SCIMConstants.StandardSCIMRepresentationAttributes.Meta);
-            if (metaObj == null)
+            if (!string.IsNullOrWhiteSpace(representation.ExternalId))
             {
-                jObj.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
-                {
-                    { SCIMConstants.StandardSCIMMetaAttributes.Location, location }
-                });
-            }
-            else
-            {
-                metaObj.Add(SCIMConstants.StandardSCIMMetaAttributes.Location, location);
+                jObj.Add(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, representation.ExternalId);
             }
 
+            EnrichResponse(representation.Attributes.AsQueryable(), jObj, isGetRequest);
             return jObj;
         }
 
@@ -124,10 +135,20 @@ namespace SimpleIdServer.Scim.Domain
                 }
             }
 
-            return result.ToResponse(location, true);
+            var jObj = result.ToResponse(location, true);
+            foreach(var excludedAttribute in excludedAttributes)
+            {
+                var fullPath = (excludedAttribute as SCIMAttributeExpression).GetFullPath();
+                if (COMMNON_PROPERTY_NAMES.Contains(fullPath))
+                {
+                    jObj.SelectToken(fullPath).Parent.Remove();
+                }
+            }
+
+            return jObj;
         }
         
-        private static void IncludeAttribute(this SCIMRepresentation scimRepresentation, SCIMExpression scimExpression , JObject result)
+        private static void IncludeAttribute(this SCIMRepresentation scimRepresentation, SCIMExpression scimExpression, JObject result)
         {
             var scimAttributeExpression = scimExpression as SCIMAttributeExpression;
             if (scimAttributeExpression == null)
@@ -136,6 +157,48 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             IncludeAttribute(scimAttributeExpression, scimRepresentation.Attributes.AsQueryable(), result);
+            var fullPath = scimAttributeExpression.GetFullPath();
+            if (!COMMNON_PROPERTY_NAMES.Contains(fullPath))
+            {
+                return;
+            }
+
+            if (fullPath == SCIMConstants.StandardSCIMRepresentationAttributes.Id)
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Id, scimRepresentation.Id);
+            }
+            else if (fullPath == SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId)
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, scimRepresentation.ExternalId);
+            } 
+            else if (fullPath == $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}")
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
+                {
+                    { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, scimRepresentation.ResourceType }
+                });
+            }
+            else if (fullPath == $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}")
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
+                {
+                    { SCIMConstants.StandardSCIMMetaAttributes.Created, scimRepresentation.Created }
+                });
+            }
+            else if (fullPath == $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}")
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
+                {
+                    { SCIMConstants.StandardSCIMMetaAttributes.LastModified, scimRepresentation.LastModified }
+                });
+            }
+            else if (fullPath == $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}")
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Meta, new JObject
+                {
+                    { SCIMConstants.StandardSCIMMetaAttributes.Version, scimRepresentation.Version }
+                });
+            }
         }
 
         private static void IncludeAttribute(SCIMAttributeExpression scimExpression, IQueryable<SCIMRepresentationAttribute> attributes, JObject result)

@@ -72,18 +72,6 @@ namespace SimpleIdServer.Scim
 
         public static class StandardSchemas
         {
-            public static SCIMSchema CommonSchema =
-                SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Common", "Common", "Common")
-                    .AddComplexAttribute(StandardSCIMRepresentationAttributes.Meta, (c) =>
-                    {
-                        c.AddStringAttribute(StandardSCIMMetaAttributes.ResourceType, mutability: SCIMSchemaAttributeMutabilities.READONLY);
-                        c.AddStringAttribute(StandardSCIMMetaAttributes.Version, mutability: SCIMSchemaAttributeMutabilities.READONLY);
-                        c.AddStringAttribute(StandardSCIMMetaAttributes.Location, mutability: SCIMSchemaAttributeMutabilities.READONLY);
-                        c.AddDateTimeAttribute(StandardSCIMMetaAttributes.Created, mutability: SCIMSchemaAttributeMutabilities.READONLY);
-                        c.AddDateTimeAttribute(StandardSCIMMetaAttributes.LastModified, mutability: SCIMSchemaAttributeMutabilities.READONLY);
-                        c.AddDateTimeAttribute(StandardSCIMRepresentationAttributes.ExternalId, mutability: SCIMSchemaAttributeMutabilities.READWRITE);
-                    })
-                    .Build();
             public static SCIMSchema UserSchema =
                  SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", "User Account")
                     .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
