@@ -35,18 +35,24 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
-            if (!addRepresentationCommand.SchemaIds.Any(s => requestedSchemas.Contains(s)))
+            var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(addRepresentationCommand.ResourceType);
+            var allSchemas = new List<string> { schema.Id };
+            var requiredSchemas = new List<string> { schema.Id };
+            allSchemas.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
+            requiredSchemas.AddRange(schema.SchemaExtensions.Where(s => s.Required).Select(s => s.Schema));
+            var missingRequiredSchemas = requiredSchemas.Where(s => !requestedSchemas.Contains(s));
+            if (missingRequiredSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"some schemas are not recognized by the endpoint");
+                throw new SCIMBadRequestException("invalidRequest", $"the required schemas {string.Join(",", missingRequiredSchemas)} are missing");
+            }
+
+            var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
+            if (unsupportedSchemas.Any())
+            {
+                throw new SCIMBadRequestException("invalidRequest", $"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            var unsupportedSchemas = requestedSchemas.Where(s => !schemas.Any(sh => sh.Id == s));
-            if (unsupportedSchemas.Any())
-            {
-                throw new SCIMBadRequestException("invalidRequest", $"{string.Join(",", unsupportedSchemas)} schemas are unknown");
-            }
-
             var version = Guid.NewGuid().ToString();
             var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation, schemas.ToList());
             scimRepresentation.Id = Guid.NewGuid().ToString();

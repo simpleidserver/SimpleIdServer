@@ -30,17 +30,19 @@ Scenario: Error is returned when schema is not valid (HTTP POST)
 
 Scenario: Error is returned when trying to add two resources with the same unique attribute
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
 
 	
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
 
 	And extract JSON from body
 
@@ -100,8 +102,8 @@ Scenario: Error is returned when schema is not valid (HTTP PUT)
 
 Scenario: Error is returned when trying to update an unknown resource (HTTP PUT)
 	When execute HTTP PUT JSON request 'http://localhost/Users/id'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
+	| Key     | Value                                                                                                          |
+	| schemas | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
 
 	And extract JSON from body
 
@@ -114,17 +116,18 @@ Scenario: Error is returned when trying to update an unknown resource (HTTP PUT)
 
 Scenario: Error is returned when update an immutable attribute (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
-	| Key		| Value												|
-	| schemas   | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]	|
-	| immutable | str												|
+	| Key       | Value                                            |
+	| schemas   | [ "urn:ietf:params:scim:schemas:core:2.0:User" ] |
+	| immutable | str                                              |
 	
 	And extract JSON from body
 	

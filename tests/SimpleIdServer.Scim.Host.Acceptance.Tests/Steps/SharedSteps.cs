@@ -145,13 +145,13 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-            _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(json), "jsonHttpBody");
+            _scenarioContext.Set(JsonConvert.DeserializeObject<JToken>(json), "jsonHttpBody");
         }
 
         [When("extract '(.*)' from JSON body")]
         public void WhenExtractJSONKeyFromBody(string key)
         {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
             var val = jsonHttpBody.SelectToken(key);
             if (val != null)
             {
@@ -169,7 +169,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         [Then("JSON exists '(.*)'")]
         public void ThenExists(string key)
         {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
             var token = jsonHttpBody.SelectToken(key);
             Assert.NotNull(token);
         }
@@ -177,7 +177,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         [Then("JSON doesn't exists '(.*)'")]
         public void TheDoesntExist(string key)
         {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
             var token = jsonHttpBody.SelectToken(key);
             Assert.Null(token);
         }
@@ -185,7 +185,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         [Then("JSON '(.*)'='(.*)'")]
         public void ThenJSONEqualsTo(string key, string value)
         {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
             Assert.Equal(value.ToLowerInvariant(), jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
         }
 

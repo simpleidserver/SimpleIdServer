@@ -4,12 +4,6 @@ SCIMHostOptions
 ``AuthenticationScheme``
     Default authentication scheme.
 
-``GroupSchemaIds``
-    Array of schema identifiers used to represent a Group.
-
-``UserSchemaIds``
-    Array of schema identifiers used to represent a User.
-
 ``MaxOperations``
     An integer value specifying the maximum number of operations.
 

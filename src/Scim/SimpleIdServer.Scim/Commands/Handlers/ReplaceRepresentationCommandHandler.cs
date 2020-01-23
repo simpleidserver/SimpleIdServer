@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
@@ -36,18 +35,16 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
-            if (!replaceRepresentationCommand.SchemaIds.Any(s => requestedSchemas.Contains(s)))
+            var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
+            var allSchemas = new List<string> { schema.Id };
+            allSchemas.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
+            var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
+            if (unsupportedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"some schemas are not recognized by the endpoint");
+                throw new SCIMBadRequestException("invalidRequest", $"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            var unsupportedSchemas = requestedSchemas.Where(s => !schemas.Any(sh => sh.Id == s));
-            if (unsupportedSchemas.Any())
-            {
-                throw new SCIMBadRequestException("invalidRequest", $"{string.Join(",", unsupportedSchemas)} schemas are unknown");
-            }
-
             var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(replaceRepresentationCommand.Id);
             if (existingRepresentation == null)
             {

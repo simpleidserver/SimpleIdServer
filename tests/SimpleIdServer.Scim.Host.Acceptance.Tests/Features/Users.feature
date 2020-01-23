@@ -3,11 +3,12 @@
 
 Scenario: Check User can be created
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key        | Value                                                                               |
-	| schemas    | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                    |
-	| userName   | bjen                                                                                |
-	| externalId | externalid                                                                          |
-	| name       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" } |
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
 
 	And extract JSON from body
 
@@ -19,6 +20,7 @@ Scenario: Check User can be created
 	Then JSON exists 'meta.lastModified'
 	Then JSON exists 'meta.version'
 	Then JSON exists 'meta.location'
+	Then JSON 'employeeNumber'='number'
 	Then JSON 'externalId'='externalid'
 	Then JSON 'meta.resourceType'='Users'
 	Then JSON 'userName'='bjen'
@@ -29,11 +31,12 @@ Scenario: Check User can be created
 
 Scenario: Check attribute with a mutability equals to readOnly cannot be overriden
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key      | Value																					|
-	| schemas  | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]										|
-	| userName | bjen																					|
-	| name     | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }	|
-	| groups   | [ { "value": "group" } ]																|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| groups         | [ { "value": "group" } ]                                                                                       |
+	| employeeNumber | number                                                                                                         |
 
 	And extract JSON from body
 
@@ -44,10 +47,11 @@ Scenario: Check attribute with a mutability equals to readOnly cannot be overrid
 
 Scenario: Check User can be returned
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body
@@ -60,10 +64,11 @@ Scenario: Check User can be returned
 
 Scenario: Check user can be removed
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body
@@ -73,11 +78,12 @@ Scenario: Check user can be removed
 
 Scenario: Check user can be filtered
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
-	| phones	| [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]				|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
 
 	And execute HTTP GET request 'http://localhost/Users?filter=userName%20eq%20bjen&count=3'	
 	And extract JSON from body
@@ -95,11 +101,12 @@ Scenario: Check user can be filtered
 
 Scenario: Check the maxResults option is used when the client is trying to fetch more than the allowed number of data
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
-	| phones	| [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]				|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
 
 	And execute HTTP GET request 'http://localhost/Users?filter=userName%20eq%20bjen&count=300'	
 	And extract JSON from body
@@ -110,11 +117,12 @@ Scenario: Check the maxResults option is used when the client is trying to fetch
 
 Scenario: Use 'attributes=phones.phoneNumber' to get only the phone numbers
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
-	| phones	| [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]				|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
 
 	And execute HTTP GET request 'http://localhost/Users?filter=userName%20eq%20bjen&count=3&attributes=phones.phoneNumber'	
 	And extract JSON from body
@@ -130,11 +138,12 @@ Scenario: Use 'attributes=phones.phoneNumber' to get only the phone numbers
 
 Scenario: Check user can be updated (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
-	| phones	| [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]				|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
@@ -157,11 +166,12 @@ Scenario: Check user can be updated (HTTP PUT)
 
 Scenario: Check user can be patched (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key		| Value																									|
-	| schemas	| [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| userName	| bjen																									|
-	| name		| { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }					|
-	| phones	| [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]				|
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
 
 	And extract JSON from body
 	And extract 'id' from JSON body	

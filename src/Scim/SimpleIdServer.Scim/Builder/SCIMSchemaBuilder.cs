@@ -10,23 +10,29 @@ namespace SimpleIdServer.Scim.Builder
     {
         private readonly string _id;
         private readonly string _name;
+        private readonly string _resourceType;
         private readonly string _description;
+        private readonly bool _isRootSchema;
         private readonly ICollection<SCIMSchemaAttribute> _attributes;
+        private readonly ICollection<SCIMSchemaExtension> _extensions;
 
         public SCIMSchemaBuilder(string id)
         {
             _id = id;
             _attributes = new List<SCIMSchemaAttribute>();
+            _extensions = new List<SCIMSchemaExtension>();
         }
 
-        public SCIMSchemaBuilder(string id, string name) : this(id)
+        public SCIMSchemaBuilder(string id, string name, string resourceType) : this(id)
         {
             _name = name;
+            _resourceType = resourceType;
         }
         
-        public SCIMSchemaBuilder(string id, string name, string description) : this(id)
+        public SCIMSchemaBuilder(string id, string name, string resourceType, string description, bool isRootSchema = false) : this(id, name, resourceType)
         {
             _description = description;
+            _isRootSchema = isRootSchema;
         }
 
         public SCIMSchemaBuilder(SCIMSchema scimSchema)
@@ -36,6 +42,13 @@ namespace SimpleIdServer.Scim.Builder
             _name = scimSchema.Name;
             _description = scimSchema.Description;
         }
+
+        public SCIMSchemaBuilder AddSCIMSchemaExtension(string schema, bool isRequired)
+        {
+            _extensions.Add(new SCIMSchemaExtension {  Id = Guid.NewGuid().ToString(), Schema = schema, Required = isRequired });
+            return this;
+        }
+        
 
         public SCIMSchemaBuilder AddAttribute(string name)
         {
@@ -71,6 +84,7 @@ namespace SimpleIdServer.Scim.Builder
             _attributes.Add(builder.Build());
             return this;
         }
+
 
         public SCIMSchemaBuilder AddStringAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
@@ -127,8 +141,11 @@ namespace SimpleIdServer.Scim.Builder
             {
                 Id = _id,
                 Name = _name,
+                ResourceType = _resourceType,
+                SchemaExtensions = _extensions,
                 Description = _description,
-                Attributes = _attributes
+                Attributes = _attributes,
+                IsRootSchema = _isRootSchema
             };
         }
 
@@ -144,15 +161,15 @@ namespace SimpleIdServer.Scim.Builder
             return result;
         }
 
-        public static SCIMSchemaBuilder Create(string id, string name)
+        public static SCIMSchemaBuilder Create(string id, string name, string resourceType)
         {
-            var result = new SCIMSchemaBuilder(id, name);
+            var result = new SCIMSchemaBuilder(id, name, resourceType);
             return result;
         }
 
-        public static SCIMSchemaBuilder Create(string id, string name, string description)
+        public static SCIMSchemaBuilder Create(string id, string name, string resourceType, string description, bool isRootSchema = false)
         {
-            var result = new SCIMSchemaBuilder(id, name, description);
+            var result = new SCIMSchemaBuilder(id, name, resourceType, description, isRootSchema);
             return result;
         }
     }

@@ -10,14 +10,14 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20200122193426_InitialCreate")]
+    [Migration("20200123102957_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -80,7 +80,11 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<bool>("IsRootSchema");
+
                     b.Property<string>("Name");
+
+                    b.Property<string>("ResourceType");
 
                     b.Property<string>("SCIMRepresentationId");
 
@@ -135,6 +139,24 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
                     b.ToTable("SCIMSchemaAttribute");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchemaExtension", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Required");
+
+                    b.Property<string>("SCIMSchemaId");
+
+                    b.Property<string>("Schema");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SCIMSchemaId");
+
+                    b.ToTable("SCIMSchemaExtension");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute", b =>
                 {
                     b.HasOne("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute", "Parent")
@@ -165,6 +187,13 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
 
                     b.HasOne("SimpleIdServer.Scim.Domain.SCIMSchema")
                         .WithMany("Attributes")
+                        .HasForeignKey("SCIMSchemaId");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchemaExtension", b =>
+                {
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMSchema")
+                        .WithMany("SchemaExtensions")
                         .HasForeignKey("SCIMSchemaId");
                 });
 #pragma warning restore 612, 618

@@ -15,7 +15,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", "User Account")
+            var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMConstants.SCIMEndpoints.Users, "User Account", true)
                .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                .AddComplexAttribute("name", c =>
                {
@@ -34,10 +34,15 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                    opt.AddStringAttribute("type", description: "Type");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddStringAttribute("org", defaultValue: new List<string> { "ENTREPRISE" }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
+               .AddSCIMSchemaExtension("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", true)
                .Build();
+            var enterpriseUser = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", "EntrepriseUser", "Enterprise user")
+                .AddStringAttribute("employeeNumber", required: true)
+                .Build();
             var schemas = new List<SCIMSchema>
             {
                 userSchema,
+                enterpriseUser,
                 SCIMConstants.StandardSchemas.GroupSchema
             };
             services.AddMvc();
@@ -45,14 +50,6 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
             services.AddSIDScim(o =>
             {
-                o.UserSchemas = new List<SCIMSchema>
-                {
-                    userSchema
-                };
-                o.GroupSchemas = new List<SCIMSchema>
-                {
-                    SCIMConstants.StandardSchemas.GroupSchema
-                };
                 o.MaxOperations = 3;
             }).AddSchemas(schemas);
         }

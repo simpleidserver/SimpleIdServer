@@ -94,7 +94,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[ \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\" ]"});
             table1.AddRow(new string[] {
                         "Operations",
-                        @"[ { ""method"": ""POST"", ""path"": ""/Users"", ""bulkId"": ""1"", ""data"": { ""schemas"": [ ""urn:ietf:params:scim:schemas:core:2.0:User"" ], ""userName"": ""bjen"", ""name"": { ""formatted"" : ""formatted"", ""familyName"": ""familyName"", ""givenName"": ""givenName"" } } }, { ""method"": ""GET"", ""path"": ""/Users/id"", ""bulkId"": ""2"" } ]"});
+                        @"[ { ""method"": ""POST"", ""path"": ""/Users"", ""bulkId"": ""1"", ""data"": { ""schemas"": [ ""urn:ietf:params:scim:schemas:core:2.0:User"", ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"" ], ""employeeNumber"": ""number"", ""userName"": ""bjen"", ""name"": { ""formatted"" : ""formatted"", ""familyName"": ""familyName"", ""givenName"": ""givenName"" } } }, { ""method"": ""GET"", ""path"": ""/Users/id"", ""bulkId"": ""2"" } ]"});
 #line 5
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Bulk\'", ((string)(null)), table1, "When ");
 #line 10

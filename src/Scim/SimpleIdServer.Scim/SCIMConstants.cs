@@ -41,6 +41,19 @@ namespace SimpleIdServer.Scim
             public const string SubAttributes = "subAttributes";
         }
 
+        public static class ResourceTypeAttribute
+        {
+            public const string Schemas = "schemas";
+            public const string Id = "id";
+            public const string Name = "name";
+            public const string Description = "description";
+            public const string Endpoint = "endpoint";
+            public const string SchemaExtensions = "schemaExtensions";
+            public const string Schema = "schema";
+            public const string Required = "required";
+            public const string Meta = "meta";
+        }
+
         public static class StandardSCIMMetaAttributes
         {
             public const string ResourceType = "resourceType";
@@ -68,12 +81,25 @@ namespace SimpleIdServer.Scim
             public const string ServiceProviderConfig = "ServiceProviderConfig";
             public const string Bulk = "Bulk";
             public const string Schemas = "Schemas";
+            public const string ResourceTypes = "ResourceTypes";
         }
 
         public static class StandardSchemas
         {
+            public static SCIMSchema ResourceTypeSchema =
+                SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ResourceType", "ResourceType", SCIMEndpoints.ResourceTypes, "Resource type", true)
+                    .AddStringAttribute(ResourceTypeAttribute.Id)
+                    .AddStringAttribute(ResourceTypeAttribute.Name, required: true)
+                    .AddStringAttribute(ResourceTypeAttribute.Description)
+                    .AddStringAttribute(ResourceTypeAttribute.Endpoint, required: true)
+                    .AddStringAttribute(ResourceTypeAttribute.Schema, required: true)
+                    .AddComplexAttribute(ResourceTypeAttribute.SchemaExtensions, callback: c =>
+                    {
+                        c.AddStringAttribute(ResourceTypeAttribute.Schema, required: true);
+                        c.AddStringAttribute(ResourceTypeAttribute.Required, required: true);
+                    }).Build();
             public static SCIMSchema UserSchema =
-                 SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", "User Account")
+                 SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMEndpoints.Users, "User Account", true)
                     .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                     .AddComplexAttribute("name", c =>
                     {
@@ -167,7 +193,7 @@ namespace SimpleIdServer.Scim
                     }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                     .Build();
 
-            public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", "Group")
+            public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMEndpoints.Groups, "Group", true)
                     .AddStringAttribute("displayName")
                     .AddComplexAttribute("members", c =>
                     {
@@ -176,16 +202,16 @@ namespace SimpleIdServer.Scim
                         c.AddStringAttribute("type");
                     }, multiValued: true)
                     .Build();
-            public static SCIMSchema ErrorSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:Error", "Error", "SCIM errors")
+            public static SCIMSchema ErrorSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:Error", "Error", null, "SCIM errors", true)
                     .AddStringAttribute("status", required: true)
                     .AddStringAttribute("scimType")
                     .AddStringAttribute("detail")
                     .Build();
-            public static SCIMSchema ListResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:ListResponse", "SearchResponse", "List response")
+            public static SCIMSchema ListResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:ListResponse", "SearchResponse", null, "List response", true)
                 .Build();
-            public static SCIMSchema PatchRequestSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:PatchOp", "Patch", "Patch representation")
+            public static SCIMSchema PatchRequestSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:PatchOp", "Patch", null, "Patch representation")
                 .Build();
-            public static SCIMSchema ServiceProvideConfigSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig", "Service Provider Configuration", "Schema for representing the service provider's configuration")
+            public static SCIMSchema ServiceProvideConfigSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig", "Service Provider Configuration", null, "Schema for representing the service provider's configuration", true)
                 .AddStringAttribute("documentationUrl")
                 .AddComplexAttribute("patch", callback: c =>
                 {
@@ -224,7 +250,7 @@ namespace SimpleIdServer.Scim
                     c.AddBooleanAttribute("primary");
                 }, multiValued: true)
                 .Build();
-            public static SCIMSchema BulkRequestSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:BulkRequest", "BulkRequest", "BulkRequest")
+            public static SCIMSchema BulkRequestSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:BulkRequest", "BulkRequest", null, "BulkRequest", true)
                 .AddComplexAttribute(StandardSCIMRepresentationAttributes.Operations, callback: c =>
                 {
                     c.AddStringAttribute(StandardSCIMRepresentationAttributes.Method);
@@ -232,7 +258,7 @@ namespace SimpleIdServer.Scim
                     c.AddStringAttribute(StandardSCIMRepresentationAttributes.BulkId);
                 }, multiValued: true)
                 .Build();
-            public static SCIMSchema BulkResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:BulkResponse", "BulkResponse", "BulkResponse")
+            public static SCIMSchema BulkResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:BulkResponse", "BulkResponse", null, "BulkResponse", true)
                 .AddComplexAttribute(StandardSCIMRepresentationAttributes.Operations, callback: c =>
                 {
                     c.AddStringAttribute(StandardSCIMRepresentationAttributes.Location);

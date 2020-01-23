@@ -21,6 +21,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             modelBuilder.Entity<SCIMSchema>()
                 .HasKey(s => s.Id);
+            modelBuilder.Entity<SCIMSchemaExtension>()
+                .HasKey(s => s.Id);
             modelBuilder.Entity<SCIMSchemaAttribute>()
                 .HasKey(s => s.Id);
             modelBuilder.Entity<SCIMSchemaAttribute>()

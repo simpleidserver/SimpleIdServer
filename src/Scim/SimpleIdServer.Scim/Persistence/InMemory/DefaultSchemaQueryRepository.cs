@@ -26,9 +26,19 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(_schemas.Where(s => schemaIdentifiers.Contains(s.Id)));
         }
 
+        public Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
+        {
+            return Task.FromResult(_schemas.FirstOrDefault(s => s.ResourceType == resourceType && s.IsRootSchema == true));
+        }
+
         public Task<IEnumerable<SCIMSchema>> GetAll()
         {
             return Task.FromResult((IEnumerable<SCIMSchema>)_schemas);
+        }
+
+        public Task<IEnumerable<SCIMSchema>> GetAllRoot()
+        {
+            return Task.FromResult((IEnumerable<SCIMSchema>)_schemas.Where(s => s.IsRootSchema == true));
         }
     }
 }

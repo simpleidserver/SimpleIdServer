@@ -53,7 +53,11 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var representations = new List<SCIMRepresentation>();
             var schemas = new List<SCIMSchema>();
-            schemas.AddRange(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, SCIMConstants.StandardSchemas.GroupSchema });
+            schemas.AddRange(new List<SCIMSchema> 
+            { 
+                SCIMConstants.StandardSchemas.UserSchema, 
+                SCIMConstants.StandardSchemas.GroupSchema 
+            });
             services.TryAddSingleton<ISCIMRepresentationCommandRepository>(new DefaultSCIMRepresentationCommandRepository(representations));
             services.TryAddSingleton<ISCIMRepresentationQueryRepository>(new DefaultSCIMRepresentationQueryRepository(representations));
             services.TryAddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));

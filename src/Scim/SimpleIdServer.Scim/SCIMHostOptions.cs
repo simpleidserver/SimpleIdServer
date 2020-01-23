@@ -1,7 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Scim.Domain;
-using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim
 {
@@ -10,14 +8,6 @@ namespace SimpleIdServer.Scim
         public SCIMHostOptions()
         {
             AuthenticationScheme = SCIMConstants.AuthenticationScheme;
-            UserSchemas = new List<SCIMSchema>
-            {
-                SCIMConstants.StandardSchemas.UserSchema
-            };
-            GroupSchemas = new List<SCIMSchema>
-            {
-                SCIMConstants.StandardSchemas.GroupSchema
-            };
             SCIMIdClaimName = "scim_id";
             MaxOperations = 1000;
             MaxPayloadSize = 1048576;
@@ -28,14 +18,6 @@ namespace SimpleIdServer.Scim
         /// Authentication scheme.
         /// </summary>
         public string AuthenticationScheme { get; set; }
-        /// <summary>
-        /// User schemas URLS.
-        /// </summary>
-        public ICollection<SCIMSchema> UserSchemas { get; set; }
-        /// <summary>
-        /// Group schemas URLS.
-        /// </summary>
-        public ICollection<SCIMSchema> GroupSchemas { get; set; }
         /// <summary>
         /// Name of the claim used to get the scim identifier.
         /// </summary>
