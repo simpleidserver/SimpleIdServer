@@ -199,7 +199,7 @@ namespace SimpleIdServer.Scim
                     {
                         c.AddStringAttribute("value");
                         c.AddStringAttribute("$ref");
-                        c.AddStringAttribute("type");
+                        c.AddStringAttribute("display");
                     }, multiValued: true)
                     .Build();
             public static SCIMSchema ErrorSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:Error", "Error", null, "SCIM errors", true)

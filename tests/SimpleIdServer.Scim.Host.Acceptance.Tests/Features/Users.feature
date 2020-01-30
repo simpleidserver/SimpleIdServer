@@ -172,13 +172,15 @@ Scenario: Check user can be patched (HTTP PATCH)
 	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
 	| employeeNumber | number                                                                                                         |
+	| scores         | { "math" : [ { "score" : "10" } ] }                                                                            |
+	| roles          | [ "role1", "role2" ]                                                                                           |
 
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
-	| Key     | Value																																																						|
-	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]																																										|
-	| Operations | [ { "op" : "remove", "path": "phones[phoneNumber eq 01]" }, { "op": "add", "path": "phones", "value": { "phoneNumber": "03", "type": "mobile" } }, { "op": "replace", "path": "userName", "value": "cassandra" } ]		|
+	| Key        | Value                                                                                                                                                                                                                                                                                                                                                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                                                                                                                                                                                                                                                                                                      |
+	| Operations | [ { "op" : "remove", "path": "phones[phoneNumber eq 01]" }, { "op": "add", "path": "phones", "value": { "phoneNumber": "03", "type": "mobile" } }, { "op": "replace", "path": "userName", "value": "cassandra" }, { "op" : "remove", "path": "scores.math[score eq \"10\"]" }, { "op" : "add", "path": "scores.math", "value": { "score": "20" } }, { "op": "add", "path": "roles", "value": "role3" } ] |
 	
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
@@ -192,3 +194,7 @@ Scenario: Check user can be patched (HTTP PATCH)
 	Then JSON 'phones[0].type'='home'
 	Then JSON 'phones[1].phoneNumber'='03'
 	Then JSON 'phones[1].type'='mobile'
+	Then JSON 'scores.math[0].score'='20'
+	Then JSON 'roles[0]'='role1'
+	Then JSON 'roles[1]'='role2'
+	Then JSON 'roles[2]'='role3'

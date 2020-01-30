@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,12 @@ namespace SimpleIdServer.Scim.Domain
         /// A complex type that defines service provider attributes and their qualities.
         /// </summary>
         public virtual ICollection<SCIMSchemaAttribute> Attributes { get; set; }
+
+        public SCIMSchemaAttribute GetAttribute(string path)
+        {
+            var splitted = path.Split('.');
+            return Attributes.GetAttribute(splitted.ToList());
+        }
 
         public object Clone()
         {

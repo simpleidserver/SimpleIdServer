@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Bulk - Copy.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Users - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Users - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\UsersErrors - Copy.feature.cs" />
   </ItemGroup>
@@ -35,6 +36,9 @@
     <Compile Update="Features\Bulk.feature.cs">
       <DependentUpon>Bulk.feature</DependentUpon>
     </Compile>
+    <Compile Update="Features\Groups.feature.cs">
+      <DependentUpon>Groups.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Users.feature.cs">
       <DependentUpon>Users.feature</DependentUpon>
     </Compile>
@@ -57,6 +61,10 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Bulk.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\Groups.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </SpecFlowFeatureFiles>

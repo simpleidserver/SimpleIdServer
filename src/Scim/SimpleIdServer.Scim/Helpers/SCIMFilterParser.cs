@@ -60,7 +60,7 @@ namespace SimpleIdServer.Scim.Helpers
             }
         }
 
-        private static SCIMExpression Parse(string filterString)
+        public static SCIMExpression Parse(string filterString)
         {
             if (string.IsNullOrWhiteSpace(filterString))
             {
@@ -274,16 +274,22 @@ namespace SimpleIdServer.Scim.Helpers
             }.Any(o => filters.Any(f => f.StartsWith(o, StringComparison.InvariantCultureIgnoreCase)));
         }
 
-        private static IEnumerable<string> SplitStringIntoFilters(string filterString)
+        public static IEnumerable<string> SplitStringIntoFilters(string filterString)
         {
             var level = 0;
             var result = new List<string>();
             var filterBuilder = new StringBuilder();
             var groupingIsClosed = false;
             var isTokenSeparatorDetected = false;
+            var betweenQuotes = false;
             for (var i = 0; i < filterString.Count(); i++)
             {
                 var character = filterString[i];
+                if (character == '"')
+                {
+                    betweenQuotes = !betweenQuotes;
+                }
+
                 if (new[] { '(', '[' }.Contains(character))
                 {
                     level++;
@@ -298,7 +304,7 @@ namespace SimpleIdServer.Scim.Helpers
                     }
                 }
 
-                if (!(character == ' ' && level == 0))
+                if (character != ' ' || level != 0 || betweenQuotes)
                 {
                     filterBuilder.Append(character);
                 }
@@ -341,7 +347,6 @@ namespace SimpleIdServer.Scim.Helpers
                     }
 
                     var rightValues = result.Skip(i + 1).TakeWhile(s => !IsLogicalOperator(s));
-
                     leftValues.Reverse();
                     groupedResult.Add(string.Join(" ", leftValues));
                     groupedResult.Add(record);

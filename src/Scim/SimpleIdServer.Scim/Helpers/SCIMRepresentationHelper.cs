@@ -67,14 +67,14 @@ namespace SimpleIdServer.Scim.Helpers
                         throw new SCIMSchemaViolatedException("badFormatAttribute", $"attribute {jsonProperty.Key} is not an array");
                     }
 
-                    foreach (var subJson in jArr)
-                    {
-                        attributes.Add(BuildAttribute(subJson, attrSchema));
-                    }
+
+                    attributes.AddRange(BuildAttributes(jArr, attrSchema));
                 }
                 else
                 {
-                    attributes.Add(BuildAttribute(jsonProperty.Value, attrSchema));
+                    var jArr = new JArray();
+                    jArr.Add(jsonProperty.Value);
+                    attributes.AddRange(BuildAttributes(jArr, attrSchema));
                 }
             }
 
@@ -126,29 +126,43 @@ namespace SimpleIdServer.Scim.Helpers
             return attributes;
         }
 
-        private static SCIMRepresentationAttribute BuildAttribute(JToken jsonProperty, SCIMSchemaAttribute schemaAttribute)
+        private static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute)
         {
-            var result = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(),schemaAttribute);
-            switch (schemaAttribute.Type)
+            var result = new List<SCIMRepresentationAttribute>();
+            if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                case SCIMSchemaAttributeTypes.BOOLEAN:
-                    result.Add(bool.Parse(jsonProperty.ToString()));
-                    break;
-                case SCIMSchemaAttributeTypes.INTEGER:
-                    result.Add(int.Parse(jsonProperty.ToString()));
-                    break;
-                case SCIMSchemaAttributeTypes.DATETIME:
-                    result.Add(DateTime.Parse(jsonProperty.ToString()));
-                    break;
-                case SCIMSchemaAttributeTypes.STRING:
-                    result.Add(jsonProperty.ToString());
-                    break;
-                case SCIMSchemaAttributeTypes.COMPLEX:
-                    result.Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes);
-                    break;
-                case SCIMSchemaAttributeTypes.REFERENCE:
-                    // REFERENCE.
-                    break;
+                foreach(var jsonProperty in jArr)
+                {
+                    var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
+                    {
+                        Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes)
+                    };
+                    result.Add(record);
+                }
+            }
+            else
+            {
+                var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute);
+                switch(schemaAttribute.Type)
+                {
+                    case SCIMSchemaAttributeTypes.BOOLEAN:
+                        record.ValuesBoolean = jArr.Select(j => bool.Parse(j.ToString())).ToList();
+                        break;
+                    case SCIMSchemaAttributeTypes.INTEGER:
+                        record.ValuesInteger = jArr.Select(j => int.Parse(j.ToString())).ToList();
+                        break;
+                    case SCIMSchemaAttributeTypes.DATETIME:
+                        record.ValuesDateTime = jArr.Select(j => DateTime.Parse(j.ToString())).ToList();
+                        break;
+                    case SCIMSchemaAttributeTypes.STRING:
+                        record.ValuesString = jArr.Select(j => j.ToString()).ToList();
+                        break;
+                    case SCIMSchemaAttributeTypes.REFERENCE:
+                        record.ValuesReference = jArr.Select(j => j.ToString()).ToList();
+                        break;
+                }
+
+                result.Add(record);
             }
 
             return result;

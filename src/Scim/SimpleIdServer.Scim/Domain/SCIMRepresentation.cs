@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,24 @@ namespace SimpleIdServer.Scim.Domain
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {
             Attributes.Add(attribute);
+        }
+
+        public SCIMRepresentationAttribute GetAttribute(string fullPath)
+        {
+            var splitted = fullPath.Split('.').ToList();
+            return Attributes.GetAttribute(splitted);
+        }
+
+        public SCIMRepresentationAttribute GetParentAttribute(string fullPath)
+        {
+            var splitted = fullPath.Split('.').ToList();
+            if (splitted.Count <= 1)
+            {
+                return null;
+            }
+
+            splitted.Remove(splitted.Last());
+            return Attributes.GetAttribute(splitted);
         }
 
         public void SetCreated(DateTime created)

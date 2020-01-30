@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -30,8 +31,23 @@ namespace SimpleIdServer.Scim.Domain
             var queryableRepresentationAttributes = representation.Attributes.AsQueryable();
             foreach (var patch in patches)
             {
-                var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, SCIMFilterParser.Parse(patch.Path, representation.Schemas)).ToList();
-                if (!attributes.Any())
+                var scimFilter = SCIMFilterParser.Parse(patch.Path, representation.Schemas);
+                var attributeExpression = scimFilter as SCIMAttributeExpression;
+                if (attributeExpression == null)
+                {
+                    throw new SCIMAttributeException($"Path {patch.Path} is not valid");
+                }
+
+                var fullPath = attributeExpression.GetFullPath();
+                var schemaAttributes = representation.Schemas.Select(s => s.GetAttribute(fullPath)).Where(s => s != null);
+                if (!schemaAttributes.Any())
+                {
+                    throw new SCIMAttributeException($"Path {patch.Path} doesn't exist");
+                }
+
+                var schemaAttribute = schemaAttributes.First();
+                var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, scimFilter).ToList();
+                if (!attributes.Any() && schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX && !schemaAttribute.MultiValued)
                 {
                     throw new SCIMAttributeException("PATCH can be applied only on existing attributes");
                 }
@@ -62,13 +78,54 @@ namespace SimpleIdServer.Scim.Domain
 
                 if (patch.Operation == SCIMPatchOperations.ADD || patch.Operation == SCIMPatchOperations.REPLACE)
                 {
-                    var firstAttribute = attributes.First();
-                    var newAttributes = ExtractRepresentationAttributesFromJSON(firstAttribute.SchemaAttribute, patch.Value);
+                    var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value);
                     foreach (var newAttribute in newAttributes)
                     {
-                        if (firstAttribute.Parent != null)
+                        var parentAttribute = representation.GetParentAttribute(fullPath);
+                        var attribute = representation.GetAttribute(fullPath);
+                        if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX && parentAttribute != null)
                         {
-                            firstAttribute.Parent.Values.Add(newAttribute);
+                            parentAttribute.Values.Add(newAttribute);
+                            continue;
+                        }
+
+                        if (attribute != null && schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
+                        {
+                            if (schemaAttribute.Type == SCIMSchemaAttributeTypes.BOOLEAN)
+                            {
+                                foreach(var b in newAttribute.ValuesBoolean)
+                                {
+                                    attribute.ValuesBoolean.Add(b);
+                                }
+                            }
+                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.DATETIME)
+                            {
+                                foreach (var d in newAttribute.ValuesDateTime)
+                                {
+                                    attribute.ValuesDateTime.Add(d);
+                                }
+                            }
+                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.INTEGER)
+                            {
+                                foreach (var i in newAttribute.ValuesInteger)
+                                {
+                                    attribute.ValuesInteger.Add(i);
+                                }
+                            }
+                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.REFERENCE)
+                            {
+                                foreach (var r in newAttribute.ValuesReference)
+                                {
+                                    attribute.ValuesReference.Add(r);
+                                }
+                            }
+                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.STRING)
+                            {
+                                foreach (var s in newAttribute.ValuesString)
+                                {
+                                    attribute.ValuesString.Add(s);
+                                }
+                            }
                         }
                         else
                         {
@@ -323,10 +380,35 @@ namespace SimpleIdServer.Scim.Domain
                 var representationAttributeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "rp");
                 var attributesProperty = Expression.Property(representationAttributeParameter, "Values");
                 var subRepresentationAttributeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString("N"));
-                var anyLambdaExpression = scimComplexAttribute.GroupingFilter.Evaluate(subRepresentationAttributeParameter);
-                var anyLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(anyLambdaExpression, subRepresentationAttributeParameter);
-                var whereLambdaExpression = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLambda);
-                var whereLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(whereLambdaExpression, representationAttributeParameter);
+                var logicalExpr = scimComplexAttribute.GroupingFilter as SCIMLogicalExpression;
+                Expression result;
+                if (logicalExpr != null)
+                {
+                    var subParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString("N"));
+                    var leftExpr = logicalExpr.LeftExpression.Evaluate(subParameter);
+                    var rightExpr = logicalExpr.RightExpression.Evaluate(subParameter);
+                    var anyLeftLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(leftExpr, subParameter);
+                    var anyRightLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(rightExpr, subParameter);
+                    var anyLeftCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLeftLambda);
+                    var anyRightCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyRightLambda);
+                    if (logicalExpr.LogicalOperator == SCIMLogicalOperators.AND)
+                    {
+                        result = Expression.AndAlso(anyLeftCall, anyRightCall);
+                    }
+                    else
+                    {
+                        result = Expression.Or(anyLeftCall, anyRightCall);
+                    }
+                }
+                else
+                {
+                    var subParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString("N"));
+                    var lambdaExpression = scimComplexAttribute.GroupingFilter.Evaluate(subParameter);
+                    var anyLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(lambdaExpression, subParameter);
+                    result = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLambda);
+                }
+
+                var whereLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(result, representationAttributeParameter);
                 var enumarableType = typeof(Queryable);
                 var whereMethod = enumarableType.GetMethods()
                      .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
