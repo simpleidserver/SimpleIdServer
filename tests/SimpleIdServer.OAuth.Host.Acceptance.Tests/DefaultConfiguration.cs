@@ -22,11 +22,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr" }
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
                 }
             }
         };

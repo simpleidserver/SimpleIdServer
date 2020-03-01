@@ -43,23 +43,23 @@ Scenario: Identity token is returned in JWS format (ES256)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | ES256             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract 'display' from callback
@@ -74,6 +74,8 @@ Scenario: Identity token is returned in JWS format (ES256)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (ES384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -85,23 +87,23 @@ Scenario: Identity token is returned in JWS format (ES384)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | ES384             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -115,6 +117,8 @@ Scenario: Identity token is returned in JWS format (ES384)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (ES512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -126,23 +130,23 @@ Scenario: Identity token is returned in JWS format (ES512)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | ES512             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -156,6 +160,8 @@ Scenario: Identity token is returned in JWS format (ES512)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (HS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -167,23 +173,23 @@ Scenario: Identity token is returned in JWS format (HS256)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | HS256             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -197,6 +203,8 @@ Scenario: Identity token is returned in JWS format (HS256)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -208,23 +216,23 @@ Scenario: Identity token is returned in JWS format (HS384)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | HS384             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -238,6 +246,8 @@ Scenario: Identity token is returned in JWS format (HS384)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -249,23 +259,23 @@ Scenario: Identity token is returned in JWS format (HS512)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | HS512             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -279,6 +289,8 @@ Scenario: Identity token is returned in JWS format (HS512)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (RS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -290,23 +302,23 @@ Scenario: Identity token is returned in JWS format (RS256)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | RS256             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -320,6 +332,8 @@ Scenario: Identity token is returned in JWS format (RS256)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (RS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -331,23 +345,23 @@ Scenario: Identity token is returned in JWS format (RS384)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | RS384             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -361,6 +375,8 @@ Scenario: Identity token is returned in JWS format (RS384)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWS format (RS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -376,23 +392,23 @@ Scenario: Identity token is returned in JWS format (RS512)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email             |
+	| scope                        | email role        |
 	| id_token_signed_response_alg | RS512             |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value           |
-	| response_type | id_token        |
-	| client_id     | $client_id$     |
-	| state         | state           |
-	| response_mode | query           |
-	| scope         | openid email    |
-	| redirect_uri  | https://web.com |
-	| ui_locales    | en fr           |
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -406,6 +422,8 @@ Scenario: Identity token is returned in JWS format (RS512)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -421,7 +439,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA1_5                        |
@@ -431,7 +449,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -439,7 +457,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -459,6 +477,8 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -474,7 +494,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA1_5                        |
@@ -484,7 +504,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -492,7 +512,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -512,6 +532,8 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -527,7 +549,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA1_5                        |
@@ -537,7 +559,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -545,7 +567,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -565,6 +587,8 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -580,7 +604,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP-256                  |
@@ -590,7 +614,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -598,7 +622,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -618,6 +642,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -633,7 +659,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP-256                  |
@@ -643,7 +669,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -651,7 +677,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -671,6 +697,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -686,7 +714,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP-256                  |
@@ -696,7 +724,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -704,7 +732,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -724,6 +752,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -739,7 +769,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP                      |
@@ -749,7 +779,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -757,7 +787,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -777,6 +807,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -792,7 +824,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP                      |
@@ -802,7 +834,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -810,7 +842,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -830,6 +862,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -845,7 +879,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email                         |
+	| scope                           | email role                    |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP                      |
@@ -855,7 +889,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
 	And extract parameter 'client_secret' from JSON body
-	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value               |
@@ -863,7 +897,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	| client_id     | $client_id$         |
 	| state         | state               |
 	| response_mode | query               |
-	| scope         | openid email        |
+	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
 	
@@ -883,6 +917,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
 	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
 	   	
 Scenario: Use request object (JWS) parameter to get an access token and authorization code
 	When add JSON web key to Authorization Server and store into 'jwks'

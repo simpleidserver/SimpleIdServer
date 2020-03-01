@@ -58,10 +58,10 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser" },
-                    { "scim_id", "1" }
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
+                    new KeyValuePair<string, string>("scim_id", "1")
                 }
             },
             new OAuthUser
@@ -75,11 +75,11 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { Jwt.Constants.UserClaims.Subject, "umaUser" },
-                    { Jwt.Constants.UserClaims.Name, "User" },
-                    { Jwt.Constants.UserClaims.UniqueName, "User" }
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Subject, "umaUser"),
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Name, "User"),
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.UniqueName, "User")
                 }
             }
         };

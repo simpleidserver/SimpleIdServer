@@ -10,13 +10,13 @@ namespace SimpleIdServer.OAuth.Domains
     {
         public OAuthUser()
         {
-            Claims = new Dictionary<string, string>();
+            Claims = new List<KeyValuePair<string, string>>();
             Consents = new List<OAuthConsent>();
             Credentials = new List<OAuthUserCredential>();
         }
 
         public string Id { get; set; }
-        public Dictionary<string, string> Claims { get; set; }
+        public List<KeyValuePair<string, string>> Claims { get; set; }
         public ICollection<OAuthConsent> Consents { get; set; }
         public ICollection<OAuthUserCredential> Credentials { get; set; }
         public DateTime CreateDateTime { get; set; }
@@ -27,7 +27,7 @@ namespace SimpleIdServer.OAuth.Domains
             return new OAuthUser
             {
                 Id = Id,
-                Claims = Claims == null ? new Dictionary<string, string>() : Claims.ToDictionary(s => s.Key, s => s.Value),
+                Claims = Claims == null ? new List<KeyValuePair<string, string>>() : Claims.ToList(),
                 Consents = Consents == null ? new List<OAuthConsent>() : Consents.Select(c => (OAuthConsent)c.Clone()).ToList(),
                 Credentials = Credentials == null ? new List<OAuthUserCredential>() : Credentials.Select(c => (OAuthUserCredential)c.Clone()).ToList(),
                 CreateDateTime = CreateDateTime,

@@ -59,10 +59,10 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser" },
-                    { "scim_id", "1" }
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
+                    new KeyValuePair<string, string>("scim_id", "1")
                 }
             },
             new OAuthUser
@@ -76,11 +76,11 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "umaUser" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "User" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User" }
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "umaUser"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Name, "User"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User")
                 }
             }
         };

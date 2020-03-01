@@ -137,9 +137,17 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 {
                     foreach (var scopeClaim in scope.Claims)
                     {
-                        if (user.Claims.ContainsKey(scopeClaim))
+                        var userClaims = user.Claims.Where(c => c.Key == scopeClaim).Select(c => c.Value);
+                        if (userClaims.Any())
                         {
-                            payload.TryAdd(scopeClaim, user.Claims.First(c => c.Key == scopeClaim).Value);
+                            if (userClaims.Count() == 1)
+                            {
+                                payload.TryAdd(scopeClaim, userClaims.First());
+                            }
+                            else
+                            {
+                                payload.TryAdd(scopeClaim, userClaims);
+                            }
                         }
                     }
                 }

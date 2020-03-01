@@ -37,11 +37,11 @@ namespace UseUMAToProtectAPI.OpenId
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "owner" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Owner" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Owner" }
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "owner"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Owner"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Owner")
                 }
             },
             new OAuthUser
@@ -55,11 +55,11 @@ namespace UseUMAToProtectAPI.OpenId
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new Dictionary<string, string>
+                Claims = new List<KeyValuePair<string, string>>
                 {
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Subject, "requester" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.Name, "Requester" },
-                    { SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Requester" }
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "requester"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Requester"),
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Requester")
                 }
             }
         };

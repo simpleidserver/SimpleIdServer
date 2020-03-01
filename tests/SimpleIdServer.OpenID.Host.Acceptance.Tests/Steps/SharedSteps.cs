@@ -450,6 +450,15 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             Assert.Equal(ParseValue(value).ToString(), tokenPayload[key].ToString());
         }
 
+        [Then("token claim '(.*)' contains '(.*)'")]
+        public void ThenIdentityTokenClaimContains(string key, string value)
+        {
+            var tokenPayload = _scenarioContext["tokenPayload"] as JwsPayload;
+            Assert.True(tokenPayload.ContainsKey(key));
+            var values = tokenPayload.GetArrayClaim(key);
+            Assert.True(values.Contains(value) == true);
+        }
+
         [Then("token claim '(.*)'!='(.*)'")]
         public void ThenIdentityTokenDoesntContainClaim(string key, string value)
         {
