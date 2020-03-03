@@ -4,7 +4,7 @@ How to protect resources with UMA2.0 ?
 The UMA 2.0 server offers to the end-user a way to manage access to his resources. 
 For example, a user can decide who can access his pictures. Protected resources must be registered in the UMA2.0 server and their identifiers should be stored by the pictures API.
 
-The **UseUMAToProtectAPI** sample project explains how to use UMA 2.0 to protect pictures, its code source can be downloaded `here`_.
+The ``UseUMAToProtectAPI`` sample project explains how to use UMA 2.0 to protect pictures, its code source can be downloaded `here`_.
 The diagram below lists the components present in the project :
 
 1. **Portal** : web portal where end-users can manage their pictures.
@@ -20,7 +20,7 @@ The diagram below lists the components present in the project :
 
 To see the project in action :
 
-1. Download the sample project and open the **samples\\UseUMAToProtectAPI\\UseUMAToProtectAPI.sln** solution with Visual Studio.
+1. Download the sample project and open the ``samples\\UseUMAToProtectAPI\\UseUMAToProtectAPI.sln`` solution with Visual Studio.
 
 2. Run all the projects, four console applications should be launched where each represents a different web application.
 
@@ -38,7 +38,7 @@ Once everything is running, you can start to authenticate to the application as 
 Authenticate as a resource owner
 --------------------------------
 
-Browse the website **https://localhost:5001**, click on the **Authenticate** button and authenticate with the following credentials :
+Browse the website ``https://localhost:5001``, click on the **Authenticate** button and authenticate with the following credentials :
 
 ===========  ===============
 Property     Value
@@ -57,7 +57,7 @@ Once end-users are authenticated they can start to add pictures.
 Add pictures
 ------------
 
-Browse the website **https://localhost:5001**, click on the **Add picture** button, fill in the form and click on **Add** to submit the form.
+Browse the website ``https://localhost:5001``, click on the **Add picture** button, fill in the form and click on **Add** to submit the form.
 At the end a picture and a UMA resource are added. The workflow below describes the differents steps :
 
 .. image:: images/use-uma-to-protect-api-3.png
@@ -74,7 +74,7 @@ Now a picture has been registered by the resource owner. You can authenticate to
 Trying to access to protected pictures
 --------------------------------------
 
-Browse the website **https://localhost:5001**, click on the **Authenticate** button and authenticate with the following credentials :
+Browse the website ``https://localhost:5001``, click on the **Authenticate** button and authenticate with the following credentials :
 
 ===========  ===============
 Property     Value
@@ -106,7 +106,7 @@ Now a request has been submitted, it should be validated by the resource owner.
 Validate pending requests
 -------------------------
 
-Browse the website **https://localhost:5001**, click on the **Authenticate** button and authenticate with the following credentials :
+Browse the website ``https://localhost:5001``, click on the **Authenticate** button and authenticate with the following credentials :
 
 ===========  ===============
 Property     Value

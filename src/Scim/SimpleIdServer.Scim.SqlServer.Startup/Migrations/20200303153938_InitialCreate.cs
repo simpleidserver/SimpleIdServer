@@ -1,7 +1,9 @@
-﻿using System;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
+namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     public partial class InitialCreate : Migration
     {
@@ -31,25 +33,44 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     IsRootSchema = table.Column<bool>(nullable: false),
-                    ResourceType = table.Column<string>(nullable: true),
-                    SCIMRepresentationId = table.Column<string>(nullable: true)
+                    ResourceType = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SCIMSchemaLst", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SCIMSchemaLst_SCIMRepresentationLst_SCIMRepresentationId",
-                        column: x => x.SCIMRepresentationId,
-                        principalTable: "SCIMRepresentationLst",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SCIMSchemaAttribute",
+                name: "SCIMRepresentationSchemaLst",
+                columns: table => new
+                {
+                    SCIMSchemaId = table.Column<string>(nullable: false),
+                    SCIMRepresentationId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SCIMRepresentationSchemaLst", x => new { x.SCIMSchemaId, x.SCIMRepresentationId });
+                    table.ForeignKey(
+                        name: "FK_SCIMRepresentationSchemaLst_SCIMRepresentationLst_SCIMRepresentationId",
+                        column: x => x.SCIMRepresentationId,
+                        principalTable: "SCIMRepresentationLst",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SCIMRepresentationSchemaLst_SCIMSchemaLst_SCIMSchemaId",
+                        column: x => x.SCIMSchemaId,
+                        principalTable: "SCIMSchemaLst",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SCIMSchemaAttributeModel",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    ParentId = table.Column<string>(nullable: true),
+                    SchemaId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Type = table.Column<int>(nullable: false),
                     MultiValued = table.Column<bool>(nullable: false),
@@ -62,136 +83,137 @@ namespace SimpleIdServer.Scim.Migrations.SqlServer.Migrations
                     Uniqueness = table.Column<int>(nullable: false),
                     ReferenceTypes = table.Column<string>(nullable: true),
                     DefaultValueString = table.Column<string>(nullable: true),
-                    DefaultValueInt = table.Column<string>(nullable: true),
-                    SCIMSchemaAttributeId = table.Column<string>(nullable: true),
-                    SCIMSchemaId = table.Column<string>(nullable: true)
+                    DefaultValueInt = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SCIMSchemaAttribute", x => x.Id);
+                    table.PrimaryKey("PK_SCIMSchemaAttributeModel", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SCIMSchemaAttribute_SCIMSchemaAttribute_SCIMSchemaAttributeId",
-                        column: x => x.SCIMSchemaAttributeId,
-                        principalTable: "SCIMSchemaAttribute",
+                        name: "FK_SCIMSchemaAttributeModel_SCIMSchemaAttributeModel_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "SCIMSchemaAttributeModel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_SCIMSchemaAttribute_SCIMSchemaLst_SCIMSchemaId",
-                        column: x => x.SCIMSchemaId,
+                        name: "FK_SCIMSchemaAttributeModel_SCIMSchemaLst_SchemaId",
+                        column: x => x.SchemaId,
                         principalTable: "SCIMSchemaLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SCIMSchemaExtension",
+                name: "SCIMSchemaExtensionModel",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     Schema = table.Column<string>(nullable: true),
                     Required = table.Column<bool>(nullable: false),
-                    SCIMSchemaId = table.Column<string>(nullable: true)
+                    SCIMSchemaModelId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SCIMSchemaExtension", x => x.Id);
+                    table.PrimaryKey("PK_SCIMSchemaExtensionModel", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SCIMSchemaExtension_SCIMSchemaLst_SCIMSchemaId",
-                        column: x => x.SCIMSchemaId,
+                        name: "FK_SCIMSchemaExtensionModel_SCIMSchemaLst_SCIMSchemaModelId",
+                        column: x => x.SCIMSchemaModelId,
                         principalTable: "SCIMSchemaLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SCIMRepresentationAttribute",
+                name: "SCIMRepresentationAttributeLst",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    ParentId = table.Column<string>(nullable: true),
+                    SchemaAttributeId = table.Column<string>(nullable: true),
+                    RepresentationId = table.Column<string>(nullable: true),
                     ValuesString = table.Column<string>(nullable: true),
                     ValuesBoolean = table.Column<string>(nullable: true),
                     ValuesInteger = table.Column<string>(nullable: true),
                     ValuesDateTime = table.Column<string>(nullable: true),
-                    ValuesReference = table.Column<string>(nullable: true),
-                    ParentId = table.Column<string>(nullable: true),
-                    SchemaAttributeId = table.Column<string>(nullable: true),
-                    SCIMRepresentationId = table.Column<string>(nullable: true)
+                    ValuesReference = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SCIMRepresentationAttribute", x => x.Id);
+                    table.PrimaryKey("PK_SCIMRepresentationAttributeLst", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SCIMRepresentationAttribute_SCIMRepresentationAttribute_ParentId",
+                        name: "FK_SCIMRepresentationAttributeLst_SCIMRepresentationAttributeLst_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "SCIMRepresentationAttribute",
+                        principalTable: "SCIMRepresentationAttributeLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_SCIMRepresentationAttribute_SCIMRepresentationLst_SCIMRepresentationId",
-                        column: x => x.SCIMRepresentationId,
+                        name: "FK_SCIMRepresentationAttributeLst_SCIMRepresentationLst_RepresentationId",
+                        column: x => x.RepresentationId,
                         principalTable: "SCIMRepresentationLst",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_SCIMRepresentationAttribute_SCIMSchemaAttribute_SchemaAttributeId",
+                        name: "FK_SCIMRepresentationAttributeLst_SCIMSchemaAttributeModel_SchemaAttributeId",
                         column: x => x.SchemaAttributeId,
-                        principalTable: "SCIMSchemaAttribute",
+                        principalTable: "SCIMSchemaAttributeModel",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_SCIMRepresentationAttribute_ParentId",
-                table: "SCIMRepresentationAttribute",
+                name: "IX_SCIMRepresentationAttributeLst_ParentId",
+                table: "SCIMRepresentationAttributeLst",
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SCIMRepresentationAttribute_SCIMRepresentationId",
-                table: "SCIMRepresentationAttribute",
-                column: "SCIMRepresentationId");
+                name: "IX_SCIMRepresentationAttributeLst_RepresentationId",
+                table: "SCIMRepresentationAttributeLst",
+                column: "RepresentationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SCIMRepresentationAttribute_SchemaAttributeId",
-                table: "SCIMRepresentationAttribute",
+                name: "IX_SCIMRepresentationAttributeLst_SchemaAttributeId",
+                table: "SCIMRepresentationAttributeLst",
                 column: "SchemaAttributeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SCIMSchemaAttribute_SCIMSchemaAttributeId",
-                table: "SCIMSchemaAttribute",
-                column: "SCIMSchemaAttributeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SCIMSchemaAttribute_SCIMSchemaId",
-                table: "SCIMSchemaAttribute",
-                column: "SCIMSchemaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SCIMSchemaExtension_SCIMSchemaId",
-                table: "SCIMSchemaExtension",
-                column: "SCIMSchemaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SCIMSchemaLst_SCIMRepresentationId",
-                table: "SCIMSchemaLst",
+                name: "IX_SCIMRepresentationSchemaLst_SCIMRepresentationId",
+                table: "SCIMRepresentationSchemaLst",
                 column: "SCIMRepresentationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SCIMSchemaAttributeModel_ParentId",
+                table: "SCIMSchemaAttributeModel",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SCIMSchemaAttributeModel_SchemaId",
+                table: "SCIMSchemaAttributeModel",
+                column: "SchemaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SCIMSchemaExtensionModel_SCIMSchemaModelId",
+                table: "SCIMSchemaExtensionModel",
+                column: "SCIMSchemaModelId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "SCIMRepresentationAttribute");
+                name: "SCIMRepresentationAttributeLst");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaExtension");
+                name: "SCIMRepresentationSchemaLst");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaAttribute");
+                name: "SCIMSchemaExtensionModel");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaLst");
+                name: "SCIMSchemaAttributeModel");
 
             migrationBuilder.DropTable(
                 name: "SCIMRepresentationLst");
+
+            migrationBuilder.DropTable(
+                name: "SCIMSchemaLst");
         }
     }
 }

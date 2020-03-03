@@ -48,13 +48,13 @@ The project contains 5 components :
 
 To see the project in action :
 
-1. Download the sample project and open the **samples\\ProtectAPIFromUndesirableUsers\\ProtectAPIFromUndesirableUsers.sln** solution with Visual Studio.
+1. Download the sample project and open the ``samples\\ProtectAPIFromUndesirableUsers\\ProtectAPIFromUndesirableUsers.sln`` solution with Visual Studio.
 
-2. Open the file **ProtectAPIFromUndesirableUsers.Native\\NativeConstants.cs** and update the **OPENID_BASE_URL** with your IPV4 address. Localhost URL cannot be used by the Xamarin emulator.
+2. Open the file ``ProtectAPIFromUndesirableUsers.Native\\NativeConstants.cs`` and update the ``OPENID_BASE_URL`` with your IPV4 address. Localhost URL cannot be used by the Xamarin emulator.
 
 3. Run all the projects, three console applications and one android emulator should be launched.
 
-4. Open a command prompt and navigate to the project **ProtectAPIFromUndesirableUsers.TraditionalWebsite**, execute the command `npm install` to restore the dependencies and execute `ng serve` to launch the application.
+4. Open a command prompt and navigate to the project ``ProtectAPIFromUndesirableUsers.TraditionalWebsite``, execute the command `npm install` to restore the dependencies and execute `ng serve` to launch the application.
 
 ========================  ============================
 URL			  			  Website
@@ -77,7 +77,7 @@ password				  password
 User-agent based application
 ----------------------------
 
-As mentioned previously, user-agent based applications are using **implicit** grant-type to get identity tokens. The sample project contains a Single Page Application (SPA) developed with Angular, it is located at URL **http://localhost:4200**.
+As mentioned previously, user-agent based applications are using **implicit** grant-type to get identity tokens. The sample project contains a Single Page Application (SPA) developed with Angular, it is located at URL ``http://localhost:4200``.
 
 .. image:: images/protect-api-undesirable-users-2.png
    :align: center
@@ -86,7 +86,7 @@ As mentioned previously, user-agent based applications are using **implicit** gr
 Traditional website
 -------------------
 
-Traditional website can use **password** and / or **authorization_code** grant-types. The sample project contains a traditional website developed with ASP.NET CORE, it is located at URL **https://localhost:5001**.
+Traditional website can use **password** and / or **authorization_code** grant-types. The sample project contains a traditional website developed with ASP.NET CORE, it is located at URL ``https://localhost:5001``.
 
 Authorization code
 ******************

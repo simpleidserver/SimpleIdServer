@@ -6,6 +6,8 @@ There is one Nuget package per UI theme, at the moment only the Bootstrap4 libra
 
 1) Create an empty ASP.NET CORE project.
 
-2) Install the Nuget package **SimpleIdServer.Uma.Bootstrap4**.
+2) Install the Nuget package ``SimpleIdServer.Uma.Bootstrap4``.
 
-3) Run the application and verify JSON is returned when you browse the following url : https://localhost:<sslPort>/.well-known/oauth-authorization-server.
+3) Run the application and verify JSON is returned when you browse the following url::
+
+    https://localhost:<sslPort>/.well-known/oauth-authorization-server.

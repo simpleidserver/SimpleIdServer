@@ -113,8 +113,7 @@ Scenario: Check the maxResults option is used when the client is trying to fetch
 
 	Then HTTP status code equals to '200'
 	Then JSON 'itemsPerPage'='200'
-
-
+	
 Scenario: Use 'attributes=phones.phoneNumber' to get only the phone numbers
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |

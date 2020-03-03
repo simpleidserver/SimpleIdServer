@@ -39,14 +39,14 @@ namespace SimpleIdServer.Scim.Domain
         public IQueryable<int> QueryableValuesInt { get => ValuesInteger.AsQueryable(); }
         public IQueryable<bool> QueryableValuesBoolean { get => ValuesBoolean.AsQueryable(); }
         public IQueryable<DateTime> QueryableValuesDateTime { get => ValuesDateTime.AsQueryable(); }
-        public virtual ICollection<string> ValuesString { get; set; }
-        public virtual ICollection<bool> ValuesBoolean { get; set; }
-        public virtual ICollection<int> ValuesInteger { get; set; }
-        public virtual ICollection<DateTime> ValuesDateTime { get; set; }
-        public virtual ICollection<string> ValuesReference { get; set; }
-        public virtual ICollection<SCIMRepresentationAttribute> Values { get; set; }
-        public virtual SCIMRepresentationAttribute Parent { get; set; }
-        public virtual SCIMSchemaAttribute SchemaAttribute { get; set; }
+        public ICollection<string> ValuesString { get; set; }
+        public ICollection<bool> ValuesBoolean { get; set; }
+        public ICollection<int> ValuesInteger { get; set; }
+        public ICollection<DateTime> ValuesDateTime { get; set; }
+        public ICollection<string> ValuesReference { get; set; }
+        public ICollection<SCIMRepresentationAttribute> Values { get; set; }
+        public SCIMRepresentationAttribute Parent { get; set; }
+        public SCIMSchemaAttribute SchemaAttribute { get; set; }
 
         public void Add(int value)
         {

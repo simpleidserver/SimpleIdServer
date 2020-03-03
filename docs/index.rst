@@ -32,6 +32,13 @@ Nuget feed: https://www.myget.org/F/advance-ict/api/v3/index.json
 .. toctree::
    :maxdepth: 3
    :hidden:
+   :caption: Persistence
+
+   persistence/entityframework-scim
+   
+.. toctree::
+   :maxdepth: 3
+   :hidden:
    :caption: Reference
    
    reference/oauthhostoptions

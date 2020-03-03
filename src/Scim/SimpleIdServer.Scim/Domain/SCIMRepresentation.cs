@@ -27,8 +27,8 @@ namespace SimpleIdServer.Scim.Domain
         public string Version { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
-        public virtual ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
-        public virtual ICollection<SCIMSchema> Schemas { get; set; }
+        public ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
+        public ICollection<SCIMSchema> Schemas { get; set; }
 
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {

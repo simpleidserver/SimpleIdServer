@@ -1,29 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
+using SimpleIdServer.Scim.Domain;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace SimpleIdServer.Scim.Domain
+namespace SimpleIdServer.Scim.Persistence.EF.Models
 {
-    public class SCIMSchemaAttribute : ICloneable
+    public class SCIMSchemaAttributeModel
     {
-        public SCIMSchemaAttribute(string id)
-        {
-            Id = id;
-            SubAttributes = new List<SCIMSchemaAttribute>();
-            CanonicalValues = new List<string>();
-            ReferenceTypes = new List<string>();
-            Uniqueness = SCIMSchemaAttributeUniqueness.NONE;
-            Mutability = SCIMSchemaAttributeMutabilities.READWRITE;
-            Returned = SCIMSchemaAttributeReturned.DEFAULT;
-            MultiValued = false;
-            Required = false;
-            DefaultValueString = new List<string>();
-            DefaultValueInt = new List<int>();
-        }
-
         public string Id { get; set; }
+        public string ParentId { get; set; }
+        public string SchemaId { get; set; }
         /// <summary>
         /// The attribute's name.
         /// </summary>
@@ -36,10 +22,6 @@ namespace SimpleIdServer.Scim.Domain
         /// A Boolean value indicating the attribute's plurality.
         /// </summary>
         public bool MultiValued { get; set; }
-        /// <summary>
-        /// When an attribute is of type "complex", "subAttributes" defines a set of sub-attributes. "subAttributes" has the same schema sub-attributes as "attributes".
-        /// </summary>
-        public ICollection<SCIMSchemaAttribute> SubAttributes { get; private set; }
         /// <summary>
         /// The attribute's human-readable description.  When applicable, service providers MUST specify the description.
         /// </summary>
@@ -80,32 +62,12 @@ namespace SimpleIdServer.Scim.Domain
         /// Default value (int)
         /// </summary>
         public ICollection<int> DefaultValueInt { get; set; }
-
-        public void AddSubAttribute(SCIMSchemaAttribute subAttribute)
-        {
-            SubAttributes.Add(subAttribute);
-        }
-
-        public object Clone()
-        {
-            return new SCIMSchemaAttribute(Id)
-            {
-                CanonicalValues = CanonicalValues.ToList(),
-                CaseExact = CaseExact,
-                Description = Description,
-                MultiValued = MultiValued,
-                Mutability = Mutability,
-                Name = Name,
-                ReferenceTypes = ReferenceTypes.ToList(),
-                Required = Required,
-                Returned = Returned,
-                SubAttributes = SubAttributes.Select(s => (SCIMSchemaAttribute)s.Clone()).ToList(),
-                Type = Type,
-                Uniqueness = Uniqueness,
-                DefaultValueInt = DefaultValueInt == null ? new List<int>() : DefaultValueInt.ToList(),
-                DefaultValueString = DefaultValueString == null ? new List<string>() : DefaultValueString.ToList(),
-                Id = Id
-            };
-        }
+        public virtual ICollection<SCIMRepresentationAttributeModel> RepresentationAttributes { get; set; }
+        /// <summary>
+        /// When an attribute is of type "complex", "subAttributes" defines a set of sub-attributes. "subAttributes" has the same schema sub-attributes as "attributes".
+        /// </summary>
+        public virtual ICollection<SCIMSchemaAttributeModel> SubAttributes { get; set; }
+        public virtual SCIMSchemaAttributeModel ParentAttribute { get; set; }
+        public virtual SCIMSchemaModel Schema { get; set; }
     }
 }

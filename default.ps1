@@ -53,6 +53,7 @@ task pack -depends compile {
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID.Bootstrap4\SimpleIdServer.OpenID.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.Bootstrap4\SimpleIdServer.Uma.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }

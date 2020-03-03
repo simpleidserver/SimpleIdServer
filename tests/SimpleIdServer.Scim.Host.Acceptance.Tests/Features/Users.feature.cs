@@ -397,7 +397,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void UseAttributesPhones_PhoneNumberToGetOnlyThePhoneNumbers()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use \'attributes=phones.phoneNumber\' to get only the phone numbers", null, ((string[])(null)));
-#line 118
+#line 117
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -422,28 +422,28 @@ this.ScenarioInitialize(scenarioInfo);
             table11.AddRow(new string[] {
                         "employeeNumber",
                         "number"});
-#line 119
+#line 118
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table11, "When ");
-#line 127
+#line 126
  testRunner.And("execute HTTP GET request \'http://localhost/Users?filter=userName%20eq%20bjen&coun" +
                     "t=3&attributes=phones.phoneNumber\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 128
+#line 127
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 130
+#line 129
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 131
+#line 130
  testRunner.Then("JSON exists \'Resources[0].phones\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 132
+#line 131
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:ListResponse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 133
+#line 132
  testRunner.Then("JSON \'totalResults\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 134
+#line 133
  testRunner.Then("JSON \'startIndex\'=\'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 135
+#line 134
  testRunner.Then("JSON \'itemsPerPage\'=\'3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 136
+#line 135
  testRunner.Then("JSON \'Resources[0].phones[0].phoneNumber\'=\'01\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 137
+#line 136
  testRunner.Then("JSON \'Resources[0].phones[1].phoneNumber\'=\'02\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -455,7 +455,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckUserCanBeUpdatedHTTPPUT()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check user can be updated (HTTP PUT)", null, ((string[])(null)));
-#line 139
+#line 138
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -480,11 +480,11 @@ this.ScenarioInitialize(scenarioInfo);
             table12.AddRow(new string[] {
                         "employeeNumber",
                         "number"});
-#line 140
+#line 139
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table12, "When ");
-#line 148
+#line 147
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 149
+#line 148
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
@@ -497,27 +497,27 @@ this.ScenarioInitialize(scenarioInfo);
                         "name",
                         "{ \"formatted\" : \"newFormatted\", \"familyName\": \"newFamilyName\", \"givenName\": \"newG" +
                             "ivenName\" }"});
-#line 150
+#line 149
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table13, "And ");
-#line 155
+#line 154
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 156
+#line 155
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 158
+#line 157
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 159
+#line 158
  testRunner.Then("HTTP HEADER contains \'Location\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 160
+#line 159
  testRunner.Then("HTTP HEADER contains \'ETag\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 161
+#line 160
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:schemas:core:2.0:User\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 162
+#line 161
  testRunner.Then("JSON \'userName\'=\'bjen\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 163
+#line 162
  testRunner.Then("JSON \'name.formatted\'=\'newFormatted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 164
+#line 163
  testRunner.Then("JSON \'name.familyName\'=\'newFamilyName\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 165
+#line 164
  testRunner.Then("JSON \'name.givenName\'=\'newGivenName\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -529,7 +529,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckUserCanBePatchedHTTPPATCH()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check user can be patched (HTTP PATCH)", null, ((string[])(null)));
-#line 167
+#line 166
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -560,11 +560,11 @@ this.ScenarioInitialize(scenarioInfo);
             table14.AddRow(new string[] {
                         "roles",
                         "[ \"role1\", \"role2\" ]"});
-#line 168
+#line 167
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table14, "When ");
-#line 178
+#line 177
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 179
+#line 178
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
@@ -576,37 +576,37 @@ this.ScenarioInitialize(scenarioInfo);
             table15.AddRow(new string[] {
                         "Operations",
                         @"[ { ""op"" : ""remove"", ""path"": ""phones[phoneNumber eq 01]"" }, { ""op"": ""add"", ""path"": ""phones"", ""value"": { ""phoneNumber"": ""03"", ""type"": ""mobile"" } }, { ""op"": ""replace"", ""path"": ""userName"", ""value"": ""cassandra"" }, { ""op"" : ""remove"", ""path"": ""scores.math[score eq \""10\""]"" }, { ""op"" : ""add"", ""path"": ""scores.math"", ""value"": { ""score"": ""20"" } }, { ""op"": ""add"", ""path"": ""roles"", ""value"": ""role3"" } ]"});
-#line 180
+#line 179
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table15, "And ");
-#line 185
+#line 184
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 186
+#line 185
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 188
+#line 187
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 189
+#line 188
  testRunner.Then("HTTP HEADER contains \'Location\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 190
+#line 189
  testRunner.Then("HTTP HEADER contains \'ETag\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 191
+#line 190
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:schemas:core:2.0:User\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 192
+#line 191
  testRunner.Then("JSON \'userName\'=\'cassandra\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 193
+#line 192
  testRunner.Then("JSON \'phones[0].phoneNumber\'=\'02\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 194
+#line 193
  testRunner.Then("JSON \'phones[0].type\'=\'home\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 195
+#line 194
  testRunner.Then("JSON \'phones[1].phoneNumber\'=\'03\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 196
+#line 195
  testRunner.Then("JSON \'phones[1].type\'=\'mobile\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 197
+#line 196
  testRunner.Then("JSON \'scores.math[0].score\'=\'20\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 198
+#line 197
  testRunner.Then("JSON \'roles[0]\'=\'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 199
+#line 198
  testRunner.Then("JSON \'roles[1]\'=\'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 200
+#line 199
  testRunner.Then("JSON \'roles[2]\'=\'role3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

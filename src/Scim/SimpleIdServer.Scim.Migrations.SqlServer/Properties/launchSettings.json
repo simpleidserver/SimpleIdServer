@@ -1,7 +1,0 @@
-{
-  "profiles": {
-    "SimpleIdServer.Scim.Migrations.SqlServer": {
-      "commandName": "Project"
-    }
-  }
-}

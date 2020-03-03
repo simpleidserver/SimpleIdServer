@@ -2,9 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Persistence.EF.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim.Persistence.EF
 {
@@ -12,50 +13,83 @@ namespace SimpleIdServer.Scim.Persistence.EF
     {
         public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions) : base(dbContextOptions)
         {
+
         }
 
-        public DbSet<SCIMSchema> SCIMSchemaLst { get; set; } 
-        public DbSet<SCIMRepresentation> SCIMRepresentationLst { get; set; }
+        public DbSet<SCIMSchemaModel> SCIMSchemaLst { get; set; } 
+        public DbSet<SCIMRepresentationModel> SCIMRepresentationLst { get; set; }
+        public DbSet<SCIMRepresentationAttributeModel> SCIMRepresentationAttributeLst { get; set; }
+        public DbSet<SCIMRepresentationSchemaModel> SCIMRepresentationSchemaLst { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SCIMSchema>()
+            modelBuilder.Entity<SCIMRepresentationSchemaModel>()
+                .HasKey(s => new { s.SCIMSchemaId, s.SCIMRepresentationId });
+            modelBuilder.Entity<SCIMSchemaModel>()
                 .HasKey(s => s.Id);
-            modelBuilder.Entity<SCIMSchemaExtension>()
+            modelBuilder.Entity<SCIMSchemaModel>()
+                .HasMany(s => s.Representations)
+                .WithOne(s => s.Schema)
+                .HasForeignKey(s => s.SCIMSchemaId);
+            modelBuilder.Entity<SCIMSchemaModel>()
+                .HasMany(s => s.Attributes)
+                .WithOne(s => s.Schema)
+                .HasForeignKey(s => s.SchemaId);
+            modelBuilder.Entity<SCIMSchemaExtensionModel>()
                 .HasKey(s => s.Id);
-            modelBuilder.Entity<SCIMSchemaAttribute>()
+            modelBuilder.Entity<SCIMSchemaAttributeModel>()
                 .HasKey(s => s.Id);
-            modelBuilder.Entity<SCIMSchemaAttribute>()
+            modelBuilder.Entity<SCIMSchemaAttributeModel>()
+                .HasMany(s => s.SubAttributes)
+                .WithOne(s => s.ParentAttribute)
+                .HasForeignKey(s => s.ParentId);
+            modelBuilder.Entity<SCIMSchemaAttributeModel>()
                 .Property(s => s.CanonicalValues)
                 .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v));
-            modelBuilder.Entity<SCIMSchemaAttribute>()
+            modelBuilder.Entity<SCIMSchemaAttributeModel>()
                 .Property(s => s.ReferenceTypes)
                 .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v));
-            modelBuilder.Entity<SCIMSchemaAttribute>()
+            modelBuilder.Entity<SCIMSchemaAttributeModel>()
                 .Property(s => s.DefaultValueString)
                 .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v));
-            modelBuilder.Entity<SCIMSchemaAttribute>()
+            modelBuilder.Entity<SCIMSchemaAttributeModel>()
                 .Property(s => s.DefaultValueInt)
                 .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<int>>(v));
-            modelBuilder.Entity<SCIMRepresentation>()
+            modelBuilder.Entity<SCIMRepresentationModel>()
                 .HasKey(r => r.Id);
-            modelBuilder.Entity<SCIMRepresentationAttribute>()
+            modelBuilder.Entity<SCIMRepresentationModel>()
+                .HasMany(r => r.Schemas)
+                .WithOne(r => r.Representation)
+                .HasForeignKey(r => r.SCIMRepresentationId);
+            modelBuilder.Entity<SCIMRepresentationModel>()
+                .HasMany(r => r.Attributes)
+                .WithOne(r => r.Representation)
+                .HasForeignKey(r => r.RepresentationId);
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
                 .HasKey(r => r.Id);
-            modelBuilder.Entity<SCIMRepresentationAttribute>()
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
+                .HasMany(r => r.Values)
+                .WithOne(r => r.Parent)
+                .HasForeignKey(r => r.ParentId);
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
+                .HasOne(r => r.SchemaAttribute)
+                .WithMany(r => r.RepresentationAttributes)
+                .HasForeignKey(r => r.SchemaAttributeId);
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
                 .Property(s => s.ValuesString)
-                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v));
-            modelBuilder.Entity<SCIMRepresentationAttribute>()
+                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v).AsQueryable());
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
                 .Property(s => s.ValuesInteger)
-                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<int>>(v));
-            modelBuilder.Entity<SCIMRepresentationAttribute>()
+                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<int>>(v).AsQueryable());
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
                 .Property(s => s.ValuesBoolean)
-                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<bool>>(v));
-            modelBuilder.Entity<SCIMRepresentationAttribute>()
+                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<bool>>(v).AsQueryable());
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
                 .Property(s => s.ValuesDateTime)
-                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<DateTime>>(v));
-            modelBuilder.Entity<SCIMRepresentationAttribute>()
+                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<DateTime>>(v).AsQueryable());
+            modelBuilder.Entity<SCIMRepresentationAttributeModel>()
                 .Property(s => s.ValuesReference)
-                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v));
+                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v).AsQueryable());
         }
     }
 }
