@@ -17,7 +17,7 @@ namespace SimpleIdServer.Scim
             public const string Meta = "meta";
             public const string Id = "id";
             public const string Name = "name";
-            public const string Description = "descriptions";
+            public const string Description = "description";
             public const string Attributes = "attributes";
             public const string ExternalId = "externalId";
             public const string TotalResults = "totalResults";
