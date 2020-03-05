@@ -11,6 +11,17 @@ namespace SimpleIdServer.Scim
 
         public const string STANDARD_SCIM_CONTENT_TYPE = "application/scim+json";
 
+        public static class ErrorSCIMTypes
+        {
+            public const string InvalidSyntax = "invalidSyntax";
+            public const string Uniqueness = "uniqueness";
+            public const string InternalServerError = "internalServerError";
+            public const string Unknown = "unknown";
+            public const string Mutability = "mutability";
+            public const string InvalidFilter = "invalidFilter";
+            public const string SchemaViolated = "schemaViolated";
+        }
+
         public static class StandardSCIMRepresentationAttributes
         {
             public const string Schemas = "schemas";

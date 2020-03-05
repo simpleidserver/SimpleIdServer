@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = addRepresentationCommand.Representation.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(addRepresentationCommand.ResourceType);
@@ -43,13 +43,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var missingRequiredSchemas = requiredSchemas.Where(s => !requestedSchemas.Contains(s));
             if (missingRequiredSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"the required schemas {string.Join(",", missingRequiredSchemas)} are missing");
+                throw new SCIMBadSyntaxException($"the required schemas {string.Join(",", missingRequiredSchemas)} are missing");
             }
 
             var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
             if (unsupportedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
+                throw new SCIMBadSyntaxException($"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
@@ -86,7 +86,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 if (record != null)
                 {
-                    throw new SCIMUniquenessAttributeException("uniqueness", $"attribute {attribute.SchemaAttribute.Name} must be unique");
+                    throw new SCIMUniquenessAttributeException($"attribute {attribute.SchemaAttribute.Name} must be unique");
                 }
             }
         }

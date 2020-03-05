@@ -17,7 +17,7 @@ namespace SimpleIdServer.Scim.Helpers
             var missingRequiredAttributes = attrsSchema.Where(a => a.Required && !json.ContainsKey(a.Name));
             if (missingRequiredAttributes.Any())
             {
-                throw new SCIMSchemaViolatedException("missingRequiredAttribute", $"required attributes {string.Join(",", missingRequiredAttributes.Select(a => a.Name))} are missing");
+                throw new SCIMSchemaViolatedException($"required attributes {string.Join(",", missingRequiredAttributes.Select(a => a.Name))} are missing");
             }
 
             return BuildRepresentation(json, attrsSchema, schemas);
@@ -51,7 +51,7 @@ namespace SimpleIdServer.Scim.Helpers
                 var attrSchema = attrsSchema.FirstOrDefault(a => a.Name == jsonProperty.Key);
                 if (attrSchema == null)
                 {
-                    throw new SCIMSchemaViolatedException("unrecognizedAttribute", $"attribute {jsonProperty.Key} is not recognized by the SCIM schema");
+                    throw new SCIMSchemaViolatedException($"attribute {jsonProperty.Key} is not recognized by the SCIM schema");
                 }
 
                 if (attrSchema.Mutability == SCIMSchemaAttributeMutabilities.READONLY)
@@ -64,7 +64,7 @@ namespace SimpleIdServer.Scim.Helpers
                     var jArr = jsonProperty.Value as JArray;
                     if (jArr == null)
                     {
-                        throw new SCIMSchemaViolatedException("badFormatAttribute", $"attribute {jsonProperty.Key} is not an array");
+                        throw new SCIMSchemaViolatedException($"attribute {jsonProperty.Key} is not an array");
                     }
 
 

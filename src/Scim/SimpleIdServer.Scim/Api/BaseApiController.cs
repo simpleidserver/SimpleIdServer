@@ -98,7 +98,11 @@ namespace SimpleIdServer.Scim.Api
             }
             catch(SCIMFilterException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, "invalidFilter");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidFilter);
+            }
+            catch (Exception ex)
+            {
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -206,13 +210,21 @@ namespace SimpleIdServer.Scim.Api
                 var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
                 return BuildHTTPResult(scimRepresentation, HttpStatusCode.Created, false);
             }
-            catch (SCIMBadRequestException)
+            catch(SCIMSchemaViolatedException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "Request is unparsable, syntactically incorrect, or violates schema.", "invalidSyntax");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.SchemaViolated);
             }
-            catch (SCIMUniquenessAttributeException)
+            catch (SCIMBadSyntaxException ex)
             {
-                return this.BuildError(HttpStatusCode.Conflict, "One or more of the attribute values are already in use or are reserved.", "uniqueness");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
+            catch (SCIMUniquenessAttributeException ex)
+            {
+                return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
+            }
+            catch(Exception ex)
+            {
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -223,9 +235,13 @@ namespace SimpleIdServer.Scim.Api
                 await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
-            catch (SCIMNotFoundException)
+            catch (SCIMNotFoundException ex)
             {
-                return this.BuildError(HttpStatusCode.NotFound, $"Resource {id} not found.");
+                return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch(Exception ex)
+            {
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -236,17 +252,25 @@ namespace SimpleIdServer.Scim.Api
                 var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, jObj));
                 return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
             }
-            catch (SCIMBadRequestException)
+            catch (SCIMSchemaViolatedException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "Request is unparsable, syntactically incorrect, or violates schema.", "invalidSyntax");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.SchemaViolated);
             }
-            catch(SCIMImmutableAttributeException)
+            catch (SCIMBadSyntaxException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "The attempted modification is not compatible with the target attribute's mutability or current state (e.g., modification of an \"immutable\" attribute with an existing value).", "mutability");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
-            catch(SCIMNotFoundException)
+            catch(SCIMImmutableAttributeException ex)
             {
-                return this.BuildError(HttpStatusCode.NotFound, "Resource does not exist", "notFound");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.Mutability);
+            }
+            catch(SCIMNotFoundException ex)
+            {
+                return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch (Exception ex)
+            {
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -257,13 +281,21 @@ namespace SimpleIdServer.Scim.Api
                 var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, jObj));
                 return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
             }
-            catch (SCIMBadRequestException)
+            catch (SCIMFilterException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "Request is unparsable, syntactically incorrect, or violates schema.", "invalidSyntax");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidFilter);
             }
-            catch (SCIMNotFoundException)
+            catch (SCIMBadSyntaxException ex)
             {
-                return this.BuildError(HttpStatusCode.NotFound, "Resource does not exist", "notFound");
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
+            catch (SCIMNotFoundException ex)
+            {
+                return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch (Exception ex)
+            {
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -272,7 +304,7 @@ namespace SimpleIdServer.Scim.Api
             var user = User.Claims.FirstOrDefault(c => c.Type == _options.SCIMIdClaimName);
             if (user == null)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, $"{_options.SCIMIdClaimName} claim cannot be retrieved", "invalidSyntax");
+                return this.BuildError(HttpStatusCode.BadRequest, $"{_options.SCIMIdClaimName} claim cannot be retrieved", SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
             return await callback();

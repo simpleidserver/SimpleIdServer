@@ -104,8 +104,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 14
  testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
- testRunner.Then("JSON \'response.detail\'=\'Request is unparsable, syntactically incorrect, or violat" +
-                    "es schema.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'schemas attribute is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -141,8 +140,8 @@ this.ScenarioInitialize(scenarioInfo);
 #line 28
  testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 29
- testRunner.Then("JSON \'response.detail\'=\'Request is unparsable, syntactically incorrect, or violat" +
-                    "es schema.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'the required schemas urn:ietf:params:scim:schemas:core:2." +
+                    "0:User,urn:ietf:params:scim:schemas:extension:enterprise:2.0:User are missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -212,8 +211,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 53
  testRunner.Then("JSON \'response.scimType\'=\'uniqueness\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 54
- testRunner.Then("JSON \'response.detail\'=\'One or more of the attribute values are already in use or" +
-                    " are reserved.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'attribute userName must be unique\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -263,7 +261,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 73
  testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 74
- testRunner.Then("JSON \'response.detail\'=\'Resource 1 not found.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'Resource \'1\' does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -296,8 +294,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 86
  testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 87
- testRunner.Then("JSON \'response.detail\'=\'Request is unparsable, syntactically incorrect, or violat" +
-                    "es schema.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'schemas attribute is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -333,8 +330,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 100
  testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 101
- testRunner.Then("JSON \'response.detail\'=\'Request is unparsable, syntactically incorrect, or violat" +
-                    "es schema.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'the schemas invalidschema are unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -369,9 +365,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 113
  testRunner.Then("JSON \'response.status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 114
- testRunner.Then("JSON \'response.scimType\'=\'notFound\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 115
- testRunner.Then("JSON \'response.detail\'=\'Resource does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'Resource \'id\' does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -465,8 +461,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 150
  testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 151
- testRunner.Then("JSON \'response.detail\'=\'Request is unparsable, syntactically incorrect, or violat" +
-                    "es schema.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'schemas attribute is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -502,8 +497,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 164
  testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 165
- testRunner.Then("JSON \'response.detail\'=\'Request is unparsable, syntactically incorrect, or violat" +
-                    "es schema.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'some schemas are not recognized by the endpoint\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -540,9 +534,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 178
  testRunner.Then("JSON \'response.status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 179
- testRunner.Then("JSON \'response.scimType\'=\'notFound\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 180
- testRunner.Then("JSON \'response.detail\'=\'Resource does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'Resource \'id\' does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

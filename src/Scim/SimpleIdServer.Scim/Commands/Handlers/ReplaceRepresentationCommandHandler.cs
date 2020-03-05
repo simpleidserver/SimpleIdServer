@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = replaceRepresentationCommand.Representation.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
@@ -41,14 +41,14 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
             if (unsupportedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
+                throw new SCIMBadSyntaxException($"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
             var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(replaceRepresentationCommand.Id);
             if (existingRepresentation == null)
             {
-                throw new SCIMNotFoundException("notFound", "Resource does not exist");
+                throw new SCIMNotFoundException($"Resource '{replaceRepresentationCommand.Id}' does not exist");
             }
 
             var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation, schemas.ToList());

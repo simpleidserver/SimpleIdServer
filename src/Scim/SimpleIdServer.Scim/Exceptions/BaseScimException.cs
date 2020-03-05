@@ -6,11 +6,8 @@ namespace SimpleIdServer.Scim.Exceptions
 {
     public class BaseScimException : Exception
     {
-        public BaseScimException(string code, string message) : base(message)
+        public BaseScimException(string message) : base(message)
         {
-            Code = code;
         }
-
-        public string Code { get; }
     }
 }

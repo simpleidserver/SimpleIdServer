@@ -12,7 +12,7 @@ Scenario: Error is returned when schemas attribute is missing (HTTP POST)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='invalidSyntax'
-	Then JSON 'response.detail'='Request is unparsable, syntactically incorrect, or violates schema.'
+	Then JSON 'response.detail'='schemas attribute is missing'
 
 Scenario: Error is returned when schema is not valid (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -26,7 +26,7 @@ Scenario: Error is returned when schema is not valid (HTTP POST)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='invalidSyntax'
-	Then JSON 'response.detail'='Request is unparsable, syntactically incorrect, or violates schema.'
+	Then JSON 'response.detail'='the required schemas urn:ietf:params:scim:schemas:core:2.0:User,urn:ietf:params:scim:schemas:extension:enterprise:2.0:User are missing'
 
 Scenario: Error is returned when trying to add two resources with the same unique attribute
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -51,7 +51,7 @@ Scenario: Error is returned when trying to add two resources with the same uniqu
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='409'
 	Then JSON 'response.scimType'='uniqueness'
-	Then JSON 'response.detail'='One or more of the attribute values are already in use or are reserved.'
+	Then JSON 'response.detail'='attribute userName must be unique'
 
 Scenario: Error is returned when the user doesn't exist (HTTP GET)
 	When execute HTTP GET request 'http://localhost/Users/1'
@@ -71,7 +71,7 @@ Scenario: Error is returned when trying to remove an unknown user (HTTP DELETE)
 	Then HTTP status code equals to '404'
 	Then JSON 'status'='404'
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
-	Then JSON 'response.detail'='Resource 1 not found.'
+	Then JSON 'response.detail'='Resource '1' does not exist'
 
 Scenario: Error is returned when schemas attribute is missing (HTTP PUT)
 	When execute HTTP PUT JSON request 'http://localhost/Users/id'
@@ -84,7 +84,7 @@ Scenario: Error is returned when schemas attribute is missing (HTTP PUT)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='invalidSyntax'
-	Then JSON 'response.detail'='Request is unparsable, syntactically incorrect, or violates schema.'
+	Then JSON 'response.detail'='schemas attribute is missing'
 
 Scenario: Error is returned when schema is not valid (HTTP PUT)
 	When execute HTTP PUT JSON request 'http://localhost/Users/id'
@@ -98,7 +98,7 @@ Scenario: Error is returned when schema is not valid (HTTP PUT)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='invalidSyntax'
-	Then JSON 'response.detail'='Request is unparsable, syntactically incorrect, or violates schema.'
+	Then JSON 'response.detail'='the schemas invalidschema are unknown'
 
 Scenario: Error is returned when trying to update an unknown resource (HTTP PUT)
 	When execute HTTP PUT JSON request 'http://localhost/Users/id'
@@ -111,8 +111,8 @@ Scenario: Error is returned when trying to update an unknown resource (HTTP PUT)
 	Then JSON 'status'='404'
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='404'
-	Then JSON 'response.scimType'='notFound'
-	Then JSON 'response.detail'='Resource does not exist'
+	Then JSON 'response.scimType'='unknown'
+	Then JSON 'response.detail'='Resource 'id' does not exist'
 
 Scenario: Error is returned when update an immutable attribute (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -148,7 +148,7 @@ Scenario: Error is returned when schemas attribute is missing (HTTP PATCH)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='invalidSyntax'
-	Then JSON 'response.detail'='Request is unparsable, syntactically incorrect, or violates schema.'
+	Then JSON 'response.detail'='schemas attribute is missing'
 	
 Scenario: Error is returned when schema is not valid (HTTP PATCH)
 	When execute HTTP PATCH JSON request 'http://localhost/Users/id'
@@ -162,7 +162,7 @@ Scenario: Error is returned when schema is not valid (HTTP PATCH)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='invalidSyntax'
-	Then JSON 'response.detail'='Request is unparsable, syntactically incorrect, or violates schema.'
+	Then JSON 'response.detail'='some schemas are not recognized by the endpoint'
 
 Scenario: Error is returned when trying to patch an unknown resource (HTTP PATCH)
 	When execute HTTP PATCH JSON request 'http://localhost/Users/id'
@@ -176,5 +176,5 @@ Scenario: Error is returned when trying to patch an unknown resource (HTTP PATCH
 	Then JSON 'status'='404'
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='404'
-	Then JSON 'response.scimType'='notFound'
-	Then JSON 'response.detail'='Resource does not exist'
+	Then JSON 'response.scimType'='unknown'
+	Then JSON 'response.detail'='Resource 'id' does not exist'

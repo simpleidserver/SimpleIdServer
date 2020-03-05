@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(request.Id, request.ResourceType);
             if (representation == null)
             {
-                throw new SCIMNotFoundException(null, null);
+                throw new SCIMNotFoundException($"Resource '{request.Id}' does not exist");
             }
 
             _scimRepresentationCommandRepository.Delete(representation);

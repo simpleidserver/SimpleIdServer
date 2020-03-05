@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -31,7 +30,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
             if (existingRepresentation == null)
             {
-                throw new SCIMNotFoundException("notFound", "Resource does not exist");
+                throw new SCIMNotFoundException($"Resource '{patchRepresentationCommand.Id}' does not exist");
             }
 
             existingRepresentation.ApplyPatches(patches);
@@ -46,18 +45,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = content.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
             if (!requestedSchemas.SequenceEqual(new List<string> { SCIMConstants.StandardSchemas.PatchRequestSchemas.Id }))
             {
-                throw new SCIMBadRequestException("invalidRequest", "some schemas are not recognized by the endpoint");
+                throw new SCIMBadSyntaxException("some schemas are not recognized by the endpoint");
             }
 
             var operationsToken = content.SelectToken("Operations") as JArray;
             if (operationsToken == null)
             {
-                throw new SCIMBadRequestException("invalidRequest", "The Operations parameter is missing");
+                throw new SCIMBadSyntaxException("The Operations parameter is missing");
             }
 
             var result = new List<SCIMPatchOperationRequest>();

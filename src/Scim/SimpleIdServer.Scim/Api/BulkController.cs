@@ -65,13 +65,17 @@ namespace SimpleIdServer.Scim.Api
                     ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
                 };
             }
-            catch (SCIMBadRequestException)
+            catch (SCIMBadSyntaxException)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, "Request is unparsable, syntactically incorrect, or violates schema.", "invalidSyntax");
             }
             catch(SCIMTooManyBulkOperationsException)
             {
                 return this.BuildError(HttpStatusCode.RequestEntityTooLarge, "{'maxOperations': "+_options.MaxOperations+", 'maxPayloadSize': "+_options.MaxPayloadSize+" }.", "tooLarge");
+            }
+            catch (Exception ex)
+            {
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -80,17 +84,17 @@ namespace SimpleIdServer.Scim.Api
             var requestedSchemas = jObj.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadRequestException("invalidRequest", $"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
             }
 
             if (!new List<string> { SCIMConstants.StandardSchemas.BulkRequestSchemas.Id }.SequenceEqual(requestedSchemas))
             {
-                throw new SCIMBadRequestException("invalidRequest", $"some schemas are not recognized by the endpoint");
+                throw new SCIMBadSyntaxException($"some schemas are not recognized by the endpoint");
             }
             var operations = jObj.SelectToken("Operations") as JArray;
             if (operations == null)
             {
-                throw new SCIMBadRequestException("invalidRequest", "Operations parameter must be passed");
+                throw new SCIMBadSyntaxException("Operations parameter must be passed");
             }
 
             var result = new List<SCIMBulkOperationRequest>();
