@@ -79,7 +79,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 }
 
                 var queryCollection = new QueryBuilder(parameters);
-                var returnUrl = $"{Request.Path}{queryCollection.ToQueryString()}";
+                var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
                 url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new { ReturnUrl = _dataProtector.Protect(returnUrl), area = redirectActionAuthorizationResponse.Area });
                 HttpContext.Response.Redirect(url);
             }
