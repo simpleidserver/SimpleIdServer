@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,17 +28,20 @@ namespace SimpleIdServer.Scim.Api
     {
         private readonly IHttpContextFactory _httpContextFactory;
         private readonly SCIMHostOptions _options;
+        private readonly ILogger _logger;
 
-        public BulkController(IHttpContextFactory httpContextFactory, IOptionsMonitor<SCIMHostOptions> options)
+        public BulkController(IHttpContextFactory httpContextFactory, IOptionsMonitor<SCIMHostOptions> options, ILogger<BulkController> logger)
         {
             _httpContextFactory = httpContextFactory;
             _options = options.CurrentValue;
+            _logger = logger;
         }
 
         [HttpPost]
         [Authorize("BulkScimResource")]
         public async Task<IActionResult> Index([FromBody] JObject jObj)
         {
+            _logger.LogInformation(string.Format(Global.StartBulk, jObj.ToString()));
             try
             {
                 var patchOperations = ExtractRequest(jObj);
@@ -65,16 +70,19 @@ namespace SimpleIdServer.Scim.Api
                     ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
                 };
             }
-            catch (SCIMBadSyntaxException)
+            catch (SCIMBadSyntaxException ex)
             {
-                return this.BuildError(HttpStatusCode.BadRequest, "Request is unparsable, syntactically incorrect, or violates schema.", "invalidSyntax");
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
-            catch(SCIMTooManyBulkOperationsException)
+            catch(SCIMTooManyBulkOperationsException ex)
             {
-                return this.BuildError(HttpStatusCode.RequestEntityTooLarge, "{'maxOperations': "+_options.MaxOperations+", 'maxPayloadSize': "+_options.MaxPayloadSize+" }.", "tooLarge");
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.RequestEntityTooLarge, "{'maxOperations': "+_options.MaxOperations+", 'maxPayloadSize': "+_options.MaxPayloadSize+" }.", SCIMConstants.ErrorSCIMTypes.TooLarge);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
@@ -84,17 +92,18 @@ namespace SimpleIdServer.Scim.Api
             var requestedSchemas = jObj.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
             }
 
             if (!new List<string> { SCIMConstants.StandardSchemas.BulkRequestSchemas.Id }.SequenceEqual(requestedSchemas))
             {
-                throw new SCIMBadSyntaxException($"some schemas are not recognized by the endpoint");
+                throw new SCIMBadSyntaxException(Global.SchemasNotRecognized);
             }
+
             var operations = jObj.SelectToken("Operations") as JArray;
             if (operations == null)
             {
-                throw new SCIMBadSyntaxException("Operations parameter must be passed");
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Operations));
             }
 
             var result = new List<SCIMBulkOperationRequest>();

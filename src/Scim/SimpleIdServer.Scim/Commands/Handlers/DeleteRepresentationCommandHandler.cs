@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Resources;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -23,7 +24,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(request.Id, request.ResourceType);
             if (representation == null)
             {
-                throw new SCIMNotFoundException($"Resource '{request.Id}' does not exist");
+                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             }
 
             _scimRepresentationCommandRepository.Delete(representation);

@@ -29,7 +29,13 @@ namespace SimpleIdServer.Scim.Startup
             };
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             services.AddMvc();
-            services.AddLogging();
+            services.AddLogging(opt =>
+            {
+                opt.AddFilter((s, l) =>
+                {
+                    return s.StartsWith("SimpleIdServer.Scim");
+                });
+            });
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
@@ -50,7 +56,7 @@ namespace SimpleIdServer.Scim.Startup
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(LogLevel.Trace);
+            loggerFactory.AddConsole(LogLevel.Information);
             app.UseAuthentication();
             app.UseMvc();
         }

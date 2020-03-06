@@ -5,6 +5,7 @@ using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = addRepresentationCommand.Representation.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
             }
 
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(addRepresentationCommand.ResourceType);
@@ -43,13 +44,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var missingRequiredSchemas = requiredSchemas.Where(s => !requestedSchemas.Contains(s));
             if (missingRequiredSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"the required schemas {string.Join(",", missingRequiredSchemas)} are missing");
+                throw new SCIMBadSyntaxException(string.Format(Global.RequiredSchemasAreMissing, string.Join(",", missingRequiredSchemas)));
             }
 
             var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
             if (unsupportedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
+                throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
@@ -86,7 +87,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 if (record != null)
                 {
-                    throw new SCIMUniquenessAttributeException($"attribute {attribute.SchemaAttribute.Name} must be unique");
+                    throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
                 }
             }
         }

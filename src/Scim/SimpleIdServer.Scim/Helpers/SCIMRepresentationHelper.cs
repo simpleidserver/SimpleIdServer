@@ -3,6 +3,7 @@
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace SimpleIdServer.Scim.Helpers
             var missingRequiredAttributes = attrsSchema.Where(a => a.Required && !json.ContainsKey(a.Name));
             if (missingRequiredAttributes.Any())
             {
-                throw new SCIMSchemaViolatedException($"required attributes {string.Join(",", missingRequiredAttributes.Select(a => a.Name))} are missing");
+                throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => a.Name))));
             }
 
             return BuildRepresentation(json, attrsSchema, schemas);
@@ -51,7 +52,7 @@ namespace SimpleIdServer.Scim.Helpers
                 var attrSchema = attrsSchema.FirstOrDefault(a => a.Name == jsonProperty.Key);
                 if (attrSchema == null)
                 {
-                    throw new SCIMSchemaViolatedException($"attribute {jsonProperty.Key} is not recognized by the SCIM schema");
+                    throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, jsonProperty.Key));
                 }
 
                 if (attrSchema.Mutability == SCIMSchemaAttributeMutabilities.READONLY)
@@ -64,7 +65,7 @@ namespace SimpleIdServer.Scim.Helpers
                     var jArr = jsonProperty.Value as JArray;
                     if (jArr == null)
                     {
-                        throw new SCIMSchemaViolatedException($"attribute {jsonProperty.Key} is not an array");
+                        throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotArray, jsonProperty.Key));
                     }
 
 

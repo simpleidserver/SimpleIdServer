@@ -61,7 +61,7 @@ Scenario: Error is returned when the user doesn't exist (HTTP GET)
 	Then HTTP status code equals to '404'
 	Then JSON 'status'='404'
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
-	Then JSON 'response.detail'='Resource 1 not found.'
+	Then JSON 'response.detail'='resource 1 not found'
 
 Scenario: Error is returned when trying to remove an unknown user (HTTP DELETE)
 	When execute HTTP DELETE request 'http://localhost/Users/1'
@@ -71,7 +71,7 @@ Scenario: Error is returned when trying to remove an unknown user (HTTP DELETE)
 	Then HTTP status code equals to '404'
 	Then JSON 'status'='404'
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
-	Then JSON 'response.detail'='Resource '1' does not exist'
+	Then JSON 'response.detail'='resource 1 not found'
 
 Scenario: Error is returned when schemas attribute is missing (HTTP PUT)
 	When execute HTTP PUT JSON request 'http://localhost/Users/id'
@@ -112,7 +112,7 @@ Scenario: Error is returned when trying to update an unknown resource (HTTP PUT)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='404'
 	Then JSON 'response.scimType'='unknown'
-	Then JSON 'response.detail'='Resource 'id' does not exist'
+	Then JSON 'response.detail'='resource id not found'
 
 Scenario: Error is returned when update an immutable attribute (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -177,4 +177,4 @@ Scenario: Error is returned when trying to patch an unknown resource (HTTP PATCH
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='404'
 	Then JSON 'response.scimType'='unknown'
-	Then JSON 'response.detail'='Resource 'id' does not exist'
+	Then JSON 'response.detail'='resource id not found'

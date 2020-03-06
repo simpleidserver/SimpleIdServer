@@ -4,6 +4,7 @@ using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,7 +102,7 @@ namespace SimpleIdServer.Scim.Helpers
                 return TransformStringFiltersIntoSCIMPresentExpression(filters);
             }
 
-            throw new SCIMFilterException($"{string.Join(" ", filters)} filters are not valid");
+            throw new SCIMFilterException(string.Format(Global.InvalidFilters, string.Join(" ", filters)));
         }
 
         private static SCIMExpression TransformStringFiltersIntoSCIMPresentExpression(IEnumerable<string> filters)
@@ -109,7 +110,7 @@ namespace SimpleIdServer.Scim.Helpers
             var attributeExpression = Parse(filters.First()) as SCIMAttributeExpression;
             if (attributeExpression == null)
             {
-                throw new SCIMFilterException("present expression can only be used with attribute");
+                throw new SCIMFilterException(Global.BadPresentExpressionUsage);
             }
 
             return new SCIMPresentExpression(attributeExpression);
@@ -132,7 +133,7 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 if(logicalOperatorIndex - 1 < 0 || logicalOperatorIndex + 1 >= filters.Count())
                 {
-                    throw new SCIMFilterException("logical expression is not well formatted");
+                    throw new SCIMFilterException(Global.BadLogicalExpression);
                 }
 
                 var rightExpression = filters.ElementAt(logicalOperatorIndex + 1);
@@ -156,7 +157,7 @@ namespace SimpleIdServer.Scim.Helpers
             var regex = new Regex(@"^(\s)*not(\s)*\(.*\)$");
             if (!regex.IsMatch(notFilter))
             {
-                throw new SCIMFilterException("not filter is not well formatted");
+                throw new SCIMFilterException(Global.BadNotFilterExpression);
             }
 
             var subFilter = (new Regex(@"\(.*\)")).Match(notFilter).Value.TrimStart('(').TrimEnd(')');
@@ -170,7 +171,7 @@ namespace SimpleIdServer.Scim.Helpers
             SCIMComparisonOperators op;
             if (!Enum.TryParse(scimOperator, true, out op))
             {
-                throw new SCIMFilterException($"the comparison operator {scimOperator} is not supported");
+                throw new SCIMFilterException(string.Format(Global.ComparisonOperatorNotSupported, scimOperator));
             }
 
             return new SCIMComparisonExpression(op, leftExpression, filters.Last().Trim('"'));

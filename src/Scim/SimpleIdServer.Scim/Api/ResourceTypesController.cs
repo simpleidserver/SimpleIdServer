@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Resources;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,15 +17,18 @@ namespace SimpleIdServer.Scim.Api
     public class ResourceTypesController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
+        private readonly ILogger _logger;
 
-        public ResourceTypesController(ISCIMSchemaQueryRepository scimSchemaQueryRepository)
+        public ResourceTypesController(ISCIMSchemaQueryRepository scimSchemaQueryRepository, ILogger<ResourceTypesController> logger)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            _logger.LogInformation(Global.StartGetResourceTypes);
             var result = await _scimSchemaQueryRepository.GetAllRoot();
             return new OkObjectResult(new JArray(result.Select(s => ToDto(s))));
         }

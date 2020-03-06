@@ -7,6 +7,7 @@ using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,21 +36,21 @@ namespace SimpleIdServer.Scim.Domain
                 var attributeExpression = scimFilter as SCIMAttributeExpression;
                 if (attributeExpression == null)
                 {
-                    throw new SCIMAttributeException($"Path {patch.Path} is not valid");
+                    throw new SCIMAttributeException(string.Format(Global.InvalidPath, patch.Path));
                 }
 
                 var fullPath = attributeExpression.GetFullPath();
                 var schemaAttributes = representation.Schemas.Select(s => s.GetAttribute(fullPath)).Where(s => s != null);
                 if (!schemaAttributes.Any())
                 {
-                    throw new SCIMAttributeException($"Path {patch.Path} doesn't exist");
+                    throw new SCIMAttributeException(string.Format(Global.UnknownPath, patch.Path));
                 }
 
                 var schemaAttribute = schemaAttributes.First();
                 var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, scimFilter).ToList();
                 if (!attributes.Any() && schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX && !schemaAttribute.MultiValued)
                 {
-                    throw new SCIMAttributeException("PATCH can be applied only on existing attributes");
+                    throw new SCIMAttributeException(Global.PatchMissingAttribute);
                 }
 
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>
@@ -210,7 +211,7 @@ namespace SimpleIdServer.Scim.Domain
             var scimAttributeExpression = scimExpression as SCIMAttributeExpression;
             if (scimAttributeExpression == null)
             {
-                throw new SCIMAttributeException("not a valid attribute expression");
+                throw new SCIMAttributeException(Global.InvalidAttributeExpression);
             }
 
             IncludeAttribute(scimAttributeExpression, scimRepresentation.Attributes.AsQueryable(), result);
@@ -302,7 +303,7 @@ namespace SimpleIdServer.Scim.Domain
             var scimAttributeExpression = scimExpression as SCIMAttributeExpression;
             if (scimAttributeExpression == null)
             {
-                throw new SCIMAttributeException("not a valid attribute expression");
+                throw new SCIMAttributeException(Global.InvalidAttributeExpression);
             }
 
             var filteredAttributes = GetAttributes(scimAttributeExpression, representationAttributes);

@@ -6,6 +6,7 @@ using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
             if (existingRepresentation == null)
             {
-                throw new SCIMNotFoundException($"Resource '{patchRepresentationCommand.Id}' does not exist");
+                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
             }
 
             existingRepresentation.ApplyPatches(patches);
@@ -45,18 +46,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = content.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
             }
 
             if (!requestedSchemas.SequenceEqual(new List<string> { SCIMConstants.StandardSchemas.PatchRequestSchemas.Id }))
             {
-                throw new SCIMBadSyntaxException("some schemas are not recognized by the endpoint");
+                throw new SCIMBadSyntaxException(Global.SchemasNotRecognized);
             }
 
             var operationsToken = content.SelectToken("Operations") as JArray;
             if (operationsToken == null)
             {
-                throw new SCIMBadSyntaxException("The Operations parameter is missing");
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Operations));
             }
 
             var result = new List<SCIMPatchOperationRequest>();

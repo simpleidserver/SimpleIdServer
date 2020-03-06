@@ -20,6 +20,7 @@ namespace SimpleIdServer.Scim
             public const string Mutability = "mutability";
             public const string InvalidFilter = "invalidFilter";
             public const string SchemaViolated = "schemaViolated";
+            public const string TooLarge = "tooLarge";
         }
 
         public static class StandardSCIMRepresentationAttributes

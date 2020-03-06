@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace SimpleIdServer.Scim.Serialization
             var scimSchemaAttributes = type.GetCustomAttributes(typeof(SCIMSchemaAttribute), false);
             if (!scimSchemaAttributes.Any())
             {
-                throw new InvalidOperationException("instance cannot be serialized because no SCIMSchemaAttribute has been found");
+                throw new InvalidOperationException(Global.MissingSCIMSchemaAttribute);
             }
 
             var scimSchemaAttribute = (SCIMSchemaAttribute)scimSchemaAttributes.First();

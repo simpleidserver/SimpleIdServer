@@ -236,7 +236,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 63
  testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 64
- testRunner.Then("JSON \'response.detail\'=\'Resource 1 not found.\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'resource 1 not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -261,7 +261,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 73
  testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 74
- testRunner.Then("JSON \'response.detail\'=\'Resource \'1\' does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'resource 1 not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -367,7 +367,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 114
  testRunner.Then("JSON \'response.scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 115
- testRunner.Then("JSON \'response.detail\'=\'Resource \'id\' does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'resource id not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -536,7 +536,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 179
  testRunner.Then("JSON \'response.scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 180
- testRunner.Then("JSON \'response.detail\'=\'Resource \'id\' does not exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.detail\'=\'resource id not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

@@ -5,6 +5,7 @@ using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = replaceRepresentationCommand.Representation.GetSchemas();
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"{SCIMConstants.StandardSCIMRepresentationAttributes.Schemas} attribute is missing");
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
             }
 
             var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
@@ -41,14 +42,14 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
             if (unsupportedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException($"the schemas {string.Join(",", unsupportedSchemas)} are unknown");
+                throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
             var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(replaceRepresentationCommand.Id);
             if (existingRepresentation == null)
             {
-                throw new SCIMNotFoundException($"Resource '{replaceRepresentationCommand.Id}' does not exist");
+                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
             }
 
             var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation, schemas.ToList());
@@ -56,7 +57,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             {
                 if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
                 {
-                    throw new SCIMImmutableAttributeException($"attribute {updatedAttribute.Id} is immutable");
+                    throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, updatedAttribute.Id));
                 }
 
                 if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE)

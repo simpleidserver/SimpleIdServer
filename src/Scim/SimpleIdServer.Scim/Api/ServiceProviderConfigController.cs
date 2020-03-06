@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Resources;
 using System.Collections.Generic;
 using System.Net;
 
@@ -14,15 +16,18 @@ namespace SimpleIdServer.Scim.Api
     public class ServiceProviderConfigController : Controller
     {
         private readonly SCIMHostOptions _options;
+        private readonly ILogger _logger;
 
-        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options)
+        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options, ILogger<ServiceProviderConfigController> logger)
         {
             _options = options.CurrentValue;
+            _logger = logger;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
+            _logger.LogInformation(Global.StartGetServiceProviderConfig);
             var schema = SCIMConstants.StandardSchemas.ServiceProvideConfigSchemas;
             var representation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { schema })
                 .AddComplexAttribute("patch", schema.Id, c =>

@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence;
+using SimpleIdServer.Scim.Resources;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -14,15 +16,18 @@ namespace SimpleIdServer.Scim.Api
     public class SchemasController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
+        private readonly ILogger _logger;
 
-        public SchemasController(ISCIMSchemaQueryRepository scimSchemaQueryRepository)
+        public SchemasController(ISCIMSchemaQueryRepository scimSchemaQueryRepository, ILogger<SchemasController> logger)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            _logger.LogInformation(Global.StartGetSchemas);
             var schemas = await _scimSchemaQueryRepository.GetAll();
             var jObj = new JObject
             {
@@ -52,7 +57,8 @@ namespace SimpleIdServer.Scim.Api
             var schema = await _scimSchemaQueryRepository.FindSCIMSchemaById(id);
             if (schema == null)
             {
-                return this.BuildError(HttpStatusCode.NotFound, $"Schema {id} not found.");
+                _logger.LogError(string.Format(Global.SchemaNotFound, id));
+                return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.SchemaNotFound, id));
             }
 
             return new ContentResult
