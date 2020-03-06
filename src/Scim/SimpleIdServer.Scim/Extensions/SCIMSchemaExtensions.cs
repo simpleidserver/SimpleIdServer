@@ -14,7 +14,7 @@ namespace SimpleIdServer.Scim.Extensions
             {
                 { SCIMConstants.StandardSCIMRepresentationAttributes.Id, schema.Id },
                 { SCIMConstants.StandardSCIMRepresentationAttributes.Name,  schema.Name},
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Description,  schema.Name}
+                { SCIMConstants.StandardSCIMRepresentationAttributes.Description,  schema.Description}
             };
 
             var attributes = new JArray();
