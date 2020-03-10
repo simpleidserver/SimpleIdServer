@@ -103,7 +103,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'Resources[1].id\'=\'urn:ietf:params:scim:schemas:extension:enterprise:2.0:Use" +
                     "r\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 15
- testRunner.Then("JSON \'Resources[1].name\'=\'EntrepriseUser\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'Resources[1].name\'=\'EnterpriseUser\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 16
  testRunner.Then("JSON \'Resources[2].id\'=\'urn:ietf:params:scim:schemas:core:2.0:Group\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 17

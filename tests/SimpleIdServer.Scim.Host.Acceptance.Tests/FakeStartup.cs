@@ -44,7 +44,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddStringAttribute("org", defaultValue: new List<string> { "ENTREPRISE" }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddSCIMSchemaExtension("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", true)
                .Build();
-            var enterpriseUser = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", "EntrepriseUser", "Enterprise user")
+            var enterpriseUser = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", "EnterpriseUser", "Enterprise user")
                 .AddStringAttribute("employeeNumber", required: true)
                 .Build();
             var schemas = new List<SCIMSchema>

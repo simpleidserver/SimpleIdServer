@@ -12,7 +12,7 @@ Scenario: Check all schemas are returned
 	Then JSON 'Resources[0].name'='User'
 	Then JSON 'Resources[0].description'='User Account'
 	Then JSON 'Resources[1].id'='urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'
-	Then JSON 'Resources[1].name'='EntrepriseUser'
+	Then JSON 'Resources[1].name'='EnterpriseUser'
 	Then JSON 'Resources[2].id'='urn:ietf:params:scim:schemas:core:2.0:Group'
 	Then JSON 'Resources[2].name'='Group'
 	Then JSON 'Resources[2].description'='Group'
