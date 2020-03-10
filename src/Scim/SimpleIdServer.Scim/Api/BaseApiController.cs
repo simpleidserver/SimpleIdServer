@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -47,7 +48,7 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet]
-        // [Authorize("QueryScimResource")]
+        [Authorize("QueryScimResource")]
         public async Task<IActionResult> Get()
         {
             _logger.LogInformation(Global.StartGetResources);
@@ -113,14 +114,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet("{id}")]
-        // [Authorize("QueryScimResource")]
+        [Authorize("QueryScimResource")]
         public Task<IActionResult> Get(string id)
         {
             return InternalGet(id);
         }
 
         [HttpGet("Me")]
-        // [Authorize("UserAuthenticated")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> GetMe(string id)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -130,14 +131,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpPost]
-        // [Authorize("AddScimResource")]
+        [Authorize("AddScimResource")]
         public Task<IActionResult> Add([FromBody] JObject jobj)
         {
             return InternalAdd(jobj);
         }
 
         [HttpPost("Me")]
-        // [Authorize("UserAuthenticated")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> AddMe([FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -147,14 +148,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpDelete("{id}")]
-        // [Authorize("DeleteScimResource")]
+        [Authorize("DeleteScimResource")]
         public Task<IActionResult> Delete(string id)
         {
             return InternalDelete(id);
         }
 
         [HttpDelete("Me/{id}")]
-        // [Authorize("UserAuthenticated")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> DeleteMe(string id)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -164,14 +165,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpPut("{id}")]
-        // [Authorize("UpdateScimResource")]
+        [Authorize("UpdateScimResource")]
         public Task<IActionResult> Update(string id, [FromBody] JObject jObj)
         {
             return InternalUpdate(id, jObj);
         }
 
         [HttpPut("Me/{id}")]
-        // [Authorize("UserAuthenticated")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> UpdateMe(string id, [FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -181,14 +182,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpPatch("{id}")]
-        // [Authorize("UpdateScimResource")]
+        [Authorize("UpdateScimResource")]
         public Task<IActionResult> Patch(string id, [FromBody] JObject jObj)
         {
             return InternalPatch(id, jObj);
         }
 
         [HttpPatch("Me/{id}")]
-        // [Authorize("UserAuthenticated")]
+        [Authorize("UserAuthenticated")]
         public Task<IActionResult> PatchMe(string id, [FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>

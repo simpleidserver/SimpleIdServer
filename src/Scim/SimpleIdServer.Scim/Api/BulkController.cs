@@ -26,13 +26,11 @@ namespace SimpleIdServer.Scim.Api
     [Route(SCIMConstants.SCIMEndpoints.Bulk)]
     public class BulkController : Controller
     {
-        private readonly IHttpContextFactory _httpContextFactory;
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
 
-        public BulkController(IHttpContextFactory httpContextFactory, IOptionsMonitor<SCIMHostOptions> options, ILogger<BulkController> logger)
+        public BulkController(IOptionsMonitor<SCIMHostOptions> options, ILogger<BulkController> logger)
         {
-            _httpContextFactory = httpContextFactory;
             _options = options.CurrentValue;
             _logger = logger;
         }
