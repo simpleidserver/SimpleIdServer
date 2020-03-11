@@ -153,7 +153,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             }
 
             var schemaAttributeProperty = Expression.Property(parameterExpression, "SchemaAttribute");
-            var valuesProperty = Expression.Property(parameterExpression, "Values");
+            var valuesProperty = Expression.Property(parameterExpression, "Children");
             var nameProperty = Expression.Property(schemaAttributeProperty, "Name");
             var notEqual = Expression.NotEqual(schemaAttributeProperty, Expression.Constant(null));
             var equal = Expression.Equal(nameProperty, Expression.Constant(attributeExpression.Name));
@@ -264,30 +264,9 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 
         private static Expression BuildPresent(Expression representationAttrExpr)
         {
-            var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
-            var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
-            var propertyValuesString = Expression.Property(representationAttrExpr, "QueryableValuesString");
-            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "QueryableValuesBoolean");
-            var propertyValuesInt = Expression.Property(representationAttrExpr, "QueryableValuesInt");
-            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "QueryableValuesDateTime");
-            var attrInteger = Expression.Parameter(typeof(int), "prop");
-            var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
-            var attrString = Expression.Parameter(typeof(string), "prop");
-            var attrBoolean = Expression.Parameter(typeof(bool), "prop");
-            var countIntegerExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(int) }, propertyValuesInt);
-            var countStringExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(string) }, propertyValuesString);
-            var countDateTimeExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(DateTime) }, propertyValuesDateTime);
-            var countBooleanExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(bool) }, propertyValuesBoolean);
-            return Expression.Or(
-                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.INTEGER)), Expression.GreaterThan(countIntegerExpression, Expression.Constant(0))),
-                Expression.Or(
-                    Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.STRING)), Expression.GreaterThan(countStringExpression, Expression.Constant(0))),
-                    Expression.Or(
-                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DATETIME)), Expression.GreaterThan(countDateTimeExpression, Expression.Constant(0))),
-                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), Expression.GreaterThan(countBooleanExpression, Expression.Constant(0)))
-                    )
-                )
-            );
+            var propertyValues = Expression.Property(representationAttrExpr, "Values");
+            var countExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(SCIMRepresentationAttributeValueModel) }, propertyValues);
+            return Expression.GreaterThanOrEqual(countExpression, Expression.Constant(1));
         }
 
         private static Expression BuildComparison(SCIMComparisonExpression comparisonExpression, MemberExpression representationExpr)
@@ -394,75 +373,76 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
-            var propertyValuesString = Expression.Property(representationAttrExpr, "ValuesString");
-            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
-            var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
-            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
+            var propertyValues = Expression.Property(representationAttrExpr, "Values");
+            var attrValue = Expression.Parameter(typeof(SCIMRepresentationAttributeValueModel), "prop");
+            var propertyValueString = Expression.Property(attrValue, "ValueString");
+            var propertyValueInteger = Expression.Property(attrValue, "ValueInteger");
+            var propertyValueDatetime = Expression.Property(attrValue, "ValueDateTime");
+            var propertyValueBoolean = Expression.Property(attrValue, "ValueBoolean");
             var attrInteger = Expression.Parameter(typeof(int), "prop");
             var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
             var attrString = Expression.Parameter(typeof(string), "prop");
             var attrBoolean = Expression.Parameter(typeof(bool), "prop");
-            Expression anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Constant(false), attrInteger),
-                anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Constant(false), attrDateTime),
-                anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Constant(false), attrString),
-                anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Constant(false), attrBoolean);
-            Expression equalValue = null;
+            Expression anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Constant(false), attrValue),
+                anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Constant(false), attrValue),
+                anyStringLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Constant(false), attrValue),
+                anyBooleanLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Constant(false), attrValue);
             switch (comparisonExpression.ComparisonOperator)
             {
                 case SCIMComparisonOperators.NE:
-                    anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.NotEqual(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
-                    anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.NotEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
-                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.NotEqual(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
-                    anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.NotEqual(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
+                    anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.NotEqual(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrValue);
+                    anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.NotEqual(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrValue);
+                    anyStringLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.NotEqual(propertyValueString, Expression.Constant(comparisonExpression.Value)), attrValue);
+                    anyBooleanLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.NotEqual(propertyValueBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrValue);
                     break;
                 case SCIMComparisonOperators.GT:
-                    anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.GreaterThan(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
-                    anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.GreaterThan(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.GreaterThan(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrValue);
+                    anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.GreaterThan(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrValue);
                     break;
                 case SCIMComparisonOperators.GE:
-                    anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.GreaterThanOrEqual(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
-                    anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.GreaterThanOrEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.GreaterThanOrEqual(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrValue);
+                    anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.GreaterThanOrEqual(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrValue);
                     break;
                 case SCIMComparisonOperators.LE:
-                    anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.LessThanOrEqual(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
-                    anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.LessThanOrEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.LessThanOrEqual(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrValue);
+                    anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.LessThanOrEqual(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrValue);
                     break;
                 case SCIMComparisonOperators.LT:
-                    anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.LessThan(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
-                    anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.LessThan(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.LessThan(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrValue);
+                    anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.LessThan(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrValue);
                     break;
                 case SCIMComparisonOperators.EQ:
-                    anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Equal(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
-                    anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Equal(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
-                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Equal(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
-                    anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Equal(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
+                    anyIntegerLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Equal(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrValue);
+                    anyDateTimeLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Equal(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrValue);
+                    anyStringLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Equal(propertyValueString, Expression.Constant(comparisonExpression.Value)), attrValue);
+                    anyBooleanLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Equal(propertyValueBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrValue);
                     break;
                 case SCIMComparisonOperators.SW:
                     var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
-                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, startWith, Expression.Constant(comparisonExpression.Value)), attrString);
+                    anyStringLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Call(propertyValueString, startWith, Expression.Constant(comparisonExpression.Value)), attrValue);
                     break;
                 case SCIMComparisonOperators.EW:
                     var endWith = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
-                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, endWith, Expression.Constant(comparisonExpression.Value)), attrString);
+                    anyStringLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Call(propertyValueString, endWith, Expression.Constant(comparisonExpression.Value)), attrValue);
                     break;
                 case SCIMComparisonOperators.CO:
                     var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, contains, Expression.Constant(comparisonExpression.Value)), attrString);
+                    anyStringLambda = Expression.Lambda<Func<SCIMRepresentationAttributeValueModel, bool>>(Expression.Call(propertyValueString, contains, Expression.Constant(comparisonExpression.Value)), attrValue);
                     break;
             }
 
-            var allInteger = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(int)), propertyValuesInt, anyIntegerLambda);
-            var allDateTime = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(DateTime)), propertyValuesDateTime, anyDateTimeLambda);
-            var allString = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(string)), propertyValuesString, anyStringLambda);
-            var allBoolean = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(bool)), propertyValuesBoolean, anyBooleanLambda);
-
-            equalValue = Expression.Or(
-                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.INTEGER)), allInteger),
+            var anyMethodType = typeof(Enumerable).GetMethods().First(m => m.Name == "Any" && m.GetParameters().Length == 2).MakeGenericMethod(typeof(SCIMRepresentationAttributeValueModel));
+            var anyInteger = Expression.Call(anyMethodType, propertyValues, anyIntegerLambda);
+            var anyDateTime = Expression.Call(anyMethodType, propertyValues, anyDateTimeLambda);
+            var anyString = Expression.Call(anyMethodType, propertyValues, anyStringLambda);
+            var anyBoolean = Expression.Call(anyMethodType, propertyValues, anyBooleanLambda);
+            var equalValue = Expression.Or(
+                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.INTEGER)), anyInteger),
                 Expression.Or(
-                    Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DATETIME)), allDateTime),
+                    Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DATETIME)), anyDateTime),
                     Expression.Or(
-                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.STRING)), allString),
-                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), allBoolean)
+                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.STRING)), anyString),
+                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), anyBoolean)
                     )
                 )
             );

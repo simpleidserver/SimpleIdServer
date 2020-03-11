@@ -23,12 +23,15 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var record = await _scimDbContext.SCIMRepresentationLst
                 .Include(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == attributeId && a.ValuesString.Contains(value)));
+                .FirstOrDefaultAsync(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == attributeId && a.Values.Any(v => v.ValueString == value)));
             if (record == null)
             {
                 return null;
@@ -43,12 +46,15 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var record = await _scimDbContext.SCIMRepresentationLst
                 .Include(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == attributeId && a.ValuesInteger.Contains(value)));
+                .FirstOrDefaultAsync(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == attributeId && a.Values.Any(v => v.ValueInteger == value)));
             if (record == null)
             {
                 return null;
@@ -63,8 +69,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var record = await _scimDbContext.SCIMRepresentationLst
                 .Include(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions)
                 .AsNoTracking()
@@ -83,8 +92,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var record = await _scimDbContext.SCIMRepresentationLst
                 .Include(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions)
                 .AsNoTracking()
@@ -103,8 +115,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             IQueryable<SCIMRepresentationModel> queryableRepresentations = _scimDbContext.SCIMRepresentationLst
                 .Include(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions)
                 .AsNoTracking();

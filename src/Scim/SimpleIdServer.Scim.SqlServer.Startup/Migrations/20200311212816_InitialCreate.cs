@@ -1,6 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
@@ -129,12 +127,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     Id = table.Column<string>(nullable: false),
                     ParentId = table.Column<string>(nullable: true),
                     SchemaAttributeId = table.Column<string>(nullable: true),
-                    RepresentationId = table.Column<string>(nullable: true),
-                    ValuesString = table.Column<string>(nullable: true),
-                    ValuesBoolean = table.Column<string>(nullable: true),
-                    ValuesInteger = table.Column<string>(nullable: true),
-                    ValuesDateTime = table.Column<string>(nullable: true),
-                    ValuesReference = table.Column<string>(nullable: true)
+                    RepresentationId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,6 +152,29 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SCIMRepresentationAttributeValueLst",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    ValueString = table.Column<string>(nullable: true),
+                    ValueInteger = table.Column<int>(nullable: false),
+                    ValueBoolean = table.Column<bool>(nullable: false),
+                    ValueDateTime = table.Column<DateTime>(nullable: false),
+                    ValueReference = table.Column<string>(nullable: true),
+                    SCIMRepresentationAttributeId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SCIMRepresentationAttributeValueLst", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SCIMRepresentationAttributeValueLst_SCIMRepresentationAttributeLst_SCIMRepresentationAttributeId",
+                        column: x => x.SCIMRepresentationAttributeId,
+                        principalTable: "SCIMRepresentationAttributeLst",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationAttributeLst_ParentId",
                 table: "SCIMRepresentationAttributeLst",
@@ -173,6 +189,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "IX_SCIMRepresentationAttributeLst_SchemaAttributeId",
                 table: "SCIMRepresentationAttributeLst",
                 column: "SchemaAttributeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SCIMRepresentationAttributeValueLst_SCIMRepresentationAttributeId",
+                table: "SCIMRepresentationAttributeValueLst",
+                column: "SCIMRepresentationAttributeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SCIMRepresentationSchemaLst_SCIMRepresentationId",
@@ -198,7 +219,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "SCIMRepresentationAttributeLst");
+                name: "SCIMRepresentationAttributeValueLst");
 
             migrationBuilder.DropTable(
                 name: "SCIMRepresentationSchemaLst");
@@ -207,10 +228,13 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMSchemaExtensionModel");
 
             migrationBuilder.DropTable(
-                name: "SCIMSchemaAttributeModel");
+                name: "SCIMRepresentationAttributeLst");
 
             migrationBuilder.DropTable(
                 name: "SCIMRepresentationLst");
+
+            migrationBuilder.DropTable(
+                name: "SCIMSchemaAttributeModel");
 
             migrationBuilder.DropTable(
                 name: "SCIMSchemaLst");

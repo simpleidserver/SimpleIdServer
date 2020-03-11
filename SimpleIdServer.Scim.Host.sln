@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Jwt", "src\O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServer.Startup", "src\Scim\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj", "{5AE1ACD1-5129-4D01-B8FB-496395048EAF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Persistence.EF.Tests", "tests\SimpleIdServer.Scim.Persistence.EF.Tests\SimpleIdServer.Scim.Persistence.EF.Tests.csproj", "{5FBBF442-B4CF-4B9A-A3DB-F8841F29B234}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{5AE1ACD1-5129-4D01-B8FB-496395048EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AE1ACD1-5129-4D01-B8FB-496395048EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AE1ACD1-5129-4D01-B8FB-496395048EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FBBF442-B4CF-4B9A-A3DB-F8841F29B234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FBBF442-B4CF-4B9A-A3DB-F8841F29B234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FBBF442-B4CF-4B9A-A3DB-F8841F29B234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FBBF442-B4CF-4B9A-A3DB-F8841F29B234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{9C160D71-D3B3-4890-BE97-0705E79D217E} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 		{B68FC807-F725-42A5-8101-4DF9A55A3CD5} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 		{5AE1ACD1-5129-4D01-B8FB-496395048EAF} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
+		{5FBBF442-B4CF-4B9A-A3DB-F8841F29B234} = {E5F2ACD7-7D4E-449B-94D3-62F8185E7AAE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

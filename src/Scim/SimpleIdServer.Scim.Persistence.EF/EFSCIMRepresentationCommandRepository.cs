@@ -43,9 +43,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public bool Delete(SCIMRepresentation data)
         {
             var result = _scimDbContext.SCIMRepresentationLst
+                .Include(s => s.Attributes).ThenInclude(s => s.Values)
                 .Include(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
-                .Include(s => s.Attributes).ThenInclude(s => s.Values).ThenInclude(s => s.Values).ThenInclude(s => s.SchemaAttribute)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
                 .Include(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions)
                 .FirstOrDefault(r => r.Id == data.Id);
@@ -57,6 +60,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
             var attrs = new List<SCIMRepresentationAttributeModel>();
              GetAllAttributes(result.Attributes, attrs);
             _scimDbContext.SCIMRepresentationAttributeLst.RemoveRange(attrs);
+            foreach(var attr in attrs)
+            {
+                _scimDbContext.SCIMRepresentationAttributeValueLst.RemoveRange(attr.Values);
+            }
+
             _scimDbContext.SCIMRepresentationSchemaLst.RemoveRange(result.Schemas);
             _scimDbContext.SCIMRepresentationLst.Remove(result);
             return true;
@@ -83,9 +91,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
             result.AddRange(attrs);
             foreach(var attr in attrs)
             {
-                if (attr.Values != null && attr.Values.Any())
+                if (attr.Children != null && attr.Children.Any())
                 {
-                    GetAllAttributes(attr.Values, result);
+                    GetAllAttributes(attr.Children, result);
                 }
             }
         }

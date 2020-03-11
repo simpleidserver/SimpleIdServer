@@ -10,7 +10,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20200303153938_InitialCreate")]
+    [Migration("20200311212816_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,16 +32,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
                     b.Property<string>("SchemaAttributeId");
 
-                    b.Property<string>("ValuesBoolean");
-
-                    b.Property<string>("ValuesDateTime");
-
-                    b.Property<string>("ValuesInteger");
-
-                    b.Property<string>("ValuesReference");
-
-                    b.Property<string>("ValuesString");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
@@ -51,6 +41,30 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.HasIndex("SchemaAttributeId");
 
                     b.ToTable("SCIMRepresentationAttributeLst");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeValueModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("SCIMRepresentationAttributeId");
+
+                    b.Property<bool>("ValueBoolean");
+
+                    b.Property<DateTime>("ValueDateTime");
+
+                    b.Property<int>("ValueInteger");
+
+                    b.Property<string>("ValueReference");
+
+                    b.Property<string>("ValueString");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SCIMRepresentationAttributeId");
+
+                    b.ToTable("SCIMRepresentationAttributeValueLst");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationModel", b =>
@@ -169,7 +183,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", b =>
                 {
                     b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", "Parent")
-                        .WithMany("Values")
+                        .WithMany("Children")
                         .HasForeignKey("ParentId");
 
                     b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationModel", "Representation")
@@ -179,6 +193,13 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaAttributeModel", "SchemaAttribute")
                         .WithMany("RepresentationAttributes")
                         .HasForeignKey("SchemaAttributeId");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeValueModel", b =>
+                {
+                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", "RepresentationAttribute")
+                        .WithMany("Values")
+                        .HasForeignKey("SCIMRepresentationAttributeId");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationSchemaModel", b =>

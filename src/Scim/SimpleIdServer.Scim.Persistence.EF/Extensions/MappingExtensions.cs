@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.EF.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,24 +12,46 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
     {
         public static SCIMRepresentationAttributeModel ToModel(this SCIMRepresentationAttribute a)
         {
+            var values = new List<SCIMRepresentationAttributeValueModel>();
+            values.AddRange(a.ValuesBoolean.Select(b => new SCIMRepresentationAttributeValueModel
+            {
+                ValueBoolean = b,
+                Id = Guid.NewGuid().ToString()
+            }));
+            values.AddRange(a.ValuesDateTime.Select(d => new SCIMRepresentationAttributeValueModel
+            {
+                ValueDateTime = d,
+                Id = Guid.NewGuid().ToString()
+            }));
+            values.AddRange(a.ValuesInteger.Select(i => new SCIMRepresentationAttributeValueModel
+            {
+                ValueInteger = i,
+                Id = Guid.NewGuid().ToString()
+            }));
+            values.AddRange(a.ValuesReference.Select(r => new SCIMRepresentationAttributeValueModel
+            {
+                ValueReference = r,
+                Id = Guid.NewGuid().ToString()
+            }));
+            values.AddRange(a.ValuesString.Select(s => new SCIMRepresentationAttributeValueModel
+            {
+                ValueString = s,
+                Id = Guid.NewGuid().ToString()
+            }));
             var result = new SCIMRepresentationAttributeModel
             {
                 Id = a.Id,
-                ValuesBoolean = a.ValuesBoolean.AsQueryable(),
-                ValuesDateTime = a.ValuesDateTime.AsQueryable(),
-                ValuesInteger = a.ValuesInteger.AsQueryable(),
-                ValuesString = a.ValuesString.AsQueryable(),
-                ValuesReference = a.ValuesReference.AsQueryable(),
+                Values = values,
                 ParentId = a.Parent == null ? null : a.Parent.Id,
                 SchemaAttributeId = a.SchemaAttribute.Id,
-                Values = new List<SCIMRepresentationAttributeModel>()
+                Children = new List<SCIMRepresentationAttributeModel>()
             };
 
             if (a.Values != null && a.Values.Any())
             {
                 foreach (var r in a.Values)
                 {
-                    result.Values.Add(ToModel(r));
+                    result.Children.Add(ToModel(r));
                 }
             }
 
@@ -164,16 +187,16 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 Id = representationAttribute.Id,
                 Parent = parent == null ? (representationAttribute.Parent == null ? null : representationAttribute.Parent.ToDomain()) : parent,
                 SchemaAttribute = representationAttribute.SchemaAttribute.ToDomain(),
-                ValuesBoolean = representationAttribute.ValuesBoolean.ToList(),
-                ValuesDateTime = representationAttribute.ValuesDateTime.ToList(),
-                ValuesInteger = representationAttribute.ValuesInteger.ToList(),
-                ValuesReference = representationAttribute.ValuesReference.ToList(),
-                ValuesString = representationAttribute.ValuesString.ToList(),
+                ValuesBoolean = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.BOOLEAN ? new List<bool>() : representationAttribute.Values.Select(v => v.ValueBoolean).ToList(),
+                ValuesDateTime = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.DATETIME ? new List<DateTime>() : representationAttribute.Values.Select(v => v.ValueDateTime).ToList(),
+                ValuesInteger = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.INTEGER ? new List<int>() : representationAttribute.Values.Select(v => v.ValueInteger).ToList(),
+                ValuesReference = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.REFERENCE ? new List<string>() : representationAttribute.Values.Select(v => v.ValueReference).ToList(),
+                ValuesString = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.STRING ? new List<string>() : representationAttribute.Values.Select(v => v.ValueString).ToList(),
                 Values = new List<SCIMRepresentationAttribute>()
             };
-            if (representationAttribute.Values != null && representationAttribute.Values.Any())
+            if (representationAttribute.Children != null && representationAttribute.Children.Any())
             {
-                foreach(var val in representationAttribute.Values)
+                foreach(var val in representationAttribute.Children)
                 {
                     result.Values.Add(val.ToDomain(result));
                 }
