@@ -29,7 +29,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 Version = data.Version,
                 ResourceType = data.ResourceType,
                 Id = data.Id,
-                Attributes = data.Attributes.Select(a => a.ToModel()).ToList(),
+                Attributes = data.Attributes.Select(a => a.ToModel(data.Id)).ToList(),
                 Schemas = data.Schemas.Select(s => new SCIMRepresentationSchemaModel
                 {
                     SCIMRepresentationId = data.Id,

@@ -10,7 +10,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 {
     public static class MappingExtensions
     {
-        public static SCIMRepresentationAttributeModel ToModel(this SCIMRepresentationAttribute a)
+        public static SCIMRepresentationAttributeModel ToModel(this SCIMRepresentationAttribute a, string representationId)
         {
             var values = new List<SCIMRepresentationAttributeValueModel>();
             values.AddRange(a.ValuesBoolean.Select(b => new SCIMRepresentationAttributeValueModel
@@ -42,6 +42,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 Id = a.Id,
                 Values = values,
+                RepresentationId = representationId,
                 ParentId = a.Parent == null ? null : a.Parent.Id,
                 SchemaAttributeId = a.SchemaAttribute.Id,
                 Children = new List<SCIMRepresentationAttributeModel>()
@@ -51,7 +52,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 foreach (var r in a.Values)
                 {
-                    result.Children.Add(ToModel(r));
+                    result.Children.Add(ToModel(r, representationId));
                 }
             }
 
@@ -73,16 +74,17 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                     Required = s.Required,
                     Schema = s.Schema
                 }).ToList(),
-                Attributes = schema.Attributes.Select(s => ToModel(s)).ToList()
+                Attributes = schema.Attributes.Select(s => ToModel(s, schema.Id)).ToList()
             };
             return result;
         }
 
-        public static SCIMSchemaAttributeModel ToModel(this SCIMSchemaAttribute schemaAttribute)
+        public static SCIMSchemaAttributeModel ToModel(this SCIMSchemaAttribute schemaAttribute, string schemaId)
         {
             var result = new SCIMSchemaAttributeModel
             {
                 Id = schemaAttribute.Id,
+                SchemaId = schemaId,
                 CanonicalValues = schemaAttribute.CanonicalValues.ToList(),
                 CaseExact = schemaAttribute.CaseExact,
                 DefaultValueInt = schemaAttribute.DefaultValueInt.ToList(),
@@ -103,7 +105,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 foreach (var subAttr in schemaAttribute.SubAttributes.ToList())
                 {
-                    result.SubAttributes.Add(ToModel(subAttr));
+                    result.SubAttributes.Add(ToModel(subAttr, schemaId));
                 }
             }
 
