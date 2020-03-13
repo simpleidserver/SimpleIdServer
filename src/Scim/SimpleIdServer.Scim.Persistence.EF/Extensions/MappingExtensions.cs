@@ -187,9 +187,9 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 Id = representationAttribute.Id,
                 Parent = parent == null ? (representationAttribute.Parent == null ? null : representationAttribute.Parent.ToDomain()) : parent,
                 SchemaAttribute = representationAttribute.SchemaAttribute.ToDomain(),
-                ValuesBoolean = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.BOOLEAN ? new List<bool>() : representationAttribute.Values.Select(v => v.ValueBoolean).ToList(),
-                ValuesDateTime = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.DATETIME ? new List<DateTime>() : representationAttribute.Values.Select(v => v.ValueDateTime).ToList(),
-                ValuesInteger = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.INTEGER ? new List<int>() : representationAttribute.Values.Select(v => v.ValueInteger).ToList(),
+                ValuesBoolean = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.BOOLEAN ? new List<bool>() : representationAttribute.Values.Select(v => v.ValueBoolean.Value).ToList(),
+                ValuesDateTime = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.DATETIME ? new List<DateTime>() : representationAttribute.Values.Select(v => v.ValueDateTime.Value).ToList(),
+                ValuesInteger = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.INTEGER ? new List<int>() : representationAttribute.Values.Select(v => v.ValueInteger.Value).ToList(),
                 ValuesReference = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.REFERENCE ? new List<string>() : representationAttribute.Values.Select(v => v.ValueReference).ToList(),
                 ValuesString = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.STRING ? new List<string>() : representationAttribute.Values.Select(v => v.ValueString).ToList(),
                 Values = new List<SCIMRepresentationAttribute>()

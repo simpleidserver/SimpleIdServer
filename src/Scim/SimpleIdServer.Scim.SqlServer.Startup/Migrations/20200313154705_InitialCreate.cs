@@ -158,9 +158,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     ValueString = table.Column<string>(nullable: true),
-                    ValueInteger = table.Column<int>(nullable: false),
-                    ValueBoolean = table.Column<bool>(nullable: false),
-                    ValueDateTime = table.Column<DateTime>(nullable: false),
+                    ValueInteger = table.Column<int>(nullable: true),
+                    ValueBoolean = table.Column<bool>(nullable: true),
+                    ValueDateTime = table.Column<DateTime>(nullable: true),
                     ValueReference = table.Column<string>(nullable: true),
                     SCIMRepresentationAttributeId = table.Column<string>(nullable: true)
                 },

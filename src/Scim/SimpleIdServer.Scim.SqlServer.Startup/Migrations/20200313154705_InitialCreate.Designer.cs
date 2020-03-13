@@ -10,7 +10,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20200311212816_InitialCreate")]
+    [Migration("20200313154705_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,11 +50,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
                     b.Property<string>("SCIMRepresentationAttributeId");
 
-                    b.Property<bool>("ValueBoolean");
+                    b.Property<bool?>("ValueBoolean");
 
-                    b.Property<DateTime>("ValueDateTime");
+                    b.Property<DateTime?>("ValueDateTime");
 
-                    b.Property<int>("ValueInteger");
+                    b.Property<int?>("ValueInteger");
 
                     b.Property<string>("ValueReference");
 

@@ -48,11 +48,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
                     b.Property<string>("SCIMRepresentationAttributeId");
 
-                    b.Property<bool>("ValueBoolean");
+                    b.Property<bool?>("ValueBoolean");
 
-                    b.Property<DateTime>("ValueDateTime");
+                    b.Property<DateTime?>("ValueDateTime");
 
-                    b.Property<int>("ValueInteger");
+                    b.Property<int?>("ValueInteger");
 
                     b.Property<string>("ValueReference");
 

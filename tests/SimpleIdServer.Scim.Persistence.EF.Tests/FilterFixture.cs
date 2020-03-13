@@ -179,6 +179,35 @@ namespace SimpleIdServer.Scim.Persistence.EF.Tests
                                 }
                             }
                         }
+                    },
+                    new SCIMRepresentationAttributeModel
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        SchemaAttribute = new SCIMSchemaAttributeModel
+                        {
+                            Name  = "phoneNumbers",
+                            Type = SCIMSchemaAttributeTypes.COMPLEX
+                        },
+                        Children = new List<SCIMRepresentationAttributeModel>
+                        {
+                            new SCIMRepresentationAttributeModel
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                SchemaAttribute = new SCIMSchemaAttributeModel
+                                {
+                                    Name  = "primary",
+                                    Type = SCIMSchemaAttributeTypes.BOOLEAN
+                                },
+                                Values = new List<SCIMRepresentationAttributeValueModel>
+                                {
+                                    new SCIMRepresentationAttributeValueModel
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        ValueBoolean = true
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -345,6 +374,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Tests
             var fifteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "emails[type eq \"work\" and value co \"example.com\"] or ims[type eq \"xmpp\" and value co \"foo.com\"]");
             var sixteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\" and meta.version eq \"2\"");
             var seventeenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified pr");
+            var eighteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "phoneNumbers[primary eq \"true\"]");
 
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
@@ -363,6 +393,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Tests
             Assert.Equal(2, fifteenResult.Count());
             Assert.Equal(1, sixteenResult.Count());
             Assert.Equal(2, seventeenResult.Count());
+            Assert.Equal(1, eighteenResult.Count());
         }
 
         private IQueryable<SCIMRepresentationModel> ParseAndExecuteFilter(IQueryable<SCIMRepresentationModel> representations, string filter)
