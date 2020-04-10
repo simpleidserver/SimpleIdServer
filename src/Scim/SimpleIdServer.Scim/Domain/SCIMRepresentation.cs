@@ -41,6 +41,13 @@ namespace SimpleIdServer.Scim.Domain
             return Attributes.GetAttribute(splitted);
         }
 
+        public ICollection<SCIMRepresentationAttribute> GetAttributesByAttrSchemaId(string attrSchemaId)
+        {
+            var result = new List<SCIMRepresentationAttribute>();
+            Attributes.GetAttributesByAttrSchemaId(attrSchemaId, result);
+            return result;
+        }
+
         public SCIMRepresentationAttribute GetParentAttribute(string fullPath)
         {
             var splitted = fullPath.Split('.').ToList();

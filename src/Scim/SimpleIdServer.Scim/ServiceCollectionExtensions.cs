@@ -23,7 +23,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var builder = new SimpleIdServerSCIMBuilder(services);
             services.AddCommandHandlers()
-                .AddSCIMRepository();
+                .AddSCIMRepository()
+                .AddHelpers();
             return builder;
         }
 
@@ -62,6 +63,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<ISCIMRepresentationQueryRepository>(new DefaultSCIMRepresentationQueryRepository(representations));
             services.TryAddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));
             services.TryAddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemas));
+            services.TryAddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(SCIMConstants.StandardAttributeMapping));
+            return services;
+        }
+
+        private static IServiceCollection AddHelpers(this IServiceCollection services)
+        {
+            services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
             return services;
         }
     }

@@ -83,8 +83,14 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                     {
                         context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.GroupSchema.ToModel());
                         context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.UserSchema.ToModel());
-                        context.SaveChanges();
                     }
+
+                    if (!context.SCIMAttributeMappingLst.Any())
+                    {
+                        context.SCIMAttributeMappingLst.AddRange(SCIMConstants.StandardAttributeMapping.First().ToModel());
+                    }
+
+                    context.SaveChanges();
                 }
             }
         }

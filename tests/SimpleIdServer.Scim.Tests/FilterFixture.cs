@@ -98,6 +98,8 @@ namespace SimpleIdServer.Scim.Tests
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter)
         {
+            var p = SCIMFilterParser.Parse("members[(value eq \"06259893-b0ae-4f76-bb1f-fe684843cfbd\" or value eq \"7a2148ba-9427-4d5d-8ae2-8aa4c4a14ce3\") or value eq \"7a2148ba-9427-4d5d-8ae2-8aa4c4a14ce3\"]", new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema });
+
             var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema });
             var evaluatedExpression = parsed.Evaluate(representations);
             return (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(representations);

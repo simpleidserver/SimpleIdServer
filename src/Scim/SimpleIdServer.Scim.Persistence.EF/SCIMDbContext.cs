@@ -14,6 +14,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         }
 
+        public DbSet<SCIMAttributeMappingModel> SCIMAttributeMappingLst { get; set; }
         public DbSet<SCIMSchemaModel> SCIMSchemaLst { get; set; } 
         public DbSet<SCIMRepresentationModel> SCIMRepresentationLst { get; set; }
         public DbSet<SCIMRepresentationAttributeModel> SCIMRepresentationAttributeLst { get; set; }
@@ -78,6 +79,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .HasMany(r => r.Values)
                 .WithOne(r => r.RepresentationAttribute)
                 .HasForeignKey(r => r.SCIMRepresentationAttributeId);
+            modelBuilder.Entity<SCIMAttributeMappingModel>()
+                .HasKey(r => r.Id);
         }
     }
 }

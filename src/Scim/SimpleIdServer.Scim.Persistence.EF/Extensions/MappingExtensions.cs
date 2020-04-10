@@ -79,6 +79,18 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             return result;
         }
 
+        public static SCIMAttributeMappingModel ToModel(this SCIMAttributeMapping attributeMapping)
+        {
+            return new SCIMAttributeMappingModel
+            {
+                Id = attributeMapping.Id,
+                SourceAttributeSelector = attributeMapping.SourceAttributeSelector,
+                SourceResourceType = attributeMapping.SourceResourceType,
+                TargetAttributeId = attributeMapping.TargetAttributeId,
+                TargetResourceType = attributeMapping.TargetResourceType
+            };
+        }
+
         public static SCIMSchemaAttributeModel ToModel(this SCIMSchemaAttribute schemaAttribute, string schemaId)
         {
             var result = new SCIMSchemaAttributeModel
@@ -110,6 +122,18 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             }
 
             return result;
+        }
+
+        public static SCIMAttributeMapping ToDomain(this SCIMAttributeMappingModel attribute)
+        {
+            return new SCIMAttributeMapping
+            {
+                Id = attribute.Id,
+                SourceAttributeSelector = attribute.SourceAttributeSelector,
+                SourceResourceType = attribute.SourceResourceType,
+                TargetAttributeId = attribute.TargetAttributeId,
+                TargetResourceType = attribute.TargetResourceType
+            };
         }
 
 

@@ -35,7 +35,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = record["Value"];
+                var value = Parse(record["Value"]);
                 try
                 {
                     jObj.Add(key, JToken.Parse(value));

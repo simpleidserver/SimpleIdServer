@@ -25,5 +25,11 @@ namespace SimpleIdServer.Scim
             _serviceCollection.AddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemas));
             return this;
         }
+
+        public SimpleIdServerSCIMBuilder AddAttributeMapping(List<SCIMAttributeMapping> attributeMappingLst)
+        {
+            _serviceCollection.AddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(attributeMappingLst));
+            return this;
+        }
     }
 }

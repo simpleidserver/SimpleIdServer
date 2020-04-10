@@ -31,10 +31,11 @@ namespace SimpleIdServer.Scim.Api
         private readonly IPatchRepresentationCommandHandler _patchRepresentationCommandHandler;
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
+        private readonly IAttributeReferenceEnricher _attributeReferenceEnricher;
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
 
-        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IOptionsMonitor<SCIMHostOptions> options, ILogger logger)
+        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger)
         {
             _resourceType = resourceType;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
@@ -43,6 +44,7 @@ namespace SimpleIdServer.Scim.Api
             _patchRepresentationCommandHandler = patchRepresentationCommandHandler;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
+            _attributeReferenceEnricher = attributeReferenceEnricher;
             _options = options.CurrentValue;
             _logger = logger;
         }
@@ -73,10 +75,13 @@ namespace SimpleIdServer.Scim.Api
                     { SCIMConstants.StandardSCIMRepresentationAttributes.StartIndex, searchRequest.StartIndex }
                 };
                 var resources = new JArray();
-                foreach(var record in result.Content)
+                var baseUrl = Request.GetAbsoluteUriWithVirtualPath();
+                var representations = result.Content.ToList();
+                await _attributeReferenceEnricher.Enrich(_resourceType, representations, baseUrl);
+                foreach (var record in representations)
                 {
                     JObject newJObj = null;
-                    var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{_resourceType}/{record.Id}";
+                    var location = $"{baseUrl}/{_resourceType}/{record.Id}";
                     if (searchRequest.Attributes.Any())
                     {
                         newJObj = record.ToResponseWithIncludedAttributes(searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, schemas)).ToList());
@@ -208,6 +213,7 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
             }
 
+            await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, Request.GetAbsoluteUriWithVirtualPath());
             return BuildHTTPResult(representation, HttpStatusCode.OK, true);
         }
 

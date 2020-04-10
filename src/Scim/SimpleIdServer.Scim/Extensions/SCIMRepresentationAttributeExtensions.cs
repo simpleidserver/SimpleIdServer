@@ -29,5 +29,22 @@ namespace SimpleIdServer.Scim.Extensions
 
             return attr.Values.GetAttribute(lst);
         }
+
+        public static void GetAttributesByAttrSchemaId(this ICollection<SCIMRepresentationAttribute> attributes, string attrSchemaId, ICollection<SCIMRepresentationAttribute> result)
+        {
+            if (!attributes.Any())
+            {
+                return;
+            }
+
+            var attr = attributes.FirstOrDefault(a => a.SchemaAttribute.Id == attrSchemaId);
+            if (attr != null)
+            {
+                result.Add(attr);
+            }
+
+            var subAttributes = attributes.SelectMany(a => a.Values).ToList();
+            subAttributes.GetAttributesByAttrSchemaId(attrSchemaId, result);
+        }
     }
 }

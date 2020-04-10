@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISCIMRepresentationQueryRepository, EFSCIMRepresentationQueryRepository>();
             services.AddTransient<ISCIMSchemaQueryRepository, EFSCIMSchemaQueryRepository>();
             services.AddTransient<ISCIMSchemaCommandRepository, EFSCIMSchemaCommandRepository>();
+            services.AddTransient<ISCIMAttributeMappingQueryRepository, EFSCIMAttributeMappingQueryRepository>();
             services.AddDbContext<SCIMDbContext>(optionsAction);
             return services;
         }

@@ -2,6 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim
 {
@@ -95,6 +98,18 @@ namespace SimpleIdServer.Scim
             public const string Schemas = "Schemas";
             public const string ResourceTypes = "ResourceTypes";
         }
+
+        public static List<SCIMAttributeMapping> StandardAttributeMapping = new List<SCIMAttributeMapping>
+        {
+            new SCIMAttributeMapping
+            {
+                Id = Guid.NewGuid().ToString(),
+                SourceResourceType = StandardSchemas.UserSchema.ResourceType,
+                SourceAttributeSelector = "groups",
+                TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
+                TargetAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+            }
+        };
 
         public static class StandardSchemas
         {
