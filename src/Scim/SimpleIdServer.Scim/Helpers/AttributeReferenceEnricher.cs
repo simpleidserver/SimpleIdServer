@@ -28,7 +28,6 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             var ids = representationLst.Select(r => r.Id);
-            var schemas = representationLst.First().Schemas;
             foreach (var attributeMapping in attributeMappingLst)
             {
                 var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttributes(attributeMapping.TargetAttributeId, ids, attributeMapping.TargetResourceType);
