@@ -265,14 +265,10 @@ namespace SimpleIdServer.Scim.Extensions
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
-            var propertyValuesString = Expression.Property(representationAttrExpr, "QueryableValuesString");
-            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "QueryableValuesBoolean");
-            var propertyValuesInt = Expression.Property(representationAttrExpr, "QueryableValuesInt");
-            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "QueryableValuesDateTime");
-            var attrInteger = Expression.Parameter(typeof(int), "prop");
-            var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
-            var attrString = Expression.Parameter(typeof(string), "prop");
-            var attrBoolean = Expression.Parameter(typeof(bool), "prop");
+            var propertyValuesString = Expression.Property(representationAttrExpr, "ValuesString");
+            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
+            var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
+            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
             var countIntegerExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(int) }, propertyValuesInt);
             var countStringExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(string) }, propertyValuesString);
             var countDateTimeExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(DateTime) }, propertyValuesDateTime);
@@ -393,10 +389,10 @@ namespace SimpleIdServer.Scim.Extensions
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
-            var propertyValuesString = Expression.Property(representationAttrExpr, "QueryableValuesString");
-            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "QueryableValuesBoolean");
-            var propertyValuesInt = Expression.Property(representationAttrExpr, "QueryableValuesInt");
-            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "QueryableValuesDateTime");
+            var propertyValuesString = Expression.Property(representationAttrExpr, "ValuesString");
+            var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
+            var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
+            var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
             var attrInteger = Expression.Parameter(typeof(int), "prop");
             var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
             var attrString = Expression.Parameter(typeof(string), "prop");
@@ -450,11 +446,10 @@ namespace SimpleIdServer.Scim.Extensions
                     break;
             }
 
-            var allInteger = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(int)), propertyValuesInt, anyIntegerLambda);
-            var allDateTime = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(DateTime)), propertyValuesDateTime, anyDateTimeLambda);
-            var allString = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(string)), propertyValuesString, anyStringLambda);
-            var allBoolean = Expression.Call(typeof(Queryable).GetMethods().First(m2 => m2.Name == "All").MakeGenericMethod(typeof(bool)), propertyValuesBoolean, anyBooleanLambda);
-            
+            var allInteger = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(int)), propertyValuesInt, anyIntegerLambda);
+            var allDateTime = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(DateTime)), propertyValuesDateTime, anyDateTimeLambda);
+            var allString = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyStringLambda);
+            var allBoolean = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(bool)), propertyValuesBoolean, anyBooleanLambda);
             equalValue = Expression.Or(
                 Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.INTEGER)), allInteger),
                 Expression.Or(
@@ -465,7 +460,6 @@ namespace SimpleIdServer.Scim.Extensions
                     )
                 )
             );
-
             return equalValue;
         }
 

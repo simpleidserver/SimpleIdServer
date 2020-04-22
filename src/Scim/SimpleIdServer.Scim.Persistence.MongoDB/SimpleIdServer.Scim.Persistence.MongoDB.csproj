@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>MongoDB persistence layer for SCIM2.0.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+	<PackageReference Include="MongoDB.Driver" Version="2.10.3" />
+  </ItemGroup>
+</Project>
