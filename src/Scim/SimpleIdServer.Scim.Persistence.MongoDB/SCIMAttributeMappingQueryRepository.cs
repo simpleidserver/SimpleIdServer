@@ -14,10 +14,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     {
         private readonly IMongoDatabase _database;
 
-        public SCIMAttributeMappingQueryRepository(IOptions<MongoDbOptions> options)
+        public SCIMAttributeMappingQueryRepository(IMongoDatabase database)
         {
-            var client = new MongoClient(options.Value.ConnectionString);
-            _database = client.GetDatabase(options.Value.Database);
+            _database = database;
         }
 
         public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)

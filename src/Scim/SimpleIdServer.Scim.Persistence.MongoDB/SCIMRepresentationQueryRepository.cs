@@ -15,10 +15,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     {
         private readonly IMongoDatabase _database;
 
-        public SCIMRepresentationQueryRepository(IOptions<MongoDbOptions> options)
+        public SCIMRepresentationQueryRepository(IMongoDatabase database)
         {
-            var client = new MongoClient(options.Value.ConnectionString);
-            _database = client.GetDatabase(options.Value.Database);
+            _database = database;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)

@@ -11,10 +11,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     {
         private readonly IMongoDatabase _database;
 
-        public SCIMRepresentationCommandRepository(IOptions<MongoDbOptions> options)
+        public SCIMRepresentationCommandRepository(IMongoDatabase database)
         {
-            var client = new MongoClient(options.Value.ConnectionString);
-            _database = client.GetDatabase(options.Value.Database);
+            _database = database;
         }
 
         public bool Add(SCIMRepresentation data)

@@ -14,10 +14,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     {
         private readonly IMongoDatabase _database;
 
-        public SCIMSchemaQueryRepository(IOptions<MongoDbOptions> options)
+        public SCIMSchemaQueryRepository(IMongoDatabase database)
         {
-            var client = new MongoClient(options.Value.ConnectionString);
-            _database = client.GetDatabase(options.Value.Database);
+            _database = database;
         }
 
         public Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
