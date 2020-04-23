@@ -13,17 +13,16 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
     public class SCIMRepresentationQueryRepository : ISCIMRepresentationQueryRepository
     {
-        private readonly IMongoDatabase _database;
+        private readonly SCIMDbContext _scimDbContext;
 
-        public SCIMRepresentationQueryRepository(IOptions<MongoDbOptions> options)
+        public SCIMRepresentationQueryRepository(SCIMDbContext scimDbContext)
         {
-            var client = new MongoClient(options.Value.ConnectionString);
-            _database = client.GetDatabase(options.Value.Database);
+            _scimDbContext = scimDbContext;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {            
-            var collection = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var collection = _scimDbContext.SCIMRepresentationLst;
             var record = await collection.AsQueryable()
                 .Where(r => (endpoint == null || endpoint == r.ResourceType)
                     && r.Attributes.Any(a => (a.SchemaAttribute.Id == schemaAttributeId && a.ValuesString.Contains(value))
@@ -42,7 +41,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
-            var collection = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var collection = _scimDbContext.SCIMRepresentationLst;
             var record = await collection.AsQueryable()
                 .Where(r => (endpoint == null || endpoint == r.ResourceType) 
                     && r.Attributes.Any(a => (a.SchemaAttribute.Id == schemaAttributeId && a.ValuesInteger.Contains(value))
@@ -61,7 +60,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string schemaAttributeId, IEnumerable<string> values, string endpoint = null)
         {
-            var collection = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var collection = _scimDbContext.SCIMRepresentationLst;
             var records = await collection.AsQueryable()
                 .Where(r => (endpoint == null || endpoint == r.ResourceType) 
                     && r.Attributes.Any(a => (a.SchemaAttribute.Id == schemaAttributeId && a.ValuesString.Any(v => values.Contains(v)))
@@ -75,19 +74,19 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
         {
-            var collection = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var collection = _scimDbContext.SCIMRepresentationLst;
             return collection.AsQueryable().Where(a => a.Id == representationId).ToMongoFirstAsync();
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
         {
-            var collection = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var collection = _scimDbContext.SCIMRepresentationLst;
             return collection.AsQueryable().Where(a => a.Id == representationId && a.ResourceType == resourceType).ToMongoFirstAsync();
         }
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            var collection = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var collection = _scimDbContext.SCIMRepresentationLst;
             var queryableRepresentations = collection.AsQueryable().Where(s => s.ResourceType == parameter.ResourceType);
             if (parameter.Filter != null)
             {

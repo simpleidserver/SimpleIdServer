@@ -9,24 +9,23 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
     public class SCIMRepresentationCommandRepository : ISCIMRepresentationCommandRepository
     {
-        private readonly IMongoDatabase _database;
+        private readonly SCIMDbContext _scimDbContext;
 
-        public SCIMRepresentationCommandRepository(IOptions<MongoDbOptions> options)
+        public SCIMRepresentationCommandRepository(SCIMDbContext scimDbContext)
         {
-            var client = new MongoClient(options.Value.ConnectionString);
-            _database = client.GetDatabase(options.Value.Database);
+            _scimDbContext = scimDbContext;
         }
 
         public bool Add(SCIMRepresentation data)
         {            
-            var representations = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var representations = _scimDbContext.SCIMRepresentationLst;
             representations.InsertOne(data);
             return true;
         }
 
         public bool Delete(SCIMRepresentation data)
         {
-            var representations = _database.GetCollection<SCIMRepresentation>(Constants.CollectionNames.Representations);
+            var representations = _scimDbContext.SCIMRepresentationLst;
             var deleteFilter = Builders<SCIMRepresentation>.Filter.Eq("_id", data.Id);
             representations.DeleteOne(deleteFilter);
             return true;
