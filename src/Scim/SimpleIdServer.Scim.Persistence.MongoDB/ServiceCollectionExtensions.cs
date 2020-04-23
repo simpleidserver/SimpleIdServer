@@ -27,9 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 				services.AddSingleton<IMongoClient>(_ => new MongoClient(options.ConnectionString));
 				services.AddSingleton(provider => provider.GetService<IMongoClient>().GetDatabase(options.Database));
-
 				services.AddSingleton<SCIMDbContext>();
-
 				MongoDbClientExtensions.EnsureMongoDbSCIMDatabaseIsCreated(options, initialSchemas, initialAttributeMapping);
 			}
 

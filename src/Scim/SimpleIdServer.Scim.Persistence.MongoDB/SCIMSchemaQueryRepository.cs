@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
@@ -20,38 +19,49 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _scimDbContext = scimDbContext;
         }
 
-        public Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
+        public async Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
         {
             var collection = _scimDbContext.SCIMSchemaLst;
-            return collection.AsQueryable().Where(s => s.Id == schemaId).ToMongoFirstAsync();
+            var result = await collection.AsQueryable().Where(s => s.Id == schemaId).ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result.ToDomain();
         }
 
         public async Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers)
         {
             var collection = _scimDbContext.SCIMSchemaLst;
             var result = await collection.AsQueryable().Where(s => schemaIdentifiers.Contains(s.Id)).ToMongoListAsync();
-            return result;
-
+            return result.Select(_ => _.ToDomain());
         }
 
-        public Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
+        public async Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
         {
             var collection = _scimDbContext.SCIMSchemaLst;
-            return collection.AsQueryable().Where(s => s.ResourceType == resourceType).ToMongoFirstAsync();
+            var result = await collection.AsQueryable().Where(s => s.ResourceType == resourceType).ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result.ToDomain();
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAll()
         {
             var collection = _scimDbContext.SCIMSchemaLst;
             var result = await collection.AsQueryable().ToMongoListAsync();
-            return result;
+            return result.Select(_ => _.ToDomain());
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAllRoot()
         {
             var collection = _scimDbContext.SCIMSchemaLst;
             var result = await collection.AsQueryable().Where(s => s.IsRootSchema).ToMongoListAsync();
-            return result;
+            return result.Select(_ => _.ToDomain());
         }
     }
 }

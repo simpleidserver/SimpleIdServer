@@ -36,8 +36,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
             existingRepresentation.ApplyPatches(patches);
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            _scimRepresentationCommandRepository.Update(existingRepresentation);
-            await _scimRepresentationCommandRepository.SaveChanges();
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            {
+                await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                await transaction.Commit();
+            }
+
             return existingRepresentation;
         }
 

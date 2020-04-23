@@ -33,7 +33,7 @@ namespace SimpleIdServer.Scim.Helpers
                 var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttributes(attributeMapping.TargetAttributeId, ids, attributeMapping.TargetResourceType);
                 foreach(var representation in representationLst)
                 {
-                    var filteredRepresentations = targetRepresentations.Where(a => a.GetAttributesByAttrSchemaId(attributeMapping.TargetAttributeId).Any(attr => attr.ValuesString.Contains(representation.Id)));
+                    var filteredRepresentations = targetRepresentations.Where(_ => _.GetAttributesByAttrSchemaId(attributeMapping.TargetAttributeId).Any(attr => attr.ValuesString.Contains(representation.Id)));
                     if (!filteredRepresentations.Any())
                     {
                         continue;

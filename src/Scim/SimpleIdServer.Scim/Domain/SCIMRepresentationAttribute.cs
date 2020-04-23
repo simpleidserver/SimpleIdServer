@@ -35,10 +35,6 @@ namespace SimpleIdServer.Scim.Domain
         }
 
         public string Id { get; set; }
-        public IQueryable<string> QueryableValuesString { get => ValuesString.AsQueryable(); }
-        public IQueryable<int> QueryableValuesInt { get => ValuesInteger.AsQueryable(); }
-        public IQueryable<bool> QueryableValuesBoolean { get => ValuesBoolean.AsQueryable(); }
-        public IQueryable<DateTime> QueryableValuesDateTime { get => ValuesDateTime.AsQueryable(); }
         public ICollection<string> ValuesString { get; set; }
         public ICollection<bool> ValuesBoolean { get; set; }
         public ICollection<int> ValuesInteger { get; set; }

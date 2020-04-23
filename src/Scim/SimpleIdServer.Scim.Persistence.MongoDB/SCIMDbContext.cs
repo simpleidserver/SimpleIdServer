@@ -1,35 +1,33 @@
-﻿using Microsoft.Extensions.Options;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
-	public class SCIMDbContext : IDisposable
+    public class SCIMDbContext : IDisposable
 	{
-		private readonly IMongoDatabase _database;
 		private readonly MongoDbOptions _options;
 
 		public SCIMDbContext(IMongoDatabase database, IOptions<MongoDbOptions> options)
 		{
-			_database = database;
+            Database = database;
 			_options = options.Value;
 		}
 
-		public IMongoCollection<SCIMSchema> SCIMSchemaLst =>
-			_database.GetCollection<SCIMSchema>(_options.CollectionSchemas);
+        internal IMongoDatabase Database { get; private set; }
 
-		public IMongoCollection<SCIMRepresentation> SCIMRepresentationLst =>
-			_database.GetCollection<SCIMRepresentation>(_options.CollectionRepresentations);
+        public IMongoCollection<SCIMRepresentationModel> SCIMRepresentationLst =>
+            Database.GetCollection<SCIMRepresentationModel>(_options.CollectionRepresentations);
+
+		public IMongoCollection<SCIMSchemaModel> SCIMSchemaLst =>
+            Database.GetCollection<SCIMSchemaModel>(_options.CollectionSchemas);
 		
-		public IMongoCollection<SCIMAttributeMapping> SCIMAttributeMappingLst =>
-			_database.GetCollection<SCIMAttributeMapping>(_options.CollectionMappings);
+		public IMongoCollection<SCIMAttributeMappingModel> SCIMAttributeMappingLst =>
+            Database.GetCollection<SCIMAttributeMappingModel>(_options.CollectionMappings);
 
-		public void Dispose()
-		{
-			//this.Dispose();
-		}
+		public void Dispose() { }
 	}
 }

@@ -27,8 +27,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             }
 
-            _scimRepresentationCommandRepository.Delete(representation);
-            await _scimRepresentationCommandRepository.SaveChanges();
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            {
+                await _scimRepresentationCommandRepository.Delete(representation);
+                await transaction.Commit();
+            }
+
             return true;
         }
     }

@@ -3,12 +3,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.InMemory
 {
     public class InMemoryCommandRepository<T> : ICommandRepository<T> where T : ICloneable
     {
+        private class DefaultTransaction : ITransaction
+        {
+            public Task Commit(CancellationToken token)
+            {
+                return Task.CompletedTask;
+            }
+
+            public void Dispose()
+            {
+            }
+        }
+
         private readonly List<T> _lstData;
 
         public InMemoryCommandRepository(List<T> lstData)
@@ -16,33 +29,30 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _lstData = lstData;
         }
 
-        public bool Add(T data)
+        public Task<ITransaction> StartTransaction(CancellationToken token)
         {
-            _lstData.Add((T)data.Clone());
-            return true;
+            ITransaction result = new DefaultTransaction();
+            return Task.FromResult(result);
         }
 
-        public bool Update(T data)
+        public Task<bool> Add(T data, CancellationToken token)
+        {
+            _lstData.Add((T)data.Clone());
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> Update(T data, CancellationToken token)
         {
             var record = _lstData.First(l => l.Equals(data));
             _lstData.Remove(record);
             _lstData.Add((T)record.Clone());
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool Delete(T data)
+        public Task<bool> Delete(T data, CancellationToken token)
         {
             _lstData.Remove(_lstData.First(l => l.Equals(data)));
-            return true;
-        }
-
-        public Task<int> SaveChanges()
-        {
-            return Task.FromResult(1);
-        }
-
-        public void Dispose()
-        {
+            return Task.FromResult(true);
         }
     }
 }

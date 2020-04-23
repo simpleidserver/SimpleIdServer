@@ -6,6 +6,7 @@ using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using SimpleIdServer.Scim.Persistence.EF.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.EF
@@ -19,7 +20,13 @@ namespace SimpleIdServer.Scim.Persistence.EF
             _scimDbContext = scimDbContext;
         }
 
-        public bool Add(SCIMRepresentation data)
+        public async Task<ITransaction> StartTransaction(CancellationToken token)
+        {
+            var transaction = await _scimDbContext.Database.BeginTransactionAsync(token);
+            return new EFTransaction(_scimDbContext, transaction);
+        }
+
+        public Task<bool> Add(SCIMRepresentation data, CancellationToken token)
         {
             var record = new SCIMRepresentationModel
             {
@@ -37,10 +44,10 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 }).ToList()
             };
             _scimDbContext.SCIMRepresentationLst.Add(record);
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool Delete(SCIMRepresentation data)
+        public Task<bool> Delete(SCIMRepresentation data, CancellationToken token)
         {
             var result = _scimDbContext.SCIMRepresentationLst
                 .Include(s => s.Attributes).ThenInclude(s => s.Values)
@@ -54,7 +61,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .FirstOrDefault(r => r.Id == data.Id);
             if (result == null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             var attrs = new List<SCIMRepresentationAttributeModel>();
@@ -67,23 +74,18 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
             _scimDbContext.SCIMRepresentationSchemaLst.RemoveRange(result.Schemas);
             _scimDbContext.SCIMRepresentationLst.Remove(result);
-            return true;
+            return Task.FromResult(false);
         }
 
-        public bool Update(SCIMRepresentation data)
+        public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
-            if (!Delete(data))
+            if (!await Delete(data, token))
             {
                 return false;
             }
 
-            Add(data);
+            await Add(data, token);
             return true;
-        }
-
-        public Task<int> SaveChanges()
-        {
-            return _scimDbContext.SaveChangesAsync();
         }
 
         private static void GetAllAttributes(ICollection<SCIMRepresentationAttributeModel> attrs, List<SCIMRepresentationAttributeModel> result)
@@ -97,7 +99,5 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 }
             }
         }
-
-        public void Dispose() { }
     }
 }

@@ -1,15 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 {
-	public static class MongoDbClientExtensions
+    public static class MongoDbClientExtensions
 	{
 		public static void EnsureMongoDbSCIMDatabaseIsCreated(
 			MongoDbOptions options,
@@ -19,23 +19,23 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 		{
 			var mongoClient = new MongoClient(options.ConnectionString);
 			var db = mongoClient.GetDatabase(options.Database);
-			var schemasCollection = EnsureCollectionIsCreated<SCIMSchema>(db, options.CollectionSchemas);
-			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);
-			EnsureCollectionIsCreated<SCIMRepresentation>(db, options.CollectionRepresentations);
+			var schemasCollection = EnsureCollectionIsCreated<SCIMSchemaModel>(db, options.CollectionSchemas);
+			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMappingModel>(db, options.CollectionMappings);
+			EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
 			var query = schemasCollection.AsQueryable();
 			if (query.Count() == 0)
 			{
 				if (initialSchemas != null)
 				{
-					schemasCollection.InsertMany(initialSchemas);
+					schemasCollection.InsertMany(initialSchemas.Select(_ => _.ToModel()));
 				}
 				else
 				{
-					var schemas = new List<SCIMSchema>
+					var schemas = new List<SCIMSchemaModel>
 					{
-						SCIMConstants.StandardSchemas.GroupSchema,
-						SCIMConstants.StandardSchemas.UserSchema
-					};
+						SCIMConstants.StandardSchemas.GroupSchema.ToModel(),
+						SCIMConstants.StandardSchemas.UserSchema.ToModel()
+                    };
 					schemasCollection.InsertMany(schemas);
 				}
 			}
@@ -43,10 +43,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 			if (mappingsCollection.AsQueryable().Count() == 0)
 			{
 				if (initialAttributeMapping != null)
-					mappingsCollection.InsertOne(initialAttributeMapping.First());
+					mappingsCollection.InsertMany(initialAttributeMapping.Select(_ => _.ToModel()));
 				else
-					mappingsCollection.InsertOne(SCIMConstants.StandardAttributeMapping.First());
-			}
+					mappingsCollection.InsertMany(SCIMConstants.StandardAttributeMapping.Select(_ => _.ToModel()));
+            }
 		}
 
 		private static IMongoCollection<T> EnsureCollectionIsCreated<T>(IMongoDatabase db, string name)
