@@ -22,6 +22,10 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
         private const string CONNECTION_STRING = "mongodb://localhost:27017";
         private const string DATABASE_NAME = "scim";
 
+        public const string REPRESENTATIONS = "representations";
+        public const string SCHEMAS = "schemas";
+        public const string MAPPINGS = "mappings";
+
         public Startup(IConfiguration configuration) 
         {
             Configuration = configuration;
@@ -61,21 +65,19 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
             {
                 opt.ConnectionString = CONNECTION_STRING;
                 opt.Database = DATABASE_NAME;
+
+                opt.CollectionMappings = MAPPINGS;
+                opt.CollectionRepresentations = REPRESENTATIONS;
+                opt.CollectionSchemas = SCHEMAS;
             });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            InitializeDatabase(app);
             loggerFactory.AddConsole(LogLevel.Trace);
             app.UseAuthentication();
             app.UseMvc();
         }
 
-        private void InitializeDatabase(IApplicationBuilder app)
-        {
-            var mongoClient = new MongoClient(CONNECTION_STRING);
-            mongoClient.EnsureMongoDbSCIMDatabaseIsCreated(DATABASE_NAME);
-        }
     }
 }

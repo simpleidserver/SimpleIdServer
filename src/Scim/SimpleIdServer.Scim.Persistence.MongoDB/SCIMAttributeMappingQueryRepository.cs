@@ -12,16 +12,17 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
     public class SCIMAttributeMappingQueryRepository : ISCIMAttributeMappingQueryRepository
     {
-        private readonly IMongoDatabase _database;
+        
+        private readonly SCIMDbContext _scimDbContext;
 
-        public SCIMAttributeMappingQueryRepository(IMongoDatabase database)
+        public SCIMAttributeMappingQueryRepository(SCIMDbContext scimDbContext)
         {
-            _database = database;
+            _scimDbContext = scimDbContext;
         }
 
         public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
         {
-            var attributeMappings = _database.GetCollection<SCIMAttributeMapping>(Constants.CollectionNames.Mappings);
+            var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
             var result = await attributeMappings.AsQueryable().Where(a => a.SourceResourceType == sourceResourceType).ToMongoListAsync();
             return result;
         }
