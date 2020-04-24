@@ -30,17 +30,17 @@ namespace SimpleIdServer.Scim.Extensions
             return attr.Values.GetAttribute(lst);
         }
 
-        public static void GetAttributesByAttrSchemaId(this ICollection<SCIMRepresentationAttribute> attributes, string attrSchemaId, ICollection<SCIMRepresentationAttribute> result)
+        public static void GetAttributesByAttrSchemaId(this ICollection<SCIMRepresentationAttribute> attributes, string attrSchemaId, List<SCIMRepresentationAttribute> result)
         {
             if (!attributes.Any())
             {
                 return;
             }
 
-            var attr = attributes.Where(a => a.SchemaAttribute.Id == attrSchemaId).ToList();
-            if (attr != null)
+            var filteredAttributes = attributes.Where(a => a.SchemaAttribute.Id == attrSchemaId).ToList();
+            if (filteredAttributes.Any())
             {
-                attr.AddRange(attr);
+                result.AddRange(filteredAttributes);
             }
 
             var subAttributes = attributes.SelectMany(a => a.Values).ToList();
