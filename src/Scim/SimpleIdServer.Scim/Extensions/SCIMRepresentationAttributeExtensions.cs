@@ -37,10 +37,10 @@ namespace SimpleIdServer.Scim.Extensions
                 return;
             }
 
-            var attr = attributes.FirstOrDefault(a => a.SchemaAttribute.Id == attrSchemaId);
+            var attr = attributes.Where(a => a.SchemaAttribute.Id == attrSchemaId).ToList();
             if (attr != null)
             {
-                result.Add(attr);
+                attr.AddRange(attr);
             }
 
             var subAttributes = attributes.SelectMany(a => a.Values).ToList();
