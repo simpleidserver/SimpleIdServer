@@ -27,7 +27,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
+                opts.AddPolicy("ManageClients", p => p.RequireAssertion(b => true));
+            });
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCustomAuthentication(opts =>
                 {

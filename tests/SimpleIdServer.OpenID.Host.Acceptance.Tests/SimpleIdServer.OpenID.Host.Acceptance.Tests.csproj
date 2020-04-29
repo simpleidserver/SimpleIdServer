@@ -40,7 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\OpenID\SimpleIdServer.OpenID.Client\SimpleIdServer.OpenID.Client.csproj" />
     <ProjectReference Include="..\..\src\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj" />
   </ItemGroup>
 

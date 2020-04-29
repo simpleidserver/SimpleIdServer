@@ -19,6 +19,14 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     "scim_id"
                 }
+            },
+            new OpenIdScope
+            {
+                Name = "role",
+                Claims = new List<string>
+                {
+                    "role"
+                }
             }
         };
 
@@ -47,6 +55,23 @@ namespace SimpleIdServer.OpenID.Startup
 
         public static List<OAuthUser> Users => new List<OAuthUser>
         {
+            new OAuthUser
+            {
+                Id = "administrator",
+                Credentials = new List<OAuthUserCredential>
+                {
+                    new OAuthUserCredential
+                    {
+                        CredentialType = "pwd",
+                        Value = PasswordHelper.ComputeHash("password")
+                    }
+                },
+                Claims = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new KeyValuePair<string, string>("role", "administrator")
+                }
+            },
             new OAuthUser
             {
                 Id = "scimUser",
@@ -163,6 +188,43 @@ namespace SimpleIdServer.OpenID.Startup
                     "token",
                     "id_token",
                     "code"
+                }
+            },
+            new OpenIdClient
+            {
+                ClientId = "simpleIdServerWebsite",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("simpleIdServerWebsiteSecret"))
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                    SIDOpenIdConstants.StandardScopes.Profile,
+                    SIDOpenIdConstants.StandardScopes.Email,
+                    SIDOpenIdConstants.StandardScopes.Role
+                },
+                GrantTypes = new List<string>
+                {
+                    "implicit"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "http://localhost:4200"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "token",
+                    "id_token"
                 }
             },
             new OpenIdClient

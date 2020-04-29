@@ -35,6 +35,11 @@ namespace SimpleIdServer.OAuth.Startup
             {
                 Name = "bulk_scim_resource",
                 IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "manage_clients",
+                IsExposedInConfigurationEdp = true
             }
         };
 
@@ -78,6 +83,36 @@ namespace SimpleIdServer.OAuth.Startup
                     new OAuthScope
                     {
                         Name = "bulk_scim_resource"
+                    }
+                },
+                GrantTypes = new List<string>
+                {
+                    "client_credentials"
+                },
+                PreferredTokenProfile = "Bearer"
+            },
+            new OAuthClient
+            {
+                ClientId = "gatewayClient",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("gatewayClientPassword"))
+                },
+                ClientNames = new []
+                {
+                    new OAuthTranslation("gatewayClient_client_name", "SCIMClient", "fr")
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OAuthScope>
+                {
+                    new OAuthScope
+                    {
+                        Name = "manage_clients"
                     }
                 },
                 GrantTypes = new List<string>

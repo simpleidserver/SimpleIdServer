@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Startup Layer", "01. Startup Layer", "{EAED5652-7B9A-48CC-89CA-25C1003A56B6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Gateway.Host", "src\Website\SimpleIdServer.Gateway.Host\SimpleIdServer.Gateway.Host.csproj", "{8DEDBDC5-F862-4084-AC9B-C83E682C924D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DEDBDC5-F862-4084-AC9B-C83E682C924D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DEDBDC5-F862-4084-AC9B-C83E682C924D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DEDBDC5-F862-4084-AC9B-C83E682C924D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DEDBDC5-F862-4084-AC9B-C83E682C924D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8DEDBDC5-F862-4084-AC9B-C83E682C924D} = {EAED5652-7B9A-48CC-89CA-25C1003A56B6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A98E0DB8-B4FA-4F18-942B-7723C6FBD80E}
+	EndGlobalSection
+EndGlobal

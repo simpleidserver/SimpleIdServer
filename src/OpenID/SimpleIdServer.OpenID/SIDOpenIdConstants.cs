@@ -66,6 +66,14 @@ namespace SimpleIdServer.OpenID
                     Jwt.Constants.UserClaims.PhoneNumberVerified
                 }
             };
+            public static OpenIdScope Role = new OpenIdScope
+            {
+                Name = "role",
+                Claims = new List<string>
+                {
+                    Jwt.Constants.UserClaims.Role
+                }
+            };
             public static OpenIdScope OpenIdScope = new OpenIdScope
             {
                 Name = "openid",

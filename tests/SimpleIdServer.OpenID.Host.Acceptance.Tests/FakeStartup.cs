@@ -37,6 +37,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
             services.AddAuthorization(policy =>
             {
                 policy.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
+                policy.AddPolicy("ManageClients", p => p.RequireAssertion(_ => true));
             });
             ConfigureClient(services);
         }

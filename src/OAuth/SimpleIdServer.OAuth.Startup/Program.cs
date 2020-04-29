@@ -16,7 +16,7 @@ namespace SimpleIdServer.OAuth.Startup
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseUrls("http://*:60000")
+                .UseUrls("http://*:60002")
                 .UseStartup<Startup>()
                 .Build();
             host.Run();

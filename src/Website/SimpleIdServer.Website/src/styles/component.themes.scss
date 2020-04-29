@@ -1,0 +1,6 @@
+@mixin app-theme($theme) {
+}
+
+@mixin component-themes($theme) {
+    @include app-theme($theme);
+}

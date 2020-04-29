@@ -86,12 +86,12 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'http://localhost/.well-known/oauth-authorization-server" +
-                    "\'", ((string)(null)), table14, "When ");
+                    "\'", ((string)(null)), table15, "When ");
 #line 8
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

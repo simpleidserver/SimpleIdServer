@@ -2,10 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OAuth.Persistence.Parameters;
+using SimpleIdServer.OAuth.Persistence.Results;
 using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Persistence.InMemory
@@ -17,6 +20,11 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
         public DefaultOpenIdClientQueryRepository(List<OpenIdClient> clients)
         {
             _clients = clients;
+        }
+
+        public Task<SearchResult<OAuthClient>> Find(SearchClientParameter parameter, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<OAuthClient> FindOAuthClientById(string clientId)

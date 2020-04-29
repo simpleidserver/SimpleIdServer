@@ -25,6 +25,17 @@ namespace SimpleIdServer.OAuth.Extensions
 
     public static class JObjectExtensions
     {
+        public static IEnumerable<KeyValuePair<string, string>> ToEnumerable(this JObject jObj)
+        {
+            var result = new List<KeyValuePair<string, string>>();
+            foreach(JProperty record in jObj.Properties())
+            {
+                result.Add(new KeyValuePair<string, string>(record.Name, record.Value.ToString()));
+            }
+
+            return result;
+        }
+
         #region Authorization request
 
         public static string GetCodeChallengeFromAuthorizationRequest(this JObject jObj)

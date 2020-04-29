@@ -1,0 +1,45 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>{{ "OAUTH_CLIENTS" | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="mat-elevation-z8 overflow-hidden">
+            <mat-table class="full-width" [dataSource]="oauthClients$" matSortActive="create_datetime" matSortDirection="desc" matSort>
+                <ng-container matColumnDef="picture">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let client">
+                        <ngx-avatar class="center" *ngIf="client.LogoUris.length > 0" src="{{ client.LogoUris | translateenum }}"></ngx-avatar>
+                        <ngx-avatar class="center" *ngIf="client.LogoUris.length == 0" name="{{ client.ClientNames | translateenum }}"></ngx-avatar>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="client_id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ "CLIENT_ID" | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let client">{{client.ClientId}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="client_name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ "CLIENT_NAME" | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let client">{{ client.ClientNames | translateenum }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="create_datetime">
+                    <mat-header-cell mat-header-cell *matHeaderCellDef mat-sort-header>{{ "CREATE_DATETIME" | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let client">{{client.CreateDateTime | date:'fullDate'}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="update_datetime">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ "UPDATE_DATETIME" | translate }}</mat-header-cell>
+                    <mat-cell *matCellDef="let client">{{client.UpdateDateTime | date:'fullDate'}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let client">
+                        <button mat-icon-button>
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                    </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+            <mat-paginator [length]="length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+        </div>
+    </mat-card-content>
+</mat-card>

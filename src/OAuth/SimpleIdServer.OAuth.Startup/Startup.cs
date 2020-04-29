@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
@@ -20,11 +21,17 @@ namespace SimpleIdServer.OAuth.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
-            JsonWebKey sigJsonWebKey;
+            SimpleIdServer.Jwt.JsonWebKey sigJsonWebKey;
+            var json = File.ReadAllText("oauth_key.txt");
+            var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            var rsaParameters = new RSAParameters
+            {
+                Modulus = dic.TryGet(RSAFields.Modulus),
+                Exponent = dic.TryGet(RSAFields.Exponent)
+            };
+            var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             using (var rsa = RSA.Create())
             {
-                var json = File.ReadAllText("oauth_key.txt");
-                var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
                 rsa.Import(dic);
                 sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
                 {
@@ -35,14 +42,28 @@ namespace SimpleIdServer.OAuth.Startup
 
             services.AddMvc();
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie()
+                .AddJwtBearer(Constants.AuthenticationScheme, cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = "http://localhost:60002",
+                        ValidAudiences = new List<string>
+                        {
+                            "gatewayClient"
+                        },
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = oauthRsaSecurityKey
+                    };
+                });
             services.AddSIDOAuth(o =>
             {
                 o.ClientSecretExpirationInSeconds = 2;
             })
             .AddClients(DefaultConfiguration.Clients)
             .AddScopes(DefaultConfiguration.Scopes)
-            .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey });
+            .AddJsonWebKeys(new List<SimpleIdServer.Jwt.JsonWebKey> { sigJsonWebKey });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

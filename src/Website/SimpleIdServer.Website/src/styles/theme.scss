@@ -1,0 +1,10 @@
+$my-theme-primary: mat-palette($mat-deep-purple);
+$my-theme-accent: mat-palette($mat-amber, A200, A100, A400);
+$my-theme-warn: mat-palette($mat-deep-orange, A200);
+
+// create theme (use mat-dark-theme for themes with dark backgrounds)
+$my-theme: mat-light-theme(
+    $my-theme-primary,
+    $my-theme-accent,
+    $my-theme-warn
+);
