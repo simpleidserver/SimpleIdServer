@@ -1,4 +1,4 @@
-import { Translation } from "../../../common/translation";
+import { Translation } from "../../../../common/translation";
 
 export class OAuthClient {
     ClientId: string;

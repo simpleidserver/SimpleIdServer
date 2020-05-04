@@ -1,17 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
-import * as fromOAuthClientReducer from '../reducers/search.reducer';
 import { OnInit } from '@angular/core';
 import { merge } from 'rxjs';
-import { OAuthClient } from '../models/oauthclient.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { select, Store, createSelector } from '@ngrx/store';
-import { StartSearch } from '../actions/client.actions';
-import { SearchResult } from '../models/search.model';
-import * as fromReducers from '../reducers';
+import { StartSearch } from '../../../stores/clients/oauth/actions/client.actions';
+import { SearchResult } from '../../../stores/clients/oauth/models/search.model';
+import { OAuthClient } from '../../../stores/clients/oauth/models/oauthclient.model';
+import * as fromReducers from '../../../stores/appstate';
 
 @Component({
-    selector: 'list-oauth-clients-component',
+    selector: 'list-oauth-clients',
     templateUrl: './list.component.html'
 })
 export class ListOauthClientsComponent implements OnInit {
@@ -21,10 +20,10 @@ export class ListOauthClientsComponent implements OnInit {
     length: number;
     oauthClients$: Array<OAuthClient> = [];
 
-    constructor(private store : Store<fromReducers.OAuthClientState>) { }
+    constructor(private store : Store<fromReducers.AppState>) { }
 
     ngOnInit(): void {
-        this.store.pipe(select(fromReducers.selectSearchResults)).subscribe((state : SearchResult<OAuthClient>) => {
+        this.store.pipe(select(fromReducers.selectOAuthClientsResult)).subscribe((state : SearchResult<OAuthClient>) => {
             if (!state) {
                 return;
             }

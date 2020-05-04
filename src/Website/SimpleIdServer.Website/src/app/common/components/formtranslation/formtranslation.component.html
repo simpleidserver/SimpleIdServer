@@ -1,0 +1,31 @@
+<form (ngSubmit)="addTranslation(addTranslationForm.value)" [formGroup]="addTranslationForm" fxLayout="row" fxLayoutGap="10px">
+    <div fxFlex="40%">
+        <mat-form-field>
+            <mat-label>{{ "LANGUAGE" | translate }}</mat-label>            
+            <mat-select formControlName="language">
+                <mat-option value="fr">French</mat-option>
+                <mat-option value="fr">English</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div fxFlex="40%">
+        <mat-form-field>
+            <mat-label>{{ "VALUE" | translate }}</mat-label>
+            <input matInput formControlName="value">
+        </mat-form-field>
+    </div>
+    <div fxFlex="20%">
+        <button mat-icon-button>
+          <mat-icon>add</mat-icon>
+        </button>
+    </div>
+</form>
+<mat-list>
+    <mat-list-item *ngFor="let translation of translations; let index = index;">
+        <span>{{ translation.Value }} ({{ translation.Language }})</span>
+        <div class="spacer"></div>        
+        <button mat-icon-button (click)="delete(index)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </mat-list-item>
+</mat-list>

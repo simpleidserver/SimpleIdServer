@@ -3,7 +3,7 @@ import { OAuthClientService } from '../services/client.service';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { ActionTypes, StartSearch } from '../actions/client.actions';
+import { ActionTypes, StartSearch, StartGet } from '../actions/client.actions';
 
 @Injectable()
 export class OAuthClientEffects {
@@ -13,7 +13,7 @@ export class OAuthClientEffects {
     ) { }
 
     @Effect()
-    getOpenedPrescriptions$ = this.actions$
+    getOAuthClients$ = this.actions$
         .pipe(
             ofType(ActionTypes.START_SEARCH),
             mergeMap((evt : StartSearch) => {
@@ -25,4 +25,18 @@ export class OAuthClientEffects {
             }
             )
     );
+
+    @Effect()
+    getOAuthClient$ = this.actions$
+    .pipe(
+        ofType(ActionTypes.START_GET),
+        mergeMap((evt : StartGet) => {
+            return this.oauthClientService.get(evt.id)
+                .pipe(
+                    map(oauthClient => { return { type: ActionTypes.COMPLETE_GET, oauthClient: oauthClient }; }),
+                    catchError(() => of({ type: ActionTypes.ERROR_GET }))
+                );
+        }
+        )
+);
 }

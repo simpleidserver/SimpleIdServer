@@ -1,7 +1,7 @@
 {
   "ReRoutes": [
     {
-      "DownstreamPathTemplate": "/management/clients/{everything}",
+      "DownstreamPathTemplate": "/management/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -9,7 +9,7 @@
           "Port": 60002
         }
       ],
-      "UpstreamPathTemplate": "/oauthclients/{everything}",
+      "UpstreamPathTemplate": "/oauth/management/{everything}",
       "UpstreamHttpMethod": [ "POST", "GET" ],
       "DelegatingHandlers": [
         "ManageClientClientCredentialsHandler"
@@ -18,8 +18,7 @@
         "AuthenticationProviderKey": "Authenticated",
         "AllowedScopes": []
       }
-    }
-  ],
+  }],
   "ClientId": "gatewayClient",
   "ClientSecret": "gatewayClientPassword",
   "OAuthBaseUrl": "http://localhost:60002"

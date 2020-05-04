@@ -6,6 +6,6 @@ namespace SimpleIdServer.Gateway.Host.Handlers
 {
     public class ManageClientClientCredentialsHandler : BaseClientCredentialsHandler
     {
-        public ManageClientClientCredentialsHandler(IConfiguration configuration) : base(configuration, new[] { "manage_clients" }) { }
+        public ManageClientClientCredentialsHandler(IConfiguration configuration) : base(configuration, new[] { "manage_clients", "manage_scopes" }) { }
     }
 }

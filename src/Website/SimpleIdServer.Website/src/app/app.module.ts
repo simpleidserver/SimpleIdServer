@@ -13,6 +13,16 @@ import { HomeModule } from './home/home.module';
 import { MaterialModule } from './shared/material.module';
 import { SharedModule } from './shared/shared.module';
 import { environment } from '../environments/environment';
+import { StoreModule } from '@ngrx/store';
+import { oauthScopeReducer } from './stores/scopes/oauth/reducers/index';
+import { oauthClientReducer } from './stores/clients/oauth/reducers/index';
+import { OAuthClientEffects } from './stores/clients/oauth/effects/client.effects';
+import { OAuthScopeEffects } from './stores/scopes/oauth/effects/scope.effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { EffectsModule } from '@ngrx/effects';
+import { OAuthClientService } from './stores/clients/oauth/services/client.service';
+import { OAuthScopeService } from './stores/scopes/oauth/services/scope.service'; 
+import { appReducer } from './stores/appstate';
 
 export function createTranslateLoader(http: HttpClient) {
     let url = environment.baseUrl + 'assets/i18n/';
@@ -30,6 +40,11 @@ export function createTranslateLoader(http: HttpClient) {
         BrowserAnimationsModule,
         HttpClientModule,
         OAuthModule.forRoot(),
+        EffectsModule.forRoot( [ OAuthClientEffects, OAuthScopeEffects ] ),
+        StoreModule.forRoot(appReducer),
+        StoreDevtoolsModule.instrument({
+            maxAge: 10
+        }),
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
@@ -41,6 +56,7 @@ export function createTranslateLoader(http: HttpClient) {
     declarations: [
         AppComponent
     ],
+    providers: [ OAuthClientService, OAuthScopeService ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

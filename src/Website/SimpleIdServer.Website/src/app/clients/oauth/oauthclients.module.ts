@@ -1,17 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ListOauthClientsComponent } from './list/list.component';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { StoreModule } from '@ngrx/store';
-import * as fromReducers  from './reducers/index';
-import { OAuthClientEffects } from './effects/client.effects';
 import { OAuthClientRoutes } from './oauthclients.routes';
-import { OAuthClientService } from './services/client.service';
 import { MaterialModule } from '../../shared/material.module';
 import { SharedModule} from '../../shared/shared.module';
 import { TranslateEnumPipe } from '../../pipes/translateenum.pipe';
 import { AvatarModule } from 'ngx-avatar';
+import { FormTranslationComponent } from '../../common/components/formtranslation/formtranslation.component';
+import { ViewOauthClientsComponent } from './view/view.component';
 
 @NgModule({
     imports: [
@@ -19,16 +15,11 @@ import { AvatarModule } from 'ngx-avatar';
         OAuthClientRoutes,
         CommonModule,
         SharedModule,
-        MaterialModule,
-        EffectsModule.forRoot( [ OAuthClientEffects ] ),
-        StoreModule.forRoot(fromReducers.appReducer),
-        StoreDevtoolsModule.instrument({
-            maxAge: 10
-        })
+        MaterialModule
     ],
     entryComponents: [],
-    declarations: [ ListOauthClientsComponent, TranslateEnumPipe ],
-    providers: [ OAuthClientService ]
+    declarations: [ ListOauthClientsComponent, FormTranslationComponent, ViewOauthClientsComponent, TranslateEnumPipe ],
+    providers: [ ]
 })
 
 export class OauthClientsModule { }

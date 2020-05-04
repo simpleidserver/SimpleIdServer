@@ -31,7 +31,7 @@
                 <ng-container matColumnDef="actions">
                     <mat-header-cell *matHeaderCellDef></mat-header-cell>
                     <mat-cell *matCellDef="let client">
-                        <button mat-icon-button>
+                        <button mat-icon-button [routerLink]="['/clients/oauth', client.ClientId]">
                             <mat-icon>visibility</mat-icon>
                         </button>
                     </mat-cell>

@@ -1,0 +1,47 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>{{ "OAUTH_CLIENT" | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="updateOAuthClientFormGroup" >
+            <mat-tab-group>
+                <mat-tab label="{{ 'DETAILS' | translate }}">
+                    <div fxLayout="row">
+                        <div fxFlex="50%" class="padding-td-5 padding-lr-5">
+                            <mat-form-field appearance="outline" class="full-width">
+                              <mat-label>{{ "CLIENT_ID" | translate }}</mat-label>
+                              <input matInput formControlName="clientId" >
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="50%" class="padding-td-5 padding-lr-5">
+                            <mat-accordion>
+                                <!-- Client names -->
+                                <mat-expansion-panel hideToggle>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            {{ "CLIENT_NAMES" | translate }}
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+
+                                        </mat-panel-description>                                    
+                                        <mat-icon matTooltip="{{ 'CLIENT_NAMES_INFO' | translate }}">info</mat-icon>
+                                    </mat-expansion-panel-header>
+                                    <formtranslation [(translations)]="clientNames"></formtranslation>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab label="{{ 'URLS' | translate }}">
+    
+                </mat-tab>
+                <mat-tab label="{{ 'SCOPES' | translate }}">
+                    
+                </mat-tab>
+                <mat-tab label="{{ 'ADVANCED' | translate}}">
+    
+                </mat-tab>
+            </mat-tab-group>
+        </form>
+    </mat-card-content>
+</mat-card>

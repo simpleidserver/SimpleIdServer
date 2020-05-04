@@ -3,11 +3,13 @@ import { OAuthClient } from '../models/oauthclient.model';
 import { SearchResult } from '../models/search.model';
 
 export interface State {
-    Content: SearchResult<OAuthClient>;
+    Clients: SearchResult<OAuthClient>;
+    Client: OAuthClient;
 }
 
 export const initialState: State = {
-    Content: new SearchResult<OAuthClient>()
+    Clients: new SearchResult<OAuthClient>(),
+    Client: null
 };
 
 export function oauthClientReducer(state = initialState, action: fromActions.ActionsUnion) {
@@ -15,8 +17,13 @@ export function oauthClientReducer(state = initialState, action: fromActions.Act
         case fromActions.ActionTypes.COMPLETE_SEARCH:
             return {
                 ...state,
-                Content: action.content
+                Clients: action.content
             };
+        case fromActions.ActionTypes.COMPLETE_GET:
+            return {
+                ...state,
+                Client: action.oauthClient
+            };            
         default:
             return state;
     }

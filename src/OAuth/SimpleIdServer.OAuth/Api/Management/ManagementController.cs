@@ -20,10 +20,12 @@ namespace SimpleIdServer.OAuth.Api.Management
     public partial class ManagementController : Controller
     {
         private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
+        private readonly IOAuthScopeQueryRepository _oauthScopeQueryRepository;
 
-        public ManagementController(IOAuthClientQueryRepository oauthClientQueryRepository)
+        public ManagementController(IOAuthClientQueryRepository oauthClientQueryRepository, IOAuthScopeQueryRepository oAuthScopeQueryRepository)
         {
             _oauthClientQueryRepository = oauthClientQueryRepository;
+            _oauthScopeQueryRepository = oAuthScopeQueryRepository;
         }
 
         [HttpPost("clients/.search")]
@@ -42,12 +44,44 @@ namespace SimpleIdServer.OAuth.Api.Management
             return InternalSearchClients(queries);
         }
 
+        [HttpGet("clients/{id}")]
+        [Authorize("ManageClients")]
+        public virtual async Task<IActionResult> GetClient(string id)
+        {
+            var client = await _oauthClientQueryRepository.FindOAuthClientById(id);
+            if (client == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(ToDto(client));
+        }
+
+        [HttpGet("scopes")]
+        [Authorize("ManageScopes")]
+        public virtual async Task<IActionResult> GetScopes()
+        {
+            var result = await _oauthScopeQueryRepository.GetAllOAuthScopes();
+            return new OkObjectResult(result.Select(_ => ToDto(_)));
+        }
+
         private async Task<IActionResult> InternalSearchClients(IEnumerable<KeyValuePair<string, string>> queries)
         {
             var parameter = ToParameter(queries);
             var result = await _oauthClientQueryRepository.Find(parameter, CancellationToken.None);
             return new OkObjectResult(ToDto(result));
 
+        }
+
+        private static JObject ToDto(OAuthScope scope)
+        {
+            return new JObject
+            {
+                { "name", scope.Name },
+                { "is_exposed", scope.IsExposedInConfigurationEdp },
+                { "update_datetime", scope.UpdateDateTime },
+                { "create_datetime", scope.CreateDateTime }
+            };
         }
 
         private static JObject ToDto(SearchResult<OAuthClient> result)
@@ -135,7 +169,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             return new JObject
             {
                 { "language", translation.Language },
-                { "valeu", translation.Value }
+                { "value", translation.Value }
             };
         }
 

@@ -40,6 +40,11 @@ namespace SimpleIdServer.OAuth.Startup
             {
                 Name = "manage_clients",
                 IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "manage_scopes",
+                IsExposedInConfigurationEdp = true
             }
         };
 
@@ -113,6 +118,10 @@ namespace SimpleIdServer.OAuth.Startup
                     new OAuthScope
                     {
                         Name = "manage_clients"
+                    },
+                    new OAuthScope
+                    {
+                        Name = "manage_scopes"
                     }
                 },
                 GrantTypes = new List<string>

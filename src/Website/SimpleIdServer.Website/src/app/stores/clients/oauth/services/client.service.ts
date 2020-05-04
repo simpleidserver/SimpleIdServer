@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SearchResult } from '../models/search.model';
 import { OAuthClient } from '../models/oauthclient.model';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../../environments/environment';
 
 @Injectable()
 export class OAuthClientService {
@@ -15,7 +15,7 @@ export class OAuthClientService {
         let headers = new HttpHeaders();
         headers = headers.set('Accept', 'application/json');
         headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
-        let targetUrl = environment.apiUrl + "/oauthclients/.search?start_index=" + startIndex + "&count=" + count;
+        let targetUrl = environment.apiUrl + "/oauth/management/clients/.search?start_index=" + startIndex + "&count=" + count;
         if (order) {
             targetUrl = targetUrl + "&order_by=" + order;
         }
@@ -31,6 +31,16 @@ export class OAuthClientService {
             result.TotalLength = res["total_length"];
             result.Content = res["content"].map(c => OAuthClient.fromJson(c));
             return result;
+        }));
+    }
+
+    get(id : string) : Observable<OAuthClient> {
+        let headers = new HttpHeaders();
+        headers = headers.set('Accept', 'application/json');
+        headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+        let targetUrl = environment.apiUrl + "/oauth/management/clients/" + id
+        return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
+            return OAuthClient.fromJson(res);
         }));
     }
 }
