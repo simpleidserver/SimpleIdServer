@@ -57,3 +57,41 @@ Scenario: Check user can be added to a group
 	Then JSON exists 'meta.version'
 	Then JSON exists 'meta.location'
 	Then JSON 'groups[0].display'='Tour guides'
+
+Scenario: Check group can be updated with multiple users
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstuserid'
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'seconduserid'
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | Tour Guides                                       |
+	| members     | [ { "value": "$firstuserid$" } ]                  |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'groupid'
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$groupid$'
+	| Key     | Value                                                           |
+	| schemas | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]               |
+	| members | [ { "value": "$firstuserid$" }, { "value": "$seconduserid$" } ] |
+	And execute HTTP GET request 'http://localhost/Groups/$groupid$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON exists 'members[0].value'
+	Then JSON exists 'members[1].value'

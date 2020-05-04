@@ -63,7 +63,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = record["Value"];
+                var value = Parse(record["Value"]);
                 try
                 {
                     jObj.Add(key, JToken.Parse(value));
@@ -92,7 +92,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = record["Value"];
+                var value = Parse(record["Value"]);
                 try
                 {
                     jObj.Add(key, JToken.Parse(value));
@@ -156,6 +156,17 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             if (val != null)
             {
                 _scenarioContext.Set(val.ToString(), key);
+            }
+        }
+
+        [When("extract '(.*)' from JSON body into '(.*)'")]
+        public void WhenExtractJSONKeyFromBodyInto(string source, string target)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
+            var val = jsonHttpBody.SelectToken(source);
+            if (val != null)
+            {
+                _scenarioContext.Set(val.ToString(), target);
             }
         }
 

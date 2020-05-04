@@ -35,6 +35,11 @@ namespace SimpleIdServer.Scim.Domain
             Attributes.Add(attribute);
         }
 
+        public void RemoveAttributes(IEnumerable<string> schemaAttrIds)
+        {
+            Attributes = Attributes.Where(_ => !schemaAttrIds.Contains(_.SchemaAttribute.Id)).ToList();
+        }
+
         public SCIMRepresentationAttribute GetAttribute(string fullPath)
         {
             var splitted = fullPath.Split('.').ToList();

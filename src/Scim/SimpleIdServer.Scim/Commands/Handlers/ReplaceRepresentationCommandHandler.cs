@@ -53,7 +53,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation, schemas.ToList());
-            foreach(var updatedAttribute in updatedRepresentation.Attributes)
+            existingRepresentation.RemoveAttributes(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
+            foreach (var updatedAttribute in updatedRepresentation.Attributes)
             {
                 if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
                 {
@@ -62,16 +63,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE)
                 {
-                    var existingAttribute = existingRepresentation.Attributes.FirstOrDefault(a => a.SchemaAttribute.Id == updatedAttribute.SchemaAttribute.Id);
-                    if (existingAttribute == null)
-                    {
-                        existingRepresentation.AddAttribute(updatedAttribute);
-                    }
-                    else
-                    {
-                        existingRepresentation.Attributes.Remove(existingAttribute);
-                        existingRepresentation.AddAttribute(updatedAttribute);
-                    }
+                    existingRepresentation.AddAttribute(updatedAttribute);
                 }
             }
 
