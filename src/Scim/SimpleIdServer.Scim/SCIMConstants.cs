@@ -26,6 +26,13 @@ namespace SimpleIdServer.Scim
             public const string TooLarge = "tooLarge";
         }
 
+        public static ICollection<string> StandardSCIMCommonRepresentationAttributes = new List<string>
+        {
+            StandardSCIMRepresentationAttributes.Id,
+            StandardSCIMRepresentationAttributes.ExternalId,
+            StandardSCIMRepresentationAttributes.Meta
+        };
+
         public static class StandardSCIMRepresentationAttributes
         {
             public const string Schemas = "schemas";

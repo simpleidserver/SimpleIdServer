@@ -44,7 +44,7 @@ namespace SimpleIdServer.Scim.Helpers
             var attributes = new List<SCIMRepresentationAttribute>();
             foreach (var jsonProperty in json)
             {
-                if (jsonProperty.Key == SCIMConstants.StandardSCIMRepresentationAttributes.Schemas)
+                if (jsonProperty.Key == SCIMConstants.StandardSCIMRepresentationAttributes.Schemas || SCIMConstants.StandardSCIMCommonRepresentationAttributes.Contains(jsonProperty.Key))
                 {
                     continue;
                 }

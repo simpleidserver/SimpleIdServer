@@ -147,9 +147,10 @@ Scenario: Check user can be updated (HTTP PUT)
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
-	| Key     | Value																									|
-	| schemas | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]														|
-	| name		| { "formatted" : "newFormatted", "familyName": "newFamilyName", "givenName": "newGivenName" }			|	
+	| Key     | Value                                                                                        |
+	| schemas | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                             |
+	| name    | { "formatted" : "newFormatted", "familyName": "newFamilyName", "givenName": "newGivenName" } |
+	| id      | $id$                                                                                         |
 	
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
