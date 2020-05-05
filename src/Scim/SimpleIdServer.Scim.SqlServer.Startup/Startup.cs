@@ -10,8 +10,10 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.EF;
 using SimpleIdServer.Scim.Persistence.EF.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,11 +24,13 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration) 
+        public Startup(IHostingEnvironment env, IConfiguration configuration) 
         {
+            Env = env;
             Configuration = configuration;
         }
 
+        public IHostingEnvironment Env { get; }
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -57,7 +61,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         IssuerSigningKey = oauthRsaSecurityKey
                     };
                 });
-            services.AddSIDScim();
+            services.AddSIDScim(_ =>
+            {
+                _.IgnoreUnsupportedCanonicalValues = false;
+            });
             services.AddScimStoreEF(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
@@ -79,15 +86,26 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 using (var context = scope.ServiceProvider.GetService<SCIMDbContext>())
                 {
                     context.Database.Migrate();
+                    var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
+                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.Users);
+                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Groups);
                     if (!context.SCIMSchemaLst.Any())
                     {
-                        context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.GroupSchema.ToModel());
-                        context.SCIMSchemaLst.Add(SCIMConstants.StandardSchemas.UserSchema.ToModel());
+                        context.SCIMSchemaLst.Add(userSchema.ToModel());
+                        context.SCIMSchemaLst.Add(groupSchema.ToModel());
                     }
 
                     if (!context.SCIMAttributeMappingLst.Any())
                     {
-                        context.SCIMAttributeMappingLst.AddRange(SCIMConstants.StandardAttributeMapping.First().ToModel());
+                        var attributeMapping = new SCIMAttributeMapping
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                            SourceAttributeSelector = "groups",
+                            TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                            TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                        };
+                        context.SCIMAttributeMappingLst.Add(attributeMapping.ToModel());
                     }
 
                     context.SaveChanges();

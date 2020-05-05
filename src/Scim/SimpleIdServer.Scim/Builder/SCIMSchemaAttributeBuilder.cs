@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using System;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Builder
 {
@@ -67,7 +68,7 @@ namespace SimpleIdServer.Scim.Builder
         public SCIMSchemaAttributeBuilder AddAttribute(string name, SCIMSchemaAttributeTypes type, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
-            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
+            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false, List<string> canonicalValues = null)
         {
             var builder = new SCIMSchemaAttributeBuilder(new SCIMSchemaAttribute(Guid.NewGuid().ToString())
             {
@@ -79,7 +80,8 @@ namespace SimpleIdServer.Scim.Builder
                 Returned = returned,
                 Uniqueness = uniqueness,
                 Type = type,
-                Description = description
+                Description = description,
+                CanonicalValues = canonicalValues
             });
             if (callback != null)
             {

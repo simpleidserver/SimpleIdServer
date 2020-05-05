@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
@@ -18,11 +19,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
     {
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        private readonly SCIMHostOptions _options;
 
-        public PatchRepresentationCommandHandler(ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository)
+        public PatchRepresentationCommandHandler(ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IOptions<SCIMHostOptions> options)
         {
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+            _options = options.Value;
         }
 
         public async Task<SCIMRepresentation> Handle(PatchRepresentationCommand patchRepresentationCommand)
@@ -34,7 +37,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
             }
 
-            existingRepresentation.ApplyPatches(patches);
+            existingRepresentation.ApplyPatches(patches, _options.IgnoreUnsupportedCanonicalValues);
             existingRepresentation.SetUpdated(DateTime.UtcNow);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {

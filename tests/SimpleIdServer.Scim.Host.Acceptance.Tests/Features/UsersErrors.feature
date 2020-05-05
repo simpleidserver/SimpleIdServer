@@ -178,3 +178,20 @@ Scenario: Error is returned when trying to patch an unknown resource (HTTP PATCH
 	Then JSON 'response.status'='404'
 	Then JSON 'response.scimType'='unknown'
 	Then JSON 'response.detail'='resource id not found'
+
+Scenario: Error is returned when trying to add a none canonical value (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| externalId     | externalid                                                                                                     |
+	| type           | unsupported                                                                                                    |
+	| employeeNumber | number                                                                                                         |
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'='property type is not a valid canonical value'

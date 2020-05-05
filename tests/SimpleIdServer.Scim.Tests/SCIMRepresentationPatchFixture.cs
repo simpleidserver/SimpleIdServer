@@ -42,7 +42,7 @@ namespace SimpleIdServer.Scim.Tests
                 new SCIMPatchOperationRequest(SCIMPatchOperations.REPLACE, "userName", "cassandra"),
                 new SCIMPatchOperationRequest(SCIMPatchOperations.ADD, "phones", JArray.Parse("[{ phoneNumber : '03', type: 'type1' }, { phoneNumber : '05', type: 'type2' }]")),
                 new SCIMPatchOperationRequest(SCIMPatchOperations.REMOVE, "phones[phoneNumber eq 01]")
-            });
+            }, false);
 
             Assert.Equal("cassandra", userRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "userName").ValuesString.First());
             Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phones" && a.Values.Any(b => b.SchemaAttribute.Name == "phoneNumber" && b.ValuesString.Contains("03"))) == true);

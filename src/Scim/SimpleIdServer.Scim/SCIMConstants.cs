@@ -61,6 +61,7 @@ namespace SimpleIdServer.Scim
             public const string Returned = "returned";
             public const string Uniqueness = "uniqueness";
             public const string SubAttributes = "subAttributes";
+            public const string CanonicalValues = "canonicalValues";
         }
 
         public static class ResourceTypeAttribute

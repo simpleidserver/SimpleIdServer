@@ -9,7 +9,8 @@ Scenario: Check User can be created
 	| externalId     | externalid                                                                                                     |
 	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| employeeNumber | number                                                                                                         |
-
+	| type           | manager                                                                                                        |
+	
 	And extract JSON from body
 
 	Then HTTP status code equals to '201'	

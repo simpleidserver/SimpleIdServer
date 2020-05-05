@@ -10,8 +10,8 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20200410110144_AddAttributeMapping")]
-    partial class AddAttributeMapping
+    [Migration("20200505111041_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -41,6 +41,11 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                        sopt.AddIntAttribute("score");
                    }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE);
                }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
+               .AddStringAttribute("type", canonicalValues: new List<string>
+               {
+                   "manager",
+                   "employee"
+               })
                .AddStringAttribute("org", defaultValue: new List<string> { "ENTREPRISE" }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddSCIMSchemaExtension("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", true)
                .Build();
@@ -59,6 +64,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             services.AddSIDScim(o =>
             {
                 o.MaxOperations = 3;
+                o.IgnoreUnsupportedCanonicalValues = false;
             }).AddSchemas(schemas);
         }
 

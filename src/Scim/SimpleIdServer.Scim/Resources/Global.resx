@@ -162,6 +162,9 @@
   <data name="MissingSCIMSchemaAttribute" xml:space="preserve">
     <value>instance cannot be serialized because no SCIMSchemaAttribute has been found</value>
   </data>
+  <data name="NotValidCanonicalValue" xml:space="preserve">
+    <value>property {0} is not a valid canonical value</value>
+  </data>
   <data name="PatchMissingAttribute" xml:space="preserve">
     <value>PATCH can be applied only on existing attributes</value>
   </data>

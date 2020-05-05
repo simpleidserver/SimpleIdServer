@@ -72,7 +72,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             var result = new SCIMSchemaAttributeModel
             {
                 Id = schemaAttribute.Id,
-                CanonicalValues = schemaAttribute.CanonicalValues.ToList(),
+                CanonicalValues = schemaAttribute.CanonicalValues == null ? new List<string>() : schemaAttribute.CanonicalValues.ToList(),
                 CaseExact = schemaAttribute.CaseExact,
                 DefaultValueInt = schemaAttribute.DefaultValueInt.ToList(),
                 DefaultValueString = schemaAttribute.DefaultValueString.ToList(),

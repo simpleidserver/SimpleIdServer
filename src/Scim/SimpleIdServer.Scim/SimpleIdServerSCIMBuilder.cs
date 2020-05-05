@@ -5,30 +5,42 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.InMemory;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SimpleIdServer.Scim
 {
     public class SimpleIdServerSCIMBuilder
     {
-        private readonly IServiceCollection _serviceCollection;
-
         public SimpleIdServerSCIMBuilder(IServiceCollection serviceCollection)
         {
-            _serviceCollection = serviceCollection;
+            ServiceCollection = serviceCollection;
         }
 
-        public IServiceCollection ServiceCollection { get => _serviceCollection; }
+        private IServiceCollection ServiceCollection { get; }
 
         public SimpleIdServerSCIMBuilder AddSchemas(List<SCIMSchema> schemas)
         {
-            _serviceCollection.AddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));
-            _serviceCollection.AddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemas));
+            ServiceCollection.AddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemas));
+            ServiceCollection.AddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemas));
+            return this;
+        }
+
+        public SimpleIdServerSCIMBuilder ImportSchemas(Dictionary<string, string> dic)
+        {
+            var schemaLst = new List<SCIMSchema>();
+            foreach (var kvp in dic)
+            {
+                schemaLst.Add(SCIMSchemaExtractor.Extract(kvp.Value, kvp.Key));
+            }
+
+            ServiceCollection.AddSingleton<ISCIMSchemaCommandRepository>(new DefaultSchemaCommandRepository(schemaLst));
+            ServiceCollection.AddSingleton<ISCIMSchemaQueryRepository>(new DefaultSchemaQueryRepository(schemaLst));
             return this;
         }
 
         public SimpleIdServerSCIMBuilder AddAttributeMapping(List<SCIMAttributeMapping> attributeMappingLst)
         {
-            _serviceCollection.AddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(attributeMappingLst));
+            ServiceCollection.AddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(attributeMappingLst));
             return this;
         }
     }

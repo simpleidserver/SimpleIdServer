@@ -8,6 +8,21 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "SCIMAttributeMappingLst",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    SourceResourceType = table.Column<string>(nullable: true),
+                    SourceAttributeSelector = table.Column<string>(nullable: true),
+                    TargetResourceType = table.Column<string>(nullable: true),
+                    TargetAttributeId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SCIMAttributeMappingLst", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SCIMRepresentationLst",
                 columns: table => new
                 {
@@ -218,6 +233,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "SCIMAttributeMappingLst");
+
             migrationBuilder.DropTable(
                 name: "SCIMRepresentationAttributeValueLst");
 

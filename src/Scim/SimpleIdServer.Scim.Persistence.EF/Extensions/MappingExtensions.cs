@@ -97,7 +97,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 Id = schemaAttribute.Id,
                 SchemaId = schemaId,
-                CanonicalValues = schemaAttribute.CanonicalValues.ToList(),
+                CanonicalValues = schemaAttribute.CanonicalValues == null ? new List<string>() : schemaAttribute.CanonicalValues.ToList(),
                 CaseExact = schemaAttribute.CaseExact,
                 DefaultValueInt = schemaAttribute.DefaultValueInt.ToList(),
                 DefaultValueString = schemaAttribute.DefaultValueString.ToList(),

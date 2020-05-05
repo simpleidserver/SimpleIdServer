@@ -27,7 +27,7 @@ namespace SimpleIdServer.Scim.Domain
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}" }
         };
 
-        public static void ApplyPatches(this SCIMRepresentation representation, ICollection<SCIMPatchOperationRequest> patches)
+        public static void ApplyPatches(this SCIMRepresentation representation, ICollection<SCIMPatchOperationRequest> patches, bool ignoreUnsupportedCanonicalValues)
         {
             var queryableRepresentationAttributes = representation.Attributes.AsQueryable();
             foreach (var patch in patches)
@@ -79,7 +79,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 if (patch.Operation == SCIMPatchOperations.ADD || patch.Operation == SCIMPatchOperations.REPLACE)
                 {
-                    var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value);
+                    var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value, ignoreUnsupportedCanonicalValues);
                     foreach (var newAttribute in newAttributes)
                     {
                         var parentAttribute = representation.GetParentAttribute(fullPath);
@@ -320,7 +320,7 @@ namespace SimpleIdServer.Scim.Domain
             return filteredAttributes;
         }
 
-        private static ICollection<SCIMRepresentationAttribute> ExtractRepresentationAttributesFromJSON(SCIMSchemaAttribute schemaAttribute, object jObj)
+        private static ICollection<SCIMRepresentationAttribute> ExtractRepresentationAttributesFromJSON(SCIMSchemaAttribute schemaAttribute, object jObj, bool ignoreUnsupportedCanonicalValues)
         {
             var jArr = jObj as JArray;
             var parsedRepresentationAttributes = new List<SCIMRepresentationAttribute>();
@@ -331,7 +331,7 @@ namespace SimpleIdServer.Scim.Domain
                     foreach (JObject record in jArr)
                     {
                         var attribute = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute);
-                        foreach(var attr in SCIMRepresentationHelper.BuildRepresentationAttributes(record, schemaAttribute.SubAttributes))
+                        foreach(var attr in SCIMRepresentationHelper.BuildRepresentationAttributes(record, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues))
                         {
                             attribute.Add(attr);
                         }
@@ -342,7 +342,7 @@ namespace SimpleIdServer.Scim.Domain
                 else
                 {
                     var attribute = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute);
-                    foreach (var attr in SCIMRepresentationHelper.BuildRepresentationAttributes(jObj as JObject, schemaAttribute.SubAttributes))
+                    foreach (var attr in SCIMRepresentationHelper.BuildRepresentationAttributes(jObj as JObject, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues))
                     {
                         attribute.Add(attr);
                     }

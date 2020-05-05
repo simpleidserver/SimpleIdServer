@@ -60,7 +60,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null,
-            bool multiValued = false, ICollection<string> defaulValueStr = null, ICollection<int> defaultValueInt = null)
+            bool multiValued = false, ICollection<string> defaulValueStr = null, ICollection<int> defaultValueInt = null, List<string> canonicalValues = null)
         {
             var builder = new SCIMSchemaAttributeBuilder(new SCIMSchemaAttribute(Guid.NewGuid().ToString())
             {
@@ -73,6 +73,7 @@ namespace SimpleIdServer.Scim.Builder
                 Uniqueness = uniqueness,
                 Type = type,
                 Description = description,
+                CanonicalValues = canonicalValues,
                 DefaultValueInt = defaultValueInt == null ? new List<int>() : defaultValueInt,
                 DefaultValueString = defaulValueStr == null ? new List<string>() : defaulValueStr
             });
@@ -89,9 +90,9 @@ namespace SimpleIdServer.Scim.Builder
         public SCIMSchemaBuilder AddStringAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
-            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, ICollection<string> defaultValue = null, bool multiValued = false)
+            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, ICollection<string> defaultValue = null, bool multiValued = false, List<string> canonicalValues = null)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.STRING, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued, defaulValueStr: defaultValue);
+            return AddAttribute(name, SCIMSchemaAttributeTypes.STRING, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued, defaulValueStr: defaultValue, canonicalValues: canonicalValues);
         }
 
         public SCIMSchemaBuilder AddBooleanAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,

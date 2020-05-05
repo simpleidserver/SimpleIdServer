@@ -8,15 +8,23 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.Scim.Domain;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace SimpleIdServer.Scim.Startup
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
+        public Startup(IHostingEnvironment env)
+        {
+            Env = env;
+        }
+
+        private IHostingEnvironment Env { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -51,7 +59,30 @@ namespace SimpleIdServer.Scim.Startup
                         IssuerSigningKey = oauthRsaSecurityKey
                     };
                 });
-            services.AddSIDScim();
+            var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.Users);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Groups);
+            var schemas = new List<SCIMSchema>
+            {
+                userSchema,
+                groupSchema
+            };
+            services.AddSIDScim(_ =>
+            {
+                _.IgnoreUnsupportedCanonicalValues = false;
+            })
+            .AddSchemas(schemas)
+            .AddAttributeMapping(new List<SCIMAttributeMapping>
+            {
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                    SourceAttributeSelector = "groups",
+                    TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                }
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
@@ -12,6 +13,13 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public class SCIMRepresentationHelper : ISCIMRepresentationHelper
     {
+        public readonly SCIMHostOptions _options;
+
+        public SCIMRepresentationHelper(IOptions<SCIMHostOptions> options)
+        {
+            _options = options.Value;
+        }
+
         public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, ICollection<SCIMSchema> schemas)
         {
             var attrsSchema = schemas.SelectMany(s => s.Attributes);
@@ -21,10 +29,10 @@ namespace SimpleIdServer.Scim.Helpers
                 throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => a.Name))));
             }
 
-            return BuildRepresentation(json, attrsSchema, schemas);
+            return BuildRepresentation(json, attrsSchema, schemas, _options.IgnoreUnsupportedCanonicalValues);
         }
 
-        public static SCIMRepresentation BuildRepresentation(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, ICollection<SCIMSchema> schemas)
+        public static SCIMRepresentation BuildRepresentation(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, ICollection<SCIMSchema> schemas, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new SCIMRepresentation();
             var externalId = json.SelectToken(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
@@ -35,11 +43,11 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             result.Schemas = schemas;
-            result.Attributes = BuildRepresentationAttributes(json, attrsSchema);
+            result.Attributes = BuildRepresentationAttributes(json, attrsSchema, ignoreUnsupportedCanonicalValues);
             return result;
         }
 
-        public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema)
+        public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, bool ignoreUnsupportedCanonicalValues)
         {
             var attributes = new List<SCIMRepresentationAttribute>();
             foreach (var jsonProperty in json)
@@ -69,13 +77,13 @@ namespace SimpleIdServer.Scim.Helpers
                     }
 
 
-                    attributes.AddRange(BuildAttributes(jArr, attrSchema));
+                    attributes.AddRange(BuildAttributes(jArr, attrSchema, ignoreUnsupportedCanonicalValues));
                 }
                 else
                 {
                     var jArr = new JArray();
                     jArr.Add(jsonProperty.Value);
-                    attributes.AddRange(BuildAttributes(jArr, attrSchema));
+                    attributes.AddRange(BuildAttributes(jArr, attrSchema, ignoreUnsupportedCanonicalValues));
                 }
             }
 
@@ -127,7 +135,7 @@ namespace SimpleIdServer.Scim.Helpers
             return attributes;
         }
 
-        private static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute)
+        private static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMRepresentationAttribute>();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
@@ -136,7 +144,7 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
                     {
-                        Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes)
+                        Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)
                     };
                     result.Add(record);
                 }
@@ -157,6 +165,11 @@ namespace SimpleIdServer.Scim.Helpers
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
                         record.ValuesString = jArr.Select(j => j.ToString()).ToList();
+                        if (schemaAttribute.CanonicalValues != null && schemaAttribute.CanonicalValues.Any() && !ignoreUnsupportedCanonicalValues && !record.ValuesString.All(_ => schemaAttribute.CanonicalValues.Contains(_)))
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidCanonicalValue, schemaAttribute.Name));
+                        }
+
                         break;
                     case SCIMSchemaAttributeTypes.REFERENCE:
                         record.ValuesReference = jArr.Select(j => j.ToString()).ToList();
