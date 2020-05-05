@@ -12,7 +12,7 @@ namespace SimpleIdServer.Scim.Tests
         public static void When_Extract_SCIMSchema()
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Schemas", "UserSchema.json");
-            var result = SCIMSchemaExtractor.Extract(filePath, SCIMConstants.SCIMEndpoints.Users);
+            var result = SCIMSchemaExtractor.Extract(filePath, SCIMConstants.SCIMEndpoints.User);
             Assert.NotNull(result);
         }
     }

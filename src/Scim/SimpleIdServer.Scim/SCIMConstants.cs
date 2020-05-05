@@ -99,12 +99,12 @@ namespace SimpleIdServer.Scim
 
         public static class SCIMEndpoints
         {
-            public const string Users = "Users";
-            public const string Groups = "Groups";
+            public const string User = "Users";
+            public const string Group = "Groups";
             public const string ServiceProviderConfig = "ServiceProviderConfig";
             public const string Bulk = "Bulk";
             public const string Schemas = "Schemas";
-            public const string ResourceTypes = "ResourceTypes";
+            public const string ResourceType = "ResourceTypes";
         }
 
         public static List<SCIMAttributeMapping> StandardAttributeMapping = new List<SCIMAttributeMapping>
@@ -122,7 +122,7 @@ namespace SimpleIdServer.Scim
         public static class StandardSchemas
         {
             public static SCIMSchema ResourceTypeSchema =
-                SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ResourceType", "ResourceType", SCIMEndpoints.ResourceTypes, "Resource type", true)
+                SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ResourceType", "ResourceType", SCIMEndpoints.ResourceType, "Resource type", true)
                     .AddStringAttribute(ResourceTypeAttribute.Id)
                     .AddStringAttribute(ResourceTypeAttribute.Name, required: true)
                     .AddStringAttribute(ResourceTypeAttribute.Description)
@@ -134,7 +134,7 @@ namespace SimpleIdServer.Scim
                         c.AddStringAttribute(ResourceTypeAttribute.Required, required: true);
                     }).Build();
             public static SCIMSchema UserSchema =
-                 SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMEndpoints.Users, "User Account", true)
+                 SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMEndpoints.User, "User Account", true)
                     .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                     .AddComplexAttribute("name", c =>
                     {
@@ -228,7 +228,7 @@ namespace SimpleIdServer.Scim
                     }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                     .Build();
 
-            public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMEndpoints.Groups, "Group", true)
+            public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMEndpoints.Group, "Group", true)
                     .AddStringAttribute("displayName")
                     .AddComplexAttribute("members", c =>
                     {

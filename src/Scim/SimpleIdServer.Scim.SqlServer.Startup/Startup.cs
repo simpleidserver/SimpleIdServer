@@ -87,8 +87,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
-                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.Users);
-                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Groups);
+                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
+                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
                     if (!context.SCIMSchemaLst.Any())
                     {
                         context.SCIMSchemaLst.Add(userSchema.ToModel());

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMConstants.SCIMEndpoints.ResourceTypes)]
+    [Route(SCIMConstants.SCIMEndpoints.ResourceType)]
     public class ResourceTypesController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
@@ -35,7 +35,7 @@ namespace SimpleIdServer.Scim.Api
 
         private JObject ToDto(SCIMSchema schema)
         {
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMConstants.SCIMEndpoints.ResourceTypes}/{schema.ResourceType}";
+            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMConstants.SCIMEndpoints.ResourceType}/{schema.ResourceType}";
             return new JObject
             {
                 { SCIMConstants.ResourceTypeAttribute.Schemas, new JArray(new List<string>  { SCIMConstants.StandardSchemas.ResourceTypeSchema.Id }) },

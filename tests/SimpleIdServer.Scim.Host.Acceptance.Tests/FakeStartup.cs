@@ -15,7 +15,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMConstants.SCIMEndpoints.Users, "User Account", true)
+            var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMConstants.SCIMEndpoints.User, "User Account", true)
                .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                .AddComplexAttribute("name", c =>
                {
