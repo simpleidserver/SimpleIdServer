@@ -7,6 +7,8 @@ import { SharedModule} from '../../shared/shared.module';
 import { TranslateEnumPipe } from '../../pipes/translateenum.pipe';
 import { AvatarModule } from 'ngx-avatar';
 import { FormTranslationComponent } from '../../common/components/formtranslation/formtranslation.component';
+import { FormListComponent } from '../../common/components/formlist/formlist.component';
+import { SelectorComponent } from '../../common/components/selector/selector.component';
 import { ViewOauthClientsComponent } from './view/view.component';
 
 @NgModule({
@@ -18,7 +20,7 @@ import { ViewOauthClientsComponent } from './view/view.component';
         MaterialModule
     ],
     entryComponents: [],
-    declarations: [ ListOauthClientsComponent, FormTranslationComponent, ViewOauthClientsComponent, TranslateEnumPipe ],
+    declarations: [ ListOauthClientsComponent, FormTranslationComponent, ViewOauthClientsComponent, FormListComponent, SelectorComponent, TranslateEnumPipe ],
     providers: [ ]
 })
 

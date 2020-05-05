@@ -14,7 +14,7 @@ export function oauthScopeReducer(state = initialState, action: fromActions.Acti
         case fromActions.ActionTypes.COMPLETE_GET_ALL:
             return {
                 ...state,
-                Content: action.oauthScopes
+                Scopes: action.oauthScopes
             };
         default:
             return state;

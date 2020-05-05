@@ -1,0 +1,24 @@
+<div fxLayout="row">
+    <div fxFlex="45%">
+        <mat-selection-list [(ngModel)]="selectedSourceValues">
+            <mat-list-option *ngFor="let value of filteredSourceValues" [value]="value">
+                {{ value }}
+            </mat-list-option>
+        </mat-selection-list>
+    </div>
+    <div fxFlex="10%">
+        <button mat-icon-button (click)="remove()">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+        </button>        
+        <button mat-icon-button (click)="add()">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+        </button>
+    </div>
+    <div fxFlex="45%">
+        <mat-selection-list [(ngModel)]="selectedTargetValues">
+            <mat-list-option *ngFor="let value of targetValues" [value]="value">
+                {{ value }}
+            </mat-list-option>
+        </mat-selection-list>
+    </div>
+</div>

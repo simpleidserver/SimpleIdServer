@@ -6,40 +6,174 @@
         <form [formGroup]="updateOAuthClientFormGroup" >
             <mat-tab-group>
                 <mat-tab label="{{ 'DETAILS' | translate }}">
-                    <div fxLayout="row">
-                        <div fxFlex="50%" class="padding-td-5 padding-lr-5">
+                    <div fxLayout="row" fxLayout.lt-sm="column">
+                        <div fxFlex="40%" class="padding-td-5 padding-lr-5 relative">
+                            <!-- Client identifier -->
                             <mat-form-field appearance="outline" class="full-width">
                               <mat-label>{{ "CLIENT_ID" | translate }}</mat-label>
                               <input matInput formControlName="clientId" >
                             </mat-form-field>
+                            <!-- Software identifier -->
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>{{ "SOFTWARE_ID" | translate }}</mat-label>
+                                <input matInput formControlName="softwareId" >
+                            </mat-form-field>
+                            <!-- Software version -->
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>{{ "SOFTWARE_VERSION" | translate }}</mat-label>
+                                <input matInput formControlName="softwareVersion" >
+                            </mat-form-field>
+                            <!-- Grant type -->
+                            <mat-divider></mat-divider>
+                            <div>
+                                <h4>{{ "GRANT_TYPE" | translate }}</h4>
+                                <selector [sourceValues]="oauthGrantTypes" [(targetValues)]="clientGrantTypes"></selector>
+                            </div>
+                            <mat-divider></mat-divider>
+                            <div>                                
+                                <h4>{{ "RESPONSE_TYPE" | translate }}</h4>
+                                <selector [sourceValues]="oauthResponseTypes" [(targetValues)]="clientResponseTypes"></selector>
+                            </div>
                         </div>
-                        <div fxFlex="50%" class="padding-td-5 padding-lr-5">
-                            <mat-accordion>
+                        <div fxFlex="60%" class="padding-td-5 padding-lr-5">
+                            <div fxLayout="row wrap" fxLayout.lt-sm="column" fxLayoutGap="10px">
                                 <!-- Client names -->
-                                <mat-expansion-panel hideToggle>
-                                    <mat-expansion-panel-header>
-                                        <mat-panel-title>
+                                <div class="padding-b-10" fxFlex="0 1 calc(50% - 10px)">
+                                    <mat-card>
+                                        <mat-card-header>
                                             {{ "CLIENT_NAMES" | translate }}
-                                        </mat-panel-title>
-                                        <mat-panel-description>
-
-                                        </mat-panel-description>                                    
-                                        <mat-icon matTooltip="{{ 'CLIENT_NAMES_INFO' | translate }}">info</mat-icon>
-                                    </mat-expansion-panel-header>
-                                    <formtranslation [(translations)]="clientNames"></formtranslation>
-                                </mat-expansion-panel>
-                            </mat-accordion>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <formtranslation [(translations)]="clientNames"></formtranslation>                                        
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                                <!-- Redirect URIS -->      
+                                <div class="padding-b-10" fxFlex="0 1 calc(50% - 10px)">       
+                                    <mat-card>
+                                        <mat-card-header>
+                                            {{ "REDIRECT_URIS" | translate }}
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <formlist [(values)]="redirectUris"></formlist>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>        
+                                <!-- Contacts -->        
+                                <div class="padding-b-10" fxFlex="0 1 calc(50% - 10px)">       
+                                    <mat-card>    
+                                        <mat-card-header>
+                                            {{ "CONTACTS" | translate }}
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <formlist [(values)]="contacts"></formlist>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </mat-tab>
                 <mat-tab label="{{ 'URLS' | translate }}">
+                    <div class="padding-td-5 padding-lr-5">
+                        <mat-accordion>
+                            <!-- Logo URI -->
+                            <mat-expansion-panel hideToggle>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{ "LOGO_URIS" | translate }}
+                                    </mat-panel-title>
+                                    <mat-panel-description>
     
+                                    </mat-panel-description>                                    
+                                    <mat-icon matTooltip="{{ 'LOGO_URI_INFO' | translate }}">info</mat-icon>
+                                </mat-expansion-panel-header>
+                                <formtranslation [(translations)]="logoUris"></formtranslation>
+                            </mat-expansion-panel>
+                            <!-- Policy URI -->
+                            <mat-expansion-panel hideToggle>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{ "POLICY_URIS" | translate }}
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+    
+                                    </mat-panel-description>                                    
+                                    <mat-icon matTooltip="{{ 'POLICY_URI_INFO' | translate }}">info</mat-icon>
+                                </mat-expansion-panel-header>
+                                <formtranslation [(translations)]="policyUris"></formtranslation>
+                            </mat-expansion-panel>
+                            <!-- TOS URI -->
+                            <mat-expansion-panel hideToggle>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{ "TOS_URIS" | translate }}
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+    
+                                    </mat-panel-description>                                    
+                                    <mat-icon matTooltip="{{ 'TOS_URI_INFO' | translate }}">info</mat-icon>
+                                </mat-expansion-panel-header>
+                                <formtranslation [(translations)]="tosUris"></formtranslation>
+                            </mat-expansion-panel>
+                            <!-- Client URI -->
+                            <mat-expansion-panel hideToggle>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{ "CLIENT_URIS" | translate }}
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+    
+                                    </mat-panel-description>                                    
+                                    <mat-icon matTooltip="{{ 'CLIENT_URI_INFO' | translate }}">info</mat-icon>
+                                </mat-expansion-panel-header>
+                                <formtranslation [(translations)]="clientUris"></formtranslation>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
                 </mat-tab>
                 <mat-tab label="{{ 'SCOPES' | translate }}">
-                    
+                    <selector [sourceValues]="oauthScopes" [(targetValues)]="clientScopes"></selector>
+                </mat-tab>
+                <mat-tab label="{{ 'SECRETS' | translate }}">
+                    <!-- TODO : SECRETS -->
                 </mat-tab>
                 <mat-tab label="{{ 'ADVANCED' | translate}}">
-    
+                    <div fxLayout="row">
+                        <div fxFlex="50%" class="padding-td-5 padding-lr-5">
+                            <!-- TODO : PreferredTokenProfile -->
+                            <!-- TODO : TokenEndpointAuthMethod -->
+                            <mat-accordion>
+                                <!-- Access token generation alg. -->
+                                <mat-expansion-panel hideToggle>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            {{ "ACCESS_TOKEN_GENERATION" | translate }}
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+        
+                                        </mat-panel-description>                                    
+                                        <mat-icon matTooltip="{{ 'ACCESS_TOKEN_GENERATION_INFO' | translate }}">info</mat-icon>
+                                    </mat-expansion-panel-header>
+                                </mat-expansion-panel>
+                                <!-- Expiration time -->
+                                <mat-expansion-panel hideToggle>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            {{ "EXPIRATION_TIME" | translate }}
+                                        </mat-panel-title>
+                                        <mat-panel-description>
+        
+                                        </mat-panel-description>                                    
+                                        <mat-icon matTooltip="{{ 'EXPIRATION_TIME_INFO' | translate }}">info</mat-icon>
+                                    </mat-expansion-panel-header>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+                        </div>
+                        <div fxFlex="50%" class="padding-td-5 padding-lr-5">
+
+                        </div>
+                    </div>
                 </mat-tab>
             </mat-tab-group>
         </form>

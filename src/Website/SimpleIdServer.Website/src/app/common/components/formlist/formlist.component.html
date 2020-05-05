@@ -1,0 +1,18 @@
+<form (ngSubmit)="addValue(addValueForm.value)" [formGroup]="addValueForm">
+    <mat-form-field>
+        <mat-label>{{ "VALUE" | translate }}</mat-label>
+        <input matInput formControlName="value">
+        <button mat-icon-button matSuffix>
+          <mat-icon>add</mat-icon>
+        </button>
+    </mat-form-field>
+</form>
+<mat-list>
+    <mat-list-item *ngFor="let value of values; let index = index;">
+        <span>{{ value }}</span>
+        <div class="spacer"></div>        
+        <button mat-icon-button (click)="delete(index)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </mat-list-item>
+</mat-list>
