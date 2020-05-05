@@ -13,7 +13,7 @@ namespace SimpleIdServer.Scim.DTOs
         public SearchSCIMResourceParameter()
         {
             Attributes = new List<string>();
-            StartIndex = 0;
+            StartIndex = 1;
             Count = 100;
         }
 
@@ -75,12 +75,15 @@ namespace SimpleIdServer.Scim.DTOs
             int count, startIndex;
             if (jObj.TryGetInt(SCIMConstants.StandardSCIMSearchAttributes.Count, out count))
             {
-                result.Count = count;
+                result.Count = count < 0 ? 0 : count;
             }
 
             if (jObj.TryGetInt(SCIMConstants.StandardSCIMSearchAttributes.StartIndex, out startIndex))
             {
-                result.StartIndex = startIndex;
+                if (startIndex >= 1)
+                {
+                    result.StartIndex = startIndex;
+                }
             }
 
             string filter;

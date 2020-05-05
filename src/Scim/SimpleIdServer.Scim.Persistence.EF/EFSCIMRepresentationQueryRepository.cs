@@ -101,7 +101,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             int totalResults = queryableRepresentations.Count();
-            var result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList().Select(s => s.ToDomain());
+            IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
+            if (parameter.Count > 0)
+            {
+                result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList().Select(s => s.ToDomain());
+            }
+
             return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
         }
 

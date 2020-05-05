@@ -55,7 +55,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             }
 
             int totalResults = queryableRepresentations.Count();
-            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList()));
+            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, parameter.Count == 0 ? new List<SCIMRepresentation>() : queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList()));
         }
     }
 }

@@ -106,7 +106,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             }
 
             int totalResults = queryableRepresentations.Count();
-            var result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList().Select(s => s.ToDomain(_scimDbContext.Database));
+            IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
+            if (parameter.Count > 0)
+            {
+                result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList().Select(s => s.ToDomain(_scimDbContext.Database));
+            }
+
             return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
         }
     }

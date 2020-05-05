@@ -93,7 +93,7 @@ Scenario: Check user can be filtered
 	Then JSON exists 'Resources[0].phones'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:ListResponse'
 	Then JSON 'totalResults'='1'
-	Then JSON 'startIndex'='0'
+	Then JSON 'startIndex'='1'
 	Then JSON 'itemsPerPage'='3'
 	Then JSON 'Resources[0].userName'='bjen'
 	Then JSON 'Resources[0].name.formatted'='formatted'
@@ -131,7 +131,7 @@ Scenario: Use 'attributes=phones.phoneNumber' to get only the phone numbers
 	Then JSON exists 'Resources[0].phones'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:ListResponse'
 	Then JSON 'totalResults'='1'
-	Then JSON 'startIndex'='0'
+	Then JSON 'startIndex'='1'
 	Then JSON 'itemsPerPage'='3'
 	Then JSON 'Resources[0].phones[0].phoneNumber'='01'
 	Then JSON 'Resources[0].phones[1].phoneNumber'='02'
@@ -199,3 +199,24 @@ Scenario: Check user can be patched (HTTP PATCH)
 	Then JSON 'roles[0]'='role1'
 	Then JSON 'roles[1]'='role2'
 	Then JSON 'roles[2]'='role3'
+
+Scenario: Check no user is returned when count parameter is 0
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
+	| scores         | { "math" : [ { "score" : "10" } ] }                                                                            |
+	| roles          | [ "role1", "role2" ]                                                                                           |
+
+	And execute HTTP GET request 'http://localhost/Users?count=0'	
+	And extract JSON from body
+	
+
+	Then HTTP status code equals to '200'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:ListResponse'
+	Then JSON 'totalResults'='1'
+	Then JSON 'startIndex'='1'
+	Then JSON 'itemsPerPage'='0'
