@@ -51,7 +51,14 @@ namespace SimpleIdServer.Scim.DTOs
             var jObj = new JObject();
             foreach(var record in query)
             {
-                jObj.Add(record.Key, record.Value.ToString());
+                if (record.Key == SCIMConstants.StandardSCIMSearchAttributes.Attributes || record.Key == SCIMConstants.StandardSCIMSearchAttributes.ExcludedAttributes)
+                {
+                    jObj.Add(record.Key, new JArray(record.Value.ToString().Split(',')));
+                }
+                else
+                {
+                    jObj.Add(record.Key, record.Value.ToString());
+                }
             }
 
             return Create(jObj);
@@ -61,8 +68,8 @@ namespace SimpleIdServer.Scim.DTOs
         {
             var result = new SearchSCIMResourceParameter
             {
-                Attributes = jObj.GetCombinedArray(SCIMConstants.StandardSCIMSearchAttributes.Attributes),
-                ExcludedAttributes = jObj.GetCombinedArray(SCIMConstants.StandardSCIMSearchAttributes.ExcludedAttributes),
+                Attributes = jObj.GetArray(SCIMConstants.StandardSCIMSearchAttributes.Attributes),
+                ExcludedAttributes = jObj.GetArray(SCIMConstants.StandardSCIMSearchAttributes.ExcludedAttributes),
                 SortBy = jObj.GetString(SCIMConstants.StandardSCIMSearchAttributes.SortBy)
             };
 
