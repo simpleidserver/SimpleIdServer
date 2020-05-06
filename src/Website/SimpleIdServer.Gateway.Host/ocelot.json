@@ -6,7 +6,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 60002
+          "Port": 60001
         }
       ],
       "UpstreamPathTemplate": "/oauth/management/{everything}",
@@ -21,5 +21,5 @@
   }],
   "ClientId": "gatewayClient",
   "ClientSecret": "gatewayClientPassword",
-  "OAuthBaseUrl": "http://localhost:60002"
+  "OAuthBaseUrl": "http://localhost:60001"
 }

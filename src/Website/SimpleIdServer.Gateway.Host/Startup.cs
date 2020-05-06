@@ -40,13 +40,15 @@ namespace SimpleIdServer.Gateway.Host
                  {
                      IssuerSigningKey = ExtractKey("openid_puk.txt"),
                      ValidAudiences = new List<string>
-                    {
-                        "https://localhost:60000"
-                    },
+                     {
+                        "https://localhost:60000",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/openid"
+                     },
                      ValidIssuers = new List<string>
-                    {
-                        "https://localhost:60000"
-                    }
+                     {
+                        "https://localhost:60000",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/openid"
+                     }
                  };
             });
             services.AddLogging();

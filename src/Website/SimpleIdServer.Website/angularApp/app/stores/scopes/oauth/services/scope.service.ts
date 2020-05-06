@@ -4,7 +4,6 @@ import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { OAuthScope } from '../models/oauthscope.model';
-import { environment } from '../../../../../environments/environment';
 
 @Injectable()
 export class OAuthScopeService {
@@ -14,7 +13,7 @@ export class OAuthScopeService {
         let headers = new HttpHeaders();
         headers = headers.set('Accept', 'application/json');
         headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
-        let targetUrl = environment.apiUrl + "/oauth/management/scopes"
+        let targetUrl = process.env.API_URL + "/oauth/management/scopes"
         return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
             var result = res.map(_ => OAuthScope.fromJson(_));
             return result;

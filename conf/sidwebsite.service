@@ -1,0 +1,13 @@
+[Unit]
+Description=SimpleIdServer website
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/dotnet /home/ftpuser/src/build/results/services/SimpleIdServerWebsite/SimpleIdServer.Website.dll --pathBase=/simpleidserver --server.urls="http://*:70000"
+KillMode=process
+TimeoutStopSec=5s
+Restart=always
+WorkingDirectory=/home/ftpuser/src/build/results/services/SimpleIdServerWebsite
+
+[Install]
+WantedBy=multi-user.target

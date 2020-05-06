@@ -12,7 +12,6 @@ import { routes } from './app.routes';
 import { HomeModule } from './home/home.module';
 import { MaterialModule } from './shared/material.module';
 import { SharedModule } from './shared/shared.module';
-import { environment } from '../environments/environment';
 import { StoreModule } from '@ngrx/store';
 import { OAuthClientEffects } from './stores/clients/oauth/effects/client.effects';
 import { OAuthScopeEffects } from './stores/scopes/oauth/effects/scope.effects';
@@ -23,7 +22,7 @@ import { OAuthScopeService } from './stores/scopes/oauth/services/scope.service'
 import { appReducer } from './stores/appstate';
 
 export function createTranslateLoader(http: HttpClient) {
-    let url = environment.baseUrl + '/assets/i18n/';
+    let url = process.env.BASE_URL + 'assets/i18n/';
     return new TranslateHttpLoader(http, url, '.json');
 }
 

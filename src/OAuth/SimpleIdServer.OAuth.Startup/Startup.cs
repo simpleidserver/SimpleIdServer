@@ -48,11 +48,11 @@ namespace SimpleIdServer.OAuth.Startup
                 {
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = "http://localhost:60002",
                         ValidAudiences = new List<string>
                         {
                             "gatewayClient"
                         },
+                        ValidateIssuer = false,
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = oauthRsaSecurityKey
                     };

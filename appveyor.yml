@@ -5,8 +5,10 @@ branches:
   only:
   - master
 image: Visual Studio 2019
+environment:
+  nodejs_version: "12"
 install:
-- ps: "# Ensures that .net core is up to date.\n  # first get the required version from global.json\n  $json = ConvertFrom-Json (Get-Content \"C:\\projects\\simpleidserver\\global.json\" -Raw)\n  $required_version = $json.sdk.version\n\n  # Running dotnet --version stupidly fails if the required SDK version is higher \n  # than the currently installed version. So move global.json out the way \n  # and then put it back again \n  Rename-Item \"C:\\projects\\simpleidserver\\global.json\" \"C:\\projects\\simpleidserver\\global.json.bak\"\n  $current_version = (dotnet --version)\n  Rename-Item \"C:\\projects\\simpleidserver\\global.json.bak\" \"C:\\projects\\simpleidserver\\global.json\"\n  Write-Host \"Required .NET version: $required_version Installed: $current_version\"\n\n  if ($current_version -ne $required_version) {\n    # Current installed version is too low.\n    # Install new version as a local only dependency. \n    $urlCurrent = \"https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$required_version/dotnet-sdk-$required_version-win-x64.zip\"\n    Write-Host \"Installing .NET Core $required_version from $urlCurrent\"\n    $env:DOTNET_INSTALL_DIR = \"C:\\Program Files\\dotnet\\sdk\\$required_version\"\n    New-Item -Type Directory C:\\dotnettmp -Force | Out-Null\n    (New-Object System.Net.WebClient).DownloadFile($urlCurrent, \"dotnet.zip\")\n    Write-Host \"Unzipping to C:\\dotnettmp\"\n    Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory(\"dotnet.zip\", \"C:\\dotnettmp\")\n	Move-Item -Path \"C:\\dotnettmp\\sdk\\$required_version\" -Destination \"C:\\Program Files\\dotnet\\sdk\\\"\n  }"
+- ps: "# Ensures that .net core is up to date.\n  # first get the required version from global.json\n  $json = ConvertFrom-Json (Get-Content \"C:\\projects\\simpleidserver\\global.json\" -Raw)\n  $required_version = $json.sdk.version\n\n  # Running dotnet --version stupidly fails if the required SDK version is higher \n  # than the currently installed version. So move global.json out the way \n  # and then put it back again \n  Rename-Item \"C:\\projects\\simpleidserver\\global.json\" \"C:\\projects\\simpleidserver\\global.json.bak\"\n  $current_version = (dotnet --version)\n  Rename-Item \"C:\\projects\\simpleidserver\\global.json.bak\" \"C:\\projects\\simpleidserver\\global.json\"\n  Write-Host \"Required .NET version: $required_version Installed: $current_version\"\n\n  if ($current_version -ne $required_version) {\n    # Current installed version is too low.\n    # Install new version as a local only dependency. \n    $urlCurrent = \"https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$required_version/dotnet-sdk-$required_version-win-x64.zip\"\n    Write-Host \"Installing .NET Core $required_version from $urlCurrent\"\n    $env:DOTNET_INSTALL_DIR = \"C:\\Program Files\\dotnet\\sdk\\$required_version\"\n    New-Item -Type Directory C:\\dotnettmp -Force | Out-Null\n    (New-Object System.Net.WebClient).DownloadFile($urlCurrent, \"dotnet.zip\")\n    Write-Host \"Unzipping to C:\\dotnettmp\"\n    Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory(\"dotnet.zip\", \"C:\\dotnettmp\")\n	Move-Item -Path \"C:\\dotnettmp\\sdk\\$required_version\" -Destination \"C:\\Program Files\\dotnet\\sdk\\\"\n  }\nUpdate-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version)"
 nuget:
   disable_publish_on_pr: true
 build_script:
@@ -15,16 +17,20 @@ test: off
 artifacts:
 - path: build\results\*.nupkg
   name: NuGet
+- path: build\results\services\**\*.*
+  name: Services
 deploy:
 - provider: NuGet
   server: https://www.myget.org/F/advance-ict/api/v2/package
   api_key:
     secure: zs1JVjFHRdvB36fGq2rN8MR7QeJnCVkt7VTG4ZHT5OYDNpuh2AlGHqK+rseevn8l
   skip_symbols: true
+  artifact: build\results\*.nupkg
   on:
     branch: master
 - provider: NuGet
   name: production
+  artifact: build\results\*.nupkg
   api_key:
     secure: Uigh51VjtY/sVniNFhkSvZ60/FvI9DyJ/g2feCm/WNdzeN9x5FSiqQwF9Y8qQ6nj
   on:

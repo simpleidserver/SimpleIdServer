@@ -2,12 +2,11 @@
   "name": "simpleidserver",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "start": "concurrently \"webpack-dev-server --env=dev --open --hot --inline --port 4200\" \"dotnet run\" ",
+    "webpack-dev": "webpack --env=dev",
+    "webpack-azure": "webpack --env=azure",
+    "build": "npm run webpack-dev",
+    "build-azure": "npm run webpack-azure"
   },
   "private": true,
   "dependencies": {
@@ -42,10 +41,16 @@
     "@angular/cli": "~9.1.1",
     "@angular/compiler-cli": "~9.1.1",
     "@angular/language-service": "~9.1.1",
-    "@types/node": "^12.11.1",
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "^12.11.1",
+    "angular-router-loader": "^0.8.5",
+    "angular2-template-loader": "^0.6.2",
+    "awesome-typescript-loader": "^5.2.1",
+    "clean-webpack-plugin": "^3.0.0",
     "codelyzer": "^5.1.2",
+    "copy-webpack-plugin": "^5.1.1",
+    "html-webpack-plugin": "^4.3.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.4.1",
@@ -54,8 +59,14 @@
     "karma-jasmine": "~3.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "protractor": "~5.4.3",
+    "to-string-loader": "^1.1.6",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
-    "typescript": "~3.8.3"
+    "tslint-loader": "^3.5.4",
+    "typescript": "~3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "webpack-filter-warnings-plugin": "^1.2.1"
   }
 }
