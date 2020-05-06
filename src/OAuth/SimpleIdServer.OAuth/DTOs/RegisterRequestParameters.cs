@@ -23,5 +23,7 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string TokenSignedResponseAlg = "token_signed_response_alg";
         public const string TokenEncryptedResponseAlg = "token_encrypted_response_alg";
         public const string TokenEncryptedResponseEnc = "token_encrypted_response_enc";
+        public const string TokenExpirationTimeInSeconds = "token_expiration_time_seconds";
+        public const string RefreshTokenExpirationTimeInSeconds = "refresh_token_expiration_time_seconds";
     }
 }

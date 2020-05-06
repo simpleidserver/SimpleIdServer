@@ -17,6 +17,7 @@ export class FormListComponent {
 
     addValue(form : any) {
         this.values.push(form.value);
+        this.addValueForm.reset();
     }
 
     delete(index) {

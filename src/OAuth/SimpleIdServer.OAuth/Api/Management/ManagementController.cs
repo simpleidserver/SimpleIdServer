@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.Parameters;
@@ -54,7 +53,7 @@ namespace SimpleIdServer.OAuth.Api.Management
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(ToDto(client));
+            return new OkObjectResult(client.ToDto());
         }
 
         [HttpGet("scopes")]
@@ -91,85 +90,7 @@ namespace SimpleIdServer.OAuth.Api.Management
                 { "start_index", result.StartIndex },
                 { "count", result.Count },
                 { "total_length", result.TotalLength },
-                { "content", new JArray(result.Content.Select(_ => ToDto(_))) }
-            };
-        }
-
-        private static JObject ToDto(OAuthClient client)
-        {
-            var result = new JObject
-            {
-                { "client_id", client.ClientId },
-                { "create_datetime", client.CreateDateTime },
-                { "update_datetime", client.UpdateDateTime },
-                { "preferred_token_profile", client.PreferredTokenProfile },
-                { RegisterRequestParameters.TokenEndpointAuthMethod, client.TokenEndPointAuthMethod },
-                { RegisterRequestParameters.JwksUri, client.JwksUri },
-                { RegisterRequestParameters.SoftwareId, client.SoftwareId },
-                { RegisterRequestParameters.SoftwareVersion, client.SoftwareVersion },
-                { RegisterRequestParameters.TokenSignedResponseAlg, client.TokenSignedResponseAlg },
-                { RegisterRequestParameters.TokenEncryptedResponseAlg, client.TokenEncryptedResponseAlg },
-                { RegisterRequestParameters.TokenEncryptedResponseEnc, client.TokenEncryptedResponseEnc }
-            };
-            if (client.Contacts != null)
-            {
-                result.Add(RegisterRequestParameters.Contacts, new JArray(client.Contacts));
-            }
-
-            if (client.PolicyUris != null)
-            {
-                result.Add(RegisterRequestParameters.PolicyUri, new JArray(client.PolicyUris.Select(_ => ToDto(_))));
-            }
-
-            if (client.RedirectionUrls != null)
-            {
-                result.Add(RegisterRequestParameters.RedirectUris, new JArray(client.RedirectionUrls));
-            }
-            
-            if (client.GrantTypes != null)
-            {
-                result.Add(RegisterRequestParameters.GrantTypes, new JArray(client.GrantTypes));
-            }
-
-            if (client.ResponseTypes != null)
-            {
-                result.Add(RegisterRequestParameters.ResponseTypes, new JArray(client.ResponseTypes));
-            }
-
-            if (client.ClientNames != null)
-            {
-                result.Add(RegisterRequestParameters.ClientName, new JArray(client.ClientNames.Select(_ => ToDto(_))));
-            }
-
-            if (client.ClientUris != null)
-            {
-                result.Add(RegisterRequestParameters.ClientUri, new JArray(client.ClientUris.Select(_ => ToDto(_))));
-            }
-
-            if (client.LogoUris != null)
-            {
-                result.Add(RegisterRequestParameters.LogoUri, new JArray(client.LogoUris.Select(_ => ToDto(_))));
-            }
-
-            if (client.AllowedScopes != null)
-            {
-                result.Add(RegisterRequestParameters.Scope, new JArray(client.AllowedScopes.Select(_ => _.Name)));
-            }
-
-            if (client.TosUris != null)
-            {
-                result.Add(RegisterRequestParameters.TosUri, new JArray(client.TosUris.Select(_ => ToDto(_))));
-            }
-
-            return result;
-        }
-
-        private static JObject ToDto(OAuthTranslation translation)
-        {
-            return new JObject
-            {
-                { "language", translation.Language },
-                { "value", translation.Value }
+                { "content", new JArray(result.Content.Select(_ => _.ToDto())) }
             };
         }
 

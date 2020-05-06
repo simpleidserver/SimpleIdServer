@@ -1,4 +1,4 @@
-<div fxLayout="row">
+<div fxLayout="row" class="mat-elevation-z8 overflow-hidden">
     <div fxFlex="45%">
         <mat-selection-list [(ngModel)]="selectedSourceValues">
             <mat-list-option *ngFor="let value of filteredSourceValues" [value]="value">
@@ -7,10 +7,10 @@
         </mat-selection-list>
     </div>
     <div fxFlex="10%">
-        <button mat-icon-button (click)="remove()">
+        <button mat-icon-button (click)="remove()" matTooltip="{{ 'ADD_SELECTED_ITEMS' | translate }}">
             <mat-icon>keyboard_arrow_left</mat-icon>
         </button>        
-        <button mat-icon-button (click)="add()">
+        <button mat-icon-button (click)="add()" matTooltip="{{ 'REMOVE_SELECTED_ITEMS' | translate }}">
             <mat-icon>keyboard_arrow_right</mat-icon>
         </button>
     </div>
