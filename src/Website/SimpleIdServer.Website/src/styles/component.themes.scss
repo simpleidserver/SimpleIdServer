@@ -1,4 +1,14 @@
-@mixin app-theme($theme) {
+@mixin app-theme($theme) {  
+    $primary: map-get($theme, primary);
+      
+    .breadcrumb {
+        background-color: mat-color($primary, 300);
+        color: white;
+    }
+
+    .is-active {
+        background-color: rgb(245, 245, 245) !important;
+    }
 }
 
 @mixin component-themes($theme) {

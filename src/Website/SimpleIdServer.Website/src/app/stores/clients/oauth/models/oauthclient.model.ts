@@ -1,4 +1,5 @@
 import { Translation } from "../../../../common/translation";
+import { OAuthClientSecret } from './oauthclientsecret.model';
 
 export class OAuthClient {
     constructor() {
@@ -19,9 +20,16 @@ export class OAuthClient {
     CreateDateTime : Date;
     UpdateDateTime : Date;
     PreferredTokenProfile: string;
+    TokenEndPointAuthMethod: string;
+    TokenSignedResponseAlg : string;
+    TokenEncryptedResponseAlg : string;
+    TokenEncryptedResponseEnc: string;
+    RefreshTokenExpirationTimeInSeconds: number;
+    TokenExpirationTimeInSeconds: number;
     Scopes : Array<string>;
     RedirectUris: Array<string>;
     GrantTypes : Array<string>;
+    Secrets: Array<OAuthClientSecret>;
     ResponseTypes : Array<string>;
     LogoUris: Translation[];
     ClientNames: Translation[];
@@ -38,6 +46,12 @@ export class OAuthClient {
         result.CreateDateTime = json["create_datetime"];
         result.UpdateDateTime = json["update_datetime"];
         result.PreferredTokenProfile = json["preferred_token_profile"];
+        result.TokenEndPointAuthMethod = json["token_endpoint_auth_method"];
+        result.TokenSignedResponseAlg = json["token_signed_response_alg"];
+        result.TokenEncryptedResponseAlg = json["token_encrypted_response_alg"];
+        result.TokenEncryptedResponseEnc = json["token_encrypted_response_enc"];
+        result.RefreshTokenExpirationTimeInSeconds = json["refresh_token_expiration_time_seconds"];
+        result.TokenExpirationTimeInSeconds = json["token_expiration_time_seconds"];
         if (json["logo_uri"]) {
             result.LogoUris = json["logo_uri"].map(j => Translation.fromJson(j));
         }
@@ -76,6 +90,10 @@ export class OAuthClient {
 
         if (json["response_types"]) {
             result.ResponseTypes = json["response_types"];
+        }
+
+        if (json["secrets"]) {
+            result.Secrets = json["secrets"].map(s => OAuthClientSecret.fromJson(s));
         }
 
         return result;

@@ -28,12 +28,16 @@
   <mat-drawer-container class="drawer-container">
         <mat-drawer #drawer mode="side" opened [fixedInViewport]="false" [fixedTopGap]="0" [fixedBottomGap]="0">
             <mat-nav-list *ngIf="isConnected">
-                <a mat-list-item [routerLink]="['/clients/oauth']" [routerLinkActive]="['is-active']">
-                    {{ "OAUTH_CLIENTS" | translate }}
+                <a mat-list-item (click)="toggleClients()">
+                    <mat-icon>folder</mat-icon> {{ "CLIENTS" | translate }}
+                    <span fxFlex>
+                        <span fxFlex></span>
+                        <mat-icon [@indicatorRotate]="isClientsExpanded ? 'expanded': 'collapsed'">expand_more</mat-icon>
+                    </span>
                 </a>
-                <a mat-list-item [routerLink]="['/clients/openid']" [routerLinkActive]="['is-active']">
-                    {{ "OPENID_CLIENTS" | translate }}
-                </a>
+                <div *ngIf="isClientsExpanded">
+                    <a mat-list-item [routerLink]="['/clients/oauth']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "OAUTH_CLIENTS" | translate }}</a>
+                </div>
             </mat-nav-list>
         </mat-drawer>
         <router-outlet></router-outlet>

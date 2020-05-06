@@ -36,3 +36,22 @@ body, h1 {
 .relative {
 	position: relative;
 }
+
+.breadcrumb {
+    padding: 20px 0px 20px 0px;
+}
+
+.breadcrumb ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.breadcrumb ul .separator {
+    padding-right: .75rem;
+    padding-left: .75rem;
+}
+
+.breadcrumb ul li {
+    display: inline-block;
+}

@@ -22,9 +22,10 @@ export class FormTranslationComponent {
         translation.Language = form.language;
         translation.Value = form.value
         this.translations.push(translation);
+        this.addTranslationForm.reset();
     }
 
-    delete(index) {
+    delete(index : number) {
         this.translations.splice(index, 1);
     }
 }

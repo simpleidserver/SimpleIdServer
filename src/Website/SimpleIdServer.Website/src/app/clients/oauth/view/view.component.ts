@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Translation } from '../../../common/translation';
 import { OAuthScope } from '../../../stores/scopes/oauth/models/oauthscope.model';
+import { OAuthClientSecret } from '../../../stores/clients/oauth/models/oauthclientsecret.model';
 
 @Component({
     selector: 'view-oauth-client',
@@ -30,6 +31,12 @@ export class ViewOauthClientsComponent implements OnInit {
     clientGrantTypes : Array<string> = [];
     oauthResponseTypes : Array<string> = [];
     clientResponseTypes : Array<string> = [];
+    oauthTokenProfiles : Array<string> = [];
+    oauthAuthMethods : Array<string> = [];
+    clientSecrets: Array<OAuthClientSecret> [];
+    oauthTokenSignedResponseAlgs : Array<string> = [];
+    oauthTokenEncryptedResponseAlgs : Array<string> = [];
+    oauthTokenEncryptedResponseEncs : Array<string> = [];
 
     constructor(private store : Store<fromReducers.AppState>, private route: ActivatedRoute) {
         this.updateOAuthClientFormGroup = new FormGroup({
@@ -39,9 +46,13 @@ export class ViewOauthClientsComponent implements OnInit {
             }),
             softwareId: new FormControl(''),
             softwareVersion: new FormControl(''),
+            preferredTokenProfile : new FormControl(''),
+            tokenEndPointAuthMethod: new FormControl(''),
             tokenSignedResponseAlg : new FormControl(''),
             tokenEncryptedResponseAlg: new FormControl(''),
-            tokenEncryptedResponseEnc: new FormControl('')
+            tokenEncryptedResponseEnc: new FormControl(''),
+            refreshTokenExpirationTimeInSeconds: new FormControl(''),
+            tokenExpirationTimeInSeconds: new FormControl('')
         });
         this.oauthGrantTypes = [
             "client_credentials",
@@ -52,6 +63,27 @@ export class ViewOauthClientsComponent implements OnInit {
         this.oauthResponseTypes = [
             "code",
             "token"
+        ];
+        this.oauthTokenProfiles = [
+            "Bearer",
+            "mac"
+        ];
+        this.oauthAuthMethods = [
+            "private_key_jwt",
+            "client_secret_basic",
+            "client_secret_jwt",
+            "client_secret_post",
+            "pkce"
+        ];
+        this.oauthTokenSignedResponseAlgs = [
+            "RS256",
+            "ES256"
+        ];
+        this.oauthTokenEncryptedResponseAlgs = [
+            "RSA1_5"
+        ];
+        this.oauthTokenEncryptedResponseEncs = [
+            "A128CBC-HS256"
         ];
     }
 
@@ -73,6 +105,10 @@ export class ViewOauthClientsComponent implements OnInit {
         this.refresh();
     }    
 
+    deleteClientSecret(index : number) {
+        this.clientSecrets.splice(index, 1);
+    }
+
     refresh() {
         var id = this.route.snapshot.params['id'];
         let getClient = new StartGet(id);
@@ -85,6 +121,13 @@ export class ViewOauthClientsComponent implements OnInit {
         this.updateOAuthClientFormGroup.controls["clientId"].setValue(oauthClient.ClientId);
         this.updateOAuthClientFormGroup.controls["softwareId"].setValue(oauthClient.SoftwareId);
         this.updateOAuthClientFormGroup.controls["softwareVersion"].setValue(oauthClient.SoftwareVersion);
+        this.updateOAuthClientFormGroup.controls["preferredTokenProfile"].setValue(oauthClient.PreferredTokenProfile);
+        this.updateOAuthClientFormGroup.controls["tokenEndPointAuthMethod"].setValue(oauthClient.TokenEndPointAuthMethod);
+        this.updateOAuthClientFormGroup.controls["tokenSignedResponseAlg"].setValue(oauthClient.TokenSignedResponseAlg);
+        this.updateOAuthClientFormGroup.controls["tokenEncryptedResponseAlg"].setValue(oauthClient.TokenEncryptedResponseAlg);
+        this.updateOAuthClientFormGroup.controls["tokenEncryptedResponseEnc"].setValue(oauthClient.TokenEncryptedResponseEnc);
+        this.updateOAuthClientFormGroup.controls["refreshTokenExpirationTimeInSeconds"].setValue(oauthClient.RefreshTokenExpirationTimeInSeconds);
+        this.updateOAuthClientFormGroup.controls["tokenExpirationTimeInSeconds"].setValue(oauthClient.TokenExpirationTimeInSeconds);
         this.clientNames = Object.assign([], oauthClient.ClientNames);
         this.contacts = Object.assign([], oauthClient.Contacts);
         this.policyUris = Object.assign([], oauthClient.PolicyUris);
@@ -95,5 +138,6 @@ export class ViewOauthClientsComponent implements OnInit {
         this.redirectUris = Object.assign([], oauthClient.RedirectUris);
         this.clientGrantTypes = Object.assign([], oauthClient.GrantTypes);
         this.clientResponseTypes = Object.assign([], oauthClient.ResponseTypes);
+        this.clientSecrets = Object.assign([], oauthClient.Secrets);
     }
 }
