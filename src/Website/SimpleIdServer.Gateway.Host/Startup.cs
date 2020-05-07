@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ using SimpleIdServer.Gateway.Host.Handlers;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace SimpleIdServer.Gateway.Host
@@ -41,12 +43,12 @@ namespace SimpleIdServer.Gateway.Host
                      IssuerSigningKey = ExtractKey("openid_puk.txt"),
                      ValidAudiences = new List<string>
                      {
-                        "https://localhost:60000",
+                        "http://localhost:60000",
                         "http://simpleidserver.northeurope.cloudapp.azure.com/openid"
                      },
                      ValidIssuers = new List<string>
                      {
-                        "https://localhost:60000",
+                        "http://localhost:60000",
                         "http://simpleidserver.northeurope.cloudapp.azure.com/openid"
                      }
                  };
@@ -54,10 +56,20 @@ namespace SimpleIdServer.Gateway.Host
             services.AddLogging();
             services.AddOcelot(Configuration)
                 .AddDelegatingHandler<ManageClientClientCredentialsHandler>();
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            if (Configuration.GetChildren().Any(i => i.Key == "pathBase"))
+            {
+                app.UsePathBase(Configuration["pathBase"]);
+            }
+
+            app.UseForwardedHeaders();
             app.UseCors("AllowAll");
             app.UseOcelot().Wait();
         }

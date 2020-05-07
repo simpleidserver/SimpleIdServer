@@ -25,3 +25,14 @@ For project documentation, please visit [readthedocs](https://simpleidserver.rea
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Live demo
+
+Live demo : [http://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver](http://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver/).
+
+Administrator credentials :
+
+| Property      |      Value      |
+|---------------|-----------------|
+| login         | administrator   |
+| value         | password        |

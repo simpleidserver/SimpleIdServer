@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,13 +12,21 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace SimpleIdServer.OpenID.Startup
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
+        private readonly IHostingEnvironment _env;
+        private readonly IConfiguration _configuration;
+
+        public Startup(IHostingEnvironment env, IConfiguration configuration)
+        {
+            _env = env;
+            _configuration = configuration;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -46,10 +56,20 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddScopes(DefaultConfiguration.Scopes)
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication();
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            if (_configuration.GetChildren().Any(i => i.Key == "pathBase"))
+            {
+                app.UsePathBase(_configuration["pathBase"]);
+            }
+
+            app.UseForwardedHeaders();
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseStaticFiles();

@@ -1,32 +1,32 @@
 <ng-container>
   <mat-toolbar class="header-toolbar">
-      <a class="no-style" [routerLink]="['/home']">
-        
-      </a>
-      <button mat-icon-button (click)="drawer.toggle()">
-          <mat-icon>menu</mat-icon>
+    <a class="no-style" [routerLink]="['/home']">
+
+    </a>
+    <button mat-icon-button (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="spacer"></span>
+    <div *ngIf="isConnected">
+      <button mat-button [matMenuTriggerFor]="welcomeMenu">
+        {{ "WELCOME" | translate:{name:name} }}
       </button>
-      <span class="spacer"></span>
-      <div *ngIf="isConnected">
-          <button mat-button [matMenuTriggerFor]="welcomeMenu">
-              {{ "WELCOME" | translate:{name:name} }}
-          </button>
-          <mat-menu #welcomeMenu="matMenu">
-              <button mat-menu-item (click)="disconnect()">{{ "DISCONNECT" | translate }}</button>
-          </mat-menu>
-      </div>
-      <div *ngIf="!isConnected">
-          <button mat-raised-button color="primary" (click)="login()">{{ "AUTHENTICATE" | translate }}</button>
-          <button mat-raised-button color="primary" (click)="chooseSession()">{{ "CHOOSE_SESSION" | translate }}</button>
-      </div>
-      <button mat-button [matMenuTriggerFor]="languages">{{ "LANGUAGES" | translate }}</button>
-      <mat-menu #languages="matMenu">
-          <button mat-menu-item (click)="chooseLanguage('fr')">{{ "FRENCH" | translate }}</button>
-          <button mat-menu-item (click)="chooseLanguage('en')">{{ "ENGLISH" | translate }}</button>
+      <mat-menu #welcomeMenu="matMenu">
+        <button mat-menu-item (click)="disconnect()">{{ "DISCONNECT" | translate }}</button>
       </mat-menu>
+    </div>
+    <div *ngIf="!isConnected">
+      <button mat-raised-button color="primary" (click)="login()">{{ "AUTHENTICATE" | translate }}</button>
+      <button mat-raised-button color="primary" (click)="chooseSession()">{{ "CHOOSE_SESSION" | translate }}</button>
+    </div>
+    <button mat-button [matMenuTriggerFor]="languages">{{ "LANGUAGES" | translate }}</button>
+    <mat-menu #languages="matMenu">
+      <button mat-menu-item (click)="chooseLanguage('fr')">{{ "FRENCH" | translate }}</button>
+      <button mat-menu-item (click)="chooseLanguage('en')">{{ "ENGLISH" | translate }}</button>
+    </mat-menu>
   </mat-toolbar>
   <mat-drawer-container class="drawer-container">
-        <mat-drawer #drawer mode="side" opened [fixedInViewport]="false" [fixedTopGap]="0" [fixedBottomGap]="0">
+        <mat-drawer #drawer mode="side" opened>
             <mat-nav-list *ngIf="isConnected">
                 <a mat-list-item (click)="toggleClients()">
                     <mat-icon>folder</mat-icon> {{ "CLIENTS" | translate }}

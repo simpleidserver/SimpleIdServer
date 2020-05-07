@@ -13,7 +13,7 @@ server {
 	server_name simpleidserver.northeurope.cloudapp.azure.com;
 		
 	location /simpleidserver {
-		proxy_pass http://localhost:70000;
+		proxy_pass http://localhost:5000;
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection keep-alive;
 		proxy_set_header Host $host;
@@ -36,7 +36,7 @@ server {
 	}
     
 	location /simpleidserverapi {
-		proxy_pass http://localhost:70001;
+		proxy_pass http://localhost:5001/simpleidserverapi;
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection keep-alive;
 		proxy_set_header Host $host;

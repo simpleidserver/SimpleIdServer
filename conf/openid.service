@@ -3,7 +3,7 @@ Description=OPENID server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/dotnet /home/ftpuser/src/build/results/services/OpenID/SimpleIdServer.OpenID.Startup.dll --server.urls="http://*:60000"
+ExecStart=/usr/bin/dotnet /home/ftpuser/src/build/results/services/OpenID/SimpleIdServer.OpenID.Startup.dll --pathBase=/openid --server.urls="http://*:60000"
 KillMode=process
 TimeoutStopSec=5s
 Restart=always

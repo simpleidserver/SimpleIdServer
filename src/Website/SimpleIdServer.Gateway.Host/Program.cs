@@ -17,9 +17,9 @@ namespace SimpleIdServer.Gateway.Host
                 {
                     config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
                         .AddEnvironmentVariables(prefix: "ASPNETCORE_")
-                        .AddJsonFile("ocelot.json");
+                        .AddJsonFile($"ocelot.{hostingContext.HostingEnvironment.EnvironmentName}.json");
                 })
-                .UseUrls("http://*:60004")
+                .UseUrls("http://*:5001")
                 .UseStartup<Startup>()
                 .Build();
             host.Run();

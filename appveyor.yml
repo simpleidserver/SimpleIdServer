@@ -25,12 +25,12 @@ deploy:
   api_key:
     secure: zs1JVjFHRdvB36fGq2rN8MR7QeJnCVkt7VTG4ZHT5OYDNpuh2AlGHqK+rseevn8l
   skip_symbols: true
-  artifact: build\results\*.nupkg
+  artifact: /.*\.nupkg/
   on:
     branch: master
 - provider: NuGet
   name: production
-  artifact: build\results\*.nupkg
+  artifact: /.*\.nupkg/
   api_key:
     secure: Uigh51VjtY/sVniNFhkSvZ60/FvI9DyJ/g2feCm/WNdzeN9x5FSiqQwF9Y8qQ6nj
   on:
