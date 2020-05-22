@@ -165,7 +165,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 IsRootSchema = schema.IsRootSchema,
                 Name = schema.Name,
                 ResourceType = schema.ResourceType,
-                Attributes = schema.Attributes.Select(a => ToDomain(a)).ToList(),
+                Attributes = schema.Attributes.Where(a => string.IsNullOrEmpty(a.ParentId)).Select(a => ToDomain(a)).ToList(),
                 SchemaExtensions = schema.SchemaExtensions.Select(s => new SCIMSchemaExtension
                 {
                     Id = s.Id,

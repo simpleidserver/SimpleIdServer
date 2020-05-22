@@ -20,7 +20,8 @@ namespace SimpleIdServer.Scim
             var builder = SCIMSchemaBuilder.Create(jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Id].ToString(), 
                 jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Name].ToString(), 
                 resourceType, 
-                jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Description].ToString());
+                jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Description].ToString(),
+                true);
             var attributes = jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Attributes] as JArray;
             foreach(JObject attribute in attributes)
             {
@@ -90,7 +91,7 @@ namespace SimpleIdServer.Scim
             }
 
             T result;
-            if (!Enum.TryParse(value.ToLowerInvariant(), out result))
+            if (!Enum.TryParse(value.ToLowerInvariant(), true, out result))
             {
                 return default(T);
             }
