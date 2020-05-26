@@ -21,6 +21,7 @@ namespace SimpleIdServer.Scim.Builder
             _id = id;
             _attributes = new List<SCIMSchemaAttribute>();
             _extensions = new List<SCIMSchemaExtension>();
+            _isRootSchema = true;
         }
 
         public SCIMSchemaBuilder(string id, string name, string resourceType) : this(id)
@@ -29,7 +30,7 @@ namespace SimpleIdServer.Scim.Builder
             _resourceType = resourceType;
         }
         
-        public SCIMSchemaBuilder(string id, string name, string resourceType, string description, bool isRootSchema = false) : this(id, name, resourceType)
+        public SCIMSchemaBuilder(string id, string name, string resourceType, string description, bool isRootSchema = true) : this(id, name, resourceType)
         {
             _description = description;
             _isRootSchema = isRootSchema;
