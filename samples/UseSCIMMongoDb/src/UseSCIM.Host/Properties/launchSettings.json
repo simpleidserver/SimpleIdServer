@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SimpleIdServer.Scim.Startup": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
