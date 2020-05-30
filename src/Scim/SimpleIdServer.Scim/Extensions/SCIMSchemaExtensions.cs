@@ -50,6 +50,11 @@ namespace SimpleIdServer.Scim.Extensions
                 result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.SubAttributes, subAttributes);
             }
 
+            if (scimSchemaAttribute.CanonicalValues != null && scimSchemaAttribute.CanonicalValues.Any())
+            {
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.CanonicalValues, new JArray(scimSchemaAttribute.CanonicalValues));
+            }
+
             return result;
         }
     }
