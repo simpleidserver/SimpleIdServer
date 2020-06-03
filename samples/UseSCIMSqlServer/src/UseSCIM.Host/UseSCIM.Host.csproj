@@ -12,9 +12,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.0" />
-    <PackageReference Include="SimpleIdServer.Scim" Version="1.1.3" />
-    <PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="1.1.3" />
-    <PackageReference Include="SimpleIdServer.Jwt" Version="1.1.3" />
+    <PackageReference Include="SimpleIdServer.Scim" Version="1.1.4" />
+    <PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="1.1.4" />
+    <PackageReference Include="SimpleIdServer.Jwt" Version="1.1.4" />
   </ItemGroup>
   <ItemGroup>
     <None Update="oauth_puk.txt">

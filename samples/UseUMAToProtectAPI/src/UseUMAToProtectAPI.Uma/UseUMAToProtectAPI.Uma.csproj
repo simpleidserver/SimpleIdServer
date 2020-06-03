@@ -6,7 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
-    <PackageReference Include="SimpleIdServer.Uma.Bootstrap4" Version="1.0.7" />
+    <PackageReference Include="SimpleIdServer.Uma.Bootstrap4" Version="1.1.4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Views.Home.Index.Designer.cs">
