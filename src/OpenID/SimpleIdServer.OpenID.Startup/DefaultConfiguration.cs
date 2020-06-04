@@ -143,6 +143,25 @@ namespace SimpleIdServer.OpenID.Startup
                     new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Name, "User"),
                     new KeyValuePair<string, string>(Jwt.Constants.UserClaims.UniqueName, "User")
                 }
+            },
+            new OAuthUser
+            {
+                Id = "doctor",
+                Credentials = new List<OAuthUserCredential>
+                {
+                    new OAuthUserCredential
+                    {
+                        CredentialType = "pwd",
+                        Value = PasswordHelper.ComputeHash("password")
+                    }
+                },
+                Claims = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Subject, "doctor"),
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Name, "Doctor"),
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.GivenName, "Doctor"),
+                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.UniqueName, "Doctor")
+                }
             }
         };
 
@@ -404,6 +423,43 @@ namespace SimpleIdServer.OpenID.Startup
                     "http://localhost:51725",
                     "http://localhost:8081",
                     "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "token",
+                    "id_token"
+                }
+            },
+            new OpenIdClient
+            {
+                ClientId = "medikitWebsite",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("f200eeb0-a6a3-465e-be91-97806e5dd3bc"))
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.Profile,
+                    SIDOpenIdConstants.StandardScopes.Email,
+                    SIDOpenIdConstants.StandardScopes.Role
+                },
+                GrantTypes = new List<string>
+                {
+                    "implicit"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "http://localhost:8080",
+                    "http://simpleidserver.northeurope.cloudapp.azure.com/medikit"
                 },
                 PreferredTokenProfile = "Bearer",
                 ResponseTypes = new List<string>
