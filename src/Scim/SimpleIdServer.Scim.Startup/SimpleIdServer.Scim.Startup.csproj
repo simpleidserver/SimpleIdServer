@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="..\SCIMSchemas\EnterpriseUserSchema.json" Link="Schemas\EnterpriseUserSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\SCIMSchemas\GroupSchema.json" Link="Schemas\GroupSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

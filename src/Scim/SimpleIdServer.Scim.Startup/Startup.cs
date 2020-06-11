@@ -61,15 +61,22 @@ namespace SimpleIdServer.Scim.Startup
                 });
             var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
             var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
+            var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
             var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
             var customResource = Builder.SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources")
                 .AddStringAttribute("name")
                 .AddStringAttribute("lastname")
                 .Build();
+            userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
+            {
+                Id = Guid.NewGuid().ToString(),
+                Schema = enterpriseUserSchema.Id
+            });
             var schemas = new List<SCIMSchema>
             {
                 userSchema,
                 groupSchema,
+                enterpriseUserSchema,
                 customResource
             };
             services.AddSIDScim(_ =>
