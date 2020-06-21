@@ -74,7 +74,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
             _scimDbContext.SCIMRepresentationSchemaLst.RemoveRange(result.Schemas);
             _scimDbContext.SCIMRepresentationLst.Remove(result);
-            return Task.FromResult(false);
+            return Task.FromResult(true);
         }
 
         public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
