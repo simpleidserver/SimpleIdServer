@@ -19,7 +19,6 @@ namespace SimpleIdServer.Scim.Domain
     {
         private static List<string> COMMNON_PROPERTY_NAMES = new List<string>
         {
-            { SCIMConstants.StandardSCIMRepresentationAttributes.Id },
             { SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId },
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}" },
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}" },
@@ -171,6 +170,7 @@ namespace SimpleIdServer.Scim.Domain
                 representation.IncludeAttribute(includedAttribute, result);
             }
 
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id);
             return result;
         }
 
@@ -221,11 +221,7 @@ namespace SimpleIdServer.Scim.Domain
                 return;
             }
 
-            if (fullPath == SCIMConstants.StandardSCIMRepresentationAttributes.Id)
-            {
-                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Id, scimRepresentation.Id);
-            }
-            else if (fullPath == SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId)
+            if (fullPath == SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId)
             {
                 result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, scimRepresentation.ExternalId);
             } 

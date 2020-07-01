@@ -65,7 +65,7 @@ namespace SimpleIdServer.Scim.Tests
             Assert.True((fifthJSON.SelectToken("phones") as JArray).Count == 1);
             Assert.NotNull(sixJSON.SelectToken("meta.lastModified"));
             Assert.Null(sevenJSON.SelectToken("meta.lastModified"));
-            Assert.Null(eightJSON.SelectToken("id"));
+            Assert.NotNull(eightJSON.SelectToken("id"));
             Assert.NotNull(nineJSON.SelectToken("id"));
         }
     }
