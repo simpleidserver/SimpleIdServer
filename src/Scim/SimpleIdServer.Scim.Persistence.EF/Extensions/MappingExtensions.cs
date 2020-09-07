@@ -148,7 +148,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 ResourceType = representation.ResourceType,
                 Id = representation.Id,
                 Schemas = representation.Schemas.Select(s => ToDomain(s.Schema)).ToList(),
-                Attributes = representation.Attributes.Select(s =>
+                Attributes = representation.Attributes.Where(_ => _.Parent == null).Select(s =>
                 {
                     return ToDomain(s);
                 }).ToList()                

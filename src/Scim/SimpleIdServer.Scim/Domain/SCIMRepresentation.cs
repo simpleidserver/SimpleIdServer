@@ -70,6 +70,11 @@ namespace SimpleIdServer.Scim.Domain
             Created = created;
         }
 
+        public void SetExternalId(string externalId)
+        {
+            ExternalId = externalId;
+        }
+
         public void SetUpdated(DateTime lastModified)
         {
             LastModified = lastModified;

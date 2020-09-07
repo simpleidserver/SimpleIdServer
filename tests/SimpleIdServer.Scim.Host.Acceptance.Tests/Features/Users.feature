@@ -195,14 +195,16 @@ Scenario: Check user can be updated (HTTP PUT)
 	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
 	| employeeNumber | number                                                                                                         |
+	| externalId     | ext                                                                                                            |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
-	| Key     | Value                                                                                        |
-	| schemas | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                             |
-	| name    | { "formatted" : "newFormatted", "familyName": "newFamilyName", "givenName": "newGivenName" } |
-	| id      | $id$                                                                                         |
+	| Key        | Value                                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                             |
+	| name       | { "formatted" : "newFormatted", "familyName": "newFamilyName", "givenName": "newGivenName" } |
+	| id         | $id$                                                                                         |
+	| externalId | newext                                                                                       |
 	
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
@@ -212,6 +214,7 @@ Scenario: Check user can be updated (HTTP PUT)
 	Then HTTP HEADER contains 'ETag'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:schemas:core:2.0:User'
 	Then JSON 'userName'='bjen'
+	Then JSON 'externalId'='newext'
 	Then JSON 'name.formatted'='newFormatted'
 	Then JSON 'name.familyName'='newFamilyName'
 	Then JSON 'name.givenName'='newGivenName'
