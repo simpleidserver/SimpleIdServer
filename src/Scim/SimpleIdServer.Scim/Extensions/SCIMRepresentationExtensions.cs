@@ -126,6 +126,20 @@ namespace SimpleIdServer.Scim.Domain
                                     attribute.ValuesString.Add(s);
                                 }
                             }
+                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.DECIMAL)
+                            {
+                                foreach(var d in newAttribute.ValuesDecimal)
+                                {
+                                    attribute.ValuesDecimal.Add(d);
+                                }
+                            }
+                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.BINARY)
+                            {
+                                foreach(var b in newAttribute.ValuesBinary)
+                                {
+                                    attribute.ValuesBinary.Add(b);
+                                }
+                            }
                         }
                         else
                         {
@@ -462,6 +476,12 @@ namespace SimpleIdServer.Scim.Domain
 
                             jObj.Add(representationAttr.SchemaAttribute.Name, jArr);
                         }
+                        break;
+                    case SCIMSchemaAttributeTypes.DECIMAL:
+                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesDecimal) : representationAttr.ValuesDecimal.First());
+                        break;
+                    case SCIMSchemaAttributeTypes.BINARY:
+                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesBinary.Select(_ => Convert.ToBase64String(_))) : Convert.ToBase64String(representationAttr.ValuesBinary.First()));
                         break;
                 }
             }

@@ -16,9 +16,15 @@ namespace SimpleIdServer.Scim.Tests
         [Fact]
         public void When_Parse_And_Execute_Filter()
         {
-            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema })
+            var customSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:CustomProperties", "User", SimpleIdServer.Scim.SCIMConstants.SCIMEndpoints.User, "Custom properties", false)
+                    .AddDecimalAttribute("age")
+                    .AddBinaryAttribute("eidCertificate")
+                    .Build();
+            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, customSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "bjensen" })
                 .AddBooleanAttribute("active", "urn:ietf:params:scim:schemas:core:2.0:User", new List<bool> { true })
+                .AddDecimalAttribute("age", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<decimal> { 22 })
+                .AddBinaryAttribute("eidCertificate", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<string> { "aGVsbG8=" })
                 .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
                 .AddStringAttribute("userType", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Employee" })
                 .AddComplexAttribute("emails", "urn:ietf:params:scim:schemas:core:2.0:User", (c) =>
@@ -76,6 +82,8 @@ namespace SimpleIdServer.Scim.Tests
             var fifteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "emails[type eq \"work\" and value co \"example.com\"] or ims[type eq \"xmpp\" and value co \"foo.com\"]");
             var sixteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\" and meta.version eq \"2\"");
             var seventeenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified pr");
+            var eighteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "age gt 15");
+            var nineteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "eidCertificate eq \"aGVsbG8=\"");
 
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
@@ -94,6 +102,8 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(2, fifteenResult.Count());
             Assert.Equal(1, sixteenResult.Count());
             Assert.Equal(2, seventeenResult.Count());
+            Assert.Equal(1, eighteenResult.Count());
+            Assert.Equal(1, nineteenResult.Count());
         }
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter)

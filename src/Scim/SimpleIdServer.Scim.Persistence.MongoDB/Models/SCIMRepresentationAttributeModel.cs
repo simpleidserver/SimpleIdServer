@@ -19,6 +19,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
         public ICollection<int> ValuesInteger { get; set; }
         public ICollection<DateTime> ValuesDateTime { get; set; }
         public ICollection<string> ValuesReference { get; set; }
+        public ICollection<decimal> ValuesDecimal { get; set; }
+        public ICollection<byte[]> ValuesByte { get; set; }
         public ICollection<SCIMRepresentationAttributeModel> Children { get; set; }
         public MongoDBRef Parent { get; set; }
         public SCIMSchemaAttributeModel SchemaAttribute { get; set; }

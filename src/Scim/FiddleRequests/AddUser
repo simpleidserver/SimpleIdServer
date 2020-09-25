@@ -1,0 +1,14 @@
+POST http://localhost:60002/Users HTTP/1.1
+User-Agent: Fiddler
+Content-Type: application/json
+Host: localhost:60002
+Content-Length: 379
+
+{
+ "schemas": [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:eid:2.0:User"],
+ "userName": "loki",
+ "externalId": "externalId",
+ "name": { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" },
+"phoneNumbers": [ { "type": "mobile", "value": "01" }, { "type": "home", "value": "02" } ],
+"validity": "22"
+}

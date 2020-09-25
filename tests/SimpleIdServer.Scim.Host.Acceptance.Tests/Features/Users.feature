@@ -10,6 +10,8 @@ Scenario: Check User can be created
 	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| employeeNumber | number                                                                                                         |
 	| type           | manager                                                                                                        |
+	| age            | 22                                                                                                             |
+	| eidCertificate | aGVsbG8=                                                                                                       |
 	
 	And extract JSON from body
 
@@ -29,6 +31,8 @@ Scenario: Check User can be created
 	Then JSON 'name.familyName'='familyName'
 	Then JSON 'name.givenName'='givenName'
 	Then JSON 'org'='ENTREPRISE'
+	Then JSON 'age'='22'
+	Then JSON 'eidCertificate'='aGVsbG8='
 
 Scenario: Check attribute with a mutability equals to readOnly cannot be overriden
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -108,12 +112,14 @@ Scenario: Check user can be filtered (HTTP POST)
 	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
 	| employeeNumber | number                                                                                                         |
+	| age            | 22                                                                                                             |
+	| eidCertificate | aGVsbG8=                                                                                                       |
 
 	And execute HTTP POST JSON request 'http://localhost/Users/.search'	
-	| Key        | Value                    |
-	| filter     | userName eq "bjen"       |
-	| count      | 3                        |
-	| attributes | [ 'phones.phoneNumber' ] |
+	| Key        | Value                                                                  |
+	| filter     | userName eq "bjen" and ( age gt 15" and eidCertificate eq "aGVsbG8=" ) |
+	| count      | 3                                                                      |
+	| attributes | [ 'phones.phoneNumber' ]                                               |
 
 	And extract JSON from body
 

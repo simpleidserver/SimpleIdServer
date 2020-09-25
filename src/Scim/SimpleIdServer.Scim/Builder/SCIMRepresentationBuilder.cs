@@ -27,17 +27,27 @@ namespace SimpleIdServer.Scim.Builder
             _schemas = schemas;
         }
 
-        public SCIMRepresentationBuilder AddAttribute(string name, string schemaId, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null)
+        public SCIMRepresentationBuilder AddAttribute(string name, string schemaId, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null, List<decimal> valuesDecimal = null, List<byte[]> valuesBinary = null)
         {
             var schemaAttribute = _schemas.First(s => s.Id == schemaId).Attributes.FirstOrDefault(a => a.Name == name);
             var id = Guid.NewGuid().ToString();
-            _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime));
+            _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime, valuesDecimal, valuesBinary));
             return this;
         }
 
         public SCIMRepresentationBuilder AddStringAttribute(string name, string schemaId, List<string> valuesString)
         {
             return AddAttribute(name, schemaId, valuesString: valuesString);
+        }
+
+        public SCIMRepresentationBuilder AddDecimalAttribute(string name, string schemaId, List<decimal> valuesDecimal)
+        {
+            return AddAttribute(name, schemaId, valuesDecimal: valuesDecimal);
+        }
+
+        public SCIMRepresentationBuilder AddBinaryAttribute(string name, string schemaId, List<string> valuesBinary)
+        {
+            return AddAttribute(name, schemaId, valuesBinary: valuesBinary.Select(_ => Convert.FromBase64String(_)).ToList());
         }
 
         public SCIMRepresentationBuilder AddBooleanAttribute(string name, string schemaId, List<bool> valuesBoolean)

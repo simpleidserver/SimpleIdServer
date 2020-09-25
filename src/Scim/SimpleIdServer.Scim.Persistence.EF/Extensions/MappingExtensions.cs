@@ -38,6 +38,16 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 ValueString = s,
                 Id = Guid.NewGuid().ToString()
             }));
+            values.AddRange(a.ValuesDecimal.Select(s => new SCIMRepresentationAttributeValueModel
+            {
+                ValueDecimal = s,
+                Id = Guid.NewGuid().ToString()
+            }));
+            values.AddRange(a.ValuesBinary.Select(s => new SCIMRepresentationAttributeValueModel
+            {
+                ValueByte = s,
+                Id = Guid.NewGuid().ToString()
+            }));
             var result = new SCIMRepresentationAttributeModel
             {
                 Id = a.Id,
@@ -218,6 +228,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 ValuesInteger = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.INTEGER ? new List<int>() : representationAttribute.Values.Select(v => v.ValueInteger.Value).ToList(),
                 ValuesReference = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.REFERENCE ? new List<string>() : representationAttribute.Values.Select(v => v.ValueReference).ToList(),
                 ValuesString = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.STRING ? new List<string>() : representationAttribute.Values.Select(v => v.ValueString).ToList(),
+                ValuesDecimal = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.DECIMAL ? new List<decimal>() : representationAttribute.Values.Select(v => v.ValueDecimal.Value).ToList(),
+                ValuesBinary = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.BINARY ? new List<byte[]>() : representationAttribute.Values.Select(v => v.ValueByte).ToList(),
                 Values = new List<SCIMRepresentationAttribute>()
             };
             if (representationAttribute.Children != null && representationAttribute.Children.Any())

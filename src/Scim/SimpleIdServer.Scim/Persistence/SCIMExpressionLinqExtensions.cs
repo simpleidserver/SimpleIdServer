@@ -1,12 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Primitives;
 using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Permissions;
 
 namespace SimpleIdServer.Scim.Extensions
 {
@@ -269,17 +274,27 @@ namespace SimpleIdServer.Scim.Extensions
             var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
             var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
             var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
+            var propertyValuesDecimal = Expression.Property(representationAttrExpr, "ValuesDecimal");
+            var propertyValuesBinary = Expression.Property(representationAttrExpr, "ValuesBinary");
             var countIntegerExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(int) }, propertyValuesInt);
             var countStringExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(string) }, propertyValuesString);
             var countDateTimeExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(DateTime) }, propertyValuesDateTime);
             var countBooleanExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(bool) }, propertyValuesBoolean);
+            var countDecimalExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(decimal) }, propertyValuesDecimal);
+            var countBinaryExpression = Expression.Call(typeof(Enumerable), "Count", new[] { typeof(byte[]) }, propertyValuesBinary);
             return Expression.Or(
                 Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.INTEGER)), Expression.GreaterThan(countIntegerExpression, Expression.Constant(0))),
                 Expression.Or(
                     Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.STRING)), Expression.GreaterThan(countStringExpression, Expression.Constant(0))),
                     Expression.Or(
                         Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DATETIME)), Expression.GreaterThan(countDateTimeExpression, Expression.Constant(0))),
-                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), Expression.GreaterThan(countBooleanExpression, Expression.Constant(0)))
+                        Expression.Or(
+                            Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), Expression.GreaterThan(countBooleanExpression, Expression.Constant(0))),
+                            Expression.Or(
+                                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DECIMAL)), Expression.GreaterThan(countDecimalExpression, Expression.Constant(0))),
+                                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BINARY)), Expression.GreaterThan(countBinaryExpression, Expression.Constant(0)))
+                            )
+                        )
                     )
                 )
             );
@@ -305,8 +320,23 @@ namespace SimpleIdServer.Scim.Extensions
                         return Expression.NotEqual(representationExpr, Expression.Constant(ParseBoolean(comparisonExpression.Value)));
                     }
 
+                    if (representationExpr.Type == typeof(decimal))
+                    {
+                        return Expression.NotEqual(representationExpr, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(byte[]))
+                    {
+                        return Expression.NotEqual(representationExpr, Expression.Constant(ParseBinary(comparisonExpression.Value)));
+                    }
+
                     return Expression.NotEqual(representationExpr, Expression.Constant(comparisonExpression.Value));
                 case SCIMComparisonOperators.GT:
+                    if (representationExpr.Type == typeof(byte[]) || representationExpr.Type == typeof(bool))
+                    {
+                        throw new SCIMFilterException(string.Format(Global.GreaterThanNotSupported, representationExpr.Type.Name));
+                    }
+
                     if (representationExpr.Type == typeof(DateTime))
                     {
                         return Expression.GreaterThan(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
@@ -317,8 +347,18 @@ namespace SimpleIdServer.Scim.Extensions
                         return Expression.GreaterThan(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
                     }
 
+                    if (representationExpr.Type == typeof(decimal))
+                    {
+                        return Expression.GreaterThan(representationExpr, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                    }
+
                     return Expression.GreaterThan(representationExpr, Expression.Constant(comparisonExpression.Value));
                 case SCIMComparisonOperators.GE:
+                    if (representationExpr.Type == typeof(byte[]) || representationExpr.Type == typeof(bool))
+                    {
+                        throw new SCIMFilterException(string.Format(Global.GreaterThanOrEqualNotSupported, representationExpr.Type.Name));
+                    }
+
                     if (representationExpr.Type == typeof(DateTime))
                     {
                         return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
@@ -329,8 +369,18 @@ namespace SimpleIdServer.Scim.Extensions
                         return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
                     }
 
+                    if (representationExpr.Type == typeof(decimal))
+                    {
+                        return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                    }
+
                     return Expression.GreaterThanOrEqual(representationExpr, Expression.Constant(comparisonExpression.Value));
                 case SCIMComparisonOperators.LE:
+                    if (representationExpr.Type == typeof(byte[]) || representationExpr.Type == typeof(bool))
+                    {
+                        throw new SCIMFilterException(string.Format(Global.LessThanOrEqualNotSupported, representationExpr.Type.Name));
+                    }
+
                     if (representationExpr.Type == typeof(DateTime))
                     {
                         return Expression.LessThanOrEqual(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
@@ -341,8 +391,18 @@ namespace SimpleIdServer.Scim.Extensions
                         return Expression.LessThanOrEqual(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
                     }
 
+                    if (representationExpr.Type == typeof(decimal))
+                    {
+                        return Expression.LessThanOrEqual(representationExpr, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                    }
+
                     return Expression.LessThanOrEqual(representationExpr, Expression.Constant(comparisonExpression.Value));
                 case SCIMComparisonOperators.LT:
+                    if (representationExpr.Type == typeof(byte[]) || representationExpr.Type == typeof(bool))
+                    {
+                        throw new SCIMFilterException(string.Format(Global.LessThanNotSupported, representationExpr.Type.Name));
+                    }
+
                     if (representationExpr.Type == typeof(DateTime))
                     {
                         return Expression.LessThan(representationExpr, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
@@ -351,6 +411,11 @@ namespace SimpleIdServer.Scim.Extensions
                     if (representationExpr.Type == typeof(int))
                     {
                         return Expression.LessThan(representationExpr, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(decimal))
+                    {
+                        return Expression.LessThan(representationExpr, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
                     }
 
                     return Expression.LessThan(representationExpr, Expression.Constant(comparisonExpression.Value));
@@ -368,6 +433,16 @@ namespace SimpleIdServer.Scim.Extensions
                     if (representationExpr.Type == typeof(bool))
                     {
                         return Expression.Equal(representationExpr, Expression.Constant(ParseBoolean(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(decimal))
+                    {
+                        return Expression.Equal(representationExpr, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                    }
+
+                    if (representationExpr.Type == typeof(byte[]))
+                    {
+                        return Expression.Equal(representationExpr, Expression.Constant(ParseBinary(comparisonExpression.Value)));
                     }
 
                     return Expression.Equal(representationExpr, Expression.Constant(comparisonExpression.Value));
@@ -393,14 +468,20 @@ namespace SimpleIdServer.Scim.Extensions
             var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
             var propertyValuesInt = Expression.Property(representationAttrExpr, "ValuesInteger");
             var propertyValuesDateTime = Expression.Property(representationAttrExpr, "ValuesDateTime");
+            var propertyValuesDecimal = Expression.Property(representationAttrExpr, "ValuesDecimal");
+            var propertyValuesBinary = Expression.Property(representationAttrExpr, "ValuesBinary");
             var attrInteger = Expression.Parameter(typeof(int), "prop");
             var attrDateTime = Expression.Parameter(typeof(DateTime), "prop");
             var attrString = Expression.Parameter(typeof(string), "prop");
             var attrBoolean = Expression.Parameter(typeof(bool), "prop");
+            var attrDecimal = Expression.Parameter(typeof(decimal), "prop");
+            var attrBinary = Expression.Parameter(typeof(byte[]), "prop");
             Expression anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Constant(false), attrInteger),
                 anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Constant(false), attrDateTime),
                 anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Constant(false), attrString),
-                anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Constant(false), attrBoolean);
+                anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Constant(false), attrBoolean),
+                anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.Constant(false), attrDecimal),
+                anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.Constant(false), attrBinary);
             Expression equalValue = null;
             switch (comparisonExpression.ComparisonOperator)
             {
@@ -409,28 +490,36 @@ namespace SimpleIdServer.Scim.Extensions
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.NotEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
                     anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.NotEqual(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
                     anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.NotEqual(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
+                    anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.NotEqual(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
+                    anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.NotEqual(attrBinary, Expression.Constant(ParseBinary(comparisonExpression.Value))), attrBinary);
                     break;
                 case SCIMComparisonOperators.GT:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.GreaterThan(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.GreaterThan(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.GreaterThan(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     break;
                 case SCIMComparisonOperators.GE:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.GreaterThanOrEqual(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.GreaterThanOrEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.GreaterThanOrEqual(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     break;
                 case SCIMComparisonOperators.LE:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.LessThanOrEqual(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.LessThanOrEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.LessThanOrEqual(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     break;
                 case SCIMComparisonOperators.LT:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.LessThan(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.LessThan(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
+                    anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.LessThan(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     break;
                 case SCIMComparisonOperators.EQ:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Equal(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Equal(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
                     anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Equal(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
                     anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Equal(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
+                    anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.Equal(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
+                    anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.NotEqual(attrBinary, Expression.Constant(ParseBinary(comparisonExpression.Value))), attrBinary);
                     break;
                 case SCIMComparisonOperators.SW:
                     var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
@@ -450,13 +539,21 @@ namespace SimpleIdServer.Scim.Extensions
             var allDateTime = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(DateTime)), propertyValuesDateTime, anyDateTimeLambda);
             var allString = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyStringLambda);
             var allBoolean = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(bool)), propertyValuesBoolean, anyBooleanLambda);
+            var allDecimal = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(decimal)), propertyValuesDecimal, anyDecimalLambda);
+            var allBinary = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(byte[])), propertyValuesBinary, anyBinaryLambda);
             equalValue = Expression.Or(
                 Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.INTEGER)), allInteger),
                 Expression.Or(
                     Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DATETIME)), allDateTime),
                     Expression.Or(
                         Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.STRING)), allString),
-                        Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), allBoolean)
+                        Expression.Or(
+                            Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BOOLEAN)), allBoolean),
+                            Expression.Or(
+                                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.DECIMAL)), allDecimal),
+                                Expression.And(Expression.Equal(propertySchemaType, Expression.Constant(SCIMSchemaAttributeTypes.BINARY)), allBinary)
+                            )
+                        )
                     )
                 )
             );
@@ -472,6 +569,24 @@ namespace SimpleIdServer.Scim.Extensions
             }
 
             return default(bool);
+        }
+
+        private static byte[] ParseBinary(string str)
+        {
+            var result = new byte[0];
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return result;
+            }
+
+            try
+            {
+                return Convert.FromBase64String(str);
+            }
+            catch
+            {
+                return result;
+            }
         }
 
         private static DateTime ParseDateTime(string str)
@@ -494,6 +609,17 @@ namespace SimpleIdServer.Scim.Extensions
             }
 
             return default(int);
+        }
+
+        private static decimal ParseDecimal(string str)
+        {
+            decimal result;
+            if (decimal.TryParse(str, out result))
+            {
+                return result;
+            }
+
+            return default(decimal);
         }
 
         private static bool IsCommonAttribute(SCIMAttributeExpression scimAttributeExpression)

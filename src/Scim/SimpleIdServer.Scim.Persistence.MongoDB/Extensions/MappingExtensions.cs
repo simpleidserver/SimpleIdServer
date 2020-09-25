@@ -21,6 +21,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 ValuesInteger = a.ValuesInteger,
                 ValuesReference = a.ValuesReference,
                 ValuesString = a.ValuesString,
+                ValuesByte = a.ValuesBinary,
+                ValuesDecimal = a.ValuesDecimal,
                 SchemaAttribute = a.SchemaAttribute.ToModel()
             };
 
@@ -194,6 +196,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 ValuesInteger = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.INTEGER ? new List<int>() : representationAttribute.ValuesInteger,
                 ValuesReference = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.REFERENCE ? new List<string>() : representationAttribute.ValuesReference,
                 ValuesString = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.STRING ? new List<string>() : representationAttribute.ValuesString,
+                ValuesDecimal = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.DECIMAL ? new List<decimal>() : representationAttribute.ValuesDecimal,
+                ValuesBinary = representationAttribute.SchemaAttribute.Type != SCIMSchemaAttributeTypes.BINARY ? new List<byte[]>() : representationAttribute.ValuesByte,
                 Values = new List<SCIMRepresentationAttribute>()
             };
             if (representationAttribute.Children != null && representationAttribute.Children.Any())

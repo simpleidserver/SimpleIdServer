@@ -17,6 +17,8 @@ namespace SimpleIdServer.Scim.Domain
             ValuesString = new List<string>();
             ValuesDateTime = new List<DateTime>();
             ValuesReference = new List<string>();
+            ValuesDecimal = new List<decimal>();
+            ValuesBinary = new List<byte[]>();
             Values = new List<SCIMRepresentationAttribute>();
         }
 
@@ -25,13 +27,20 @@ namespace SimpleIdServer.Scim.Domain
             Id = id;
         }
 
-        public SCIMRepresentationAttribute(string id, SCIMSchemaAttribute schemaAttribute, List<int> valuesInteger = null, List<bool> valuesBoolean = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null) : this(id)
+        public SCIMRepresentationAttribute(string id, SCIMSchemaAttribute schemaAttribute, List<int> valuesInteger = null, 
+            List<bool> valuesBoolean = null, 
+            List<string> valuesString = null, 
+            List<DateTime> valuesDateTime = null,
+            List<decimal> valuesDecimal = null,
+            List<byte[]> valuesBinary = null) : this(id)
         {
             SchemaAttribute = schemaAttribute;
             ValuesInteger = valuesInteger == null ? new List<int>() : valuesInteger;
             ValuesBoolean = valuesBoolean == null ? new List<bool>() : valuesBoolean;
             ValuesString = valuesString == null ? new List<string>() : valuesString;
             ValuesDateTime = valuesDateTime == null ? new List<DateTime>() : valuesDateTime;
+            ValuesDecimal = valuesDecimal == null ? new List<decimal>() : valuesDecimal;
+            ValuesBinary = valuesBinary == null ? new List<byte[]>() : valuesBinary;
         }
 
         public string Id { get; set; }
@@ -40,6 +49,8 @@ namespace SimpleIdServer.Scim.Domain
         public ICollection<int> ValuesInteger { get; set; }
         public ICollection<DateTime> ValuesDateTime { get; set; }
         public ICollection<string> ValuesReference { get; set; }
+        public ICollection<decimal> ValuesDecimal { get; set; }
+        public ICollection<byte[]> ValuesBinary { get; set; }
         public ICollection<SCIMRepresentationAttribute> Values { get; set; }
         public SCIMRepresentationAttribute Parent { get; set; }
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
@@ -62,6 +73,16 @@ namespace SimpleIdServer.Scim.Domain
         public void Add(bool value)
         {
             ValuesBoolean.Add(value);
+        }
+
+        public void Add(decimal value)
+        {
+            ValuesDecimal.Add(value);
+        }
+
+        public void Add(byte[] value)
+        {
+            ValuesBinary.Add(value);
         }
 
         public void Add(SCIMRepresentationAttribute value)
@@ -92,6 +113,8 @@ namespace SimpleIdServer.Scim.Domain
                 ValuesDateTime = ValuesDateTime.ToList(),
                 ValuesInteger = ValuesInteger.ToList(),
                 ValuesReference = ValuesReference.ToList(),
+                ValuesDecimal = ValuesDecimal.ToList(),
+                ValuesBinary = ValuesBinary.ToList(),
                 SchemaAttribute = (SCIMSchemaAttribute)SchemaAttribute.Clone()
             };
             foreach(var cloneAttribute in Values.Select(v => (SCIMRepresentationAttribute)v.Clone()).ToList())

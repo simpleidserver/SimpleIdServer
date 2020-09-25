@@ -174,6 +174,12 @@ namespace SimpleIdServer.Scim.Helpers
                     case SCIMSchemaAttributeTypes.REFERENCE:
                         record.ValuesReference = jArr.Select(j => j.ToString()).ToList();
                         break;
+                    case SCIMSchemaAttributeTypes.DECIMAL:
+                        record.ValuesDecimal = jArr.Select(j => decimal.Parse(j.ToString())).ToList();
+                        break;
+                    case SCIMSchemaAttributeTypes.BINARY:
+                        record.ValuesBinary = jArr.Select(j => Convert.FromBase64String(j.ToString())).ToList();
+                        break;
                 }
 
                 result.Add(record);

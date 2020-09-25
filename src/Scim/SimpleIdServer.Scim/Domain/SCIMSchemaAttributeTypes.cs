@@ -9,6 +9,8 @@ namespace SimpleIdServer.Scim.Domain
         INTEGER = 2,
         DATETIME = 3,
         REFERENCE = 4,
-        COMPLEX = 5
+        COMPLEX = 5,
+        DECIMAL = 6,
+        BINARY = 7
     }
 }

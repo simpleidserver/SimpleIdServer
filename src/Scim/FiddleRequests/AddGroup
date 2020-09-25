@@ -1,0 +1,10 @@
+POST http://localhost:60002/Groups HTTP/1.1
+User-Agent: Fiddler
+Content-Type: application/json
+Host: localhost:60002
+Content-Length: 98
+
+{
+ "schemas": [ "urn:ietf:params:scim:schemas:core:2.0:Group"],
+ "displayName": "Tour guides"
+}
