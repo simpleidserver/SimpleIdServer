@@ -446,16 +446,20 @@ namespace SimpleIdServer.Scim.Domain
                 switch (representationAttr.SchemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
-                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesString) : representationAttr.ValuesString.First());
+                        if (representationAttr.ValuesString != null && representationAttr.ValuesString.Any())
+                            jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesString) : representationAttr.ValuesString.First());
                         break;
                     case SCIMSchemaAttributeTypes.BOOLEAN:
-                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesBoolean) : representationAttr.ValuesBoolean.First());
+                        if (representationAttr.ValuesBoolean != null && representationAttr.ValuesBoolean.Any())
+                            jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesBoolean) : representationAttr.ValuesBoolean.First());
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
-                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesInteger) : representationAttr.ValuesInteger.First());
+                        if (representationAttr.ValuesInteger != null && representationAttr.ValuesInteger.Any())
+                            jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesInteger) : representationAttr.ValuesInteger.First());
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
-                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesDateTime) : representationAttr.ValuesDateTime.First());
+                        if (representationAttr.ValuesDateTime != null && representationAttr.ValuesDateTime.Any())
+                            jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesDateTime) : representationAttr.ValuesDateTime.First());
                         break;
                     case SCIMSchemaAttributeTypes.COMPLEX:
                         if (representationAttr.SchemaAttribute.MultiValued == false)
@@ -478,10 +482,12 @@ namespace SimpleIdServer.Scim.Domain
                         }
                         break;
                     case SCIMSchemaAttributeTypes.DECIMAL:
-                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesDecimal) : representationAttr.ValuesDecimal.First());
+                        if (representationAttr.ValuesDecimal != null && representationAttr.ValuesDecimal.Any())
+                            jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesDecimal) : representationAttr.ValuesDecimal.First());
                         break;
                     case SCIMSchemaAttributeTypes.BINARY:
-                        jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesBinary.Select(_ => Convert.ToBase64String(_))) : Convert.ToBase64String(representationAttr.ValuesBinary.First()));
+                        if (representationAttr.ValuesBinary != null && representationAttr.ValuesBinary.Any())
+                            jObj.Add(representationAttr.SchemaAttribute.Name, representationAttr.SchemaAttribute.MultiValued ? (JToken)new JArray(representationAttr.ValuesBinary.Select(_ => Convert.ToBase64String(_))) : Convert.ToBase64String(representationAttr.ValuesBinary.First()));
                         break;
                 }
             }
