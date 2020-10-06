@@ -55,9 +55,9 @@ namespace SimpleIdServer.Scim.Helpers
 
 						refLst.Add(new SCIMRepresentationAttribute
 						{
-							SchemaAttribute = new SCIMSchemaAttribute("id")
+							SchemaAttribute = new SCIMSchemaAttribute("value")
 							{
-								Name = "id",
+								Name = "value",
 								MultiValued = false,
 								Type = SCIMSchemaAttributeTypes.STRING
 							},

@@ -222,6 +222,8 @@ this.ScenarioInitialize(scenarioInfo);
 #line 58
  testRunner.Then("JSON exists \'meta.location\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 59
+ testRunner.Then("JSON exists \'groups[0].value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 60
  testRunner.Then("JSON \'groups[0].display\'=\'Tour guides\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -233,7 +235,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckGroupCanBeUpdatedWithMultipleUsers()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check group can be updated with multiple users", null, ((string[])(null)));
-#line 61
+#line 62
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -257,11 +259,11 @@ this.ScenarioInitialize(scenarioInfo);
             table7.AddRow(new string[] {
                         "employeeNumber",
                         "number"});
-#line 62
+#line 63
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table7, "When ");
-#line 70
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 71
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 72
  testRunner.And("extract \'id\' from JSON body into \'firstuserid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
@@ -284,11 +286,11 @@ this.ScenarioInitialize(scenarioInfo);
             table8.AddRow(new string[] {
                         "employeeNumber",
                         "number"});
-#line 72
+#line 73
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table8, "And ");
-#line 79
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 80
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 81
  testRunner.And("extract \'id\' from JSON body into \'seconduserid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
@@ -303,11 +305,11 @@ this.ScenarioInitialize(scenarioInfo);
             table9.AddRow(new string[] {
                         "members",
                         "[ { \"value\": \"$firstuserid$\" } ]"});
-#line 81
+#line 82
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table9, "And ");
-#line 86
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 87
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 88
  testRunner.And("extract \'id\' from JSON body into \'groupid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
@@ -319,17 +321,17 @@ this.ScenarioInitialize(scenarioInfo);
             table10.AddRow(new string[] {
                         "members",
                         "[ { \"value\": \"$firstuserid$\" }, { \"value\": \"$seconduserid$\" } ]"});
-#line 88
+#line 89
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$groupid$\'", ((string)(null)), table10, "And ");
-#line 92
- testRunner.And("execute HTTP GET request \'http://localhost/Groups/$groupid$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 93
+ testRunner.And("execute HTTP GET request \'http://localhost/Groups/$groupid$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 94
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 95
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 96
- testRunner.Then("JSON exists \'members[0].value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 97
+ testRunner.Then("JSON exists \'members[0].value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 98
  testRunner.Then("JSON exists \'members[1].value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

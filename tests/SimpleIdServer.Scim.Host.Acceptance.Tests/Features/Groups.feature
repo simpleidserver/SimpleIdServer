@@ -56,6 +56,7 @@ Scenario: Check user can be added to a group
 	Then JSON exists 'meta.lastModified'
 	Then JSON exists 'meta.version'
 	Then JSON exists 'meta.location'
+	Then JSON exists 'groups[0].value'
 	Then JSON 'groups[0].display'='Tour guides'
 
 Scenario: Check group can be updated with multiple users
