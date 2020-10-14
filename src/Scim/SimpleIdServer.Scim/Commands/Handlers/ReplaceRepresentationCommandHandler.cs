@@ -4,11 +4,13 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -19,13 +21,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        private readonly IDistributedLock _distributedLock;
 
-        public ReplaceRepresentationCommandHandler(ISCIMSchemaQueryRepository scimSchemaQueryRepository, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationHelper scimRepresentationHelper, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository)
+        public ReplaceRepresentationCommandHandler(ISCIMSchemaQueryRepository scimSchemaQueryRepository, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationHelper scimRepresentationHelper, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IDistributedLock distributedLock)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+            _distributedLock = distributedLock;
         }
 
         public async Task<SCIMRepresentation> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
@@ -46,36 +50,45 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(replaceRepresentationCommand.Id);
-            if (existingRepresentation == null)
+            var lockName = $"representation-{replaceRepresentationCommand.Id}";
+            await _distributedLock.WaitLock(lockName, CancellationToken.None);
+            try
             {
-                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
-            }
-
-            var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation, schemas.ToList());
-            existingRepresentation.RemoveAttributes(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
-            foreach (var updatedAttribute in updatedRepresentation.Attributes)
-            {
-                if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
+                var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(replaceRepresentationCommand.Id);
+                if (existingRepresentation == null)
                 {
-                    throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, updatedAttribute.Id));
+                    throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
                 }
 
-                if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE)
+                var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation, schemas.ToList());
+                existingRepresentation.RemoveAttributes(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
+                foreach (var updatedAttribute in updatedRepresentation.Attributes)
                 {
-                    existingRepresentation.AddAttribute(updatedAttribute);
+                    if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
+                    {
+                        throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, updatedAttribute.Id));
+                    }
+
+                    if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE)
+                    {
+                        existingRepresentation.AddAttribute(updatedAttribute);
+                    }
                 }
-            }
 
-            existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
-            existingRepresentation.SetUpdated(DateTime.UtcNow);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+                existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
+                existingRepresentation.SetUpdated(DateTime.UtcNow);
+                using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+                {
+                    await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                    await transaction.Commit();
+                }
+
+                return existingRepresentation;
+            }
+            finally
             {
-                await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                await transaction.Commit();
+                await _distributedLock.ReleaseLock(lockName, CancellationToken.None);
             }
-
-            return existingRepresentation;
         }
     }
 }

@@ -69,6 +69,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             {
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
             });
+            services.AddDistributedLockSQLServer(opts =>
+            {
+                opts.ConnectionString = Configuration.GetConnectionString("db");
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+    <Description>Distributed lock implemented for SQL server.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
+  </ItemGroup>
+</Project>

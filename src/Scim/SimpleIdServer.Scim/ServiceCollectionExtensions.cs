@@ -5,6 +5,7 @@ using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.InMemory;
 using System;
@@ -69,6 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddHelpers(this IServiceCollection services)
         {
+            services.TryAddSingleton<IDistributedLock, InMemoryDistributedLock>();
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
             return services;
         }

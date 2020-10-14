@@ -6,11 +6,13 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -19,33 +21,44 @@ namespace SimpleIdServer.Scim.Commands.Handlers
     {
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        private readonly IDistributedLock _distributedLock;
         private readonly SCIMHostOptions _options;
 
-        public PatchRepresentationCommandHandler(ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IOptions<SCIMHostOptions> options)
+        public PatchRepresentationCommandHandler(ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IDistributedLock distributedLock, IOptions<SCIMHostOptions> options)
         {
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+            _distributedLock = distributedLock;
             _options = options.Value;
         }
 
         public async Task<SCIMRepresentation> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
             var patches = ExtractPatchOperationsFromRequest(patchRepresentationCommand.Content);
-            var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
-            if (existingRepresentation == null)
+            var lockName = $"representation-{patchRepresentationCommand.Id}";
+            await _distributedLock.WaitLock(lockName, CancellationToken.None);
+            try
             {
-                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
-            }
+                var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
+                if (existingRepresentation == null)
+                {
+                    throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
+                }
 
-            existingRepresentation.ApplyPatches(patches, _options.IgnoreUnsupportedCanonicalValues);
-            existingRepresentation.SetUpdated(DateTime.UtcNow);
-            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+                existingRepresentation.ApplyPatches(patches, _options.IgnoreUnsupportedCanonicalValues);
+                existingRepresentation.SetUpdated(DateTime.UtcNow);
+                using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+                {
+                    await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                    await transaction.Commit();
+                }
+
+                return existingRepresentation;
+            }
+            finally
             {
-                await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                await transaction.Commit();
+                await _distributedLock.ReleaseLock(lockName, CancellationToken.None);
             }
-
-            return existingRepresentation;
         }
 
         private ICollection<SCIMPatchOperationRequest> ExtractPatchOperationsFromRequest(JObject content)
