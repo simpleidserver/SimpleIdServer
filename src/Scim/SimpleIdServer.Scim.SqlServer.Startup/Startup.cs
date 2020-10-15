@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +45,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 Exponent = dic.TryGet(RSAFields.Exponent)
             };
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.AddSCIMValueProviders();
+            });
             services.AddLogging();
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)

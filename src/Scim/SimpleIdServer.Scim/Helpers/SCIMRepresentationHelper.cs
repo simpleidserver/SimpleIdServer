@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.Helpers
             _options = options.Value;
         }
 
-        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, ICollection<SCIMSchema> schemas)
+        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, ICollection<SCIMSchema> schemas)
         {
             var attrsSchema = schemas.SelectMany(s => s.Attributes);
             var missingRequiredAttributes = attrsSchema.Where(a => a.Required && !json.ContainsKey(a.Name));
@@ -29,19 +29,13 @@ namespace SimpleIdServer.Scim.Helpers
                 throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => a.Name))));
             }
 
-            return BuildRepresentation(json, attrsSchema, schemas, _options.IgnoreUnsupportedCanonicalValues);
+            return BuildRepresentation(json, attrsSchema, externalId, schemas, _options.IgnoreUnsupportedCanonicalValues);
         }
 
-        public static SCIMRepresentation BuildRepresentation(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, ICollection<SCIMSchema> schemas, bool ignoreUnsupportedCanonicalValues)
+        public static SCIMRepresentation BuildRepresentation(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, string externalId, ICollection<SCIMSchema> schemas, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new SCIMRepresentation();
-            var externalId = json.SelectToken(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
-            if (externalId != null)
-            {
-                result.ExternalId = externalId.ToString();
-                json.Remove(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
-            }
-
+            result.ExternalId = externalId;
             result.Schemas = schemas;
             result.Attributes = BuildRepresentationAttributes(json, attrsSchema, ignoreUnsupportedCanonicalValues);
             return result;

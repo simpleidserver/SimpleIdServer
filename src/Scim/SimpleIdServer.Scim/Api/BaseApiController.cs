@@ -49,33 +49,32 @@ namespace SimpleIdServer.Scim.Api
             _logger = logger;
         }
 
+        public string ResourceType => _resourceType;
+
         [HttpGet]
-        [Authorize("QueryScimResource")]
-        public Task<IActionResult> Get()
+        public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest)
         {
-            var searchRequest = SearchSCIMResourceParameter.Create(Request.Query);
             return InternalSearch(searchRequest);
         }
 
 
         [HttpPost(".search")]
         [Authorize("QueryScimResource")]
-        public Task<IActionResult> Search([FromBody] JObject jObj)
+        public virtual Task<IActionResult> Search([FromBody] SearchSCIMResourceParameter searchRequest)
         {
-            var searchRequest = SearchSCIMResourceParameter.Create(jObj);
             return InternalSearch(searchRequest);
         }
 
         [HttpGet("{id}")]
         [Authorize("QueryScimResource")]
-        public Task<IActionResult> Get(string id)
+        public virtual Task<IActionResult> Get(string id)
         {
             return InternalGet(id);
         }
 
         [HttpGet("Me")]
         [Authorize("UserAuthenticated")]
-        public Task<IActionResult> GetMe(string id)
+        public virtual Task<IActionResult> GetMe(string id)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -85,31 +84,31 @@ namespace SimpleIdServer.Scim.Api
 
         [HttpPost]
         [Authorize("AddScimResource")]
-        public Task<IActionResult> Add([FromBody] JObject jobj)
+        public virtual Task<IActionResult> Add([FromBody] RepresentationParameter param)
         {
-            return InternalAdd(jobj);
+            return InternalAdd(param);
         }
 
         [HttpPost("Me")]
         [Authorize("UserAuthenticated")]
-        public Task<IActionResult> AddMe([FromBody] JObject jObj)
+        public virtual Task<IActionResult> AddMe([FromBody] RepresentationParameter param)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
-                return InternalAdd(jObj);
+                return InternalAdd(param);
             });
         }
 
         [HttpDelete("{id}")]
         [Authorize("DeleteScimResource")]
-        public Task<IActionResult> Delete(string id)
+        public virtual Task<IActionResult> Delete(string id)
         {
             return InternalDelete(id);
         }
 
         [HttpDelete("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public Task<IActionResult> DeleteMe(string id)
+        public virtual Task<IActionResult> DeleteMe(string id)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -119,31 +118,31 @@ namespace SimpleIdServer.Scim.Api
 
         [HttpPut("{id}")]
         [Authorize("UpdateScimResource")]
-        public Task<IActionResult> Update(string id, [FromBody] JObject jObj)
+        public virtual Task<IActionResult> Update(string id, [FromBody] RepresentationParameter param)
         {
-            return InternalUpdate(id, jObj);
+            return InternalUpdate(id, param);
         }
 
         [HttpPut("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public Task<IActionResult> UpdateMe(string id, [FromBody] JObject jObj)
+        public virtual Task<IActionResult> UpdateMe(string id, [FromBody] RepresentationParameter param)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
-                return InternalUpdate(id, jObj);
+                return InternalUpdate(id, param);
             });
         }
 
         [HttpPatch("{id}")]
         [Authorize("UpdateScimResource")]
-        public Task<IActionResult> Patch(string id, [FromBody] JObject jObj)
+        public virtual Task<IActionResult> Patch(string id, [FromBody] JObject jObj)
         {
             return InternalPatch(id, jObj);
         }
 
         [HttpPatch("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public Task<IActionResult> PatchMe(string id, [FromBody] JObject jObj)
+        public virtual Task<IActionResult> PatchMe(string id, [FromBody] JObject jObj)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
@@ -231,7 +230,7 @@ namespace SimpleIdServer.Scim.Api
             return BuildHTTPResult(representation, HttpStatusCode.OK, true);
         }
 
-        private async Task<IActionResult> InternalAdd([FromBody] JObject jobj)
+        private async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
         {
             _logger.LogInformation(string.Format(Global.AddResource, jobj.ToString()));
             try
@@ -282,12 +281,12 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> InternalUpdate(string id, JObject jObj)
+        private async Task<IActionResult> InternalUpdate(string id, RepresentationParameter representationParameter)
         {
             _logger.LogInformation(string.Format(Global.UpdateResource, id));
             try
             {
-                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, jObj));
+                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter));
                 return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
             }
             catch (SCIMSchemaViolatedException ex)

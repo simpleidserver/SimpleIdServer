@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 
 namespace SimpleIdServer.Scim.Startup
@@ -36,7 +38,10 @@ namespace SimpleIdServer.Scim.Startup
                 Exponent = dic.TryGet(RSAFields.Exponent)
             };
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.AddSCIMValueProviders();
+            });
             services.AddLogging(opt =>
             {
                 opt.AddFilter((s, l) =>
@@ -79,6 +84,19 @@ namespace SimpleIdServer.Scim.Startup
                 enterpriseUserSchema,
                 customResource
             };
+            services.AddSwaggerGen(c =>
+            {
+                var currentAssembly = Assembly.GetExecutingAssembly();
+                var xmlDocs = currentAssembly.GetReferencedAssemblies()
+                    .Union(new AssemblyName[] { currentAssembly.GetName() })
+                    .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+                    .Where(f => File.Exists(f)).ToArray();
+                Array.ForEach(xmlDocs, (d) =>
+                {
+                    c.IncludeXmlComments(d);
+                });
+            });
+            services.AddSCIMSwagger();
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
@@ -99,6 +117,11 @@ namespace SimpleIdServer.Scim.Startup
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SCIM API V1");
+            });
             loggerFactory.AddConsole(LogLevel.Information);
             app.UseAuthentication();
             app.UseMvc();

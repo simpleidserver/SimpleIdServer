@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Scim;
+using SimpleIdServer.Scim.Api;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Helpers;
@@ -25,7 +26,8 @@ namespace Microsoft.Extensions.DependencyInjection
             var builder = new SimpleIdServerSCIMBuilder(services);
             services.AddCommandHandlers()
                 .AddSCIMRepository()
-                .AddHelpers();
+                .AddHelpers()
+                .AddInfrastructure();
             return builder;
         }
 
@@ -70,8 +72,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddHelpers(this IServiceCollection services)
         {
-            services.TryAddSingleton<IDistributedLock, InMemoryDistributedLock>();
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
+            return services;
+        }
+
+        private static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IDistributedLock, InMemoryDistributedLock>();
+            foreach (var assm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                services.RegisterAllAssignableType(typeof(BaseApiController), assm, true);
+            }
+
             return services;
         }
     }

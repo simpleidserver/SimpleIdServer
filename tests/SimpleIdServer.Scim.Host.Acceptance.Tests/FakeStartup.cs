@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Infrastructure.Converters;
+using SimpleIdServer.Scim.Infrastructure.ValueProviders;
 using System;
 using System.Collections.Generic;
 
@@ -60,7 +62,13 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 enterpriseUser,
                 SCIMConstants.StandardSchemas.GroupSchema
             };
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
+            })
+            .AddJsonOptions(options => {
+                // options.SerializerSettings.Converters.Add(new RepresentationParameterConverter());
+            });
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
             services.AddSIDScim(o =>

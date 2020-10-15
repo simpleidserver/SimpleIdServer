@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.MongoDb
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServer", "src\Scim\SimpleIdServer.Scim.SqlServer\SimpleIdServer.Scim.SqlServer.csproj", "{025D5A4C-BEA5-4132-817D-BA1C57072625}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Swashbuckle", "src\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj", "{A8244272-C4D7-42F3-8316-A118D34399B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{025D5A4C-BEA5-4132-817D-BA1C57072625}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{025D5A4C-BEA5-4132-817D-BA1C57072625}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{025D5A4C-BEA5-4132-817D-BA1C57072625}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8244272-C4D7-42F3-8316-A118D34399B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8244272-C4D7-42F3-8316-A118D34399B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8244272-C4D7-42F3-8316-A118D34399B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8244272-C4D7-42F3-8316-A118D34399B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +103,7 @@ Global
 		{02A2B0B2-3328-4340-8E20-06256544935E} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 		{FB7F6266-9813-4D71-9CB1-4C1872442795} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{025D5A4C-BEA5-4132-817D-BA1C57072625} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
+		{A8244272-C4D7-42F3-8316-A118D34399B9} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

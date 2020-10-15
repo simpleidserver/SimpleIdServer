@@ -34,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         public async Task<SCIMRepresentation> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
-            var requestedSchemas = replaceRepresentationCommand.Representation.GetSchemas();
+            var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
@@ -60,7 +60,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
                 }
 
-                var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation, schemas.ToList());
+                var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation.Attributes, replaceRepresentationCommand.Representation.ExternalId, schemas.ToList());
                 existingRepresentation.RemoveAttributes(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
                 foreach (var updatedAttribute in updatedRepresentation.Attributes)
                 {

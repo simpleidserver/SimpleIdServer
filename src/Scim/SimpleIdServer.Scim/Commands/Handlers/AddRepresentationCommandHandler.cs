@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
-using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -30,7 +29,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         public async Task<SCIMRepresentation> Handle(AddRepresentationCommand addRepresentationCommand)
         {
-            var requestedSchemas = addRepresentationCommand.Representation.GetSchemas();
+            var requestedSchemas = addRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
@@ -55,7 +54,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
             var version = Guid.NewGuid().ToString();
-            var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation, schemas.ToList());
+            var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schemas.ToList());
             scimRepresentation.Id = Guid.NewGuid().ToString();
             scimRepresentation.SetCreated(DateTime.UtcNow);
             scimRepresentation.SetUpdated(DateTime.UtcNow);
