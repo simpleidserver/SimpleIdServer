@@ -26,7 +26,7 @@ namespace SimpleIdServer.Scim.Domain
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}" }
         };
 
-        public static void ApplyPatches(this SCIMRepresentation representation, ICollection<SCIMPatchOperationRequest> patches, bool ignoreUnsupportedCanonicalValues)
+        public static void ApplyPatches(this SCIMRepresentation representation, ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
         {
             var queryableRepresentationAttributes = representation.Attributes.AsQueryable();
             foreach (var patch in patches)

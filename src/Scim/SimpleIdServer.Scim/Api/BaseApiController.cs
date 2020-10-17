@@ -135,18 +135,18 @@ namespace SimpleIdServer.Scim.Api
 
         [HttpPatch("{id}")]
         [Authorize("UpdateScimResource")]
-        public virtual Task<IActionResult> Patch(string id, [FromBody] JObject jObj)
+        public virtual Task<IActionResult> Patch(string id, [FromBody] PatchRepresentationParameter patchRepresentation)
         {
-            return InternalPatch(id, jObj);
+            return InternalPatch(id, patchRepresentation);
         }
 
         [HttpPatch("Me/{id}")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> PatchMe(string id, [FromBody] JObject jObj)
+        public virtual Task<IActionResult> PatchMe(string id, [FromBody] PatchRepresentationParameter patchRepresentation)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
-                return InternalPatch(id, jObj);
+                return InternalPatch(id, patchRepresentation);
             });
         }
 
@@ -316,12 +316,12 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> InternalPatch(string id, JObject jObj)
+        private async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
         {
             _logger.LogInformation(string.Format(Global.PatchResource, id));
             try
             {
-                var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, jObj));
+                var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, patchRepresentation));
                 return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
             }
             catch (SCIMFilterException ex)

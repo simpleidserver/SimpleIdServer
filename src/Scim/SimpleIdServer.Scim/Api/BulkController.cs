@@ -37,20 +37,21 @@ namespace SimpleIdServer.Scim.Api
 
         [HttpPost]
         [Authorize("BulkScimResource")]
-        public async Task<IActionResult> Index([FromBody] JObject jObj)
+        public async Task<IActionResult> Index([FromBody] BulkParameter bulk)
         {
-            _logger.LogInformation(string.Format(Global.StartBulk, jObj.ToString()));
+            var json = JsonConvert.SerializeObject(bulk);
+            _logger.LogInformation(string.Format(Global.StartBulk, json));
             try
             {
-                var patchOperations = ExtractRequest(jObj);
-                var size = ASCIIEncoding.ASCII.GetByteCount(jObj.ToString());
-                if (patchOperations.Count() > _options.MaxOperations || size > _options.MaxPayloadSize)
+                CheckParameter(bulk);
+                var size = ASCIIEncoding.ASCII.GetByteCount(json.ToString());
+                if (bulk.Operations.Count() > _options.MaxOperations || size > _options.MaxPayloadSize)
                 {
                     throw new SCIMTooManyBulkOperationsException();
                 }
 
                 var taskLst = new List<Task<JObject>>();
-                foreach(var patchOperation in patchOperations)
+                foreach(var patchOperation in bulk.Operations)
                 {
                     taskLst.Add(ExecuteBulkOperation(patchOperation));
                 }
@@ -85,9 +86,9 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private IEnumerable<SCIMBulkOperationRequest> ExtractRequest(JObject jObj)
+        private static void CheckParameter(BulkParameter bulkParameter)
         {
-            var requestedSchemas = jObj.GetSchemas();
+            var requestedSchemas = bulkParameter.Schemas;
             if (!requestedSchemas.Any())
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
@@ -98,43 +99,13 @@ namespace SimpleIdServer.Scim.Api
                 throw new SCIMBadSyntaxException(Global.SchemasNotRecognized);
             }
 
-            var operations = jObj.SelectToken("Operations") as JArray;
-            if (operations == null)
+            if (bulkParameter.Operations == null)
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Operations));
             }
-
-            var result = new List<SCIMBulkOperationRequest>();
-            foreach(JObject operation in operations)
-            {
-                var record = new SCIMBulkOperationRequest();
-                if (operation.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.Method))
-                {
-                    record.HttpMethod = operation[SCIMConstants.StandardSCIMRepresentationAttributes.Method].ToString();
-                }
-
-                if (operation.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.Path))
-                {
-                    record.Path = operation[SCIMConstants.StandardSCIMRepresentationAttributes.Path].ToString();
-                }
-
-                if (operation.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.BulkId))
-                {
-                    record.BulkIdentifier = operation[SCIMConstants.StandardSCIMRepresentationAttributes.BulkId].ToString();
-                }
-
-                if (operation.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.Data))
-                {
-                    record.Data = JToken.Parse(operation[SCIMConstants.StandardSCIMRepresentationAttributes.Data].ToString());
-                }
-
-                result.Add(record);
-            }
-
-            return result;
         }
 
-        private async Task<JObject> ExecuteBulkOperation(SCIMBulkOperationRequest scimBulkOperationRequest)
+        private async Task<JObject> ExecuteBulkOperation(BulkOperationParameter scimBulkOperationRequest)
         {
             var router = RouteData.Routers.OfType<IRouteCollection>().First();
             var features = new FeatureCollection();

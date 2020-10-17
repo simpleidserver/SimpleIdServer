@@ -1,11 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
-using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -34,7 +32,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         public async Task<SCIMRepresentation> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
-            var patches = ExtractPatchOperationsFromRequest(patchRepresentationCommand.Content);
+            CheckParameter(patchRepresentationCommand.PatchRepresentation);
             var lockName = $"representation-{patchRepresentationCommand.Id}";
             await _distributedLock.WaitLock(lockName, CancellationToken.None);
             try
@@ -45,7 +43,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
                 }
 
-                existingRepresentation.ApplyPatches(patches, _options.IgnoreUnsupportedCanonicalValues);
+                existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
@@ -61,9 +59,9 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
         }
 
-        private ICollection<SCIMPatchOperationRequest> ExtractPatchOperationsFromRequest(JObject content)
+        private void CheckParameter(PatchRepresentationParameter patchRepresentation)
         {
-            var requestedSchemas = content.GetSchemas();
+            var requestedSchemas = patchRepresentation.Schemas;
             if (!requestedSchemas.Any())
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
@@ -74,24 +72,10 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadSyntaxException(Global.SchemasNotRecognized);
             }
 
-            var operationsToken = content.SelectToken("Operations") as JArray;
-            if (operationsToken == null)
+            if (patchRepresentation.Operations == null)
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Operations));
             }
-
-            var result = new List<SCIMPatchOperationRequest>();
-            foreach(JObject record in operationsToken)
-            {
-                SCIMPatchOperations op;
-                string path;
-                if (record.TryGetEnum<SCIMPatchOperations>("op", out op) && record.TryGetString("path", out path))
-                {
-                    result.Add(new SCIMPatchOperationRequest(op, path, record.SelectToken("value")));
-                }
-            }
-
-            return result;
         }
     }
 }

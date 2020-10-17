@@ -37,11 +37,25 @@ namespace SimpleIdServer.Scim.Tests
                 })
                 .Build();
 
-            userRepresentation.ApplyPatches(new List<SCIMPatchOperationRequest>
+            userRepresentation.ApplyPatches(new List<PatchOperationParameter>
             {
-                new SCIMPatchOperationRequest(SCIMPatchOperations.REPLACE, "userName", "cassandra"),
-                new SCIMPatchOperationRequest(SCIMPatchOperations.ADD, "phones", JArray.Parse("[{ phoneNumber : '03', type: 'type1' }, { phoneNumber : '05', type: 'type2' }]")),
-                new SCIMPatchOperationRequest(SCIMPatchOperations.REMOVE, "phones[phoneNumber eq 01]")
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Path = "userName",
+                    Value = "cassandra"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "phones",
+                    Value = JArray.Parse("[{ phoneNumber : '03', type: 'type1' }, { phoneNumber : '05', type: 'type2' }]")
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REMOVE,
+                    Path = "phones[phoneNumber eq 01]"
+                }
             }, false);
 
             Assert.Equal("cassandra", userRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "userName").ValuesString.First());

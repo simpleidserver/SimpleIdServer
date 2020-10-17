@@ -64,6 +64,14 @@ namespace SimpleIdServer.Scim
             public const string CanonicalValues = "canonicalValues";
         }
 
+        public static class PathOperationAttributes
+        {
+            public const string Operation = "op";
+            public const string Path = "path";
+            public const string Value = "value";
+            public const string Operations = "Operations";
+        }
+
         public static class ResourceTypeAttribute
         {
             public const string Schemas = "schemas";
