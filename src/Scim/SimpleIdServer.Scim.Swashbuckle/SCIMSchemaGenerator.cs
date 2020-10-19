@@ -24,11 +24,15 @@ namespace SimpleIdServer.Scim.Swashbuckle
             { SCIMSchemaAttributeTypes.BINARY, "binary" },
             { SCIMSchemaAttributeTypes.BOOLEAN, "boolean" },
             { SCIMSchemaAttributeTypes.COMPLEX, "object" },
-            { SCIMSchemaAttributeTypes.DATETIME, "date-time" },
+            { SCIMSchemaAttributeTypes.DATETIME, "string" },
             { SCIMSchemaAttributeTypes.DECIMAL, "number" },
             { SCIMSchemaAttributeTypes.INTEGER, "integer" },
             { SCIMSchemaAttributeTypes.REFERENCE, "string" },
             { SCIMSchemaAttributeTypes.STRING, "string" }
+        };
+        private static Dictionary<SCIMSchemaAttributeTypes, string> MAPPING_ENUM_TO_FORMAT = new Dictionary<SCIMSchemaAttributeTypes, string>
+        {
+            { SCIMSchemaAttributeTypes.DATETIME, "date-time" }
         };
         private readonly ILogger<SCIMSchemaGenerator> _logger;
         private readonly SchemaGeneratorOptions _generatorOptions;
@@ -173,7 +177,11 @@ namespace SimpleIdServer.Scim.Swashbuckle
                     _logger.LogError($"the schema '{controller.ResourceType}' doesn't exist !");
                 }
 
-                schema.Properties.Remove(schema.Properties.First(_ => _.Key == "Attributes"));
+                var kvp = schema.Properties.First(_ => _.Key == "Attributes");
+                if (!kvp.Equals(default(KeyValuePair<string, OpenApiSchema>)) && !string.IsNullOrWhiteSpace(kvp.Key))
+                {
+                    schema.Properties.Remove(kvp);
+                }
             }
 
             schemaRepository.Schemas[schemaId] = schema;
@@ -193,6 +201,11 @@ namespace SimpleIdServer.Scim.Swashbuckle
                     Type = attr.MultiValued ? "array" : MAPPING_ENUM_TO_NAMES[attr.Type],
                     Properties = new Dictionary<string, OpenApiSchema>()
                 };
+                if (!attr.MultiValued && MAPPING_ENUM_TO_FORMAT.ContainsKey(attr.Type))
+                {
+                    sc.Format = MAPPING_ENUM_TO_FORMAT[attr.Type];
+                }
+
                 properties.Add(new KeyValuePair<string, OpenApiSchema>(attr.Name, sc));
                 if (attr.MultiValued && attr.Type != SCIMSchemaAttributeTypes.COMPLEX)
                 {
@@ -200,6 +213,11 @@ namespace SimpleIdServer.Scim.Swashbuckle
                     {
                         Type = MAPPING_ENUM_TO_NAMES[attr.Type]
                     };
+                    if (MAPPING_ENUM_TO_FORMAT.ContainsKey(attr.Type))
+                    {
+                        sc.Format = MAPPING_ENUM_TO_FORMAT[attr.Type];
+                    }
+
                     continue;
                 }
 

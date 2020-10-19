@@ -71,6 +71,7 @@ namespace SimpleIdServer.Scim.Startup
             var customResource = Builder.SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources")
                 .AddStringAttribute("name")
                 .AddStringAttribute("lastname")
+                .AddDateTimeAttribute("birthDate")
                 .Build();
             userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
             {
