@@ -177,7 +177,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
                     _logger.LogError($"the schema '{controller.ResourceType}' doesn't exist !");
                 }
 
-                var kvp = schema.Properties.First(_ => _.Key == "Attributes");
+                var kvp = schema.Properties.FirstOrDefault(_ => _.Key == "Attributes");
                 if (!kvp.Equals(default(KeyValuePair<string, OpenApiSchema>)) && !string.IsNullOrWhiteSpace(kvp.Key))
                 {
                     schema.Properties.Remove(kvp);
