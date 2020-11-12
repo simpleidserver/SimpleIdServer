@@ -52,6 +52,7 @@ namespace SimpleIdServer.Scim.Api
         public string ResourceType => _resourceType;
 
         [HttpGet]
+        [Authorize("QueryScimResource")]
         public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest)
         {
             return InternalSearch(searchRequest);
