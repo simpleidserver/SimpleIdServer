@@ -37,7 +37,7 @@ namespace SimpleIdServer.Scim.Api
 
         [HttpPost]
         [Authorize("BulkScimResource")]
-        public async Task<IActionResult> Index([FromBody] BulkParameter bulk)
+        public async virtual Task<IActionResult> Index([FromBody] BulkParameter bulk)
         {
             var json = JsonConvert.SerializeObject(bulk);
             _logger.LogInformation(string.Format(Global.StartBulk, json));
@@ -86,7 +86,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private static void CheckParameter(BulkParameter bulkParameter)
+        protected static void CheckParameter(BulkParameter bulkParameter)
         {
             var requestedSchemas = bulkParameter.Schemas;
             if (!requestedSchemas.Any())
@@ -105,7 +105,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<JObject> ExecuteBulkOperation(BulkOperationParameter scimBulkOperationRequest)
+        protected async Task<JObject> ExecuteBulkOperation(BulkOperationParameter scimBulkOperationRequest)
         {
             var router = RouteData.Routers.OfType<IRouteCollection>().First();
             var features = new FeatureCollection();

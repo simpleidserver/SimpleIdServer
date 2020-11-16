@@ -25,7 +25,7 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async virtual Task<IActionResult> Get()
         {
             _logger.LogInformation(Global.StartGetSchemas);
             var schemas = await _scimSchemaQueryRepository.GetAll();
@@ -52,7 +52,7 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async virtual Task<IActionResult> Get(string id)
         {
             var schema = await _scimSchemaQueryRepository.FindSCIMSchemaById(id);
             if (schema == null)

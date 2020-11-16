@@ -26,14 +26,14 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async virtual Task<IActionResult> Get()
         {
             _logger.LogInformation(Global.StartGetResourceTypes);
             var result = await _scimSchemaQueryRepository.GetAllRoot();
             return new OkObjectResult(new JArray(result.Select(s => ToDto(s))));
         }
 
-        private JObject ToDto(SCIMSchema schema)
+        protected JObject ToDto(SCIMSchema schema)
         {
             var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMConstants.SCIMEndpoints.ResourceType}/{schema.ResourceType}";
             return new JObject

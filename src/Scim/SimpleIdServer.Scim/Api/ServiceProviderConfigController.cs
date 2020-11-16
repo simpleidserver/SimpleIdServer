@@ -25,7 +25,7 @@ namespace SimpleIdServer.Scim.Api
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public virtual IActionResult Get()
         {
             _logger.LogInformation(Global.StartGetServiceProviderConfig);
             var schema = SCIMConstants.StandardSchemas.ServiceProvideConfigSchemas;

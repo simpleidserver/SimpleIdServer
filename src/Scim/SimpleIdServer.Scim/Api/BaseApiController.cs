@@ -151,7 +151,7 @@ namespace SimpleIdServer.Scim.Api
             });
         }
 
-        private async Task<IActionResult> InternalSearch(SearchSCIMResourceParameter searchRequest)
+        protected async Task<IActionResult> InternalSearch(SearchSCIMResourceParameter searchRequest)
         {
             _logger.LogInformation(Global.StartGetResources);
             try
@@ -217,7 +217,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> InternalGet(string id)
+        protected async Task<IActionResult> InternalGet(string id)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType);
@@ -231,7 +231,7 @@ namespace SimpleIdServer.Scim.Api
             return BuildHTTPResult(representation, HttpStatusCode.OK, true);
         }
 
-        private async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
+        protected async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
         {
             _logger.LogInformation(string.Format(Global.AddResource, jobj.ToString()));
             try
@@ -262,7 +262,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> InternalDelete(string id)
+        protected async Task<IActionResult> InternalDelete(string id)
         {
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
@@ -282,7 +282,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> InternalUpdate(string id, RepresentationParameter representationParameter)
+        protected async Task<IActionResult> InternalUpdate(string id, RepresentationParameter representationParameter)
         {
             _logger.LogInformation(string.Format(Global.UpdateResource, id));
             try
@@ -317,7 +317,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
+        protected async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
         {
             _logger.LogInformation(string.Format(Global.PatchResource, id));
             try
@@ -346,7 +346,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private async Task<IActionResult> ExecuteActionIfAuthenticated(Func<Task<IActionResult>> callback)
+        protected async Task<IActionResult> ExecuteActionIfAuthenticated(Func<Task<IActionResult>> callback)
         {
             var user = User.Claims.FirstOrDefault(c => c.Type == _options.SCIMIdClaimName);
             if (user == null)
@@ -357,7 +357,7 @@ namespace SimpleIdServer.Scim.Api
             return await callback();
         }
 
-        private IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
+        protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
         {
             var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{_resourceType}/{representation.Id}";
             HttpContext.Response.Headers.Add("Location", location);
