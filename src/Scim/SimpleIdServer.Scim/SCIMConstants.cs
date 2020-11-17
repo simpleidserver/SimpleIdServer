@@ -24,6 +24,7 @@ namespace SimpleIdServer.Scim
             public const string InvalidFilter = "invalidFilter";
             public const string SchemaViolated = "schemaViolated";
             public const string TooLarge = "tooLarge";
+            public const string NoTarget = "noTarget";
         }
 
         public static ICollection<string> StandardSCIMCommonRepresentationAttributes = new List<string>

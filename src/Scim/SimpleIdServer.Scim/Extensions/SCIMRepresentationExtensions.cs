@@ -46,10 +46,13 @@ namespace SimpleIdServer.Scim.Domain
                 }
 
                 var schemaAttribute = schemaAttributes.First();
+                var complexAttr = attributeExpression as SCIMComplexAttributeExpression;
                 var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, scimFilter).ToList();
-                if (!attributes.Any() && schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX && !schemaAttribute.MultiValued)
+                if (!attributes.Any() && (
+                    (schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX && !schemaAttribute.MultiValued) ||
+                    (schemaAttribute.MultiValued && complexAttr != null && complexAttr.GroupingFilter != null)))
                 {
-                    throw new SCIMAttributeException(Global.PatchMissingAttribute);
+                    throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
 
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>

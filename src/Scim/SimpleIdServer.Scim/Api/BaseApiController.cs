@@ -335,6 +335,10 @@ namespace SimpleIdServer.Scim.Api
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
+            catch (SCIMNoTargetException ex)
+            {
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.NoTarget);
+            }
             catch (SCIMNotFoundException ex)
             {
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);

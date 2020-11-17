@@ -472,7 +472,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void ErrorIsReturnedWhenSchemaIsNotValidHTTPPATCH()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when schema is not valid (HTTP PATCH)", null, ((string[])(null)));
-#line 153
+#line 154
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -482,21 +482,21 @@ this.ScenarioInitialize(scenarioInfo);
             table36.AddRow(new string[] {
                         "schemas",
                         "[ \"invalidschema\" ]"});
-#line 154
+#line 155
  testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table36, "When ");
-#line 158
+#line 159
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 160
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 161
- testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 162
- testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 163
- testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 164
- testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 165
+ testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 166
  testRunner.Then("JSON \'response.detail\'=\'some schemas are not recognized by the endpoint\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -508,7 +508,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void ErrorIsReturnedWhenTryingToPatchAnUnknownResourceHTTPPATCH()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to patch an unknown resource (HTTP PATCH)", null, ((string[])(null)));
-#line 167
+#line 168
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -521,33 +521,33 @@ this.ScenarioInitialize(scenarioInfo);
             table37.AddRow(new string[] {
                         "Operations",
                         "[ ]"});
-#line 168
+#line 169
  testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table37, "When ");
-#line 173
+#line 174
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 175
- testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 176
- testRunner.Then("JSON \'status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 177
- testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 178
- testRunner.Then("JSON \'response.status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 179
- testRunner.Then("JSON \'response.scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'response.status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 180
+ testRunner.Then("JSON \'response.scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 181
  testRunner.Then("JSON \'response.detail\'=\'resource id not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [Xunit.FactAttribute(DisplayName="Error is returned when trying to add a none canonical value (HTTP POST)")]
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to PATCH and there is no match (HTTP PATCH)")]
         [Xunit.TraitAttribute("FeatureTitle", "UsersErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to add a none canonical value (HTTP POST)")]
-        public virtual void ErrorIsReturnedWhenTryingToAddANoneCanonicalValueHTTPPOST()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to PATCH and there is no match (HTTP PATCH)")]
+        public virtual void ErrorIsReturnedWhenTryingToPATCHAndThereIsNoMatchHTTPPATCH()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add a none canonical value (HTTP POST)", null, ((string[])(null)));
-#line 182
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to PATCH and there is no match (HTTP PATCH)", null, ((string[])(null)));
+#line 184
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -562,27 +562,98 @@ this.ScenarioInitialize(scenarioInfo);
                         "userName",
                         "bjen"});
             table38.AddRow(new string[] {
-                        "externalId",
-                        "externalid"});
+                        "name",
+                        "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                            " }"});
             table38.AddRow(new string[] {
-                        "type",
-                        "unsupported"});
+                        "phones",
+                        "[ { \"phoneNumber\": \"01\", \"type\": \"mobile\" }, { \"phoneNumber\": \"02\", \"type\": \"home" +
+                            "\" } ]"});
             table38.AddRow(new string[] {
                         "employeeNumber",
                         "number"});
-#line 183
+            table38.AddRow(new string[] {
+                        "scores",
+                        "{ \"math\" : [ { \"score\" : \"10\" } ] }"});
+            table38.AddRow(new string[] {
+                        "roles",
+                        "[ \"role1\", \"role2\" ]"});
+#line 185
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table38, "When ");
-#line 191
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 193
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 194
- testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 195
- testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 196
- testRunner.Then("JSON \'response.scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table39.AddRow(new string[] {
+                        "schemas",
+                        "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+            table39.AddRow(new string[] {
+                        "Operations",
+                        "[ { \"op\" : \"remove\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
 #line 197
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table39, "And ");
+#line 202
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 203
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 204
+ testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 205
+ testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 206
+ testRunner.Then("JSON \'response.scimType\'=\'noTarget\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 207
+ testRunner.Then("JSON \'response.detail\'=\'PATCH can be applied only on existing attributes\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to add a none canonical value (HTTP POST)")]
+        [Xunit.TraitAttribute("FeatureTitle", "UsersErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to add a none canonical value (HTTP POST)")]
+        public virtual void ErrorIsReturnedWhenTryingToAddANoneCanonicalValueHTTPPOST()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add a none canonical value (HTTP POST)", null, ((string[])(null)));
+#line 209
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table40.AddRow(new string[] {
+                        "schemas",
+                        "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                            "ension:enterprise:2.0:User\" ]"});
+            table40.AddRow(new string[] {
+                        "userName",
+                        "bjen"});
+            table40.AddRow(new string[] {
+                        "externalId",
+                        "externalid"});
+            table40.AddRow(new string[] {
+                        "type",
+                        "unsupported"});
+            table40.AddRow(new string[] {
+                        "employeeNumber",
+                        "number"});
+#line 210
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table40, "When ");
+#line 218
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 220
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 221
+ testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 222
+ testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 223
+ testRunner.Then("JSON \'response.scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 224
  testRunner.Then("JSON \'response.detail\'=\'property type is not a valid canonical value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
