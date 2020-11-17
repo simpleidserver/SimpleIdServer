@@ -69,7 +69,7 @@ namespace SimpleIdServer.Scim.Domain
                         }
                     }
                 });
-                if (patch.Operation == SCIMPatchOperations.REMOVE || patch.Operation == SCIMPatchOperations.REPLACE)
+                if (patch.Operation == SCIMPatchOperations.REMOVE)
                 {
                     removeCallback(attributes);
                 }
@@ -77,10 +77,6 @@ namespace SimpleIdServer.Scim.Domain
                 if (patch.Operation == SCIMPatchOperations.ADD)
                 {
                     removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued).ToList());
-                }
-
-                if (patch.Operation == SCIMPatchOperations.ADD || patch.Operation == SCIMPatchOperations.REPLACE)
-                {
                     var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value, ignoreUnsupportedCanonicalValues);
                     foreach (var newAttribute in newAttributes)
                     {
@@ -96,7 +92,7 @@ namespace SimpleIdServer.Scim.Domain
                         {
                             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.BOOLEAN)
                             {
-                                foreach(var b in newAttribute.ValuesBoolean)
+                                foreach (var b in newAttribute.ValuesBoolean)
                                 {
                                     attribute.ValuesBoolean.Add(b);
                                 }
@@ -131,14 +127,14 @@ namespace SimpleIdServer.Scim.Domain
                             }
                             else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.DECIMAL)
                             {
-                                foreach(var d in newAttribute.ValuesDecimal)
+                                foreach (var d in newAttribute.ValuesDecimal)
                                 {
                                     attribute.ValuesDecimal.Add(d);
                                 }
                             }
                             else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.BINARY)
                             {
-                                foreach(var b in newAttribute.ValuesBinary)
+                                foreach (var b in newAttribute.ValuesBinary)
                                 {
                                     attribute.ValuesBinary.Add(b);
                                 }
@@ -148,6 +144,17 @@ namespace SimpleIdServer.Scim.Domain
                         {
                             representation.Attributes.Add(newAttribute);
                         }
+                    }
+                }
+
+                if (patch.Operation == SCIMPatchOperations.REPLACE)
+                {
+                    removeCallback(attributes);
+                    var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value, ignoreUnsupportedCanonicalValues);
+                    Merge(newAttributes, attributes);
+                    foreach(var newAttr in newAttributes)
+                    {
+                        representation.Attributes.Add(newAttr);
                     }
                 }
             }
@@ -223,6 +230,26 @@ namespace SimpleIdServer.Scim.Domain
             return jObj;
         }
         
+        private static void Merge(ICollection<SCIMRepresentationAttribute> newAttributes, ICollection<SCIMRepresentationAttribute> oldAttributes)
+        {
+            var unknownAttributes = oldAttributes.Where(oa => !newAttributes.Any(na => na.SchemaAttribute.Name == oa.SchemaAttribute.Name));
+            foreach(var unknownAttr in unknownAttributes)
+            {
+                newAttributes.Add(unknownAttr);
+            }
+
+            foreach(var newAttr in newAttributes)
+            {
+                var oldAttr = oldAttributes.FirstOrDefault(oa => oa.SchemaAttribute.Name == newAttr.SchemaAttribute.Name);
+                if (oldAttr == null)
+                {
+                    continue;
+                }
+
+                Merge(newAttr.Values, oldAttr.Values);
+            }
+        }
+
         private static void IncludeAttribute(this SCIMRepresentation scimRepresentation, SCIMExpression scimExpression, JObject result)
         {
             var scimAttributeExpression = scimExpression as SCIMAttributeExpression;
