@@ -152,9 +152,18 @@ namespace SimpleIdServer.Scim.Domain
                     removeCallback(attributes);
                     var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value, ignoreUnsupportedCanonicalValues);
                     Merge(newAttributes, attributes);
-                    foreach(var newAttr in newAttributes)
+                    var parent = attributes.FirstOrDefault()?.Parent;
+                    foreach (var newAttribute in newAttributes)
                     {
-                        representation.Attributes.Add(newAttr);
+                        if (parent != null)
+                        {
+                            newAttribute.Parent = parent;
+                            parent.Values.Add(newAttribute);
+                        }
+                        else
+                        {
+                            representation.Attributes.Add(newAttribute);
+                        }
                     }
                 }
             }

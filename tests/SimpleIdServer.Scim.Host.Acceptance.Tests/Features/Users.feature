@@ -239,9 +239,9 @@ Scenario: Check user can be patched (HTTP PATCH)
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
-	| Key        | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-	| Operations | [ { "op": "remove", "path": "phones[phoneNumber eq 05].phoneNumber" }, { "op" : "replace", "path": "phones[phoneNumber eq 04]", "value": { "type": "home" } }, { "op" : "remove", "path": "phones[phoneNumber eq 01]" }, { "op": "add", "path": "phones", "value": { "phoneNumber": "03", "type": "mobile" } }, { "op": "replace", "path": "userName", "value": "cassandra" }, { "op" : "remove", "path": "scores.math[score eq \"10\"]" }, { "op" : "add", "path": "scores.math", "value": { "score": "20" } }, { "op": "add", "path": "roles", "value": "role3" } ] |
+	| Key        | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+	| Operations | [ { "op": "replace", "path": "phones[phoneNumber eq \"05\"].type", "value": "NewHome05" }, { "op": "remove", "path": "phones[phoneNumber eq \"05\"].phoneNumber" }, { "op" : "replace", "path": "phones[phoneNumber eq 04]", "value": { "type": "home" } }, { "op" : "remove", "path": "phones[phoneNumber eq 01]" }, { "op": "add", "path": "phones", "value": { "phoneNumber": "03", "type": "mobile" } }, { "op": "replace", "path": "userName", "value": "cassandra" }, { "op" : "remove", "path": "scores.math[score eq \"10\"]" }, { "op" : "add", "path": "scores.math", "value": { "score": "20" } }, { "op": "add", "path": "roles", "value": "role3" } ] |
 	
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
@@ -253,7 +253,7 @@ Scenario: Check user can be patched (HTTP PATCH)
 	Then JSON 'userName'='cassandra'
 	Then JSON 'phones[0].phoneNumber'='02'
 	Then JSON 'phones[0].type'='home'
-	Then JSON 'phones[1].type'='home05'
+	Then JSON 'phones[1].type'='NewHome05'
 	Then JSON doesn't exists 'phones[1].phoneNumber'
 	Then JSON 'phones[2].type'='home'
 	Then JSON 'phones[2].phoneNumber'='04'

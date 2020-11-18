@@ -742,7 +742,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
             table24.AddRow(new string[] {
                         "Operations",
-                        @"[ { ""op"": ""remove"", ""path"": ""phones[phoneNumber eq 05].phoneNumber"" }, { ""op"" : ""replace"", ""path"": ""phones[phoneNumber eq 04]"", ""value"": { ""type"": ""home"" } }, { ""op"" : ""remove"", ""path"": ""phones[phoneNumber eq 01]"" }, { ""op"": ""add"", ""path"": ""phones"", ""value"": { ""phoneNumber"": ""03"", ""type"": ""mobile"" } }, { ""op"": ""replace"", ""path"": ""userName"", ""value"": ""cassandra"" }, { ""op"" : ""remove"", ""path"": ""scores.math[score eq \""10\""]"" }, { ""op"" : ""add"", ""path"": ""scores.math"", ""value"": { ""score"": ""20"" } }, { ""op"": ""add"", ""path"": ""roles"", ""value"": ""role3"" } ]"});
+                        @"[ { ""op"": ""replace"", ""path"": ""phones[phoneNumber eq \""05\""].type"", ""value"": ""NewHome05"" }, { ""op"": ""remove"", ""path"": ""phones[phoneNumber eq \""05\""].phoneNumber"" }, { ""op"" : ""replace"", ""path"": ""phones[phoneNumber eq 04]"", ""value"": { ""type"": ""home"" } }, { ""op"" : ""remove"", ""path"": ""phones[phoneNumber eq 01]"" }, { ""op"": ""add"", ""path"": ""phones"", ""value"": { ""phoneNumber"": ""03"", ""type"": ""mobile"" } }, { ""op"": ""replace"", ""path"": ""userName"", ""value"": ""cassandra"" }, { ""op"" : ""remove"", ""path"": ""scores.math[score eq \""10\""]"" }, { ""op"" : ""add"", ""path"": ""scores.math"", ""value"": { ""score"": ""20"" } }, { ""op"": ""add"", ""path"": ""roles"", ""value"": ""role3"" } ]"});
 #line 241
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table24, "And ");
 #line 246
@@ -764,7 +764,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 255
  testRunner.Then("JSON \'phones[0].type\'=\'home\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 256
- testRunner.Then("JSON \'phones[1].type\'=\'home05\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'phones[1].type\'=\'NewHome05\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 257
  testRunner.Then("JSON doesn\'t exists \'phones[1].phoneNumber\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 258
