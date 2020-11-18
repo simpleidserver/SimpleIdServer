@@ -53,7 +53,6 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 Id = a.Id,
                 Values = values,
                 RepresentationId = representationId,
-                ParentId = a.Parent == null ? null : a.Parent.Id,
                 SchemaAttributeId = a.SchemaAttribute.Id,
                 Children = new List<SCIMRepresentationAttributeModel>()
             };

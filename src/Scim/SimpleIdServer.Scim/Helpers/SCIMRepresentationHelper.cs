@@ -41,7 +41,7 @@ namespace SimpleIdServer.Scim.Helpers
             return result;
         }
 
-        public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, bool ignoreUnsupportedCanonicalValues)
+        public static ICollection<SCIMRepresentationAttribute> BuildRepresentationAttributes(JObject json, IEnumerable<SCIMSchemaAttribute> attrsSchema, bool ignoreUnsupportedCanonicalValues, bool ignoreDefaultAttrs = false)
         {
             var attributes = new List<SCIMRepresentationAttribute>();
             foreach (var jsonProperty in json)
@@ -79,6 +79,11 @@ namespace SimpleIdServer.Scim.Helpers
                     jArr.Add(jsonProperty.Value);
                     attributes.AddRange(BuildAttributes(jArr, attrSchema, ignoreUnsupportedCanonicalValues));
                 }
+            }
+
+            if (ignoreDefaultAttrs)
+            {
+                return attributes;
             }
 
             var defaultAttributes = attrsSchema.Where(a => !json.ContainsKey(a.Name) && a.Mutability == SCIMSchemaAttributeMutabilities.READWRITE);
@@ -129,7 +134,7 @@ namespace SimpleIdServer.Scim.Helpers
             return attributes;
         }
 
-        private static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, bool ignoreUnsupportedCanonicalValues)
+        public static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMRepresentationAttribute>();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)

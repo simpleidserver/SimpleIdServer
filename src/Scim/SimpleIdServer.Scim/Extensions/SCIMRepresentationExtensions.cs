@@ -33,26 +33,20 @@ namespace SimpleIdServer.Scim.Domain
             {
                 var scimFilter = SCIMFilterParser.Parse(patch.Path, representation.Schemas);
                 var attributeExpression = scimFilter as SCIMAttributeExpression;
-                if (attributeExpression == null)
+                var fullPath = string.Empty;
+                var schemaAttributes = representation.Schemas.SelectMany(_ => _.Attributes);
+                List<SCIMRepresentationAttribute> attributes = null;
+                if (attributeExpression != null)
                 {
-                    throw new SCIMAttributeException(string.Format(Global.InvalidPath, patch.Path));
+                    fullPath = attributeExpression.GetFullPath();
+                    schemaAttributes = representation.Schemas
+                        .Select(s => s.GetAttribute(fullPath))
+                        .Where(s => s != null);
+                    attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, scimFilter).ToList();
                 }
-
-                var fullPath = attributeExpression.GetFullPath();
-                var schemaAttributes = representation.Schemas.Select(s => s.GetAttribute(fullPath)).Where(s => s != null);
-                if (!schemaAttributes.Any())
+                else
                 {
-                    throw new SCIMAttributeException(string.Format(Global.UnknownPath, patch.Path));
-                }
-
-                var schemaAttribute = schemaAttributes.First();
-                var complexAttr = attributeExpression as SCIMComplexAttributeExpression;
-                var attributes = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, scimFilter).ToList();
-                if (!attributes.Any() && (
-                    (schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX && !schemaAttribute.MultiValued) ||
-                    (schemaAttribute.MultiValued && complexAttr != null && complexAttr.GroupingFilter != null)))
-                {
-                    throw new SCIMNoTargetException(Global.PatchMissingAttribute);
+                    attributes = queryableRepresentationAttributes.ToList();
                 }
 
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>
@@ -69,102 +63,130 @@ namespace SimpleIdServer.Scim.Domain
                         }
                     }
                 });
-                if (patch.Operation == SCIMPatchOperations.REMOVE)
-                {
-                    removeCallback(attributes);
-                }
 
-                if (patch.Operation == SCIMPatchOperations.ADD)
+                switch (patch.Operation)
                 {
-                    removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued).ToList());
-                    var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value, ignoreUnsupportedCanonicalValues);
-                    foreach (var newAttribute in newAttributes)
-                    {
-                        var parentAttribute = representation.GetParentAttribute(fullPath);
-                        var attribute = representation.GetAttribute(fullPath);
-                        if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX && parentAttribute != null)
+                    case SCIMPatchOperations.ADD:
+                        try
                         {
-                            parentAttribute.Values.Add(newAttribute);
+                            removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued).ToList());
+                            var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                            foreach (var newAttribute in newAttributes)
+                            {
+                                var parentAttribute = representation.GetParentAttribute(fullPath);
+                                var attribute = representation.GetAttribute(fullPath);
+                                var schemaAttr = newAttribute.SchemaAttribute;
+                                if (schemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && parentAttribute != null)
+                                {
+                                    parentAttribute.Add(newAttribute);
+                                    continue;
+                                }
+
+                                if (attribute != null && schemaAttr.Type != SCIMSchemaAttributeTypes.COMPLEX)
+                                {
+                                    if (schemaAttr.Type == SCIMSchemaAttributeTypes.BOOLEAN)
+                                    {
+                                        foreach (var b in newAttribute.ValuesBoolean)
+                                        {
+                                            attribute.ValuesBoolean.Add(b);
+                                        }
+                                    }
+                                    else if (schemaAttr.Type == SCIMSchemaAttributeTypes.DATETIME)
+                                    {
+                                        foreach (var d in newAttribute.ValuesDateTime)
+                                        {
+                                            attribute.ValuesDateTime.Add(d);
+                                        }
+                                    }
+                                    else if (schemaAttr.Type == SCIMSchemaAttributeTypes.INTEGER)
+                                    {
+                                        foreach (var i in newAttribute.ValuesInteger)
+                                        {
+                                            attribute.ValuesInteger.Add(i);
+                                        }
+                                    }
+                                    else if (schemaAttr.Type == SCIMSchemaAttributeTypes.REFERENCE)
+                                    {
+                                        foreach (var r in newAttribute.ValuesReference)
+                                        {
+                                            attribute.ValuesReference.Add(r);
+                                        }
+                                    }
+                                    else if (schemaAttr.Type == SCIMSchemaAttributeTypes.STRING)
+                                    {
+                                        foreach (var s in newAttribute.ValuesString)
+                                        {
+                                            attribute.ValuesString.Add(s);
+                                        }
+                                    }
+                                    else if (schemaAttr.Type == SCIMSchemaAttributeTypes.DECIMAL)
+                                    {
+                                        foreach (var d in newAttribute.ValuesDecimal)
+                                        {
+                                            attribute.ValuesDecimal.Add(d);
+                                        }
+                                    }
+                                    else if (schemaAttr.Type == SCIMSchemaAttributeTypes.BINARY)
+                                    {
+                                        foreach (var b in newAttribute.ValuesBinary)
+                                        {
+                                            attribute.ValuesBinary.Add(b);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    representation.Attributes.Add(newAttribute);
+                                }
+                            }
+                        }
+                        catch (SCIMSchemaViolatedException)
+                        {
                             continue;
                         }
+                        break;
+                    case SCIMPatchOperations.REMOVE:
+                        {
+                            if (attributeExpression == null)
+                            {
+                                throw new SCIMNoTargetException(string.Format(Global.InvalidPath, patch.Path));
+                            }
 
-                        if (attribute != null && schemaAttribute.Type != SCIMSchemaAttributeTypes.COMPLEX)
+                            removeCallback(attributes);
+                        }
+                        break;
+                    case SCIMPatchOperations.REPLACE:
                         {
-                            if (schemaAttribute.Type == SCIMSchemaAttributeTypes.BOOLEAN)
+                            var complexAttr = attributeExpression as SCIMComplexAttributeExpression;
+                            if (complexAttr != null && !attributes.Any() && (schemaAttributes != null && schemaAttributes.Any() && schemaAttributes.First().MultiValued && complexAttr != null && complexAttr.GroupingFilter != null))
                             {
-                                foreach (var b in newAttribute.ValuesBoolean)
+                                throw new SCIMNoTargetException(Global.PatchMissingAttribute);
+                            }
+                            
+                            try
+                            {
+                                var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                                removeCallback(attributes);
+                                Merge(newAttributes, attributes);
+                                var parent = attributes.FirstOrDefault()?.Parent;
+                                foreach (var newAttribute in newAttributes)
                                 {
-                                    attribute.ValuesBoolean.Add(b);
+                                    if (parent != null)
+                                    {
+                                        parent.Add(newAttribute);
+                                    }
+                                    else
+                                    {
+                                        representation.Attributes.Add(newAttribute);
+                                    }
                                 }
                             }
-                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.DATETIME)
+                            catch(SCIMSchemaViolatedException)
                             {
-                                foreach (var d in newAttribute.ValuesDateTime)
-                                {
-                                    attribute.ValuesDateTime.Add(d);
-                                }
-                            }
-                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.INTEGER)
-                            {
-                                foreach (var i in newAttribute.ValuesInteger)
-                                {
-                                    attribute.ValuesInteger.Add(i);
-                                }
-                            }
-                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.REFERENCE)
-                            {
-                                foreach (var r in newAttribute.ValuesReference)
-                                {
-                                    attribute.ValuesReference.Add(r);
-                                }
-                            }
-                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.STRING)
-                            {
-                                foreach (var s in newAttribute.ValuesString)
-                                {
-                                    attribute.ValuesString.Add(s);
-                                }
-                            }
-                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.DECIMAL)
-                            {
-                                foreach (var d in newAttribute.ValuesDecimal)
-                                {
-                                    attribute.ValuesDecimal.Add(d);
-                                }
-                            }
-                            else if (schemaAttribute.Type == SCIMSchemaAttributeTypes.BINARY)
-                            {
-                                foreach (var b in newAttribute.ValuesBinary)
-                                {
-                                    attribute.ValuesBinary.Add(b);
-                                }
+                                continue;
                             }
                         }
-                        else
-                        {
-                            representation.Attributes.Add(newAttribute);
-                        }
-                    }
-                }
-
-                if (patch.Operation == SCIMPatchOperations.REPLACE)
-                {
-                    removeCallback(attributes);
-                    var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttribute, patch.Value, ignoreUnsupportedCanonicalValues);
-                    Merge(newAttributes, attributes);
-                    var parent = attributes.FirstOrDefault()?.Parent;
-                    foreach (var newAttribute in newAttributes)
-                    {
-                        if (parent != null)
-                        {
-                            newAttribute.Parent = parent;
-                            parent.Values.Add(newAttribute);
-                        }
-                        else
-                        {
-                            representation.Attributes.Add(newAttribute);
-                        }
-                    }
+                        break;
                 }
             }
         }
@@ -241,7 +263,7 @@ namespace SimpleIdServer.Scim.Domain
         
         private static void Merge(ICollection<SCIMRepresentationAttribute> newAttributes, ICollection<SCIMRepresentationAttribute> oldAttributes)
         {
-            var unknownAttributes = oldAttributes.Where(oa => !newAttributes.Any(na => na.SchemaAttribute.Name == oa.SchemaAttribute.Name));
+            var unknownAttributes = oldAttributes.Where(oa => !newAttributes.Any(na => na.SchemaAttribute.Name == oa.SchemaAttribute.Name)).ToList();
             foreach(var unknownAttr in unknownAttributes)
             {
                 newAttributes.Add(unknownAttr);
@@ -369,56 +391,50 @@ namespace SimpleIdServer.Scim.Domain
             return filteredAttributes;
         }
 
-        private static ICollection<SCIMRepresentationAttribute> ExtractRepresentationAttributesFromJSON(SCIMSchemaAttribute schemaAttribute, object jObj, bool ignoreUnsupportedCanonicalValues)
+        private static ICollection<SCIMRepresentationAttribute> ExtractRepresentationAttributesFromJSON(ICollection<SCIMSchemaAttribute> schemaAttributes, object obj, bool ignoreUnsupportedCanonicalValues)
         {
-            var jArr = jObj as JArray;
-            var parsedRepresentationAttributes = new List<SCIMRepresentationAttribute>();
-            if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
+            var result = new List<SCIMRepresentationAttribute>();
+            var jArr = obj as JArray;
+            var jObj = obj as JObject;
+            if (jObj != null && schemaAttributes != null && 
+                schemaAttributes.Any() && 
+                schemaAttributes.Count() == 1 && 
+                schemaAttributes.First().Type == SCIMSchemaAttributeTypes.COMPLEX && 
+                schemaAttributes.First().MultiValued)
             {
-                if (jArr != null)
-                {
-                    foreach (JObject record in jArr)
-                    {
-                        var attribute = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute);
-                        foreach(var attr in SCIMRepresentationHelper.BuildRepresentationAttributes(record, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues))
-                        {
-                            attribute.Add(attr);
-                        }
-
-                        parsedRepresentationAttributes.Add(attribute);
-                    }
-                }
-                else
-                {
-                    var attribute = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute);
-                    foreach (var attr in SCIMRepresentationHelper.BuildRepresentationAttributes(jObj as JObject, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues))
-                    {
-                        attribute.Add(attr);
-                    }
-
-                    parsedRepresentationAttributes.Add(attribute);
-                }
+                jArr = new JArray();
+                jArr.Add(jObj);
             }
-            else
+
+            if (jArr != null)
             {
+                result.AddRange(SCIMRepresentationHelper.BuildAttributes(jArr, schemaAttributes.First(), ignoreUnsupportedCanonicalValues));
+            }
+            else if (jObj != null)
+            {
+                result.AddRange(SCIMRepresentationHelper.BuildRepresentationAttributes(jObj, schemaAttributes, ignoreUnsupportedCanonicalValues));
+            }
+            else if (schemaAttributes.Any() && schemaAttributes.Count() == 1)
+            {
+                var schemaAttribute = schemaAttributes.First();
                 switch (schemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.BOOLEAN:
-                        parsedRepresentationAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesBoolean: new List<bool> { bool.Parse(jObj.ToString()) }));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesBoolean: new List<bool> { bool.Parse(obj.ToString()) }));
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
-                        parsedRepresentationAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesString: new List<string> { jObj.ToString() }));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesString: new List<string> { obj.ToString() }));
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
-                        parsedRepresentationAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesInteger: new List<int> { int.Parse(jObj.ToString()) }));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesInteger: new List<int> { int.Parse(obj.ToString()) }));
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
-                        parsedRepresentationAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesDateTime: new List<DateTime> { DateTime.Parse(jObj.ToString()) }));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute, valuesDateTime: new List<DateTime> { DateTime.Parse(obj.ToString()) }));
                         break;
                 }
             }
 
-            return parsedRepresentationAttributes;
+            return result;
         }
 
         private static IQueryable<SCIMRepresentationAttribute> GetAttributes(SCIMAttributeExpression scimExpression, IQueryable<SCIMRepresentationAttribute> attributes)
