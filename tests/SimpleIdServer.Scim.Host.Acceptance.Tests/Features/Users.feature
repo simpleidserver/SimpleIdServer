@@ -227,21 +227,21 @@ Scenario: Check user can be updated (HTTP PUT)
 
 Scenario: Check user can be patched (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key            | Value                                                                                                                           |
-	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]                  |
-	| userName       | bjen                                                                                                                            |
-	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                                             |
-	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" }, { "phoneNumber": "04", "type": "home" } ] |
-	| employeeNumber | number                                                                                                                          |
-	| scores         | { "math" : [ { "score" : "10" } ] }                                                                                             |
-	| roles          | [ "role1", "role2" ]                                                                                                            |
+	| Key            | Value                                                                                                                                                                      |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]                                                             |
+	| userName       | bjen                                                                                                                                                                       |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                                                                                        |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" }, { "phoneNumber": "04", "type": "home" }, { "phoneNumber": "05", "type": "home05" } ] |
+	| employeeNumber | number                                                                                                                                                                     |
+	| scores         | { "math" : [ { "score" : "10" } ] }                                                                                                                                        |
+	| roles          | [ "role1", "role2" ]                                                                                                                                                       |
 
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
 	| Key        | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-	| Operations | [ { "op" : "replace", "path": "phones[phoneNumber eq 04]", "value": { "type": "home" } }, { "op" : "remove", "path": "phones[phoneNumber eq 01]" }, { "op": "add", "path": "phones", "value": { "phoneNumber": "03", "type": "mobile" } }, { "op": "replace", "path": "userName", "value": "cassandra" }, { "op" : "remove", "path": "scores.math[score eq \"10\"]" }, { "op" : "add", "path": "scores.math", "value": { "score": "20" } }, { "op": "add", "path": "roles", "value": "role3" } ] |
+	| Operations | [ { "op": "remove", "path": "phones[phoneNumber eq 05].phoneNumber" }, { "op" : "replace", "path": "phones[phoneNumber eq 04]", "value": { "type": "home" } }, { "op" : "remove", "path": "phones[phoneNumber eq 01]" }, { "op": "add", "path": "phones", "value": { "phoneNumber": "03", "type": "mobile" } }, { "op": "replace", "path": "userName", "value": "cassandra" }, { "op" : "remove", "path": "scores.math[score eq \"10\"]" }, { "op" : "add", "path": "scores.math", "value": { "score": "20" } }, { "op": "add", "path": "roles", "value": "role3" } ] |
 	
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
@@ -253,10 +253,12 @@ Scenario: Check user can be patched (HTTP PATCH)
 	Then JSON 'userName'='cassandra'
 	Then JSON 'phones[0].phoneNumber'='02'
 	Then JSON 'phones[0].type'='home'
-	Then JSON 'phones[1].type'='home'
-	Then JSON 'phones[1].phoneNumber'='04'
-	Then JSON 'phones[2].type'='mobile'
-	Then JSON 'phones[2].phoneNumber'='03'
+	Then JSON 'phones[1].type'='home05'
+	Then JSON doesn't exists 'phones[1].phoneNumber'
+	Then JSON 'phones[2].type'='home'
+	Then JSON 'phones[2].phoneNumber'='04'
+	Then JSON 'phones[3].type'='mobile'
+	Then JSON 'phones[3].phoneNumber'='03'
 	Then JSON 'scores.math[0].score'='20'
 	Then JSON 'roles[0]'='role1'
 	Then JSON 'roles[1]'='role2'
