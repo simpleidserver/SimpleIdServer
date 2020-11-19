@@ -145,6 +145,12 @@ namespace SimpleIdServer.Scim.Helpers
                     {
                         Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)
                     };
+                    
+                    foreach (var subAttribute in record.Values)
+                    {
+                        subAttribute.Parent = record;
+                    }
+                    
                     result.Add(record);
                 }
             }
