@@ -563,7 +563,7 @@ namespace SimpleIdServer.Scim.Extensions
         private static bool ParseBoolean(string str)
         {
             bool result;
-            if (!bool.TryParse(str, out result))
+            if (bool.TryParse(str, out result))
             {
                 return result;
             }
