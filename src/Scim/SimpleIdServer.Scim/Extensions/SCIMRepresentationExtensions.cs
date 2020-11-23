@@ -69,6 +69,11 @@ namespace SimpleIdServer.Scim.Domain
                     case SCIMPatchOperations.ADD:
                         try
                         {
+                            if (schemaAttributes == null || !schemaAttributes.Any())
+                            {
+                                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
+                            }
+                            
                             removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued).ToList());
                             var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                             foreach (var newAttribute in newAttributes)
@@ -157,8 +162,13 @@ namespace SimpleIdServer.Scim.Domain
                         break;
                     case SCIMPatchOperations.REPLACE:
                         {
+                            if (schemaAttributes == null || !schemaAttributes.Any())
+                            {
+                                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
+                            }
+                            
                             var complexAttr = attributeExpression as SCIMComplexAttributeExpression;
-                            if (complexAttr != null && !attributes.Any() && (schemaAttributes != null && schemaAttributes.Any() && schemaAttributes.First().MultiValued && complexAttr != null && complexAttr.GroupingFilter != null))
+                            if (complexAttr != null && !attributes.Any() && complexAttr.GroupingFilter != null)
                             {
                                 throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                             }
