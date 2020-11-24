@@ -205,6 +205,31 @@ Scenario: Error is returned when trying to remove attribute and path is not spec
 	Then JSON 'response.scimType'='noTarget'
 	Then JSON 'response.detail'='path  is not valid'
 
+Scenario: Error is returned when trying to add attribute and path is not valid (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
+	| scores         | { "math" : [ { "score" : "10" } ] }                                                                            |
+	| roles          | [ "role1", "role2" ]                                                                                           |
+
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                               |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ] |
+	| Operations | [ { "op" : "add", "path": "fakepath" } ]            |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'status'='400'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='noTarget'
+	Then JSON 'response.detail'='attribute fakepath is not recognized by the SCIM schema'
+
 
 Scenario: Error is returned when trying to PATCH and there is no match (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Users'

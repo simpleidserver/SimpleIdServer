@@ -33,9 +33,9 @@ namespace SimpleIdServer.Scim.Domain
             {
                 var scimFilter = SCIMFilterParser.Parse(patch.Path, representation.Schemas);
                 var attributeExpression = scimFilter as SCIMAttributeExpression;
-                var fullPath = string.Empty;
                 var schemaAttributes = representation.Schemas.SelectMany(_ => _.Attributes);
                 List<SCIMRepresentationAttribute> attributes = null;
+                string fullPath = null;
                 if (attributeExpression != null)
                 {
                     fullPath = attributeExpression.GetFullPath();
@@ -64,17 +64,25 @@ namespace SimpleIdServer.Scim.Domain
                     }
                 });
 
+
+
                 switch (patch.Operation)
                 {
                     case SCIMPatchOperations.ADD:
                         try
                         {
-                            removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued).ToList());
+                            if (schemaAttributes == null || !schemaAttributes.Any())
+                            {
+                                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
+                            }
+
                             var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                            removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && newAttributes.Any(_ => _.SchemaAttribute.Name == a.SchemaAttribute.Name)).ToList());
                             foreach (var newAttribute in newAttributes)
                             {
-                                var parentAttribute = representation.GetParentAttribute(fullPath);
-                                var attribute = representation.GetAttribute(fullPath);
+                                var path = string.IsNullOrWhiteSpace(fullPath) ? newAttribute.SchemaAttribute.Name : fullPath;
+                                var parentAttribute = representation.GetParentAttribute(path);
+                                var attribute = representation.GetAttribute(path);
                                 var schemaAttr = newAttribute.SchemaAttribute;
                                 if (schemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && parentAttribute != null)
                                 {
@@ -157,8 +165,13 @@ namespace SimpleIdServer.Scim.Domain
                         break;
                     case SCIMPatchOperations.REPLACE:
                         {
+                            if (schemaAttributes == null || !schemaAttributes.Any())
+                            {
+                                throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
+                            }
+
                             var complexAttr = attributeExpression as SCIMComplexAttributeExpression;
-                            if (complexAttr != null && !attributes.Any() && (schemaAttributes != null && schemaAttributes.Any() && schemaAttributes.First().MultiValued && complexAttr != null && complexAttr.GroupingFilter != null))
+                            if (complexAttr != null && !attributes.Any() && complexAttr.GroupingFilter != null)
                             {
                                 throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                             }
@@ -412,7 +425,7 @@ namespace SimpleIdServer.Scim.Domain
             }
             else if (jObj != null)
             {
-                result.AddRange(SCIMRepresentationHelper.BuildRepresentationAttributes(jObj, schemaAttributes, ignoreUnsupportedCanonicalValues));
+                result.AddRange(SCIMRepresentationHelper.BuildRepresentationAttributes(jObj, schemaAttributes, ignoreUnsupportedCanonicalValues, true));
             }
             else if (schemaAttributes.Any() && schemaAttributes.Count() == 1)
             {
