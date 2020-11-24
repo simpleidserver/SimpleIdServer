@@ -55,6 +55,23 @@ namespace SimpleIdServer.Scim.Domain
         public SCIMRepresentationAttribute Parent { get; set; }
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
 
+        public string GetFullPath()
+        {
+            var lst = new List<string>();
+            GetFullPath(lst);
+            lst.Reverse();
+            return string.Join(".", lst);
+        }
+
+        public void GetFullPath(List<string> lst)
+        {
+            lst.Add(SchemaAttribute.Name);
+            if (Parent != null)
+            {
+                Parent.GetFullPath(lst);
+            }
+        }
+
         public void Add(int value)
         {
             ValuesInteger.Add(value);

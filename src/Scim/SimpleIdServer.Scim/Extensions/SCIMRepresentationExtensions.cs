@@ -179,20 +179,21 @@ namespace SimpleIdServer.Scim.Domain
                             try
                             {
                                 var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
-                                removeCallback(attributes);
-                                Merge(newAttributes, attributes);
-                                var parent = attributes.FirstOrDefault()?.Parent;
-                                foreach (var newAttribute in newAttributes)
+                                var parentFullPath = attributes.First().Parent?.GetFullPath();
+                                if (!string.IsNullOrWhiteSpace(parentFullPath))
                                 {
-                                    if (parent != null)
+                                    scimFilter = SCIMFilterParser.Parse(parentFullPath, representation.Schemas);
+                                    var allAttrs = GetRepresentationAttributeFromPath(queryableRepresentationAttributes, scimFilter);
+                                    foreach(var attr in allAttrs)
                                     {
-                                        parent.Add(newAttribute);
-                                    }
-                                    else
-                                    {
-                                        representation.Attributes.Add(newAttribute);
+                                        if (!attr.Values.Any(_ => attributes.Any(a => a.SchemaAttribute.Name == _.SchemaAttribute.Name)))
+                                        {
+                                            attr.Add(attributes.First());
+                                        }
                                     }
                                 }
+
+                                Merge(attributes, newAttributes);
                             }
                             catch(SCIMSchemaViolatedException)
                             {
@@ -274,23 +275,24 @@ namespace SimpleIdServer.Scim.Domain
             return jObj;
         }
         
-        private static void Merge(ICollection<SCIMRepresentationAttribute> newAttributes, ICollection<SCIMRepresentationAttribute> oldAttributes)
+        private static void Merge(List<SCIMRepresentationAttribute> attributes, ICollection<SCIMRepresentationAttribute> newAttributes)
         {
-            var unknownAttributes = oldAttributes.Where(oa => !newAttributes.Any(na => na.SchemaAttribute.Name == oa.SchemaAttribute.Name)).ToList();
-            foreach(var unknownAttr in unknownAttributes)
+            foreach(var attribute in attributes)
             {
-                newAttributes.Add(unknownAttr);
-            }
-
-            foreach(var newAttr in newAttributes)
-            {
-                var oldAttr = oldAttributes.FirstOrDefault(oa => oa.SchemaAttribute.Name == newAttr.SchemaAttribute.Name);
-                if (oldAttr == null)
+                var newAttr = newAttributes.FirstOrDefault(na => na.SchemaAttribute.Name == attribute.SchemaAttribute.Name);
+                if (newAttr == null)
                 {
                     continue;
                 }
 
-                Merge(newAttr.Values, oldAttr.Values);
+                attribute.ValuesBinary = newAttr.ValuesBinary;
+                attribute.ValuesBoolean = newAttr.ValuesBoolean;
+                attribute.ValuesDateTime = newAttr.ValuesDateTime;
+                attribute.ValuesDecimal = newAttr.ValuesDecimal;
+                attribute.ValuesInteger = newAttr.ValuesInteger;
+                attribute.ValuesReference = newAttr.ValuesReference;
+                attribute.ValuesString = newAttr.ValuesString;
+                Merge(attribute.Values.ToList(), newAttr.Values);
             }
         }
 

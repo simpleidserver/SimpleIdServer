@@ -38,6 +38,10 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                    opt.AddStringAttribute("phoneNumber", description: "Phone number");
                    opt.AddStringAttribute("type", description: "Type");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
+               .AddComplexAttribute("adRoles", opt => {
+                   opt.AddStringAttribute("value", description: "Value");
+                   opt.AddStringAttribute("display", description: "Display");
+               }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddComplexAttribute("scores", opt =>
                {
                    opt.AddComplexAttribute("math", sopt =>
