@@ -730,7 +730,7 @@ this.ScenarioInitialize(scenarioInfo);
             table23.AddRow(new string[] {
                         "adRoles",
                         "[ { \"display\": \"adRole1\", \"value\" : \"user1\" } , { \"display\": \"adRole2\", \"value\" :" +
-                            " \"user2\" }, { \"value\": \"user3\" } ]"});
+                            " \"user2\" }, { \"value\": \"user3\" }, { \"display\": \"adRole3\", \"value\" : \"user4\" } ]"});
 #line 229
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table23, "When ");
 #line 240
@@ -746,7 +746,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
             table24.AddRow(new string[] {
                         "Operations",
-                        @"[ { ""op"": ""replace"", ""path"": ""adRoles.display"", ""value"" : ""NEWUSER"" }, { ""op"": ""replace"", ""path"": ""adRoles[value eq user1].value"", ""value"" : ""NEWUSERVALUE"" }, { ""op"": ""replace"", ""path"": ""adRoles[value eq user2]"", ""value"" : { ""value"": ""NEWUSERVALUE2"" } }, { ""op"": ""add"", ""value"" : { ""roles"": [ ""role10"" ] } }, { ""op"": ""replace"", ""value"" : { ""userName"": ""cassandra"" } }, { ""op"": ""replace"", ""path"": ""phones[phoneNumber eq \""05\""].type"", ""value"": ""NewHome05"" }, { ""op"": ""remove"", ""path"": ""phones[phoneNumber eq \""05\""].phoneNumber"" }, { ""op"" : ""replace"", ""path"": ""phones[phoneNumber eq 04]"", ""value"": { ""type"": ""home"" } }, { ""op"" : ""remove"", ""path"": ""phones[phoneNumber eq 01]"" }, { ""op"": ""add"", ""path"": ""phones"", ""value"": { ""phoneNumber"": ""03"", ""type"": ""mobile"" } }, { ""op"" : ""remove"", ""path"": ""scores.math[score eq \""10\""]"" }, { ""op"" : ""add"", ""path"": ""scores.math"", ""value"": { ""score"": ""20"" } }, { ""op"": ""add"", ""path"": ""roles"", ""value"": ""role3"" } ]"});
+                        @"[ { ""op"": ""replace"", ""path"": ""adRoles.display"", ""value"" : ""NEWUSER"" }, { ""op"": ""add"", ""path"" : ""adRoles[value eq user4].display"", ""value"": ""NEWUSER4"" }, { ""op"": ""replace"", ""path"": ""adRoles[value eq user1].value"", ""value"" : ""NEWUSERVALUE"" }, { ""op"": ""replace"", ""path"": ""adRoles[value eq user2]"", ""value"" : { ""value"": ""NEWUSERVALUE2"" } }, { ""op"": ""add"", ""value"" : { ""roles"": [ ""role10"" ] } }, { ""op"": ""replace"", ""value"" : { ""userName"": ""cassandra"" } }, { ""op"": ""replace"", ""path"": ""phones[phoneNumber eq \""05\""].type"", ""value"": ""NewHome05"" }, { ""op"": ""remove"", ""path"": ""phones[phoneNumber eq \""05\""].phoneNumber"" }, { ""op"" : ""replace"", ""path"": ""phones[phoneNumber eq 04]"", ""value"": { ""type"": ""home"" } }, { ""op"" : ""remove"", ""path"": ""phones[phoneNumber eq 01]"" }, { ""op"": ""add"", ""path"": ""phones"", ""value"": { ""phoneNumber"": ""03"", ""type"": ""mobile"" } }, { ""op"" : ""remove"", ""path"": ""scores.math[score eq \""10\""]"" }, { ""op"" : ""add"", ""path"": ""scores.math"", ""value"": { ""score"": ""20"" } }, { ""op"": ""add"", ""path"": ""roles"", ""value"": ""role3"" } ]"});
 #line 242
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table24, "And ");
 #line 247
@@ -801,6 +801,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'adRoles[2].display\'=\'NEWUSER\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 273
  testRunner.Then("JSON \'adRoles[2].value\'=\'user3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 274
+ testRunner.Then("JSON \'adRoles[3].value\'=\'user4\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 275
+ testRunner.Then("JSON \'adRoles[3].display\'=\'NEWUSER4\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
@@ -811,7 +815,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckNoUserIsReturnedWhenCountParameterIs0()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check no user is returned when count parameter is 0", null, ((string[])(null)));
-#line 275
+#line 277
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -842,21 +846,21 @@ this.ScenarioInitialize(scenarioInfo);
             table25.AddRow(new string[] {
                         "roles",
                         "[ \"role1\", \"role2\" ]"});
-#line 276
+#line 278
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table25, "When ");
-#line 286
+#line 288
  testRunner.And("execute HTTP GET request \'http://localhost/Users?count=0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 287
+#line 289
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 290
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 291
- testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:ListResponse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 292
- testRunner.Then("JSON \'totalResults\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 293
- testRunner.Then("JSON \'startIndex\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:ListResponse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 294
+ testRunner.Then("JSON \'totalResults\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 295
+ testRunner.Then("JSON \'startIndex\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 296
  testRunner.Then("JSON \'itemsPerPage\'=\'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
