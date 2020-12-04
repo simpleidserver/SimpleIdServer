@@ -59,6 +59,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             var records = await IncludeRepresentationNavigationProperties(IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => values.Contains(v.ValueString)))
                 .Select(a => a.Representation))
+                .Distinct()
                 .AsNoTracking()
                 .ToListAsync();
             return records.Select(r => r.ToDomain());
