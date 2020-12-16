@@ -551,7 +551,10 @@ namespace SimpleIdServer.Scim.Domain
                         {
                             var jObjVal = new JObject();
                             EnrichResponse(representationAttr.Values.AsQueryable(), jObjVal, isGetRequest);
-                            jObj.Add(representationAttr.SchemaAttribute.Name, jObjVal);
+                            if (jObjVal.Children().Count() > 0)
+                            {
+                                jObj.Add(representationAttr.SchemaAttribute.Name, jObjVal);
+                            }
                         }
                         else
                         {
@@ -560,7 +563,10 @@ namespace SimpleIdServer.Scim.Domain
                             {
                                 var jObjVal = new JObject();
                                 EnrichResponse(attr.Values.AsQueryable(), jObjVal, isGetRequest);
-                                jArr.Add(jObjVal);
+                                if (jObjVal.Children().Count() > 0)
+                                {
+                                    jArr.Add(jObjVal);
+                                }
                             }
 
                             jObj.Add(representationAttr.SchemaAttribute.Name, jArr);
