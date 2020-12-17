@@ -119,6 +119,26 @@ namespace SimpleIdServer.Scim.Domain
             
             return true;
         }
+        
+        public bool HasValue
+        {
+            get
+            {
+                if (Values.Any()
+                    || ValuesBinary.Any()
+                    || ValuesBoolean.Any()
+                    || ValuesDateTime.Any()
+                    || ValuesDecimal.Any()
+                    || ValuesInteger.Any()
+                    || ValuesReference.Any()
+                    || ValuesString.Any())
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
 
         public object Clone()
         {
