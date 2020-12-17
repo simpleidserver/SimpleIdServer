@@ -82,7 +82,7 @@ namespace SimpleIdServer.Scim.Domain
 
                             var newAttributes = ExtractRepresentationAttributesFromJSON(schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                             var parentAttrs = removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && newAttributes.Any(_ => _.SchemaAttribute.Name == a.SchemaAttribute.Name)).ToList());
-                            foreach (var newAttribute in newAttributes)
+                            foreach (var newAttribute in newAttributes.Where(x => x.HasValue))
                             {
                                 var path = string.IsNullOrWhiteSpace(fullPath) ? newAttribute.SchemaAttribute.Name : fullPath;
                                 var schemaAttr = newAttribute.SchemaAttribute;
