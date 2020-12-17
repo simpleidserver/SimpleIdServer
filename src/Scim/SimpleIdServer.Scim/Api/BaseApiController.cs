@@ -165,7 +165,7 @@ namespace SimpleIdServer.Scim.Api
                 var schemaIds = new List<string> { schema.Id };
                 schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
                 var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
-                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex - 1, searchRequest.Count, searchRequest.SortBy, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas)));
+                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex - 1, searchRequest.Count, searchRequest.SortBy, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), searchRequest.Attributes));
                 var jObj = new JObject
                 {
                     { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },
