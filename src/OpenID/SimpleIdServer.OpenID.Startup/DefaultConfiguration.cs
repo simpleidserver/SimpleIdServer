@@ -395,6 +395,44 @@ namespace SimpleIdServer.OpenID.Startup
             },
             new OpenIdClient
             {
+                ClientId = "caseManagementTasklistWebsite",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("b98113b5-f45f-4a4a-9db5-610b7183e148"))
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                ApplicationType = "web",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                IdTokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OpenIdScope>
+                {
+                    SIDOpenIdConstants.StandardScopes.Profile,
+                    SIDOpenIdConstants.StandardScopes.Email,
+                    SIDOpenIdConstants.StandardScopes.Role
+                },
+                GrantTypes = new List<string>
+                {
+                    "implicit"
+                },
+                RedirectionUrls = new List<string>
+                {
+                    "http://localhost:51724",
+                    "http://localhost:8081",
+                    "http://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
+                },
+                PreferredTokenProfile = "Bearer",
+                ResponseTypes = new List<string>
+                {
+                    "token",
+                    "id_token"
+                }
+            },
+            new OpenIdClient
+            {
                 ClientId = "caseManagementPerformanceWebsite",
                 Secrets = new List<ClientSecret>
                 {

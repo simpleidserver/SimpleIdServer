@@ -165,11 +165,106 @@ namespace SimpleIdServer.OAuth.Startup
             {
                 Name = "add_role",
                 IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
+                Name = "create_humantaskinstance",
+                IsExposedInConfigurationEdp = true
             }
         };
 
         public static List<OAuthClient> Clients => new List<OAuthClient>
         {
+            new OAuthClient
+            {
+                ClientId = "bpmnClient",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("bpmnClientSecret"))
+                },
+                ClientNames = new []
+                {
+                    new OAuthTranslation("bpmnClient_client_name", "BPMN Client", "fr")
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OAuthScope>
+                {
+                    new OAuthScope
+                    {
+                        Name = "create_humantaskinstance"
+                    }
+                },
+                GrantTypes = new List<string>
+                {
+                    "client_credentials"
+                },
+                PreferredTokenProfile = "Bearer"
+            },
+            new OAuthClient
+            {
+                ClientId = "cmmnClient",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("cmmnClientSecret"))
+                },
+                ClientNames = new []
+                {
+                    new OAuthTranslation("cmmnClient_client_name", "CMMN Client", "fr")
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OAuthScope>
+                {
+                    new OAuthScope
+                    {
+                        Name = "create_humantaskinstance"
+                    }
+                },
+                GrantTypes = new List<string>
+                {
+                    "client_credentials"
+                },
+                PreferredTokenProfile = "Bearer"
+            },
+            new OAuthClient
+            {
+                ClientId = "humanTaskClient",
+                Secrets = new List<ClientSecret>
+                {
+                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("humanTaskClientSecret"))
+                },
+                ClientNames = new []
+                {
+                    new OAuthTranslation("humanTaskClient_client_name", "HumanTask Client", "fr")
+                },
+                TokenEndPointAuthMethod = "client_secret_post",
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
+                TokenExpirationTimeInSeconds = 60 * 30,
+                RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                TokenSignedResponseAlg = "RS256",
+                AllowedScopes = new List<OAuthScope>
+                {
+                    new OAuthScope
+                    {
+                        Name = "complete_humantask"
+                    }
+                },
+                GrantTypes = new List<string>
+                {
+                    "client_credentials"
+                },
+                PreferredTokenProfile = "Bearer"
+            },
             new OAuthClient
             {
                 ClientId = "scimClient",
