@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.Builder
             _attributes = new List<SCIMRepresentationAttribute>();
         }
 
-        public SCIMRepresentationAttributeBuilder AddAttribute(string name, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null)
+        public SCIMRepresentationAttributeBuilder AddAttribute(string name, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null, List<decimal> valuesDecimal = null, List<byte[]> valuesBinary = null)
         {
             var id = Guid.NewGuid().ToString();
             SCIMSchemaAttribute schemaAttribute = null;
@@ -27,7 +27,7 @@ namespace SimpleIdServer.Scim.Builder
                 schemaAttribute = _scimSchemaAttribute.SubAttributes.FirstOrDefault(a => a.Name == name);
             }
 
-            _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime));
+            _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime, valuesDecimal, valuesBinary));
             return this;
         }
 
@@ -44,6 +44,16 @@ namespace SimpleIdServer.Scim.Builder
         public SCIMRepresentationAttributeBuilder AddIntegerAttribute(string name, List<int> valuesInteger)
         {
             return AddAttribute(name,  valuesInt: valuesInteger);
+        }
+
+        public SCIMRepresentationAttributeBuilder AddDecimalAttribute(string name, List<decimal> valuesDecimal)
+        {
+            return AddAttribute(name, valuesDecimal: valuesDecimal);
+        }
+
+        public SCIMRepresentationAttributeBuilder AddBinaryAttribute(string name, List<byte[]> valuesBinary)
+        {
+            return AddAttribute(name, valuesBinary: valuesBinary);
         }
 
         public SCIMRepresentationAttributeBuilder AddDateTimeAttribute(string name, List<DateTime> valuesDateTime)

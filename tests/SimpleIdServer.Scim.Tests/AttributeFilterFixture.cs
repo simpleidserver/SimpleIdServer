@@ -22,6 +22,10 @@ namespace SimpleIdServer.Scim.Tests
                    opt.AddStringAttribute("phoneNumber", description: "Phone number");
                    opt.AddStringAttribute("type", description: "Type");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
+               .AddComplexAttribute("info", opt =>
+               {
+                   opt.AddDecimalAttribute("age", description: "Age");
+               }, multiValued: false, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .Build();
             var userRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { userSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "john" })
@@ -35,6 +39,10 @@ namespace SimpleIdServer.Scim.Tests
                     b.AddStringAttribute("phoneNumber", new List<string> { "02" });
                     b.AddStringAttribute("type", new List<string> { "home" });
                 })
+                .AddComplexAttribute("info", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddDecimalAttribute("age", new List<decimal> { 20 });
+                })
                 .Build();
 
             var firstFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
@@ -46,6 +54,7 @@ namespace SimpleIdServer.Scim.Tests
             var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema });
             var eightFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
             var nineFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
+            var tenFilter = SCIMFilterParser.Parse("info.age", new List<SCIMSchema> { userSchema });
 
             var firstJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { firstFilter });
             var secondJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { secondFilter });
@@ -56,6 +65,7 @@ namespace SimpleIdServer.Scim.Tests
             var sevenJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { sevenFilter }, "http://localhost");
             var eightJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { eightFilter }, "http://localhost");
             var nineJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { nineFilter });
+            var tenJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { tenFilter });
 
             Assert.Equal("01", firstJSON.SelectToken("phones[0].phoneNumber").ToString());
             Assert.Equal("02", secondJSON.SelectToken("phones[0].phoneNumber").ToString());
@@ -67,6 +77,7 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Null(sevenJSON.SelectToken("meta.lastModified"));
             Assert.NotNull(eightJSON.SelectToken("id"));
             Assert.NotNull(nineJSON.SelectToken("id"));
+            Assert.Equal("20", tenJSON.SelectToken("info.age").ToString());
         }
     }
 }
