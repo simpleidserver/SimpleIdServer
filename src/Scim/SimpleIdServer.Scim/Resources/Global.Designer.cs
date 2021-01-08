@@ -259,6 +259,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; request is not well-formatted.
+        /// </summary>
+        public static string RequestIsNotWellFormatted {
+            get {
+                return ResourceManager.GetString("RequestIsNotWellFormatted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à required attributes {0} are missing.
         /// </summary>
         public static string RequiredAttributesAreMissing {

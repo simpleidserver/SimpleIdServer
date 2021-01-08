@@ -61,6 +61,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)
         {
+            if (patchRepresentation == null)
+            {
+                throw new SCIMBadSyntaxException(string.Format(Global.RequestIsNotWellFormatted, "PATCH"));
+            }
+
             var requestedSchemas = patchRepresentation.Schemas;
             if (!requestedSchemas.Any())
             {

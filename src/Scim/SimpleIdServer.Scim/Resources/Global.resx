@@ -183,6 +183,9 @@
   <data name="PatchResource" xml:space="preserve">
     <value>patch resource {0}</value>
   </data>
+  <data name="RequestIsNotWellFormatted" xml:space="preserve">
+    <value>'{0}' request is not well-formatted</value>
+  </data>
   <data name="RequiredAttributesAreMissing" xml:space="preserve">
     <value>required attributes {0} are missing</value>
   </data>

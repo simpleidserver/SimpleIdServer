@@ -256,6 +256,30 @@ Scenario: Error is returned when trying to PATCH and there is no match (HTTP PAT
 	Then JSON 'response.scimType'='noTarget'
 	Then JSON 'response.detail'='PATCH can be applied only on existing attributes'
 
+Scenario: Error is returned when "op" value is invalid (HTTP PATCH)
+		When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
+	| scores         | { "math" : [ { "score" : "10" } ] }                                                                            |
+	| roles          | [ "role1", "role2" ]                                                                                           |
+	 
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]              |
+	| Operations | [ { "op" : "invalid-op", "path": "phones[phoneNumber eq 03]" } ] |
+
+	And extract JSON from body
+	Then HTTP status code equals to '400'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='invalidSyntax'
+	Then JSON 'response.detail'=''PATCH' request is not well-formatted'
+
 Scenario: Error is returned when trying to add a none canonical value (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |

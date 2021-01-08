@@ -760,12 +760,12 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.FactAttribute(DisplayName="Error is returned when trying to add a none canonical value (HTTP POST)")]
+        [Xunit.FactAttribute(DisplayName="Error is returned when \"op\" value is invalid (HTTP PATCH)")]
         [Xunit.TraitAttribute("FeatureTitle", "UsersErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to add a none canonical value (HTTP POST)")]
-        public virtual void ErrorIsReturnedWhenTryingToAddANoneCanonicalValueHTTPPOST()
+        [Xunit.TraitAttribute("Description", "Error is returned when \"op\" value is invalid (HTTP PATCH)")]
+        public virtual void ErrorIsReturnedWhenOpValueIsInvalidHTTPPATCH()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add a none canonical value (HTTP POST)", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when \"op\" value is invalid (HTTP PATCH)", null, ((string[])(null)));
 #line 259
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -781,27 +781,96 @@ this.ScenarioInitialize(scenarioInfo);
                         "userName",
                         "bjen"});
             table45.AddRow(new string[] {
-                        "externalId",
-                        "externalid"});
+                        "name",
+                        "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                            " }"});
             table45.AddRow(new string[] {
-                        "type",
-                        "unsupported"});
+                        "phones",
+                        "[ { \"phoneNumber\": \"01\", \"type\": \"mobile\" }, { \"phoneNumber\": \"02\", \"type\": \"home" +
+                            "\" } ]"});
             table45.AddRow(new string[] {
                         "employeeNumber",
                         "number"});
+            table45.AddRow(new string[] {
+                        "scores",
+                        "{ \"math\" : [ { \"score\" : \"10\" } ] }"});
+            table45.AddRow(new string[] {
+                        "roles",
+                        "[ \"role1\", \"role2\" ]"});
 #line 260
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table45, "When ");
-#line 268
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table45, "When ");
 #line 270
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 271
- testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table46.AddRow(new string[] {
+                        "schemas",
+                        "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+            table46.AddRow(new string[] {
+                        "Operations",
+                        "[ { \"op\" : \"invalid-op\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
 #line 272
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table46, "And ");
+#line 277
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 278
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 279
  testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 273
+#line 280
+ testRunner.Then("JSON \'response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 281
+ testRunner.Then("JSON \'response.detail\'=\'\'PATCH\' request is not well-formatted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to add a none canonical value (HTTP POST)")]
+        [Xunit.TraitAttribute("FeatureTitle", "UsersErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to add a none canonical value (HTTP POST)")]
+        public virtual void ErrorIsReturnedWhenTryingToAddANoneCanonicalValueHTTPPOST()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add a none canonical value (HTTP POST)", null, ((string[])(null)));
+#line 283
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table47.AddRow(new string[] {
+                        "schemas",
+                        "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                            "ension:enterprise:2.0:User\" ]"});
+            table47.AddRow(new string[] {
+                        "userName",
+                        "bjen"});
+            table47.AddRow(new string[] {
+                        "externalId",
+                        "externalid"});
+            table47.AddRow(new string[] {
+                        "type",
+                        "unsupported"});
+            table47.AddRow(new string[] {
+                        "employeeNumber",
+                        "number"});
+#line 284
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table47, "When ");
+#line 292
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 294
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 295
+ testRunner.Then("JSON \'response.schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 296
+ testRunner.Then("JSON \'response.status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 297
  testRunner.Then("JSON \'response.scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 274
+#line 298
  testRunner.Then("JSON \'response.detail\'=\'property type is not a valid canonical value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
