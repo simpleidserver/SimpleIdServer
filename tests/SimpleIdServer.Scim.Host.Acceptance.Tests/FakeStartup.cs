@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Infrastructure.Converters;
 using SimpleIdServer.Scim.Infrastructure.ValueProviders;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
         public void ConfigureServices(IServiceCollection services)
         {
             var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMConstants.SCIMEndpoints.User, "User Account", true)
-               .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
+               .AddStringAttribute("userName", required: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE, caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                .AddComplexAttribute("name", c =>
                {
                    c.AddStringAttribute("formatted", description: "The full name");

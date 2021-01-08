@@ -23,12 +23,7 @@ namespace SimpleIdServer.Scim.Helpers
         public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, ICollection<SCIMSchema> schemas)
         {
             var attrsSchema = schemas.SelectMany(s => s.Attributes);
-            var missingRequiredAttributes = attrsSchema.Where(a => a.Required && !json.ContainsKey(a.Name));
-            if (missingRequiredAttributes.Any())
-            {
-                throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => a.Name))));
-            }
-
+            CheckRequiredAttributes(attrsSchema, json);
             return BuildRepresentation(json, attrsSchema, externalId, schemas, _options.IgnoreUnsupportedCanonicalValues);
         }
 
@@ -139,8 +134,9 @@ namespace SimpleIdServer.Scim.Helpers
             var result = new List<SCIMRepresentationAttribute>();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                foreach(var jsonProperty in jArr)
+                foreach(JObject jsonProperty in jArr)
                 {
+                    CheckRequiredAttributes(schemaAttribute.SubAttributes, jsonProperty);
                     var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
                     {
                         Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)
@@ -191,6 +187,15 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             return result;
+        }
+
+        private static void CheckRequiredAttributes(IEnumerable<SCIMSchemaAttribute> attributes, JObject json)
+        {
+            var missingRequiredAttributes = attributes.Where(a => a.Required && !json.ContainsKey(a.Name));
+            if (missingRequiredAttributes.Any())
+            {
+                throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => a.Name))));
+            }
         }
     }
 }

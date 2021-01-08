@@ -211,7 +211,8 @@ Scenario: Check user can be updated (HTTP PUT)
 	| name       | { "formatted" : "newFormatted", "familyName": "newFamilyName", "givenName": "newGivenName" } |
 	| id         | $id$                                                                                         |
 	| externalId | newext                                                                                       |
-	
+	| userName   | bjen                                                                                         |
+
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
 
