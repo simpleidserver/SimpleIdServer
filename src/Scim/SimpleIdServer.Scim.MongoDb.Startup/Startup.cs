@@ -27,6 +27,7 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
         public const string REPRESENTATIONS = "representations";
         public const string SCHEMAS = "schemas";
         public const string MAPPINGS = "mappings";
+        public const bool SUPPORT_TRANSACTION = false;
 
         public Startup(IHostingEnvironment env, IConfiguration configuration) 
         {
@@ -94,6 +95,7 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 opt.CollectionMappings = MAPPINGS;
                 opt.CollectionRepresentations = REPRESENTATIONS;
                 opt.CollectionSchemas = SCHEMAS;
+                opt.SupportTransaction = SUPPORT_TRANSACTION;
             }, schemas,
             new List<SCIMAttributeMapping>
             {

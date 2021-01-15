@@ -13,6 +13,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 			CollectionRepresentations = "representations";
 			CollectionSchemas = "schemas";
 			CollectionMappings = "mappings";
+			SupportTransaction = true;
 		}
 
 		public string ConnectionString { get; set; }
@@ -20,5 +21,6 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		public string CollectionRepresentations { get; set; }
 		public string CollectionSchemas { get; set; }
 		public string CollectionMappings { get; set; }
+		public bool SupportTransaction { get; set; }
 	}
 }

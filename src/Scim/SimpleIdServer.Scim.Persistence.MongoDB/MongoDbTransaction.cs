@@ -10,6 +10,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
     {
         private readonly IClientSessionHandle _clientSessionHandle;
 
+        public MongoDbTransaction()
+        {
+
+        }
+
         public MongoDbTransaction(IClientSessionHandle clientSessionHandle)
         {
             _clientSessionHandle = clientSessionHandle;
@@ -17,12 +22,20 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public Task Commit(CancellationToken token)
         {
-            return _clientSessionHandle.CommitTransactionAsync(token);
+            if (_clientSessionHandle != null)
+            {
+                return _clientSessionHandle.CommitTransactionAsync(token);
+            }
+
+            return Task.CompletedTask;
         }
 
         public void Dispose()
         {
-            _clientSessionHandle.Dispose();
+            if (_clientSessionHandle != null)
+            {
+                _clientSessionHandle.Dispose();
+            }
         }
     }
 }

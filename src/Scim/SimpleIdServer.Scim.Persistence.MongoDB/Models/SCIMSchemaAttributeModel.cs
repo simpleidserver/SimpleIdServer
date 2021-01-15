@@ -3,7 +3,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SimpleIdServer.Scim.Domain;
-using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Models

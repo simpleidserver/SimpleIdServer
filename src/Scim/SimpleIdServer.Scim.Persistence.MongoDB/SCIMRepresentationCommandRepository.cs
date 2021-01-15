@@ -26,9 +26,14 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<ITransaction> StartTransaction(CancellationToken token)
         {
-            var session = await _mongoClient.StartSessionAsync(null, token);
-            session.StartTransaction();
-            return new MongoDbTransaction(session);
+            if (_options.SupportTransaction)
+            {
+                var session = await _mongoClient.StartSessionAsync(null, token);
+                session.StartTransaction();
+                return new MongoDbTransaction(session);
+            }
+
+            return new MongoDbTransaction();
         }
 
         public async Task<bool> Add(SCIMRepresentation data, CancellationToken token)
