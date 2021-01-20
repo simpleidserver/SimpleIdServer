@@ -19,6 +19,7 @@ namespace SimpleIdServer.Scim.Tests
             var customSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:CustomProperties", "User", SimpleIdServer.Scim.SCIMConstants.SCIMEndpoints.User, "Custom properties", false)
                     .AddDecimalAttribute("age")
                     .AddBinaryAttribute("eidCertificate")
+                    .AddStringAttribute("filePath")
                     .Build();
             var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, customSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "bjensen" })
@@ -27,6 +28,7 @@ namespace SimpleIdServer.Scim.Tests
                 .AddBinaryAttribute("eidCertificate", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<string> { "aGVsbG8=" })
                 .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
                 .AddStringAttribute("userType", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Employee" })
+                .AddStringAttribute("filePath", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<string> { @"C:\Program Files (x86)\Internet Explorer" })
                 .AddComplexAttribute("emails", "urn:ietf:params:scim:schemas:core:2.0:User", (c) =>
                 {
                     c.AddStringAttribute("value", new List<string> { "example.com" });
@@ -84,6 +86,7 @@ namespace SimpleIdServer.Scim.Tests
             var seventeenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified pr");
             var eighteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "age gt 15");
             var nineteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "eidCertificate eq \"aGVsbG8=\"");
+            var twentyResult = ParseAndExecuteFilter(representations.AsQueryable(), "filePath eq \"C:\\Program Files (x86)\\Internet Explorer\"");
 
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
@@ -104,12 +107,11 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(2, seventeenResult.Count());
             Assert.Equal(1, eighteenResult.Count());
             Assert.Equal(1, nineteenResult.Count());
+            Assert.Equal(1, twentyResult.Count());
         }
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter)
         {
-            var p = SCIMFilterParser.Parse("members[(value eq \"06259893-b0ae-4f76-bb1f-fe684843cfbd\" or value eq \"7a2148ba-9427-4d5d-8ae2-8aa4c4a14ce3\") or value eq \"7a2148ba-9427-4d5d-8ae2-8aa4c4a14ce3\"]", new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema });
-
             var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema });
             var evaluatedExpression = parsed.Evaluate(representations);
             return (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(representations);

@@ -69,8 +69,6 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             filterString = filterString.Trim();
-            var result = new SCIMFilterParser();
-            var strBuilder = new StringBuilder();
             var filters = SplitStringIntoFilters(filterString);
             return TransformStringFiltersIntoSCIMExpression(filters);
         }
@@ -281,6 +279,7 @@ namespace SimpleIdServer.Scim.Helpers
             var result = new List<string>();
             var filterBuilder = new StringBuilder();
             var groupingIsClosed = false;
+            var groupingIsOpened = false;
             var isTokenSeparatorDetected = false;
             var betweenQuotes = false;
             for (var i = 0; i < filterString.Count(); i++)
@@ -291,18 +290,27 @@ namespace SimpleIdServer.Scim.Helpers
                     betweenQuotes = !betweenQuotes;
                 }
 
-                if (new[] { '(', '[' }.Contains(character))
+                if ('[' == character)
                 {
                     level++;
                 }
 
-                if (new[] { ')', ']' }.Contains(character))
+                if ('(' == character && (string.IsNullOrWhiteSpace(filterBuilder.ToString()) || filterBuilder.ToString() == "not"))
+                {
+                    level++;
+                    groupingIsOpened = true;
+                }
+
+                if (']' == character)
                 {
                     level--;
-                    if (character == ')')
-                    {
-                        groupingIsClosed = true;
-                    }
+                }
+
+                if (')' == character && groupingIsOpened)
+                {
+                    level--;
+                    groupingIsOpened = false;
+                    groupingIsClosed = true;
                 }
 
                 if (character != ' ' || level != 0 || betweenQuotes)
