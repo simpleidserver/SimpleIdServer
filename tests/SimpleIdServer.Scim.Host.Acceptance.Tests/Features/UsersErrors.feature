@@ -1,6 +1,81 @@
 ﻿Feature: UsersErrors
 	Check the errors returned by the /Users endpoint
 
+Scenario: Error is returned when pass invalid boolean (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| employeeNumber | number                                                                                                         |
+	| active         | test                                                                                                           |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'=''test' are not valid boolean'
+
+Scenario: Error is returned when pass invalid decimal (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| employeeNumber | number                                                                                                         |
+	| age            | test                                                                                                           |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'=''test' are not valid decimal'
+
+Scenario: Error is returned when pass invalid DateTime (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| employeeNumber | number                                                                                                         |
+	| birthDate      | test                                                                                                           |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'=''test' are not valid DateTime'
+
+Scenario: Error is returned when pass invalid int (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| employeeNumber | number                                                                                                         |
+	| nbPoints       | test                                                                                                           |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'=''test' are not valid integer'
+
+Scenario: Error is returned when pass invalid Base64 (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| employeeNumber | number                                                                                                         |
+	| eidCertificate | %HELLO%                                                                                                        |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'=''%HELLO%' are not valid Base64String'
+
 Scenario: Error is returned when required attribute is missing (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key     | Value                                                                                                          |

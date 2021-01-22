@@ -26,6 +26,9 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                }, description: "The components of the user's real name.")
                .AddStringAttribute("roles", multiValued: true)
                .AddDecimalAttribute("age")
+               .AddDateTimeAttribute("birthDate")
+               .AddBooleanAttribute("active")
+               .AddIntAttribute("nbPoints")
                .AddBinaryAttribute("eidCertificate")
                .AddStringAttribute("immutable", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE)
                .AddComplexAttribute("groups", opt =>

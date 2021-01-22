@@ -8,6 +8,7 @@ using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -156,13 +157,31 @@ namespace SimpleIdServer.Scim.Helpers
                 switch(schemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.BOOLEAN:
-                        record.ValuesBoolean = jArr.Select(j => bool.Parse(j.ToString())).ToList();
+                        var valuesBooleanResult = Extract<bool>(jArr);
+                        if (valuesBooleanResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidBoolean, string.Join(",", valuesBooleanResult.InvalidValues)));
+                        }
+
+                        record.ValuesBoolean = valuesBooleanResult.Values;
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
-                        record.ValuesInteger = jArr.Select(j => int.Parse(j.ToString())).ToList();
+                        var valuesIntegerResult = Extract<int>(jArr);
+                        if (valuesIntegerResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidInteger, string.Join(",", valuesIntegerResult.InvalidValues)));
+                        }
+
+                        record.ValuesInteger = valuesIntegerResult.Values;
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
-                        record.ValuesDateTime = jArr.Select(j => DateTime.Parse(j.ToString())).ToList();
+                        var valuesDateTimeResult = Extract<DateTime>(jArr);
+                        if (valuesDateTimeResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidDateTime, string.Join(",", valuesDateTimeResult.InvalidValues)));
+                        }
+
+                        record.ValuesDateTime = valuesDateTimeResult.Values;
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
                         record.ValuesString = jArr.Select(j => j.ToString()).ToList();
@@ -176,10 +195,35 @@ namespace SimpleIdServer.Scim.Helpers
                         record.ValuesReference = jArr.Select(j => j.ToString()).ToList();
                         break;
                     case SCIMSchemaAttributeTypes.DECIMAL:
-                        record.ValuesDecimal = jArr.Select(j => decimal.Parse(j.ToString())).ToList();
+                        var valuesDecimalResult = Extract<decimal>(jArr);
+                        if (valuesDecimalResult.InvalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidDecimal, string.Join(",", valuesDecimalResult.InvalidValues)));
+                        }
+
+                        record.ValuesDecimal = valuesDecimalResult.Values;
                         break;
                     case SCIMSchemaAttributeTypes.BINARY:
-                        record.ValuesBinary = jArr.Select(j => Convert.FromBase64String(j.ToString())).ToList();
+                        var invalidValues = new List<string>();
+                        var valuesBinary = new List<byte[]>();
+                        foreach(var rec in jArr)
+                        {
+                            try
+                            {
+                                valuesBinary.Add(Convert.FromBase64String(rec.ToString()));
+                            }
+                            catch(FormatException)
+                            {
+                                invalidValues.Add(rec.ToString());
+                            }
+                        }
+
+                        if (invalidValues.Any())
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidBase64, string.Join(",", invalidValues)));
+                        }
+
+                        record.ValuesBinary = valuesBinary;
                         break;
                 }
 
@@ -196,6 +240,42 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => a.Name))));
             }
+        }
+
+        private class ExtractionResult<T>
+        {
+            public ExtractionResult()
+            {
+                InvalidValues = new List<string>();
+                Values = new List<T>();
+            }
+
+            public ICollection<string> InvalidValues { get; set; }
+            public ICollection<T> Values { get; set; }
+        }
+
+        private static ExtractionResult<T> Extract<T>(JArray jArr) where T : struct
+        {
+            var result = new ExtractionResult<T>();
+            var type = typeof(T);
+            Type[] argTypes = { typeof(string), type.MakeByRefType() };
+            var method = typeof(T).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, argTypes, null);
+            foreach(var record in jArr)
+            {
+                var parameters = new object[] { record.ToString(), null };
+                var success = (bool)method.Invoke(null, parameters);
+                if (!success)
+                {
+                    result.InvalidValues.Add(record.ToString());
+                } 
+                else
+                {
+                    var retVal = (T)parameters[1];
+                    result.Values.Add(retVal);
+                }
+            }
+
+            return result;
         }
     }
 }

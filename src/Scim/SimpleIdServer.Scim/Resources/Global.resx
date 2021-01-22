@@ -174,8 +174,23 @@
   <data name="MissingSCIMSchemaAttribute" xml:space="preserve">
     <value>instance cannot be serialized because no SCIMSchemaAttribute has been found</value>
   </data>
+  <data name="NotValidBase64" xml:space="preserve">
+    <value>'{0}' are not valid Base64String</value>
+  </data>
+  <data name="NotValidBoolean" xml:space="preserve">
+    <value>'{0}' are not valid boolean</value>
+  </data>
   <data name="NotValidCanonicalValue" xml:space="preserve">
     <value>property {0} is not a valid canonical value</value>
+  </data>
+  <data name="NotValidDateTime" xml:space="preserve">
+    <value>'{0}' are not valid DateTime</value>
+  </data>
+  <data name="NotValidDecimal" xml:space="preserve">
+    <value>'{0}' are not valid decimal</value>
+  </data>
+  <data name="NotValidInteger" xml:space="preserve">
+    <value>'{0}' are not valid integer</value>
   </data>
   <data name="PatchMissingAttribute" xml:space="preserve">
     <value>PATCH can be applied only on existing attributes</value>

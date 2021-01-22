@@ -232,11 +232,56 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid Base64String.
+        /// </summary>
+        public static string NotValidBase64 {
+            get {
+                return ResourceManager.GetString("NotValidBase64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid boolean.
+        /// </summary>
+        public static string NotValidBoolean {
+            get {
+                return ResourceManager.GetString("NotValidBoolean", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à property {0} is not a valid canonical value.
         /// </summary>
         public static string NotValidCanonicalValue {
             get {
                 return ResourceManager.GetString("NotValidCanonicalValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid DateTime.
+        /// </summary>
+        public static string NotValidDateTime {
+            get {
+                return ResourceManager.GetString("NotValidDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid decimal.
+        /// </summary>
+        public static string NotValidDecimal {
+            get {
+                return ResourceManager.GetString("NotValidDecimal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid integer.
+        /// </summary>
+        public static string NotValidInteger {
+            get {
+                return ResourceManager.GetString("NotValidInteger", resourceCulture);
             }
         }
         
