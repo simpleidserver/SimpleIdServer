@@ -520,8 +520,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 case SCIMComparisonOperators.EQ:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Equal(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Equal(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
-                    anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Equal(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
-                    anyCaseNotSensitiveStringLambda = Expression.Call(containsStringMethod, propertyValuesString, toLower);
+                    {
+                        var equals = typeof(string).GetMethod("Equals", new Type[] { typeof(string) });
+                        var toLowerAttrStr = Expression.Call(attrString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
+                        var anyCaseNotSensitiveStringLambdaBody = Expression.Lambda<Func<string, bool>>(Expression.Call(toLowerAttrStr, equals, toLower), attrString);
+                        anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Equal(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
+                        anyCaseNotSensitiveStringLambda = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyCaseNotSensitiveStringLambdaBody);
+                    }
                     anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Equal(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
                     anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.Equal(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.NotEqual(attrBinary, Expression.Constant(ParseBinary(comparisonExpression.Value))), attrBinary);
