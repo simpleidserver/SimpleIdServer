@@ -135,9 +135,15 @@ namespace SimpleIdServer.Scim.Helpers
             var result = new List<SCIMRepresentationAttribute>();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                foreach(JObject jsonProperty in jArr)
+                foreach(var jsonProperty in jArr)
                 {
-                    CheckRequiredAttributes(schemaAttribute.SubAttributes, jsonProperty);
+                    var rec = jsonProperty as JObject;
+                    if (rec == null)
+                    {
+                        throw new SCIMSchemaViolatedException(string.Format(Global.NotValidJSON, jsonProperty.ToString()));
+                    }
+
+                    CheckRequiredAttributes(schemaAttribute.SubAttributes, rec);
                     var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
                     {
                         Values = BuildRepresentationAttributes(jsonProperty as JObject, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)

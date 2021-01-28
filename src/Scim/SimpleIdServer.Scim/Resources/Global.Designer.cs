@@ -142,6 +142,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Body is not a valid JSON.
+        /// </summary>
+        public static string BodyNotValidJSON {
+            get {
+                return ResourceManager.GetString("BodyNotValidJSON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the comparison operator {0} is not supported.
         /// </summary>
         public static string ComparisonOperatorNotSupported {
@@ -174,6 +183,24 @@ namespace SimpleIdServer.Scim.Resources {
         public static string GreaterThanOrEqualNotSupported {
             get {
                 return ResourceManager.GetString("GreaterThanOrEqualNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à HTTP POST request is not well formatted.
+        /// </summary>
+        public static string HttpPostNotWellFormatted {
+            get {
+                return ResourceManager.GetString("HttpPostNotWellFormatted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à HTTP PUT request is not well formatted.
+        /// </summary>
+        public static string HttpPutNotWellFormatted {
+            get {
+                return ResourceManager.GetString("HttpPutNotWellFormatted", resourceCulture);
             }
         }
         
@@ -282,6 +309,15 @@ namespace SimpleIdServer.Scim.Resources {
         public static string NotValidInteger {
             get {
                 return ResourceManager.GetString("NotValidInteger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à {0} is not a valid JSON.
+        /// </summary>
+        public static string NotValidJSON {
+            get {
+                return ResourceManager.GetString("NotValidJSON", resourceCulture);
             }
         }
         

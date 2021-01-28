@@ -233,6 +233,11 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
         {
+            if (jobj == null)
+            {
+                return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
+
             _logger.LogInformation(string.Format(Global.AddResource, jobj.ToString()));
             try
             {
@@ -284,6 +289,11 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalUpdate(string id, RepresentationParameter representationParameter)
         {
+            if (representationParameter == null)
+            {
+                return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPutNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
+
             _logger.LogInformation(string.Format(Global.UpdateResource, id));
             try
             {

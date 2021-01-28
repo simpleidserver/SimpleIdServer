@@ -144,6 +144,9 @@
   <data name="BadPresentExpressionUsage" xml:space="preserve">
     <value>present expression can only be used with attribute</value>
   </data>
+  <data name="BodyNotValidJSON" xml:space="preserve">
+    <value>Body is not a valid JSON</value>
+  </data>
   <data name="ComparisonOperatorNotSupported" xml:space="preserve">
     <value>the comparison operator {0} is not supported</value>
   </data>
@@ -155,6 +158,12 @@
   </data>
   <data name="GreaterThanOrEqualNotSupported" xml:space="preserve">
     <value>greater than or equal cannot be applied on '{0}' type</value>
+  </data>
+  <data name="HttpPostNotWellFormatted" xml:space="preserve">
+    <value>HTTP POST request is not well formatted</value>
+  </data>
+  <data name="HttpPutNotWellFormatted" xml:space="preserve">
+    <value>HTTP PUT request is not well formatted</value>
   </data>
   <data name="InvalidAttributeExpression" xml:space="preserve">
     <value>not a valid attribute expression</value>
@@ -191,6 +200,9 @@
   </data>
   <data name="NotValidInteger" xml:space="preserve">
     <value>'{0}' are not valid integer</value>
+  </data>
+  <data name="NotValidJSON" xml:space="preserve">
+    <value>{0} is not a valid JSON</value>
   </data>
   <data name="PatchMissingAttribute" xml:space="preserve">
     <value>PATCH can be applied only on existing attributes</value>

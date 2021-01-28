@@ -56,6 +56,45 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
+        [When("execute HTTP POST JSON request '(.*)' with body '(.*)'")]
+        public async Task WhenExecuteHTTPPostJSONRequestWithBody(string url, string body)
+        {
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url),
+                Content = new StringContent(body, Encoding.UTF8, "application/json")
+            };
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("execute HTTP PUT JSON request '(.*)' with body '(.*)'")]
+        public async Task WhenExecuteHTTPPutJSONRequestWithBody(string url, string body)
+        {
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(url),
+                Content = new StringContent(body, Encoding.UTF8, "application/json")
+            };
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("execute HTTP PATCH JSON request '(.*)' with body '(.*)'")]
+        public async Task WhenExecuteHTTPPatchJSONRequestWithBody(string url, string body)
+        {
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Patch,
+                RequestUri = new Uri(url),
+                Content = new StringContent(body, Encoding.UTF8, "application/json")
+            };
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("execute HTTP PUT JSON request '(.*)'")]
         public async Task WhenExecuteHTTPPutJSONRequest(string url, Table table)
         {

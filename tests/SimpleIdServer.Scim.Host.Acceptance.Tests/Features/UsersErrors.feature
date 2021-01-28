@@ -1,6 +1,41 @@
 ﻿Feature: UsersErrors
 	Check the errors returned by the /Users endpoint
 
+Scenario: Error is returned when pass invalid JSON object (HTTP POST)
+	When execute HTTP POST JSON request 'http://localhost/Users' with body '{ "schemas": [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ], "userName": "externalId": "externalId" }'
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='invalidSyntax'
+	Then JSON 'response.detail'='HTTP POST request is not well formatted'
+	
+Scenario: Error is returned when pass invalid JSON object (HTTP PUT)
+	When execute HTTP PUT JSON request 'http://localhost/Users/id' with body '{ "schemas": [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ], "userName": "externalId": "externalId" }'
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='invalidSyntax'
+	Then JSON 'response.detail'='HTTP PUT request is not well formatted'
+
+Scenario: Error is returned when pass invalid JSON object in sub attribute
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| employeeNumber | number                                                                                                         |
+	| name           | {                                                                                                              |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.status'='400'
+	Then JSON 'response.scimType'='schemaViolated'
+	Then JSON 'response.detail'='{ is not a valid JSON'
+
 Scenario: Error is returned when pass invalid boolean (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
