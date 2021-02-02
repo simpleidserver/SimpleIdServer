@@ -16,5 +16,6 @@ namespace SimpleIdServer.OAuth
         }
 
         public static string AuthenticationScheme = "SimpleIdServerOAuth";
+        public static string AuthorizationHeaderName = "Authorization";
     }
 }

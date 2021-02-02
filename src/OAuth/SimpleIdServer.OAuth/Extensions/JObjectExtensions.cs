@@ -147,7 +147,7 @@ namespace SimpleIdServer.OAuth.Extensions
 
         public static ClientCredentials GetClientCredentials(this JObject jObj)
         {
-            var authorization = jObj.GetToken("Authorization");
+            var authorization = jObj.GetToken(Constants.AuthorizationHeaderName);
             if (authorization == null)
             {
                 return null;
@@ -166,22 +166,13 @@ namespace SimpleIdServer.OAuth.Extensions
 
             foreach(var record in lst)
             {
-                var splitted = record.Split(' ');
-                if (splitted.Count() != 2)
+                var value = record.ExtractAuthorizationValue(new string[] { AutenticationSchemes.Bearer, AutenticationSchemes.Basic });
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     continue;
                 }
 
-                var authenticationScheme = splitted.First();
-                ClientCredentials result = null;
-                switch (authenticationScheme)
-                {
-                    case AutenticationSchemes.Bearer:
-                    case AutenticationSchemes.Basic:
-                        result = ExtractClientCredentialsFromHeader(splitted.Last());
-                        break;
-                }
-
+                var result = ExtractClientCredentialsFromHeader(value);
                 if (result != null)
                 {
                     return result;

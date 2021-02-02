@@ -1,7 +1,7 @@
 ﻿Feature: UserInfoErrors
 	Check the errors returned by the UserInfo endpoint
 
-Scenario: Error is returned when the token is missing
+Scenario: Error is returned when the token is missing (HTTP GET)
 	When execute HTTP GET request 'http://localhost/userinfo'
 	| Key | Value |
 
@@ -9,6 +9,24 @@ Scenario: Error is returned when the token is missing
 	
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='missing token'
+
+Scenario: Error is returned when the token is missing (HTTP POST + FORMURLENCODED)
+	When execute HTTP POST request 'http://localhost/userinfo'
+	| Key | Value |
+
+	And extract JSON from body
+	
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='missing token'
+
+Scenario: Error is returned when the token is missing (HTTP POST + JSON)
+	When execute HTTP POST JSON request 'http://localhost/userinfo'
+	| Key | Value |
+
+	And extract JSON from body
+	
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the content-type is not correct'
 
 Scenario: Error is returned when token is incorrect
 	When execute HTTP GET request 'http://localhost/userinfo'

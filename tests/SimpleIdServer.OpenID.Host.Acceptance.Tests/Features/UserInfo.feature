@@ -1,6 +1,37 @@
 ﻿Feature: UserInfo
 	Check the userinfo endpoint
 
+Scenario: Check user information are returned when access_token is passed in the HTTP BODY
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key			| Value				|
+	| redirect_uris | [https://web.com] |
+	| scope			| profile			|	
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body
+
+	And add JSON web key to Authorization Server and store into 'jwks'
+	| Type	| Kid	| AlgName	|
+	| SIG	| 1		| ES256		|	
+	
+	And use '1' JWK from 'jwks' to build JWS and store into 'accesstoken'
+	| Key	| Value				|
+	| sub	| administrator		|
+	| aud	| $client_id$		|	
+	| scope | [openid,profile]	|
+
+	And add user consent : user='administrator', scope='profile', clientId='$client_id$'	
+	
+	And execute HTTP POST request 'http://localhost/userinfo'
+	| Key          | Value         |
+	| access_token | $accesstoken$ |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'	
+	Then HTTP header 'Content-Type' contains 'application/json'
+	Then JSON 'name'='Thierry Habart'
+
 Scenario: Check user information are returned (JSON)
 	When execute HTTP POST JSON request 'http://localhost/register'
 	| Key			| Value				|

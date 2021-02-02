@@ -15,6 +15,7 @@ using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -44,12 +45,40 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
         }
 
         [HttpGet]
+        public Task<IActionResult> GetIndex()
+        {
+            return Common(null);
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> PostIndex()
         {
             try
             {
-                var accessToken = ExtractAccessToken();
+                var jObjBody = Request.Form?.ToJObject();
+                return await Common(jObjBody);
+            }
+            catch(InvalidOperationException)
+            {
+                var jObj = new JObject
+                {
+                    { ErrorResponseParameters.Error, ErrorCodes.INVALID_REQUEST },
+                    { ErrorResponseParameters.ErrorDescription, ErrorMessages.CONTENT_TYPE_NOT_SUPPORTED }
+                };
+                return new ContentResult
+                {
+                    Content = jObj.ToString(),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
+        }
+
+        private async Task<IActionResult> Common(JObject content)
+        {
+            try
+            {
+                var accessToken = ExtractAccessToken(content);
                 var jwsPayload = await Extract(accessToken);
                 if (jwsPayload == null)
                 {
@@ -105,7 +134,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     ContentType = contentType
                 };
             }
-            catch(OAuthException ex)
+            catch (OAuthException ex)
             {
                 var jObj = new JObject
                 {
@@ -139,39 +168,30 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             return await _jwtParser.Unsign(jws);
         }
 
-        public string ExtractAccessToken()
+        private string ExtractAccessToken(JObject jObj)
         {
-            if (!Request.Headers.ContainsKey("Authorization"))
+            if (Request.Headers.ContainsKey(Constants.AuthorizationHeaderName))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_TOKEN);
+                foreach (var authorizationValue in Request.Headers[Constants.AuthorizationHeaderName])
+                {
+                    var at = authorizationValue.ExtractAuthorizationValue(new string[] { AutenticationSchemes.Bearer });
+                    if (!string.IsNullOrWhiteSpace(at))
+                    {
+                        return at;
+                    }
+                }
             }
 
-            foreach(var authorizationValue in Request.Headers["Authorization"])
+            if (jObj != null && jObj.ContainsKey(OAuth.DTOs.TokenResponseParameters.AccessToken))
             {
-                var at = ExtractAccessToken(authorizationValue);
-                if (!string.IsNullOrWhiteSpace(at))
+                var at = jObj.GetValue(OAuth.DTOs.TokenResponseParameters.AccessToken) as JValue;
+                if(at != null && !string.IsNullOrWhiteSpace(at.ToString()))
                 {
-                    return at;
+                    return at.ToString();
                 }
             }
 
             throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_TOKEN);
-        }
-
-        private static string ExtractAccessToken(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return null;
-            }
-
-            var splitted = value.Split(' ');
-            if (splitted.Count() != 2 || splitted.First() != "Bearer")
-            {
-                return null;
-            }
-
-            return splitted.Last();
         }
     }
 }
