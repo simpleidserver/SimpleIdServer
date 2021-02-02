@@ -29,8 +29,8 @@ namespace SimpleIdServer.Jwt.Extensions
             var parameters = rsa.ExportParameters(false);
             var result = new Dictionary<string, string>
             {
-                { RSAFields.Modulus, Convert.ToBase64String(parameters.Modulus) },
-                { RSAFields.Exponent, Convert.ToBase64String(parameters.Exponent) }
+                { RSAFields.Modulus, parameters.Modulus.Base64EncodeBytes() },
+                { RSAFields.Exponent, parameters.Exponent.Base64EncodeBytes() }
             };
             return result;
         }
@@ -42,12 +42,12 @@ namespace SimpleIdServer.Jwt.Extensions
                 var parameters = rsa.ExportParameters(true);
                 var result = new Dictionary<string, string>
                 {
-                    { RSAFields.D, Convert.ToBase64String(parameters.D) },
-                    { RSAFields.P, Convert.ToBase64String(parameters.P) },
-                    { RSAFields.Q, Convert.ToBase64String(parameters.Q) },
-                    { RSAFields.DP, Convert.ToBase64String(parameters.DP) },
-                    { RSAFields.DQ, Convert.ToBase64String(parameters.DQ) },
-                    { RSAFields.InverseQ, Convert.ToBase64String(parameters.InverseQ) }
+                    { RSAFields.D, parameters.D.Base64EncodeBytes() },
+                    { RSAFields.P, parameters.P.Base64EncodeBytes() },
+                    { RSAFields.Q, parameters.Q.Base64EncodeBytes() },
+                    { RSAFields.DP, parameters.DP.Base64EncodeBytes() },
+                    { RSAFields.DQ, parameters.DQ.Base64EncodeBytes() },
+                    { RSAFields.InverseQ, parameters.InverseQ.Base64EncodeBytes() }
                 };
                 return result;
             }

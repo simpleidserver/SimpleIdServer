@@ -3,6 +3,7 @@
 using SimpleIdServer.OpenID.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Persistence.InMemory
@@ -19,6 +20,12 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
         public Task<AuthenticationContextClassReference> FindACRByName(string name)
         {
             return Task.FromResult(_acrLst.FirstOrDefault(a => a.Name == name));
+        }
+
+        public Task<ICollection<AuthenticationContextClassReference>> GetAllACR(CancellationToken token)
+        {
+            ICollection<AuthenticationContextClassReference> result = _acrLst;
+            return Task.FromResult(result);
         }
     }
 }

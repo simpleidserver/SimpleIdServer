@@ -127,6 +127,7 @@ namespace SimpleIdServer.Jwt
         public JsonWebKey()
         {
             Content = new Dictionary<string, string>();
+            KeyOps = new List<KeyOperations>();
         }
 
         public JsonWebKey(string kid) : this()

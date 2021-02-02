@@ -16,6 +16,8 @@ namespace SimpleIdServer.OpenID.Options
             AuthenticationScheme = "MultiAccount";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
             SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
+            IsRedirectionUrlHTTPSRequired = true;
+            IsLocalhostAllowed = false;
         }
 
         /// <summary>
@@ -42,5 +44,13 @@ namespace SimpleIdServer.OpenID.Options
         /// Session cookie name.
         /// </summary>
         public string SessionCookieName { get; set; }
+        /// <summary>
+        /// Check if the redirection url must be HTTPS.
+        /// </summary>
+        public bool IsRedirectionUrlHTTPSRequired { get; set; }
+        /// <summary>
+        /// Check if the redirection url can contains localhost.
+        /// </summary>
+        public bool IsLocalhostAllowed { get; set; }
     }
 }

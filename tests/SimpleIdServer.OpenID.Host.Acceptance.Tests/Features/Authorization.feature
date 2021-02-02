@@ -33,6 +33,45 @@ Scenario: Check display is passed into the callback url
 
 	Then '$display$'='popup'
 
+Scenario: Identity token is returned in JWS format (none)
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                          | Value             |
+	| redirect_uris                | [https://web.com] |
+	| grant_types                  | [implicit]        |
+	| response_types               | [id_token]        |
+	| scope                        | email role        |
+	| id_token_signed_response_alg | none              |
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body
+	And extract parameter 'client_secret' from JSON body
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
+
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
+	
+	And extract 'id_token' from callback
+	And extract 'display' from callback
+	And extract payload from JWS '$id_token$'
+
+	Then JWS Alg equals to 'none'
+	Then token contains 'iss'
+	Then token contains 'iat'
+	Then token contains 'exp'
+	Then token contains 'azp'
+	Then token contains 'aud'
+	Then token claim 'sub'='administrator'
+	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
+
 Scenario: Identity token is returned in JWS format (ES256)
 	When add JSON web key to Authorization Server and store into 'jwks'
 	| Type | Kid | AlgName |

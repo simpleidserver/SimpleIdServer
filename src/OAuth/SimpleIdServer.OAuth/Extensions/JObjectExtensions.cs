@@ -147,19 +147,53 @@ namespace SimpleIdServer.OAuth.Extensions
 
         public static ClientCredentials GetClientCredentials(this JObject jObj)
         {
-            var authorizationHeaderValue = jObj.GetStr("Authorization");
-            if (string.IsNullOrWhiteSpace(authorizationHeaderValue))
+            var authorization = jObj.GetToken("Authorization");
+            if (authorization == null)
             {
                 return null;
             }
 
-            var splitted = authorizationHeaderValue.Split(' ');
-            if (splitted.Count() != 2 || splitted.First() != TokenTypes.Bearer)
+            var jArr = authorization as JArray;
+            var lst = new List<string>();
+            if (jArr != null)
             {
-                return null;
+                lst = jArr.Select(_ => _.ToString()).ToList();
+            }
+            else
+            {
+                lst.Add(authorization.ToString());
             }
 
-            splitted = splitted.Last().Base64Decode().Split(':');
+            foreach(var record in lst)
+            {
+                var splitted = record.Split(' ');
+                if (splitted.Count() != 2)
+                {
+                    continue;
+                }
+
+                var authenticationScheme = splitted.First();
+                ClientCredentials result = null;
+                switch (authenticationScheme)
+                {
+                    case AutenticationSchemes.Bearer:
+                    case AutenticationSchemes.Basic:
+                        result = ExtractClientCredentialsFromHeader(splitted.Last());
+                        break;
+                }
+
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private static ClientCredentials ExtractClientCredentialsFromHeader(string header)
+        {
+            var splitted = header.Base64Decode().Split(':');
             if (splitted.Count() != 2)
             {
                 return null;

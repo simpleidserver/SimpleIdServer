@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Configuration
@@ -22,7 +23,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
         }
 
         [HttpGet]
-        public virtual async Task<IActionResult> Get()
+        public virtual async Task<IActionResult> Get(CancellationToken token)
         {
             return new OkObjectResult(await Build());
         }

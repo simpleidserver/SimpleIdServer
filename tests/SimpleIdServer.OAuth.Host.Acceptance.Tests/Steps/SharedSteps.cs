@@ -241,7 +241,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             }
 
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var jws = jwtBuilder.Sign(jwsPayload, FakeJwks.GetInstance().Jwks.First());
+            var jwk = FakeJwks.GetInstance().Jwks.First();
+            var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
             _scenarioContext.Set(jws, "softwareStatement");
         }
 

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Domains;
@@ -17,7 +18,7 @@ namespace SimpleIdServer.OAuth.Jwt
         Task<string> BuildAccessToken(OAuthClient client, JwsPayload jwsPayload);
         Task<string> BuildClientToken(OAuthClient client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc);
         Task<string> Sign(JwsPayload jwsPayload, string jwsAlg);
-        string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey);
+        string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey, string jwsAlg);
         Task<string> Encrypt(string jws, string jweAlg, string jweEnc);
         string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey);
         string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey, string password);
@@ -67,13 +68,13 @@ namespace SimpleIdServer.OAuth.Jwt
             {
                 KeyOperations.Sign
             });
-            return Sign(jwsPayload, jsonWebKeys.First());
+            return Sign(jwsPayload, jsonWebKeys.FirstOrDefault(), jwsAlg);
         }
 
-        public string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey)
+        public string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey, string jwsAlg)
         {
             var serializedPayload = JsonConvert.SerializeObject(jwsPayload);
-            return _jwsGenerator.Build(serializedPayload, jsonWebKey.Alg, jsonWebKey);
+            return _jwsGenerator.Build(serializedPayload, jwsAlg, jsonWebKey);
         }
 
         public async Task<string> Encrypt(string jws, string jweAlg, string jweEnc)

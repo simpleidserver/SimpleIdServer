@@ -10,6 +10,9 @@
     <None Remove="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Authorization - Copier.feature.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Views\Accounts\Index.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -44,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Configuration.feature.cs">
+      <DependentUpon>Configuration.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Register.feature.cs">
       <DependentUpon>Register.feature</DependentUpon>
     </Compile>
@@ -89,6 +95,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Configuration.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Register.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

@@ -203,12 +203,12 @@ namespace SimpleIdServer.OpenID.Api.Register
             var uri = new Uri(redirectUrl);
             if (applicationType == "web")
             {
-                if (uri.Scheme.ToLowerInvariant() != "https")
+                if (uri.Scheme.ToLowerInvariant() != "https" && _openIDHostOptions.IsRedirectionUrlHTTPSRequired)
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_HTTPS_REDIRECT_URI);
                 }
 
-                if (uri.Host.ToLowerInvariant() == "localhost")
+                if (uri.Host.ToLowerInvariant() == "localhost" && !_openIDHostOptions.IsLocalhostAllowed)
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_LOCALHOST_REDIRECT_URI);
                 }

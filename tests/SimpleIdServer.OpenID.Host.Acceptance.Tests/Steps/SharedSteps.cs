@@ -232,7 +232,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             }
             
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var jws = jwtBuilder.Sign(jwsPayload, jwk);
+            var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
             _scenarioContext.Set(jws, name);
         }
 
@@ -261,7 +261,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             var clientRepository = (IOAuthClientQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthClientQueryRepository));
             var oauthClient = await clientRepository.FindOAuthClientById(clientId);
             var jsonWebKey = oauthClient.JsonWebKeys.First(f => f.Use == Usages.SIG && f.Alg == algName);
-            var requestParameter = jwtBuilder.Sign(jwsPayload, jsonWebKey);
+            var requestParameter = jwtBuilder.Sign(jwsPayload, jsonWebKey, jsonWebKey.Alg);
             _scenarioContext.Set(requestParameter, "requestParameter");
         }
 

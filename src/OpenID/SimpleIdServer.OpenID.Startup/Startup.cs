@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using System.Collections.Generic;
@@ -49,12 +50,16 @@ namespace SimpleIdServer.OpenID.Startup
             services.AddMvc();
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-            services.AddSIDOpenID()
+            services.AddSIDOpenID(opt =>
+                {
+                    opt.IsLocalhostAllowed = true;
+                    opt.IsRedirectionUrlHTTPSRequired = false;
+                })
                 .AddClients(DefaultConfiguration.Clients)
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddScopes(DefaultConfiguration.Scopes)
-                .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
+                // .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
