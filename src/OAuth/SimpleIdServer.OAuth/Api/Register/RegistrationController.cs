@@ -26,7 +26,7 @@ namespace SimpleIdServer.OAuth.Api.Register
         {
             try
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, jObj, null));
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObj, null));
                 var result = await _registerRequestHandler.Handle(context, token);
                 return new ContentResult
                 {

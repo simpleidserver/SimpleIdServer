@@ -141,30 +141,6 @@ Scenario: Error is returned when user is not authenticated and prompt=none
 	Then JSON 'error'='login_required'
 	Then JSON 'error_description'='login is required'
 
-Scenario: Error is returned when id_token_hint is not present and prompt=none
-	When execute HTTP POST JSON request 'http://localhost/register'
-	| Key                          | Value             |
-	| redirect_uris                | [https://web.com] |
-	| scope                        | email             |	
-
-	And extract JSON from body
-	And extract parameter 'client_id' from JSON body
-
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key			| Value											|
-	| response_type | code											|
-	| client_id		| $client_id$									|
-	| state			| state											|
-	| response_mode	| query											|
-	| scope			| openid										|
-	| redirect_uri	| https://web.com								|
-	| prompt		| none											|
-	
-	And extract query parameters into JSON
-
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='missing parameter id_token_hint'
-
 Scenario: Error is returned when subject in the id_token_hint is not correct
 	When add JSON web key to Authorization Server and store into 'jwks'
 	| Type | Kid | AlgName |

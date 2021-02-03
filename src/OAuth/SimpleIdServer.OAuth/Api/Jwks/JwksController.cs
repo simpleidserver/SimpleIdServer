@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Jwks
@@ -23,9 +24,9 @@ namespace SimpleIdServer.OAuth.Api.Jwks
         }
 
         [HttpPut]
-        public async Task<IActionResult> Put()
+        public async Task<IActionResult> Put(CancellationToken token)
         {
-            await _jwksRequestHandler.Rotate();
+            await _jwksRequestHandler.Rotate(token);
             return new OkResult();
         }
     }

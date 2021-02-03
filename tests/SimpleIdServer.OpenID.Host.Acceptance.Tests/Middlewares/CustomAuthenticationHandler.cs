@@ -34,11 +34,6 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Middlewares
             };
             var authInstant = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString());
             var nameIdentifier = new Claim(ClaimTypes.NameIdentifier, "administrator");
-            if (_scenarioContext.ContainsKey("authInstant"))
-            {
-                authInstant = new Claim(ClaimTypes.AuthenticationInstant, (_scenarioContext.Get<DateTime>("authInstant")).ToString());
-            }
-
             if (_scenarioContext.ContainsKey("nameIdentifier"))
             {
                 nameIdentifier = new Claim(ClaimTypes.NameIdentifier, _scenarioContext.Get<string>("nameIdentifier"));

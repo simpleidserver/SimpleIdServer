@@ -2,12 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
-using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.LoginPassword.Services;
 using SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels;
@@ -22,7 +20,12 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
     {
         private readonly IPasswordAuthService _passwordAuthService;
 
-        public AuthenticateController(IPasswordAuthService passwordAuthService, IDataProtectionProvider dataProtectionProvider, IAmrHelper amrHelper, IOAuthClientQueryRepository oauthClientRepository) : base(dataProtectionProvider, oauthClientRepository, amrHelper)
+        public AuthenticateController(
+            IPasswordAuthService passwordAuthService, 
+            IDataProtectionProvider dataProtectionProvider, 
+            IAmrHelper amrHelper, 
+            IOAuthClientQueryRepository oauthClientRepository,
+            IOAuthUserCommandRepository oauthUserCommandRepository) : base(dataProtectionProvider, oauthClientRepository, oauthUserCommandRepository, amrHelper)
         {
             _passwordAuthService = passwordAuthService;
         }
@@ -65,7 +68,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
             try
             {
                 var user = await _passwordAuthService.Authenticate(viewModel.Login, viewModel.Password, token);
-                return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, viewModel.RememberLogin);
+                return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
             }
             catch (CryptographicException)
             {

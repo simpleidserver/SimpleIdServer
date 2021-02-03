@@ -338,10 +338,12 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
-        [When("add '(.*)' seconds to authentication instant")]
-        public void WhenSubstractAuthenticationInstant(int seconds)
+        [When("add '(.*)' seconds to authentication instant to user '(.*)'")]
+        public async Task WhenSubstractAuthenticationInstant(int seconds, string login)
         {
-            _scenarioContext.Set(DateTime.UtcNow.AddSeconds(seconds), "authInstant");
+            var oauthUserRepository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
+            var user = await oauthUserRepository.FindOAuthUserByLogin(login, CancellationToken.None);
+            user.AuthenticationTime = DateTime.UtcNow.AddSeconds(seconds);
         }
 
         [When("extract string from body")]

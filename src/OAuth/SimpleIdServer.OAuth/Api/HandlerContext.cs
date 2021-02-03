@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
-using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OAuth.Api
@@ -48,31 +47,29 @@ namespace SimpleIdServer.OAuth.Api
 
     public class HandlerContextRequest
     {
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime)
+        public HandlerContextRequest(string issuerName, string userSubject)
         {
             IssuerName = issuerName;
             UserSubject = userSubject;
-            AuthDateTime = authDateTime;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data) : this(issuerName, userSubject, authDateTime)
+        public HandlerContextRequest(string issuerName, string userSubject, JObject data) : this(issuerName, userSubject)
         {
             Data = data;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data, JObject httpHeader) : this(issuerName, userSubject, authDateTime, data)
+        public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader) : this(issuerName, userSubject, data)
         {
             HttpHeader = httpHeader;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, DateTime? authDateTime, JObject data, JObject httpHeader, IRequestCookieCollection cookies): this(issuerName, userSubject, authDateTime, data, httpHeader)
+        public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader, IRequestCookieCollection cookies): this(issuerName, userSubject, data, httpHeader)
         {
             Cookies = cookies;
         }
 
         public string IssuerName { get; private set; }
         public string UserSubject { get; private set; }
-        public DateTime? AuthDateTime { get; private set; }
         public JObject Data { get; private set; }
         public JObject HttpHeader { get; private set; }
         public IRequestCookieCollection Cookies { get; set; }

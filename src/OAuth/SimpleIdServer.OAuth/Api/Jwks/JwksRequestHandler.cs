@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Persistence;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Jwks
@@ -9,7 +10,7 @@ namespace SimpleIdServer.OAuth.Api.Jwks
     public interface IJwksRequestHandler
     {
         Task<JObject> Get();
-        Task<bool> Rotate();
+        Task<bool> Rotate(CancellationToken token);
     }
 
     public class JwksRequestHandler : IJwksRequestHandler
@@ -40,16 +41,16 @@ namespace SimpleIdServer.OAuth.Api.Jwks
             return result;
         }
 
-        public async Task<bool> Rotate()
+        public async Task<bool> Rotate(CancellationToken token)
         {
             var jsonWebKeys = await _jsonWebKeyQueryRepository.GetAllJsonWebKeys();
             foreach (var jsonWebKey in jsonWebKeys)
             {
                 jsonWebKey.Renew();
-                _jsonWebKeyCommandRepository.Update(jsonWebKey);
+                _jsonWebKeyCommandRepository.Update(jsonWebKey, token);
             }
 
-            await _jsonWebKeyCommandRepository.SaveChanges();
+            await _jsonWebKeyCommandRepository.SaveChanges(token);
             return true;
         }
     }

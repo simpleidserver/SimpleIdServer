@@ -173,7 +173,7 @@ namespace SimpleIdServer.OAuth.Api.Register
             var oauthClient = new OAuthClient();
             var jObj = await EnrichOAuthClient(context, oauthClient, token);
             _oauthClientCommandRepository.Add(oauthClient);
-            await _oauthClientCommandRepository.SaveChanges();
+            await _oauthClientCommandRepository.SaveChanges(token);
             return jObj;
         }
 

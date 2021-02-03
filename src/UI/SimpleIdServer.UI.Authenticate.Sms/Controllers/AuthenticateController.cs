@@ -10,6 +10,7 @@ using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.Sms.Services;
 using SimpleIdServer.UI.Authenticate.Sms.ViewModels;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
@@ -19,7 +20,12 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
     {
         private readonly ISmsAuthService _smsAuthService;
 
-        public AuthenticateController(IDataProtectionProvider dataProtectionProvider, IOAuthClientQueryRepository oauthClientRepository, IAmrHelper amrHelper, ISmsAuthService smsAuthService) : base(dataProtectionProvider, oauthClientRepository, amrHelper)
+        public AuthenticateController(
+            IDataProtectionProvider dataProtectionProvider,
+            IOAuthClientQueryRepository oauthClientRepository, 
+            IOAuthUserCommandRepository oauthUserCommandRepository,
+            IAmrHelper amrHelper, 
+            ISmsAuthService smsAuthService) : base(dataProtectionProvider, oauthClientRepository, oauthUserCommandRepository, amrHelper)
         {
             _smsAuthService = smsAuthService;
         }
@@ -46,7 +52,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(AuthenticateViewModel viewModel)
+        public async Task<IActionResult> Index(AuthenticateViewModel viewModel, CancellationToken token)
         {
             if (viewModel == null)
             {
@@ -76,7 +82,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
                     try
                     {
                         var user = await _smsAuthService.Authenticate(viewModel.PhoneNumber, viewModel.ConfirmationCode);
-                        return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, viewModel.RememberLogin);
+                        return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
                     }
                     catch (CryptographicException)
                     {

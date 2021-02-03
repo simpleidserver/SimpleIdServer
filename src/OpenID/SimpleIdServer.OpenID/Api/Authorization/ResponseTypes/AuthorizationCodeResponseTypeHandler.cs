@@ -36,9 +36,9 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
                 { UserClaims.Subject, context.User.Id }
             };
 
-            if (context.Request.AuthDateTime != null)
+            if (context.User.AuthenticationTime != null)
             {
-                dic.Add(OAuthClaims.AuthenticationTime, context.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
+                dic.Add(OAuthClaims.AuthenticationTime, context.User.AuthenticationTime.Value.ConvertToUnixTimestamp());
             }
 
             foreach(var record in context.Request.Data)

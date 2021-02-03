@@ -5,7 +5,6 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.InMemory;
-using SimpleIdServer.OAuth.Persistence.Users;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OAuth

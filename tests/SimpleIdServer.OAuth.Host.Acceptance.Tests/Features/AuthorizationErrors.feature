@@ -74,8 +74,8 @@ Scenario: Error is returned when response_mode is not supported
 	| state			| state													|
 	| redirect_uri  | http://localhost:8080									|
 	| response_mode | invalid												|
-
-	And extract JSON from body
+	
+	And extract query parameters into JSON
 
 	Then JSON 'error'='unsupported_response_mode'
 	Then JSON 'error_description'='response mode invalid is not supported'
@@ -88,8 +88,8 @@ Scenario: Error is returned when scope is not supported by the client
 	| state			| state													|
 	| redirect_uri  | http://localhost:8080									|
 	| scope			| role													|
-
-	And extract JSON from body
+	
+	And extract query parameters into JSON
 
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='scopes role are not supported'

@@ -81,19 +81,14 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (maxAge != null)
             {
-                if (DateTime.UtcNow > context.Request.AuthDateTime.Value.AddSeconds(maxAge.Value))
+                if (DateTime.UtcNow > context.User.AuthenticationTime.Value.AddSeconds(maxAge.Value))
                 {
                     throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
                 }
             }
-            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.Request.AuthDateTime.Value.AddSeconds(openidClient.DefaultMaxAge.Value))
+            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.User.AuthenticationTime.Value.AddSeconds(openidClient.DefaultMaxAge.Value))
             {
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
-            }
-
-            if (string.IsNullOrWhiteSpace(idTokenHint) && prompt == PromptParameters.None)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.IdTokenHint));
             }
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))

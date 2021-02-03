@@ -1187,7 +1187,7 @@ Scenario: User-agent is redirected to the login page when elapsed time > authent
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
 	And add user consent : user='administrator', scope='email', clientId='$client_id$'
-	And add '-10' seconds to authentication instant
+	And add '-10' seconds to authentication instant to user 'administrator'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value           |
@@ -1211,7 +1211,7 @@ Scenario: User-agent is redirected to the login page when elapsed time > to auth
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
 	And add user consent : user='administrator', scope='email', clientId='$client_id$'
-	And add '-10' seconds to authentication instant	
+	And add '-10' seconds to authentication instant to user 'administrator'
 
 	And execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value           |

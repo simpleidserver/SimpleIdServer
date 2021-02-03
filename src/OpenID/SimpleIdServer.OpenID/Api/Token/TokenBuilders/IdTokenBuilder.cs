@@ -103,7 +103,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
             if (maxAge != null)
             {
-                result.Add(OAuthClaims.AuthenticationTime, currentContext.Request.AuthDateTime.Value.ConvertToUnixTimestamp());
+                result.Add(OAuthClaims.AuthenticationTime, currentContext.User.AuthenticationTime.Value.ConvertToUnixTimestamp());
             }
 
             if (!string.IsNullOrWhiteSpace(nonce))
@@ -120,7 +120,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
             var scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
             EnrichWithScopeParameter(result, scopes, currentContext.User);
-            EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.Request.AuthDateTime);
+            EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.User.AuthenticationTime);
             foreach (var claimsSource in _claimsSources)
             {
                 await claimsSource.Enrich(result, openidClient).ConfigureAwait(false);

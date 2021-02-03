@@ -108,7 +108,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                 repository.Add(jwk);
             }
 
-            await repository.SaveChanges();
+            await repository.SaveChanges(CancellationToken.None);
             _scenarioContext.Set(jwks, name);
         }
 
@@ -206,6 +206,20 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(json), "jsonHttpBody");
         }
 
+        [When("extract query parameters into JSON")]
+        public void WhenExtractQueryParametersIntoJSON()
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queryValues = httpResponseMessage.RequestMessage.RequestUri.ParseQueryString();
+            var jObj = new JObject();
+            foreach (var key in queryValues.AllKeys)
+            {
+                jObj.Add(key, queryValues[key]);
+            }
+
+            _scenarioContext.Set(jObj, "jsonHttpBody");
+        }
+        
         [When("extract parameter '(.*)' from redirect url")]
         public void GivenExtractRedirectUrlParameter(string parameter)
         {

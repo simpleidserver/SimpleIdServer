@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Persistence.InMemory
@@ -24,7 +25,7 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return true;
         }
 
-        public bool Update(OAuthScope data)
+        public bool Update(OAuthScope data, CancellationToken token)
         {
             _scopes.Remove(_scopes.First(s => s.Name == data.Name));
             _scopes.Add((OpenIdScope)data.Clone());
@@ -37,7 +38,7 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return true;
         }
 
-        public Task<int> SaveChanges()
+        public Task<int> SaveChanges(CancellationToken token)
         {
             return Task.FromResult(1);
         }

@@ -168,7 +168,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             openidClient.DefaultAcrValues = acrValues.ToList();
             openidClient.PostLogoutRedirectUris = postLogoutRedirectUris.ToList();
             OAuthClientCommandRepository.Add(openidClient);
-            await OAuthClientCommandRepository.SaveChanges();
+            await OAuthClientCommandRepository.SaveChanges(token);
             AddNotEmpty(result, RegisterRequestParameters.ApplicationType, applicationType);
             AddNotEmpty(result, RegisterRequestParameters.SectorIdentifierUri, sectorIdentifierUri);
             AddNotEmpty(result, RegisterRequestParameters.SubjectType, subjectType);

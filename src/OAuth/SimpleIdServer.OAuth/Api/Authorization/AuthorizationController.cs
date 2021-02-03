@@ -39,16 +39,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            var claimAuthTime = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.AuthenticationInstant);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
-            DateTime? authTime = null;
-            DateTime auth;
-            if (claimAuthTime != null && !string.IsNullOrWhiteSpace(claimAuthTime.Value) && DateTime.TryParse(claimAuthTime.Value, out auth))
-            {
-                authTime = auth;
-            }
-
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, authTime, jObjBody, null, Request.Cookies), new HandlerContextResponse(Response.Cookies));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), new HandlerContextResponse(Response.Cookies));
             try
             {
                 string url;
@@ -98,7 +90,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 {
                     jObj.Add(ErrorResponseParameters.State, state);
                 }
-                if (string.IsNullOrWhiteSpace(redirectUri))
+                if (string.IsNullOrWhiteSpace(redirectUri) || !Uri.TryCreate(redirectUri, UriKind.Absolute, out Uri r))
                 {   
                     var payload = Encoding.UTF8.GetBytes(jObj.ToString());
                     HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

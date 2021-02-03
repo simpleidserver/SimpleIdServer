@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Persistence.InMemory
@@ -24,7 +25,7 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return true;
         }
 
-        public bool Update(OAuthClient data)
+        public bool Update(OAuthClient data, CancellationToken token)
         {
             var client = (OpenIdClient)data;
             _clients.Remove(_clients.First(c => c.ClientId == client.ClientId));
@@ -38,7 +39,7 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return true;
         }
 
-        public Task<int> SaveChanges()
+        public Task<int> SaveChanges(CancellationToken token)
         {
             return Task.FromResult(1);
         }

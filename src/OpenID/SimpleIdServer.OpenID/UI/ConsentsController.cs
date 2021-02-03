@@ -10,7 +10,6 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OAuth.Persistence.Users;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
@@ -105,8 +104,8 @@ namespace SimpleIdServer.OpenID.UI
                 {
                     consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                     user.Consents.Add(consent);
-                    _oAuthUserCommandRepository.Update(user);
-                    await _oAuthUserCommandRepository.SaveChanges();
+                    _oAuthUserCommandRepository.Update(user, token);
+                    await _oAuthUserCommandRepository.SaveChanges(token);
                 }
 
                 return Redirect(unprotectedUrl);

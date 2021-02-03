@@ -29,18 +29,10 @@ namespace SimpleIdServer.OAuth.Api.Token
         public async Task<IActionResult> Post(CancellationToken token)
         {
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            var claimAuthTime = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.AuthenticationInstant);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
-            DateTime? authTime = null;
-            DateTime auth;
-            if (claimAuthTime != null && !string.IsNullOrWhiteSpace(claimAuthTime.Value) && DateTime.TryParse(claimAuthTime.Value, out auth))
-            {
-                authTime = auth;
-            }
-
             var jObjHeader = Request.Headers.ToJObject();
             var jObjBody = Request.Form.ToJObject();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, authTime, jObjBody, jObjHeader));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader));
             return await _tokenRequestHandler.Handle(context, token);
         }
 

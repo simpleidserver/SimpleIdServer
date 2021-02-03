@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Persistence.InMemory
@@ -22,7 +23,7 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return true;
         }
 
-        public bool Update(T data)
+        public bool Update(T data, CancellationToken token)
         {
             var record = _lstData.First(l => l.Equals(data));
             _lstData.Remove(record);
@@ -30,7 +31,7 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return true;
         }
 
-        public Task<int> SaveChanges()
+        public Task<int> SaveChanges(CancellationToken token)
         {
             return Task.FromResult(1);
         }

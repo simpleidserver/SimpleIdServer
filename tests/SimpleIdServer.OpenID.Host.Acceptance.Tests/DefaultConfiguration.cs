@@ -1,6 +1,7 @@
 ﻿using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenID.Domains;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -21,6 +22,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
+                AuthenticationTime = DateTime.UtcNow,
                 Claims = new List<Claim>
                 {
                     new Claim(Jwt.Constants.UserClaims.Subject, "administrator"),

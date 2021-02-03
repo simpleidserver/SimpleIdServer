@@ -86,11 +86,11 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table178 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table176 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'http://localhost/.well-known/openid-configuration\'", ((string)(null)), table178, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/.well-known/openid-configuration\'", ((string)(null)), table176, "When ");
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 9

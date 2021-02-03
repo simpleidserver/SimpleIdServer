@@ -11,6 +11,7 @@ using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
 using System;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.UI
@@ -19,12 +20,18 @@ namespace SimpleIdServer.OpenID.UI
     {
         private readonly IDataProtector _dataProtector;
         private readonly IOAuthClientQueryRepository _oauthClientRepository;
+        private readonly IOAuthUserCommandRepository _oauthUserCommandRepository;
         private readonly IAmrHelper _amrHelper;
 
-        public BaseAuthenticateController(IDataProtectionProvider dataProtectionProvider, IOAuthClientQueryRepository oauthClientRepository, IAmrHelper amrHelper)
+        public BaseAuthenticateController(
+            IDataProtectionProvider dataProtectionProvider, 
+            IOAuthClientQueryRepository oauthClientRepository,
+            IOAuthUserCommandRepository oAuthUserCommandRepository,
+            IAmrHelper amrHelper)
         {
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _oauthClientRepository = oauthClientRepository;
+            _oauthUserCommandRepository = oAuthUserCommandRepository;
             _amrHelper = amrHelper;
         }
 
@@ -40,7 +47,7 @@ namespace SimpleIdServer.OpenID.UI
         }
 
 
-        protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, OAuthUser user, bool rememberLogin = false)
+        protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, OAuthUser user, CancellationToken token, bool rememberLogin = false)
         {
             var unprotectedUrl = Unprotect(returnUrl);
             var query = unprotectedUrl.GetQueries().ToJObj();
@@ -52,9 +59,11 @@ namespace SimpleIdServer.OpenID.UI
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {
                 var claims = user.ToClaims();
-                claims.Add(new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString()));
                 var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                user.AuthenticationTime = DateTime.UtcNow;
+                _oauthUserCommandRepository.Update(user, token);
+                await _oauthUserCommandRepository.SaveChanges(token);
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {
                     IsPersistent = rememberLogin

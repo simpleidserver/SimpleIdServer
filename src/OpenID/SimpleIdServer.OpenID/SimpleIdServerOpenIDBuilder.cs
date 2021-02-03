@@ -1,17 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.InMemory;
-using SimpleIdServer.OAuth.Persistence.Users;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.Persistence.InMemory;
 using System.Collections.Generic;

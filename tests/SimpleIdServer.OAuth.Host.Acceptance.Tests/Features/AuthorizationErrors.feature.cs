@@ -290,7 +290,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 70
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table7, "When ");
 #line 78
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 80
  testRunner.Then("JSON \'error\'=\'unsupported_response_mode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 81
@@ -330,7 +330,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 84
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table8, "When ");
 #line 92
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 94
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 95

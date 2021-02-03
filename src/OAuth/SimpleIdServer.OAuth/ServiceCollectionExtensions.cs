@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe.CEKHandlers;
@@ -29,7 +28,6 @@ using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.InMemory;
-using SimpleIdServer.OAuth.Persistence.Users;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;

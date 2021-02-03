@@ -3077,7 +3077,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 1189
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 1190
- testRunner.And("add \'-10\' seconds to authentication instant", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("add \'-10\' seconds to authentication instant to user \'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table89 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
@@ -3145,7 +3145,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 1213
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 1214
- testRunner.And("add \'-10\' seconds to authentication instant", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("add \'-10\' seconds to authentication instant to user \'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table91 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
