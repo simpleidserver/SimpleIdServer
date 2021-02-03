@@ -110,10 +110,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 }
 
                 var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, token)).Cast<OpenIdScope>();
-                var payload = new JwsPayload
-                {
-                    { UserClaims.Subject, user.Id },
-                };
+                var payload = new JwsPayload();
                 IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user);
                 IdTokenBuilder.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);
                 foreach (var claimsSource in _claimsSources)

@@ -58,7 +58,9 @@ namespace SimpleIdServer.OpenID.Startup
                     opt.DefaultScopes = new List<string>
                     {
                         SIDOpenIdConstants.StandardScopes.Profile.Name,
-                        SIDOpenIdConstants.StandardScopes.Email.Name
+                        SIDOpenIdConstants.StandardScopes.Email.Name,
+                        SIDOpenIdConstants.StandardScopes.Address.Name,
+                        SIDOpenIdConstants.StandardScopes.Phone.Name
                     };
                 })
                 .AddClients(DefaultConfiguration.Clients)

@@ -84,6 +84,15 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
             {
                 Name = "offline_access",
                 IsExposedInConfigurationEdp = true
+            },
+            new OpenIdScope
+            {
+                Name = "openid",
+                Claims = new List<string>
+                {
+                    Jwt.Constants.UserClaims.Subject
+                },
+                IsExposedInConfigurationEdp = true
             }
         };
     }

@@ -87,7 +87,10 @@ namespace SimpleIdServer.OpenID.Startup
                     new Claim(Jwt.Constants.UserClaims.Gender, "gender"),
                     new Claim(Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
                     new Claim(Jwt.Constants.UserClaims.UpdatedAt, "1612355959", Jwt.ClaimValueTypes.INTEGER),
-                    new Claim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
+                    new Claim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
+                    new Claim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", Jwt.ClaimValueTypes.JSONOBJECT),
+                    new Claim(Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
+                    new Claim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
                 }
             },
             new OAuthUser
