@@ -87,14 +87,28 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
             catch(OAuthException ex)
             {
+                var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
+                var state = context.Request.Data.GetStateFromAuthorizationRequest();
                 var jObj = new JObject
                 {
                     { ErrorResponseParameters.Error, ex.Code },
                     { ErrorResponseParameters.ErrorDescription, ex.Message }
                 };
-                var payload = Encoding.UTF8.GetBytes(jObj.ToString());
-                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
+                if (!string.IsNullOrWhiteSpace(state))
+                {
+                    jObj.Add(ErrorResponseParameters.State, state);
+                }
+                if (string.IsNullOrWhiteSpace(redirectUri))
+                {   
+                    var payload = Encoding.UTF8.GetBytes(jObj.ToString());
+                    HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
+                    return;
+                }
+
+                var dic = jObj.ToEnumerable().ToDictionary(k => k.Key, k => k.Value);
+                var newUrl = new Uri(QueryHelpers.AddQueryString(redirectUri, dic));
+                HttpContext.Response.Redirect(newUrl.AbsoluteUri);
             }
         }
     }

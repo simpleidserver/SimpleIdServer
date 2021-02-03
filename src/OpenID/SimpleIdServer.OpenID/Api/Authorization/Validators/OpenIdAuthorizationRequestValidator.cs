@@ -38,6 +38,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
             var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
             var acrValues = context.Request.Data.GetAcrValuesFromAuthorizationRequest();
+            var prompt = context.Request.Data.GetPromptFromAuthorizationRequest();
             if (!scopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
@@ -56,6 +57,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (context.User == null)
             {
+                if (prompt == PromptParameters.None)
+                {
+                    throw new OAuthException(ErrorCodes.LOGIN_REQUIRED, OAuth.ErrorMessages.LOGIN_IS_REQUIRED);
+                }
+
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
             }
 
@@ -67,7 +73,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
             var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
             var maxAge = context.Request.Data.GetMaxAgeFromAuthorizationRequest();
-            var prompt = context.Request.Data.GetPromptFromAuthorizationRequest();
             var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(redirectUri))
             {

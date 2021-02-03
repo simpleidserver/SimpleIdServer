@@ -1,6 +1,30 @@
 ﻿Feature: AuthorizationErrors
 	Check the errors returned by the authorization endpoint
 
+Scenario: Check state is returned in the callback url
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                          | Value             |
+	| redirect_uris                | [https://web.com] |
+	| scope                        | email             |
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body	
+	
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value            |
+	| response_type | code             |
+	| client_id     | $client_id$      |
+	| scope         | openid           |
+	| state         | state            |
+	| request_uri   | uri              |
+	| redirect_uri  | http://localhost |
+	
+	And extract query parameters into JSON
+
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='redirect uri http://localhost is not correct'
+	Then JSON 'state'='state'
+
 Scenario: Error is returned when scope is missing
 	When execute HTTP POST JSON request 'http://localhost/register'
 	| Key                          | Value             |
@@ -16,7 +40,7 @@ Scenario: Error is returned when scope is missing
 	| client_id		| $client_id$									|
 	| state			| state											|
 	| response_mode	| query											|
-
+	
 	And extract JSON from body
 
 	Then HTTP status code equals to '400'
@@ -92,6 +116,31 @@ Scenario: Error is returned when redirect_uri is missing
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='missing parameter redirect_uri'
 
+Scenario: Error is returned when user is not authenticated and prompt=none
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                          | Value             |
+	| redirect_uris                | [https://web.com] |
+	| scope                        | email             |	
+
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body
+	And anonymous authentication
+
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key			| Value											|
+	| response_type | code											|
+	| client_id		| $client_id$									|
+	| state			| state											|
+	| response_mode	| query											|
+	| scope			| openid										|
+	| redirect_uri	| https://web.com								|
+	| prompt		| none											|
+
+	And extract query parameters into JSON
+
+	Then JSON 'error'='login_required'
+	Then JSON 'error_description'='login is required'
+
 Scenario: Error is returned when id_token_hint is not present and prompt=none
 	When execute HTTP POST JSON request 'http://localhost/register'
 	| Key                          | Value             |
@@ -110,8 +159,8 @@ Scenario: Error is returned when id_token_hint is not present and prompt=none
 	| scope			| openid										|
 	| redirect_uri	| https://web.com								|
 	| prompt		| none											|
-
-	And extract JSON from body
+	
+	And extract query parameters into JSON
 
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='missing parameter id_token_hint'
@@ -144,7 +193,7 @@ Scenario: Error is returned when subject in the id_token_hint is not correct
 	| prompt		| none											| 
 	| id_token_hint | $id_token_hint$								|
 	
-	And extract JSON from body
+	And extract query parameters into JSON
 	
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='subject contained in id_token_hint is invalid'
@@ -178,7 +227,7 @@ Scenario: Error is returned when audience in the id_token_hint is not correct
 	| prompt		| none											| 
 	| id_token_hint | $id_token_hint$								|
 	
-	And extract JSON from body
+	And extract query parameters into JSON
 	
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='audience contained in id_token_hint is invalid'
@@ -202,8 +251,8 @@ Scenario: Error is returned when the value specified in claims parameter is inva
 	| scope				| openid email													|
 	| redirect_uri		| https://web.com												|
 	| claims			| { id_token: { sub: { essential : true, value: "invalid" } } }	|
-
-	And extract JSON from body
+	
+	And extract query parameters into JSON
 
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='claims sub are invalid'
@@ -224,7 +273,7 @@ Scenario: Error is returned when request parameter is not a valid JWT token
 	| scope				| openid																					|
 	| request			| invalid																					|
 	| state				| state																						|
-
+	
 	And extract JSON from body
 	
 	Then JSON 'error'='invalid_request'
@@ -246,7 +295,7 @@ Scenario: Error is returned when request parameter is not a valid JWS token
 	| scope				| openid																					|
 	| request			| a.b.c																						|
 	| state				| state																						|
-
+	
 	And extract JSON from body
 	
 	Then JSON 'error'='invalid_request'
@@ -309,7 +358,7 @@ Scenario: Error is returned when request parameter doesn't contain issuer
 	| scope				| openid																					|
 	| request			| $request$																					|
 	| state				| state																						|
-
+	
 	And extract JSON from body
 	
 	Then JSON 'error'='invalid_request'
@@ -400,12 +449,12 @@ Scenario: Error is returned when request parameter doesn't contain response_type
 	| aud			| aud1			|
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | $request$   |
+	| state         | state       |
 	
 	And extract JSON from body
 	
@@ -533,7 +582,7 @@ Scenario: Error is returned when request uri is invalid
 	| scope				| openid		|
 	| state				| state			|
 	| request_uri		| uri			|
-
+	
 	And extract JSON from body
 
 	Then JSON 'error'='invalid_request'

@@ -93,6 +93,12 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             });
         }
 
+        [When("anonymous authentication")]
+        public void WhenAnonymousAuthentication()
+        {
+            _scenarioContext.Set("anonymous", "anonymous");
+        }
+
         [When("execute HTTP GET request '(.*)'")]
         public async Task WhenExecuteHTTPGetRequest(string url, Table table)
         {
@@ -275,11 +281,25 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         }
 
         [When("extract JSON from body")]
-        public async Task GivenExtractFromBody()
+        public async Task WhenExtractFromBody()
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(json), "jsonHttpBody");
+        }
+
+        [When("extract query parameters into JSON")]
+        public void WhenExtractQueryParametersIntoJSON()
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queryValues = httpResponseMessage.RequestMessage.RequestUri.ParseQueryString();
+            var jObj = new JObject();
+            foreach(var key in queryValues.AllKeys)
+            {
+                jObj.Add(key, queryValues[key]);
+            }
+
+            _scenarioContext.Set(jObj, "jsonHttpBody");
         }
 
         [When("extract parameter '(.*)' from JSON body")]

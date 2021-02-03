@@ -51,5 +51,6 @@ namespace SimpleIdServer.OAuth
         public const string REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT = "refresh token has not been issued by the client";
         public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
         public const string DUPLICATE_JWKS = "jwks and jwks_uri parameters cannot be passed at the same time";
+        public const string LOGIN_IS_REQUIRED = "login is required";
     }
 }
