@@ -19,6 +19,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using TechTalk.SpecFlow;
@@ -51,7 +52,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public async Task WhenAddUserConsent(string user, string scope, string clientId)
         {
             var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
-            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString());
+            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             oauthUser.Consents.Add(new OAuthConsent
             {
                 ClientId = ParseValue(clientId).ToString(),
@@ -78,7 +79,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public async Task WhenAddUserConsent(string user, string scope, string clientId, string claim)
         {
             var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
-            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString());
+            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             var claims = claim.Split(' ').Select(s =>
             {
                 var splitted = s.Split('=');
@@ -404,7 +405,21 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public void ThenEqualsTo(string key, string value)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
-            Assert.Equal(value, jsonHttpBody[key].ToString());
+            Assert.Equal(value, jsonHttpBody.SelectToken(key).ToString());
+        }
+
+        [Then("JSON '(.*)'=(.*)")]
+        public void ThenEqualsTo(string key, int value)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            Assert.Equal(value, jsonHttpBody.SelectToken(key));
+        }
+
+        [Then("JSON '(.*)'=(.*)")]
+        public void ThenEqualsTo(string key, bool value)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            Assert.Equal(value, jsonHttpBody.SelectToken(key));
         }
 
         [Then("token contains '(.*)'")]
@@ -440,6 +455,13 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         {
             var tokenHeader = _scenarioContext["jweHeader"] as JweHeader;
             Assert.Equal(value, tokenHeader.Enc);
+        }
+
+        [Then("token claim doesn't contain '(.*)'")]
+        public void ThenIdentityTokenContainsClaim(string key)
+        {
+            var tokenPayload = _scenarioContext["tokenPayload"] as JwsPayload;
+            Assert.False(tokenPayload.ContainsKey(key));
         }
 
         [Then("token claim '(.*)'='(.*)'")]

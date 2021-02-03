@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
@@ -36,7 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             return Task.FromResult(0);
         }
 
-        public virtual Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext)
+        public virtual Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)
         {
             var refreshToken = _grantedTokenHelper.BuildRefreshToken(previousQueryParameters, handlerContext.Client.RefreshTokenExpirationTimeInSeconds);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);

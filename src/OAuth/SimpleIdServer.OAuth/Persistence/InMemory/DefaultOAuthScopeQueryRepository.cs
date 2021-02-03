@@ -3,6 +3,7 @@
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Persistence.InMemory
@@ -26,7 +27,7 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return Task.FromResult(_scopes);
         }
 
-        public Task<List<OAuthScope>> FindOAuthScopesByNames(IEnumerable<string> names)
+        public Task<List<OAuthScope>> FindOAuthScopesByNames(IEnumerable<string> names, CancellationToken token)
         {
             return Task.FromResult(_scopes.Where(s => names.Contains(s.Name)).ToList());
         }

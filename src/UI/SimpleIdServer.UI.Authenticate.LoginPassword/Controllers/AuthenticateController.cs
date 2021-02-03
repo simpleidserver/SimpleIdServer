@@ -12,6 +12,7 @@ using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.LoginPassword.Services;
 using SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
@@ -48,7 +49,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(AuthenticateViewModel viewModel)
+        public async Task<IActionResult> Index(AuthenticateViewModel viewModel, CancellationToken token)
         {
             if (viewModel == null)
             {
@@ -63,7 +64,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
 
             try
             {
-                var user = await _passwordAuthService.Authenticate(viewModel.Login, viewModel.Password);
+                var user = await _passwordAuthService.Authenticate(viewModel.Login, viewModel.Password, token);
                 return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, viewModel.RememberLogin);
             }
             catch (CryptographicException)

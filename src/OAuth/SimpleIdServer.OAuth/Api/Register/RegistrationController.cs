@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Register
@@ -21,12 +22,12 @@ namespace SimpleIdServer.OAuth.Api.Register
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] JObject jObj)
+        public async Task<IActionResult> Add([FromBody] JObject jObj, CancellationToken token)
         {
             try
             {
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, jObj, null));
-                var result = await _registerRequestHandler.Handle(context);
+                var result = await _registerRequestHandler.Handle(context, token);
                 return new ContentResult
                 {
                     Content = result.ToString(),

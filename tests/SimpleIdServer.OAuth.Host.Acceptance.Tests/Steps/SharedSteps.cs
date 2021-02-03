@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -49,7 +50,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         public async Task WhenAddUserConsent(string user, string scope, string clientId)
         {
             var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
-            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString());
+            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             oauthUser.Consents.Add(new OAuthConsent
             {
                 ClientId = ParseValue(clientId).ToString(),

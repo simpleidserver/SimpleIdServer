@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
 
@@ -52,26 +53,26 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             }
 
             var openidClient = (OpenIdClient)context.Client;
-            var payload = await BuildIdToken(context, context.Request.Data).ConfigureAwait(false);
+            var payload = await BuildIdToken(context, context.Request.Data, scopes).ConfigureAwait(false);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
             context.Response.Add(Name, idToken);
         }
 
-        public async Task Refresh(JObject previousQueryParameters, HandlerContext currentContext)
+        public async Task Refresh(JObject previousQueryParameters, HandlerContext currentContext, CancellationToken token)
         {
             if (!previousQueryParameters.ContainsKey(UserClaims.Subject))
             {
                 return;
             }
 
-            currentContext.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(previousQueryParameters[UserClaims.Subject].ToString()));
+            currentContext.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(previousQueryParameters[UserClaims.Subject].ToString(), token));
             var openidClient = (OpenIdClient)currentContext.Client;
-            var payload = await BuildIdToken(currentContext, previousQueryParameters).ConfigureAwait(false);
+            var payload = await BuildIdToken(currentContext, previousQueryParameters, new string[0]).ConfigureAwait(false);
             var idToken = await _jwtBuilder.BuildClientToken(currentContext.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
             currentContext.Response.Add(Name, idToken);
         }
 
-        private async Task<JwsPayload> BuildIdToken(HandlerContext currentContext, JObject queryParameters)
+        private async Task<JwsPayload> BuildIdToken(HandlerContext currentContext, JObject queryParameters, IEnumerable<string> requestedScopes)
         {
             var openidClient = (OpenIdClient)currentContext.Client;
             var result = new JwsPayload
@@ -86,7 +87,6 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             var nonce = queryParameters.GetNonceFromAuthorizationRequest();
             var acrValues = queryParameters.GetAcrValuesFromAuthorizationRequest();
             var requestedClaims = queryParameters.GetClaimsFromAuthorizationRequest();
-            var requestedScopes = queryParameters.GetScopesFromAuthorizationRequest();
             var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.SubjectType));
             var subject = await subjectTypeBuilder.Build(currentContext);
             result.Add(UserClaims.Subject, subject);
@@ -137,18 +137,8 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 {
                     foreach (var scopeClaim in scope.Claims)
                     {
-                        var userClaims = user.Claims.Where(c => c.Key == scopeClaim).Select(c => c.Value);
-                        if (userClaims.Any())
-                        {
-                            if (userClaims.Count() == 1)
-                            {
-                                payload.TryAdd(scopeClaim, userClaims.First());
-                            }
-                            else
-                            {
-                                payload.TryAdd(scopeClaim, userClaims);
-                            }
-                        }
+                        var userClaims = user.Claims.Where(c => c.Type == scopeClaim);
+                        payload.AddOrReplace(userClaims);
                     }
                 }
             }
@@ -162,7 +152,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 {
                     if (USER_CLAIMS.Contains(claim.Name))
                     {
-                        payload.TryAdd(claim.Name, user.Claims.First(c => c.Key == claim.Name).Value);
+                        payload.AddOrReplace(user.Claims.First(c => c.Type == claim.Name));
                     }
                     else
                     {

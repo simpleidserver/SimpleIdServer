@@ -8,6 +8,7 @@ using SimpleIdServer.OAuth.Extensions;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token
@@ -25,7 +26,7 @@ namespace SimpleIdServer.OAuth.Api.Token
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post(CancellationToken token)
         {
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             var claimAuthTime = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.AuthenticationInstant);
@@ -40,7 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Token
             var jObjHeader = Request.Headers.ToJObject();
             var jObjBody = Request.Form.ToJObject();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, authTime, jObjBody, jObjHeader));
-            return await _tokenRequestHandler.Handle(context);
+            return await _tokenRequestHandler.Handle(context, token);
         }
 
         [HttpPost("revoke")]

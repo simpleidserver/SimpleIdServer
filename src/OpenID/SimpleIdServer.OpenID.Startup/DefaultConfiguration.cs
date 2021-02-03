@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace SimpleIdServer.OpenID.Startup
 {
@@ -12,20 +13,19 @@ namespace SimpleIdServer.OpenID.Startup
     {
         public static List<OpenIdScope> Scopes = new List<OpenIdScope>
         {
+            SIDOpenIdConstants.StandardScopes.OpenIdScope,
+            SIDOpenIdConstants.StandardScopes.Phone,
+            SIDOpenIdConstants.StandardScopes.Profile,
+            SIDOpenIdConstants.StandardScopes.Role,
+            SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
+            SIDOpenIdConstants.StandardScopes.Email,
+            SIDOpenIdConstants.StandardScopes.Address,
             new OpenIdScope
             {
                 Name = "scim",
                 Claims = new List<string>
                 {
                     "scim_id"
-                }
-            },
-            new OpenIdScope
-            {
-                Name = "role",
-                Claims = new List<string>
-                {
-                    "role"
                 }
             }
         };
@@ -57,6 +57,41 @@ namespace SimpleIdServer.OpenID.Startup
         {
             new OAuthUser
             {
+                Id = "sub",
+                Credentials = new List<OAuthUserCredential>
+                {
+                    new OAuthUserCredential
+                    {
+                        CredentialType = "pwd",
+                        Value = PasswordHelper.ComputeHash("password")
+                    }
+                },
+                CreateDateTime = DateTime.Now,
+                UpdateDateTime = DateTime.Now,
+                Claims = new List<Claim>
+                {
+                    new Claim(Jwt.Constants.UserClaims.Subject, "sub"),
+                    new Claim(Jwt.Constants.UserClaims.Name, "name"),
+                    new Claim(Jwt.Constants.UserClaims.FamilyName, "familyName"),
+                    new Claim(Jwt.Constants.UserClaims.UniqueName, "uniquename"),
+                    new Claim(Jwt.Constants.UserClaims.GivenName, "givenName"),
+                    new Claim(Jwt.Constants.UserClaims.MiddleName, "middleName"),
+                    new Claim(Jwt.Constants.UserClaims.NickName, "nickName"),
+                    new Claim(Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
+                    new Claim(Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
+                    new Claim(Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
+                    new Claim(Jwt.Constants.UserClaims.Locale, "locale"),
+                    new Claim(Jwt.Constants.UserClaims.Picture, "picture"),
+                    new Claim(Jwt.Constants.UserClaims.WebSite, "website"),
+                    new Claim(Jwt.Constants.UserClaims.Profile, "profile"),
+                    new Claim(Jwt.Constants.UserClaims.Gender, "gender"),
+                    new Claim(Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
+                    new Claim(Jwt.Constants.UserClaims.UpdatedAt, "1612355959", Jwt.ClaimValueTypes.INTEGER),
+                    new Claim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
+                }
+            },
+            new OAuthUser
+            {
                 Id = "administrator",
                 Credentials = new List<OAuthUserCredential>
                 {
@@ -66,11 +101,11 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
                 }
             },
             new OAuthUser
@@ -84,11 +119,11 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
                 }
             },
             new OAuthUser
@@ -102,11 +137,11 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
                 }
             },
             new OAuthUser
@@ -120,10 +155,10 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
-                    new KeyValuePair<string, string>("scim_id", "1")
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
+                    new Claim("scim_id", "1")
                 }
             },
             new OAuthUser
@@ -137,11 +172,11 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Subject, "umaUser"),
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Name, "User"),
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.UniqueName, "User")
+                    new Claim(Jwt.Constants.UserClaims.Subject, "umaUser"),
+                    new Claim(Jwt.Constants.UserClaims.Name, "User"),
+                    new Claim(Jwt.Constants.UserClaims.UniqueName, "User")
                 }
             },
             new OAuthUser
@@ -155,12 +190,12 @@ namespace SimpleIdServer.OpenID.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Subject, "doctor"),
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.Name, "Doctor"),
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.GivenName, "Doctor"),
-                    new KeyValuePair<string, string>(Jwt.Constants.UserClaims.UniqueName, "Doctor")
+                    new Claim(Jwt.Constants.UserClaims.Subject, "doctor"),
+                    new Claim(Jwt.Constants.UserClaims.Name, "Doctor"),
+                    new Claim(Jwt.Constants.UserClaims.GivenName, "Doctor"),
+                    new Claim(Jwt.Constants.UserClaims.UniqueName, "Doctor")
                 }
             }
         };

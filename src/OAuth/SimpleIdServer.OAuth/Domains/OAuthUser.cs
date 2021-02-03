@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace SimpleIdServer.OAuth.Domains
 {
@@ -10,13 +11,13 @@ namespace SimpleIdServer.OAuth.Domains
     {
         public OAuthUser()
         {
-            Claims = new List<KeyValuePair<string, string>>();
             Consents = new List<OAuthConsent>();
             Credentials = new List<OAuthUserCredential>();
+            Claims = new List<Claim>();
         }
 
         public string Id { get; set; }
-        public List<KeyValuePair<string, string>> Claims { get; set; }
+        public List<Claim> Claims { get; set; }
         public ICollection<OAuthConsent> Consents { get; set; }
         public ICollection<OAuthUserCredential> Credentials { get; set; }
         public DateTime CreateDateTime { get; set; }
@@ -27,7 +28,7 @@ namespace SimpleIdServer.OAuth.Domains
             return new OAuthUser
             {
                 Id = Id,
-                Claims = Claims == null ? new List<KeyValuePair<string, string>>() : Claims.ToList(),
+                Claims = Claims == null ? new List<Claim>() : Claims.Select(_ => new Claim(_.Type, _.Value, _.ValueType)).ToList(),
                 Consents = Consents == null ? new List<OAuthConsent>() : Consents.Select(c => (OAuthConsent)c.Clone()).ToList(),
                 Credentials = Credentials == null ? new List<OAuthUserCredential>() : Credentials.Select(c => (OAuthUserCredential)c.Clone()).ToList(),
                 CreateDateTime = CreateDateTime,

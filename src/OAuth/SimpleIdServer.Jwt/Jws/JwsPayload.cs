@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Claims;
 
 namespace SimpleIdServer.Jwt.Jws
 {
@@ -17,16 +19,6 @@ namespace SimpleIdServer.Jwt.Jws
         public string GetClaimValue(string claimName)
         {
             if (!ContainsKey(claimName) || this[claimName] == null)
-            {
-                return null;
-            }
-
-            return this[claimName].ToString();
-        }
-
-        private string GetStringClaim(string claimName)
-        {
-            if (!ContainsKey(claimName))
             {
                 return null;
             }
@@ -74,6 +66,42 @@ namespace SimpleIdServer.Jwt.Jws
             return new[] { claim.ToString() };
         }
 
+        public void AddOrReplace(IEnumerable<Claim> claims)
+        {
+            foreach(var claim in claims)
+            {
+                AddOrReplace(claim);
+            }
+        }
+
+        public void AddOrReplace(Claim claim)
+        {
+            var value = ExtractValue(claim);
+            if (value == null)
+            {
+                return;
+            }
+
+            if (ContainsKey(claim.Type))
+            {
+                var lst = typeof(List<>).MakeGenericType(value.GetType());
+                var lstValues = this[claim.Type];
+                if (lstValues.GetType() != lst)
+                {
+                    lstValues = Activator.CreateInstance(lst);
+                    var existingValue = this[claim.Type];
+                    lst.GetMethod("Add").Invoke(lstValues, new[] { existingValue });
+                    this[claim.Type] = lstValues;
+                }
+
+                lst.GetMethod("Add").Invoke(lstValues, new[] { value });
+            }
+            else
+            {
+                Add(claim.Type, value);
+            }
+        }
+
         public bool TryAdd(string key, object value)
         {
             if (ContainsKey(key))
@@ -94,6 +122,45 @@ namespace SimpleIdServer.Jwt.Jws
             }
 
             return result;
+        }
+
+        private static object ExtractValue(Claim claim)
+        {
+            switch(claim.ValueType)
+            {
+                case ClaimValueTypes.BOOLEAN:
+                    {
+                        if (bool.TryParse(claim.Value, out bool r))
+                        {
+                            return r;
+                        }
+                    }
+                    break;
+                case ClaimValueTypes.INTEGER:
+                    {
+                        if (int.TryParse(claim.Value, out int r))
+                        {
+                            return r;
+                        }
+                    }
+                    break;
+                case ClaimValueTypes.JSONOBJECT:
+                    {
+                        if (!string.IsNullOrWhiteSpace(claim.Value))
+                        {
+                            var jObj = JObject.Parse(claim.Value);
+                            if (jObj != null)
+                            {
+                                return jObj;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    return claim.Value;
+            }
+
+            return null;
         }
     }
 }

@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
@@ -41,7 +42,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }
 
-        public virtual Task Refresh(JObject previousRequest, HandlerContext currentContext)
+        public virtual Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken token)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             return Build(scopes, currentContext);

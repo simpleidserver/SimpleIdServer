@@ -35,12 +35,12 @@ namespace SimpleIdServer.OpenID.Extensions
             var claims = new List<Claim>();
             foreach (var cl in oauthUser.Claims)
             {
-                if (!CLAIM_MAPPINGS.ContainsKey(cl.Key))
+                if (!CLAIM_MAPPINGS.ContainsKey(cl.Type))
                 {
                     continue;
                 }
 
-                claims.Add(new Claim(CLAIM_MAPPINGS[cl.Key], cl.Value));
+                claims.Add(new Claim(CLAIM_MAPPINGS[cl.Type], cl.Value));
             }
 
             return claims;

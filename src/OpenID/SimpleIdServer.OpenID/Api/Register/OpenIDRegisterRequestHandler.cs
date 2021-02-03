@@ -24,6 +24,7 @@ using SimpleIdServer.OpenID.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Register
@@ -46,7 +47,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             _openIDHostOptions = openidHostOptions.Value;
         }
 
-        protected override Task Check(HandlerContext handlerContext)
+        protected override Task Check(HandlerContext handlerContext, CancellationToken token)
         {
             var jObj = handlerContext.Request.Data;
             var applicationType = jObj.GetApplicationTypeFromRegisterRequest();
@@ -91,10 +92,10 @@ namespace SimpleIdServer.OpenID.Api.Register
             CheckEncryption(userInfoEncryptedResponseAlg, userInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, RegisterRequestParameters.UserInfoEncryptedResponseAlg);
             CheckSignature(requestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);
             CheckEncryption(requestObjectEncryptionAlg, requestObjectEncryptionEnc, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC, RegisterRequestParameters.RequestObjectEncryptionAlg);
-            return base.Check(handlerContext);
+            return base.Check(handlerContext, token);
         }
 
-        protected override async Task<JObject> Create(HandlerContext context)
+        protected override async Task<JObject> Create(HandlerContext context, CancellationToken token)
         {
             var jObj = context.Request.Data;
             var applicationType = GetDefaultApplicationType(jObj);
@@ -149,7 +150,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             }
 
             var openidClient = new OpenIdClient();
-            var result = await EnrichOAuthClient(context, openidClient);
+            var result = await EnrichOAuthClient(context, openidClient, token);
             openidClient.ApplicationType = applicationType;
             openidClient.SectorIdentifierUri = sectorIdentifierUri;
             openidClient.SubjectType = subjectType;

@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
+using System.Threading;
 using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
 
@@ -15,7 +16,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
     {
         public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder) : base(grantedTokenHelper, jwtBuilder) { }        
 
-        public override Task Refresh(JObject previousRequest, HandlerContext currentContext)
+        public override Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken token)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             var jObj = new JObject();

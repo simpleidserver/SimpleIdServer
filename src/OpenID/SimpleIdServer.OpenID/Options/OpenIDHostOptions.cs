@@ -6,9 +6,9 @@ using SimpleIdServer.OpenID.SubjectTypeBuilders;
 
 namespace SimpleIdServer.OpenID.Options
 {
-    public class OpenIDHostOptions : OAuthHostOptions
+    public class OpenIDHostOptions
     {
-        public OpenIDHostOptions() : base()
+        public OpenIDHostOptions()
         {
             DefaultSubjectType = PublicSubjectTypeBuilder.SUBJECT_TYPE;
             DefaultMaxAge = null;

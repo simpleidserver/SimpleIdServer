@@ -37,7 +37,7 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return Task.FromResult((OAuthClient)res.Clone());
         }
 
-        public Task<IEnumerable<OAuthClient>> FindOAuthClientByIds(IEnumerable<string> clientIds)
+        public Task<IEnumerable<OAuthClient>> FindOAuthClientByIds(IEnumerable<string> clientIds, CancellationToken token)
         {
             return Task.FromResult(_clients.Where(c => clientIds.Contains(c.ClientId)));
         }

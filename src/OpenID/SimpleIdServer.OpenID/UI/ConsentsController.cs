@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.UI
@@ -91,14 +92,14 @@ namespace SimpleIdServer.OpenID.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(ConfirmConsentsViewModel confirmConsentsViewModel)
+        public async Task<IActionResult> Index(ConfirmConsentsViewModel confirmConsentsViewModel, CancellationToken token)
         { 
             try
             {
                 var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
                 var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                var user = await _oauthUserRepository.FindOAuthUserByLogin(claimName.Value);
+                var user = await _oauthUserRepository.FindOAuthUserByLogin(claimName.Value, token);
                 var consent = _userConsentFetcher.FetchFromAuthorizationRequest(user, query);
                 if (consent == null)
                 {

@@ -8,11 +8,11 @@ using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -23,22 +23,20 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
 
         public RefreshTokenHandler(IRefreshTokenGrantTypeValidator refreshTokenGrantTypeValidator, IGrantedTokenHelper grantedTokenHelper, IEnumerable<ITokenProfile> tokenProfiles,
-            IEnumerable<ITokenBuilder> tokenBuilders, IClientAuthenticationHelper clientAuthenticationHelper, IOAuthUserQueryRepository oauthUserQueryRepository) : base(clientAuthenticationHelper)
+            IEnumerable<ITokenBuilder> tokenBuilders, IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
-            _oauthUserRepository = oauthUserQueryRepository;
         }
 
         public const string GRANT_TYPE = "refresh_token";
         public override string GrantType { get => GRANT_TYPE; }
 
-        public override async Task<IActionResult> Handle(HandlerContext context)
+        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
         {
             try
             {
@@ -62,7 +60,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Refresh(jwsPayload, context).ConfigureAwait(false);
+                    await tokenBuilder.Refresh(jwsPayload, context, token);
                 }
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

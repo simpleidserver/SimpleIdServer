@@ -11,6 +11,7 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Api.Authorization;
@@ -59,9 +60,26 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services, Action<OpenIDHostOptions> options)
+        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services, Action<OpenIDHostOptions> openidOptions = null, Action<OAuthHostOptions> oauthOptions = null)
         {
-            services.Configure(options);
+            if (openidOptions != null)
+            {
+                services.Configure(openidOptions);
+            }
+            else
+            {
+                services.Configure<OpenIDHostOptions>((opt) => { });
+            }
+
+            if (oauthOptions != null)
+            {
+                services.Configure(oauthOptions);
+            }
+            else
+            {
+                services.Configure<OAuthHostOptions>((opt) => { });
+            }
+
             return services.AddSIDOpenID();
         }
 

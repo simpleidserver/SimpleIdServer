@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
 
@@ -45,18 +46,18 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
         }
 
         [HttpGet]
-        public Task<IActionResult> GetIndex()
+        public Task<IActionResult> GetIndex(CancellationToken token)
         {
-            return Common(null);
+            return Common(null, token);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostIndex()
+        public async Task<IActionResult> PostIndex(CancellationToken token)
         {
             try
             {
                 var jObjBody = Request.Form?.ToJObject();
-                return await Common(jObjBody);
+                return await Common(jObjBody, token);
             }
             catch(InvalidOperationException)
             {
@@ -74,7 +75,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             }
         }
 
-        private async Task<IActionResult> Common(JObject content)
+        private async Task<IActionResult> Common(JObject content, CancellationToken token)
         {
             try
             {
@@ -90,13 +91,13 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 var audiences = jwsPayload.GetAudiences();
                 var claims = jwsPayload.GetClaims();
                 var authTime = jwsPayload.GetAuthTime();
-                var user = await _oauthUserRepository.FindOAuthUserByLogin(subject);
+                var user = await _oauthUserRepository.FindOAuthUserByLogin(subject, token);
                 if (user == null)
                 {
                     return new UnauthorizedResult();
                 }
 
-                var filteredClients = await _oauthClientRepository.FindOAuthClientByIds(audiences);
+                var filteredClients = await _oauthClientRepository.FindOAuthClientByIds(audiences, token);
                 if (!filteredClients.Any())
                 {
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.INVALID_AUDIENCE);
@@ -108,7 +109,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
                 }
 
-                var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes)).Cast<OpenIdScope>();
+                var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, token)).Cast<OpenIdScope>();
                 var payload = new JwsPayload
                 {
                     { UserClaims.Subject, user.Id },

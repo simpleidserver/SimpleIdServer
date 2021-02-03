@@ -13,13 +13,14 @@ using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Authorization
 {
     public interface IAuthorizationRequestHandler
     {
-        Task<AuthorizationResponse> Handle(HandlerContext context);
+        Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token);
     }
 
     public class AuthorizationRequestHandler : IAuthorizationRequestHandler
@@ -48,11 +49,11 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             _httpClientFactory = httpClientFactory;
         }
 
-        public virtual async Task<AuthorizationResponse> Handle(HandlerContext context)
+        public virtual async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
         {
             try
             {
-                return await BuildResponse(context);
+                return await BuildResponse(context, token);
             }
             catch (OAuthUserConsentRequiredException)
             {
@@ -64,7 +65,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
         }
 
-        protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context)
+        protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken token)
         {
             var requestedResponseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
             if (!requestedResponseTypes.Any())
@@ -80,7 +81,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
 
             context.SetClient(await Validate(context.Request.Data));
-            context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject));
+            context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, token));
             foreach (var validator in _authorizationRequestValidators)
             {
                 await validator.Validate(context);

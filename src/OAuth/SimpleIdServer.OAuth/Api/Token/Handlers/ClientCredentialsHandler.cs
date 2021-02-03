@@ -11,6 +11,7 @@ using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -32,7 +33,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         public const string GRANT_TYPE = "client_credentials";
         public override string GrantType { get => GRANT_TYPE; }
 
-        public override async Task<IActionResult> Handle(HandlerContext context)
+        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
         {
             try
             {

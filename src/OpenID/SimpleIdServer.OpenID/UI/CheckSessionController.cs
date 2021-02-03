@@ -15,6 +15,7 @@ using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.UI
@@ -47,7 +48,7 @@ namespace SimpleIdServer.OpenID.UI
         }
 
         [HttpGet(SIDOpenIdConstants.EndPoints.EndSession)]
-        public async Task<IActionResult> EndSession()
+        public async Task<IActionResult> EndSession(CancellationToken token)
         {
             var url = SIDOpenIdConstants.EndPoints.EndSessionCallback;
             var jObjBody = Request.Query.ToJObject();
@@ -55,7 +56,7 @@ namespace SimpleIdServer.OpenID.UI
             var postLogoutRedirectUri = jObjBody.GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest();
             try
             {
-                var jwsPayload = await Validate(postLogoutRedirectUri, idTokenHint);
+                var jwsPayload = await Validate(postLogoutRedirectUri, idTokenHint, token);
                 if (Request.QueryString.HasValue)
                 {
                     url = $"{url}{Request.QueryString.Value}";
@@ -70,7 +71,7 @@ namespace SimpleIdServer.OpenID.UI
         }
 
         [HttpGet(SIDOpenIdConstants.EndPoints.EndSessionCallback)]
-        public async Task<IActionResult> EndSessionCallback()
+        public async Task<IActionResult> EndSessionCallback(CancellationToken token)
         {
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
@@ -78,7 +79,7 @@ namespace SimpleIdServer.OpenID.UI
             var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
-                var jwsPayload = await Validate(postLogoutRedirectUri, idTokenHint);
+                var jwsPayload = await Validate(postLogoutRedirectUri, idTokenHint, token);
                 Response.Cookies.Delete(_openidHostOptions.SessionCookieName);
                 await HttpContext.SignOutAsync();
                 if (jwsPayload == null)
@@ -104,7 +105,7 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
-        private async Task<JwsPayload> Validate(string postLogoutRedirectUri, string idTokenHint)
+        private async Task<JwsPayload> Validate(string postLogoutRedirectUri, string idTokenHint, CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
             {
@@ -122,7 +123,7 @@ namespace SimpleIdServer.OpenID.UI
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
             }
 
-            var openidClients = (await _oauthClientQueryRepository.FindOAuthClientByIds(jwsPayload.GetAudiences())).Cast<OpenIdClient>();
+            var openidClients = (await _oauthClientQueryRepository.FindOAuthClientByIds(jwsPayload.GetAudiences(), token)).Cast<OpenIdClient>();
             if (openidClients.SelectMany(c => c.PostLogoutRedirectUris).Contains(postLogoutRedirectUri))
             {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_POST_LOGOUT_REDIRECT_URI);

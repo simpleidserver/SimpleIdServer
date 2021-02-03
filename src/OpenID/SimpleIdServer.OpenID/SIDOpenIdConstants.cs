@@ -38,7 +38,8 @@ namespace SimpleIdServer.OpenID
                     Jwt.Constants.UserClaims.ZoneInfo,
                     Jwt.Constants.UserClaims.Locale,
                     Jwt.Constants.UserClaims.UpdatedAt
-                }
+                },
+                IsExposedInConfigurationEdp = true
             };
             public static OpenIdScope Email = new OpenIdScope
             {
@@ -47,7 +48,8 @@ namespace SimpleIdServer.OpenID
                 {
                     Jwt.Constants.UserClaims.Email,
                     Jwt.Constants.UserClaims.EmailVerified
-                }
+                },
+                IsExposedInConfigurationEdp = true
             };
             public static OpenIdScope Address = new OpenIdScope
             {
@@ -55,7 +57,8 @@ namespace SimpleIdServer.OpenID
                 Claims = new List<string>
                 {
                     Jwt.Constants.UserClaims.Address
-                }
+                },
+                IsExposedInConfigurationEdp = true
             };
             public static OpenIdScope Phone = new OpenIdScope
             {
@@ -64,7 +67,8 @@ namespace SimpleIdServer.OpenID
                 {
                     Jwt.Constants.UserClaims.PhoneNumber,
                     Jwt.Constants.UserClaims.PhoneNumberVerified
-                }
+                },
+                IsExposedInConfigurationEdp = true
             };
             public static OpenIdScope Role = new OpenIdScope
             {
@@ -72,7 +76,8 @@ namespace SimpleIdServer.OpenID
                 Claims = new List<string>
                 {
                     Jwt.Constants.UserClaims.Role
-                }
+                },
+                IsExposedInConfigurationEdp = true
             };
             public static OpenIdScope OpenIdScope = new OpenIdScope
             {
@@ -80,11 +85,13 @@ namespace SimpleIdServer.OpenID
                 Claims = new List<string>
                 {
                     Jwt.Constants.UserClaims.Subject
-                }
+                },
+                IsExposedInConfigurationEdp = true
             };
             public static OpenIdScope OfflineAccessScope = new OpenIdScope
             {
-                Name = "offline_access"
+                Name = "offline_access",
+                IsExposedInConfigurationEdp = true
             };
         }
     }

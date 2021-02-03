@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using System.Collections.Generic;
@@ -54,6 +53,13 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     opt.IsLocalhostAllowed = true;
                     opt.IsRedirectionUrlHTTPSRequired = false;
+                }, opt =>
+                {
+                    opt.DefaultScopes = new List<string>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile.Name,
+                        SIDOpenIdConstants.StandardScopes.Email.Name
+                    };
                 })
                 .AddClients(DefaultConfiguration.Clients)
                 .AddAcrs(DefaultConfiguration.AcrLst)

@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Exceptions;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.UI.Authenticate.LoginPassword.Services
@@ -18,9 +19,9 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Services
             _oauthUserRepository = oauthUserRepository;
         }
 
-        public virtual async Task<OAuthUser> Authenticate(string login, string password)
+        public virtual async Task<OAuthUser> Authenticate(string login, string password, CancellationToken token)
         {
-            var user = await _oauthUserRepository.FindOAuthUserByLogin(login);
+            var user = await _oauthUserRepository.FindOAuthUserByLogin(login, token);
             if (user == null)
             {
                 throw new BaseUIException(Exceptions.ErrorCodes.UNKNOWN_USER);

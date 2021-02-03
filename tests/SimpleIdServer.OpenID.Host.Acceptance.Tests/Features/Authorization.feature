@@ -1,6 +1,45 @@
 ﻿Feature: Authorization
 	Check the authorization endpoint
 
+Scenario: When no access token is issued the resulting claims are returned in the ID token
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                          | Value             |
+	| redirect_uris                | [https://web.com] |
+	| grant_types                  | [implicit]        |
+	| response_types               | [id_token]        |
+	| scope                        | email role        |
+	| id_token_signed_response_alg | none              |
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body
+	And extract parameter 'client_secret' from JSON body
+	And add user consent : user='administrator', scope='email role', clientId='$client_id$'
+
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value             |
+	| response_type | id_token          |
+	| client_id     | $client_id$       |
+	| state         | state             |
+	| response_mode | query             |
+	| scope         | openid email role |
+	| redirect_uri  | https://web.com   |
+	| ui_locales    | en fr             |
+	
+	And extract 'id_token' from callback
+	And extract 'display' from callback
+	And extract payload from JWS '$id_token$'
+
+	Then JWS Alg equals to 'none'
+	Then token contains 'iss'
+	Then token contains 'iat'
+	Then token contains 'exp'
+	Then token contains 'azp'
+	Then token contains 'aud'
+	Then token claim 'sub'='administrator'
+	Then token claim 'email'='habarthierry@hotmail.fr'
+	Then token claim 'role' contains 'role1'
+	Then token claim 'role' contains 'role2'
+
 Scenario: Check display is passed into the callback url
 	When add JSON web key to Authorization Server and store into 'jwks'
 	| Type | Kid | AlgName |
@@ -515,9 +554,8 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -570,9 +608,8 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -625,9 +662,8 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -680,9 +716,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -735,9 +770,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -790,9 +824,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -845,9 +878,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -900,9 +932,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 
 Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -955,9 +986,8 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	Then token contains 'azp'
 	Then token contains 'aud'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
-	Then token claim 'role' contains 'role1'
-	Then token claim 'role' contains 'role2'
+	Then token claim doesn't contain 'email'
+	Then token claim doesn't contain 'role'
 	   	
 Scenario: Use request object (JWS) parameter to get an access token and authorization code
 	When add JSON web key to Authorization Server and store into 'jwks'

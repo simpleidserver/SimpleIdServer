@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Authorization
@@ -34,7 +35,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         }
 
-        public async Task Get()
+        public async Task Get(CancellationToken token)
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -51,7 +52,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             try
             {
                 string url;
-                var authorizationResponse = await _authorizationRequestHandler.Handle(context);
+                var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
                 if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
                 {
                     var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;

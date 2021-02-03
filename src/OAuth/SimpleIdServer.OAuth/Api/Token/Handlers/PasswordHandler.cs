@@ -13,6 +13,7 @@ using SimpleIdServer.OAuth.Persistence;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -36,7 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         public const string GRANT_TYPE = "password";
         public override string GrantType => GRANT_TYPE;
 
-        public override async Task<IActionResult> Handle(HandlerContext context)
+        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
         {
             try
             {

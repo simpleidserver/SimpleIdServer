@@ -25,7 +25,13 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
         public void Enrich(HandlerContext context)
         {
-            _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context);
+            IEnumerable<string> scopes = new string[1] { SIDOpenIdConstants.StandardScopes.OpenIdScope.Name };
+            if (!context.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.AccessToken, out string accessToken))
+            {
+                scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
+            }
+
+            _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(scopes, context);
         }
     }
 }

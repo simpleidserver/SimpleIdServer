@@ -21,13 +21,14 @@ using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Register
 {
     public interface IRegisterRequestHandler
     {
-        Task<JObject> Handle(HandlerContext handlerContext);
+        Task<JObject> Handle(HandlerContext handlerContext, CancellationToken token);
     }
 
     /// <summary>
@@ -73,14 +74,14 @@ namespace SimpleIdServer.OAuth.Api.Register
         protected IEnumerable<ICEKHandler> CEKHandlers => _cekHandlers;
         protected IEnumerable<IEncHandler> ENCHandlers => _encHandlers;
 
-        public async Task<JObject> Handle(HandlerContext handlerContext)
+        public async Task<JObject> Handle(HandlerContext handlerContext, CancellationToken token)
         {
             await ExtractSoftwareStatement(handlerContext.Request.Data);
-            await Check(handlerContext);
-            return await Create(handlerContext);
+            await Check(handlerContext, token);
+            return await Create(handlerContext, token);
         }
 
-        protected virtual async Task Check(HandlerContext context)
+        protected virtual async Task Check(HandlerContext context, CancellationToken token)
         {
             var jObj = context.Request.Data;
             var grantTypes = GetDefaultGrantTypes(jObj);
@@ -147,7 +148,7 @@ namespace SimpleIdServer.OAuth.Api.Register
                 }
             }
 
-            var existingScopeNames = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes)).Select(s => s.Name);
+            var existingScopeNames = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, token)).Select(s => s.Name);
             var unsupportedScopes = scopes.Except(existingScopeNames);
             if (unsupportedScopes.Any())
             {
@@ -167,16 +168,16 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
         }
 
-        protected virtual async Task<JObject> Create(HandlerContext context)
+        protected virtual async Task<JObject> Create(HandlerContext context, CancellationToken token)
         {
             var oauthClient = new OAuthClient();
-            var jObj = await EnrichOAuthClient(context, oauthClient);
+            var jObj = await EnrichOAuthClient(context, oauthClient, token);
             _oauthClientCommandRepository.Add(oauthClient);
             await _oauthClientCommandRepository.SaveChanges();
             return jObj;
         }
 
-        protected async Task<JObject> EnrichOAuthClient(HandlerContext context, OAuthClient oauthClient)
+        protected async Task<JObject> EnrichOAuthClient(HandlerContext context, OAuthClient oauthClient, CancellationToken token)
         {
             var jObj = context.Request.Data;
             var clientId = Guid.NewGuid().ToString();
@@ -215,7 +216,7 @@ namespace SimpleIdServer.OAuth.Api.Register
                 tokenEncryptedResponseEnc = A128CBCHS256EncHandler.ENC_NAME;
             }
 
-            var supportedScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes);
+            var supportedScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes, token);
             oauthClient.ClientId = clientId;
             oauthClient.TokenEndPointAuthMethod = tokenEndpointAuthMethod;
             oauthClient.GrantTypes = grantTypes.ToList();

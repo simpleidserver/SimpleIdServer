@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -35,7 +36,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         public override string GrantType => GRANT_TYPE;
         public static string GRANT_TYPE = "authorization_code";
 
-        public override async Task<IActionResult> Handle(HandlerContext context)
+        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
         {
             try
             {
@@ -60,7 +61,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Refresh(previousRequest, context).ConfigureAwait(false);
+                    await tokenBuilder.Refresh(previousRequest, context, token);
                 }
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

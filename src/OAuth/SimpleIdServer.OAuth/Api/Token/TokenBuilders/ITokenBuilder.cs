@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
@@ -23,6 +24,6 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         /// <param name="previousQueryParameters"></param>
         /// <param name="handlerContext"></param>
         /// <returns></returns>
-        Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext);
+        Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token);
     }
 }

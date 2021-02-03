@@ -3,6 +3,7 @@
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Persistence.InMemory
@@ -16,12 +17,12 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             _users = users;
         }
 
-        public Task<OAuthUser> FindOAuthUserByClaim(string claimKey, string claimValue)
+        public Task<OAuthUser> FindOAuthUserByClaim(string claimType, string claimValue)
         {
-            return Task.FromResult(_users.FirstOrDefault(u => u.Claims.Any(c => c.Key == claimKey && c.Value == claimValue)));
+            return Task.FromResult(_users.FirstOrDefault(u => u.Claims.Any(c => c.Type == claimType && c.Value == claimValue)));
         }
 
-        public Task<OAuthUser> FindOAuthUserByLogin(string login)
+        public Task<OAuthUser> FindOAuthUserByLogin(string login, CancellationToken token)
         {
             return Task.FromResult(_users.FirstOrDefault(u => u.Id == login));
         }

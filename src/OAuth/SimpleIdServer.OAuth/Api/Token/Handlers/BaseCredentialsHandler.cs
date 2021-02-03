@@ -8,6 +8,7 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token.Handlers
@@ -22,7 +23,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         }
 
         public abstract string GrantType { get; }
-        public abstract Task<IActionResult> Handle(HandlerContext context);
+        public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken token);
 
         protected async Task<OAuthClient> AuthenticateClient(HandlerContext context)
         {

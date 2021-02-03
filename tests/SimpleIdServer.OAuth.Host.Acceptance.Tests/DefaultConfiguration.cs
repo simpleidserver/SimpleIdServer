@@ -4,6 +4,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 {
@@ -22,11 +23,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
                 }
             }
         };

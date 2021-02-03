@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Authorization
@@ -33,11 +34,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             _openidHostOptions = options.Value;
         }
 
-        public override async Task<AuthorizationResponse> Handle(HandlerContext context)
+        public override async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
         {
             try
             {
-                var result = await base.BuildResponse(context);
+                var result = await base.BuildResponse(context, token);
                 var display = context.Request.Data.GetDisplayFromAuthorizationRequest();
                 if (!string.IsNullOrWhiteSpace(display))
                 {
