@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
@@ -45,7 +46,6 @@ namespace SimpleIdServer.OpenID.UI
         {
             ViewBag.SuccessMessage = msg;
         }
-
 
         protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, OAuthUser user, CancellationToken token, bool rememberLogin = false)
         {

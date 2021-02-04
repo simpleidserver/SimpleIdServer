@@ -14,6 +14,11 @@ namespace SimpleIdServer.OAuth.Options
             ClientSecretExpirationInSeconds = null;
             SoftwareStatementTrustedParties = new List<SoftwareStatementTrustedParty>();
             DefaultCulture = "en";
+            SupportedUICultures = new List<UICultureOption>
+            {
+                new UICultureOption("fr", "French"),
+                new UICultureOption("en", "English")
+            };
         }
 
         /// <summary>
@@ -36,5 +41,9 @@ namespace SimpleIdServer.OAuth.Options
         /// Set the default UI culture.
         /// </summary>
         public string DefaultCulture { get; set; }
+        /// <summary>
+        /// Supported cultures.
+        /// </summary>
+        public IEnumerable<UICultureOption> SupportedUICultures { get; set; }
     }
 }

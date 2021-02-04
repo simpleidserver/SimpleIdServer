@@ -74,7 +74,13 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 var queryCollection = new QueryBuilder(parameters);
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
                 var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
-                url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new { ReturnUrl = _dataProtector.Protect(returnUrl), area = redirectActionAuthorizationResponse.Area });
+                var uiLocales = context.Request.Data.GetUILocalesFromAuthorizationRequest();
+                url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
+                {
+                    ReturnUrl = _dataProtector.Protect(returnUrl),
+                    area = redirectActionAuthorizationResponse.Area,
+                    ui_locales = string.Join(" ", uiLocales)
+                });
                 HttpContext.Response.Redirect(url);
             }
             catch(OAuthException ex)

@@ -21,7 +21,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
         private readonly IPasswordAuthService _passwordAuthService;
 
         public AuthenticateController(
-            IPasswordAuthService passwordAuthService, 
+            IPasswordAuthService passwordAuthService,
             IDataProtectionProvider dataProtectionProvider, 
             IAmrHelper amrHelper, 
             IOAuthClientQueryRepository oauthClientRepository,

@@ -1,36 +1,46 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.OAuth;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace SimpleIdServer.OpenID.Extensions
 {
     public static class TranslationHelper
     {
-        public static CultureInfo GetCulture(IEnumerable<string> requestedCultures, string defaultCulture = null)
+        public static CultureInfo GetCulture(IEnumerable<string> requestedCultures, IEnumerable<UICultureOption> uiCultures)
         {
-            var rootDir = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            var supportedCultures = from c in CultureInfo.GetCultures(CultureTypes.AllCultures)
-                                    join d in rootDir.EnumerateDirectories() on c.IetfLanguageTag equals d.Name
-                                    select c;
-            var culture = requestedCultures.FirstOrDefault(r => supportedCultures.Any(sc => sc.Name == r));
-            if (culture == null && !string.IsNullOrWhiteSpace(defaultCulture))
+            var culture = requestedCultures.FirstOrDefault(r => uiCultures.Any(sc => sc.Name == r));
+            if (culture == null)
             {
-                culture = defaultCulture;
+                return null;
             }
 
             return new CultureInfo(culture);
         }
 
-        public static string SwitchCulture(IEnumerable<string> requestedCultures, string defaultCulture)
+        public static bool TrySwitchCulture(IEnumerable<string> requestedCultures, IEnumerable<UICultureOption> uiCultures)
         {
-            var cultureInfo = GetCulture(requestedCultures, defaultCulture);
+            var cultureInfo = GetCulture(requestedCultures, uiCultures);
+            if (cultureInfo != null)
+            {
+                SwitchCulture(cultureInfo);
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void SwitchCulture(string language)
+        {
+            SwitchCulture(new CultureInfo(language));
+        }
+
+        public static void SwitchCulture(CultureInfo cultureInfo)
+        {
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-            return cultureInfo.Name;
         }
     }
 }

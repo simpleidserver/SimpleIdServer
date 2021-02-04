@@ -14,6 +14,7 @@ using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -53,7 +54,6 @@ namespace SimpleIdServer.OpenID.UI
             {
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
-                var uiLocales = query.GetUILocalesFromAuthorizationRequest();
                 var cancellationUrl = query.GetRedirectUriFromAuthorizationRequest();
                 if (!string.IsNullOrWhiteSpace(cancellationUrl))
                 {
@@ -68,7 +68,7 @@ namespace SimpleIdServer.OpenID.UI
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId);
-                var defaultLanguage = TranslationHelper.SwitchCulture(uiLocales, _oauthHostOptions.DefaultCulture);
+                var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _oauthHostOptions.DefaultCulture;
                 var consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                 var claimDescriptions = new List<string>();
                 if (claims != null && claims.Any())

@@ -243,4 +243,16 @@
   <data name="revoke_session_title" xml:space="preserve">
     <value>Revoke session</value>
   </data>
+  <data name="languages" xml:space="preserve">
+    <value>Languages</value>
+  </data>
+  <data name="en" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="fr" xml:space="preserve">
+    <value>French</value>
+  </data>
+  <data name="selected_language" xml:space="preserve">
+    <value>Current language is '{0}'</value>
+  </data>
 </root>

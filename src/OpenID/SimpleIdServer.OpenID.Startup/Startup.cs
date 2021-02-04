@@ -83,6 +83,7 @@ namespace SimpleIdServer.OpenID.Startup
             }
 
             app.UseForwardedHeaders();
+            app.UseRequestCulture();
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseStaticFiles();

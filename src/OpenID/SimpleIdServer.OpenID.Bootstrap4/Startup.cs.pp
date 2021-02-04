@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,6 +12,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace $rootnamespace$
@@ -37,23 +40,48 @@ namespace $rootnamespace$
                     KeyOperations.Verify
                 }).SetAlg(rsa, "RS256").Build();
             }
-
+            
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
             services.AddMvc();
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-            services.AddSIDOpenID()
+            services.AddSIDOpenID(opt =>
+                {
+                    opt.IsLocalhostAllowed = true;
+                    opt.IsRedirectionUrlHTTPSRequired = false;
+                }, opt =>
+                {
+                    opt.DefaultScopes = new List<string>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile.Name,
+                        SIDOpenIdConstants.StandardScopes.Email.Name,
+                        SIDOpenIdConstants.StandardScopes.Address.Name,
+                        SIDOpenIdConstants.StandardScopes.Phone.Name
+                    };
+                })
                 .AddClients(DefaultConfiguration.Clients)
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddScopes(DefaultConfiguration.Scopes)
-                .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey });
+                // .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
+                .AddLoginPasswordAuthentication();
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            if (_configuration.GetChildren().Any(i => i.Key == "pathBase"))
+            {
+                app.UsePathBase(_configuration["pathBase"]);
+            }
+
+            app.UseForwardedHeaders();
+            app.UseRequestCulture();
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseStaticFiles();
