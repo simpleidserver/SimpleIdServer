@@ -7,6 +7,8 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenID.DTOs;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 {
@@ -23,7 +25,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
         public string ResponseType => "id_token";
         public int Order => 3;
 
-        public void Enrich(HandlerContext context)
+        public Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopes = new string[1] { SIDOpenIdConstants.StandardScopes.OpenIdScope.Name };
             if (!context.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.AccessToken, out string accessToken))
@@ -31,7 +33,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
                 scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
             }
 
-            _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(scopes, context);
+            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(scopes, context, cancellationToken);
         }
     }
 }

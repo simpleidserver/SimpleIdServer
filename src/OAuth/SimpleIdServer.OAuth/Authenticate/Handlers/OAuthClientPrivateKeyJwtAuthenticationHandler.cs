@@ -7,6 +7,7 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Authenticate.Handlers
@@ -24,7 +25,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
         public string AuthMethod => "private_key_jwt";
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
         {
             if (authenticateInstruction == null)
             {

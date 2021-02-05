@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
@@ -34,8 +35,18 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
         private readonly IOAuthUserQueryRepository _oauthUserRepository;
         private readonly IOAuthClientQueryRepository _oauthClientRepository;
         private readonly IEnumerable<IClaimsSource> _claimsSources;
+        private readonly ITokenQueryRepository _tokenQueryRepository;
+        private readonly ILogger<UserInfoController> _logger;
 
-        public UserInfoController(IJwtParser jwtParser, IJwtBuilder jwtBuilder, IOAuthScopeQueryRepository oauthScopeRepository, IOAuthUserQueryRepository oauthUserRepository, IOAuthClientQueryRepository oauthClientRepository, IEnumerable<IClaimsSource> claimsSources)
+        public UserInfoController(
+            IJwtParser jwtParser,
+            IJwtBuilder jwtBuilder,
+            IOAuthScopeQueryRepository oauthScopeRepository,
+            IOAuthUserQueryRepository oauthUserRepository,
+            IOAuthClientQueryRepository oauthClientRepository,
+            IEnumerable<IClaimsSource> claimsSources,
+            ITokenQueryRepository tokenQueryRepository,
+            ILogger<UserInfoController> logger)
         {
             _jwtParser = jwtParser;
             _jwtBuilder = jwtBuilder;
@@ -43,6 +54,8 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             _oauthUserRepository = oauthUserRepository;
             _oauthClientRepository = oauthClientRepository;
             _claimsSources = claimsSources;
+            _tokenQueryRepository = tokenQueryRepository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -75,7 +88,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             }
         }
 
-        private async Task<IActionResult> Common(JObject content, CancellationToken token)
+        private async Task<IActionResult> Common(JObject content, CancellationToken cancellationToken)
         {
             try
             {
@@ -91,13 +104,13 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 var audiences = jwsPayload.GetAudiences();
                 var claims = jwsPayload.GetClaims();
                 var authTime = jwsPayload.GetAuthTime();
-                var user = await _oauthUserRepository.FindOAuthUserByLogin(subject, token);
+                var user = await _oauthUserRepository.FindOAuthUserByLogin(subject, cancellationToken);
                 if (user == null)
                 {
                     return new UnauthorizedResult();
                 }
 
-                var filteredClients = await _oauthClientRepository.FindOAuthClientByIds(audiences, token);
+                var filteredClients = await _oauthClientRepository.FindOAuthClientByIds(audiences, cancellationToken);
                 if (!filteredClients.Any())
                 {
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.INVALID_AUDIENCE);
@@ -109,7 +122,14 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
                 }
 
-                var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, token)).Cast<OpenIdScope>();
+                var token = await _tokenQueryRepository.Get(accessToken, cancellationToken);
+                if (token == null)
+                {
+                    _logger.LogError("Cannot get user information because access token has been rejected");
+                    throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.ACCESS_TOKEN_REJECTED);
+                }
+
+                var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken)).Cast<OpenIdScope>();
                 var payload = new JwsPayload();
                 IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user);
                 IdTokenBuilder.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);

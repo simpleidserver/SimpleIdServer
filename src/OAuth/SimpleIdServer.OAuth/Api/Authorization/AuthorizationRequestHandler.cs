@@ -65,7 +65,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
         }
 
-        protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken token)
+        protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
         {
             var requestedResponseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
             if (!requestedResponseTypes.Any())
@@ -81,7 +81,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
 
             context.SetClient(await Validate(context.Request.Data));
-            context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, token));
+            context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, cancellationToken));
             foreach (var validator in _authorizationRequestValidators)
             {
                 await validator.Validate(context);
@@ -102,7 +102,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
 
             foreach (var responseTypeHandler in responseTypeHandlers)
             {
-                responseTypeHandler.Enrich(context);
+                await responseTypeHandler.Enrich(context, cancellationToken);
             }
 
             _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

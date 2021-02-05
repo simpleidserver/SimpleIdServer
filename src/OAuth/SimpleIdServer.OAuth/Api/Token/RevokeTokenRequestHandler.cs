@@ -1,21 +1,20 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
-using System;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token
 {
     public interface IRevokeTokenRequestHandler
     {
-        Task Handle(JObject jObjHeader, JObject jObjBody, string issuerName);
+        Task Handle(JObject jObjHeader, JObject jObjBody, string issuerName, CancellationToken token);
     }
 
     public class RevokeTokenRequestHandler : IRevokeTokenRequestHandler
@@ -23,25 +22,52 @@ namespace SimpleIdServer.OAuth.Api.Token
         private readonly IRevokeTokenValidator _revokeTokenValidator;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IClientAuthenticationHelper _clientAuthenticationHelper;
+        private readonly ILogger<RevokeTokenRequestHandler> _logger;
 
-        public RevokeTokenRequestHandler(IRevokeTokenValidator revokeTokenValidator, IGrantedTokenHelper grantedTokenHelper, IClientAuthenticationHelper clientAuthenticationHelper)
+        public RevokeTokenRequestHandler(
+            IRevokeTokenValidator revokeTokenValidator, 
+            IGrantedTokenHelper grantedTokenHelper, 
+            IClientAuthenticationHelper clientAuthenticationHelper,
+            ILogger<RevokeTokenRequestHandler> logger)
         {
             _revokeTokenValidator = revokeTokenValidator;
             _grantedTokenHelper = grantedTokenHelper;
             _clientAuthenticationHelper = clientAuthenticationHelper;
+            _logger = logger;
         }
 
-        public async Task Handle(JObject jObjHeader, JObject jObjBody, string issuerName)
+        public async Task Handle(JObject jObjHeader, JObject jObjBody, string issuerName, CancellationToken cancellationToken)
         {
-            _revokeTokenValidator.Validate(jObjBody);
-            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(jObjBody, jObjBody, issuerName).ConfigureAwait(false);
-            var refreshToken = _grantedTokenHelper.GetRefreshToken(jObjBody.GetStr(RevokeTokenRequestParameters.Token));
-            if (refreshToken != null && !refreshToken.GetClientIdFromAuthorizationRequest().Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
+            var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
+            var validationResult = _revokeTokenValidator.Validate(jObjBody);
+            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(jObjBody, jObjBody, issuerName, cancellationToken);
+            bool isAccessTokenRemoved = false, isRefreshTokenRemoved = false;
+            if (validationResult.TokenTypeHint == TokenResponseParameters.AccessToken)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
+                isAccessTokenRemoved = await _grantedTokenHelper.TryRemoveAccessToken(token, oauthClient.ClientId, cancellationToken);
+            }
+            else if (validationResult.TokenTypeHint == TokenResponseParameters.RefreshToken)
+            {
+                isRefreshTokenRemoved = await _grantedTokenHelper.TryRemoveRefreshToken(token, oauthClient.ClientId, cancellationToken);
+            }
+            else
+            {
+                isAccessTokenRemoved = await _grantedTokenHelper.TryRemoveAccessToken(token, oauthClient.ClientId, cancellationToken);
+                if (!isAccessTokenRemoved)
+                {
+                    isRefreshTokenRemoved = await _grantedTokenHelper.TryRemoveRefreshToken(token, oauthClient.ClientId, cancellationToken);
+                }
             }
 
-            _grantedTokenHelper.RemoveRefreshToken(jObjBody.GetStr(RevokeTokenRequestParameters.Token));
+            if (isRefreshTokenRemoved)
+            {
+                _logger.LogInformation($"refresh token '{token}' has been removed");
+            }
+
+            if (isAccessTokenRemoved)
+            {
+                _logger.LogInformation($"access token '{token}' has been removed");
+            }
         }
     }
 }

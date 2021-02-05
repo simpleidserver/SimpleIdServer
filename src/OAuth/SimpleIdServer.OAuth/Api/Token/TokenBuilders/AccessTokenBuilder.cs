@@ -24,7 +24,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.AccessToken;
 
-        public async virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
+        public async virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken, JObject claims = null)
         {
             var jwsPayload = _grantedTokenHelper.BuildAccessToken(new[]
             {
@@ -38,14 +38,21 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
                 }
             }
 
+            var authorizationCode = string.Empty;
+            if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
+            {
+                authorizationCode = handlerContext.Request.Data.GetAuthorizationCode();
+            }
+
             var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, jwsPayload);
+            await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }
 
-        public virtual Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken token)
+        public virtual Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
-            return Build(scopes, currentContext);
+            return Build(scopes, currentContext, cancellationToken);
         }
     }
 }

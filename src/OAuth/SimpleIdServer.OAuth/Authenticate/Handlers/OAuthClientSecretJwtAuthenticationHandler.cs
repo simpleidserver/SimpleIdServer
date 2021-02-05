@@ -7,24 +7,23 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Authenticate.Handlers
 {
     public class OAuthClientSecretJwtAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        private readonly IJwsGenerator _jwsGenerator;
         private readonly IJwtParser _jwtParser;
 
-        public OAuthClientSecretJwtAuthenticationHandler(IJwsGenerator jwsGenerator, IJwtParser jwtParser)
+        public OAuthClientSecretJwtAuthenticationHandler(IJwtParser jwtParser)
         {
-            _jwsGenerator = jwsGenerator;
             _jwtParser = jwtParser;
         }
 
         public string AuthMethod => "client_secret_jwt";
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
         {
             if (authenticateInstruction == null)
             {

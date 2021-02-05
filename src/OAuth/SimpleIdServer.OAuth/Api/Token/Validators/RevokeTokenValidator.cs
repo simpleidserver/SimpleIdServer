@@ -4,28 +4,55 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.OAuth.Api.Token.Validators
 {
     public interface IRevokeTokenValidator
     {
-        void Validate(JObject jObjBody);
+        RevokeTokenValidationResult Validate(JObject jObjBody);
+    }
+
+    public class RevokeTokenValidationResult
+    {
+        public RevokeTokenValidationResult(string token, string tokenTypeHint)
+        {
+            Token = token;
+            TokenTypeHint = tokenTypeHint;
+        }
+
+        public string Token { get; set; }
+        public string TokenTypeHint { get; set; }
     }
 
     public class RevokeTokenValidator : IRevokeTokenValidator
     {
-        public void Validate(JObject jObjBody)
+        public RevokeTokenValidationResult Validate(JObject jObjBody)
         {
-            if (string.IsNullOrWhiteSpace(jObjBody.GetStr(RevokeTokenRequestParameters.Token)))
+            var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
+            if (string.IsNullOrWhiteSpace(token))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RevokeTokenRequestParameters.Token));
             }
 
             var tokenTypeHint = jObjBody.GetStr(RevokeTokenRequestParameters.TokenTypeHint);
-            if (!string.IsNullOrWhiteSpace(tokenTypeHint) && tokenTypeHint != "access_token" && tokenTypeHint != "refresh_token")
+            var supportedTokens = GetSupportedTokens();
+            if (!string.IsNullOrWhiteSpace(tokenTypeHint) && supportedTokens.Contains(tokenTypeHint))
             {
-                throw new OAuthException(ErrorCodes.UNSUPPORTED_TOKEN_TYPE, string.Format(ErrorMessages.UNKNOWN_REFRESH_TOKEN_HINT, tokenTypeHint));
+                throw new OAuthException(ErrorCodes.UNSUPPORTED_TOKEN_TYPE, string.Format(ErrorMessages.UNKNOWN_TOKEN_TYPE_HINT, tokenTypeHint));
             }
+
+            return new RevokeTokenValidationResult(token, tokenTypeHint);
+        }
+
+        protected virtual IEnumerable<string> GetSupportedTokens()
+        {
+            return new string[]
+            {
+                TokenResponseParameters.AccessToken,
+                TokenResponseParameters.RefreshToken
+            };
         }
     }
 }

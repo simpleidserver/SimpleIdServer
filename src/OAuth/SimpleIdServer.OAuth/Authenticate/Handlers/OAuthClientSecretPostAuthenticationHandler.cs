@@ -4,6 +4,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Authenticate.Handlers
@@ -14,7 +15,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
         public string AuthMethod => "client_secret_post";
 
-        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer)
+        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
         {
             if (authenticateInstruction == null)
             {

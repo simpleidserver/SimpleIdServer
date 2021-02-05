@@ -8,6 +8,8 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenID.DTOs;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
@@ -25,7 +27,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
         public string ResponseType => "token";
         public int Order => 2;
 
-        public void Enrich(HandlerContext context)
+        public Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
             var dic = new JObject
             {
@@ -41,7 +43,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
                 dic.Add(OAuthClaims.Claims, context.Request.Data[AuthorizationRequestParameters.Claims]);
             }
 
-            _tokenBuilders.First(t => t.Name == OAuth.DTOs.AuthorizationResponseParameters.AccessToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context, dic);
+            return _tokenBuilders.First(t => t.Name == OAuth.DTOs.AuthorizationResponseParameters.AccessToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context, cancellationToken, dic);
         }
     }
 }

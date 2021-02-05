@@ -14,6 +14,7 @@ namespace SimpleIdServer.OAuth.Options
             ClientSecretExpirationInSeconds = null;
             SoftwareStatementTrustedParties = new List<SoftwareStatementTrustedParty>();
             DefaultCulture = "en";
+            AuthorizationCodeExpirationInSeconds = 10 * 60;
             SupportedUICultures = new List<UICultureOption>
             {
                 new UICultureOption("fr", "French"),
@@ -33,6 +34,10 @@ namespace SimpleIdServer.OAuth.Options
         /// Client secret expiration time in seconds.
         /// </summary>
         public int? ClientSecretExpirationInSeconds { get; set; }
+        /// <summary>
+        /// Authorization cod expiration time in seconds.
+        /// </summary>
+        public int AuthorizationCodeExpirationInSeconds { get; set; }
         /// <summary>
         /// Trusted parties used to validate the software statement.
         /// </summary>

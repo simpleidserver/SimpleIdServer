@@ -4,35 +4,80 @@ using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
+using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OAuth.Persistence.Parameters;
+using SimpleIdServer.OAuth.Persistence.Results;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OAuth.Helpers
 {
     public interface IGrantedTokenHelper
-    {
+    {    
+        Task<SearchResult<Token>> SearchTokens(SearchTokenParameter parameter, CancellationToken cancellationToken);
+        Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
+        Task<bool> AddToken(Token token, CancellationToken cancellationToken);
         JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
         JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
+        Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken);
+        Task<JwsPayload> GetAccessToken(string accessToken, CancellationToken cancellationToken);
+        Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
         void RefreshAccessToken(JwsPayload jwsPayload, double validityPeriodsInSeconds);
-        string BuildRefreshToken(JObject jwsPayload, double validityPeriodsInSeconds);
-        JObject GetRefreshToken(string refreshToken);
-        void RemoveRefreshToken(string refreshToken);
-        string BuildAuthorizationCode(JObject authorizationRequest);
-        JObject GetAuthorizationCode(string code);
-        void RemoveAuthorizationCode(string code);
+        Task<string> AddRefreshToken(string clientId, string authorizationCode, JObject jwsPayload, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<Token> GetRefreshToken(string refreshToken, CancellationToken cancellationToken);
+        Task RemoveRefreshToken(string refreshToken, CancellationToken cancellationToken);
+        Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken);
+        Task<string> AddAuthorizationCode(JObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<JObject> GetAuthorizationCode(string code, CancellationToken cancellationToken);
+        Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
     }
 
     public class GrantedTokenHelper : IGrantedTokenHelper
     {
         private readonly IDistributedCache _distributedCache;
+        private readonly ITokenCommandRepository _tokenCommandRepository;
+        private readonly ITokenQueryRepository _tokenQueryRepository;
 
-        public GrantedTokenHelper(IDistributedCache distributedCache)
+        public GrantedTokenHelper(IDistributedCache distributedCache, ITokenCommandRepository tokenCommandRepository, ITokenQueryRepository tokenQueryRepository)
         {
             _distributedCache = distributedCache;
+            _tokenCommandRepository = tokenCommandRepository;
+            _tokenQueryRepository = tokenQueryRepository;
         }
+
+        #region Tokens
+
+        public Task<SearchResult<Token>> SearchTokens(SearchTokenParameter parameter, CancellationToken cancellationToken)
+        {
+            return _tokenQueryRepository.Find(parameter, cancellationToken);
+        }
+
+        public async Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken)
+        {
+            foreach(var token in tokens)
+            {
+                await _tokenCommandRepository.Delete(token, cancellationToken);
+            }
+
+            await _tokenCommandRepository.SaveChanges(cancellationToken);
+            return true;
+        }
+
+        public Task<bool> AddToken(Token token, CancellationToken cancellationToken)
+        {
+            return _tokenCommandRepository.Add(token, cancellationToken);
+        }
+
+        #endregion
+
+        #region Access token
 
         public JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName)
         {
@@ -51,6 +96,49 @@ namespace SimpleIdServer.OAuth.Helpers
             return jwsPayload;
         }
 
+        public async Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken)
+        {
+            await _tokenCommandRepository.Add(new Token
+            {
+                Id = token,
+                ClientId = clientId,
+                CreateDateTime = DateTime.UtcNow,
+                TokenType = DTOs.TokenResponseParameters.AccessToken,
+                AuthorizationCode = authorizationCode
+            }, cancellationToken);
+            await _tokenCommandRepository.SaveChanges(cancellationToken);
+            return true;
+        }
+
+        public async Task<JwsPayload> GetAccessToken(string accessToken, CancellationToken cancellationToken)
+        {
+            var result = await _tokenQueryRepository.Get(accessToken, cancellationToken);
+            if (result == null)
+            {
+                return null;
+            }
+
+            return JsonConvert.DeserializeObject<JwsPayload>(result.Data);
+        }
+
+        public async Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken)
+        {
+            var result = await _tokenQueryRepository.Get(accessToken,cancellationToken);
+            if (result == null)
+            {
+                return false;
+            }
+
+            if (result.ClientId != clientId)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
+            }
+
+            await _tokenCommandRepository.Delete(result, cancellationToken);
+            await _tokenCommandRepository.SaveChanges(cancellationToken);
+            return true;
+        }
+
         public void RefreshAccessToken(JwsPayload jwsPayload, double validityPeriodsInSeconds)
         {
             var currentDateTime = DateTime.UtcNow;
@@ -59,19 +147,68 @@ namespace SimpleIdServer.OAuth.Helpers
             jwsPayload[OAuthClaims.ExpirationTime] = expirationDateTime.ConvertToUnixTimestamp();
         }
 
-        public string BuildRefreshToken(JObject request, double validityPeriodsInSeconds)
+        #endregion
+
+        #region Refresh token
+
+        public async Task<Token> GetRefreshToken(string refreshToken, CancellationToken token)
+        {
+            var cache = await _tokenQueryRepository.Get(refreshToken, token);
+            if (cache == null)
+            {
+                return null;
+            }
+
+            return cache;
+        }
+
+        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, JObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
             var refreshToken = Guid.NewGuid().ToString();
-            _distributedCache.Set(refreshToken, Encoding.UTF8.GetBytes(request.ToString()), new DistributedCacheEntryOptions
+            await _tokenCommandRepository.Add(new Token
             {
-                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
-            });
+                Id = refreshToken,
+                TokenType = DTOs.TokenResponseParameters.RefreshToken,
+                ClientId = clientId,
+                Data = request.ToString(),
+                AuthorizationCode = authorizationCode,
+                ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
+                CreateDateTime = DateTime.UtcNow,
+            }, cancellationToken);
+            await _tokenCommandRepository.SaveChanges(cancellationToken);
             return refreshToken;
         }
 
-        public JObject GetRefreshToken(string refreshToken)
+        public Task RemoveRefreshToken(string refreshToken, CancellationToken token)
         {
-            var cache = _distributedCache.Get(refreshToken);
+            return _distributedCache.RemoveAsync(refreshToken, token);
+        }
+
+        public async Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken)
+        {
+            var result = await _tokenQueryRepository.Get(refreshToken, cancellationToken);
+            if (result == null)
+            {
+                return false;
+            }
+
+            if (result.ClientId != clientId)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
+            }
+
+            await _tokenCommandRepository.Delete(result, cancellationToken);
+            await _tokenCommandRepository.SaveChanges(cancellationToken);
+            return true;
+        }
+
+        #endregion
+
+        #region Authorization code
+
+        public async Task<JObject> GetAuthorizationCode(string code, CancellationToken token)
+        {
+            var cache = await _distributedCache.GetAsync(code, token);
             if (cache == null)
             {
                 return null;
@@ -80,35 +217,24 @@ namespace SimpleIdServer.OAuth.Helpers
             return JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(cache));
         }
 
-        public void RemoveRefreshToken(string refreshToken)
-        {
-            _distributedCache.Remove(refreshToken);
-        }
-
-        public string BuildAuthorizationCode(JObject request)
+        public async Task<string> AddAuthorizationCode(JObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
             var code = Guid.NewGuid().ToString();
-            _distributedCache.Set(code, Encoding.UTF8.GetBytes(request.ToString()));
+            await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(request.ToString()), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
             return code;
         }
 
-        public JObject GetAuthorizationCode(string code)
+        public Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken)
         {
-            var cache = _distributedCache.Get(code);
-            if (cache == null)
-            {
-                return null;
-            }
-
-            return JsonConvert.DeserializeObject<JObject>(Encoding.UTF8.GetString(cache));
+            return _distributedCache.RemoveAsync(code, cancellationToken);
         }
 
-        public void RemoveAuthorizationCode(string code)
-        {
-            _distributedCache.Remove(code);
-        }
+        #endregion
 
-        private void AddExpirationAndIssueTime(JwsPayload jwsPayload, double validityPeriodsInSeconds)
+        private static void AddExpirationAndIssueTime(JwsPayload jwsPayload, double validityPeriodsInSeconds)
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationDateTime = currentDateTime.AddSeconds(validityPeriodsInSeconds);

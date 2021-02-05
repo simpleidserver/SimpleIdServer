@@ -530,12 +530,12 @@ Scenario: Error is returned when request parameter contains an invalid client id
 	| client_id		| invalid		|
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | $request$   |
+	| state         | state       |
 	
 	And extract JSON from body
 	

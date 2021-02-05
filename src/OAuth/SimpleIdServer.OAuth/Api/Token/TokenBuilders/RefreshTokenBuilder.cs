@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
         public string Name => TokenResponseParameters.RefreshToken;
 
-        public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
+        public virtual async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken, JObject claims = null)
         {
             var dic = new JObject();
             if (handlerContext.Request.Data != null)
@@ -32,16 +33,22 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
                 }
             }
 
-            var refreshToken = _grantedTokenHelper.BuildRefreshToken(dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds);
+            var authorizationCode = string.Empty;
+            if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
+            {
+                authorizationCode = handlerContext.Request.Data.GetAuthorizationCode();
+            }
+
+            var refreshToken = await _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
-            return Task.FromResult(0);
         }
 
-        public virtual Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)
+        public virtual async Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var refreshToken = _grantedTokenHelper.BuildRefreshToken(previousQueryParameters, handlerContext.Client.RefreshTokenExpirationTimeInSeconds);
+            var authorizationCode = string.Empty;
+            handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
+            var refreshToken = await  _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, previousQueryParameters, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
-            return Task.FromResult(0);
         }
     }
 }

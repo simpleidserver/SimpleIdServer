@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
 
@@ -13,7 +14,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
     {
         public OpenIDRefreshTokenBuilder(IGrantedTokenHelper grantedTokenHelper) : base(grantedTokenHelper) { }
 
-        public override Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, JObject claims = null)
+        public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken, JObject claims = null)
         {
             var dic = new JObject();
             if (handlerContext.Request.Data != null)
@@ -29,9 +30,10 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
                 dic.Add(UserClaims.Subject, handlerContext.User.Id);
             }
 
-            var refreshToken = GrantedTokenHelper.BuildRefreshToken(dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds);
+            var authorizationCode = string.Empty;
+            handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
+            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
-            return Task.FromResult(0);
         }
     }
 }

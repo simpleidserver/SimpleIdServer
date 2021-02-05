@@ -5,6 +5,8 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 {
@@ -23,9 +25,9 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
         public string ResponseType => RESPONSE_TYPE;
         public int Order => 2;
 
-        public void Enrich(HandlerContext context)
+        public Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
-            _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context);
+            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context, cancellationToken);
         }
     }
 }

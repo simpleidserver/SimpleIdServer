@@ -33,18 +33,18 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         public const string GRANT_TYPE = "client_credentials";
         public override string GrantType { get => GRANT_TYPE; }
 
-        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
+        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             try
             {
                 _clientCredentialsGrantTypeValidator.Validate(context);
-                var oauthClient = await AuthenticateClient(context);
+                var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var scopes = ScopeHelper.Validate(context.Request.Data.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Build(scopes, context).ConfigureAwait(false);
+                    await tokenBuilder.Build(scopes, context, cancellationToken);
                 }
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

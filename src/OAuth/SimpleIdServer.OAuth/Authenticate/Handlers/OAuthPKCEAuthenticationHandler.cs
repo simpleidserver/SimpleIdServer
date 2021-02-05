@@ -8,6 +8,7 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Authenticate.Handlers
@@ -26,7 +27,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "pkce";
         public string AuthMethod => AUTH_METHOD;
 
-        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
         {
             var codeVerifier = authenticateInstruction.RequestData.GetCodeVerifier();
             if (string.IsNullOrWhiteSpace(codeVerifier))
@@ -37,13 +38,13 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             var code = authenticateInstruction.RequestData.GetAuthorizationCode();
             if (code == null)
             {
-                return Task.FromResult(false);
+                return false;
             }
 
-            var previousRequest = _grantedTokenHelper.GetAuthorizationCode(code);
+            var previousRequest = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
             if (previousRequest == null)
             {
-                return Task.FromResult(false);
+                return false;
             }
 
             var codeChallenge = previousRequest.GetCodeChallengeFromAuthorizationRequest();
@@ -60,7 +61,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_CODE_VERIFIER);
             }
 
-            return Task.FromResult(true);
+            return true;
         }
     }
 }

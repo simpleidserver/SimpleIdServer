@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Authorization - Copier.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Accounts\Index.cshtml">
@@ -55,6 +56,11 @@
     </Compile>
     <Compile Update="Features\RegisterErrors.feature.cs">
       <DependentUpon>RegisterErrors.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\TokenErrors.feature.cs">
+      <DependentUpon>TokenErrors.feature</DependentUpon>
+      <LastGenOutput>Token.feature.feature.cs</LastGenOutput>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
     </Compile>
     <Compile Update="Features\Token.feature.cs">
       <DependentUpon>%(Filename)</DependentUpon>
@@ -106,6 +112,11 @@
       <Generator>SpecFlowSingleFileGenerator</Generator>
     </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\RegisterErrors.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\TokenErrors.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <Generator>SpecFlowSingleFileGenerator</Generator>

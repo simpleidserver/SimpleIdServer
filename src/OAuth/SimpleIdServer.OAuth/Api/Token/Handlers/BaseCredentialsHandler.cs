@@ -23,11 +23,11 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         }
 
         public abstract string GrantType { get; }
-        public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken token);
+        public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken);
 
-        protected async Task<OAuthClient> AuthenticateClient(HandlerContext context)
+        protected async Task<OAuthClient> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
         {
-            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.Data, context.Request.IssuerName).ConfigureAwait(false);
+            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.Data, context.Request.IssuerName, cancellationToken);
             if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.BAD_CLIENT_GRANT_TYPE, GrantType));

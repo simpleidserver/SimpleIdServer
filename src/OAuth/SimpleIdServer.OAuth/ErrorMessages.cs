@@ -10,7 +10,7 @@ namespace SimpleIdServer.OAuth
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";
-        public const string UNKNOWN_REFRESH_TOKEN_HINT = "unknown refresh token hint : {0}";
+        public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
@@ -52,5 +52,8 @@ namespace SimpleIdServer.OAuth
         public const string NO_REGISTERED_REDIRECTURI = "no redirect uri has been registered";
         public const string DUPLICATE_JWKS = "jwks and jwks_uri parameters cannot be passed at the same time";
         public const string LOGIN_IS_REQUIRED = "login is required";
+        public const string AUTHORIZATION_CODE_ALREADY_USED = "authorization code has already been used, all tokens previously issued have been revoked";
+        public const string ACCESS_TOKEN_REJECTED = "access token has been rejected";
+        public const string REFRESH_TOKEN_IS_EXPIRED = "refresh token is expired";
     }
 }

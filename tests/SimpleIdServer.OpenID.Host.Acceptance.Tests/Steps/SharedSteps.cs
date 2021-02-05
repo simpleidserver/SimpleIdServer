@@ -241,6 +241,13 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
             var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
             _scenarioContext.Set(jws, name);
+            var tokenCommandRepository = (ITokenCommandRepository)_factory.Server.Host.Services.GetService(typeof(ITokenCommandRepository));
+            tokenCommandRepository.Add(new Token
+            {
+                Id = jws,
+                CreateDateTime = DateTime.UtcNow,
+                TokenType = "access_token"
+            }, CancellationToken.None).Wait();
         }
 
         [When("use '(.*)' JWKS from '(.*)' to encrypt '(.*)' and enc '(.*)' and store the result into '(.*)'")]

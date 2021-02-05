@@ -29,6 +29,7 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.InMemory;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -114,6 +115,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var clients = new List<OAuthClient>();
             var users = new List<OAuthUser>();
             var scopes = new List<OAuthScope>();
+            var tokens = new ConcurrentBag<Token>();
             services.TryAddSingleton<IJsonWebKeyQueryRepository>(new DefaultJsonWebKeyQueryRepository(jsonWebKeys));
             services.TryAddSingleton<IJsonWebKeyCommandRepository>(new DefaultJsonWebKeyCommandRepository(jsonWebKeys));
             services.TryAddSingleton<IOAuthClientQueryRepository>(new DefaultOAuthClientQueryRepository(clients));
@@ -122,6 +124,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IOAuthUserCommandRepository>(new DefaultOAuthUserCommandRepository(users));
             services.TryAddSingleton<IOAuthScopeQueryRepository>(new DefaultOAuthScopeQueryRepository(scopes));
             services.TryAddSingleton<IOAuthScopeCommandRepository>(new DefaultOAuthScopeCommandRepository(scopes));
+            services.TryAddSingleton<ITokenCommandRepository>(new DefaultTokenCommandRepository(tokens));
+            services.TryAddSingleton<ITokenQueryRepository>(new DefaultTokenQueryRepository(tokens));
             return services;
         }
 

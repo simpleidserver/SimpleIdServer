@@ -16,7 +16,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
     {
         public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder) : base(grantedTokenHelper, jwtBuilder) { }        
 
-        public override Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken token)
+        public override Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             var jObj = new JObject();
@@ -25,7 +25,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 jObj.Add(UserClaims.Subject, previousRequest[UserClaims.Subject].ToString());
             }
 
-            return Build(scopes, currentContext, jObj);
+            return Build(scopes, currentContext, cancellationToken, jObj);
         }
     }
 }

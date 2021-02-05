@@ -5,7 +5,6 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -37,13 +36,13 @@ namespace SimpleIdServer.OAuth.Api.Token
         }
 
         [HttpPost("revoke")]
-        public async Task<IActionResult> Revoke()
+        public async Task<IActionResult> Revoke(CancellationToken cancellationToken)
         {
             try
             {
                 var jObjHeader = Request.Headers.ToJObject();
                 var jObjBody = Request.Form.ToJObject();
-                await _revokeTokenRequestHandler.Handle(jObjHeader, jObjBody, Request.GetAbsoluteUriWithVirtualPath());
+                await _revokeTokenRequestHandler.Handle(jObjHeader, jObjBody, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken);
                 return new OkResult();
             }
             catch (OAuthException ex)

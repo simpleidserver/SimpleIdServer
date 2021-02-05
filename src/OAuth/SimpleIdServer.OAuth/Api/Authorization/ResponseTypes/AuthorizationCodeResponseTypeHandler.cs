@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
@@ -8,8 +9,11 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Options;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 {
@@ -17,11 +21,13 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ICodeChallengeMethodHandler> _codeChallengeMethodHandlers;
+        private readonly OAuthHostOptions _options;
 
-        public AuthorizationCodeResponseTypeHandler(IGrantedTokenHelper grantedTokenHelper, IEnumerable<ICodeChallengeMethodHandler> codeChallengeMethodHandlers)
+        public AuthorizationCodeResponseTypeHandler(IGrantedTokenHelper grantedTokenHelper, IEnumerable<ICodeChallengeMethodHandler> codeChallengeMethodHandlers, IOptions<OAuthHostOptions> options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _codeChallengeMethodHandlers = codeChallengeMethodHandlers;
+            _options = options.Value;
         }
 
         public string GrantType => AuthorizationCodeHandler.GRANT_TYPE;
@@ -29,7 +35,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
         public int Order => 1;
         public static string RESPONSE_TYPE = "code";
 
-        public void Enrich(HandlerContext context)
+        public async Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
             var dic = new JObject();
             foreach (var record in context.Request.Data)
@@ -38,7 +44,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
             }
 
             CheckPKCEParameters(context);
-            var authCode = _grantedTokenHelper.BuildAuthorizationCode(dic);
+            var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
         }
 
