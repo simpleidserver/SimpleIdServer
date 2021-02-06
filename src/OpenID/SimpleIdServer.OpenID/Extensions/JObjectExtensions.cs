@@ -126,7 +126,38 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             return result;
+        }
 
+        public static IEnumerable<AuthorizationRequestClaimParameter> ExtractClaims(this JObject jObj, AuthorizationRequestClaimTypes type)
+        {
+            if (jObj == null)
+            {
+                return new AuthorizationRequestClaimParameter[0];
+            }
+
+            var result = new List<AuthorizationRequestClaimParameter>();
+            foreach (var rec in jObj)
+            {
+                var claimName = rec.Key;
+                var child = rec.Value as JObject;
+                if (child != null)
+                {
+                    IEnumerable<string> values = null;
+                    if (child.ContainsKey(ClaimsParameter.Value))
+                    {
+                        values = new[] { child.GetStr(ClaimsParameter.Value) };
+                    }
+
+                    if (child.ContainsKey(ClaimsParameter.Values))
+                    {
+                        values = child.GetArray(ClaimsParameter.Values);
+                    }
+
+                    result.Add(new AuthorizationRequestClaimParameter(claimName, values, child.GetBoolean(ClaimsParameter.Essential), type));
+                }
+            }
+
+            return result;
         }
 
         public static string GetNonceFromAuthorizationRequest(this JObject jObj)
@@ -207,37 +238,5 @@ namespace SimpleIdServer.OpenID.Extensions
         }
 
         #endregion
-
-        private static IEnumerable<AuthorizationRequestClaimParameter> ExtractClaims(JObject jObj, AuthorizationRequestClaimTypes type)
-        {
-            if (jObj == null)
-            {
-                return new AuthorizationRequestClaimParameter[0];
-            }
-
-            var result = new List<AuthorizationRequestClaimParameter>();
-            foreach(var rec in jObj)
-            {
-                var claimName = rec.Key;
-                var child = rec.Value as JObject;
-                if (child != null)
-                {
-                    IEnumerable<string> values = null;
-                    if (child.ContainsKey(ClaimsParameter.Value))
-                    {
-                        values = new[] { child.GetStr(ClaimsParameter.Value) };
-                    }
-
-                    if (child.ContainsKey(ClaimsParameter.Values))
-                    {
-                        values = child.GetArray(ClaimsParameter.Values);
-                    }
-
-                    result.Add(new AuthorizationRequestClaimParameter(claimName, values, child.GetBoolean(ClaimsParameter.Essential), type));
-                }
-            }
-
-            return result;
-        }
     }
 }

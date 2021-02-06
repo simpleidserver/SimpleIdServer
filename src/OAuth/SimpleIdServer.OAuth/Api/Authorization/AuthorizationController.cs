@@ -83,6 +83,23 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 });
                 HttpContext.Response.Redirect(url);
             }
+            catch(OAuthExceptionBadRequestURIException ex)
+            {
+                var state = context.Request.Data.GetStateFromAuthorizationRequest();
+                var jObj = new JObject
+                {
+                    { ErrorResponseParameters.Error, ex.Code },
+                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                };
+                if (!string.IsNullOrWhiteSpace(state))
+                {
+                    jObj.Add(ErrorResponseParameters.State, state);
+                }
+
+                var payload = Encoding.UTF8.GetBytes(jObj.ToString());
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
+            }
             catch(OAuthException ex)
             {
                 var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();

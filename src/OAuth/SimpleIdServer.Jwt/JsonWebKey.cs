@@ -185,6 +185,45 @@ namespace SimpleIdServer.Jwt
             };
         }
 
+        public JObject Serialize()
+        {
+            var result = new JObject
+            {
+                { "kty", MAPPING_KEYTYPEENUM_TO_STR[Kty] },
+                { "use", MAPPING_USAGESENUM_TO_STR[Use] }
+            };
+            if (!string.IsNullOrWhiteSpace(Alg))
+            {
+                result.Add("alg", Alg);
+            }
+
+            if (!string.IsNullOrWhiteSpace(Kid))
+            {
+                result.Add("kid", Kid);
+            }
+
+            if (KeyOps != null && KeyOps.Any())
+            {
+                var jArr = new JArray();
+                foreach(var ko in KeyOps)
+                {
+                    jArr.Add(MAPPING_KEYOPERATIONENUM_TO_STR[ko]);
+                }
+
+                result.Add("key_ops", jArr);
+            }
+
+            if (Content != null && Content.Any())
+            {
+                foreach(var kvp in Content)
+                {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+            }
+
+            return result;
+        }
+
         public JObject GetPublicJwt()
         {
             var result = new JObject

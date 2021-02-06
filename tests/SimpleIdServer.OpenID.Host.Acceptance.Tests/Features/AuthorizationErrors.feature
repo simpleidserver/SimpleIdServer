@@ -19,7 +19,7 @@ Scenario: Check state is returned in the callback url
 	| request_uri   | uri              |
 	| redirect_uri  | http://localhost |
 	
-	And extract query parameters into JSON
+	And extract JSON from body
 
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='redirect uri http://localhost is not correct'
@@ -307,102 +307,6 @@ Scenario: Error is returned when request parameter is a JWS token with an invali
 	
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='the signature algorithm is invalid'
-	
-Scenario: Error is returned when request parameter doesn't contain issuer
-	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
-	| Type | Kid | AlgName |
-	| SIG  | 1   | RS256   |
-
-	And execute HTTP POST JSON request 'http://localhost/register'
-	| Key                          | Value             |
-	| redirect_uris                | [https://web.com] |
-	| scope                        | email             |
-	| request_object_signing_alg   | RS256			   |
-	| jwks						   | $jwks_json$	   |
-	
-	And extract JSON from body
-	And extract parameter 'client_id' from JSON body	
-	
-	And use '1' JWK from 'jwks' to build JWS and store into 'request'
-	| Key           | Value         |
-	| key           | val		    |	
-	
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
-	
-	And extract JSON from body
-	
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='the issuer claim is missing'
-
-Scenario: Error is returned when request parameter contains an invalid issuer
-	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
-	| Type | Kid | AlgName |
-	| SIG  | 1   | RS256   |
-
-	And execute HTTP POST JSON request 'http://localhost/register'
-	| Key                          | Value             |
-	| redirect_uris                | [https://web.com] |
-	| scope                        | email             |
-	| request_object_signing_alg   | RS256			   |
-	| jwks						   | $jwks_json$	   |
-	
-	And extract JSON from body
-	And extract parameter 'client_id' from JSON body	
-	
-	And use '1' JWK from 'jwks' to build JWS and store into 'request'
-	| Key           | Value         |
-	| iss           | invalid	    |	
-	
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
-	
-	And extract JSON from body
-	
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='the issuer claim is invalid'
-
-Scenario: Error is returned when request parameter doesn't contain audience
-	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
-	| Type | Kid | AlgName |
-	| SIG  | 1   | RS256   |
-
-	And execute HTTP POST JSON request 'http://localhost/register'
-	| Key                          | Value             |
-	| redirect_uris                | [https://web.com] |
-	| scope                        | email             |
-	| request_object_signing_alg   | RS256			   |
-	| jwks						   | $jwks_json$	   |
-	
-	And extract JSON from body
-	And extract parameter 'client_id' from JSON body	
-	
-	And use '1' JWK from 'jwks' to build JWS and store into 'request'
-	| Key           | Value         |
-	| iss           | $client_id$   |	
-	
-	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
-	
-	And extract JSON from body
-	
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='the audience claim is missing'
 
 Scenario: Error is returned when request parameter doesn't contain response_type
 	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'

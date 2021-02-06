@@ -29,17 +29,6 @@ Scenario: Error is returned when client_id parameter is missing
 
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='missing parameter client_id'
-
-Scenario: Error is returned when state parameter is missing
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key			| Value													|
-	| response_type | code													|
-	| client_id		| clientId												|
-
-	And extract JSON from body
-
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='missing parameter state'
 	
 Scenario: Error is returned when client doesn't exist
 	When execute HTTP GET request 'http://localhost/authorization'

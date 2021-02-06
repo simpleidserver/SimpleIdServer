@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OpenID.DTOs;
@@ -21,14 +20,15 @@ namespace SimpleIdServer.OpenID.Extensions
             return jwsPayload.GetClaimValue(UserClaims.Name);
         }
 
-        public static IEnumerable<AuthorizationRequestClaimParameter> GetClaims(this JwsPayload jObj)
+        public static IEnumerable<AuthorizationRequestClaimParameter> GetClaimsFromAccessToken(this JwsPayload jObj, AuthorizationRequestClaimTypes type)
         {
             if (!jObj.ContainsKey(AuthorizationRequestParameters.Claims))
             {
                 return new AuthorizationRequestClaimParameter[0];
             }
 
-            return ((JObject)JsonConvert.DeserializeObject(jObj[AuthorizationRequestParameters.Claims].ToString())).GetClaims();
+            var claims = jObj[AuthorizationRequestParameters.Claims] as JObject;
+            return claims.ExtractClaims(type);
         }
     }
 }

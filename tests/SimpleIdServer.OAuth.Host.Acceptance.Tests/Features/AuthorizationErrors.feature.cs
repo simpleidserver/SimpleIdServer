@@ -157,12 +157,12 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.FactAttribute(DisplayName="Error is returned when state parameter is missing")]
+        [Xunit.FactAttribute(DisplayName="Error is returned when client doesn\'t exist")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when state parameter is missing")]
-        public virtual void ErrorIsReturnedWhenStateParameterIsMissing()
+        [Xunit.TraitAttribute("Description", "Error is returned when client doesn\'t exist")]
+        public virtual void ErrorIsReturnedWhenClientDoesntExist()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when state parameter is missing", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client doesn\'t exist", null, ((string[])(null)));
 #line 33
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
@@ -176,47 +176,16 @@ this.ScenarioInitialize(scenarioInfo);
             table4.AddRow(new string[] {
                         "client_id",
                         "clientId"});
-#line 34
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table4, "When ");
-#line 39
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 41
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 42
- testRunner.Then("JSON \'error_description\'=\'missing parameter state\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.FactAttribute(DisplayName="Error is returned when client doesn\'t exist")]
-        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client doesn\'t exist")]
-        public virtual void ErrorIsReturnedWhenClientDoesntExist()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client doesn\'t exist", null, ((string[])(null)));
-#line 44
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
-#line hidden
-            TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table5.AddRow(new string[] {
-                        "response_type",
-                        "code"});
-            table5.AddRow(new string[] {
-                        "client_id",
-                        "clientId"});
-            table5.AddRow(new string[] {
+            table4.AddRow(new string[] {
                         "state",
                         "state"});
-#line 45
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table5, "When ");
-#line 51
+#line 34
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table4, "When ");
+#line 40
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 53
+#line 42
  testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 54
+#line 43
  testRunner.Then("JSON \'error_description\'=\'unknown client clientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -228,7 +197,44 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void ErrorIsReturnedWhenRedirect_UriIsInvalid()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when redirect_uri is invalid", null, ((string[])(null)));
+#line 45
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table5.AddRow(new string[] {
+                        "response_type",
+                        "code"});
+            table5.AddRow(new string[] {
+                        "client_id",
+                        "f3d35cce-de69-45bf-958c-4a8796f8ed37"});
+            table5.AddRow(new string[] {
+                        "state",
+                        "state"});
+            table5.AddRow(new string[] {
+                        "redirect_uri",
+                        "invalid"});
+#line 46
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table5, "When ");
+#line 53
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 55
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 56
+ testRunner.Then("JSON \'error_description\'=\'redirect uri invalid is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when response_mode is not supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when response_mode is not supported")]
+        public virtual void ErrorIsReturnedWhenResponse_ModeIsNotSupported()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when response_mode is not supported", null, ((string[])(null)));
+#line 58
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -246,26 +252,29 @@ this.ScenarioInitialize(scenarioInfo);
                         "state"});
             table6.AddRow(new string[] {
                         "redirect_uri",
+                        "http://localhost:8080"});
+            table6.AddRow(new string[] {
+                        "response_mode",
                         "invalid"});
-#line 57
+#line 59
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table6, "When ");
-#line 64
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 66
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 67
- testRunner.Then("JSON \'error_description\'=\'redirect uri invalid is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 69
+ testRunner.Then("JSON \'error\'=\'unsupported_response_mode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 70
+ testRunner.Then("JSON \'error_description\'=\'response mode invalid is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
-        [Xunit.FactAttribute(DisplayName="Error is returned when response_mode is not supported")]
+        [Xunit.FactAttribute(DisplayName="Error is returned when scope is not supported by the client")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when response_mode is not supported")]
-        public virtual void ErrorIsReturnedWhenResponse_ModeIsNotSupported()
+        [Xunit.TraitAttribute("Description", "Error is returned when scope is not supported by the client")]
+        public virtual void ErrorIsReturnedWhenScopeIsNotSupportedByTheClient()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when response_mode is not supported", null, ((string[])(null)));
-#line 69
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when scope is not supported by the client", null, ((string[])(null)));
+#line 72
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -285,55 +294,15 @@ this.ScenarioInitialize(scenarioInfo);
                         "redirect_uri",
                         "http://localhost:8080"});
             table7.AddRow(new string[] {
-                        "response_mode",
-                        "invalid"});
-#line 70
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table7, "When ");
-#line 78
- testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 80
- testRunner.Then("JSON \'error\'=\'unsupported_response_mode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 81
- testRunner.Then("JSON \'error_description\'=\'response mode invalid is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.FactAttribute(DisplayName="Error is returned when scope is not supported by the client")]
-        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when scope is not supported by the client")]
-        public virtual void ErrorIsReturnedWhenScopeIsNotSupportedByTheClient()
-        {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when scope is not supported by the client", null, ((string[])(null)));
-#line 83
-this.ScenarioInitialize(scenarioInfo);
-            this.ScenarioStart();
-#line hidden
-            TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table8.AddRow(new string[] {
-                        "response_type",
-                        "code"});
-            table8.AddRow(new string[] {
-                        "client_id",
-                        "f3d35cce-de69-45bf-958c-4a8796f8ed37"});
-            table8.AddRow(new string[] {
-                        "state",
-                        "state"});
-            table8.AddRow(new string[] {
-                        "redirect_uri",
-                        "http://localhost:8080"});
-            table8.AddRow(new string[] {
                         "scope",
                         "role"});
-#line 84
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table8, "When ");
-#line 92
+#line 73
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table7, "When ");
+#line 81
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 94
+#line 83
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 95
+#line 84
  testRunner.Then("JSON \'error_description\'=\'scopes role are not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -345,59 +314,59 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void ErrorIsReturnedWhenTheCode_ChallengeParameterIsMissing()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when the code_challenge parameter is missing", null, ((string[])(null)));
-#line 97
+#line 86
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table8.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+            table8.AddRow(new string[] {
+                        "token_endpoint_auth_method",
+                        "pkce"});
+            table8.AddRow(new string[] {
+                        "response_types",
+                        "[code]"});
+            table8.AddRow(new string[] {
+                        "grant_types",
+                        "[authorization_code]"});
+            table8.AddRow(new string[] {
+                        "scope",
+                        "scope1"});
+#line 87
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table8, "When ");
+#line 95
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 96
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 97
+ testRunner.And("add user consent : user=\'administrator\', scope=\'scope1\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
             table9.AddRow(new string[] {
-                        "redirect_uris",
-                        "[http://localhost]"});
-            table9.AddRow(new string[] {
-                        "token_endpoint_auth_method",
-                        "pkce"});
-            table9.AddRow(new string[] {
-                        "response_types",
-                        "[code]"});
-            table9.AddRow(new string[] {
-                        "grant_types",
-                        "[authorization_code]"});
-            table9.AddRow(new string[] {
-                        "scope",
-                        "scope1"});
-#line 98
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table9, "When ");
-#line 106
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 107
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 108
- testRunner.And("add user consent : user=\'administrator\', scope=\'scope1\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table10.AddRow(new string[] {
                         "response_type",
                         "code"});
-            table10.AddRow(new string[] {
+            table9.AddRow(new string[] {
                         "client_id",
                         "$client_id$"});
-            table10.AddRow(new string[] {
+            table9.AddRow(new string[] {
                         "state",
                         "state"});
-            table10.AddRow(new string[] {
+            table9.AddRow(new string[] {
                         "scope",
                         "scope1"});
-#line 110
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table10, "And ");
-#line 117
+#line 99
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table9, "And ");
+#line 106
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 119
+#line 108
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 120
+#line 109
  testRunner.Then("JSON \'error_description\'=\'missing parameter code_challenge\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -409,65 +378,65 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void ErrorIsReturnedWhenTheCode_Challenge_MethodParameterIsInvalid()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when the code_challenge_method parameter is invalid", null, ((string[])(null)));
-#line 122
+#line 111
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table10.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+            table10.AddRow(new string[] {
+                        "token_endpoint_auth_method",
+                        "pkce"});
+            table10.AddRow(new string[] {
+                        "response_types",
+                        "[code]"});
+            table10.AddRow(new string[] {
+                        "grant_types",
+                        "[authorization_code]"});
+            table10.AddRow(new string[] {
+                        "scope",
+                        "scope1"});
+#line 112
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table10, "When ");
+#line 120
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 121
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 122
+ testRunner.And("add user consent : user=\'administrator\', scope=\'scope1\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
             table11.AddRow(new string[] {
-                        "redirect_uris",
-                        "[http://localhost]"});
-            table11.AddRow(new string[] {
-                        "token_endpoint_auth_method",
-                        "pkce"});
-            table11.AddRow(new string[] {
-                        "response_types",
-                        "[code]"});
-            table11.AddRow(new string[] {
-                        "grant_types",
-                        "[authorization_code]"});
-            table11.AddRow(new string[] {
-                        "scope",
-                        "scope1"});
-#line 123
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table11, "When ");
-#line 131
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 132
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 133
- testRunner.And("add user consent : user=\'administrator\', scope=\'scope1\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table12.AddRow(new string[] {
                         "response_type",
                         "code"});
-            table12.AddRow(new string[] {
+            table11.AddRow(new string[] {
                         "client_id",
                         "$client_id$"});
-            table12.AddRow(new string[] {
+            table11.AddRow(new string[] {
                         "state",
                         "state"});
-            table12.AddRow(new string[] {
+            table11.AddRow(new string[] {
                         "scope",
                         "scope1"});
-            table12.AddRow(new string[] {
+            table11.AddRow(new string[] {
                         "code_challenge",
                         "code_challenge"});
-            table12.AddRow(new string[] {
+            table11.AddRow(new string[] {
                         "code_challenge_method",
                         "invalid"});
-#line 135
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table12, "And ");
-#line 144
+#line 124
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table11, "And ");
+#line 133
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 146
+#line 135
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 147
+#line 136
  testRunner.Then("JSON \'error_description\'=\'transform algorithm invalid is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

@@ -575,6 +575,11 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
                 return JArray.FromObject(val.Split(','));
             }
 
+            if (val.StartsWith('{') && val.EndsWith('}'))
+            {
+                return JObject.Parse(val);
+            }
+
             var regularExpression = new Regex(@"\$([a-zA-Z]|_)*\$");
             var result = regularExpression.Replace(val, (m) =>
             {

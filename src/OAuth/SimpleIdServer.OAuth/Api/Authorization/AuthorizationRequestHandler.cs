@@ -121,11 +121,6 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
             }
 
-            if (string.IsNullOrWhiteSpace(state))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.State));
-            }
-
             var client = await _oauthClientRepository.FindOAuthClientById(clientId);
             if (client == null)
             {
@@ -135,7 +130,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             var redirectionUrls = await client.GetRedirectionUrls(_httpClientFactory);
             if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Contains(redirectUri))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_REDIRECT_URI, redirectUri));
+                throw new OAuthExceptionBadRequestURIException(redirectUri);
             }
 
             if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode))

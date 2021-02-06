@@ -86,14 +86,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table16.AddRow(new string[] {
+            table15.AddRow(new string[] {
                         "redirect_uris",
                         "[http://localhost]"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table16, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table15, "When ");
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
@@ -128,65 +128,65 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "redirect_uris",
                         "[http://localhost]"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "response_types",
                         "[token]"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "grant_types",
                         "[implicit]"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "client_name",
                         "name"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "client_name#fr",
                         "nom"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "client_name#en",
                         "name"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "client_uri",
                         "http://localhost"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "client_uri#fr",
                         "http://localhost/fr"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "logo_uri",
                         "http://localhost/1.png"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "logo_uri#fr",
                         "http://localhost/fr/1.png"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "software_id",
                         "software"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "software_version",
                         "1.0"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "token_endpoint_auth_method",
                         "client_secret_basic"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "scope",
                         "scope1"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "contacts",
                         "[addr1,addr2]"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "tos_uri",
                         "http://localhost/tos"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "policy_uri",
                         "http://localhost/policy"});
-            table17.AddRow(new string[] {
+            table16.AddRow(new string[] {
                         "jwks_uri",
                         "http://localhost/jwks"});
 #line 22
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table17, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table16, "When ");
 #line 43
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 45
@@ -247,26 +247,26 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
+            TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table17.AddRow(new string[] {
+                        "iss",
+                        "iss"});
+            table17.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+#line 69
+ testRunner.When("build software statement", ((string)(null)), table17, "When ");
+#line hidden
             TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
             table18.AddRow(new string[] {
-                        "iss",
-                        "iss"});
-            table18.AddRow(new string[] {
-                        "redirect_uris",
-                        "[http://localhost]"});
-#line 69
- testRunner.When("build software statement", ((string)(null)), table18, "When ");
-#line hidden
-            TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table19.AddRow(new string[] {
                         "software_statement",
                         "$softwareStatement$"});
 #line 74
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table19, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table18, "When ");
 #line 78
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 80

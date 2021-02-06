@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
+using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
@@ -156,9 +157,10 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_URI_PARAMETER);
             }
 
+            var cleanedUrl = uri.AbsoluteUri.Replace(uri.Fragment, "");
             using (var httpClient = new HttpClient())
             {
-                var httpResult = await httpClient.GetAsync(uri);
+                var httpResult = await httpClient.GetAsync(cleanedUrl);
                 var json = await httpResult.Content.ReadAsStringAsync();
                 return await CheckRequest(context, json);
             }
@@ -192,7 +194,10 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
-            if (header.Alg != openidClient.RequestObjectSigningAlg)
+            if (
+                (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg) ||
+                (string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != NoneSignHandler.ALG_NAME)
+            )
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SIGNATURE_ALG);
             }
@@ -201,23 +206,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             if (jwsPayload == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
-            }
-
-            var issuer = jwsPayload.GetIssuer();
-            var audiences = jwsPayload.GetAudiences();
-            if (string.IsNullOrWhiteSpace(issuer))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_ISSUER_CLAIM);
-            }
-
-            if (issuer != context.Client.ClientId)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ISSUER_CLAIM);
-            }
-
-            if (!audiences.Any())
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_AUD_CLAIM);
             }
 
             if (!jwsPayload.ContainsKey(OAuth.DTOs.AuthorizationRequestParameters.ResponseType))

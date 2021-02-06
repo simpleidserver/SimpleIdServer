@@ -86,17 +86,17 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table14.AddRow(new string[] {
+            table13.AddRow(new string[] {
                         "start_index",
                         "0"});
-            table14.AddRow(new string[] {
+            table13.AddRow(new string[] {
                         "count",
                         "10"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/management/clients/.search\'", ((string)(null)), table14, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/management/clients/.search\'", ((string)(null)), table13, "When ");
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11

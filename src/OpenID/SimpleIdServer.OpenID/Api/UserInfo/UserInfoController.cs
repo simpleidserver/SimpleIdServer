@@ -102,7 +102,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 var subject = jwsPayload.GetSub();
                 var scopes = jwsPayload.GetScopes();
                 var audiences = jwsPayload.GetAudiences();
-                var claims = jwsPayload.GetClaims();
+                var claims = jwsPayload.GetClaimsFromAccessToken(AuthorizationRequestClaimTypes.UserInfo);
                 var authTime = jwsPayload.GetAuthTime();
                 var user = await _oauthUserRepository.FindOAuthUserByLogin(subject, cancellationToken);
                 if (user == null)

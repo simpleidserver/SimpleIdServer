@@ -473,11 +473,11 @@ namespace SimpleIdServer.OAuth.Api.Register
 
         protected static void AddNotEmpty(JObject jObj, string name, IEnumerable<SimpleIdServer.Jwt.JsonWebKey> jwks)
         {
-            if (jwks != null)
+            if (jwks != null && jwks.Any())
             {
                 var result = new JObject
                 {
-                    { "keys", JArray.FromObject(jwks) }
+                    { "keys", JArray.FromObject(jwks.Select(_ => _.Serialize())) }
                 };
                 jObj.Add(name, result);
             }

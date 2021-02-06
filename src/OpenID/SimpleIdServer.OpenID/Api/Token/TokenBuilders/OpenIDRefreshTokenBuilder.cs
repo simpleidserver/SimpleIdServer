@@ -14,7 +14,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
     {
         public OpenIDRefreshTokenBuilder(IGrantedTokenHelper grantedTokenHelper) : base(grantedTokenHelper) { }
 
-        public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken, JObject claims = null)
+        public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JObject();
             if (handlerContext.Request.Data != null)

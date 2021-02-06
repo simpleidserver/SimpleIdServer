@@ -22,7 +22,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
         public string Name => TokenResponseParameters.RefreshToken;
 
-        public virtual async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken, JObject claims = null)
+        public virtual async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JObject();
             if (handlerContext.Request.Data != null)

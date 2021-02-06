@@ -180,10 +180,10 @@ Scenario: Use claims parameter to get user information from UserInfo endpoint
 	And extract parameter 'client_id' from JSON body
 	
 	And use '1' JWK from 'jwks' to build JWS and store into 'accesstoken'
-	| Key		| Value																		|
-	| sub		| administrator																|
-	| aud		| $client_id$																|	
-	| claims	| { userinfo: { name: { essential : true }, email: { essential : true } } }	|	
+	| Key    | Value                                                       |
+	| sub    | administrator                                               |
+	| aud    | $client_id$                                                 |
+	| claims | { name: { essential : true }, email: { essential : true } } |
 
 	And add user consent with claim : user='administrator', scope='email', clientId='$client_id$', claim='name email'	
 
