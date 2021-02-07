@@ -9,6 +9,7 @@ namespace SimpleIdServer.OAuth.Domains
         public string Id { get; set; }
         public string ClientId { get; set; }
         public string TokenType { get; set; }
+        public bool IsRegistrationAccessToken { get; set; }
         public string Data { get; set; }
         public string AuthorizationCode { get; set; }
         public DateTime? ExpirationTime { get; set; }

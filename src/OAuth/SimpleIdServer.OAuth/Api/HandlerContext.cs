@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.OAuth.Api
 {
@@ -77,6 +79,43 @@ namespace SimpleIdServer.OAuth.Api
         public void SetData(JObject data)
         {
             Data = data;
+        }
+
+        public string GetToken(params string[] prefixes)
+        {
+            if (!HttpHeader.ContainsKey("Authorization"))
+            {
+                return null;
+            }
+
+            var authorizationValue = HttpHeader["Authorization"];
+            var values = new List<string>();
+            if (authorizationValue is JArray)
+            {
+                var jArr = authorizationValue as JArray;
+                foreach(var rec in jArr)
+                {
+                    values.Add(rec.ToString());
+                }
+            }
+            else
+            {
+                values.Add(authorizationValue.ToString());
+            }
+
+            return values.Select(_ => GetToken(_, prefixes)).FirstOrDefault(_ => _ != null);
+        }
+
+        private static string GetToken(string value, params string[] prefixes)
+        {
+            var splitted = value.Split(' ');
+            var prefix = prefixes.FirstOrDefault(_ => value.StartsWith(_));
+            if (prefix == null || splitted.Count() != 2)
+            {
+                return null;
+            }
+
+            return splitted[1];
         }
     }
 

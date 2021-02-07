@@ -8,5 +8,6 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string ClientSecret = "client_secret";
         public const string ClientIdIssuedAt = "client_id_issued_at";
         public const string ClientSecretExpiresAt = "client_secret_expires_at";
+        public const string RegistrationAccessToken  = "registration_access_token";
     }
 }

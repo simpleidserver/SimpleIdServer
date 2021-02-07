@@ -180,7 +180,7 @@ namespace SimpleIdServer.OAuth.Startup
                 ClientId = "bpmnClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("bpmnClientSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "bpmnClientSecret", null)
                 },
                 ClientNames = new []
                 {
@@ -210,7 +210,7 @@ namespace SimpleIdServer.OAuth.Startup
                 ClientId = "cmmnClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("cmmnClientSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "cmmnClientSecret", null)
                 },
                 ClientNames = new []
                 {
@@ -240,7 +240,7 @@ namespace SimpleIdServer.OAuth.Startup
                 ClientId = "humanTaskClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("humanTaskClientSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "humanTaskClientSecret", null)
                 },
                 ClientNames = new []
                 {
@@ -270,7 +270,7 @@ namespace SimpleIdServer.OAuth.Startup
                 ClientId = "scimClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("scimClientSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
                 },
                 ClientNames = new []
                 {
@@ -316,7 +316,7 @@ namespace SimpleIdServer.OAuth.Startup
                 ClientId = "gatewayClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("gatewayClientPassword"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "gatewayClientPassword", null)
                 },
                 ClientNames = new []
                 {
@@ -350,7 +350,7 @@ namespace SimpleIdServer.OAuth.Startup
                 ClientId = "websiteGateway",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("websiteGatewaySecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "websiteGatewaySecret", null)
                 },
                 ClientNames = new []
                 {

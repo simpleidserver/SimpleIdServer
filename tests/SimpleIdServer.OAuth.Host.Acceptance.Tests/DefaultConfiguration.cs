@@ -53,7 +53,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 ClientId = "f3d35cce-de69-45bf-958c-4a8796f8ed37",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("BankCvSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "BankCvSecret", null)
                 },
                 ClientNames = new []
                 {

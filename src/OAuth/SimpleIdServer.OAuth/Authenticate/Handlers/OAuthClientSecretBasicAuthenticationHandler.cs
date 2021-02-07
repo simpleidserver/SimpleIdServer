@@ -39,7 +39,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 return Task.FromResult(false);
             }
 
-            var result = string.Compare(clientSecret.Value, PasswordHelper.ComputeHash(authenticateInstruction.ClientSecretFromAuthorizationHeader), StringComparison.CurrentCultureIgnoreCase) == 0;
+            var result = string.Compare(clientSecret.Value, authenticateInstruction.ClientSecretFromAuthorizationHeader, StringComparison.CurrentCultureIgnoreCase) == 0;
             return Task.FromResult(true);
         }
     }

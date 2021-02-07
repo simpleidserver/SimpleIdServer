@@ -22,6 +22,7 @@ namespace SimpleIdServer.OAuth.Helpers
     public interface IGrantedTokenHelper
     {    
         Task<SearchResult<Token>> SearchTokens(SearchTokenParameter parameter, CancellationToken cancellationToken);
+        Task<bool> RemoveToken(string token, CancellationToken cancellationToken);
         Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
         Task<bool> AddToken(Token token, CancellationToken cancellationToken);
         JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
@@ -57,6 +58,19 @@ namespace SimpleIdServer.OAuth.Helpers
         public Task<SearchResult<Token>> SearchTokens(SearchTokenParameter parameter, CancellationToken cancellationToken)
         {
             return _tokenQueryRepository.Find(parameter, cancellationToken);
+        }
+
+        public async Task<bool> RemoveToken(string token, CancellationToken cancellationToken)
+        {
+            var result = await _tokenQueryRepository.Get(token, cancellationToken);
+            if (result == null)
+            {
+                return false;
+            }
+
+            await _tokenCommandRepository.Delete(result, cancellationToken);
+            await _tokenCommandRepository.SaveChanges(cancellationToken);
+            return true;
         }
 
         public async Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken)

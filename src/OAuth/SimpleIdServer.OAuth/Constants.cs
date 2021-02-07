@@ -15,6 +15,11 @@ namespace SimpleIdServer.OAuth
             public const string Management = "management";
         }
 
+        public static class ScopeNames
+        {
+            public const string Register = "register";
+        }
+
         public static string AuthenticationScheme = "SimpleIdServerOAuth";
         public static string AuthorizationHeaderName = "Authorization";
     }

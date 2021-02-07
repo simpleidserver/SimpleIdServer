@@ -86,59 +86,59 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table192 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table194 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table192.AddRow(new string[] {
+            table194.AddRow(new string[] {
                         "redirect_uris",
                         "[https://web.com]"});
-            table192.AddRow(new string[] {
+            table194.AddRow(new string[] {
                         "scope",
                         "profile email address"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table192, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table194, "When ");
 #line 10
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table193 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table195 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table193.AddRow(new string[] {
+            table195.AddRow(new string[] {
                         "SIG",
                         "1",
                         "ES256"});
 #line 13
- testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table193, "And ");
+ testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table195, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table194 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table196 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table194.AddRow(new string[] {
+            table196.AddRow(new string[] {
                         "sub",
                         "administrator"});
-            table194.AddRow(new string[] {
+            table196.AddRow(new string[] {
                         "aud",
                         "$client_id$"});
-            table194.AddRow(new string[] {
+            table196.AddRow(new string[] {
                         "scope",
                         "[openid,profile,email,address]"});
 #line 17
- testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table194, "And ");
+ testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table196, "And ");
 #line 23
  testRunner.And("add user consent : user=\'administrator\', scope=\'profile email address\', clientId=" +
                     "\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table195 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table197 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table195.AddRow(new string[] {
+            table197.AddRow(new string[] {
                         "access_token",
                         "$accesstoken$"});
 #line 25
- testRunner.And("execute HTTP POST request \'http://localhost/userinfo\'", ((string)(null)), table195, "And ");
+ testRunner.And("execute HTTP POST request \'http://localhost/userinfo\'", ((string)(null)), table197, "And ");
 #line 29
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 31
@@ -169,58 +169,58 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table196 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table198 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table196.AddRow(new string[] {
+            table198.AddRow(new string[] {
                         "redirect_uris",
                         "[https://web.com]"});
-            table196.AddRow(new string[] {
+            table198.AddRow(new string[] {
                         "scope",
                         "profile"});
 #line 41
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table196, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table198, "When ");
 #line 46
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 47
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table197 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table199 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table197.AddRow(new string[] {
+            table199.AddRow(new string[] {
                         "SIG",
                         "1",
                         "ES256"});
 #line 49
- testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table197, "And ");
+ testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table199, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table198 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table200 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table198.AddRow(new string[] {
+            table200.AddRow(new string[] {
                         "sub",
                         "administrator"});
-            table198.AddRow(new string[] {
+            table200.AddRow(new string[] {
                         "aud",
                         "$client_id$"});
-            table198.AddRow(new string[] {
+            table200.AddRow(new string[] {
                         "scope",
                         "[openid,profile]"});
 #line 53
- testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table198, "And ");
+ testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table200, "And ");
 #line 59
  testRunner.And("add user consent : user=\'administrator\', scope=\'profile\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table199 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table201 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table199.AddRow(new string[] {
+            table201.AddRow(new string[] {
                         "access_token",
                         "$accesstoken$"});
 #line 61
- testRunner.And("execute HTTP POST request \'http://localhost/userinfo\'", ((string)(null)), table199, "And ");
+ testRunner.And("execute HTTP POST request \'http://localhost/userinfo\'", ((string)(null)), table201, "And ");
 #line 65
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 67
@@ -243,58 +243,58 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table200 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table202 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table200.AddRow(new string[] {
+            table202.AddRow(new string[] {
                         "redirect_uris",
                         "[https://web.com]"});
-            table200.AddRow(new string[] {
+            table202.AddRow(new string[] {
                         "scope",
                         "profile"});
 #line 72
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table200, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table202, "When ");
 #line 77
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 78
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table201 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table203 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table201.AddRow(new string[] {
+            table203.AddRow(new string[] {
                         "SIG",
                         "1",
                         "ES256"});
 #line 80
- testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table201, "And ");
+ testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table203, "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table202 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table204 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table202.AddRow(new string[] {
+            table204.AddRow(new string[] {
                         "sub",
                         "administrator"});
-            table202.AddRow(new string[] {
+            table204.AddRow(new string[] {
                         "aud",
                         "$client_id$"});
-            table202.AddRow(new string[] {
+            table204.AddRow(new string[] {
                         "scope",
                         "[openid,profile]"});
 #line 84
- testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table202, "And ");
+ testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table204, "And ");
 #line 90
  testRunner.And("add user consent : user=\'administrator\', scope=\'profile\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table203 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table205 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table203.AddRow(new string[] {
+            table205.AddRow(new string[] {
                         "Authorization",
                         "Bearer $accesstoken$"});
 #line 92
- testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table203, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table205, "And ");
 #line 96
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 98
@@ -317,61 +317,61 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table204 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table206 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table204.AddRow(new string[] {
+            table206.AddRow(new string[] {
                         "SIG",
                         "1",
                         "ES256"});
 #line 103
- testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table204, "When ");
-#line hidden
-            TechTalk.SpecFlow.Table table205 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table205.AddRow(new string[] {
-                        "redirect_uris",
-                        "[https://web.com]"});
-            table205.AddRow(new string[] {
-                        "scope",
-                        "profile"});
-            table205.AddRow(new string[] {
-                        "userinfo_signed_response_alg",
-                        "ES256"});
-#line 107
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table205, "And ");
-#line 113
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 114
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            TechTalk.SpecFlow.Table table206 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table206.AddRow(new string[] {
-                        "sub",
-                        "administrator"});
-            table206.AddRow(new string[] {
-                        "aud",
-                        "$client_id$"});
-            table206.AddRow(new string[] {
-                        "scope",
-                        "[openid,profile]"});
-#line 116
- testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table206, "And ");
-#line 122
- testRunner.And("add user consent : user=\'administrator\', scope=\'profile\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table206, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table207 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
             table207.AddRow(new string[] {
+                        "redirect_uris",
+                        "[https://web.com]"});
+            table207.AddRow(new string[] {
+                        "scope",
+                        "profile"});
+            table207.AddRow(new string[] {
+                        "userinfo_signed_response_alg",
+                        "ES256"});
+#line 107
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table207, "And ");
+#line 113
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 114
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table208 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table208.AddRow(new string[] {
+                        "sub",
+                        "administrator"});
+            table208.AddRow(new string[] {
+                        "aud",
+                        "$client_id$"});
+            table208.AddRow(new string[] {
+                        "scope",
+                        "[openid,profile]"});
+#line 116
+ testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table208, "And ");
+#line 122
+ testRunner.And("add user consent : user=\'administrator\', scope=\'profile\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table209 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table209.AddRow(new string[] {
                         "Authorization",
                         "Bearer $accesstoken$"});
 #line 124
- testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table207, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table209, "And ");
 #line 128
  testRunner.And("extract string from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 129
@@ -392,82 +392,82 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table208 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table210 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table208.AddRow(new string[] {
+            table210.AddRow(new string[] {
                         "SIG",
                         "1",
                         "ES256"});
 #line 133
- testRunner.When("add JSON web key to Authorization Server and store into \'jwks_sig\'", ((string)(null)), table208, "When ");
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks_sig\'", ((string)(null)), table210, "When ");
 #line hidden
-            TechTalk.SpecFlow.Table table209 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table211 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table209.AddRow(new string[] {
+            table211.AddRow(new string[] {
                         "ENC",
                         "2",
                         "RSA1_5"});
 #line 137
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
-                    "json\'", ((string)(null)), table209, "And ");
-#line hidden
-            TechTalk.SpecFlow.Table table210 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table210.AddRow(new string[] {
-                        "redirect_uris",
-                        "[https://web.com]"});
-            table210.AddRow(new string[] {
-                        "scope",
-                        "profile"});
-            table210.AddRow(new string[] {
-                        "userinfo_signed_response_alg",
-                        "ES256"});
-            table210.AddRow(new string[] {
-                        "userinfo_encrypted_response_alg",
-                        "RSA1_5"});
-            table210.AddRow(new string[] {
-                        "userinfo_encrypted_response_enc",
-                        "A128CBC-HS256"});
-            table210.AddRow(new string[] {
-                        "jwks",
-                        "$jwks_json$"});
-#line 141
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table210, "And ");
-#line 150
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 151
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            TechTalk.SpecFlow.Table table211 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table211.AddRow(new string[] {
-                        "sub",
-                        "administrator"});
-            table211.AddRow(new string[] {
-                        "aud",
-                        "$client_id$"});
-            table211.AddRow(new string[] {
-                        "scope",
-                        "[openid,profile]"});
-#line 153
- testRunner.And("use \'1\' JWK from \'jwks_sig\' to build JWS and store into \'accesstoken\'", ((string)(null)), table211, "And ");
-#line 159
- testRunner.And("add user consent : user=\'administrator\', scope=\'profile\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                    "json\'", ((string)(null)), table211, "And ");
 #line hidden
             TechTalk.SpecFlow.Table table212 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
             table212.AddRow(new string[] {
+                        "redirect_uris",
+                        "[https://web.com]"});
+            table212.AddRow(new string[] {
+                        "scope",
+                        "profile"});
+            table212.AddRow(new string[] {
+                        "userinfo_signed_response_alg",
+                        "ES256"});
+            table212.AddRow(new string[] {
+                        "userinfo_encrypted_response_alg",
+                        "RSA1_5"});
+            table212.AddRow(new string[] {
+                        "userinfo_encrypted_response_enc",
+                        "A128CBC-HS256"});
+            table212.AddRow(new string[] {
+                        "jwks",
+                        "$jwks_json$"});
+#line 141
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table212, "And ");
+#line 150
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 151
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table213 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table213.AddRow(new string[] {
+                        "sub",
+                        "administrator"});
+            table213.AddRow(new string[] {
+                        "aud",
+                        "$client_id$"});
+            table213.AddRow(new string[] {
+                        "scope",
+                        "[openid,profile]"});
+#line 153
+ testRunner.And("use \'1\' JWK from \'jwks_sig\' to build JWS and store into \'accesstoken\'", ((string)(null)), table213, "And ");
+#line 159
+ testRunner.And("add user consent : user=\'administrator\', scope=\'profile\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table214 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table214.AddRow(new string[] {
                         "Authorization",
                         "Bearer $accesstoken$"});
 #line 161
- testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table212, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table214, "And ");
 #line 165
  testRunner.And("extract string from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 166
@@ -488,59 +488,59 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table213 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table215 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table213.AddRow(new string[] {
+            table215.AddRow(new string[] {
                         "SIG",
                         "1",
                         "ES256"});
 #line 170
- testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table213, "When ");
-#line hidden
-            TechTalk.SpecFlow.Table table214 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table214.AddRow(new string[] {
-                        "redirect_uris",
-                        "[https://web.com]"});
-            table214.AddRow(new string[] {
-                        "scope",
-                        "email"});
-#line 174
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table214, "And ");
-#line 179
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 180
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            TechTalk.SpecFlow.Table table215 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Key",
-                        "Value"});
-            table215.AddRow(new string[] {
-                        "sub",
-                        "administrator"});
-            table215.AddRow(new string[] {
-                        "aud",
-                        "$client_id$"});
-            table215.AddRow(new string[] {
-                        "claims",
-                        "{ name: { essential : true }, email: { essential : true } }"});
-#line 182
- testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table215, "And ");
-#line 188
- testRunner.And("add user consent with claim : user=\'administrator\', scope=\'email\', clientId=\'$cli" +
-                    "ent_id$\', claim=\'name email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table215, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table216 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
             table216.AddRow(new string[] {
+                        "redirect_uris",
+                        "[https://web.com]"});
+            table216.AddRow(new string[] {
+                        "scope",
+                        "email"});
+#line 174
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table216, "And ");
+#line 179
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 180
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table217 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table217.AddRow(new string[] {
+                        "sub",
+                        "administrator"});
+            table217.AddRow(new string[] {
+                        "aud",
+                        "$client_id$"});
+            table217.AddRow(new string[] {
+                        "claims",
+                        "{ name: { essential : true }, email: { essential : true } }"});
+#line 182
+ testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table217, "And ");
+#line 188
+ testRunner.And("add user consent with claim : user=\'administrator\', scope=\'email\', clientId=\'$cli" +
+                    "ent_id$\', claim=\'name email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table218 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table218.AddRow(new string[] {
                         "Authorization",
                         "Bearer $accesstoken$"});
 #line 190
- testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table216, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table218, "And ");
 #line 194
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 195
@@ -565,40 +565,40 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table217 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table219 = new TechTalk.SpecFlow.Table(new string[] {
                         "Type",
                         "Kid",
                         "AlgName"});
-            table217.AddRow(new string[] {
+            table219.AddRow(new string[] {
                         "SIG",
                         "1",
                         "RS256"});
 #line 201
- testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table217, "When ");
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table219, "When ");
 #line hidden
-            TechTalk.SpecFlow.Table table218 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table220 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table218.AddRow(new string[] {
+            table220.AddRow(new string[] {
                         "redirect_uris",
                         "[https://web.com]"});
-            table218.AddRow(new string[] {
+            table220.AddRow(new string[] {
                         "grant_types",
                         "[authorization_code,refresh_token]"});
-            table218.AddRow(new string[] {
+            table220.AddRow(new string[] {
                         "response_types",
                         "[code]"});
-            table218.AddRow(new string[] {
+            table220.AddRow(new string[] {
                         "scope",
                         "offline_access"});
-            table218.AddRow(new string[] {
+            table220.AddRow(new string[] {
                         "subject_type",
                         "public"});
-            table218.AddRow(new string[] {
+            table220.AddRow(new string[] {
                         "token_endpoint_auth_method",
                         "client_secret_post"});
 #line 205
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table218, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table220, "When ");
 #line 214
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 215
@@ -609,65 +609,65 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("add user consent : user=\'administrator\', scope=\'offline_access\', clientId=\'$clien" +
                     "t_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table219 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table221 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "response_type",
                         "code"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "client_id",
                         "$client_id$"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "state",
                         "state"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "response_mode",
                         "query"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "scope",
                         "openid offline_access"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "redirect_uri",
                         "https://web.com"});
-            table219.AddRow(new string[] {
+            table221.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
 #line 219
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table219, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table221, "And ");
 #line 229
  testRunner.And("extract parameter \'refresh_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table220 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table222 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table220.AddRow(new string[] {
+            table222.AddRow(new string[] {
                         "client_id",
                         "$client_id$"});
-            table220.AddRow(new string[] {
+            table222.AddRow(new string[] {
                         "client_secret",
                         "$client_secret$"});
-            table220.AddRow(new string[] {
+            table222.AddRow(new string[] {
                         "grant_type",
                         "refresh_token"});
-            table220.AddRow(new string[] {
+            table222.AddRow(new string[] {
                         "refresh_token",
                         "$refresh_token$"});
 #line 231
- testRunner.And("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table220, "And ");
+ testRunner.And("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table222, "And ");
 #line 238
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 239
  testRunner.And("extract parameter \'access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            TechTalk.SpecFlow.Table table221 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table223 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table221.AddRow(new string[] {
+            table223.AddRow(new string[] {
                         "Authorization",
                         "Bearer $access_token$"});
 #line 241
- testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table221, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/userinfo\'", ((string)(null)), table223, "And ");
 #line 245
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 247

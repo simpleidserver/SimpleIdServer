@@ -102,10 +102,55 @@ Scenario: Error is returned when iss is not correct
 	| iss								| unknown							|
 	
 	When execute HTTP POST JSON request 'http://localhost/register'
-	| Key								| Value														|
-	| software_statement				| $softwareStatement$										|
+	| Key                | Value               |
+	| software_statement | $softwareStatement$ |
 	
 	And extract JSON from body
 
 	Then JSON 'error'='invalid_software_statement'
 	Then JSON 'error_description'='software statement issuer is not trusted'
+
+Scenario: Error is returned when trying to get a client and access token is not passed
+	When execute HTTP GET request 'http://localhost/register/clientid'
+	| Key |  Value |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'
+	Then JSON 'error_description'='access token is missing'
+
+Scenario: Error is returned when trying to get a client and access token is unknown
+	When execute HTTP GET request 'http://localhost/register/clientid'
+	| Key           | Value       |
+	| Authorization | accesstoken |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'
+	Then JSON 'error_description'='access token is not correct'
+
+Scenario: Error is returned when trying to get a client and access token is has been issued from a different client
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+	And extract parameter 'registration_access_token' from JSON body into 'firstRegistrationAccessToken'
+
+	And execute HTTP POST JSON request 'http://localhost/register'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body into 'secondClientId'
+
+	And execute HTTP GET request 'http://localhost/register/$secondClientId$'
+	| Key           | Value                          |
+	| Authorization | $firstRegistrationAccessToken$ |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'

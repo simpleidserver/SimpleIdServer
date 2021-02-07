@@ -12,6 +12,7 @@ using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Jwks;
 using SimpleIdServer.OAuth.Api.Register;
+using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Token;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
@@ -208,7 +209,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddRegisterApi(this IServiceCollection services)
         {
-            services.AddTransient<IRegisterRequestHandler, OAuthRegisterRequestHandler>();
+            services.AddTransient<IAddOAuthClientHandler, AddOAuthClientHandler>();
+            services.AddTransient<IGetOAuthClientHandler, GetOAuthClientHandler>();
             return services;
         }
     }

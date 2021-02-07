@@ -53,7 +53,7 @@ namespace SimpleIdServer.OAuth.Api.Management
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(client.ToDto());
+            return new OkObjectResult(client.ToDto(Request.GetAbsoluteUriWithVirtualPath()));
         }
 
         [HttpGet("scopes")]
@@ -68,7 +68,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         {
             var parameter = ToParameter(queries);
             var result = await _oauthClientQueryRepository.Find(parameter, CancellationToken.None);
-            return new OkObjectResult(ToDto(result));
+            return new OkObjectResult(ToDto(result, Request.GetAbsoluteUriWithVirtualPath()));
 
         }
 
@@ -83,14 +83,14 @@ namespace SimpleIdServer.OAuth.Api.Management
             };
         }
 
-        private static JObject ToDto(SearchResult<OAuthClient> result)
+        private static JObject ToDto(SearchResult<OAuthClient> result, string issuer)
         {
             return new JObject
             {
                 { "start_index", result.StartIndex },
                 { "count", result.Count },
                 { "total_length", result.TotalLength },
-                { "content", new JArray(result.Content.Select(_ => _.ToDto())) }
+                { "content", new JArray(result.Content.Select(_ => _.ToDto(issuer))) }
             };
         }
 

@@ -86,14 +86,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table19.AddRow(new string[] {
+            table21.AddRow(new string[] {
                         "grant_types",
                         "[a,b]"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table19, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table21, "When ");
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 11
@@ -114,14 +114,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table20.AddRow(new string[] {
+            table22.AddRow(new string[] {
                         "token_endpoint_auth_method",
                         "invalid"});
 #line 15
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table20, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table22, "When ");
 #line 19
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 21
@@ -142,14 +142,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table21.AddRow(new string[] {
+            table23.AddRow(new string[] {
                         "response_types",
                         "[a,b]"});
 #line 25
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table21, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table23, "When ");
 #line 29
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 31
@@ -170,17 +170,17 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table22.AddRow(new string[] {
+            table24.AddRow(new string[] {
                         "response_types",
                         "[token]"});
-            table22.AddRow(new string[] {
+            table24.AddRow(new string[] {
                         "grant_types",
                         "[implicit,authorization_code]"});
 #line 35
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table22, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table24, "When ");
 #line 40
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 42
@@ -202,17 +202,17 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table23.AddRow(new string[] {
+            table25.AddRow(new string[] {
                         "response_types",
                         "[token]"});
-            table23.AddRow(new string[] {
+            table25.AddRow(new string[] {
                         "grant_types",
                         "[implicit]"});
 #line 46
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table23, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table25, "When ");
 #line 51
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 53
@@ -233,20 +233,20 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table24.AddRow(new string[] {
+            table26.AddRow(new string[] {
                         "response_types",
                         "[token]"});
-            table24.AddRow(new string[] {
+            table26.AddRow(new string[] {
                         "grant_types",
                         "[implicit]"});
-            table24.AddRow(new string[] {
+            table26.AddRow(new string[] {
                         "redirect_uris",
                         "[invalid]"});
 #line 57
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table24, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table26, "When ");
 #line 63
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 65
@@ -267,17 +267,17 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table25.AddRow(new string[] {
+            table27.AddRow(new string[] {
                         "scope",
                         "a"});
-            table25.AddRow(new string[] {
+            table27.AddRow(new string[] {
                         "redirect_uris",
                         "[http://localhost]"});
 #line 69
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table25, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table27, "When ");
 #line 74
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 76
@@ -298,14 +298,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table26.AddRow(new string[] {
+            table28.AddRow(new string[] {
                         "software_statement",
                         "a"});
 #line 80
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table26, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table28, "When ");
 #line 84
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 86
@@ -326,14 +326,14 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table27.AddRow(new string[] {
+            table29.AddRow(new string[] {
                         "software_statement",
                         "a.b.c"});
 #line 90
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table27, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table29, "When ");
 #line 94
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 96
@@ -354,29 +354,144 @@ this.ScenarioInitialize(scenarioInfo);
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
-            TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table28.AddRow(new string[] {
+            table30.AddRow(new string[] {
                         "iss",
                         "unknown"});
 #line 100
- testRunner.When("build software statement", ((string)(null)), table28, "When ");
+ testRunner.When("build software statement", ((string)(null)), table30, "When ");
 #line hidden
-            TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
+            TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
                         "Key",
                         "Value"});
-            table29.AddRow(new string[] {
+            table31.AddRow(new string[] {
                         "software_statement",
                         "$softwareStatement$"});
 #line 104
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table29, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table31, "When ");
 #line 108
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 110
  testRunner.Then("JSON \'error\'=\'invalid_software_statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 111
  testRunner.Then("JSON \'error_description\'=\'software statement issuer is not trusted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to get a client and access token is not passed")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is not passed")]
+        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsNotPassed()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is not passed", null, ((string[])(null)));
+#line 113
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+#line 114
+ testRunner.When("execute HTTP GET request \'http://localhost/register/clientid\'", ((string)(null)), table32, "When ");
+#line 117
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 119
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 120
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 121
+ testRunner.Then("JSON \'error_description\'=\'access token is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to get a client and access token is unknown")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is unknown")]
+        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsUnknown()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is unknown", null, ((string[])(null)));
+#line 123
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table33.AddRow(new string[] {
+                        "Authorization",
+                        "accesstoken"});
+#line 124
+ testRunner.When("execute HTTP GET request \'http://localhost/register/clientid\'", ((string)(null)), table33, "When ");
+#line 128
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 130
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 131
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 132
+ testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Error is returned when trying to get a client and access token is has been issued" +
+            " from a different client")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is has been issued" +
+            " from a different client")]
+        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsHasBeenIssuedFromADifferentClient()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is has been issued" +
+                    " from a different client", null, ((string[])(null)));
+#line 134
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table34.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+#line 135
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table34, "When ");
+#line 139
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 140
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
+                    "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table35.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+#line 142
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table35, "And ");
+#line 146
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 147
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'secondClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table36.AddRow(new string[] {
+                        "Authorization",
+                        "$firstRegistrationAccessToken$"});
+#line 149
+ testRunner.And("execute HTTP GET request \'http://localhost/register/$secondClientId$\'", ((string)(null)), table36, "And ");
+#line 153
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 155
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 156
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

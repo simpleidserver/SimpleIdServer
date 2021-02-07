@@ -287,8 +287,143 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON exists \'response_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 88
  testRunner.Then("JSON exists \'client_name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 89
- testRunner.Then("JSON exists \'software_statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.FactAttribute(DisplayName="Get client")]
+        [Xunit.TraitAttribute("FeatureTitle", "Register")]
+        [Xunit.TraitAttribute("Description", "Get client")]
+        public virtual void GetClient()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get client", null, ((string[])(null)));
+#line 90
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table19.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+            table19.AddRow(new string[] {
+                        "response_types",
+                        "[token]"});
+            table19.AddRow(new string[] {
+                        "grant_types",
+                        "[implicit]"});
+            table19.AddRow(new string[] {
+                        "client_name",
+                        "name"});
+            table19.AddRow(new string[] {
+                        "client_name#fr",
+                        "nom"});
+            table19.AddRow(new string[] {
+                        "client_name#en",
+                        "name"});
+            table19.AddRow(new string[] {
+                        "client_uri",
+                        "http://localhost"});
+            table19.AddRow(new string[] {
+                        "client_uri#fr",
+                        "http://localhost/fr"});
+            table19.AddRow(new string[] {
+                        "logo_uri",
+                        "http://localhost/1.png"});
+            table19.AddRow(new string[] {
+                        "logo_uri#fr",
+                        "http://localhost/fr/1.png"});
+            table19.AddRow(new string[] {
+                        "software_id",
+                        "software"});
+            table19.AddRow(new string[] {
+                        "software_version",
+                        "1.0"});
+            table19.AddRow(new string[] {
+                        "token_endpoint_auth_method",
+                        "client_secret_basic"});
+            table19.AddRow(new string[] {
+                        "scope",
+                        "scope1"});
+            table19.AddRow(new string[] {
+                        "contacts",
+                        "[addr1,addr2]"});
+            table19.AddRow(new string[] {
+                        "tos_uri",
+                        "http://localhost/tos"});
+            table19.AddRow(new string[] {
+                        "policy_uri",
+                        "http://localhost/policy"});
+            table19.AddRow(new string[] {
+                        "jwks_uri",
+                        "http://localhost/jwks"});
+#line 91
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table19, "When ");
+#line 112
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 113
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'clientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 114
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'registrationAc" +
+                    "cessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table20.AddRow(new string[] {
+                        "Authorization",
+                        "$registrationAccessToken$"});
+#line 115
+ testRunner.And("execute HTTP GET request \'http://localhost/register/$clientId$\'", ((string)(null)), table20, "And ");
+#line 119
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 121
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 122
+ testRunner.Then("JSON exists \'client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 123
+ testRunner.Then("JSON exists \'client_secret\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 124
+ testRunner.Then("JSON exists \'client_id_issued_at\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 125
+ testRunner.Then("JSON exists \'grant_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 126
+ testRunner.Then("JSON exists \'redirect_uris\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 127
+ testRunner.Then("JSON exists \'response_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 128
+ testRunner.Then("JSON exists \'contacts\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 129
+ testRunner.Then("JSON \'client_secret_expires_at\'=\'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 130
+ testRunner.Then("JSON \'token_endpoint_auth_method\'=\'client_secret_basic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 131
+ testRunner.Then("JSON \'client_uri\'=\'http://localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 132
+ testRunner.Then("JSON \'client_uri#fr\'=\'http://localhost/fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 133
+ testRunner.Then("JSON \'logo_uri\'=\'http://localhost/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 134
+ testRunner.Then("JSON \'logo_uri#fr\'=\'http://localhost/fr/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 135
+ testRunner.Then("JSON \'scope\'=\'scope1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 136
+ testRunner.Then("JSON \'tos_uri\'=\'http://localhost/tos\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 137
+ testRunner.Then("JSON \'policy_uri\'=\'http://localhost/policy\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 138
+ testRunner.Then("JSON \'jwks_uri\'=\'http://localhost/jwks\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 139
+ testRunner.Then("JSON \'client_name\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 140
+ testRunner.Then("JSON \'client_name#fr\'=\'nom\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 141
+ testRunner.Then("JSON \'client_name#en\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 142
+ testRunner.Then("JSON \'software_id\'=\'software\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 143
+ testRunner.Then("JSON \'software_version\'=\'1.0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

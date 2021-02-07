@@ -24,9 +24,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OAuth.Api.Register
+namespace SimpleIdServer.OAuth.Api.Register.Handlers
 {
-    public interface IRegisterRequestHandler
+    public interface IAddOAuthClientHandler
     {
         Task<JObject> Handle(HandlerContext handlerContext, CancellationToken token);
     }
@@ -34,45 +34,48 @@ namespace SimpleIdServer.OAuth.Api.Register
     /// <summary>
     /// https://tools.ietf.org/html/rfc7591
     /// </summary>
-    public class OAuthRegisterRequestHandler : IRegisterRequestHandler
+    public class AddOAuthClientHandler : IAddOAuthClientHandler
     {
         private readonly IEnumerable<IGrantTypeHandler> _grantTypeHandlers;
         private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _oauthClientAuthenticationHandlers;
-        private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
-        private readonly IOAuthClientCommandRepository _oauthClientCommandRepository;
         private readonly IOAuthScopeQueryRepository _oauthScopeRepository;
         private readonly IJwtParser _jwtParser;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IEnumerable<ISignHandler> _signHandlers;
-        private readonly IEnumerable<ICEKHandler> _cekHandlers;
-        private readonly IEnumerable<IEncHandler> _encHandlers;
 
-        public OAuthRegisterRequestHandler(IEnumerable<IGrantTypeHandler> grantTypeHandlers, IEnumerable<IResponseTypeHandler> responseTypeHandlers,
-            IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers, IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository, IOAuthScopeQueryRepository oauthScopeRepository, IJwtParser jwtParser, IHttpClientFactory httpClientFactory,
-            IEnumerable<ISignHandler> signHandlers, IEnumerable<ICEKHandler> cekHandlers, IEnumerable<IEncHandler> encHandlers, IOptions<OAuthHostOptions> oauthHostOptions)
+        public AddOAuthClientHandler(
+            IEnumerable<IGrantTypeHandler> grantTypeHandlers,
+            IEnumerable<IResponseTypeHandler> responseTypeHandlers,
+            IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers,
+            IOAuthClientQueryRepository oauthClientQueryRepository,
+            IOAuthClientCommandRepository oAuthClientCommandRepository,
+            IOAuthScopeQueryRepository oauthScopeRepository, IJwtParser jwtParser,
+            IHttpClientFactory httpClientFactory,
+            IEnumerable<ISignHandler> signHandlers,
+            IEnumerable<ICEKHandler> cekHandlers,
+            IEnumerable<IEncHandler> encHandlers,
+            IOptions<OAuthHostOptions> oauthHostOptions)
         {
             _grantTypeHandlers = grantTypeHandlers;
             _responseTypeHandlers = responseTypeHandlers;
             _oauthClientAuthenticationHandlers = oauthClientAuthenticationHandlers;
-            _oauthClientQueryRepository = oauthClientQueryRepository;
-            _oauthClientCommandRepository = oAuthClientCommandRepository;
+            OAuthClientQueryRepository = oauthClientQueryRepository;
+            OAuthClientCommandRepository = oAuthClientCommandRepository;
             _oauthScopeRepository = oauthScopeRepository;
             _jwtParser = jwtParser;
             _httpClientFactory = httpClientFactory;
-            _signHandlers = signHandlers;
-            _cekHandlers = cekHandlers;
-            _encHandlers = encHandlers;
+            SignHandlers = signHandlers;
+            CEKHandlers = cekHandlers;
+            ENCHandlers = encHandlers;
             OauthHostOptions = oauthHostOptions.Value;
         }
 
         protected readonly OAuthHostOptions OauthHostOptions;
-        protected IOAuthClientQueryRepository OAuthClientQueryRepository => _oauthClientQueryRepository;
-        protected IOAuthClientCommandRepository OAuthClientCommandRepository => _oauthClientCommandRepository;
-        protected IEnumerable<ISignHandler> SignHandlers => _signHandlers;
-        protected IEnumerable<ICEKHandler> CEKHandlers => _cekHandlers;
-        protected IEnumerable<IEncHandler> ENCHandlers => _encHandlers;
+        protected IOAuthClientQueryRepository OAuthClientQueryRepository { get; private set; }
+        protected IOAuthClientCommandRepository OAuthClientCommandRepository { get; private set; }
+        protected IEnumerable<ISignHandler> SignHandlers { get; private set; }
+        protected IEnumerable<ICEKHandler> CEKHandlers { get; private set; }
+        protected IEnumerable<IEncHandler> ENCHandlers { get; private set; }
 
         public async Task<JObject> Handle(HandlerContext handlerContext, CancellationToken token)
         {
@@ -168,19 +171,30 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
         }
 
-        protected virtual async Task<JObject> Create(HandlerContext context, CancellationToken token)
+        protected virtual async Task<JObject> Create(HandlerContext context, CancellationToken cancellationToken)
         {
-            var oauthClient = new OAuthClient();
-            var jObj = await EnrichOAuthClient(context, oauthClient, token);
-            _oauthClientCommandRepository.Add(oauthClient);
-            await _oauthClientCommandRepository.SaveChanges(token);
-            return jObj;
+            var oauthClient = await BuildOAuthClient(context.Request.Data, cancellationToken);
+            OAuthClientCommandRepository.Add(oauthClient);
+            await OAuthClientCommandRepository.SaveChanges(cancellationToken);
+            return BuildResponse(oauthClient, context.Request.IssuerName);
         }
 
-        protected async Task<JObject> EnrichOAuthClient(HandlerContext context, OAuthClient oauthClient, CancellationToken token)
+        protected virtual JObject BuildResponse(OAuthClient oauthClient, string issuer)
         {
-            var jObj = context.Request.Data;
+            return oauthClient.ToDto(issuer);
+        }
+
+        protected virtual async Task<OAuthClient> BuildOAuthClient(JObject jObj, CancellationToken cancellationToken)
+        {
+            var oauthClient = new OAuthClient();
+            await EnrichOAuthClient(oauthClient, jObj, cancellationToken);
+            return oauthClient;
+        }
+
+        protected async Task EnrichOAuthClient(OAuthClient oauthClient, JObject jObj, CancellationToken cancellationToken)
+        {
             var clientId = Guid.NewGuid().ToString();
+            var registrationAccessToken = Guid.NewGuid().ToString();
             var clientSecret = Guid.NewGuid().ToString();
             var grantTypes = GetDefaultGrantTypes(jObj);
             var scopes = GetDefaultScopes(jObj);
@@ -216,7 +230,9 @@ namespace SimpleIdServer.OAuth.Api.Register
                 tokenEncryptedResponseEnc = A128CBCHS256EncHandler.ENC_NAME;
             }
 
-            var supportedScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes, token);
+            var supportedScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken);
+            oauthClient.CreateDateTime = DateTime.UtcNow;
+            oauthClient.UpdateDateTime = DateTime.UtcNow;
             oauthClient.ClientId = clientId;
             oauthClient.TokenEndPointAuthMethod = tokenEndpointAuthMethod;
             oauthClient.GrantTypes = grantTypes.ToList();
@@ -234,6 +250,7 @@ namespace SimpleIdServer.OAuth.Api.Register
             oauthClient.TokenEncryptedResponseEnc = tokenEncryptedResponseEnc;
             oauthClient.RefreshTokenExpirationTimeInSeconds = 60 * 30;
             oauthClient.TokenExpirationTimeInSeconds = 60 * 30;
+            oauthClient.RegistrationAccessToken = registrationAccessToken;
             foreach (var kvp in clientNames)
             {
                 oauthClient.AddClientName(kvp.Key, kvp.Value);
@@ -259,38 +276,14 @@ namespace SimpleIdServer.OAuth.Api.Register
                 oauthClient.AddPolicyUri(kvp.Key, kvp.Value);
             }
 
-            oauthClient.AddSharedSecret(clientSecret);
             var currentDateTime = DateTime.UtcNow;
-            var result = new JObject();
-            AddNotEmpty(result, RegisterResponseParameters.ClientId, clientId);
-            AddNotEmpty(result, RegisterResponseParameters.ClientSecret, clientSecret);
-            AddNotEmpty(result, RegisterResponseParameters.ClientIdIssuedAt, currentDateTime.ConvertToUnixTimestamp().ToString());
+            DateTime? expirationDateTime = null;
             if (OauthHostOptions.ClientSecretExpirationInSeconds != null)
             {
-                AddNotEmpty(result, RegisterResponseParameters.ClientSecretExpiresAt, currentDateTime.AddSeconds(OauthHostOptions.ClientSecretExpirationInSeconds.Value).ConvertToUnixTimestamp().ToString());
+                expirationDateTime = currentDateTime.AddSeconds(OauthHostOptions.ClientSecretExpirationInSeconds.Value);
             }
 
-            AddNotEmpty(result, RegisterRequestParameters.GrantTypes, grantTypes);
-            AddNotEmpty(result, RegisterRequestParameters.RedirectUris, redirectUris);
-            AddNotEmpty(result, RegisterRequestParameters.TokenEndpointAuthMethod, tokenEndpointAuthMethod);
-            AddNotEmpty(result, RegisterRequestParameters.ResponseTypes, responseTypes);
-            AddNotEmpty(result, RegisterRequestParameters.ClientName, clientNames);
-            AddNotEmpty(result, RegisterRequestParameters.ClientUri, clientUris);
-            AddNotEmpty(result, RegisterRequestParameters.LogoUri, logoUris);
-            if (scopes.Any())
-            {
-                AddNotEmpty(result, RegisterRequestParameters.Scope, string.Join(" ", scopes));
-            }
-
-            AddNotEmpty(result, RegisterRequestParameters.Contacts, contacts);
-            AddNotEmpty(result, RegisterRequestParameters.TosUri, tosUris);
-            AddNotEmpty(result, RegisterRequestParameters.PolicyUri, policyUris);
-            AddNotEmpty(result, RegisterRequestParameters.JwksUri, jwksUri);
-            AddNotEmpty(result, RegisterRequestParameters.Jwks, jwks);
-            AddNotEmpty(result, RegisterRequestParameters.SoftwareId, softwareId);
-            AddNotEmpty(result, RegisterRequestParameters.SoftwareVersion, softwareVersion);
-            AddNotEmpty(result, RegisterRequestParameters.SoftwareStatement, softwareStatement);
-            return result;
+            oauthClient.AddSharedSecret(clientSecret, expirationDateTime);
         }
 
         private async Task ExtractSoftwareStatement(JObject jObj)
@@ -437,55 +430,9 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
         }
 
-        protected static void AddNotEmpty(JObject jObj, string name, string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                jObj.Add(name, value);
-            }
-        }
-
-        protected static void AddNotEmpty(JObject jObj, string name, IEnumerable<string> values)
-        {
-            if (values != null && values.Any())
-            {
-                jObj.Add(name, JArray.FromObject(values));
-            }
-        }
-
-        protected static void AddNotEmpty(JObject jObj, string name, Dictionary<string, string> dic)
-        {
-            if (dic != null && dic.Any())
-            {
-                foreach (var kvp in dic)
-                {
-                    if (string.IsNullOrWhiteSpace(kvp.Key))
-                    {
-                        jObj.Add(name, kvp.Value);
-                    }
-                    else
-                    {
-                        jObj.Add($"{name}#{kvp.Key}", kvp.Value);
-                    }
-                }
-            }
-        }
-
-        protected static void AddNotEmpty(JObject jObj, string name, IEnumerable<SimpleIdServer.Jwt.JsonWebKey> jwks)
-        {
-            if (jwks != null && jwks.Any())
-            {
-                var result = new JObject
-                {
-                    { "keys", JArray.FromObject(jwks.Select(_ => _.Serialize())) }
-                };
-                jObj.Add(name, result);
-            }
-        }
-
         protected void CheckSignature(string alg, string errorMessage)
         {
-            if (!string.IsNullOrWhiteSpace(alg) && !_signHandlers.Any(s => s.AlgName == alg))
+            if (!string.IsNullOrWhiteSpace(alg) && !SignHandlers.Any(s => s.AlgName == alg))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, errorMessage);
             }
@@ -493,12 +440,12 @@ namespace SimpleIdServer.OAuth.Api.Register
 
         protected void CheckEncryption(string alg, string enc, string unsupportedAlgMsg, string unsupportedEncMsg, string parameterName)
         {
-            if (!string.IsNullOrWhiteSpace(alg) && !_cekHandlers.Any(c => c.AlgName == alg))
+            if (!string.IsNullOrWhiteSpace(alg) && !CEKHandlers.Any(c => c.AlgName == alg))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, unsupportedAlgMsg);
             }
 
-            if (!string.IsNullOrWhiteSpace(enc) && !_encHandlers.Any(c => c.EncName == enc))
+            if (!string.IsNullOrWhiteSpace(enc) && !ENCHandlers.Any(c => c.EncName == enc))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, unsupportedEncMsg);
             }

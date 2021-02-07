@@ -210,7 +210,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "scimClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("scimClientSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -252,7 +252,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "umaClient",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("umaClientSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "umaClientSecret", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -289,7 +289,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "simpleIdServerWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("simpleIdServerWebsiteSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "simpleIdServerWebsiteSecret", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -327,7 +327,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "tradWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("tradWebsiteSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "tradWebsiteSecret", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -364,7 +364,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "native",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("nativeSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
                 },
                 TokenEndPointAuthMethod = "pkce",
                 ApplicationType = "web",
@@ -398,7 +398,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "caseManagementWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("b98113b5-f45f-4a4a-9db5-610b7183e148"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -436,7 +436,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "caseManagementTasklistWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("b98113b5-f45f-4a4a-9db5-610b7183e148"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -474,7 +474,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "caseManagementPerformanceWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("91894b86-c57e-489a-838d-fb82621a67ee"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "91894b86-c57e-489a-838d-fb82621a67ee", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -512,7 +512,7 @@ namespace SimpleIdServer.OpenID.Startup
                 ClientId = "medikitWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("f200eeb0-a6a3-465e-be91-97806e5dd3bc"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "f200eeb0-a6a3-465e-be91-97806e5dd3bc", null)
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",

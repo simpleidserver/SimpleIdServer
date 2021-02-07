@@ -102,6 +102,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         [When("execute HTTP GET request '(.*)'")]
         public async Task WhenExecuteHTTPGetRequest(string url, Table table)
         {
+            url = ParseValue(url).ToString();
             string authHeader = null;
             foreach (var record in table.Rows)
             {

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using System.Collections.Generic;
 using System.Globalization;
@@ -432,6 +433,46 @@ namespace SimpleIdServer.OAuth.Extensions
             }
 
             return jToken;
+        }
+
+        public static JObject AddNotEmpty(this JObject jObj, string name, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                jObj.Add(name, value);
+            }
+
+            return jObj;
+        }
+
+        public static JObject AddNotEmpty(this JObject jObj, string name, IEnumerable<string> values)
+        {
+            if (values != null && values.Any())
+            {
+                jObj.Add(name, JArray.FromObject(values));
+            }
+
+            return jObj;
+        }
+
+        public static JObject AddNotEmpty(this JObject jObj, string name, ICollection<OAuthTranslation> translations)
+        {
+            if (translations != null && translations.Any())
+            {
+                foreach (var translation in translations)
+                {
+                    if (string.IsNullOrWhiteSpace(translation.Language))
+                    {
+                        jObj.Add(name, translation.Value);
+                    }
+                    else
+                    {
+                        jObj.Add($"{name}#{translation.Language}", translation.Value);
+                    }
+                }
+            }
+
+            return jObj;
         }
     }
 }

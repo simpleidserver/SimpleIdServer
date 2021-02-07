@@ -8,9 +8,10 @@ using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
-using SimpleIdServer.OAuth.Api.Register;
+using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
@@ -32,15 +33,26 @@ namespace SimpleIdServer.OpenID.Api.Register
     /// <summary>
     /// https://openid.net/specs/openid-connect-registration-1_0.html
     /// </summary>
-    public class OpenIDRegisterRequestHandler : OAuthRegisterRequestHandler
+    public class AddOpenIdClientHandler : AddOAuthClientHandler
     {
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly OpenIDHostOptions _openIDHostOptions;
 
-        public OpenIDRegisterRequestHandler(IEnumerable<IGrantTypeHandler> grantTypeHandlers, IEnumerable<IResponseTypeHandler> responseTypeHandlers,
-            IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers, IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository, IOAuthScopeQueryRepository oauthScopeRepository, IJwtParser jwtParser, IHttpClientFactory httpClientFactory, IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IEnumerable<ISignHandler> signHandlers,
-            IEnumerable<ICEKHandler> cekHandlers, IEnumerable<IEncHandler> encHandlers, IOptions<OAuthHostOptions> oauthHostOptions, IOptions<OpenIDHostOptions> openidHostOptions) 
+        public AddOpenIdClientHandler(
+            IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
+            IEnumerable<IResponseTypeHandler> responseTypeHandlers,
+            IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers, 
+            IOAuthClientQueryRepository oauthClientQueryRepository,
+            IOAuthClientCommandRepository oAuthClientCommandRepository, 
+            IOAuthScopeQueryRepository oauthScopeRepository, 
+            IJwtParser jwtParser, 
+            IHttpClientFactory httpClientFactory, 
+            IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
+            IEnumerable<ISignHandler> signHandlers,
+            IEnumerable<ICEKHandler> cekHandlers, 
+            IEnumerable<IEncHandler> encHandlers, 
+            IOptions<OAuthHostOptions> oauthHostOptions, 
+            IOptions<OpenIDHostOptions> openidHostOptions) 
             : base(grantTypeHandlers, responseTypeHandlers, oauthClientAuthenticationHandlers, oauthClientQueryRepository, oAuthClientCommandRepository, oauthScopeRepository, jwtParser, httpClientFactory, signHandlers, cekHandlers, encHandlers, oauthHostOptions)
         {
             _subjectTypeBuilders = subjectTypeBuilders;
@@ -95,9 +107,21 @@ namespace SimpleIdServer.OpenID.Api.Register
             return base.Check(handlerContext, token);
         }
 
-        protected override async Task<JObject> Create(HandlerContext context, CancellationToken token)
+        protected override async Task<OAuthClient> BuildOAuthClient(JObject jObj, CancellationToken cancellationToken)
         {
-            var jObj = context.Request.Data;
+            var openidClient = new OpenIdClient();
+            await EnrichOpenIdClient(openidClient, jObj, cancellationToken);
+            return openidClient;
+        }
+
+        protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
+        {
+            var openidClient = oauthClient as OpenIdClient;
+            return openidClient.ToDto(issuer);
+        }
+
+        protected async Task EnrichOpenIdClient(OpenIdClient openidClient, JObject jObj, CancellationToken cancellationToken)
+        {
             var applicationType = GetDefaultApplicationType(jObj);
             var sectorIdentifierUri = jObj.GetSectorIdentifierUriFromRegisterRequest();
             var subjectType = jObj.GetSubjectTypeFromRegisterRequest();
@@ -149,8 +173,7 @@ namespace SimpleIdServer.OpenID.Api.Register
                 requestObjectEncryptionEnc = A128CBCHS256EncHandler.ENC_NAME;
             }
 
-            var openidClient = new OpenIdClient();
-            var result = await EnrichOAuthClient(context, openidClient, token);
+            await EnrichOAuthClient(openidClient, jObj, cancellationToken);
             openidClient.ApplicationType = applicationType;
             openidClient.SectorIdentifierUri = sectorIdentifierUri;
             openidClient.SubjectType = subjectType;
@@ -167,29 +190,6 @@ namespace SimpleIdServer.OpenID.Api.Register
             openidClient.RequireAuthTime = requireAuthTime.Value;
             openidClient.DefaultAcrValues = acrValues.ToList();
             openidClient.PostLogoutRedirectUris = postLogoutRedirectUris.ToList();
-            OAuthClientCommandRepository.Add(openidClient);
-            await OAuthClientCommandRepository.SaveChanges(token);
-            AddNotEmpty(result, RegisterRequestParameters.ApplicationType, applicationType);
-            AddNotEmpty(result, RegisterRequestParameters.SectorIdentifierUri, sectorIdentifierUri);
-            AddNotEmpty(result, RegisterRequestParameters.SubjectType, subjectType);
-            AddNotEmpty(result, RegisterRequestParameters.IdTokenSignedResponseAlg, idTokenSignedResponseAlg);
-            AddNotEmpty(result, RegisterRequestParameters.IdTokenEncryptedResponseAlg, idTokenEncryptedResponseAlg);
-            AddNotEmpty(result, RegisterRequestParameters.IdTokenEncryptedResponseEnc, idTokenEncryptedResponseEnc);
-            AddNotEmpty(result, RegisterRequestParameters.UserInfoSignedResponseAlg, userInfoSignedResponseAlg);
-            AddNotEmpty(result, RegisterRequestParameters.UserInfoEncryptedResponseAlg, userInfoEncryptedResponseAlg);
-            AddNotEmpty(result, RegisterRequestParameters.UserInfoEncryptedResponseEnc, userInfoEncryptedResponseEnc);
-            AddNotEmpty(result, RegisterRequestParameters.RequestObjectSigningAlg, requestObjectSigningAlg);
-            AddNotEmpty(result, RegisterRequestParameters.RequestObjectEncryptionAlg, requestObjectEncryptionAlg);
-            AddNotEmpty(result, RegisterRequestParameters.RequestObjectEncryptionEnc, requestObjectEncryptionEnc);
-            if (defaultMaxAge != null)
-            {
-                AddNotEmpty(result, RegisterRequestParameters.DefaultMaxAge, defaultMaxAge.Value.ToString().ToLowerInvariant());
-            }
-
-            AddNotEmpty(result, RegisterRequestParameters.RequireAuthTime, requireAuthTime.Value.ToString().ToLowerInvariant());
-            AddNotEmpty(result, RegisterRequestParameters.DefaultAcrValues, acrValues);
-            AddNotEmpty(result, RegisterRequestParameters.PostLogoutRedirectUris, postLogoutRedirectUris);
-            return result;
         }
 
         protected override void CheckRedirectUrl(HandlerContext context, string redirectUrl)

@@ -47,7 +47,7 @@ namespace SimpleIdServer.OAuth.Api.Jwks
             foreach (var jsonWebKey in jsonWebKeys)
             {
                 jsonWebKey.Renew();
-                _jsonWebKeyCommandRepository.Update(jsonWebKey, token);
+                await _jsonWebKeyCommandRepository.Update(jsonWebKey, token);
             }
 
             await _jsonWebKeyCommandRepository.SaveChanges(token);

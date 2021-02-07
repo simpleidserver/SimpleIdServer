@@ -15,7 +15,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenProfiles
         }
 
         public string Profile => DEFAULT_NAME;
-        public static string DEFAULT_NAME = "Bearer";
+        public const string DEFAULT_NAME = "Bearer";
 
         public void Enrich(HandlerContext context)
         {

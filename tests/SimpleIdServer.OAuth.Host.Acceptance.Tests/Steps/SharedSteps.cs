@@ -62,8 +62,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("execute HTTP GET request '(.*)'")]
         public async Task GivenExecuteHTTPGetRequest(string url, Table table)
         {
+            url = ParseValue(url).ToString();
             string authHeader = null;
-
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
@@ -233,6 +233,13 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         {
             var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
             _scenarioContext.Set(jObj[parameter].ToString(), parameter);
+        }
+
+        [When("extract parameter '(.*)' from JSON body into '(.*)'")]
+        public void GivenExtractParameterFromBody(string parameter, string key)
+        {
+            var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
+            _scenarioContext.Set(jObj[parameter].ToString(), key);
         }
 
         [When("build software statement")]

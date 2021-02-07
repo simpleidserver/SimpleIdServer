@@ -104,7 +104,7 @@ namespace SimpleIdServer.OpenID.UI
                 {
                     consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                     user.Consents.Add(consent);
-                    _oAuthUserCommandRepository.Update(user, token);
+                    await _oAuthUserCommandRepository.Update(user, token);
                     await _oAuthUserCommandRepository.SaveChanges(token);
                 }
 

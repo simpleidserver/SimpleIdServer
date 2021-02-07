@@ -23,12 +23,12 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return true;
         }
 
-        public bool Update(T data, CancellationToken token)
+        public Task<bool> Update(T data, CancellationToken token)
         {
             var record = _lstData.First(l => l.Equals(data));
             _lstData.Remove(record);
             _lstData.Add((T)record.Clone());
-            return true;
+            return Task.FromResult(true);
         }
 
         public Task<int> SaveChanges(CancellationToken token)

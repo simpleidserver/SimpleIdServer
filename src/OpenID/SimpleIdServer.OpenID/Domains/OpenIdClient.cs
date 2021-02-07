@@ -186,7 +186,9 @@ namespace SimpleIdServer.OpenID.Domains
                 SubjectType = SubjectType,
                 UserInfoEncryptedResponseAlg = UserInfoEncryptedResponseAlg,
                 UserInfoEncryptedResponseEnc = UserInfoEncryptedResponseEnc,
-                UserInfoSignedResponseAlg = UserInfoSignedResponseAlg
+                UserInfoSignedResponseAlg = UserInfoSignedResponseAlg,
+                RegistrationAccessToken = RegistrationAccessToken,
+                PostLogoutRedirectUris = PostLogoutRedirectUris
             };
         }
     }

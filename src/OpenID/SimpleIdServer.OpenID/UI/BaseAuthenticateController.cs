@@ -62,7 +62,7 @@ namespace SimpleIdServer.OpenID.UI
                 var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
                 user.AuthenticationTime = DateTime.UtcNow;
-                _oauthUserCommandRepository.Update(user, token);
+                await _oauthUserCommandRepository.Update(user, token);
                 await _oauthUserCommandRepository.SaveChanges(token);
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {

@@ -12,5 +12,7 @@ namespace SimpleIdServer.OAuth.Persistence.Parameters
             OrderBy = "update_datetime";
             Order = SortOrders.DESC;
         }
+
+        public string RegistrationAccessToken { get; set; }
     }
 }

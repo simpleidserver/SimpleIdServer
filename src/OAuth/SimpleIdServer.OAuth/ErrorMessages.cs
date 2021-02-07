@@ -31,6 +31,7 @@ namespace SimpleIdServer.OAuth
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC = "token_encrypted_response_enc is not supported";
         public const string BAD_RESPONSE_TYPES = "response types {0} are not supported";
         public const string BAD_RESPONSE_TYPES_CLIENT = "response types {0} are not supported by the client";
+        public const string BAD_ACCESS_TOKEN = "access token is not correct";
         public const string BAD_REDIRECT_URI = "redirect uri {0} is not correct";
         public const string BAD_CLIENT_URI = "client uri {0} is not correct";
         public const string BAD_LOGO_URI = "logo uri {0} is not correct";
@@ -38,6 +39,7 @@ namespace SimpleIdServer.OAuth
         public const string BAD_TOS_URI = "tos uri {0} is not correct";
         public const string BAD_JWKS_URI = "jwks uri {0} is not correct";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";
+        public const string MISSING_ACCESS_TOKEN = "access token is missing";
         public const string BAD_TOKEN = "bad token";
         public const string BAD_CLIENT_ASSERTION_AUDIENCES = "bad client assertion audiences";
         public const string BAD_CLIENT_ASSERTION_EXPIRED = "bad client assertion expired";
@@ -55,5 +57,6 @@ namespace SimpleIdServer.OAuth
         public const string AUTHORIZATION_CODE_ALREADY_USED = "authorization code has already been used, all tokens previously issued have been revoked";
         public const string ACCESS_TOKEN_REJECTED = "access token has been rejected";
         public const string REFRESH_TOKEN_IS_EXPIRED = "refresh token is expired";
+        public const string ACCESS_TOKEN_VALID_CLIENT = "access token can be used for the client '{0}' and not for '{1}'";
     }
 }

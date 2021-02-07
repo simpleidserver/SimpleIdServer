@@ -19,18 +19,20 @@ namespace SimpleIdServer.OAuth.Domains
 
     public class ClientSecret : ICloneable
     {
-        public ClientSecret(ClientSecretTypes type, string value)
+        public ClientSecret(ClientSecretTypes type, string value, DateTime? expirationDateTime)
         {
             Type = type;
             Value = value;
+            ExpirationDateTime = expirationDateTime;
         }
 
         public ClientSecretTypes Type { get; set; }
         public string Value { get; set; }
+        public DateTime? ExpirationDateTime { get; set; }
 
         public object Clone()
         {
-            return new ClientSecret(Type, Value);
+            return new ClientSecret(Type, Value, ExpirationDateTime);
         }
     }
 
@@ -183,6 +185,11 @@ namespace SimpleIdServer.OAuth.Domains
         /// </summary>
         public DateTime UpdateDateTime { get; set; }
 
+        /// <summary>
+        /// String containing the access token to be used at the client configuration endpoint to perform subsequent operations upon the client registration.
+        /// </summary>
+        public string RegistrationAccessToken { get; set; }
+
         public async Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(IHttpClientFactory httpClientFactory)
         {
             if (JsonWebKeys != null && JsonWebKeys.Any())
@@ -233,9 +240,9 @@ namespace SimpleIdServer.OAuth.Domains
             PolicyUris.Add(new OAuthTranslation($"{ClientId}_policy_uri", value, language));
         }
 
-        public void AddSharedSecret(string secret)
+        public void AddSharedSecret(string secret, DateTime? expirationDateTime)
         {
-            Secrets.Add(new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash(secret)));
+            Secrets.Add(new ClientSecret(ClientSecretTypes.SharedSecret, secret, expirationDateTime));
         }
 
         /// <summary>
@@ -277,6 +284,7 @@ namespace SimpleIdServer.OAuth.Domains
                 Contacts = Contacts.ToList(),
                 SoftwareId = SoftwareId,
                 SoftwareVersion = SoftwareVersion,
+                RegistrationAccessToken = RegistrationAccessToken,
                 PostLogoutRedirectUris = PostLogoutRedirectUris.ToList()
             };
         }

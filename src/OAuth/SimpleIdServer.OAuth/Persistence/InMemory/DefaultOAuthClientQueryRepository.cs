@@ -45,6 +45,11 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
         public Task<SearchResult<OAuthClient>> Find(SearchClientParameter parameter, CancellationToken token)
         {
             var result = _clients.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(parameter.RegistrationAccessToken))
+            {
+                result = result.Where(_ => _.RegistrationAccessToken == parameter.RegistrationAccessToken);
+            }
+
             if (MAPPING_CLIENT_TO_PROPERTYNAME.ContainsKey(parameter.OrderBy))
             {
                 result = result.InvokeOrderBy(MAPPING_CLIENT_TO_PROPERTYNAME[parameter.OrderBy], parameter.Order);
