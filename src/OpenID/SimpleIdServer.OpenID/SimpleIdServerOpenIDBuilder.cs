@@ -32,15 +32,10 @@ namespace SimpleIdServer.OpenID
             return this;
         }
 
-        public SimpleIdServerOpenIDBuilder AddClients(List<OpenIdClient> clients)
+        public SimpleIdServerOpenIDBuilder AddClients(List<OpenIdClient> clients, List<OpenIdScope> scopes)
         {
             _serviceCollection.AddSingleton<IOAuthClientQueryRepository>(new DefaultOpenIdClientQueryRepository(clients));
-            _serviceCollection.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients));
-            return this;
-        }
-
-        public SimpleIdServerOpenIDBuilder AddScopes(List<OpenIdScope> scopes)
-        {
+            _serviceCollection.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients, scopes));
             _serviceCollection.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
             _serviceCollection.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
             return this;

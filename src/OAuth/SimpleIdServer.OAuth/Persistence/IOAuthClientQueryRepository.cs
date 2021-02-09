@@ -11,7 +11,7 @@ namespace SimpleIdServer.OAuth.Persistence
 {
     public interface IOAuthClientQueryRepository
     {
-        Task<OAuthClient> FindOAuthClientById(string clientId);
+        Task<OAuthClient> FindOAuthClientById(string clientId, CancellationToken cancellationToken);
         Task<IEnumerable<OAuthClient>> FindOAuthClientByIds(IEnumerable<string> clientIds, CancellationToken token);
         Task<SearchResult<OAuthClient>> Find(SearchClientParameter parameter, CancellationToken token);
     }

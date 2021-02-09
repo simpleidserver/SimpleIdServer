@@ -63,10 +63,9 @@ namespace SimpleIdServer.OpenID.Startup
                         SIDOpenIdConstants.StandardScopes.Phone.Name
                     };
                 })
-                .AddClients(DefaultConfiguration.Clients)
+                .AddClients(DefaultConfiguration.Clients, DefaultConfiguration.Scopes)
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
-                .AddScopes(DefaultConfiguration.Scopes)
                 // .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication();
             services.Configure<ForwardedHeadersOptions>(options =>

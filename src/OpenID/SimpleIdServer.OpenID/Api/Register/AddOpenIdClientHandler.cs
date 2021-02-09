@@ -2,31 +2,21 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Jwe.CEKHandlers;
 using SimpleIdServer.Jwt.Jwe.EncHandlers;
 using SimpleIdServer.Jwt.Jws.Handlers;
-using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
-using SimpleIdServer.OAuth.Api.Token.Handlers;
-using SimpleIdServer.OAuth.Authenticate;
+using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Register
 {
@@ -35,83 +25,37 @@ namespace SimpleIdServer.OpenID.Api.Register
     /// </summary>
     public class AddOpenIdClientHandler : AddOAuthClientHandler
     {
-        private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly OpenIDHostOptions _openIDHostOptions;
 
         public AddOpenIdClientHandler(
-            IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
-            IEnumerable<IResponseTypeHandler> responseTypeHandlers,
-            IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers, 
             IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository, 
-            IOAuthScopeQueryRepository oauthScopeRepository, 
-            IJwtParser jwtParser, 
-            IHttpClientFactory httpClientFactory, 
-            IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
-            IEnumerable<ISignHandler> signHandlers,
-            IEnumerable<ICEKHandler> cekHandlers, 
-            IEnumerable<IEncHandler> encHandlers, 
-            IOptions<OAuthHostOptions> oauthHostOptions, 
-            IOptions<OpenIDHostOptions> openidHostOptions) 
-            : base(grantTypeHandlers, responseTypeHandlers, oauthClientAuthenticationHandlers, oauthClientQueryRepository, oAuthClientCommandRepository, oauthScopeRepository, jwtParser, httpClientFactory, signHandlers, cekHandlers, encHandlers, oauthHostOptions)
+            IOAuthClientCommandRepository oAuthClientCommandRepository,
+            IJwtParser jwtParser,
+            IHttpClientFactory httpClientFactory,
+            IOAuthClientValidator oauthClientValidator,
+            IOptions<OAuthHostOptions> oauthHostOptions,
+            IOptions<OpenIDHostOptions> openidHostOptions) : base(oauthClientQueryRepository, oAuthClientCommandRepository, jwtParser, httpClientFactory, oauthClientValidator, oauthHostOptions)
         {
-            _subjectTypeBuilders = subjectTypeBuilders;
             _openIDHostOptions = openidHostOptions.Value;
         }
 
-        protected override Task Check(HandlerContext handlerContext, CancellationToken token)
+        protected override OAuthClient ExtractClient(HandlerContext handlerContext)
         {
-            var jObj = handlerContext.Request.Data;
-            var applicationType = jObj.GetApplicationTypeFromRegisterRequest();
-            var sectorIdentifierUri = jObj.GetSectorIdentifierUriFromRegisterRequest();
-            var subjectType = jObj.GetSubjectTypeFromRegisterRequest();
-            var idTokenSignedResponseAlg = jObj.GetIdTokenSignedResponseAlgFromRegisterRequest();
-            var idTokenEncryptedResponseAlg = jObj.GetIdTokenEncryptedResponseAlgFromRegisterRequest();
-            var idTokenEncryptedResponseEnc = jObj.GetIdTokenEncryptedResponseEncFromRegisterRequest();
-            var userInfoSignedResponseAlg = jObj.GetUserInfoSignedResponseAlgFromRegisterRequest();
-            var userInfoEncryptedResponseAlg = jObj.GetUserInfoEncryptedResponseAlgFromRegisterRequest();
-            var userInfoEncryptedResponseEnc = jObj.GetUserInfoEncryptedResponseEncFromRegisterRequest();
-            var requestObjectSigningAlg = jObj.GetRequestObjectSigningAlgFromRegisterRequest();
-            var requestObjectEncryptionAlg  = jObj.GetRequestObjectEncryptionAlgFromRegisterRequest();
-            var requestObjectEncryptionEnc  = jObj.GetRequestObjectEncryptionEncFromRegisterRequest();
-            if (!string.IsNullOrWhiteSpace(applicationType) && applicationType != "web" && applicationType != "native")
-            {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_APPLICATION_TYPE);
-            }
-
-            if (!string.IsNullOrWhiteSpace(sectorIdentifierUri))
-            {
-                if (!Uri.IsWellFormedUriString(sectorIdentifierUri, UriKind.Absolute))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SECTOR_IDENTIFIER_URI);
-                }
-
-                var uri = new Uri(sectorIdentifierUri);
-                if (uri.Scheme != "https")
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_SECTOR_IDENTIFIER_URI);
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(subjectType) && !_subjectTypeBuilders.Any(s => s.SubjectType == subjectType))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SUBJECT_TYPE);
-            }
-
-            CheckSignature(idTokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG);
-            CheckEncryption(idTokenEncryptedResponseAlg, idTokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC, RegisterRequestParameters.IdTokenEncryptedResponseAlg);
-            CheckSignature(userInfoSignedResponseAlg, ErrorMessages.UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG);
-            CheckEncryption(userInfoEncryptedResponseAlg, userInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, RegisterRequestParameters.UserInfoEncryptedResponseAlg);
-            CheckSignature(requestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);
-            CheckEncryption(requestObjectEncryptionAlg, requestObjectEncryptionEnc, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC, RegisterRequestParameters.RequestObjectEncryptionAlg);
-            return base.Check(handlerContext, token);
+            var openIdClient = handlerContext.Request.Data.ToDomain();
+            EnrichOpenIdClient(openIdClient);
+            return openIdClient;
         }
 
-        protected override async Task<OAuthClient> BuildOAuthClient(JObject jObj, CancellationToken cancellationToken)
+        protected void EnrichOpenIdClient(OpenIdClient openidClient)
         {
-            var openidClient = new OpenIdClient();
-            await EnrichOpenIdClient(openidClient, jObj, cancellationToken);
-            return openidClient;
+            EnrichClient(openidClient);
+            SetDefaultApplicationType(openidClient);
+            SetDefaultSubjectType(openidClient);
+            SetDefaultIdTokenResponseAlg(openidClient);
+            SetDefaultMaxAge(openidClient);
+            SetDefaultIdTokenEncryptedResponseAlg(openidClient);
+            SetUserInfoEncryptedResponseAlg(openidClient);
+            SetRequestObjectEncryptionAlg(openidClient);
         }
 
         protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
@@ -120,111 +64,60 @@ namespace SimpleIdServer.OpenID.Api.Register
             return openidClient.ToDto(issuer);
         }
 
-        protected async Task EnrichOpenIdClient(OpenIdClient openidClient, JObject jObj, CancellationToken cancellationToken)
+        protected virtual void SetDefaultApplicationType(OpenIdClient openidClient)
         {
-            var applicationType = GetDefaultApplicationType(jObj);
-            var sectorIdentifierUri = jObj.GetSectorIdentifierUriFromRegisterRequest();
-            var subjectType = jObj.GetSubjectTypeFromRegisterRequest();
-            var idTokenSignedResponseAlg = jObj.GetIdTokenSignedResponseAlgFromRegisterRequest();
-            var idTokenEncryptedResponseAlg = jObj.GetIdTokenEncryptedResponseAlgFromRegisterRequest();
-            var idTokenEncryptedResponseEnc = jObj.GetIdTokenEncryptedResponseEncFromRegisterRequest();
-            var userInfoSignedResponseAlg = jObj.GetUserInfoSignedResponseAlgFromRegisterRequest();
-            var userInfoEncryptedResponseAlg = jObj.GetUserInfoEncryptedResponseAlgFromRegisterRequest();
-            var userInfoEncryptedResponseEnc = jObj.GetUserInfoEncryptedResponseEncFromRegisterRequest();
-            var requestObjectSigningAlg = jObj.GetRequestObjectSigningAlgFromRegisterRequest();
-            var requestObjectEncryptionAlg = jObj.GetRequestObjectEncryptionAlgFromRegisterRequest();
-            var requestObjectEncryptionEnc = jObj.GetRequestObjectEncryptionEncFromRegisterRequest();
-            var defaultMaxAge = jObj.GetDefaultMaxAgeFromRegisterRequest();
-            var requireAuthTime = jObj.GetRequireAuhTimeFromRegisterRequest();
-            var acrValues = jObj.GetDefaultAcrValuesFromRegisterRequest();
-            var postLogoutRedirectUris = jObj.GetPostLogoutRedirectUrisFromRegisterRequest();
-            if (string.IsNullOrWhiteSpace(subjectType))
+            if (string.IsNullOrWhiteSpace(openidClient.ApplicationType))
             {
-                subjectType = _openIDHostOptions.DefaultSubjectType;
-            }
-
-            if (string.IsNullOrWhiteSpace(idTokenSignedResponseAlg))
-            {
-                idTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
-            }
-
-            if (defaultMaxAge == null)
-            {
-                defaultMaxAge = _openIDHostOptions.DefaultMaxAge;
-            }
-
-            if (requireAuthTime == null)
-            {
-                requireAuthTime = false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(idTokenEncryptedResponseAlg) && string.IsNullOrWhiteSpace(idTokenEncryptedResponseEnc))
-            {
-                idTokenEncryptedResponseEnc = A128CBCHS256EncHandler.ENC_NAME;
-            }
-
-            if (!string.IsNullOrWhiteSpace(userInfoEncryptedResponseAlg) && string.IsNullOrWhiteSpace(userInfoEncryptedResponseEnc))
-            {
-                userInfoEncryptedResponseEnc = A128CBCHS256EncHandler.ENC_NAME;
-            }
-
-            if (!string.IsNullOrWhiteSpace(requestObjectEncryptionAlg) && string.IsNullOrWhiteSpace(requestObjectEncryptionEnc))
-            {
-                requestObjectEncryptionEnc = A128CBCHS256EncHandler.ENC_NAME;
-            }
-
-            await EnrichOAuthClient(openidClient, jObj, cancellationToken);
-            openidClient.ApplicationType = applicationType;
-            openidClient.SectorIdentifierUri = sectorIdentifierUri;
-            openidClient.SubjectType = subjectType;
-            openidClient.IdTokenSignedResponseAlg = idTokenSignedResponseAlg;
-            openidClient.IdTokenEncryptedResponseAlg = idTokenEncryptedResponseAlg;
-            openidClient.IdTokenEncryptedResponseEnc = idTokenEncryptedResponseEnc;
-            openidClient.UserInfoSignedResponseAlg = userInfoSignedResponseAlg;
-            openidClient.UserInfoEncryptedResponseAlg = userInfoEncryptedResponseAlg;
-            openidClient.UserInfoEncryptedResponseEnc = userInfoEncryptedResponseEnc;
-            openidClient.RequestObjectSigningAlg = requestObjectSigningAlg;
-            openidClient.RequestObjectEncryptionAlg = requestObjectEncryptionAlg;
-            openidClient.RequestObjectEncryptionEnc = requestObjectEncryptionEnc;
-            openidClient.DefaultMaxAge = defaultMaxAge;
-            openidClient.RequireAuthTime = requireAuthTime.Value;
-            openidClient.DefaultAcrValues = acrValues.ToList();
-            openidClient.PostLogoutRedirectUris = postLogoutRedirectUris.ToList();
-        }
-
-        protected override void CheckRedirectUrl(HandlerContext context, string redirectUrl)
-        {
-            var jObj = context.Request.Data;
-            var applicationType = GetDefaultApplicationType(jObj);
-            if (!Uri.IsWellFormedUriString(redirectUrl, UriKind.Absolute))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, string.Format(OAuth.ErrorMessages.BAD_REDIRECT_URI, redirectUrl));
-            }
-
-            var uri = new Uri(redirectUrl);
-            if (applicationType == "web")
-            {
-                if (uri.Scheme.ToLowerInvariant() != "https" && _openIDHostOptions.IsRedirectionUrlHTTPSRequired)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_HTTPS_REDIRECT_URI);
-                }
-
-                if (uri.Host.ToLowerInvariant() == "localhost" && !_openIDHostOptions.IsLocalhostAllowed)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_LOCALHOST_REDIRECT_URI);
-                }
+                openidClient.ApplicationType = "web";
             }
         }
 
-        private static string GetDefaultApplicationType(JObject jObj)
+        protected virtual void SetDefaultSubjectType(OpenIdClient openidClient)
         {
-            var applicationType = jObj.GetApplicationTypeFromRegisterRequest();
-            if (string.IsNullOrWhiteSpace(applicationType))
+            if (string.IsNullOrWhiteSpace(openidClient.SubjectType))
             {
-                applicationType = "web";
+                openidClient.SubjectType = _openIDHostOptions.DefaultSubjectType;
             }
+        }
 
-            return applicationType;
+        protected virtual void SetDefaultIdTokenResponseAlg(OpenIdClient openidClient)
+        {
+            if (string.IsNullOrWhiteSpace(openidClient.IdTokenSignedResponseAlg))
+            {
+                openidClient.IdTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
+            }
+        }
+
+        protected virtual void SetDefaultMaxAge(OpenIdClient openidClient)
+        {
+            if (openidClient.DefaultMaxAge == null)
+            {
+                openidClient.DefaultMaxAge = _openIDHostOptions.DefaultMaxAge;
+            }
+        }
+
+        protected virtual void SetDefaultIdTokenEncryptedResponseAlg(OpenIdClient openidClient)
+        {
+            if (!string.IsNullOrWhiteSpace(openidClient.IdTokenEncryptedResponseAlg) && string.IsNullOrWhiteSpace(openidClient.IdTokenEncryptedResponseEnc))
+            {
+                openidClient.IdTokenEncryptedResponseEnc = A128CBCHS256EncHandler.ENC_NAME;
+            }
+        }
+
+        protected virtual void SetUserInfoEncryptedResponseAlg(OpenIdClient openidClient)
+        {
+            if (!string.IsNullOrWhiteSpace(openidClient.UserInfoEncryptedResponseAlg) && string.IsNullOrWhiteSpace(openidClient.UserInfoEncryptedResponseEnc))
+            {
+                openidClient.UserInfoEncryptedResponseEnc = A128CBCHS256EncHandler.ENC_NAME;
+            }
+        }
+
+        protected virtual void SetRequestObjectEncryptionAlg(OpenIdClient openidClient)
+        {
+            if (!string.IsNullOrWhiteSpace(openidClient.RequestObjectEncryptionAlg) && string.IsNullOrWhiteSpace(openidClient.RequestObjectEncryptionEnc))
+            {
+                openidClient.RequestObjectEncryptionEnc = A128CBCHS256EncHandler.ENC_NAME;
+            }
         }
     }
 }

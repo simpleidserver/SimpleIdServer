@@ -274,7 +274,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
 
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
             var clientRepository = (IOAuthClientQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthClientQueryRepository));
-            var oauthClient = await clientRepository.FindOAuthClientById(clientId);
+            var oauthClient = await clientRepository.FindOAuthClientById(clientId, CancellationToken.None);
             var jsonWebKey = oauthClient.JsonWebKeys.First(f => f.Use == Usages.SIG && f.Alg == algName);
             var requestParameter = jwtBuilder.Sign(jwsPayload, jsonWebKey, jsonWebKey.Alg);
             _scenarioContext.Set(requestParameter, "requestParameter");
@@ -524,42 +524,6 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.True(httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri.Contains(url) == true);
-        }
-
-        private async Task<string> BuildJws(string clientId, Table table)
-        {
-            var accessTokenPayload = new JwsPayload();
-            foreach (var row in table.Rows)
-            {
-                var values = row["Value"].Split(",");
-                if (values.Count() > 1 && !row["Value"].StartsWith("{"))
-                {
-                    var jArr = new JArray(values.ToArray());
-                    accessTokenPayload.Add(row["Key"],  jArr);
-                }
-                else
-                {
-                    accessTokenPayload.Add(row["Key"], row["Value"]);
-                }
-            }
-
-            var clientRepository = (IOAuthClientQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthClientQueryRepository));
-            var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var oauthClient = (OpenIdClient)await clientRepository.FindOAuthClientById(clientId);
-            return await jwtBuilder.BuildClientToken(oauthClient, accessTokenPayload, oauthClient.IdTokenSignedResponseAlg, oauthClient.IdTokenEncryptedResponseAlg, oauthClient.IdTokenEncryptedResponseEnc);
-        }
-
-        private static bool CheckJson(string str)
-        {
-            try
-            {
-                JToken.Parse(str);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         private object ParseValue(string val)

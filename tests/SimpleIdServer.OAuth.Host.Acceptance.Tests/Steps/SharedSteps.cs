@@ -112,6 +112,53 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwks, name);
         }
 
+        [When("execute HTTP PUT JSON request '(.*)'")]
+        public async Task GivenExecuteHTTPPutJSONRequest(string url, Table table)
+        {
+            url = ParseValue(url).ToString();
+            string authHeader = null;
+            var jObj = new JObject();
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = record["Value"];
+                if (value.StartsWith('$') && value.EndsWith('$'))
+                {
+                    value = value.TrimStart('$').TrimEnd('$');
+                    value = _scenarioContext.Get<string>(value);
+                }
+
+                if (key == "Authorization")
+                {
+                    authHeader = ParseValue(value).ToString();
+                }
+                else if (value.StartsWith('[') && value.EndsWith(']'))
+                {
+                    value = value.TrimStart('[').TrimEnd(']');
+                    var splitted = value.Split(',');
+                    jObj.Add(record["Key"], JArray.FromObject(splitted));
+                }
+                else
+                {
+                    jObj.Add(record["Key"], ParseValue(value).ToString());
+                }
+            }
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(url),
+                Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
+            };
+            if (!string.IsNullOrWhiteSpace(authHeader))
+            {
+                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("execute HTTP POST JSON request '(.*)'")]
         public async Task GivenExecuteHTTPPostJSONRequest(string url, Table table)
         {

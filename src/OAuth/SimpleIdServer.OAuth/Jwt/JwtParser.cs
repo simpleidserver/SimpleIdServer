@@ -10,6 +10,7 @@ using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Jwt
@@ -21,14 +22,14 @@ namespace SimpleIdServer.OAuth.Jwt
         Task<string> Decrypt(string jwe);
         string Decrypt(string jwe, JsonWebKey jsonWebKey);
         Task<string> DecryptWithPassword(string jwe, string password);
-        Task<string> Decrypt(string jwe, string clientId);
+        Task<string> Decrypt(string jwe, string clientId, CancellationToken cancellationToken);
         Task<string> Decrypt(string jwe, OAuthClient client);
-        Task<string> Decrypt(string jwe, string clientId, string password);
+        Task<string> Decrypt(string jwe, string clientId, string password, CancellationToken cancellationToken);
         JwsHeader ExtractJwsHeader(string jws);
         JweHeader ExtractJweHeader(string jwe);
         JwsPayload ExtractJwsPayload(string jws);
         Task<JwsPayload> Unsign(string jws);
-        Task<JwsPayload> Unsign(string jws, string clientId);
+        Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken);
         Task<JwsPayload> Unsign(string jws, OAuthClient client);
         JwsPayload Unsign(string jws, JsonWebKey jwk);
     }
@@ -117,9 +118,9 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jweGenerator.Decrypt(jwe, jsonWebKey, password);
         }
 
-        public async Task<string> Decrypt(string jwe, string clientId)
+        public async Task<string> Decrypt(string jwe, string clientId, CancellationToken cancellationToken)
         {
-            var jsonWebKey = await GetJsonWebKeyToDecrypt(jwe, clientId);
+            var jsonWebKey = await GetJsonWebKeyToDecrypt(jwe, clientId, cancellationToken);
             if (jsonWebKey == null)
             {
                 return string.Empty;
@@ -139,9 +140,9 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jweGenerator.Decrypt(jwe, jsonWebKey);
         }
 
-        public async Task<string> Decrypt(string jwe, string clientId, string password)
+        public async Task<string> Decrypt(string jwe, string clientId, string password, CancellationToken cancellationToken)
         {
-            var jsonWebKey = await GetJsonWebKeyToDecrypt(jwe, clientId);
+            var jsonWebKey = await GetJsonWebKeyToDecrypt(jwe, clientId, cancellationToken);
             if (jsonWebKey == null)
             {
                 return string.Empty;
@@ -182,9 +183,9 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jwsGenerator.ExtractPayload(jws, jsonWebKey);
         }
 
-        public async Task<JwsPayload> Unsign(string jws, string clientId)
+        public async Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken)
         {
-            var client = await _oauthClientRepository.FindOAuthClientById(clientId);
+            var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
             if (client == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
@@ -210,9 +211,9 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jwsGenerator.ExtractPayload(jws, jwk);
         }
 
-        private async Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, string clientId)
+        private async Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, string clientId, CancellationToken cancellationToken)
         {
-            var client = await _oauthClientRepository.FindOAuthClientById(clientId);
+            var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
             if (client == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));

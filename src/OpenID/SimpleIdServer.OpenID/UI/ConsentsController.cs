@@ -43,7 +43,7 @@ namespace SimpleIdServer.OpenID.UI
             _oauthHostOptions = opts.Value;
         }
 
-        public async Task<IActionResult> Index(string returnUrl)
+        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -67,7 +67,7 @@ namespace SimpleIdServer.OpenID.UI
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId);
+                var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
                 var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _oauthHostOptions.DefaultCulture;
                 var consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                 var claimDescriptions = new List<string>();

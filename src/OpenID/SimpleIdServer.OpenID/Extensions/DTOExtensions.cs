@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenID.DTOs;
+using System.Linq;
 
 namespace SimpleIdServer.OpenID.Extensions
 {
@@ -33,6 +34,33 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             result.Add(OpenIdClientParameters.RequireAuthTime, openidClient.RequireAuthTime);
+            return result;
+        }
+
+        public static OpenIdClient ToDomain(this JObject jObj)
+        {
+            var result = new OpenIdClient();
+            jObj.EnrichDomain(result);
+            result.ApplicationType = jObj.GetApplicationType();
+            result.SectorIdentifierUri = jObj.GetSectorIdentifierUri();
+            result.SubjectType = jObj.GetSubjectType();
+            result.IdTokenSignedResponseAlg = jObj.GetIdTokenSignedResponseAlg();
+            result.IdTokenEncryptedResponseAlg = jObj.GetIdTokenEncryptedResponseAlg();
+            result.IdTokenEncryptedResponseEnc = jObj.GetIdTokenEncryptedResponseEnc();
+            result.UserInfoSignedResponseAlg = jObj.GetUserInfoSignedResponseAlg();
+            result.UserInfoEncryptedResponseAlg = jObj.GetUserInfoEncryptedResponseAlg();
+            result.UserInfoEncryptedResponseEnc = jObj.GetUserInfoEncryptedResponseEnc();
+            result.RequestObjectSigningAlg = jObj.GetRequestObjectSigningAlg();
+            result.RequestObjectEncryptionAlg = jObj.GetRequestObjectEncryptionAlg();
+            result.RequestObjectEncryptionEnc = jObj.GetRequestObjectEncryptionEnc();
+            result.DefaultMaxAge = jObj.GetDefaultMaxAge();
+            result.RequireAuthTime = jObj.GetRequireAuhTime() ?? false;
+            result.DefaultAcrValues = jObj.GetDefaultAcrValues();
+            result.PostLogoutRedirectUris = jObj.GetPostLogoutRedirectUris();
+            result.AllowedScopes = result.AllowedScopes.Select(s => new OpenIdScope
+            {
+                Name = s.Name
+            }).ToList();
             return result;
         }
     }

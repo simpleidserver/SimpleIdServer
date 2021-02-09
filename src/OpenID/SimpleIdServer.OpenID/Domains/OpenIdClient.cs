@@ -80,7 +80,7 @@ namespace SimpleIdServer.OpenID.Domains
         /// <summary>
         /// Default requested Authentication Context Class Reference values.
         /// </summary>
-        public ICollection<string> DefaultAcrValues { get; set; }
+        public IEnumerable<string> DefaultAcrValues { get; set; }
 
         /// <summary>
         /// Default requested Authentication Context Class Reference values.

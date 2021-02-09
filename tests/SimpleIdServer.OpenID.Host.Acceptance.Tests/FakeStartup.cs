@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Host.Acceptance.Tests.Middlewares;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
         {
             services.AddMvc();
             services.AddSIDOpenID()
-                .AddScopes(DefaultConfiguration.Scopes)
+                .AddClients(new List<OpenIdClient>(), DefaultConfiguration.Scopes)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<Jwt.JsonWebKey>());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -428,6 +428,209 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.FactAttribute(DisplayName="Update client")]
+        [Xunit.TraitAttribute("FeatureTitle", "Register")]
+        [Xunit.TraitAttribute("Description", "Update client")]
+        public virtual void UpdateClient()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Update client", null, ((string[])(null)));
+#line 145
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table21.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+            table21.AddRow(new string[] {
+                        "response_types",
+                        "[token]"});
+            table21.AddRow(new string[] {
+                        "grant_types",
+                        "[implicit]"});
+            table21.AddRow(new string[] {
+                        "client_name",
+                        "name"});
+            table21.AddRow(new string[] {
+                        "client_name#fr",
+                        "nom"});
+            table21.AddRow(new string[] {
+                        "client_name#en",
+                        "name"});
+            table21.AddRow(new string[] {
+                        "client_uri",
+                        "http://localhost"});
+            table21.AddRow(new string[] {
+                        "client_uri#fr",
+                        "http://localhost/fr"});
+            table21.AddRow(new string[] {
+                        "logo_uri",
+                        "http://localhost/1.png"});
+            table21.AddRow(new string[] {
+                        "logo_uri#fr",
+                        "http://localhost/fr/1.png"});
+            table21.AddRow(new string[] {
+                        "software_id",
+                        "software"});
+            table21.AddRow(new string[] {
+                        "software_version",
+                        "1.0"});
+            table21.AddRow(new string[] {
+                        "token_endpoint_auth_method",
+                        "client_secret_basic"});
+            table21.AddRow(new string[] {
+                        "scope",
+                        "scope1"});
+            table21.AddRow(new string[] {
+                        "contacts",
+                        "[addr1,addr2]"});
+            table21.AddRow(new string[] {
+                        "tos_uri",
+                        "http://localhost/tos"});
+            table21.AddRow(new string[] {
+                        "policy_uri",
+                        "http://localhost/policy"});
+            table21.AddRow(new string[] {
+                        "jwks_uri",
+                        "http://localhost/jwks"});
+#line 146
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table21, "When ");
+#line 167
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 168
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'clientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 169
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'registrationAc" +
+                    "cessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table22.AddRow(new string[] {
+                        "Authorization",
+                        "$registrationAccessToken$"});
+            table22.AddRow(new string[] {
+                        "client_id",
+                        "$clientId$"});
+            table22.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+            table22.AddRow(new string[] {
+                        "response_types",
+                        "[token]"});
+            table22.AddRow(new string[] {
+                        "grant_types",
+                        "[implicit]"});
+            table22.AddRow(new string[] {
+                        "client_name",
+                        "name"});
+            table22.AddRow(new string[] {
+                        "client_name#fr",
+                        "nom"});
+            table22.AddRow(new string[] {
+                        "client_name#en",
+                        "name"});
+            table22.AddRow(new string[] {
+                        "client_uri",
+                        "http://clienturi"});
+            table22.AddRow(new string[] {
+                        "client_uri#fr",
+                        "http://clienturi/fr"});
+            table22.AddRow(new string[] {
+                        "logo_uri",
+                        "http://logouri/1.png"});
+            table22.AddRow(new string[] {
+                        "logo_uri#fr",
+                        "http://logouri/fr/1.png"});
+            table22.AddRow(new string[] {
+                        "software_id",
+                        "software"});
+            table22.AddRow(new string[] {
+                        "software_version",
+                        "1.0"});
+            table22.AddRow(new string[] {
+                        "token_endpoint_auth_method",
+                        "client_secret_basic"});
+            table22.AddRow(new string[] {
+                        "scope",
+                        "scope1"});
+            table22.AddRow(new string[] {
+                        "contacts",
+                        "[addr1,addr2]"});
+            table22.AddRow(new string[] {
+                        "tos_uri",
+                        "http://tosuri/tos"});
+            table22.AddRow(new string[] {
+                        "policy_uri",
+                        "http://policyuri/policy"});
+            table22.AddRow(new string[] {
+                        "jwks_uri",
+                        "http://jwksuri/jwks"});
+#line 171
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/register/$clientId$\'", ((string)(null)), table22, "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table23.AddRow(new string[] {
+                        "Authorization",
+                        "$registrationAccessToken$"});
+#line 194
+ testRunner.And("execute HTTP GET request \'http://localhost/register/$clientId$\'", ((string)(null)), table23, "And ");
+#line 198
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 200
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 201
+ testRunner.Then("JSON exists \'client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 202
+ testRunner.Then("JSON exists \'client_secret\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 203
+ testRunner.Then("JSON exists \'client_id_issued_at\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 204
+ testRunner.Then("JSON exists \'grant_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 205
+ testRunner.Then("JSON exists \'redirect_uris\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 206
+ testRunner.Then("JSON exists \'response_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 207
+ testRunner.Then("JSON exists \'contacts\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 208
+ testRunner.Then("JSON \'client_secret_expires_at\'=\'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 209
+ testRunner.Then("JSON \'token_endpoint_auth_method\'=\'client_secret_basic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 210
+ testRunner.Then("JSON \'client_uri\'=\'http://clienturi\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 211
+ testRunner.Then("JSON \'client_uri#fr\'=\'http://clienturi/fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 212
+ testRunner.Then("JSON \'logo_uri\'=\'http://logouri/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 213
+ testRunner.Then("JSON \'logo_uri#fr\'=\'http://logouri/fr/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 214
+ testRunner.Then("JSON \'scope\'=\'scope1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 215
+ testRunner.Then("JSON \'tos_uri\'=\'http://tosuri/tos\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 216
+ testRunner.Then("JSON \'policy_uri\'=\'http://policyuri/policy\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 217
+ testRunner.Then("JSON \'jwks_uri\'=\'http://jwksuri/jwks\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 218
+ testRunner.Then("JSON \'client_name\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 219
+ testRunner.Then("JSON \'client_name#fr\'=\'nom\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 220
+ testRunner.Then("JSON \'client_name#en\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 221
+ testRunner.Then("JSON \'software_id\'=\'software\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 222
+ testRunner.Then("JSON \'software_version\'=\'1.0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

@@ -58,5 +58,7 @@ namespace SimpleIdServer.OAuth
         public const string ACCESS_TOKEN_REJECTED = "access token has been rejected";
         public const string REFRESH_TOKEN_IS_EXPIRED = "refresh token is expired";
         public const string ACCESS_TOKEN_VALID_CLIENT = "access token can be used for the client '{0}' and not for '{1}'";
+        public const string CLIENT_IDENTIFIER_MUST_BE_IDENTICAL = "client identifier must be identical";
+        public const string CLIENT_SECRET_MUST_BE_IDENTICAL = "client secret must be identical";
     }
 }

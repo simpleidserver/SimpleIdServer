@@ -54,7 +54,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             }
 
             var clientId = authenticateInstruction.ClientIdFromHttpRequestBody;
-            var jws = await _jwtParser.Decrypt(clientAssertion, clientId, clientSecret.Value).ConfigureAwait(false);
+            var jws = await _jwtParser.Decrypt(clientAssertion, clientId, clientSecret.Value, cancellationToken);
             if (string.IsNullOrWhiteSpace(jws))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_DECRYPTION);
@@ -66,7 +66,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
             }
 
-            var payload = await _jwtParser.Unsign(clientAssertion, clientId).ConfigureAwait(false);
+            var payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken);
             if (payload == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);

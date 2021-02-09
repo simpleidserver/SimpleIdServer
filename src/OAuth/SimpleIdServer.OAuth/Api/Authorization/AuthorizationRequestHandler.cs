@@ -80,7 +80,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
             }
 
-            context.SetClient(await Validate(context.Request.Data));
+            context.SetClient(await Validate(context.Request.Data, cancellationToken));
             context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, cancellationToken));
             foreach (var validator in _authorizationRequestValidators)
             {
@@ -109,7 +109,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 
-        private async Task<OAuthClient> Validate(JObject jObj)
+        private async Task<OAuthClient> Validate(JObject jObj, CancellationToken cancellationToken)
         {
             var responseTypes = jObj.GetResponseTypesFromAuthorizationRequest();
             var responseMode = jObj.GetResponseModeFromAuthorizationRequest();
@@ -121,7 +121,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
             }
 
-            var client = await _oauthClientRepository.FindOAuthClientById(clientId);
+            var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
             if (client == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));

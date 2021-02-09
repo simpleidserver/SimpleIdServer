@@ -113,7 +113,7 @@ namespace SimpleIdServer.OAuth.Domains
         /// <summary>
         /// Array of OAUTH2.0 grant type strings that the client can use at the token endpoint.
         /// </summary>
-        public ICollection<string> GrantTypes { get; set; }
+        public IEnumerable<string> GrantTypes { get; set; }
 
         /// <summary>
         /// Array of the OAUTH2.0 response type strings that the client can use at the authorization endpoint.
@@ -128,12 +128,12 @@ namespace SimpleIdServer.OAuth.Domains
         /// <summary>
         /// Array of redirection URIS for use in redirect-based flows.
         /// </summary>
-        public ICollection<string> RedirectionUrls { get; set; }
+        public IEnumerable<string> RedirectionUrls { get; set; }
 
         /// <summary>
         /// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
         /// </summary>
-        public ICollection<string> PostLogoutRedirectUris { get; set; }
+        public IEnumerable<string> PostLogoutRedirectUris { get; set; }
 
         /// <summary>
         /// URI string referencing the client’s JSON Web Key (JWK) Set document, which contains the client’s public keys.
@@ -143,7 +143,7 @@ namespace SimpleIdServer.OAuth.Domains
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>
-        public ICollection<JsonWebKey> JsonWebKeys { get; set; }
+        public IEnumerable<JsonWebKey> JsonWebKeys { get; set; }
 
         /// <summary>
         /// Token expiration time in seconds.
@@ -163,7 +163,7 @@ namespace SimpleIdServer.OAuth.Domains
         /// <summary>
         /// Array of strings representing ways to contact people responsible for this client, typically email addresses.
         /// </summary>
-        public ICollection<string> Contacts { get; set; }
+        public IEnumerable<string> Contacts { get; set; }
 
         /// <summary>
         /// A unique identifier string assigned by the client developer or software publisher used by registration endpoints to identify the client software to be dynamically registered.
@@ -287,6 +287,17 @@ namespace SimpleIdServer.OAuth.Domains
                 RegistrationAccessToken = RegistrationAccessToken,
                 PostLogoutRedirectUris = PostLogoutRedirectUris.ToList()
             };
+        }
+
+        public override bool Equals(object obj)
+        {
+            var r = obj as OAuthClient;
+            if (r == null)
+            {
+                return false;
+            }
+
+            return GetHashCode() == r.GetHashCode();
         }
 
         public bool Equals(OAuthClient other)

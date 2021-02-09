@@ -12,15 +12,18 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
 {
     public class DefaultOpenIdClientCommandRepository : IOAuthClientCommandRepository
     {
-        private List<OpenIdClient> _clients;
+        private readonly List<OpenIdClient> _clients;
+        private readonly List<OpenIdScope> _scopes;
 
-        public DefaultOpenIdClientCommandRepository(List<OpenIdClient> clients)
+        public DefaultOpenIdClientCommandRepository(List<OpenIdClient> clients, List<OpenIdScope> scopes)
         {
             _clients = clients;
+            _scopes = scopes;
         }
 
         public bool Add(OAuthClient data)
         {
+            data.AllowedScopes = _scopes.Where(s => data.AllowedScopes.Any(_ => _.Name == s.Name)).ToList();
             _clients.Add((OpenIdClient)data.Clone());
             return true;
         }

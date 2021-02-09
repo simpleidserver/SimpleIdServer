@@ -10,86 +10,86 @@ namespace SimpleIdServer.OpenID.Extensions
 {
     public static class JObjectExtensions
     {
-        #region Register request
+        #region Openid client request
 
-        public static string GetApplicationTypeFromRegisterRequest(this JObject jObj)
+        public static string GetApplicationType(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.ApplicationType);
+            return jObj.GetStr(OpenIdClientParameters.ApplicationType);
         }
 
-        public static string GetSectorIdentifierUriFromRegisterRequest(this JObject jObj)
+        public static string GetSectorIdentifierUri(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.SectorIdentifierUri);
+            return jObj.GetStr(OpenIdClientParameters.SectorIdentifierUri);
         }
 
-        public static string GetSubjectTypeFromRegisterRequest(this JObject jObj)
+        public static string GetSubjectType(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.SubjectType);
+            return jObj.GetStr(OpenIdClientParameters.SubjectType);
         }
 
-        public static string GetIdTokenSignedResponseAlgFromRegisterRequest(this JObject jObj)
+        public static string GetIdTokenSignedResponseAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.IdTokenSignedResponseAlg);
+            return jObj.GetStr(OpenIdClientParameters.IdTokenSignedResponseAlg);
         }
 
-        public static string GetIdTokenEncryptedResponseAlgFromRegisterRequest(this JObject jObj)
+        public static string GetIdTokenEncryptedResponseAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.IdTokenEncryptedResponseAlg);
+            return jObj.GetStr(OpenIdClientParameters.IdTokenEncryptedResponseAlg);
         }
 
-        public static string GetIdTokenEncryptedResponseEncFromRegisterRequest(this JObject jObj)
+        public static string GetIdTokenEncryptedResponseEnc(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.IdTokenEncryptedResponseEnc);
+            return jObj.GetStr(OpenIdClientParameters.IdTokenEncryptedResponseEnc);
         }
 
-        public static string GetUserInfoSignedResponseAlgFromRegisterRequest(this JObject jObj)
+        public static string GetUserInfoSignedResponseAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.UserInfoSignedResponseAlg);
+            return jObj.GetStr(OpenIdClientParameters.UserInfoSignedResponseAlg);
         }
 
-        public static string GetUserInfoEncryptedResponseAlgFromRegisterRequest(this JObject jObj)
+        public static string GetUserInfoEncryptedResponseAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.UserInfoEncryptedResponseAlg);
+            return jObj.GetStr(OpenIdClientParameters.UserInfoEncryptedResponseAlg);
         }
 
-        public static string GetUserInfoEncryptedResponseEncFromRegisterRequest(this JObject jObj)
+        public static string GetUserInfoEncryptedResponseEnc(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.UserInfoEncryptedResponseEnc);
+            return jObj.GetStr(OpenIdClientParameters.UserInfoEncryptedResponseEnc);
         }
 
-        public static string GetRequestObjectSigningAlgFromRegisterRequest(this JObject jObj)
+        public static string GetRequestObjectSigningAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.RequestObjectSigningAlg);
+            return jObj.GetStr(OpenIdClientParameters.RequestObjectSigningAlg);
         }
 
-        public static string GetRequestObjectEncryptionAlgFromRegisterRequest(this JObject jObj)
+        public static string GetRequestObjectEncryptionAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.RequestObjectEncryptionAlg);
+            return jObj.GetStr(OpenIdClientParameters.RequestObjectEncryptionAlg);
         }
 
-        public static string GetRequestObjectEncryptionEncFromRegisterRequest(this JObject jObj)
+        public static string GetRequestObjectEncryptionEnc(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.RequestObjectEncryptionEnc);
+            return jObj.GetStr(OpenIdClientParameters.RequestObjectEncryptionEnc);
         }
 
-        public static double? GetDefaultMaxAgeFromRegisterRequest(this JObject jObj)
+        public static double? GetDefaultMaxAge(this JObject jObj)
         {
-            return jObj.GetDouble(RegisterRequestParameters.DefaultMaxAge);
+            return jObj.GetDouble(OpenIdClientParameters.DefaultMaxAge);
         }
 
-        public static bool? GetRequireAuhTimeFromRegisterRequest(this JObject jObj)
+        public static bool? GetRequireAuhTime(this JObject jObj)
         {
-            return jObj.GetNullableBoolean(RegisterRequestParameters.RequireAuthTime);
+            return jObj.GetNullableBoolean(OpenIdClientParameters.RequireAuthTime);
         }
 
-        public static IEnumerable<string> GetDefaultAcrValuesFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetDefaultAcrValues(this JObject jObj)
         {
-            return jObj.GetArray(RegisterRequestParameters.DefaultAcrValues);
+            return jObj.GetArray(OpenIdClientParameters.DefaultAcrValues);
         }
 
-        public static IEnumerable<string> GetPostLogoutRedirectUrisFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetPostLogoutRedirectUris(this JObject jObj)
         {
-            return jObj.GetArray(RegisterRequestParameters.PostLogoutRedirectUris);
+            return jObj.GetArray(OpenIdClientParameters.PostLogoutRedirectUris);
         }
 
         #endregion

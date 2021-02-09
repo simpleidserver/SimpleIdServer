@@ -3,14 +3,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
-using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
+using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
@@ -138,7 +137,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IAuthenticationContextClassReferenceQueryRepository>(new DefaultAuthenticationContextClassReferenceQueryRepository(acrs));
             services.AddSingleton<IAuthenticationContextClassReferenceCommandRepository>(new DefaultAuthenticationContextClassReferenceCommandRepository(acrs));
             services.AddSingleton<IOAuthClientQueryRepository>(new DefaultOpenIdClientQueryRepository(clients));
-            services.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients));
+            services.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients, scopes));
             services.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
             services.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
             return services;
@@ -172,8 +171,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.RemoveAll<IAddOAuthClientHandler>();
             services.RemoveAll<IGetOAuthClientHandler>();
+            services.RemoveAll<IUpdateOAuthClientHandler>();
+            services.RemoveAll<IOAuthClientValidator>();
             services.AddTransient<IAddOAuthClientHandler, AddOpenIdClientHandler>();
             services.AddTransient<IGetOAuthClientHandler, GetOpenIdClientHandler>();
+            services.AddTransient<IUpdateOAuthClientHandler, UpdateOpenIdClientHandler>();
+            services.AddTransient<IOAuthClientValidator, OpenIdClientValidator>();
             return services;
         }
 

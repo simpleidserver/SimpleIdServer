@@ -17,13 +17,16 @@ namespace SimpleIdServer.OAuth.Api.Register
     {
         private readonly IAddOAuthClientHandler _addOAuthClientHandler;
         private readonly IGetOAuthClientHandler _getOAuthClientHandler;
+        private readonly IUpdateOAuthClientHandler _updateOAuthClientHandler;
 
         public RegistrationController(
             IAddOAuthClientHandler registerRequestHandler,
-            IGetOAuthClientHandler getOAuthClientHandler)
+            IGetOAuthClientHandler getOAuthClientHandler,
+            IUpdateOAuthClientHandler updateOAuthClientHandler)
         {
             _addOAuthClientHandler = registerRequestHandler;
             _getOAuthClientHandler = getOAuthClientHandler;
+            _updateOAuthClientHandler = updateOAuthClientHandler;
         }
 
         [HttpPost]
@@ -75,7 +78,46 @@ namespace SimpleIdServer.OAuth.Api.Register
                     StatusCode = (int)HttpStatusCode.Unauthorized
                 };
             }
+        }
 
+        [HttpPut("{clientId}")]
+        public async Task<IActionResult> Update(string clientId, [FromBody] JObject jObj, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var jObjHeader = Request.Headers.ToJObject();
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObj, jObjHeader));
+                var result = await _updateOAuthClientHandler.Handle(clientId, context, cancellationToken);
+                return new OkObjectResult(result);
+            }
+            catch (OAuthUnauthorizedException ex)
+            {
+                var res = new JObject
+                {
+                    { ErrorResponseParameters.Error, ex.Code },
+                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                };
+                return new ContentResult
+                {
+                    Content = res.ToString(),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.Unauthorized
+                };
+            }
+            catch (OAuthException ex)
+            {
+                var res = new JObject
+                {
+                    { ErrorResponseParameters.Error, ex.Code },
+                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                };
+                return new ContentResult
+                {
+                    Content = res.ToString(),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            }
         }
     }
 }

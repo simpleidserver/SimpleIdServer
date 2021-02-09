@@ -44,7 +44,7 @@ namespace SimpleIdServer.OAuth.Authenticate
             var clientId = TryGettingClientId(authenticateInstruction);
             if (!string.IsNullOrWhiteSpace(clientId))
             {
-                client = await _oauthClientRepository.FindOAuthClientById(clientId);
+                client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
             }
 
             if (client == null)

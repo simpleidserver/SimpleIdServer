@@ -27,7 +27,7 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
         {
             var record = _lstData.First(l => l.Equals(data));
             _lstData.Remove(record);
-            _lstData.Add((T)record.Clone());
+            _lstData.Add((T)data.Clone());
             return Task.FromResult(true);
         }
 

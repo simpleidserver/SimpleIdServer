@@ -45,9 +45,9 @@ namespace SimpleIdServer.OAuth.Api.Management
 
         [HttpGet("clients/{id}")]
         [Authorize("ManageClients")]
-        public virtual async Task<IActionResult> GetClient(string id)
+        public virtual async Task<IActionResult> GetClient(string id, CancellationToken cancellationToken)
         {
-            var client = await _oauthClientQueryRepository.FindOAuthClientById(id);
+            var client = await _oauthClientQueryRepository.FindOAuthClientById(id, cancellationToken);
             if (client == null)
             {
                 return new NotFoundResult();

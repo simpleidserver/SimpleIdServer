@@ -51,7 +51,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             }
 
             var clientId = jwsPayload.GetIssuer();
-            var payload = await _jwtParser.Unsign(clientAssertion, clientId).ConfigureAwait(false);
+            var payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken);
             if (payload == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);

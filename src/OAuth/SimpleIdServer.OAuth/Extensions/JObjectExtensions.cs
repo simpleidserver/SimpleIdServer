@@ -196,91 +196,96 @@ namespace SimpleIdServer.OAuth.Extensions
 
         #endregion
 
-        #region Register request
+        #region OAuth client parameters
 
-        public static string GetTokenSignedResponseAlgFromRegisterRequest(this JObject jObj)
+        public static string GetTokenSignedResponseAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.TokenSignedResponseAlg);
+            return jObj.GetStr(OAuthClientParameters.TokenSignedResponseAlg);
         }
 
-        public static string GetTokenEncryptedResponseAlgFromRegisterRequest(this JObject jObj)
+        public static string GetTokenEncryptedResponseAlg(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.TokenEncryptedResponseAlg);
+            return jObj.GetStr(OAuthClientParameters.TokenEncryptedResponseAlg);
         }
 
-        public static string GetTokenEncryptedResponseEncFromRegisterRequest(this JObject jObj)
+        public static string GetTokenEncryptedResponseEnc(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.TokenEncryptedResponseEnc);
+            return jObj.GetStr(OAuthClientParameters.TokenEncryptedResponseEnc);
         }
 
-        public static IEnumerable<string> GetGrantTypesFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetGrantTypes(this JObject jObj)
         {
-            return jObj.GetArray(RegisterRequestParameters.GrantTypes);
+            return jObj.GetArray(OAuthClientParameters.GrantTypes);
         }
 
-        public static IEnumerable<string> GetRedirectUrisFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetRedirectUris(this JObject jObj)
         {
-            return jObj.GetArray(RegisterRequestParameters.RedirectUris);
+            return jObj.GetArray(OAuthClientParameters.RedirectUris);
         }
 
-        public static string GetTokenEndpointAuthMethodFromRegisterRequest(this JObject jObj)
+        public static string GetTokenEndpointAuthMethod(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.TokenEndpointAuthMethod);
+            return jObj.GetStr(OAuthClientParameters.TokenEndpointAuthMethod);
         }
 
-        public static IEnumerable<string> GetResponseTypesFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetResponseTypes(this JObject jObj)
         {
-            return jObj.GetArray(RegisterRequestParameters.ResponseTypes);
+            return jObj.GetArray(OAuthClientParameters.ResponseTypes);
         }
 
-        public static Dictionary<string, string> GetClientNamesFromRegisterRequest(this JObject jObj)
+        public static Dictionary<string, string> GetClientNames(this JObject jObj)
         {            
-            return jObj.GetTranslationsFromRegisterRequest(RegisterRequestParameters.ClientName);
+            return jObj.GetTranslations(OAuthClientParameters.ClientName);
         }
 
-        public static Dictionary<string, string> GetClientUrisFromRegisterRequest(this JObject jObj)
+        public static Dictionary<string, string> GetClientUris(this JObject jObj)
         {
-            return jObj.GetTranslationsFromRegisterRequest(RegisterRequestParameters.ClientUri);
+            return jObj.GetTranslations(OAuthClientParameters.ClientUri);
         }
 
-        public static Dictionary<string, string> GetLogoUrisFromRegisterRequest(this JObject jObj)
+        public static Dictionary<string, string> GetLogoUris(this JObject jObj)
         {
-            return jObj.GetTranslationsFromRegisterRequest(RegisterRequestParameters.LogoUri);
+            return jObj.GetTranslations(OAuthClientParameters.LogoUri);
         }
 
-        public static Dictionary<string, string> GetTosUrisFromRegisterRequest(this JObject jObj)
+        public static Dictionary<string, string> GetTosUris(this JObject jObj)
         {
-            return jObj.GetTranslationsFromRegisterRequest(RegisterRequestParameters.TosUri);
+            return jObj.GetTranslations(OAuthClientParameters.TosUri);
         }
 
-        public static Dictionary<string, string> GetPolicyUrisFromRegisterRequest(this JObject jObj)
+        public static Dictionary<string, string> GetPolicyUris(this JObject jObj)
         {
-            return jObj.GetTranslationsFromRegisterRequest(RegisterRequestParameters.PolicyUri);
+            return jObj.GetTranslations(OAuthClientParameters.PolicyUri);
         }
 
-        public static string GetJwksUriFromRegisterRequest(this JObject jObj)
+        public static string GetJwksUri(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.JwksUri);
+            return jObj.GetStr(OAuthClientParameters.JwksUri);
         }
 
-        public static string GetSoftwareIdFromRegisterRequest(this JObject jObj)
+        public static string GetSoftwareId(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.SoftwareId);
+            return jObj.GetStr(OAuthClientParameters.SoftwareId);
         }
 
-        public static string GetSoftwareStatementFromRegisterRequest(this JObject jObj)
+        public static string GetSoftwareStatement(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.SoftwareStatement);
+            return jObj.GetStr(OAuthClientParameters.SoftwareStatement);
         }
 
-        public static string GetSoftwareVersionFromRegisterRequest(this JObject jObj)
+        public static string GetSoftwareVersion(this JObject jObj)
         {
-            return jObj.GetStr(RegisterRequestParameters.SoftwareVersion);
+            return jObj.GetStr(OAuthClientParameters.SoftwareVersion);
         }
 
-        public static IEnumerable<JsonWebKey> GetJwksFromRegisterRequest(this JObject jObj)
+        public static string GetRegistrationAccessToken(this JObject jObj)
         {
-            var str = jObj.GetStr(RegisterRequestParameters.Jwks);
+            return jObj.GetStr(OAuthClientParameters.RegistrationAccessToken);
+        }
+
+        public static IEnumerable<JsonWebKey> GetJwks(this JObject jObj)
+        {
+            var str = jObj.GetStr(OAuthClientParameters.Jwks);
             if (string.IsNullOrWhiteSpace(str))
             {
                 return null;
@@ -296,9 +301,9 @@ namespace SimpleIdServer.OAuth.Extensions
             return JsonConvert.DeserializeObject<JArray>(keysJson).Select(k => JsonWebKey.Deserialize(k.ToString()));
         }
 
-        public static IEnumerable<string> GetScopesFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetScopes(this JObject jObj)
         {
-            var scope = jObj.GetStr(RegisterRequestParameters.Scope);
+            var scope = jObj.GetStr(OAuthClientParameters.Scope);
             if (string.IsNullOrWhiteSpace(scope))
             {
                 return new string[0];
@@ -307,12 +312,12 @@ namespace SimpleIdServer.OAuth.Extensions
             return scope.Split(' ');
         }
 
-        public static IEnumerable<string> GetContactsFromRegisterRequest(this JObject jObj)
+        public static IEnumerable<string> GetContacts(this JObject jObj)
         {
-            return jObj.GetArray(RegisterRequestParameters.Contacts);
+            return jObj.GetArray(OAuthClientParameters.Contacts);
         }
 
-        public static Dictionary<string, string> GetTranslationsFromRegisterRequest(this JObject jObj, string name)
+        public static Dictionary<string, string> GetTranslations(this JObject jObj, string name)
         {
             var cultureNames = CultureInfo.GetCultures(CultureTypes.AllCultures).Select(c => c.Name);
             var result = new Dictionary<string, string>();

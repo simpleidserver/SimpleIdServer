@@ -29,7 +29,7 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             _clients = clients;
         }
 
-        public Task<OAuthClient> FindOAuthClientById(string clientId)
+        public Task<OAuthClient> FindOAuthClientById(string clientId, CancellationToken cancellationToken)
         {
             var res = _clients.FirstOrDefault(c => c.ClientId == clientId);
             if (res == null)

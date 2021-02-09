@@ -13,6 +13,7 @@ using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Jwks;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
+using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
@@ -211,6 +212,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IAddOAuthClientHandler, AddOAuthClientHandler>();
             services.AddTransient<IGetOAuthClientHandler, GetOAuthClientHandler>();
+            services.AddTransient<IUpdateOAuthClientHandler, UpdateOAuthClientHandler>();
+            services.AddTransient<IOAuthClientValidator, OAuthClientValidator>();
             return services;
         }
     }

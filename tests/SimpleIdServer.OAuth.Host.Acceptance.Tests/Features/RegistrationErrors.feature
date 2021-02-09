@@ -154,3 +154,91 @@ Scenario: Error is returned when trying to get a client and access token is has 
 	
 	Then HTTP status code equals to '401'
 	Then JSON 'error'='invalid_token'
+
+Scenario: Error is returned when trying to update a client and access token is not passed
+	When execute HTTP PUT JSON request 'http://localhost/register/ClientId'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'
+	Then JSON 'error_description'='access token is missing'
+
+Scenario: Error is returned when trying to update the client and access token is invalid
+	When execute HTTP PUT JSON request 'http://localhost/register/ClientId'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+	| Authorization | accesstoken        |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'
+	Then JSON 'error_description'='access token is not correct'
+
+Scenario: Error is returned when trying to update the client and access token has been issued from a diffrent client
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+	And extract parameter 'registration_access_token' from JSON body into 'firstRegistrationAccessToken'
+
+	And execute HTTP POST JSON request 'http://localhost/register'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body into 'secondClientId'
+
+	And execute HTTP PUT JSON request 'http://localhost/register/$secondClientId$'
+	| Key           | Value                          |
+	| Authorization | $firstRegistrationAccessToken$ |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'
+
+Scenario: Error is returned when trying to update the client and client_id is different
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+	And extract parameter 'registration_access_token' from JSON body into 'firstRegistrationAccessToken'
+	And extract parameter 'client_id' from JSON body into 'firstClientId'
+	
+	And execute HTTP PUT JSON request 'http://localhost/register/$firstClientId$'
+	| Key           | Value                          |
+	| Authorization | $firstRegistrationAccessToken$ |
+	| client_id     | clientId                       |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='client identifier must be identical'
+
+Scenario: Error is returned when trying to update the client and client_secret is different
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key           | Value              |
+	| redirect_uris | [http://localhost] |
+
+	And extract JSON from body
+	And extract parameter 'registration_access_token' from JSON body into 'firstRegistrationAccessToken'
+	And extract parameter 'client_id' from JSON body into 'firstClientId'
+
+	And execute HTTP PUT JSON request 'http://localhost/register/$firstClientId$'
+	| Key           | Value                          |
+	| Authorization | $firstRegistrationAccessToken$ |
+	| client_id     | $firstClientId$                |
+	| client_secret | clientSecret                   |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='client secret must be identical'
