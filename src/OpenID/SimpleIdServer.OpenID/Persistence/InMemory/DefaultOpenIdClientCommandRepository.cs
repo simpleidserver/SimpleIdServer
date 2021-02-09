@@ -36,10 +36,10 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return Task.FromResult(true);
         }
 
-        public bool Delete(OAuthClient data)
+        public Task<bool> Delete(OAuthClient data, CancellationToken cancellationToken)
         {
             _clients.Remove(_clients.First(c => c.ClientId == data.ClientId));
-            return true;
+            return Task.FromResult(true);
         }
 
         public Task<int> SaveChanges(CancellationToken token)

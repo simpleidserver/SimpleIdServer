@@ -98,6 +98,46 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
+
+        [When("execute HTTP DELETE request '(.*)'")]
+        public async Task GivenExecuteHTTPDeleteRequest(string url, Table table)
+        {
+            url = ParseValue(url).ToString();
+            string authHeader = null;
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = record["Value"];
+                if (value.StartsWith('$') && value.EndsWith('$'))
+                {
+                    value = value.TrimStart('$').TrimEnd('$');
+                    value = _scenarioContext.Get<string>(value);
+                }
+
+                if (key == "Authorization")
+                {
+                    authHeader = value;
+                }
+                else
+                {
+                    url = QueryHelpers.AddQueryString(url, record["Key"], value);
+                }
+            }
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(url)
+            };
+            if (!string.IsNullOrWhiteSpace(authHeader))
+            {
+                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("add JSON web key to Authorization Server and store into '(.*)'")]
         public async Task WhenAddJsonWebKey(string name, Table table)
         {

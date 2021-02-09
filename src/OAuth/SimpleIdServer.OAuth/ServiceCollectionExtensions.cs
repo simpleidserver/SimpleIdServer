@@ -213,6 +213,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAddOAuthClientHandler, AddOAuthClientHandler>();
             services.AddTransient<IGetOAuthClientHandler, GetOAuthClientHandler>();
             services.AddTransient<IUpdateOAuthClientHandler, UpdateOAuthClientHandler>();
+            services.AddTransient<IDeleteOAuthClientHandler, DeleteOAuthClientHandler>();
             services.AddTransient<IOAuthClientValidator, OAuthClientValidator>();
             return services;
         }

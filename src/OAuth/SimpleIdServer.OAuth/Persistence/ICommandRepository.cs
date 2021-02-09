@@ -10,7 +10,7 @@ namespace SimpleIdServer.OAuth.Persistence
     {
         bool Add(T data);
         Task<bool> Update(T data, CancellationToken token);
-        bool Delete(T data);
+        Task<bool> Delete(T data, CancellationToken token);
         Task<int> SaveChanges(CancellationToken token);
     }
 }

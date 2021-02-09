@@ -32,10 +32,10 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return Task.FromResult(true);
         }
 
-        public bool Delete(OAuthScope data)
+        public Task<bool> Delete(OAuthScope data, CancellationToken cancellationToken)
         {
             _scopes.Remove(_scopes.First(s => s.Name == data.Name));
-            return true;
+            return Task.FromResult(true);
         }
 
         public Task<int> SaveChanges(CancellationToken token)

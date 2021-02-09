@@ -3,11 +3,8 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,51 +15,15 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
         Task<JObject> Handle(string clientId, HandlerContext handlerContext, CancellationToken cancellationToken);
     }
 
-    public class GetOAuthClientHandler : IGetOAuthClientHandler
+    public class GetOAuthClientHandler : BaseOAuthClientHandler, IGetOAuthClientHandler
     {
-        private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
-        private readonly IOAuthClientCommandRepository _oAuthClientCommandRepository;
-        private ILogger<GetOAuthClientHandler> _logger;
-
-        public GetOAuthClientHandler(
-            IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository,
-            ILogger<GetOAuthClientHandler> logger)
+        public GetOAuthClientHandler(IOAuthClientQueryRepository oauthClientQueryRepository, IOAuthClientCommandRepository oAuthClientCommandRepository, ILogger<BaseOAuthClientHandler> logger) : base(oauthClientQueryRepository, oAuthClientCommandRepository, logger)
         {
-            _oauthClientQueryRepository = oauthClientQueryRepository;
-            _oAuthClientCommandRepository = oAuthClientCommandRepository;
-            _logger = logger;
         }
 
         public virtual async Task<JObject> Handle(string clientId, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var accessToken = handlerContext.Request.GetToken(AutenticationSchemes.Bearer, AutenticationSchemes.Basic);
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                _logger.LogError("access token is missing");
-                throw new OAuthUnauthorizedException(ErrorCodes.INVALID_TOKEN, ErrorMessages.MISSING_ACCESS_TOKEN);
-            }
-
-            var clients = await _oauthClientQueryRepository.Find(new Persistence.Parameters.SearchClientParameter
-            {
-                RegistrationAccessToken = accessToken
-            }, cancellationToken);
-            if (!clients.Content.Any())
-            {
-                _logger.LogError($"access token '{accessToken}' is invalid");
-                throw new OAuthUnauthorizedException(ErrorCodes.INVALID_TOKEN, ErrorMessages.BAD_ACCESS_TOKEN);
-            }
-
-            var client = clients.Content.First();
-            if (client.ClientId != clientId)
-            {
-                client.RegistrationAccessToken = null;
-                await _oAuthClientCommandRepository.Update(client, cancellationToken);
-                await _oAuthClientCommandRepository.SaveChanges(cancellationToken);
-                _logger.LogError($"access token '{accessToken}' can be used for the client '{client.ClientId}' and not for the client '{clientId}'");
-                throw new OAuthUnauthorizedException(ErrorCodes.INVALID_TOKEN, string.Format(ErrorMessages.ACCESS_TOKEN_VALID_CLIENT, client.ClientId, clientId));
-            }
-
+            var client = await GetClient(clientId, handlerContext, cancellationToken);
             return BuildResponse(client, handlerContext.Request.IssuerName);
         }
 

@@ -631,6 +631,112 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.FactAttribute(DisplayName="Delete client")]
+        [Xunit.TraitAttribute("FeatureTitle", "Register")]
+        [Xunit.TraitAttribute("Description", "Delete client")]
+        public virtual void DeleteClient()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Delete client", null, ((string[])(null)));
+#line 225
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table24.AddRow(new string[] {
+                        "redirect_uris",
+                        "[http://localhost]"});
+            table24.AddRow(new string[] {
+                        "response_types",
+                        "[token]"});
+            table24.AddRow(new string[] {
+                        "grant_types",
+                        "[implicit]"});
+            table24.AddRow(new string[] {
+                        "client_name",
+                        "name"});
+            table24.AddRow(new string[] {
+                        "client_name#fr",
+                        "nom"});
+            table24.AddRow(new string[] {
+                        "client_name#en",
+                        "name"});
+            table24.AddRow(new string[] {
+                        "client_uri",
+                        "http://localhost"});
+            table24.AddRow(new string[] {
+                        "client_uri#fr",
+                        "http://localhost/fr"});
+            table24.AddRow(new string[] {
+                        "logo_uri",
+                        "http://localhost/1.png"});
+            table24.AddRow(new string[] {
+                        "logo_uri#fr",
+                        "http://localhost/fr/1.png"});
+            table24.AddRow(new string[] {
+                        "software_id",
+                        "software"});
+            table24.AddRow(new string[] {
+                        "software_version",
+                        "1.0"});
+            table24.AddRow(new string[] {
+                        "token_endpoint_auth_method",
+                        "client_secret_basic"});
+            table24.AddRow(new string[] {
+                        "scope",
+                        "scope1"});
+            table24.AddRow(new string[] {
+                        "contacts",
+                        "[addr1,addr2]"});
+            table24.AddRow(new string[] {
+                        "tos_uri",
+                        "http://localhost/tos"});
+            table24.AddRow(new string[] {
+                        "policy_uri",
+                        "http://localhost/policy"});
+            table24.AddRow(new string[] {
+                        "jwks_uri",
+                        "http://localhost/jwks"});
+#line 226
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table24, "When ");
+#line 247
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 248
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'clientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 249
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'registrationAc" +
+                    "cessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table25.AddRow(new string[] {
+                        "Authorization",
+                        "$registrationAccessToken$"});
+#line 251
+ testRunner.And("execute HTTP DELETE request \'http://localhost/register/$clientId$\'", ((string)(null)), table25, "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table26.AddRow(new string[] {
+                        "Authorization",
+                        "$registrationAccessToken$"});
+#line 256
+ testRunner.And("execute HTTP GET request \'http://localhost/register/$clientId$\'", ((string)(null)), table26, "And ");
+#line 260
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 262
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 263
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 264
+ testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

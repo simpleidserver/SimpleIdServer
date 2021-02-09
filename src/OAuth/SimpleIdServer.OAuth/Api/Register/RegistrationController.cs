@@ -18,15 +18,18 @@ namespace SimpleIdServer.OAuth.Api.Register
         private readonly IAddOAuthClientHandler _addOAuthClientHandler;
         private readonly IGetOAuthClientHandler _getOAuthClientHandler;
         private readonly IUpdateOAuthClientHandler _updateOAuthClientHandler;
+        private readonly IDeleteOAuthClientHandler _deleteOAuthClientHandler;
 
         public RegistrationController(
             IAddOAuthClientHandler registerRequestHandler,
             IGetOAuthClientHandler getOAuthClientHandler,
-            IUpdateOAuthClientHandler updateOAuthClientHandler)
+            IUpdateOAuthClientHandler updateOAuthClientHandler,
+            IDeleteOAuthClientHandler deleteOAuthClientHandler)
         {
             _addOAuthClientHandler = registerRequestHandler;
             _getOAuthClientHandler = getOAuthClientHandler;
             _updateOAuthClientHandler = updateOAuthClientHandler;
+            _deleteOAuthClientHandler = deleteOAuthClientHandler;
         }
 
         [HttpPost]
@@ -63,6 +66,32 @@ namespace SimpleIdServer.OAuth.Api.Register
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, null, jObjHeader));
                 var result = await _getOAuthClientHandler.Handle(clientId, context, cancellationToken);
                 return new OkObjectResult(result);
+            }
+            catch (OAuthUnauthorizedException ex)
+            {
+                var res = new JObject
+                {
+                    { ErrorResponseParameters.Error, ex.Code },
+                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                };
+                return new ContentResult
+                {
+                    Content = res.ToString(),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.Unauthorized
+                };
+            }
+        }
+
+        [HttpDelete("{clientId}")]
+        public async Task<IActionResult> Delete(string clientId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var jObjHeader = Request.Headers.ToJObject();
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, null, jObjHeader));
+                await _deleteOAuthClientHandler.Handle(clientId, context, cancellationToken);
+                return new NoContentResult();
             }
             catch (OAuthUnauthorizedException ex)
             {

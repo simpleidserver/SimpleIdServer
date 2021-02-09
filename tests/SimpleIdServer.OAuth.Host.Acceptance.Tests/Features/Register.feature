@@ -220,3 +220,45 @@ Scenario: Update client
 	Then JSON 'client_name#en'='name'
 	Then JSON 'software_id'='software'
 	Then JSON 'software_version'='1.0'
+
+
+Scenario: Delete client
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                        | Value                     |
+	| redirect_uris              | [http://localhost]        |
+	| response_types             | [token]                   |
+	| grant_types                | [implicit]                |
+	| client_name                | name                      |
+	| client_name#fr             | nom                       |
+	| client_name#en             | name                      |
+	| client_uri                 | http://localhost          |
+	| client_uri#fr              | http://localhost/fr       |
+	| logo_uri                   | http://localhost/1.png    |
+	| logo_uri#fr                | http://localhost/fr/1.png |
+	| software_id                | software                  |
+	| software_version           | 1.0                       |
+	| token_endpoint_auth_method | client_secret_basic       |
+	| scope                      | scope1                    |
+	| contacts                   | [addr1,addr2]             |
+	| tos_uri                    | http://localhost/tos      |
+	| policy_uri                 | http://localhost/policy   |
+	| jwks_uri                   | http://localhost/jwks     |
+
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body into 'clientId'
+	And extract parameter 'registration_access_token' from JSON body into 'registrationAccessToken'
+
+	And execute HTTP DELETE request 'http://localhost/register/$clientId$'
+	| Key           | Value                     |
+	| Authorization | $registrationAccessToken$ |
+
+	
+	And execute HTTP GET request 'http://localhost/register/$clientId$'
+	| Key           | Value                     |
+	| Authorization | $registrationAccessToken$ |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '401'
+	Then JSON 'error'='invalid_token'
+	Then JSON 'error_description'='access token is not correct'
