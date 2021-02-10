@@ -217,14 +217,15 @@ Scenario: Use offline_access scope to get user information from UserInfo endpoin
 	And add user consent : user='administrator', scope='offline_access', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value								 |
-	| response_type | code								 |
-	| client_id     | $client_id$						 |
-	| state         | state								 |
-	| response_mode | query								 |
-	| scope         | openid offline_access		         |
-	| redirect_uri  | https://web.com					 |
-	| ui_locales    | en fr								 |
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | $client_id$           |
+	| state         | state                 |
+	| response_mode | query                 |
+	| scope         | openid offline_access |
+	| redirect_uri  | https://web.com       |
+	| ui_locales    | en fr                 |
+	| nonce         | nonce                 |
 	
 	And extract parameter 'refresh_token' from redirect url
 

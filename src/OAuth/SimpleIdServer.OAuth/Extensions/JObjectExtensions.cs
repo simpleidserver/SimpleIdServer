@@ -230,7 +230,7 @@ namespace SimpleIdServer.OAuth.Extensions
 
         public static IEnumerable<string> GetResponseTypes(this JObject jObj)
         {
-            return jObj.GetArray(OAuthClientParameters.ResponseTypes);
+            return jObj.GetArray(OAuthClientParameters.ResponseTypes).SelectMany(_ => _.Trim().Split(' '));
         }
 
         public static Dictionary<string, string> GetClientNames(this JObject jObj)

@@ -85,46 +85,38 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
             catch(OAuthExceptionBadRequestURIException ex)
             {
-                var state = context.Request.Data.GetStateFromAuthorizationRequest();
-                var jObj = new JObject
-                {
-                    { ErrorResponseParameters.Error, ex.Code },
-                    { ErrorResponseParameters.ErrorDescription, ex.Message }
-                };
-                if (!string.IsNullOrWhiteSpace(state))
-                {
-                    jObj.Add(ErrorResponseParameters.State, state);
-                }
-
-                var payload = Encoding.UTF8.GetBytes(jObj.ToString());
-                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
+                await BuildErrorResponse(context, ex, true);
             }
             catch(OAuthException ex)
             {
-                var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
-                var state = context.Request.Data.GetStateFromAuthorizationRequest();
-                var jObj = new JObject
+                await BuildErrorResponse(context, ex);
+            }
+        }
+
+        private async Task BuildErrorResponse(HandlerContext context, OAuthException ex, bool returnsJSON = false)
+        {
+            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
+            var state = context.Request.Data.GetStateFromAuthorizationRequest();
+            var jObj = new JObject
                 {
                     { ErrorResponseParameters.Error, ex.Code },
                     { ErrorResponseParameters.ErrorDescription, ex.Message }
                 };
-                if (!string.IsNullOrWhiteSpace(state))
-                {
-                    jObj.Add(ErrorResponseParameters.State, state);
-                }
-                if (string.IsNullOrWhiteSpace(redirectUri) || !Uri.TryCreate(redirectUri, UriKind.Absolute, out Uri r))
-                {   
-                    var payload = Encoding.UTF8.GetBytes(jObj.ToString());
-                    HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
-                    return;
-                }
-
-                var dic = jObj.ToEnumerable().ToDictionary(k => k.Key, k => k.Value);
-                var newUrl = new Uri(QueryHelpers.AddQueryString(redirectUri, dic));
-                HttpContext.Response.Redirect(newUrl.AbsoluteUri);
+            if (!string.IsNullOrWhiteSpace(state))
+            {
+                jObj.Add(ErrorResponseParameters.State, state);
             }
+            if ((string.IsNullOrWhiteSpace(redirectUri) || !Uri.TryCreate(redirectUri, UriKind.Absolute, out Uri r)) || returnsJSON)
+            {
+                var payload = Encoding.UTF8.GetBytes(jObj.ToString());
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await HttpContext.Response.Body.WriteAsync(payload, 0, payload.Length);
+                return;
+            }
+
+            var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
+            _responseModeHandler.Handle(context.Request.Data, redirectUrlAuthorizationResponse, HttpContext);
         }
     }
 }

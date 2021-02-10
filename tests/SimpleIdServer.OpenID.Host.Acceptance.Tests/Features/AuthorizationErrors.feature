@@ -93,6 +93,32 @@ Scenario: Error is returned when the scope is not supported by the client
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='scopes role are not supported'
 
+Scenario: Error is returned when nonce is not passed
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key            | Value                         |
+	| redirect_uris  | [https://web.com]             |
+	| scope          | email                         |
+	| response_types | [token,id_token,code]         |
+	| grant_types    | [implicit,authorization_code] |
+
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body
+
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value           |
+	| response_type | code id_token   |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | openid email    |
+	| redirect_uri  | https://web.com |
+	
+	And extract query parameters into JSON 
+
+	Then HTTP status code equals to '200'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='missing parameter nonce'
+
 Scenario: Error is returned when redirect_uri is missing		
 	When execute HTTP POST JSON request 'http://localhost/register'
 	| Key                          | Value             |
@@ -103,12 +129,13 @@ Scenario: Error is returned when redirect_uri is missing
 	And extract parameter 'client_id' from JSON body
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key			| Value											|
-	| response_type | code											|
-	| client_id		| $client_id$									|
-	| state			| state											|
-	| response_mode	| query											|
-	| scope			| openid										|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| state         | state       |
+	| response_mode | query       |
+	| scope         | openid      |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -127,14 +154,15 @@ Scenario: Error is returned when user is not authenticated and prompt=none
 	And anonymous authentication
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key			| Value											|
-	| response_type | code											|
-	| client_id		| $client_id$									|
-	| state			| state											|
-	| response_mode	| query											|
-	| scope			| openid										|
-	| redirect_uri	| https://web.com								|
-	| prompt		| none											|
+	| Key           | Value           |
+	| response_type | code            |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | openid          |
+	| redirect_uri  | https://web.com |
+	| prompt        | none            |
+	| nonce         | nonce           |
 
 	And extract query parameters into JSON
 
@@ -159,15 +187,16 @@ Scenario: Error is returned when subject in the id_token_hint is not correct
 	And extract parameter 'client_id' from JSON body 
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key			| Value											|
-	| response_type | code											|
-	| client_id		| $client_id$									|
-	| state			| state											|
-	| response_mode	| query											|
-	| scope			| openid										|
-	| redirect_uri	| https://web.com								|
-	| prompt		| none											| 
-	| id_token_hint | $id_token_hint$								|
+	| Key           | Value           |
+	| response_type | code            |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | openid          |
+	| redirect_uri  | https://web.com |
+	| prompt        | none            |
+	| id_token_hint | $id_token_hint$ |
+	| nonce         | nonce           |
 	
 	And extract query parameters into JSON
 	
@@ -193,15 +222,16 @@ Scenario: Error is returned when audience in the id_token_hint is not correct
 	And extract parameter 'client_id' from JSON body	
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key			| Value											|
-	| response_type | code											|
-	| client_id		| $client_id$									|
-	| state			| state											|
-	| response_mode	| query											|
-	| scope			| openid										|
-	| redirect_uri	| https://web.com								|
-	| prompt		| none											| 
-	| id_token_hint | $id_token_hint$								|
+	| Key           | Value           |
+	| response_type | code            |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | openid          |
+	| redirect_uri  | https://web.com |
+	| prompt        | none            |
+	| id_token_hint | $id_token_hint$ |
+	| nonce         | nonce           |
 	
 	And extract query parameters into JSON
 	
@@ -219,14 +249,15 @@ Scenario: Error is returned when the value specified in claims parameter is inva
 	And add user consent with claim : user='administrator', scope='email', clientId='$client_id$', claim='sub=administrator'	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value															|
-	| response_type		| code															|
-	| client_id			| $client_id$													|
-	| state				| state															|
-	| response_mode		| query															|
-	| scope				| openid email													|
-	| redirect_uri		| https://web.com												|
-	| claims			| { id_token: { sub: { essential : true, value: "invalid" } } }	|
+	| Key           | Value                                                         |
+	| response_type | code                                                          |
+	| client_id     | $client_id$                                                   |
+	| state         | state                                                         |
+	| response_mode | query                                                         |
+	| scope         | openid email                                                  |
+	| redirect_uri  | https://web.com                                               |
+	| claims        | { id_token: { sub: { essential : true, value: "invalid" } } } |
+	| nonce         | nonce                                                         |
 	
 	And extract query parameters into JSON
 
@@ -243,12 +274,13 @@ Scenario: Error is returned when request parameter is not a valid JWT token
 	And extract parameter 'client_id' from JSON body	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| invalid																					|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | invalid     |
+	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -265,12 +297,13 @@ Scenario: Error is returned when request parameter is not a valid JWS token
 	And extract parameter 'client_id' from JSON body	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| a.b.c																						|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | a.b.c       |
+	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -296,12 +329,13 @@ Scenario: Error is returned when request parameter is a JWS token with an invali
 	| key           | val		    |	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | $request$   |
+	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -335,6 +369,7 @@ Scenario: Error is returned when request parameter doesn't contain response_type
 	| scope         | openid      |
 	| request       | $request$   |
 	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -363,12 +398,13 @@ Scenario: Error is returned when request parameter doesn't contain client_id
 	| response_type | code			|
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | $request$   |
+	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -398,12 +434,13 @@ Scenario: Error is returned when request parameter contains an invalid response_
 	| client_id		| $client_id$	|
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value																						|
-	| response_type		| code																						|
-	| client_id			| $client_id$																				|
-	| scope				| openid																					|
-	| request			| $request$																					|
-	| state				| state																						|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| request       | $request$   |
+	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -440,6 +477,7 @@ Scenario: Error is returned when request parameter contains an invalid client id
 	| scope         | openid      |
 	| request       | $request$   |
 	| state         | state       |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 	
@@ -456,12 +494,13 @@ Scenario: Error is returned when request uri is invalid
 	And extract parameter 'client_id' from JSON body	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value			|
-	| response_type		| code			|
-	| client_id			| $client_id$	|
-	| scope				| openid		|
-	| state				| state			|
-	| request_uri		| uri			|
+	| Key           | Value       |
+	| response_type | code        |
+	| client_id     | $client_id$ |
+	| scope         | openid      |
+	| state         | state       |
+	| request_uri   | uri         |
+	| nonce         | nonce       |
 	
 	And extract JSON from body
 
@@ -478,14 +517,15 @@ Scenario: Redirect to the login page when prompt=login
 	And extract parameter 'client_id' from JSON body	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value							|
-	| response_type		| code							|
-	| client_id			| $client_id$					|
-	| state				| state							|
-	| response_mode		| query							|
-	| scope				| openid						|
-	| redirect_uri		| https://web.com				|
-	| prompt			| login							|
+	| Key           | Value           |
+	| response_type | code            |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | openid          |
+	| redirect_uri  | https://web.com |
+	| nonce         | nonce           |
+	| prompt        | login           |
 
 	And extract JSON from body
 	
@@ -501,14 +541,15 @@ Scenario: Redirect to the account page when prompt=select_account
 	And extract parameter 'client_id' from JSON body	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value							|
-	| response_type		| code							|
-	| client_id			| $client_id$					|
-	| state				| state							|
-	| response_mode		| query							|
-	| scope				| email openid					|
-	| redirect_uri		| https://web.com				|
-	| prompt			| select_account				|
+	| Key           | Value           |
+	| response_type | code            |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | email openid    |
+	| redirect_uri  | https://web.com |
+	| prompt        | select_account  |
+	| nonce         | nonce           |
 	
 	And extract JSON from body
 	
@@ -526,14 +567,15 @@ Scenario: Redirect to the consents page when no consent has been given for the s
 	And add user consent : user='administrator', scope='email', clientId='$client_id$'
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key				| Value												|
-	| response_type		| code												|
-	| client_id			| $client_id$										|
-	| state				| state												|
-	| response_mode		| query												|
-	| scope				| openid email										|
-	| redirect_uri		| https://web.com									|
-	| claims			| { id_token: { name: { essential : true } } }		|
+	| Key           | Value                                        |
+	| response_type | code                                         |
+	| client_id     | $client_id$                                  |
+	| state         | state                                        |
+	| response_mode | query                                        |
+	| scope         | openid email                                 |
+	| redirect_uri  | https://web.com                              |
+	| nonce         | nonce                                        |
+	| claims        | { id_token: { name: { essential : true } } } |
 	
 	And extract JSON from body
 	

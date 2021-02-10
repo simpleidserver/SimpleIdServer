@@ -140,33 +140,36 @@ this.ScenarioInitialize(scenarioInfo);
             table2.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
+            table2.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 18
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table2, "And ");
-#line 28
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 29
- testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 30
+ testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 31
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 32
- testRunner.Then("JWS Alg equals to \'none\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 33
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'none\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 34
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 35
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 36
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 37
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 38
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 39
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 40
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 41
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 42
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -178,7 +181,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckDisplayIsPassedIntoTheCallbackUrl()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check display is passed into the callback url", null, ((string[])(null)));
-#line 43
+#line 44
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -190,7 +193,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "ES256"});
-#line 44
+#line 45
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table3, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
@@ -211,13 +214,13 @@ this.ScenarioInitialize(scenarioInfo);
             table4.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES256"});
-#line 48
+#line 49
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table4, "And ");
-#line 56
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 57
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 58
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 59
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
@@ -247,11 +250,14 @@ this.ScenarioInitialize(scenarioInfo);
             table5.AddRow(new string[] {
                         "display",
                         "popup"});
-#line 60
+            table5.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 61
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table5, "And ");
-#line 71
- testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 73
+ testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 75
  testRunner.Then("\'$display$\'=\'popup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -263,7 +269,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatNone()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (none)", null, ((string[])(null)));
-#line 75
+#line 77
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -285,15 +291,15 @@ this.ScenarioInitialize(scenarioInfo);
             table6.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "none"});
-#line 76
+#line 78
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table6, "When ");
-#line 84
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 85
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 86
- testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 87
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 88
+ testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 89
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -321,33 +327,36 @@ this.ScenarioInitialize(scenarioInfo);
             table7.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 89
+            table7.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 91
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table7, "And ");
-#line 99
+#line 102
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 100
- testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 101
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 103
- testRunner.Then("JWS Alg equals to \'none\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 104
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 105
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 106
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'none\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 107
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 108
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 109
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 110
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 111
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 112
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 113
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 114
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 115
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -359,7 +368,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatES256()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (ES256)", null, ((string[])(null)));
-#line 114
+#line 117
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -371,7 +380,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "ES256"});
-#line 115
+#line 118
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table8, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
@@ -392,15 +401,15 @@ this.ScenarioInitialize(scenarioInfo);
             table9.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES256"});
-#line 119
+#line 122
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table9, "And ");
-#line 127
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 128
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 129
- testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 130
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 131
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 132
+ testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 133
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -428,35 +437,38 @@ this.ScenarioInitialize(scenarioInfo);
             table10.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 132
+            table10.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 135
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table10, "And ");
-#line 142
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 143
- testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 144
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 146
- testRunner.Then("JWS Alg equals to \'ES256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 147
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'display\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 148
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 149
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 150
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'ES256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 151
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 152
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 153
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 154
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 155
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 156
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 157
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 158
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 159
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 160
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -468,7 +480,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatES384()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (ES384)", null, ((string[])(null)));
-#line 158
+#line 162
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -480,7 +492,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "ES384"});
-#line 159
+#line 163
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table11, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
@@ -501,15 +513,15 @@ this.ScenarioInitialize(scenarioInfo);
             table12.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES384"});
-#line 163
+#line 167
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table12, "And ");
-#line 171
+#line 175
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 172
+#line 176
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 173
+#line 177
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 174
+#line 178
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -537,33 +549,36 @@ this.ScenarioInitialize(scenarioInfo);
             table13.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 176
+            table13.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 180
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table13, "And ");
-#line 186
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 187
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 189
- testRunner.Then("JWS Alg equals to \'ES384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 190
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 191
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 192
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 193
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 194
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'ES384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 195
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 196
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 197
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 198
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 199
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 200
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 201
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 202
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 203
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 204
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -575,7 +590,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatES512()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (ES512)", null, ((string[])(null)));
-#line 201
+#line 206
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -587,7 +602,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "ES512"});
-#line 202
+#line 207
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table14, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
@@ -608,15 +623,15 @@ this.ScenarioInitialize(scenarioInfo);
             table15.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES512"});
-#line 206
+#line 211
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table15, "And ");
-#line 214
+#line 219
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 215
+#line 220
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 216
+#line 221
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 217
+#line 222
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -644,33 +659,36 @@ this.ScenarioInitialize(scenarioInfo);
             table16.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 219
+            table16.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 224
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table16, "And ");
-#line 229
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 230
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 232
- testRunner.Then("JWS Alg equals to \'ES512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 233
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 234
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 235
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 236
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 237
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 238
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'ES512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 239
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 240
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 241
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 242
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 243
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 244
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 245
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 246
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 247
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 248
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -682,7 +700,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatHS256()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (HS256)", null, ((string[])(null)));
-#line 244
+#line 250
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -694,7 +712,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "HS256"});
-#line 245
+#line 251
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table17, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
@@ -715,15 +733,15 @@ this.ScenarioInitialize(scenarioInfo);
             table18.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "HS256"});
-#line 249
+#line 255
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table18, "And ");
-#line 257
+#line 263
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 258
+#line 264
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 259
+#line 265
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 260
+#line 266
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -751,33 +769,36 @@ this.ScenarioInitialize(scenarioInfo);
             table19.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 262
+            table19.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 268
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table19, "And ");
-#line 272
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 273
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 275
- testRunner.Then("JWS Alg equals to \'HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 276
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 277
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 278
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 279
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 280
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 281
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 282
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 283
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 284
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 285
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 286
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 287
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 288
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 289
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 290
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 291
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 292
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -789,7 +810,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatHS384()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (HS384)", null, ((string[])(null)));
-#line 287
+#line 294
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -801,7 +822,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "HS384"});
-#line 288
+#line 295
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table20, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
@@ -822,15 +843,15 @@ this.ScenarioInitialize(scenarioInfo);
             table21.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "HS384"});
-#line 292
+#line 299
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table21, "And ");
-#line 300
+#line 307
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 301
+#line 308
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 302
+#line 309
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 303
+#line 310
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -858,33 +879,36 @@ this.ScenarioInitialize(scenarioInfo);
             table22.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 305
+            table22.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 312
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table22, "And ");
-#line 315
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 316
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 318
- testRunner.Then("JWS Alg equals to \'HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 319
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 320
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 321
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 322
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 323
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 324
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 325
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 326
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 327
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 328
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 329
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 330
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 331
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 332
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 333
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 334
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 335
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 336
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -896,7 +920,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatHS512()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (HS512)", null, ((string[])(null)));
-#line 330
+#line 338
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -908,7 +932,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "HS512"});
-#line 331
+#line 339
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table23, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
@@ -929,15 +953,15 @@ this.ScenarioInitialize(scenarioInfo);
             table24.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "HS512"});
-#line 335
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table24, "And ");
 #line 343
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table24, "And ");
+#line 351
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 344
+#line 352
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 345
+#line 353
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 346
+#line 354
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -965,33 +989,36 @@ this.ScenarioInitialize(scenarioInfo);
             table25.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 348
+            table25.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 356
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table25, "And ");
-#line 358
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 359
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 361
- testRunner.Then("JWS Alg equals to \'HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 362
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 363
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 364
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 365
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 366
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 367
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 368
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 369
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 370
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JWS Alg equals to \'HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 371
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 372
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 373
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 374
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 375
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 376
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 377
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 378
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 379
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 380
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1003,7 +1030,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatRS256()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (RS256)", null, ((string[])(null)));
-#line 373
+#line 382
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1015,7 +1042,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 374
+#line 383
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table26, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1036,15 +1063,15 @@ this.ScenarioInitialize(scenarioInfo);
             table27.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "RS256"});
-#line 378
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table27, "And ");
-#line 386
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 387
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table27, "And ");
+#line 395
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 396
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 388
+#line 397
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 389
+#line 398
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1072,33 +1099,36 @@ this.ScenarioInitialize(scenarioInfo);
             table28.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 391
+            table28.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 400
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table28, "And ");
-#line 401
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 402
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 404
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 405
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 406
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 407
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 408
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 409
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 410
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 411
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 412
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 413
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 414
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 415
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 416
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 417
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 418
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 419
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 420
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 421
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 422
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 423
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 424
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1110,7 +1140,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatRS384()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (RS384)", null, ((string[])(null)));
-#line 416
+#line 426
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1122,7 +1152,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS384"});
-#line 417
+#line 427
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table29, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1143,15 +1173,15 @@ this.ScenarioInitialize(scenarioInfo);
             table30.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "RS384"});
-#line 421
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table30, "And ");
-#line 429
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 430
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 431
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table30, "And ");
+#line 439
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 440
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 441
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 432
+#line 442
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1179,33 +1209,36 @@ this.ScenarioInitialize(scenarioInfo);
             table31.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 434
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table31, "And ");
+            table31.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 444
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 445
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 447
- testRunner.Then("JWS Alg equals to \'RS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 448
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 449
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 450
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 451
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 452
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 453
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 454
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table31, "And ");
 #line 455
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 456
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 458
+ testRunner.Then("JWS Alg equals to \'RS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 459
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 460
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 461
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 462
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 463
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 464
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 465
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 466
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 467
  testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 457
+#line 468
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1217,7 +1250,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWSFormatRS512()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWS format (RS512)", null, ((string[])(null)));
-#line 459
+#line 470
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1229,7 +1262,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "ES256"});
-#line 460
+#line 471
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table32, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1240,7 +1273,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS512"});
-#line 464
+#line 475
  testRunner.And("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table33, "And ");
 #line hidden
             TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1261,15 +1294,15 @@ this.ScenarioInitialize(scenarioInfo);
             table34.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "RS512"});
-#line 468
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table34, "And ");
-#line 476
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 477
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 478
- testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 479
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table34, "And ");
+#line 487
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 488
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 489
+ testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 490
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1297,33 +1330,36 @@ this.ScenarioInitialize(scenarioInfo);
             table35.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 481
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table35, "And ");
-#line 491
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+            table35.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 492
- testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 494
- testRunner.Then("JWS Alg equals to \'RS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 495
- testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 496
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 497
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 498
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 499
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 500
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 501
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 502
- testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table35, "And ");
 #line 503
- testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 504
+ testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 506
+ testRunner.Then("JWS Alg equals to \'RS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 507
+ testRunner.Then("JWS Kid equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 508
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 509
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 510
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 511
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 512
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 513
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 514
+ testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 515
+ testRunner.Then("token claim \'role\' contains \'role1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 516
  testRunner.Then("token claim \'role\' contains \'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1335,7 +1371,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA1_5A128CBC_HS256()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)", null, ((string[])(null)));
-#line 506
+#line 518
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1347,7 +1383,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 507
+#line 519
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table36, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1358,7 +1394,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA1_5"});
-#line 511
+#line 523
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table37, "And ");
 #line hidden
@@ -1392,15 +1428,15 @@ this.ScenarioInitialize(scenarioInfo);
             table38.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 515
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table38, "And ");
 #line 527
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table38, "And ");
+#line 539
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 528
+#line 540
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 529
+#line 541
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 530
+#line 542
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1428,39 +1464,42 @@ this.ScenarioInitialize(scenarioInfo);
             table39.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 532
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "And ");
-#line 542
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 543
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+            table39.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 544
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 546
- testRunner.Then("JWE Alg equals to \'RSA1_5\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 547
- testRunner.Then("JWE Enc equals to \'A128CBC-HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 548
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 549
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 550
- testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 551
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 552
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 553
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 554
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "And ");
 #line 555
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 556
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 557
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 559
+ testRunner.Then("JWE Alg equals to \'RSA1_5\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 560
+ testRunner.Then("JWE Enc equals to \'A128CBC-HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 561
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 562
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 563
+ testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 564
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 565
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 566
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 567
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 568
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 569
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 570
  testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 558
+#line 571
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1472,7 +1511,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA1_5A192CBC_HS384()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)", null, ((string[])(null)));
-#line 560
+#line 573
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1484,7 +1523,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 561
+#line 574
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table40, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1495,7 +1534,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA1_5"});
-#line 565
+#line 578
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table41, "And ");
 #line hidden
@@ -1529,15 +1568,15 @@ this.ScenarioInitialize(scenarioInfo);
             table42.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 569
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table42, "And ");
-#line 581
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 582
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table42, "And ");
+#line 594
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 595
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 583
+#line 596
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 584
+#line 597
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1565,39 +1604,42 @@ this.ScenarioInitialize(scenarioInfo);
             table43.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 586
+            table43.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 599
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table43, "And ");
-#line 596
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 597
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 598
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 600
- testRunner.Then("JWE Alg equals to \'RSA1_5\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 601
- testRunner.Then("JWE Enc equals to \'A192CBC-HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 602
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 603
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 604
- testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 605
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 606
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 607
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 608
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 609
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 610
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 611
- testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 612
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 614
+ testRunner.Then("JWE Alg equals to \'RSA1_5\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 615
+ testRunner.Then("JWE Enc equals to \'A192CBC-HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 616
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 617
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 618
+ testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 619
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 620
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 621
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 622
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 623
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 624
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 625
+ testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 626
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1609,7 +1651,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA1_5A256CBC_HS512()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)", null, ((string[])(null)));
-#line 614
+#line 628
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1621,7 +1663,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 615
+#line 629
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table44, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1632,7 +1674,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA1_5"});
-#line 619
+#line 633
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table45, "And ");
 #line hidden
@@ -1666,15 +1708,15 @@ this.ScenarioInitialize(scenarioInfo);
             table46.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 623
- testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table46, "When ");
-#line 635
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 636
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 637
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table46, "When ");
+#line 649
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 650
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 651
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 638
+#line 652
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1702,39 +1744,42 @@ this.ScenarioInitialize(scenarioInfo);
             table47.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 640
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table47, "And ");
-#line 650
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 651
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 652
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+            table47.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 654
- testRunner.Then("JWE Alg equals to \'RSA1_5\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 655
- testRunner.Then("JWE Enc equals to \'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 656
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 657
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 658
- testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 659
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 660
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 661
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 662
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 663
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 664
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table47, "And ");
 #line 665
- testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 666
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 667
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 669
+ testRunner.Then("JWE Alg equals to \'RSA1_5\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 670
+ testRunner.Then("JWE Enc equals to \'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 671
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 672
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 673
+ testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 674
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 675
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 676
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 677
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 678
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 679
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 680
+ testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 681
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1746,7 +1791,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA_OAEP_256A128CBC_HS256()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256)", null, ((string[])(null)));
-#line 668
+#line 683
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1758,7 +1803,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 669
+#line 684
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table48, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1769,7 +1814,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA-OAEP-256"});
-#line 673
+#line 688
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table49, "And ");
 #line hidden
@@ -1803,15 +1848,15 @@ this.ScenarioInitialize(scenarioInfo);
             table50.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 677
- testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table50, "And ");
-#line 689
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 690
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 691
- testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 692
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table50, "And ");
+#line 704
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 705
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 706
+ testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 707
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1839,39 +1884,42 @@ this.ScenarioInitialize(scenarioInfo);
             table51.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 694
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table51, "And ");
-#line 704
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 705
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 706
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 708
- testRunner.Then("JWE Alg equals to \'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+            table51.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 709
- testRunner.Then("JWE Enc equals to \'A128CBC-HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 710
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 711
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 712
- testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 713
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 714
- testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 715
- testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 716
- testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 717
- testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 718
- testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 719
- testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table51, "And ");
 #line 720
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 721
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 722
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 724
+ testRunner.Then("JWE Alg equals to \'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 725
+ testRunner.Then("JWE Enc equals to \'A128CBC-HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 726
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 727
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 728
+ testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 729
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 730
+ testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 731
+ testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 732
+ testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 733
+ testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 734
+ testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 735
+ testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 736
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -1883,7 +1931,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA_OAEP_256A192CBC_HS384()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384)", null, ((string[])(null)));
-#line 722
+#line 738
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -1895,7 +1943,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 723
+#line 739
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table52, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table53 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1906,7 +1954,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA-OAEP-256"});
-#line 727
+#line 743
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table53, "And ");
 #line hidden
@@ -1940,15 +1988,15 @@ this.ScenarioInitialize(scenarioInfo);
             table54.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 731
+#line 747
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table54, "And ");
-#line 743
+#line 759
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 744
+#line 760
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 745
+#line 761
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 746
+#line 762
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -1976,39 +2024,42 @@ this.ScenarioInitialize(scenarioInfo);
             table55.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 748
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table55, "And ");
-#line 758
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 759
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 760
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 762
- testRunner.Then("JWE Alg equals to \'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 763
- testRunner.Then("JWE Enc equals to \'A192CBC-HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+            table55.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 764
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table55, "And ");
+#line 775
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 776
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 777
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 779
+ testRunner.Then("JWE Alg equals to \'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 780
+ testRunner.Then("JWE Enc equals to \'A192CBC-HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 781
  testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 765
+#line 782
  testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 766
+#line 783
  testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 767
+#line 784
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 768
+#line 785
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 769
+#line 786
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 770
+#line 787
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 771
+#line 788
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 772
+#line 789
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 773
+#line 790
  testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 774
+#line 791
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2020,7 +2071,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA_OAEP_256A256CBC_HS512()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512)", null, ((string[])(null)));
-#line 776
+#line 793
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2032,7 +2083,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 777
+#line 794
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table56, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table57 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2043,7 +2094,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA-OAEP-256"});
-#line 781
+#line 798
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table57, "And ");
 #line hidden
@@ -2077,15 +2128,15 @@ this.ScenarioInitialize(scenarioInfo);
             table58.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 785
+#line 802
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table58, "And ");
-#line 797
+#line 814
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 798
+#line 815
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 799
+#line 816
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 800
+#line 817
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -2113,39 +2164,42 @@ this.ScenarioInitialize(scenarioInfo);
             table59.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 802
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table59, "And ");
-#line 812
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 813
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 814
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 816
- testRunner.Then("JWE Alg equals to \'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 817
- testRunner.Then("JWE Enc equals to \'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 818
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+            table59.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 819
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table59, "And ");
+#line 830
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 831
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 832
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 834
+ testRunner.Then("JWE Alg equals to \'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 835
+ testRunner.Then("JWE Enc equals to \'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 836
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 837
  testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 820
+#line 838
  testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 821
+#line 839
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 822
+#line 840
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 823
+#line 841
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 824
+#line 842
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 825
+#line 843
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 826
+#line 844
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 827
+#line 845
  testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 828
+#line 846
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2157,7 +2211,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA_OAEPA128CBC_HS256()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)", null, ((string[])(null)));
-#line 830
+#line 848
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2169,7 +2223,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 831
+#line 849
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table60, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table61 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2180,7 +2234,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA-OAEP"});
-#line 835
+#line 853
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table61, "And ");
 #line hidden
@@ -2214,15 +2268,15 @@ this.ScenarioInitialize(scenarioInfo);
             table62.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 839
+#line 857
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table62, "And ");
-#line 851
+#line 869
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 852
+#line 870
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 853
+#line 871
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 854
+#line 872
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -2250,39 +2304,42 @@ this.ScenarioInitialize(scenarioInfo);
             table63.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 856
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table63, "And ");
-#line 866
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 867
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 868
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 870
- testRunner.Then("JWE Alg equals to \'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 871
- testRunner.Then("JWE Enc equals to \'A128CBC-HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 872
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 873
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+            table63.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 874
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table63, "And ");
+#line 885
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 886
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 887
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 889
+ testRunner.Then("JWE Alg equals to \'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 890
+ testRunner.Then("JWE Enc equals to \'A128CBC-HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 891
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 892
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 893
  testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 875
+#line 894
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 876
+#line 895
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 877
+#line 896
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 878
+#line 897
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 879
+#line 898
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 880
+#line 899
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 881
+#line 900
  testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 882
+#line 901
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2294,7 +2351,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA_OAEPA192CBC_HS384()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)", null, ((string[])(null)));
-#line 884
+#line 903
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2306,7 +2363,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 885
+#line 904
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table64, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2317,7 +2374,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA-OAEP"});
-#line 889
+#line 908
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table65, "And ");
 #line hidden
@@ -2351,15 +2408,15 @@ this.ScenarioInitialize(scenarioInfo);
             table66.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 893
+#line 912
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table66, "And ");
-#line 905
+#line 924
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 906
+#line 925
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 907
+#line 926
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 908
+#line 927
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -2387,39 +2444,42 @@ this.ScenarioInitialize(scenarioInfo);
             table67.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 910
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table67, "And ");
-#line 920
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 921
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 922
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 924
- testRunner.Then("JWE Alg equals to \'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 925
- testRunner.Then("JWE Enc equals to \'A192CBC-HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 926
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 927
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 928
- testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+            table67.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 929
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table67, "And ");
+#line 940
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 941
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 942
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 944
+ testRunner.Then("JWE Alg equals to \'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 945
+ testRunner.Then("JWE Enc equals to \'A192CBC-HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 946
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 947
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 948
+ testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 949
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 930
+#line 950
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 931
+#line 951
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 932
+#line 952
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 933
+#line 953
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 934
+#line 954
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 935
+#line 955
  testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 936
+#line 956
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2431,7 +2491,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenIsReturnedInJWEFormatRSA_OAEPA256CBC_HS512()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)", null, ((string[])(null)));
-#line 938
+#line 958
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2443,7 +2503,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 939
+#line 959
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table68, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2454,7 +2514,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA-OAEP"});
-#line 943
+#line 963
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table69, "And ");
 #line hidden
@@ -2488,15 +2548,15 @@ this.ScenarioInitialize(scenarioInfo);
             table70.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 947
+#line 967
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table70, "And ");
-#line 959
+#line 979
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 960
+#line 980
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 961
+#line 981
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 962
+#line 982
  testRunner.And("add user consent : user=\'administrator\', scope=\'email role\', clientId=\'$client_id" +
                     "$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -2524,39 +2584,42 @@ this.ScenarioInitialize(scenarioInfo);
             table71.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 964
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table71, "And ");
-#line 974
- testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 975
- testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 976
- testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 978
- testRunner.Then("JWE Alg equals to \'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 979
- testRunner.Then("JWE Enc equals to \'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 980
- testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 981
- testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 982
- testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 983
- testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+            table71.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
 #line 984
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table71, "And ");
+#line 995
+ testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 996
+ testRunner.And("use \'jwks\' JWKS to decrypt \'$id_token$\' JWE into \'jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 997
+ testRunner.And("extract payload from JWS \'$jws$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 999
+ testRunner.Then("JWE Alg equals to \'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 1000
+ testRunner.Then("JWE Enc equals to \'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 1001
+ testRunner.Then("JWS Alg equals to \'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 1002
+ testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 1003
+ testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 1004
+ testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 1005
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 985
+#line 1006
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 986
+#line 1007
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 987
+#line 1008
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 988
+#line 1009
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 989
+#line 1010
  testRunner.Then("token claim doesn\'t contain \'email\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 990
+#line 1011
  testRunner.Then("token claim doesn\'t contain \'role\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2568,7 +2631,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void UseRequestObjectJWSParameterToGetAnAccessTokenAndAuthorizationCode()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use request object (JWS) parameter to get an access token and authorization code", null, ((string[])(null)));
-#line 992
+#line 1013
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2580,7 +2643,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 993
+#line 1014
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table72, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2591,7 +2654,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 997
+#line 1018
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks\' and store the public keys into \'jwks_" +
                     "json\'", ((string)(null)), table73, "And ");
 #line hidden
@@ -2616,13 +2679,13 @@ this.ScenarioInitialize(scenarioInfo);
             table74.AddRow(new string[] {
                         "jwks",
                         "$jwks_json$"});
-#line 1001
+#line 1022
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table74, "And ");
-#line 1010
+#line 1031
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1011
+#line 1032
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1012
+#line 1033
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2647,9 +2710,12 @@ this.ScenarioInitialize(scenarioInfo);
                         "scope",
                         "openid email"});
             table75.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+            table75.AddRow(new string[] {
                         "redirect_uri",
                         "https://web.com"});
-#line 1014
+#line 1035
  testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'request\'", ((string)(null)), table75, "And ");
 #line hidden
             TechTalk.SpecFlow.Table table76 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2670,31 +2736,31 @@ this.ScenarioInitialize(scenarioInfo);
             table76.AddRow(new string[] {
                         "scope",
                         "openid email"});
-#line 1024
+#line 1046
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table76, "And ");
-#line 1032
+#line 1054
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1033
+#line 1055
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1035
+#line 1057
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1036
+#line 1058
  testRunner.Then("redirect url contains \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1037
+#line 1059
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1038
+#line 1060
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1039
+#line 1061
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1040
+#line 1062
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1041
+#line 1063
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1042
+#line 1064
  testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1043
+#line 1065
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1044
+#line 1066
  testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2706,7 +2772,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void UseRequestObjectJWEParameterToGetAnAccessTokenAndAuthorizationCode()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use request object (JWE) parameter to get an access token and authorization code", null, ((string[])(null)));
-#line 1046
+#line 1068
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2722,7 +2788,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "ENC",
                         "2",
                         "RSA1_5"});
-#line 1047
+#line 1069
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks_enc\'", ((string)(null)), table77, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table78 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2733,7 +2799,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1052
+#line 1074
  testRunner.And("build JSON Web Keys, store JWKS into \'jwks_sig\' and store the public keys into \'j" +
                     "wks_sig_json\'", ((string)(null)), table78, "And ");
 #line hidden
@@ -2764,15 +2830,15 @@ this.ScenarioInitialize(scenarioInfo);
             table79.AddRow(new string[] {
                         "jwks",
                         "$jwks_sig_json$"});
-#line 1056
+#line 1078
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table79, "And ");
-#line 1067
+#line 1089
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1068
+#line 1090
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1069
+#line 1091
  testRunner.And("extract parameter \'client_secret\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1070
+#line 1092
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table80 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2799,9 +2865,12 @@ this.ScenarioInitialize(scenarioInfo);
             table80.AddRow(new string[] {
                         "redirect_uri",
                         "https://web.com"});
-#line 1072
+            table80.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1094
  testRunner.And("use \'1\' JWK from \'jwks_sig\' to build JWS and store into \'jws_request\'", ((string)(null)), table80, "And ");
-#line 1082
+#line 1105
  testRunner.And("use \'2\' JWKS from \'jwks_enc\' to encrypt \'$jws_request$\' and enc \'A128CBC-HS256\' a" +
                     "nd store the result into \'request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -2823,31 +2892,34 @@ this.ScenarioInitialize(scenarioInfo);
             table81.AddRow(new string[] {
                         "scope",
                         "openid email"});
-#line 1084
+            table81.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1107
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table81, "And ");
-#line 1092
+#line 1116
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1093
+#line 1117
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1095
+#line 1119
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1096
+#line 1120
  testRunner.Then("redirect url contains \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1097
+#line 1121
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1098
+#line 1122
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1099
+#line 1123
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1100
+#line 1124
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1101
+#line 1125
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1102
+#line 1126
  testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1103
+#line 1127
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1104
+#line 1128
  testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2859,7 +2931,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void PublicSubjectIsReturnedInId_Token()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Public subject is returned in id_token", null, ((string[])(null)));
-#line 1106
+#line 1130
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2871,7 +2943,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1107
+#line 1131
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table82, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table83 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2892,13 +2964,13 @@ this.ScenarioInitialize(scenarioInfo);
             table83.AddRow(new string[] {
                         "subject_type",
                         "public"});
-#line 1111
+#line 1135
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table83, "And ");
-#line 1119
+#line 1143
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1120
+#line 1144
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1121
+#line 1145
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table84 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2925,21 +2997,24 @@ this.ScenarioInitialize(scenarioInfo);
             table84.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 1123
+            table84.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1147
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table84, "And ");
-#line 1133
+#line 1158
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1134
+#line 1159
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1136
+#line 1161
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1137
+#line 1162
  testRunner.Then("redirect url contains \'token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1138
+#line 1163
  testRunner.Then("redirect url contains \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1139
+#line 1164
  testRunner.Then("redirect url contains \'ui_locales\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1140
+#line 1165
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -2951,7 +3026,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void PairwiseSubjectIsReturnedInId_Token()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Pairwise subject is returned in id_token", null, ((string[])(null)));
-#line 1142
+#line 1167
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -2963,7 +3038,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1143
+#line 1168
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table85, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table86 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2984,13 +3059,13 @@ this.ScenarioInitialize(scenarioInfo);
             table86.AddRow(new string[] {
                         "subject_type",
                         "pairwise"});
-#line 1147
+#line 1172
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table86, "And ");
-#line 1155
+#line 1180
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1156
+#line 1181
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1157
+#line 1182
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table87 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3017,21 +3092,24 @@ this.ScenarioInitialize(scenarioInfo);
             table87.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 1159
+            table87.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1184
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table87, "And ");
-#line 1169
+#line 1195
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1170
+#line 1196
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1172
+#line 1198
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1173
+#line 1199
  testRunner.Then("redirect url contains \'token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1174
+#line 1200
  testRunner.Then("redirect url contains \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1175
+#line 1201
  testRunner.Then("redirect url contains \'ui_locales\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1176
+#line 1202
  testRunner.Then("token claim \'sub\'!=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3046,7 +3124,7 @@ this.ScenarioInitialize(scenarioInfo);
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User-agent is redirected to the login page when elapsed time > authentication tim" +
                     "e + default client max age", null, ((string[])(null)));
-#line 1178
+#line 1204
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3068,15 +3146,15 @@ this.ScenarioInitialize(scenarioInfo);
             table88.AddRow(new string[] {
                         "scope",
                         "email"});
-#line 1179
+#line 1205
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table88, "When ");
-#line 1187
+#line 1213
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1188
+#line 1214
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1189
+#line 1215
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1190
+#line 1216
  testRunner.And("add \'-10\' seconds to authentication instant to user \'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table89 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3100,9 +3178,12 @@ this.ScenarioInitialize(scenarioInfo);
             table89.AddRow(new string[] {
                         "redirect_uri",
                         "https://web.com"});
-#line 1192
+            table89.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1218
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table89, "And ");
-#line 1201
+#line 1228
  testRunner.Then("redirect url contains \'http://localhost/Authenticate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3117,7 +3198,7 @@ this.ScenarioInitialize(scenarioInfo);
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User-agent is redirected to the login page when elapsed time > to authentication " +
                     "time + max_age parameter", null, ((string[])(null)));
-#line 1203
+#line 1230
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3136,15 +3217,15 @@ this.ScenarioInitialize(scenarioInfo);
             table90.AddRow(new string[] {
                         "scope",
                         "email"});
-#line 1204
+#line 1231
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table90, "When ");
-#line 1211
+#line 1238
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1212
+#line 1239
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1213
+#line 1240
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1214
+#line 1241
  testRunner.And("add \'-10\' seconds to authentication instant to user \'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table91 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3171,9 +3252,12 @@ this.ScenarioInitialize(scenarioInfo);
             table91.AddRow(new string[] {
                         "redirect_uri",
                         "https://web.com"});
-#line 1216
+            table91.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1243
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table91, "And ");
-#line 1226
+#line 1254
  testRunner.Then("redirect url contains \'http://localhost/Authenticate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3185,7 +3269,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void IdentityTokenMustContainsAnAuth_TimeClaimWhenMentionnedAsEssential()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token must contains an auth_time claim when mentionned as essential", null, ((string[])(null)));
-#line 1228
+#line 1256
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3197,7 +3281,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1229
+#line 1257
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table92, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table93 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3215,13 +3299,13 @@ this.ScenarioInitialize(scenarioInfo);
             table93.AddRow(new string[] {
                         "scope",
                         "email"});
-#line 1233
+#line 1261
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table93, "And ");
-#line 1240
+#line 1268
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1241
+#line 1269
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1242
+#line 1270
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table94 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3251,31 +3335,31 @@ this.ScenarioInitialize(scenarioInfo);
             table94.AddRow(new string[] {
                         "claims",
                         "{ id_token: { auth_time: { essential : true } } }"});
-#line 1244
+#line 1272
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table94, "And ");
-#line 1255
+#line 1283
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1256
+#line 1284
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1258
+#line 1286
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1259
+#line 1287
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1260
+#line 1288
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1261
+#line 1289
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1262
+#line 1290
  testRunner.Then("token contains \'auth_time\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1263
+#line 1291
  testRunner.Then("token claim \'iss\'=\'http://localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1264
+#line 1292
  testRunner.Then("token claim \'azp\'=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1265
+#line 1293
  testRunner.Then("token claim \'nonce\'=\'nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1266
+#line 1294
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1267
+#line 1295
  testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3287,7 +3371,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void UseImplicitGrant_TypeToGetAnAccessToken()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use implicit grant-type to get an access token", null, ((string[])(null)));
-#line 1269
+#line 1297
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3299,7 +3383,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1270
+#line 1298
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table95, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table96 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3317,13 +3401,13 @@ this.ScenarioInitialize(scenarioInfo);
             table96.AddRow(new string[] {
                         "scope",
                         "email"});
-#line 1274
+#line 1302
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table96, "And ");
-#line 1281
+#line 1309
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1282
+#line 1310
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1283
+#line 1311
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table97 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3347,27 +3431,27 @@ this.ScenarioInitialize(scenarioInfo);
             table97.AddRow(new string[] {
                         "redirect_uri",
                         "https://web.com"});
-#line 1285
+#line 1313
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table97, "And ");
-#line 1294
+#line 1322
  testRunner.And("extract \'access_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1295
+#line 1323
  testRunner.And("extract payload from JWS \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1297
+#line 1325
  testRunner.Then("redirect url contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1298
+#line 1326
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1299
+#line 1327
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1300
+#line 1328
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1301
+#line 1329
  testRunner.Then("token contains \'auth_time\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1302
+#line 1330
  testRunner.Then("token contains \'scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1303
+#line 1331
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1304
+#line 1332
  testRunner.Then("token claim \'iss\'=\'http://localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3379,7 +3463,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void UseImplicitGrant_TypeToGetAnAccessAndIdentityToken()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use implicit grant-type to get an access and identity token", null, ((string[])(null)));
-#line 1306
+#line 1334
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3391,7 +3475,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1307
+#line 1335
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table98, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table99 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3409,13 +3493,13 @@ this.ScenarioInitialize(scenarioInfo);
             table99.AddRow(new string[] {
                         "scope",
                         "email"});
-#line 1311
+#line 1339
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table99, "And ");
-#line 1318
+#line 1346
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1319
+#line 1347
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1320
+#line 1348
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table100 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3442,31 +3526,31 @@ this.ScenarioInitialize(scenarioInfo);
             table100.AddRow(new string[] {
                         "nonce",
                         "nonce"});
-#line 1322
+#line 1350
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table100, "And ");
-#line 1332
+#line 1360
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1333
+#line 1361
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1335
+#line 1363
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1336
+#line 1364
  testRunner.Then("redirect url contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1337
+#line 1365
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1338
+#line 1366
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1339
+#line 1367
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1340
+#line 1368
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1341
+#line 1369
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1342
+#line 1370
  testRunner.Then("token contains \'at_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1343
+#line 1371
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1344
+#line 1372
  testRunner.Then("token claim \'nonce\'=\'nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3478,7 +3562,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void UseHybridGrant_TypeToGetAnIdentityTokenAndAuthorizationCode()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use hybrid grant-type to get an identity token and authorization code", null, ((string[])(null)));
-#line 1346
+#line 1374
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3490,7 +3574,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1347
+#line 1375
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table101, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table102 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3508,13 +3592,13 @@ this.ScenarioInitialize(scenarioInfo);
             table102.AddRow(new string[] {
                         "scope",
                         "email"});
-#line 1351
+#line 1379
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table102, "And ");
-#line 1358
+#line 1386
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1359
+#line 1387
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1360
+#line 1388
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table103 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3541,31 +3625,31 @@ this.ScenarioInitialize(scenarioInfo);
             table103.AddRow(new string[] {
                         "nonce",
                         "nonce"});
-#line 1362
+#line 1390
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table103, "And ");
-#line 1372
+#line 1400
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1373
+#line 1401
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1375
+#line 1403
  testRunner.Then("redirect url contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1376
+#line 1404
  testRunner.Then("redirect url contains \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1377
+#line 1405
  testRunner.Then("token contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1378
+#line 1406
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1379
+#line 1407
  testRunner.Then("token contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1380
+#line 1408
  testRunner.Then("token contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1381
+#line 1409
  testRunner.Then("token contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1382
+#line 1410
  testRunner.Then("token contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1383
+#line 1411
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1384
+#line 1412
  testRunner.Then("token claim \'nonce\'=\'nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3577,7 +3661,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckARefreshTokenIsReturnedWhenTheScopeOffline_AccessIsUsed()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check a refresh token is returned when the scope offline_access is used", null, ((string[])(null)));
-#line 1386
+#line 1414
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3599,13 +3683,13 @@ this.ScenarioInitialize(scenarioInfo);
             table104.AddRow(new string[] {
                         "subject_type",
                         "public"});
-#line 1387
+#line 1415
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table104, "When ");
-#line 1395
+#line 1423
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1396
+#line 1424
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1397
+#line 1425
  testRunner.And("add user consent : user=\'administrator\', scope=\'email offline_access\', clientId=\'" +
                     "$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -3633,11 +3717,11 @@ this.ScenarioInitialize(scenarioInfo);
             table105.AddRow(new string[] {
                         "ui_locales",
                         "en fr"});
-#line 1399
+#line 1427
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table105, "And ");
-#line 1409
+#line 1437
  testRunner.Then("redirect url contains \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1410
+#line 1438
  testRunner.Then("redirect url contains \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -3649,7 +3733,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CheckAmrAndAcrClaimsArePresentInTheIdentityToken()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check amr and acr claims are present in the identity token", null, ((string[])(null)));
-#line 1412
+#line 1440
 this.ScenarioInitialize(scenarioInfo);
             this.ScenarioStart();
 #line hidden
@@ -3661,7 +3745,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "SIG",
                         "1",
                         "RS256"});
-#line 1413
+#line 1441
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table106, "When ");
 #line hidden
             TechTalk.SpecFlow.Table table107 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3672,7 +3756,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "1",
                         "Level1",
                         "pwd"});
-#line 1417
+#line 1445
  testRunner.And("add authentication class references", ((string)(null)), table107, "And ");
 #line hidden
             TechTalk.SpecFlow.Table table108 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3693,13 +3777,13 @@ this.ScenarioInitialize(scenarioInfo);
             table108.AddRow(new string[] {
                         "subject_type",
                         "public"});
-#line 1421
+#line 1449
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table108, "And ");
-#line 1429
+#line 1457
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1430
+#line 1458
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1431
+#line 1459
  testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             TechTalk.SpecFlow.Table table109 = new TechTalk.SpecFlow.Table(new string[] {
@@ -3726,19 +3810,22 @@ this.ScenarioInitialize(scenarioInfo);
             table109.AddRow(new string[] {
                         "acr_values",
                         "1"});
-#line 1433
+            table109.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+#line 1461
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table109, "And ");
-#line 1443
+#line 1472
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1444
+#line 1473
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 1446
+#line 1475
  testRunner.Then("token contains \'amr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1447
+#line 1476
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1448
+#line 1477
  testRunner.Then("token claim \'email\'=\'habarthierry@hotmail.fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line 1449
+#line 1478
  testRunner.Then("token claim \'acr\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();

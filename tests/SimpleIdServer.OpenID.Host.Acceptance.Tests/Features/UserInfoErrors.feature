@@ -165,6 +165,7 @@ Scenario: If access token is rejected then userinfo endpoint cannot be accessed
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 
 	And extract 'id_token' from callback
 	And extract 'code' from callback

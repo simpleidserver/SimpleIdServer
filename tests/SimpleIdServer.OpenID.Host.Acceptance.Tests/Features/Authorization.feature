@@ -24,6 +24,7 @@ Scenario: When no access token is issued the resulting claims are returned in th
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract 'display' from callback
@@ -66,7 +67,8 @@ Scenario: Check display is passed into the callback url
 	| scope         | openid email    |
 	| redirect_uri  | https://web.com |
 	| ui_locales    | en fr           |
-	| display		| popup			  |
+	| display       | popup           |
+	| nonce         | nonce           |
 	
 	And extract 'display' from callback
 
@@ -95,6 +97,7 @@ Scenario: Identity token is returned in JWS format (none)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract 'display' from callback
@@ -138,6 +141,7 @@ Scenario: Identity token is returned in JWS format (ES256)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract 'display' from callback
@@ -182,6 +186,7 @@ Scenario: Identity token is returned in JWS format (ES384)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -225,6 +230,7 @@ Scenario: Identity token is returned in JWS format (ES512)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -268,6 +274,7 @@ Scenario: Identity token is returned in JWS format (HS256)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -311,6 +318,7 @@ Scenario: Identity token is returned in JWS format (HS384)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -354,6 +362,7 @@ Scenario: Identity token is returned in JWS format (HS512)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -397,6 +406,7 @@ Scenario: Identity token is returned in JWS format (RS256)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -440,6 +450,7 @@ Scenario: Identity token is returned in JWS format (RS384)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -487,6 +498,7 @@ Scenario: Identity token is returned in JWS format (RS512)
 	| scope         | openid email role |
 	| redirect_uri  | https://web.com   |
 	| ui_locales    | en fr             |
+	| nonce         | nonce             |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -538,6 +550,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -592,6 +605,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -646,6 +660,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -700,6 +715,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -754,6 +770,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -808,6 +825,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -862,6 +880,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -916,6 +935,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -970,6 +990,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	| scope         | openid email role   |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And use 'jwks' JWKS to decrypt '$id_token$' JWE into 'jws'
@@ -1019,6 +1040,7 @@ Scenario: Use request object (JWS) parameter to get an access token and authoriz
 	| client_id     | $client_id$     |
 	| response_mode | query           |
 	| scope         | openid email    |
+	| nonce         | nonce           |
 	| redirect_uri  | https://web.com |
 
 	And execute HTTP GET request 'http://localhost/authorization'
@@ -1078,6 +1100,7 @@ Scenario: Use request object (JWE) parameter to get an access token and authoriz
 	| response_mode | query           |
 	| scope         | openid email    |
 	| redirect_uri  | https://web.com |
+	| nonce         | nonce           |
 
 	And use '2' JWKS from 'jwks_enc' to encrypt '$jws_request$' and enc 'A128CBC-HS256' and store the result into 'request'
 		
@@ -1088,6 +1111,7 @@ Scenario: Use request object (JWE) parameter to get an access token and authoriz
 	| client_id     | $client_id$   |
 	| state         | state         |
 	| scope         | openid email  |
+	| nonce         | nonce         |
 
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -1129,6 +1153,7 @@ Scenario: Public subject is returned in id_token
 	| scope         | openid email        |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -1165,6 +1190,7 @@ Scenario: Pairwise subject is returned in id_token
 	| scope         | openid email        |
 	| redirect_uri  | https://web.com     |
 	| ui_locales    | en fr               |
+	| nonce         | nonce               |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'
@@ -1197,6 +1223,7 @@ Scenario: User-agent is redirected to the login page when elapsed time > authent
 	| response_mode | query           |
 	| scope         | openid email    |
 	| redirect_uri  | https://web.com |
+	| nonce         | nonce           |
 	
 	Then redirect url contains 'http://localhost/Authenticate'
 
@@ -1222,6 +1249,7 @@ Scenario: User-agent is redirected to the login page when elapsed time > to auth
 	| scope         | openid email    |
 	| max_age       | 2               |
 	| redirect_uri  | https://web.com |
+	| nonce         | nonce           |
 
 	Then redirect url contains 'http://localhost/Authenticate'
 	
@@ -1397,14 +1425,14 @@ Scenario: Check a refresh token is returned when the scope offline_access is use
 	And add user consent : user='administrator', scope='email offline_access', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value								 |
-	| response_type | code								 |
-	| client_id     | $client_id$						 |
-	| state         | state								 |
-	| response_mode | query								 |
-	| scope         | openid offline_access email        |
-	| redirect_uri  | https://web.com					 |
-	| ui_locales    | en fr								 |
+	| Key           | Value                       |
+	| response_type | code                        |
+	| client_id     | $client_id$                 |
+	| state         | state                       |
+	| response_mode | query                       |
+	| scope         | openid offline_access email |
+	| redirect_uri  | https://web.com             |
+	| ui_locales    | en fr                       |
 
 	Then redirect url contains 'code'
 	Then redirect url contains 'refresh_token'
@@ -1431,14 +1459,15 @@ Scenario: Check amr and acr claims are present in the identity token
 	And add user consent : user='administrator', scope='email', clientId='$client_id$'
 
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value				|
-	| response_type | code id_token		|
-	| client_id     | $client_id$		|
-	| state         | state				|
-	| response_mode | query				|
-	| scope         | openid email		|
-	| redirect_uri  | https://web.com	|
-	| acr_values    | 1					|	
+	| Key           | Value           |
+	| response_type | code id_token   |
+	| client_id     | $client_id$     |
+	| state         | state           |
+	| response_mode | query           |
+	| scope         | openid email    |
+	| redirect_uri  | https://web.com |
+	| acr_values    | 1               |
+	| nonce         | nonce           |
 	
 	And extract 'id_token' from callback
 	And extract payload from JWS '$id_token$'

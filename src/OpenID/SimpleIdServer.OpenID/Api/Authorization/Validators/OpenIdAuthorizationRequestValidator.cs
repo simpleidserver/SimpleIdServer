@@ -71,6 +71,8 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 await CheckRequestUriParameter(context);
             }
 
+            var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
+            var nonce = context.Request.Data.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
             var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
             var maxAge = context.Request.Data.GetMaxAgeFromAuthorizationRequest();
@@ -78,6 +80,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             if (string.IsNullOrWhiteSpace(redirectUri))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.RedirectUri));
+            }
+
+            if (responseTypes.Contains(TokenResponseParameters.IdToken) && string.IsNullOrWhiteSpace(nonce))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OpenID.DTOs.AuthorizationRequestParameters.Nonce));
             }
 
             if (maxAge != null)

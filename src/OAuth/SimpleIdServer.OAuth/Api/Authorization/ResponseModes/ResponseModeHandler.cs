@@ -11,11 +11,6 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
 {
     public class ResponseModeHandler : IResponseModeHandler
     {
-        private static Dictionary<IEnumerable<string>, string> MAPPING_RESPONSETYPES_TO_RESPONSEMODE = new Dictionary<IEnumerable<string>, string>
-        {
-            { new [] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }, QueryResponseModeHandler.NAME },
-            { new [] { TokenResponseTypeHandler.RESPONSE_TYPE, "id_token" }, FragmentResponseModeHandler.NAME }
-        };
         private readonly IEnumerable<IOAuthResponseModeHandler> _oauthResponseModeHandlers;
 
         public ResponseModeHandler(IEnumerable<IOAuthResponseModeHandler> oauthResponseModeHandlers)
@@ -29,11 +24,24 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
             var responseMode = queryParams.GetResponseModeFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(responseMode))
             {
-                var kvp = MAPPING_RESPONSETYPES_TO_RESPONSEMODE.FirstOrDefault(r => r.Key.All(k => responseTypes.Contains(k)));
-                responseMode = kvp.Value;
+                // https://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3.1.2.6
+                if (!responseTypes.Any() || (responseTypes.Count() == 1 && responseTypes.Contains(AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE)))
+                {
+                    responseMode = QueryResponseModeHandler.NAME;
+                }
+                else
+                {
+                    responseMode = FragmentResponseModeHandler.NAME;
+                }
             }
 
-            _oauthResponseModeHandlers.First(o => o.ResponseMode == responseMode).Handle(authorizationResponse, httpContext);
+            var oauthResponseModeHandler = _oauthResponseModeHandlers.FirstOrDefault(o => o.ResponseMode == responseMode);
+            if (oauthResponseModeHandler == null)
+            {
+                oauthResponseModeHandler = _oauthResponseModeHandlers.First(o => o.ResponseMode == QueryResponseModeHandler.NAME);
+            }
+
+            oauthResponseModeHandler.Handle(authorizationResponse, httpContext);
         }
     }
 }
