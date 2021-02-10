@@ -1063,7 +1063,6 @@ Scenario: Use request object (JWS) parameter to get an access token and authoriz
 	Then token contains 'azp'
 	Then token contains 'c_hash'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
 
 Scenario: Use request object (JWE) parameter to get an access token and authorization code
 	When add JSON web key to Authorization Server and store into 'jwks_enc'
@@ -1125,7 +1124,6 @@ Scenario: Use request object (JWE) parameter to get an access token and authoriz
 	Then token contains 'azp'
 	Then token contains 'c_hash'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
 
 Scenario: Public subject is returned in id_token
 	When add JSON web key to Authorization Server and store into 'jwks'
@@ -1474,5 +1472,4 @@ Scenario: Check amr and acr claims are present in the identity token
 	
 	Then token contains 'amr'
 	Then token claim 'sub'='administrator'
-	Then token claim 'email'='habarthierry@hotmail.fr'
 	Then token claim 'acr'='1'
