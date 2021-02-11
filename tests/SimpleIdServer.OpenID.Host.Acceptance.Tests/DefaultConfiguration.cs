@@ -48,38 +48,38 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
             {
                 Name = "role",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<string>
+                Claims = new List<OpenIdScopeClaim>
                 {
-                    "role"
+                    new OpenIdScopeClaim("role", true)
                 }
             },
             new OpenIdScope
             {
                 Name = "email",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<string>
+                Claims = new List<OpenIdScopeClaim>
                 {
-                    Jwt.Constants.UserClaims.Email,
-                    Jwt.Constants.UserClaims.EmailVerified
+                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Email, true),
+                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.EmailVerified, true)
                 }
             },
             new OpenIdScope
             {
                 Name = "profile",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<string>
+                Claims = new List<OpenIdScopeClaim>
                 {
-                    Jwt.Constants.UserClaims.Name,
-                    Jwt.Constants.UserClaims.UpdatedAt
+                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Name, true),
+                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.UpdatedAt, true)
                 }
             },
             new OpenIdScope
             {
                 Name = "address",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<string>
+                Claims = new List<OpenIdScopeClaim>
                 {
-                    Jwt.Constants.UserClaims.Address
+                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Address, true)
                 }
             },
             new OpenIdScope
@@ -90,9 +90,9 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
             new OpenIdScope
             {
                 Name = "openid",
-                Claims = new List<string>
+                Claims = new List<OpenIdScopeClaim>
                 {
-                    Jwt.Constants.UserClaims.Subject
+                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Subject, true)
                 },
                 IsExposedInConfigurationEdp = true
             }

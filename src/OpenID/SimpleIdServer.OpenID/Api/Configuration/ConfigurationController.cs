@@ -7,6 +7,8 @@ using SimpleIdServer.Jwt.Jwe.EncHandlers;
 using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
@@ -24,6 +26,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
         private readonly IEnumerable<IEncHandler> _encHandlers;
         private readonly IEnumerable<ISignHandler> _signHandlers;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
+        private readonly IOAuthScopeQueryRepository _oauthScopeQueryRepository;
         private readonly IAuthenticationContextClassReferenceQueryRepository _authenticationContextClassReferenceQueryRepository;
 
         public ConfigurationController(
@@ -32,12 +35,14 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             IEnumerable<IEncHandler> encHandlers,
             IEnumerable<ISignHandler> signHandlers,
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders,
+            IOAuthScopeQueryRepository oauthScopeQueryRepository,
             IAuthenticationContextClassReferenceQueryRepository authenticationContextClassReferenceQueryRepository) : base(configurationRequestHandler)
         {
             _cekHandlers = cekHandlers;
             _encHandlers = encHandlers;
             _signHandlers = signHandlers;
             _subjectTypeBuilders = subjectTypeBuilders;
+            _oauthScopeQueryRepository = oauthScopeQueryRepository;
             _authenticationContextClassReferenceQueryRepository = authenticationContextClassReferenceQueryRepository;
         }
 
@@ -47,6 +52,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var acrLst = await _authenticationContextClassReferenceQueryRepository.GetAllACR(token);
             var result = await Build();
+            var openidScopes = (await _oauthScopeQueryRepository.GetAllOAuthScopes()).Cast<OpenIdScope>().SelectMany(s => s.Claims).Where(c => c.IsExposed).Select(s => s.ClaimName);
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{SIDOpenIdConstants.EndPoints.UserInfo}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{SIDOpenIdConstants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{SIDOpenIdConstants.EndPoints.EndSession}");
@@ -63,6 +69,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             result.Add(OpenIDConfigurationNames.UserInfoSigningAlgValuesSupported, JArray.FromObject(_signHandlers.Select(_ => _.AlgName)));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JArray.FromObject(_cekHandlers.Select(r => r.AlgName)));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JArray.FromObject(_encHandlers.Select(r => r.EncName)));
+            result.Add(OpenIDConfigurationNames.ClaimsSupported, JArray.FromObject(openidScopes));
             return new OkObjectResult(result);
         }
     }

@@ -23,9 +23,9 @@ namespace SimpleIdServer.OpenID.Startup
             new OpenIdScope
             {
                 Name = "scim",
-                Claims = new List<string>
+                Claims = new List<OpenIdScopeClaim>
                 {
-                    "scim_id"
+                    new OpenIdScopeClaim("scim_id", true)
                 }
             }
         };
@@ -225,9 +225,9 @@ namespace SimpleIdServer.OpenID.Startup
                     new OpenIdScope
                     {
                         Name = "scim",
-                        Claims = new List<string>
+                        Claims = new List<OpenIdScopeClaim>
                         {
-                            "scim_id"
+                            new OpenIdScopeClaim("scim_id", true)
                         }
                     }
                 },
