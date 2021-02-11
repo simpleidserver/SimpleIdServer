@@ -66,6 +66,20 @@ namespace SimpleIdServer.OpenID.Api.Register
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(openidClient.InitiateLoginUri))
+            {
+                if (!Uri.IsWellFormedUriString(openidClient.InitiateLoginUri, UriKind.Absolute))
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_INITIATE_LOGIN_URI);
+                }
+
+                var uri = new Uri(openidClient.InitiateLoginUri);
+                if (uri.Scheme != "https" && _openIDHostOptions.IsInitiateLoginUriHTTPSRequired)
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_INITIATE_LOGIN_URI);
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(openidClient.SubjectType) && !_subjectTypeBuilders.Any(s => s.SubjectType == openidClient.SubjectType))
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SUBJECT_TYPE);

@@ -92,6 +92,11 @@ namespace SimpleIdServer.OpenID.Extensions
             return jObj.GetArray(OpenIdClientParameters.PostLogoutRedirectUris);
         }
 
+        public static string GetInitiateLoginUri(this JObject jObj)
+        {
+            return jObj.GetStr(OpenIdClientParameters.InitiateLoginUri);
+        }
+
         #endregion
 
         #region Authorization request

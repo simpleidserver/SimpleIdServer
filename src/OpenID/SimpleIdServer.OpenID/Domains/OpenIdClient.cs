@@ -103,6 +103,11 @@ namespace SimpleIdServer.OpenID.Domains
         public IEnumerable<OpenIdScope> AllowedOpenIdScopes => (IEnumerable<OpenIdScope>)AllowedScopes;
 
         /// <summary>
+        /// URI using the https scheme that a third party can use to initiate a login by the RP.
+        /// </summary>
+        public string InitiateLoginUri { get; set; }
+
+        /// <summary>
         /// Resolve redirection urls.
         /// </summary>
         /// <returns></returns>
@@ -188,7 +193,8 @@ namespace SimpleIdServer.OpenID.Domains
                 UserInfoEncryptedResponseEnc = UserInfoEncryptedResponseEnc,
                 UserInfoSignedResponseAlg = UserInfoSignedResponseAlg,
                 RegistrationAccessToken = RegistrationAccessToken,
-                PostLogoutRedirectUris = PostLogoutRedirectUris
+                PostLogoutRedirectUris = PostLogoutRedirectUris,
+                InitiateLoginUri = InitiateLoginUri
             };
         }
     }

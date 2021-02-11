@@ -17,6 +17,7 @@ namespace SimpleIdServer.OpenID.Options
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
             SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
             IsRedirectionUrlHTTPSRequired = true;
+            IsInitiateLoginUriHTTPSRequired = true;
             IsLocalhostAllowed = false;
         }
 
@@ -52,5 +53,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Check if the redirection url can contains localhost.
         /// </summary>
         public bool IsLocalhostAllowed { get; set; }
+        /// <summary>
+        /// Check if 'initiate_login_uri' must be HTTPS.
+        /// </summary>
+        public bool IsInitiateLoginUriHTTPSRequired { get; set; }
     }
 }

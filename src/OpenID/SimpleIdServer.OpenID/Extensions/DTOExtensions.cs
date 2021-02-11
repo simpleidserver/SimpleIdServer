@@ -27,6 +27,7 @@ namespace SimpleIdServer.OpenID.Extensions
                 .AddNotEmpty(OpenIdClientParameters.RequestObjectEncryptionAlg, openidClient.RequestObjectEncryptionAlg)
                 .AddNotEmpty(OpenIdClientParameters.RequestObjectEncryptionEnc, openidClient.RequestObjectEncryptionEnc)
                 .AddNotEmpty(OpenIdClientParameters.DefaultAcrValues, openidClient.DefaultAcrValues)
+                .AddNotEmpty(OpenIdClientParameters.InitiateLoginUri, openidClient.InitiateLoginUri)
                 .AddNotEmpty(OpenIdClientParameters.PostLogoutRedirectUris, openidClient.PostLogoutRedirectUris);
             if (openidClient.DefaultMaxAge != null)
             {
@@ -57,6 +58,7 @@ namespace SimpleIdServer.OpenID.Extensions
             result.RequireAuthTime = jObj.GetRequireAuhTime() ?? false;
             result.DefaultAcrValues = jObj.GetDefaultAcrValues();
             result.PostLogoutRedirectUris = jObj.GetPostLogoutRedirectUris();
+            result.InitiateLoginUri = jObj.GetInitiateLoginUri();
             result.AllowedScopes = result.AllowedScopes.Select(s => new OpenIdScope
             {
                 Name = s.Name

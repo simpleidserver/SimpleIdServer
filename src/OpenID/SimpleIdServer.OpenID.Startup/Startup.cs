@@ -53,6 +53,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     opt.IsLocalhostAllowed = true;
                     opt.IsRedirectionUrlHTTPSRequired = false;
+                    opt.IsInitiateLoginUriHTTPSRequired = true;
                 }, opt =>
                 {
                     opt.DefaultScopes = new List<string>

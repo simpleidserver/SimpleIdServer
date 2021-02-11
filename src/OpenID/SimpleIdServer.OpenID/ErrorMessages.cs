@@ -21,7 +21,9 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_ISSUER_CLAIM = "the issuer claim is invalid";
         public const string INVALID_APPLICATION_TYPE = "application type is invalid";
         public const string INVALID_SECTOR_IDENTIFIER_URI = "sector_identifier_uri is not a valid URI";
+        public const string INVALID_INITIATE_LOGIN_URI = "initiate_login_uri is not a valid URI";
         public const string INVALID_HTTPS_SECTOR_IDENTIFIER_URI = "sector_identifier_uri doesn't contain https scheme";
+        public const string INVALID_HTTPS_INITIATE_LOGIN_URI = "initiate_login_uri doesn't contain https scheme";
         public const string INVALID_HTTPS_REDIRECT_URI = "redirect_uri does not contain https scheme";
         public const string INVALID_LOCALHOST_REDIRECT_URI = "redirect_uri must not contain localhost";
         public const string INVALID_SUBJECT_TYPE = "subject_type is invalid";

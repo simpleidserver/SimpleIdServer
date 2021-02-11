@@ -21,7 +21,7 @@ Scenario: Error is returned when sectore_identifier_uri is incorrect
 	Then JSON 'error'='invalid_client_metadata'
 	Then JSON 'error_description'='sector_identifier_uri is not a valid URI'
 
-Scenario: Error is returned when sectore_identifier_uri doesn't contains HTTPS scheme
+Scenario: Error is returned when sectore_identifier_uri doesn't contain HTTPS scheme
 	When execute HTTP POST JSON request 'http://localhost/register'
 	| Key					| Value													|
 	| sector_identifier_uri	| http://localhost										|
@@ -30,6 +30,26 @@ Scenario: Error is returned when sectore_identifier_uri doesn't contains HTTPS s
 
 	Then JSON 'error'='invalid_client_metadata'
 	Then JSON 'error_description'='sector_identifier_uri doesn't contain https scheme'
+
+Scenario: Error is returned when initiate_login_uri is incorrect
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                | Value   |
+	| initiate_login_uri | unknown |
+
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_client_metadata'
+	Then JSON 'error_description'='initiate_login_uri is not a valid URI'
+	
+Scenario: Error is returned when initiate_login_uri doesn't contain HTTPS scheme
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key                | Value            |
+	| initiate_login_uri | http://localhost |
+
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_client_metadata'
+	Then JSON 'error_description'='initiate_login_uri doesn't contain https scheme'
 
 Scenario: Error is returned when subject_type is not supported
 	When execute HTTP POST JSON request 'http://localhost/register'
