@@ -57,5 +57,11 @@ namespace SimpleIdServer.OpenID.Options
         /// Check if 'initiate_login_uri' must be HTTPS.
         /// </summary>
         public bool IsInitiateLoginUriHTTPSRequired { get; set; }
+        /// <summary>
+        /// Check if 'mutual-tls' is enabled.
+        /// Configure the 'mutual-tls' with CERTIFICATE in STARTUP
+        /// https://docs.identityserver.io/en/3.1.0/topics/mtls.html
+        /// </summary>
+        public bool IsMutualTlsEnabled { get; set; }
     }
 }

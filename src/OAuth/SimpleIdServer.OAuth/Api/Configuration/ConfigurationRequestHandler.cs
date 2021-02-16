@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Authorization;
@@ -7,6 +8,7 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate;
 using SimpleIdServer.OAuth.DTOs;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +29,11 @@ namespace SimpleIdServer.OAuth.Api.Configuration
         private readonly IEnumerable<IGrantTypeHandler> _grantTypeHandlers;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _oauthClientAuthenticationHandlers;
         private readonly IEnumerable<ISignHandler> _signHandlers;
+        private readonly OAuthHostOptions _options;
 
         public ConfigurationRequestHandler(IOAuthScopeQueryRepository oauthScopeRepository, IEnumerable<IResponseTypeHandler> authorizationGrantTypeHandlers, IEnumerable<IOAuthResponseMode> oauthResponseModes,
             IEnumerable<IGrantTypeHandler> grantTypeHandlers, IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers,
-            IEnumerable<ISignHandler> signHandlers)
+            IEnumerable<ISignHandler> signHandlers, IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
             _authorizationGrantTypeHandlers = authorizationGrantTypeHandlers;
@@ -38,16 +41,25 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             _grantTypeHandlers = grantTypeHandlers;
             _oauthClientAuthenticationHandlers = oauthClientAuthenticationHandlers;
             _signHandlers = signHandlers;
+            _options = options.Value;
         }
 
         public virtual async Task Enrich(JObject jObj, string issuer)
         {
+            jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
             jObj.Add(OAuthConfigurationNames.ScopesSupported, JArray.FromObject((await _oauthScopeRepository.GetAllOAuthScopesExposed()).Select(s => s.Name).ToList()));
             jObj.Add(OAuthConfigurationNames.ResponseTypesSupported, JArray.FromObject(_authorizationGrantTypeHandlers.Select(s => s.ResponseType).Distinct()));
             jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JArray.FromObject(_oauthResponseModes.Select(s => s.ResponseMode)));
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JArray.FromObject(_grantTypeHandlers.Select(r => r.GrantType)));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JArray.FromObject(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JArray.FromObject(_signHandlers.Select(s => s.AlgName)));
+            if (_options.MtlsEnabled)
+            {
+                jObj.Add(OAuthConfigurationNames.MtlsEndpointAliases, new JObject
+                {
+                    { OAuthConfigurationNames.TokenEndpoint, $"{issuer}/{Constants.EndPoints.MtlsToken}" }
+                });
+            }
         }
     }
 }

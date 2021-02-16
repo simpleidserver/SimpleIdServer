@@ -32,5 +32,10 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string TokenExpirationTimeInSeconds = "token_expiration_time_seconds";
         public const string RefreshTokenExpirationTimeInSeconds = "refresh_token_expiration_time_seconds";
         public const string RegistrationClientUri = "registration_client_uri";
+        public const string TlsClientAuthSubjectDN = "tls_client_auth_subject_dn";
+        public const string TlsClientAuthSanDNS = "tls_client_auth_san_dns";
+        public const string TlsClientAuthSanUri = "tls_client_auth_san_uri";
+        public const string TlsClientAuthSanIp = "tls_client_auth_san_ip";
+        public const string TlsClientAuthSanEmail = "tls_client_auth_san_email";
     }
 }

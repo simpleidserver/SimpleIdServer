@@ -32,6 +32,8 @@ namespace SimpleIdServer.Jwt
             public static string ClientId = "client_id";
             public static string Scopes = "scope";
             public static string Claims = "claims";
+            public static string Cnf = "cnf";
+            public static string X5TS256 = "x5t#S256";
         }
 
         public static class UserClaims

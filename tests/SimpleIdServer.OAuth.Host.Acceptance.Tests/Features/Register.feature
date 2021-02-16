@@ -2,7 +2,7 @@
 	Check registration endpoint
 	
 Scenario: Create minimalist client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key           | Value              |
 	| redirect_uris | [http://localhost] |
 
@@ -19,7 +19,7 @@ Scenario: Create minimalist client
 	Then JSON exists 'client_name'
 
 Scenario: Create client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                        | Value                     |
 	| redirect_uris              | [http://localhost]        |
 	| response_types             | [token]                   |
@@ -71,7 +71,7 @@ Scenario: Use software_statement parameter to create a client
 	| iss           | iss                |
 	| redirect_uris | [http://localhost] |
 	
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                | Value               |
 	| software_statement | $softwareStatement$ |
 	
@@ -88,7 +88,7 @@ Scenario: Use software_statement parameter to create a client
 	Then JSON exists 'client_name'
 
 Scenario: Get client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                        | Value                     |
 	| redirect_uris              | [http://localhost]        |
 	| response_types             | [token]                   |
@@ -113,8 +113,8 @@ Scenario: Get client
 	And extract parameter 'client_id' from JSON body into 'clientId'
 	And extract parameter 'registration_access_token' from JSON body into 'registrationAccessToken'
 	And execute HTTP GET request 'http://localhost/register/$clientId$'
-	| Key           | Value                     |
-	| Authorization | $registrationAccessToken$ |
+	| Key           | Value                            |
+	| Authorization | Bearer $registrationAccessToken$ |
 
 	And extract JSON from body
 
@@ -143,7 +143,7 @@ Scenario: Get client
 	Then JSON 'software_version'='1.0'
 
 Scenario: Update client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                        | Value                     |
 	| redirect_uris              | [http://localhost]        |
 	| response_types             | [token]                   |
@@ -168,32 +168,32 @@ Scenario: Update client
 	And extract parameter 'client_id' from JSON body into 'clientId'
 	And extract parameter 'registration_access_token' from JSON body into 'registrationAccessToken'
 
-	And execute HTTP PUT JSON request 'http://localhost/register/$clientId$'
-	| Key                        | Value                     |
-	| Authorization              | $registrationAccessToken$ |
-	| client_id                  | $clientId$                |
-	| redirect_uris              | [http://localhost]        |
-	| response_types             | [token]                   |
-	| grant_types                | [implicit]                |
-	| client_name                | name                      |
-	| client_name#fr             | nom                       |
-	| client_name#en             | name                      |
-	| client_uri                 | http://clienturi          |
-	| client_uri#fr              | http://clienturi/fr       |
-	| logo_uri                   | http://logouri/1.png      |
-	| logo_uri#fr                | http://logouri/fr/1.png   |
-	| software_id                | software                  |
-	| software_version           | 1.0                       |
-	| token_endpoint_auth_method | client_secret_basic       |
-	| scope                      | scope1                    |
-	| contacts                   | [addr1,addr2]             |
-	| tos_uri                    | http://tosuri/tos         |
-	| policy_uri                 | http://policyuri/policy   |
-	| jwks_uri                   | http://jwksuri/jwks       |
+	And execute HTTP PUT JSON request 'https://localhost:8080/register/$clientId$'
+	| Key                        | Value                            |
+	| Authorization              | Bearer $registrationAccessToken$ |
+	| client_id                  | $clientId$                       |
+	| redirect_uris              | [http://localhost]               |
+	| response_types             | [token]                          |
+	| grant_types                | [implicit]                       |
+	| client_name                | name                             |
+	| client_name#fr             | nom                              |
+	| client_name#en             | name                             |
+	| client_uri                 | http://clienturi                 |
+	| client_uri#fr              | http://clienturi/fr              |
+	| logo_uri                   | http://logouri/1.png             |
+	| logo_uri#fr                | http://logouri/fr/1.png          |
+	| software_id                | software                         |
+	| software_version           | 1.0                              |
+	| token_endpoint_auth_method | client_secret_basic              |
+	| scope                      | scope1                           |
+	| contacts                   | [addr1,addr2]                    |
+	| tos_uri                    | http://tosuri/tos                |
+	| policy_uri                 | http://policyuri/policy          |
+	| jwks_uri                   | http://jwksuri/jwks              |
 
-	And execute HTTP GET request 'http://localhost/register/$clientId$'
-	| Key           | Value                     |
-	| Authorization | $registrationAccessToken$ |
+	And execute HTTP GET request 'https://localhost:8080/register/$clientId$'
+	| Key           | Value                            |
+	| Authorization | Bearer $registrationAccessToken$ |
 
 	And extract JSON from body
 
@@ -223,7 +223,7 @@ Scenario: Update client
 
 
 Scenario: Delete client
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                        | Value                     |
 	| redirect_uris              | [http://localhost]        |
 	| response_types             | [token]                   |
@@ -248,14 +248,14 @@ Scenario: Delete client
 	And extract parameter 'client_id' from JSON body into 'clientId'
 	And extract parameter 'registration_access_token' from JSON body into 'registrationAccessToken'
 
-	And execute HTTP DELETE request 'http://localhost/register/$clientId$'
-	| Key           | Value                     |
-	| Authorization | $registrationAccessToken$ |
+	And execute HTTP DELETE request 'https://localhost:8080/register/$clientId$'
+	| Key           | Value                            |
+	| Authorization | Bearer $registrationAccessToken$ |
 
 	
-	And execute HTTP GET request 'http://localhost/register/$clientId$'
-	| Key           | Value                     |
-	| Authorization | $registrationAccessToken$ |
+	And execute HTTP GET request 'https://localhost:8080/register/$clientId$'
+	| Key           | Value                            |
+	| Authorization | Bearer $registrationAccessToken$ |
 
 	And extract JSON from body
 

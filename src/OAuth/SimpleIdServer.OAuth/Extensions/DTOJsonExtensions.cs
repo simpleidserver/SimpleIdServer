@@ -30,7 +30,12 @@ namespace SimpleIdServer.OAuth.Extensions
                 .AddNotEmpty(OAuthClientParameters.PolicyUri, client.PolicyUris)
                 .AddNotEmpty(OAuthClientParameters.JwksUri, client.JwksUri)
                 .AddNotEmpty(OAuthClientParameters.SoftwareId, client.SoftwareId)
-                .AddNotEmpty(OAuthClientParameters.SoftwareVersion, client.SoftwareVersion);
+                .AddNotEmpty(OAuthClientParameters.SoftwareVersion, client.SoftwareVersion)
+                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSubjectDN, client.TlsClientAuthSubjectDN)
+                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanDNS, client.TlsClientAuthSanDNS)
+                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanUri, client.TlsClientAuthSanURI)
+                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanIp, client.TlsClientAuthSanIP)
+                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanEmail, client.TlsClientAuthSanEmail);
             result.Add(OAuthClientParameters.ClientIdIssuedAt, client.CreateDateTime.ConvertToUnixTimestamp());
             result.Add(OAuthClientParameters.RegistrationClientUri, $"{issuer}/{Constants.EndPoints.Registration}/{client.ClientId}");
             if (client.Secrets != null && client.Secrets.Any())
@@ -87,6 +92,11 @@ namespace SimpleIdServer.OAuth.Extensions
             result.TokenEncryptedResponseAlg = jObj.GetTokenEncryptedResponseAlg();
             result.TokenEncryptedResponseEnc = jObj.GetTokenEncryptedResponseEnc();
             result.RegistrationAccessToken = jObj.GetRegistrationAccessToken();
+            result.TlsClientAuthSubjectDN = jObj.GetTlsClientAuthSubjectDn();
+            result.TlsClientAuthSanDNS = jObj.GetTlsClientAuthSanDNS();
+            result.TlsClientAuthSanURI = jObj.GetTlsClientAuthSanUri();
+            result.TlsClientAuthSanIP = jObj.GetTlsClientAuthSanIP();
+            result.TlsClientAuthSanEmail = jObj.GetTlsClientAuthSanEmail();
             var clientSecret = jObj.GetClientSecret();
             if (!string.IsNullOrWhiteSpace(clientSecret))
             {

@@ -26,5 +26,10 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string IntrospectionEndpointAuthMethodsSupported = "introspection_endpoint_auth_methods_supported";
         public const string IntrospectionEndpointAuthSigningAlgValuesSupported = "introspection_endpoint_auth_signing_alg_values_supported";
         public const string CodeChallengeMethodsSupported = "code_challenge_methods_supported";
+        /// <summary>
+        /// Boolean value indicating server support for mutual-TLS client certificate-bound access tokens.
+        /// </summary>
+        public const string TlsClientCertificateBoundAccessTokens = "tls_client_certificate_bound_access_tokens";
+        public const string MtlsEndpointAliases = "mtls_endpoint_aliases";
     }
 }

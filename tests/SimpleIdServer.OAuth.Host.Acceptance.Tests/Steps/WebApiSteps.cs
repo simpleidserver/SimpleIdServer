@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jws;
@@ -21,17 +20,17 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
-using Xunit;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
 {
     [Binding]
-    public class SharedSteps
+    public class WebApiSteps
     {
+        private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert" };
         private ScenarioContext _scenarioContext;
         private CustomWebApplicationFactory<FakeStartup> _factory;
 
-        public SharedSteps(ScenarioContext scenarioContext)
+        public WebApiSteps(ScenarioContext scenarioContext)
         {
             _scenarioContext = scenarioContext;
             _factory = new CustomWebApplicationFactory<FakeStartup>((o) =>
@@ -58,86 +57,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             });
         }
 
-
-        [When("execute HTTP GET request '(.*)'")]
-        public async Task GivenExecuteHTTPGetRequest(string url, Table table)
-        {
-            url = ParseValue(url).ToString();
-            string authHeader = null;
-            foreach (var record in table.Rows)
-            {
-                var key = record["Key"];
-                var value = record["Value"];
-                if (value.StartsWith('$') && value.EndsWith('$'))
-                {
-                    value = value.TrimStart('$').TrimEnd('$');
-                    value = _scenarioContext.Get<string>(value);
-                }
-
-                if (key == "Authorization")
-                {
-                    authHeader = value;
-                }
-                else
-                {
-                    url = QueryHelpers.AddQueryString(url, record["Key"], value);
-                }
-            }
-
-            var httpRequestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(url)
-            };
-            if (!string.IsNullOrWhiteSpace(authHeader))
-            {
-                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
-            }
-
-            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
-            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
-        }
-
-
-        [When("execute HTTP DELETE request '(.*)'")]
-        public async Task GivenExecuteHTTPDeleteRequest(string url, Table table)
-        {
-            url = ParseValue(url).ToString();
-            string authHeader = null;
-            foreach (var record in table.Rows)
-            {
-                var key = record["Key"];
-                var value = record["Value"];
-                if (value.StartsWith('$') && value.EndsWith('$'))
-                {
-                    value = value.TrimStart('$').TrimEnd('$');
-                    value = _scenarioContext.Get<string>(value);
-                }
-
-                if (key == "Authorization")
-                {
-                    authHeader = value;
-                }
-                else
-                {
-                    url = QueryHelpers.AddQueryString(url, record["Key"], value);
-                }
-            }
-
-            var httpRequestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(url)
-            };
-            if (!string.IsNullOrWhiteSpace(authHeader))
-            {
-                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
-            }
-
-            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
-            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
-        }
-
         [When("add JSON web key to Authorization Server and store into '(.*)'")]
         public async Task WhenAddJsonWebKey(string name, Table table)
         {
@@ -152,47 +71,59 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwks, name);
         }
 
+        [When("execute HTTP GET request '(.*)'")]
+        public async Task GivenExecuteHTTPGetRequest(string url, Table table)
+        {
+            url = ExtractUrl(url, table);
+            var headers = ExtractHeaders(table);
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(url)
+            };
+            foreach(var kvp in headers)
+            {
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("execute HTTP DELETE request '(.*)'")]
+        public async Task GivenExecuteHTTPDeleteRequest(string url, Table table)
+        {
+            url = ExtractUrl(url, table);
+            var headers = ExtractHeaders(table);
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(url)
+            };
+            foreach(var kvp in headers)
+            {
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("execute HTTP PUT JSON request '(.*)'")]
         public async Task GivenExecuteHTTPPutJSONRequest(string url, Table table)
         {
             url = ParseValue(url).ToString();
-            string authHeader = null;
-            var jObj = new JObject();
-            foreach (var record in table.Rows)
-            {
-                var key = record["Key"];
-                var value = record["Value"];
-                if (value.StartsWith('$') && value.EndsWith('$'))
-                {
-                    value = value.TrimStart('$').TrimEnd('$');
-                    value = _scenarioContext.Get<string>(value);
-                }
-
-                if (key == "Authorization")
-                {
-                    authHeader = ParseValue(value).ToString();
-                }
-                else if (value.StartsWith('[') && value.EndsWith(']'))
-                {
-                    value = value.TrimStart('[').TrimEnd(']');
-                    var splitted = value.Split(',');
-                    jObj.Add(record["Key"], JArray.FromObject(splitted));
-                }
-                else
-                {
-                    jObj.Add(record["Key"], ParseValue(value).ToString());
-                }
-            }
-
+            var headers = ExtractHeaders(table);
+            var jObj = ExtractBody(table);
             var httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(url),
                 Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
             };
-            if (!string.IsNullOrWhiteSpace(authHeader))
+            foreach(var kvp in headers)
             {
-                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
@@ -202,43 +133,19 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("execute HTTP POST JSON request '(.*)'")]
         public async Task GivenExecuteHTTPPostJSONRequest(string url, Table table)
         {
-            string authHeader = null;
-            var jObj = new JObject();
-            foreach (var record in table.Rows)
-            {
-                var key = record["Key"];
-                var value = record["Value"];
-                if (value.StartsWith('$') && value.EndsWith('$'))
-                {
-                    value = value.TrimStart('$').TrimEnd('$');
-                    value = _scenarioContext.Get<string>(value);
-                }
-
-                if (key == "Authorization")
-                {
-                    authHeader = value;
-                }
-                else if (value.StartsWith('[') && value.EndsWith(']'))
-                {
-                    value = value.TrimStart('[').TrimEnd(']');
-                    var splitted = value.Split(',');
-                    jObj.Add(record["Key"], JArray.FromObject(splitted));
-                }
-                else
-                {
-                    jObj.Add(record["Key"], value);
-                }
-            }
-
+            url = ParseValue(url).ToString();
+            var headers = ExtractHeaders(table);
+            var jObj = ExtractBody(table);
             var httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(url),
                 Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
             };
-            if (!string.IsNullOrWhiteSpace(authHeader))
+
+            foreach(var kvp in headers)
             {
-                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
@@ -248,26 +155,18 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("execute HTTP POST request '(.*)'")]
         public async Task GivenExecuteHTTPPostRequest(string url, Table table)
         {
-            string authHeader = null;
             var jObj = new List<KeyValuePair<string, string>>();
+            var headers = ExtractHeaders(table);
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = record["Value"];
-                if (value.StartsWith('$') && value.EndsWith('$'))
+                var value = ParseValue(record["Value"]).ToString();
+                if (PARAMETERS_IN_HEADER.Contains(key))
                 {
-                    value = value.TrimStart('$').TrimEnd('$');
-                    value = _scenarioContext.Get<string>(value);
+                    continue;
                 }
 
-                if (key == "Authorization")
-                {
-                    authHeader = value;
-                }
-                else
-                {
-                    jObj.Add(new KeyValuePair<string, string>(record["Key"], value));
-                }
+                jObj.Add(new KeyValuePair<string, string>(record["Key"], value));
             }
 
             var httpRequestMessage = new HttpRequestMessage
@@ -276,57 +175,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                 RequestUri = new Uri(url),
                 Content = new FormUrlEncodedContent(jObj)
             };
-            if (!string.IsNullOrWhiteSpace(authHeader))
+            
+            foreach(var kvp in headers)
             {
-                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
 
-            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            var httpClient = _factory.CreateClient();
+            var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
-        }
-
-        [When("extract JSON from body")]
-        public async Task GivenExtractFromBody()
-        {
-            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-            _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(json), "jsonHttpBody");
-        }
-
-        [When("extract query parameters into JSON")]
-        public void WhenExtractQueryParametersIntoJSON()
-        {
-            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            var queryValues = httpResponseMessage.RequestMessage.RequestUri.ParseQueryString();
-            var jObj = new JObject();
-            foreach (var key in queryValues.AllKeys)
-            {
-                jObj.Add(key, queryValues[key]);
-            }
-
-            _scenarioContext.Set(jObj, "jsonHttpBody");
-        }
-        
-        [When("extract parameter '(.*)' from redirect url")]
-        public void GivenExtractRedirectUrlParameter(string parameter)
-        {
-            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            var queryValue = httpResponseMessage.RequestMessage.RequestUri.ParseQueryString()[parameter];
-            _scenarioContext.Set(queryValue, parameter);
-        }
-
-        [When("extract parameter '(.*)' from JSON body")]
-        public void GivenExtractParameterFromBody(string parameter)
-        {
-            var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
-            _scenarioContext.Set(jObj[parameter].ToString(), parameter);
-        }
-
-        [When("extract parameter '(.*)' from JSON body into '(.*)'")]
-        public void GivenExtractParameterFromBody(string parameter, string key)
-        {
-            var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
-            _scenarioContext.Set(jObj[parameter].ToString(), key);
         }
 
         [When("build software statement")]
@@ -355,25 +212,65 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jws, "softwareStatement");
         }
 
-        [Then("JSON exists '(.*)'")]
-        public void ThenExists(string key)
+        private string ExtractUrl(string url, Table table)
         {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
-            Assert.True(jsonHttpBody.ContainsKey(key));
+            url = ParseValue(url).ToString();
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = ParseValue(record["Value"]).ToString();
+                if (PARAMETERS_IN_HEADER.Contains(key))
+                {
+                    continue;
+                }
+
+                url = QueryHelpers.AddQueryString(url, record["Key"], value);
+            }
+
+            return url;
         }
 
-        [Then("JSON '(.*)'='(.*)'")]
-        public void ThenEqualsTo(string key, string value)
+        private JObject ExtractBody(Table table)
         {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
-            Assert.Equal(value, jsonHttpBody[key].ToString());
+            var result = new JObject();
+            foreach(var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = ParseValue(record["Value"]);
+                if (PARAMETERS_IN_HEADER.Contains(key))
+                {
+                    continue;
+                }
+
+                if (value is JArray)
+                {
+                    result.Add(key, value as JArray);
+                }
+                else
+                {
+                    result.Add(key, value.ToString());
+                }
+            }
+
+            return result;
         }
 
-        [Then("HTTP status code equals to '(.*)'")]
-        public void ThenCheckHttpStatusCode(int code)
+        private Dictionary<string, string> ExtractHeaders(Table table)
         {
-            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            Assert.Equal(code, (int)httpResponseMessage.StatusCode);
+            var result = new Dictionary<string, string>();
+            foreach(var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = ParseValue(record["Value"]).ToString();
+                if (!PARAMETERS_IN_HEADER.Contains(key))
+                {
+                    continue;
+                }
+
+                result.Add(key, value.ToString());
+            }
+
+            return result;
         }
 
         private object ParseValue(string val)
@@ -403,7 +300,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
 
             return result;
         }
-
 
         private static IEnumerable<JsonWebKey> ExtractJsonWebKeys(Table table)
         {

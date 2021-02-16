@@ -2,7 +2,7 @@
 	Check management endpoint
 
 Scenario: Search OAUTH2.0 clients
-	When execute HTTP POST JSON request 'http://localhost/management/clients/.search'
+	When execute HTTP POST JSON request 'https://localhost:8080/management/clients/.search'
 	| Key         | Value |
 	| start_index | 0     |
 	| count       | 10    |	

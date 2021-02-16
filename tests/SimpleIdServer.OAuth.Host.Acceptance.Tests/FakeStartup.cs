@@ -4,17 +4,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests.Middlewares;
 using SimpleIdServer.OAuth.Options;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using IHttpClientFactory = SimpleIdServer.OAuth.Infrastructures.IHttpClientFactory;
 
@@ -26,7 +29,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.
+                AddMvc(option => option.EnableEndpointRouting = false)
+                .AddApplicationPart(typeof(RegistrationController).Assembly)
+                .AddNewtonsoftJson();
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
+                options.HttpsPort = 8080;
+            });
             services.AddAuthorization(opts =>
             {
                 opts.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
@@ -37,9 +48,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddCustomAuthentication(opts =>
                 {
 
+                })
+                .AddCertificate(o =>
+                {
+                    o.RevocationFlag = X509RevocationFlag.EntireChain;
+                    o.RevocationMode = X509RevocationMode.NoCheck;
                 });
             services.AddSIDOAuth(o =>
             {
+                o.MtlsEnabled = true;
                 o.SoftwareStatementTrustedParties.Add(new SoftwareStatementTrustedParty("iss", "http://localhost/custom-jwks"));
             })
                 .AddClients(DefaultConfiguration.Clients)
@@ -50,7 +67,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseHttpsRedirection();
             app.UseAuthentication();
+            app.UseSIDOauth();
             app.UseMvc();
         }
 
@@ -80,28 +99,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 });
             services.RemoveAll<IHttpClientFactory>();
             services.AddSingleton<IHttpClientFactory>(mo.Object);
-        }
-
-        private static void HandleCustomJwks(IApplicationBuilder app)
-        {
-            app.Run(async context =>
-            {
-                var jwks = FakeJwks.GetInstance().Jwks;
-                var keys = new JArray();
-                foreach (var jsonWebKey in jwks)
-                {
-                    var key = new JObject();
-                    keys.Add(jsonWebKey.GetPublicJwt());
-                }
-
-                var result = new JObject
-                {
-                    { "keys", keys }
-                };
-                var data = Encoding.UTF8.GetBytes(result.ToString());
-                context.Response.ContentType = "application/json";
-                await context.Response.Body.WriteAsync(data, 0, data.Length);
-            });
         }
     }
 

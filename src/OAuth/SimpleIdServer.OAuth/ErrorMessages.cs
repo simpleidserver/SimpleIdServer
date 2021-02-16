@@ -60,5 +60,10 @@ namespace SimpleIdServer.OAuth
         public const string ACCESS_TOKEN_VALID_CLIENT = "access token can be used for the client '{0}' and not for '{1}'";
         public const string CLIENT_IDENTIFIER_MUST_BE_IDENTICAL = "client identifier must be identical";
         public const string CLIENT_SECRET_MUST_BE_IDENTICAL = "client secret must be identical";
+        public const string NO_CLIENT_CERTIFICATE = "no client certificate";
+        public const string CERTIFICATE_SUBJECT_INVALID = "certificate subject is invalid";
+        public const string CERTIFICATE_SAN_DNS_INVALID = "certificate san DNS is invalid";
+        public const string CERTIFICATE_SAN_EMAIL_INVALID = "certificate san EMAIL is invalid";
+        public const string CERTIFICATE_SAN_IP_INVALID = "certificate san IP is invalid";
     }
 }

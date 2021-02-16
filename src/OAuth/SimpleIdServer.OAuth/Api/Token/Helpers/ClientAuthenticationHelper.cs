@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Authenticate;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
 {
     public interface IClientAuthenticationHelper
     {
-        Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, string issuerName, CancellationToken cancellationToken);
+        Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken);
     }
 
     public class ClientAuthenticationHelper : IClientAuthenticationHelper
@@ -24,9 +25,9 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
             _authenticateClient = authenticateClient;
         }
 
-        public async Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, string issuerName, CancellationToken cancellationToken)
+        public async Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
         {
-            var authenticateInstruction = BuildAuthenticateInstruction(jObjHeader, jObjBody);
+            var authenticateInstruction = BuildAuthenticateInstruction(jObjHeader, jObjBody, certificate);
             var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken);
             if (oauthClient == null)
             {
@@ -36,7 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
             return oauthClient;
         }
 
-        private static AuthenticateInstruction BuildAuthenticateInstruction(JObject jObjHeader, JObject jObjBody)
+        private AuthenticateInstruction BuildAuthenticateInstruction(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate)
         {
             var clientCredential = jObjHeader.GetClientCredentials();
             return new AuthenticateInstruction
@@ -47,7 +48,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
                 ClientSecretFromHttpRequestBody = jObjBody.GetClientSecret(),
                 ClientIdFromAuthorizationHeader = clientCredential == null ? null : clientCredential.ClientId,
                 ClientSecretFromAuthorizationHeader = clientCredential == null ? null : clientCredential.ClientSecret,
-                Certificate = null,
+                Certificate = certificate,
                 RequestData = jObjBody
             };
         }

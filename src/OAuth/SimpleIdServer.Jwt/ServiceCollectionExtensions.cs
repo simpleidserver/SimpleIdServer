@@ -30,6 +30,9 @@ namespace SimpleIdServer.Jwt
             serviceCollection.AddTransient<ISignHandler, RSA256SignHandler>();
             serviceCollection.AddTransient<ISignHandler, RSA384SignHandler>();
             serviceCollection.AddTransient<ISignHandler, RSA512SignHandler>();
+            serviceCollection.AddTransient<ISignHandler, PS256SignHandler>();
+            serviceCollection.AddTransient<ISignHandler, PS384SignHandler>();
+            serviceCollection.AddTransient<ISignHandler, PS512SignHandler>();
             serviceCollection.AddTransient<ISignHandler, NoneSignHandler>();
             return serviceCollection;
         }

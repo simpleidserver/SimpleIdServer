@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.OAuth.Api
 {
@@ -70,11 +71,17 @@ namespace SimpleIdServer.OAuth.Api
             Cookies = cookies;
         }
 
+        public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader, IRequestCookieCollection cookies, X509Certificate2 certificate) : this(issuerName, userSubject, data, httpHeader, cookies)
+        {
+            Certificate = certificate;
+        }
+
         public string IssuerName { get; private set; }
         public string UserSubject { get; private set; }
         public JObject Data { get; private set; }
         public JObject HttpHeader { get; private set; }
         public IRequestCookieCollection Cookies { get; set; }
+        public X509Certificate2 Certificate { get; set; }
 
         public void SetData(JObject data)
         {

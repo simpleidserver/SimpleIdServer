@@ -1,15 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Builder;
 using SimpleIdServer.OpenID.Middlewares;
 
-namespace SimpleIdServer.OpenID
+namespace Microsoft.AspNetCore.Builder
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseRequestCulture(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseSIDOpenId(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<UILocalesMiddleware>();
+            builder.UseMiddleware<UILocalesMiddleware>();
+            builder.UseSIDOauth();
+            return builder;
         }
     }
 }

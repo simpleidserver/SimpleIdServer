@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace SimpleIdServer.OAuth.Api.Token
 {
     [Route(Constants.EndPoints.Token)]
+    [Route(Constants.EndPoints.MtlsToken)]
     public class TokenController : Controller
     {
         private readonly ITokenRequestHandler _tokenRequestHandler;
@@ -27,11 +28,12 @@ namespace SimpleIdServer.OAuth.Api.Token
         [HttpPost]
         public async Task<IActionResult> Post(CancellationToken token)
         {
+            var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
             var jObjHeader = Request.Headers.ToJObject();
             var jObjBody = Request.Form.ToJObject();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, null, clientCertificate));
             return await _tokenRequestHandler.Handle(context, token);
         }
 
@@ -40,9 +42,10 @@ namespace SimpleIdServer.OAuth.Api.Token
         {
             try
             {
+                var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
                 var jObjHeader = Request.Headers.ToJObject();
                 var jObjBody = Request.Form.ToJObject();
-                await _revokeTokenRequestHandler.Handle(jObjHeader, jObjBody, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken);
+                await _revokeTokenRequestHandler.Handle(jObjHeader, jObjBody, clientCertificate, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken);
                 return new OkResult();
             }
             catch (OAuthException ex)

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenID.Domains;
@@ -203,347 +204,436 @@ namespace SimpleIdServer.OpenID.Startup
             }
         };
 
-        public static List<OpenIdClient> Clients => new List<OpenIdClient>
+        public static List<OpenIdClient> GetClients(JsonWebKey firstMtlsClientJsonWebKey, JsonWebKey secondMtlsClientJsonWebKey)
         {
-            new OpenIdClient
+            return new List<OpenIdClient>
             {
-                ClientId = "scimClient",
-                Secrets = new List<ClientSecret>
+                new OpenIdClient
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    new OpenIdScope
+                    ClientId = "firstMtlsClient",
+                    Secrets = new List<ClientSecret>
                     {
-                        Name = "scim",
-                        Claims = new List<OpenIdScopeClaim>
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "mtsClientSecret", null)
+                    },
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Phone,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Role,
+                        new OpenIdScope
                         {
-                            new OpenIdScopeClaim("scim_id", true)
+                            CreateDateTime = DateTime.UtcNow,
+                            Name = "accounts"
                         }
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    TokenEndPointAuthMethod = "tls_client_auth",
+                    ResponseTypes = new List<string>
+                    {
+                        "id_token", "token", "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code", "implicit", "client_credentials"
+                    },
+                    JsonWebKeys = new List<JsonWebKey>
+                    {
+                        firstMtlsClientJsonWebKey
+                    },
+                    TlsClientAuthSubjectDN = "mtlsClient"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "secondMtlsClient",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "mtsClientSecret", null)
+                    },
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Phone,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Role,
+                        new OpenIdScope
+                        {
+                            CreateDateTime = DateTime.UtcNow,
+                            Name = "accounts"
+                        }
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    TokenEndPointAuthMethod = "tls_client_auth",
+                    ResponseTypes = new List<string>
+                    {
+                        "id_token", "token", "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code", "implicit", "client_credentials"
+                    },
+                    JsonWebKeys = new List<JsonWebKey>
+                    {
+                        secondMtlsClientJsonWebKey
+                    },
+                    TlsClientAuthSubjectDN = "mtlsClient"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "scimClient",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        new OpenIdScope
+                        {
+                            Name = "scim",
+                            Claims = new List<OpenIdScopeClaim>
+                            {
+                                new OpenIdScopeClaim("scim_id", true)
+                            }
+                        }
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit",
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:8080",
+                        "http://localhost:1700"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
                     }
                 },
-                GrantTypes = new List<string>
+                new OpenIdClient
                 {
-                    "implicit",
+                    ClientId = "umaClient",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "umaClientSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit",
+                        "authorization_code"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://localhost:60001/signin-oidc"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token",
+                        "code"
+                    }
                 },
-                RedirectionUrls = new List<string>
+                new OpenIdClient
                 {
-                    "http://localhost:8080",
-                    "http://localhost:1700"
+                    ClientId = "simpleIdServerWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "simpleIdServerWebsiteSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:4200",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
+                    }
                 },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
+                new OpenIdClient
                 {
-                    "token",
-                    "id_token"
+                    ClientId = "tradWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "tradWebsiteSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code",
+                        "password"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://localhost:5001/signin-oidc"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "code",
+                        "token",
+                        "id_token"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "native",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "pkce",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "sid:/oauth2redirect"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "code"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "caseManagementWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:51724",
+                        "http://localhost:8080",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagement"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "caseManagementTasklistWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:51724",
+                        "http://localhost:8081",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "caseManagementPerformanceWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "91894b86-c57e-489a-838d-fb82621a67ee", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:51725",
+                        "http://localhost:8081",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "medikitWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "f200eeb0-a6a3-465e-be91-97806e5dd3bc", null)
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:8080",
+                        "http://simpleidserver.northeurope.cloudapp.azure.com/medikit"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
+                    }
                 }
-            },
-            new OpenIdClient
-            {
-                ClientId = "umaClient",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "umaClientSecret", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email
-                },
-                GrantTypes = new List<string>
-                {
-                    "implicit",
-                    "authorization_code"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "https://localhost:60001/signin-oidc"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "token",
-                    "id_token",
-                    "code"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "simpleIdServerWebsite",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "simpleIdServerWebsiteSecret", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email,
-                    SIDOpenIdConstants.StandardScopes.Role
-                },
-                GrantTypes = new List<string>
-                {
-                    "implicit"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "http://localhost:4200",
-					"http://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "token",
-                    "id_token"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "tradWebsite",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "tradWebsiteSecret", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                    SIDOpenIdConstants.StandardScopes.Profile
-                },
-                GrantTypes = new List<string>
-                {
-                    "authorization_code",
-                    "password"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "https://localhost:5001/signin-oidc"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "code",
-                    "token",
-                    "id_token"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "native",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
-                },
-                TokenEndPointAuthMethod = "pkce",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email
-                },
-                GrantTypes = new List<string>
-                {
-                    "authorization_code"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "sid:/oauth2redirect"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "code"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "caseManagementWebsite",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email,
-                    SIDOpenIdConstants.StandardScopes.Role
-                },
-                GrantTypes = new List<string>
-                {
-                    "implicit"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "http://localhost:51724",
-                    "http://localhost:8080",
-                    "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagement"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "token",
-                    "id_token"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "caseManagementTasklistWebsite",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email,
-                    SIDOpenIdConstants.StandardScopes.Role
-                },
-                GrantTypes = new List<string>
-                {
-                    "implicit"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "http://localhost:51724",
-                    "http://localhost:8081",
-                    "http://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "token",
-                    "id_token"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "caseManagementPerformanceWebsite",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "91894b86-c57e-489a-838d-fb82621a67ee", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email,
-                    SIDOpenIdConstants.StandardScopes.Role
-                },
-                GrantTypes = new List<string>
-                {
-                    "implicit"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "http://localhost:51725",
-                    "http://localhost:8081",
-                    "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "token",
-                    "id_token"
-                }
-            },
-            new OpenIdClient
-            {
-                ClientId = "medikitWebsite",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "f200eeb0-a6a3-465e-be91-97806e5dd3bc", null)
-                },
-                TokenEndPointAuthMethod = "client_secret_post",
-                ApplicationType = "web",
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-                TokenExpirationTimeInSeconds = 60 * 30,
-                RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                TokenSignedResponseAlg = "RS256",
-                IdTokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OpenIdScope>
-                {
-                    SIDOpenIdConstants.StandardScopes.Profile,
-                    SIDOpenIdConstants.StandardScopes.Email,
-                    SIDOpenIdConstants.StandardScopes.Role
-                },
-                GrantTypes = new List<string>
-                {
-                    "implicit"
-                },
-                RedirectionUrls = new List<string>
-                {
-                    "http://localhost:8080",
-                    "http://simpleidserver.northeurope.cloudapp.azure.com/medikit"
-                },
-                PreferredTokenProfile = "Bearer",
-                ResponseTypes = new List<string>
-                {
-                    "token",
-                    "id_token"
-                }
-            }
-        };
+            };
+        }
     }
 }

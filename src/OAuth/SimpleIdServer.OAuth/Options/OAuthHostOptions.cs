@@ -20,6 +20,8 @@ namespace SimpleIdServer.OAuth.Options
                 new UICultureOption("fr", "French"),
                 new UICultureOption("en", "English")
             };
+            MtlsEnabled = false;
+            CertificateAuthenticationScheme = "Certificate";
         }
 
         /// <summary>
@@ -50,5 +52,13 @@ namespace SimpleIdServer.OAuth.Options
         /// Supported cultures.
         /// </summary>
         public IEnumerable<UICultureOption> SupportedUICultures { get; set; }
+        /// <summary>
+        /// Mututal TLS is enabled.
+        /// </summary>
+        public bool MtlsEnabled { get; set; }
+        /// <summary>
+        /// Client certificate authentication scheme.
+        /// </summary>
+        public string CertificateAuthenticationScheme { get; set; }
     }
 }

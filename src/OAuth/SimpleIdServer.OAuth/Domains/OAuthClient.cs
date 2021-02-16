@@ -190,6 +190,38 @@ namespace SimpleIdServer.OAuth.Domains
         /// </summary>
         public string RegistrationAccessToken { get; set; }
 
+        /// <summary>
+        /// Boolean value used to indicate the client's intention to use mutual-TLS client certificate-bound access tokens.
+        /// https://tools.ietf.org/html/rfc8705#section-3.4
+        /// </summary>
+        public bool TlsClientCertificateBoundAccessToken { get; set; }
+
+        /// <summary>
+        /// A string representation of the expected  subject distinguished  of the certificate that the OAuth client will use in mututal-TLS authentication.
+        /// </summary>
+        public string TlsClientAuthSubjectDN { get; set; }
+
+        /// <summary>
+        /// A string containing the value of an expected dNSName SAN entry in the certificate.
+        /// </summary>
+        public string TlsClientAuthSanDNS { get; set; }
+
+        /// <summary>
+        /// A string containing the value expected uniformResourceIdentifier  SAN entry in the certificate.
+        /// </summary>
+        public string TlsClientAuthSanURI { get; set; }
+
+        /// <summary>
+        /// Astring representation of an IP address in either dotted decimal notation(for IPv4) or colon-delimited hexadecimal(for IPv6, as defined in [RFC5952]) 
+        /// that is expected to be present as an iPAddress SAN entry in the certificate
+        /// </summary>
+        public string TlsClientAuthSanIP { get; set; }
+
+        /// <summary>
+        ///  A string containing the value of an expected rfc822Name SAN entry in the certificate.
+        /// </summary>
+        public string TlsClientAuthSanEmail { get; set; }
+
         public async Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(IHttpClientFactory httpClientFactory)
         {
             if (JsonWebKeys != null && JsonWebKeys.Any())
@@ -285,7 +317,12 @@ namespace SimpleIdServer.OAuth.Domains
                 SoftwareId = SoftwareId,
                 SoftwareVersion = SoftwareVersion,
                 RegistrationAccessToken = RegistrationAccessToken,
-                PostLogoutRedirectUris = PostLogoutRedirectUris.ToList()
+                PostLogoutRedirectUris = PostLogoutRedirectUris.ToList(),
+                TlsClientAuthSanDNS = TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = TlsClientAuthSanEmail,
+                TlsClientAuthSanIP = TlsClientAuthSanIP,
+                TlsClientAuthSanURI = TlsClientAuthSanURI,
+                TlsClientAuthSubjectDN = TlsClientAuthSubjectDN
             };
         }
 

@@ -55,6 +55,9 @@ namespace SimpleIdServer.Jwt.Tests.Jws
             var hs256JWS = _jwsGenerator.Build(payload.ToString(), "HS256", hmac256JsonWebKey);
             var hs384JWS = _jwsGenerator.Build(payload.ToString(), "HS384", hmac256JsonWebKey);
             var hs512JWS = _jwsGenerator.Build(payload.ToString(), "HS512", hmac256JsonWebKey);
+            var ps256JWS = _jwsGenerator.Build(payload.ToString(), "PS256", rsaJsonWebKey);
+            var ps384JWS = _jwsGenerator.Build(payload.ToString(), "PS384", rsaJsonWebKey);
+            var ps512JWS = _jwsGenerator.Build(payload.ToString(), "PS512", rsaJsonWebKey);
             var isRSA256JWSValid = _jwsGenerator.Check(rsa256JWS, rsaJsonWebKey);
             var isRSA384JWSValid = _jwsGenerator.Check(rsa384JWS, rsaJsonWebKey);
             var isRSA512JWSValid = _jwsGenerator.Check(rsa512JWS, rsaJsonWebKey);
@@ -64,6 +67,9 @@ namespace SimpleIdServer.Jwt.Tests.Jws
             var isHS256JWSValid = _jwsGenerator.Check(hs256JWS, hmac256JsonWebKey);
             var isHS384JWSValid = _jwsGenerator.Check(hs384JWS, hmac256JsonWebKey);
             var isHS512JWSValid = _jwsGenerator.Check(hs512JWS, hmac256JsonWebKey);
+            var isPS256JWSValid = _jwsGenerator.Check(ps256JWS, rsaJsonWebKey);
+            var isPS384JWSValid = _jwsGenerator.Check(ps384JWS, rsaJsonWebKey);
+            var isPS512JWSValid = _jwsGenerator.Check(ps512JWS, rsaJsonWebKey);
 
 
             // ASSERT
@@ -76,6 +82,9 @@ namespace SimpleIdServer.Jwt.Tests.Jws
             Assert.True(isHS256JWSValid);
             Assert.True(isHS384JWSValid);
             Assert.True(isHS512JWSValid);
+            Assert.True(isPS256JWSValid);
+            Assert.True(isPS384JWSValid);
+            Assert.True(isPS512JWSValid);
         }
 
         private static void InitializeFakeObjects()
@@ -90,7 +99,10 @@ namespace SimpleIdServer.Jwt.Tests.Jws
                 new RSA512SignHandler(),
                 new HMAC256SignHandler(),
                 new HMAC384SignHandler(),
-                new HMAC512SignHandler()
+                new HMAC512SignHandler(),
+                new PS256SignHandler(),
+                new PS384SignHandler(),
+                new PS512SignHandler()
             });
         }
     }

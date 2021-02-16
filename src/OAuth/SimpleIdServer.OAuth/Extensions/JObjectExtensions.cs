@@ -6,9 +6,12 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace SimpleIdServer.OAuth.Extensions
 {
@@ -346,12 +349,61 @@ namespace SimpleIdServer.OAuth.Extensions
             return result;
         }
 
+        public static string GetTlsClientAuthSubjectDn(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSubjectDN);
+        }
+
+        public static string GetTlsClientAuthSanDNS(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanDNS);
+        }
+
+        public static string GetTlsClientAuthSanUri(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanUri);
+        }
+
+        public static string GetTlsClientAuthSanIP(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanIp);
+        }
+
+        public static string GetTlsClientAuthSanEmail(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanEmail);
+        }
+
         #endregion
 
         public static string GetStr(this JObject jObj, string name)
         {
             var result = jObj.GetToken(name);
             return result == null ? null : result.ToString();
+        }
+
+        public static X509Certificate2 GetCertificate(this JObject jObj, string name)
+        {
+            var result = jObj.GetArray(name);
+            if (result == null || !result.Any())
+            {
+                return null;
+            }
+
+            foreach(var str in result)
+            {
+                try
+                {
+                    var bytes = Encoding.UTF8.GetBytes(Uri.UnescapeDataString(str));
+                    return new X509Certificate2(bytes);
+                }
+                catch
+                {
+
+                }
+            }
+
+            return null;
         }
 
         public static bool? GetNullableBoolean(this JObject jObj, string name)

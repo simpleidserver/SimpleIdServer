@@ -6,12 +6,39 @@ Scenario: Use client_credentials grant type to get an access token
 	| Type | Kid | AlgName |
 	| SIG  | 1   | RS256   |
 
-	And execute HTTP POST request 'http://localhost/token'
-	| Key			| Value													|
-	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
-	| client_secret | BankCvSecret											|
-	| scope			| scope1												|
-	| grant_type	| client_credentials									|
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value                                |
+	| client_id     | f3d35cce-de69-45bf-958c-4a8796f8ed37 |
+	| client_secret | BankCvSecret                         |
+	| scope         | scope1                               |
+	| grant_type    | client_credentials                   |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON exists 'access_token'
+	Then JSON exists 'refresh_token'
+	Then JSON 'token_type'='Bearer'
+
+Scenario: Use client_credentials grant type & use tls_client_auth authentication type to get an access token
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
+	| Key                        | Value                   |
+	| token_endpoint_auth_method | tls_client_auth         |
+	| response_types             | [token]                 |
+	| grant_types                | [client_credentials]    |
+	| scope                      | scope1                  |
+	| redirect_uris              | [http://localhost:8080] |
+	| tls_client_auth_san_dns    | mtlsClient              |
+
+	And extract JSON from body	
+	And extract parameter 'client_id' from JSON body
+
+	And execute HTTP POST request 'https://localhost:8080/mtls/token'
+	| Key                  | Value              |
+	| client_id            | $client_id$        |
+	| scope                | scope1             |
+	| grant_type           | client_credentials |
+	| X-Testing-ClientCert | mtlsClient.crt     |
 
 	And extract JSON from body
 	
@@ -25,7 +52,7 @@ Scenario: Use password grant type to get an access token
 	| Type | Kid | AlgName |
 	| SIG  | 1   | RS256   |
 
-	And execute HTTP POST request 'http://localhost/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key			| Value													|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
 	| client_secret | BankCvSecret											|
@@ -47,7 +74,7 @@ Scenario: Use authorization_code grant type to get an access token
 
 	And add user consent : user='administrator', scope='scope1', clientId='f3d35cce-de69-45bf-958c-4a8796f8ed37'
 
-	And execute HTTP GET request 'http://localhost/authorization'
+	And execute HTTP GET request 'https://localhost:8080/authorization'
 	| Key			| Value													|
 	| response_type | code													|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
@@ -57,7 +84,7 @@ Scenario: Use authorization_code grant type to get an access token
 	
 	And extract parameter 'code' from redirect url
 
-	And execute HTTP POST request 'http://localhost/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key			| Value													|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
 	| client_secret | BankCvSecret											|
@@ -77,7 +104,7 @@ Scenario: Use refresh_token grant type to get an access token
 	| Type | Kid | AlgName |
 	| SIG  | 1   | RS256   |
 
-	And execute HTTP POST request 'http://localhost/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key			| Value													|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
 	| client_secret | BankCvSecret											|
@@ -87,7 +114,7 @@ Scenario: Use refresh_token grant type to get an access token
 	And extract JSON from body
 	And extract parameter 'refresh_token' from JSON body
 	
-	And execute HTTP POST request 'http://localhost/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key			| Value													|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
 	| client_secret | BankCvSecret											|
@@ -106,7 +133,7 @@ Scenario: Revoke refresh_token
 	| Type | Kid | AlgName |
 	| SIG  | 1   | RS256   |
 
-	And execute HTTP POST request 'http://localhost/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key			| Value													|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
 	| client_secret | BankCvSecret											|
@@ -116,7 +143,7 @@ Scenario: Revoke refresh_token
 	And extract JSON from body
 	And extract parameter 'refresh_token' from JSON body	
 	
-	And execute HTTP POST request 'http://localhost/token/revoke'
+	And execute HTTP POST request 'https://localhost:8080/token/revoke'
 	| Key			| Value													|
 	| token			| $refresh_token$										|
 	| client_id		| f3d35cce-de69-45bf-958c-4a8796f8ed37					|
@@ -125,7 +152,7 @@ Scenario: Revoke refresh_token
 	Then HTTP status code equals to '200'
 
 Scenario: Use authorization_code grant type to get an access token (PKCE)
-	When execute HTTP POST JSON request 'http://localhost/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key							| Value						|
 	| token_endpoint_auth_method	| pkce						|
 	| response_types				| [code]					|
@@ -137,7 +164,7 @@ Scenario: Use authorization_code grant type to get an access token (PKCE)
 	And extract parameter 'client_id' from JSON body	
 	And add user consent : user='administrator', scope='scope1', clientId='$client_id$'
 	
-	And execute HTTP GET request 'http://localhost/authorization'
+	And execute HTTP GET request 'https://localhost:8080/authorization'
 	| Key					| Value											|
 	| response_type			| code											|
 	| client_id				| $client_id$									|
@@ -148,7 +175,7 @@ Scenario: Use authorization_code grant type to get an access token (PKCE)
 	
 	And extract parameter 'code' from redirect url	
 
-	And execute HTTP POST request 'http://localhost/token'
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key			| Value						|
 	| client_id		| $client_id$				|
 	| client_secret | BankCvSecret				|

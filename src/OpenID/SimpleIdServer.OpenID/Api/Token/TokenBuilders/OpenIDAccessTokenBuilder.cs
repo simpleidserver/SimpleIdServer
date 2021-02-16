@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Api;
@@ -7,6 +8,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using System.Collections.Generic;
@@ -19,12 +21,11 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
     public class OpenIDAccessTokenBuilder : AccessTokenBuilder
     {
-        public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder) : base(grantedTokenHelper, jwtBuilder) { }
+        public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IOptions<OAuthHostOptions> options) : base(grantedTokenHelper, jwtBuilder, options) { }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var claimParameters = handlerContext.Request.Data.GetClaimsFromAuthorizationRequest();
-            // SET CLAIMS.
             var jwsPayload = BuildOpenIdPayload(scopes, claimParameters, handlerContext);
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
@@ -32,7 +33,6 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         public override async Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
-            // SET CLAIMS.
             var claimParameters = previousRequest.GetClaimsFromAuthorizationRequest();
             var jwsPayload = BuildOpenIdPayload(scopes, claimParameters, currentContext);
             await SetResponse(currentContext, jwsPayload, cancellationToken);
@@ -44,11 +44,10 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             if (handlerContext.User != null)
             {
                 jwsPayload.Add(UserClaims.Subject, handlerContext.User.Id);
-            }
-
-            if (handlerContext.User.AuthenticationTime != null)
-            {
-                jwsPayload.Add(OAuthClaims.AuthenticationTime, handlerContext.User.AuthenticationTime.Value.ConvertToUnixTimestamp());
+                if (handlerContext.User.AuthenticationTime != null)
+                {
+                    jwsPayload.Add(OAuthClaims.AuthenticationTime, handlerContext.User.AuthenticationTime.Value.ConvertToUnixTimestamp());
+                }
             }
 
             if (claimParameters != null)
