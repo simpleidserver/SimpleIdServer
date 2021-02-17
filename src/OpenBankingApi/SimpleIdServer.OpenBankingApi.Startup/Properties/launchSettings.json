@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "SimpleIdServer.OpenBankingApi.Startup": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:60010"
+    }
+  }
+}
