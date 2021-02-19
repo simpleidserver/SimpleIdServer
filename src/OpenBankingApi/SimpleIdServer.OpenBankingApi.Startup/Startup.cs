@@ -47,6 +47,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenBanking V1");
             });
+            app.UseOpenBankingAPI();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

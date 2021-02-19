@@ -33,6 +33,14 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             Assert.Equal(value, token);
         }
 
+        [Then("HTTP Header '(.*)'='(.*)'")]
+        public void ThenHttpHeaderEqualsTo(string key, string value)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpHeader"] as JObject;
+            var token = jsonHttpBody.SelectToken(key).ToString();
+            Assert.Equal(value, token);
+        }
+
         [Then("HTTP status code equals to '(.*)'")]
         public void ThenCheckHttpStatusCode(int code)
         {

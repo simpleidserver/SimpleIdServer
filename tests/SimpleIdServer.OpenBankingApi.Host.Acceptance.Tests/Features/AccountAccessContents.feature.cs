@@ -169,6 +169,9 @@ this.ScenarioInitialize(scenarioInfo);
                             "Authorization",
                             "Bearer $accessToken$"});
                 table3.AddRow(new string[] {
+                            "x-fapi-interaction-id",
+                            "guid"});
+                table3.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
                 table3.AddRow(new string[] {
@@ -177,17 +180,23 @@ this.ScenarioInitialize(scenarioInfo);
 #line 27
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/account-requests\'", ((string)(null)), table3, "And ");
 #line hidden
-#line 33
+#line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 35
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 36
- testRunner.Then("JSON \'data.permissions[0]\'=\'ReadAccountsBasic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract HTTP headers", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 37
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 38
+ testRunner.Then("JSON \'data.permissions[0]\'=\'ReadAccountsBasic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 39
  testRunner.Then("JSON \'data.permissions[1]\'=\'ReadAccountsDetail\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 40
+ testRunner.Then("HTTP Header \'x-fapi-interaction-id\'=\'guid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

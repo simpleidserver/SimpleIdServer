@@ -73,6 +73,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseSIDOauth();
+            app.UseOpenBankingAPI();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
@@ -25,6 +26,19 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(json), "jsonHttpBody");
+        }
+
+        [When("extract HTTP headers")]
+        public void GivenExtractFromHeader()
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var jObj = new JObject();
+            foreach(var kvp in httpResponseMessage.Headers)
+            {
+                jObj.Add(kvp.Key, kvp.Value.ElementAt(0));
+            }
+
+            _scenarioContext.Set(jObj, "jsonHttpHeader");
         }
 
         [When("extract query parameters into JSON")]

@@ -25,13 +25,16 @@ Scenario: Create Account Access Content
 	And extract parameter 'access_token' from JSON body into 'accessToken'
 
 	And execute HTTP POST JSON request 'https://localhost:8080/account-requests'
-    | Key                  | Value                                                             |
-    | Authorization        | Bearer $accessToken$                                              |
-    | X-Testing-ClientCert | mtlsClient.crt                                                    |
-    | data                 | { "permissions" : [ "ReadAccountsBasic", "ReadAccountsDetail" ] } |
+    | Key                   | Value                                                             |
+    | Authorization         | Bearer $accessToken$                                              |
+    | x-fapi-interaction-id | guid                                                              |
+    | X-Testing-ClientCert  | mtlsClient.crt                                                    |
+    | data                  | { "permissions" : [ "ReadAccountsBasic", "ReadAccountsDetail" ] } |
 
 	And extract JSON from body
+	And extract HTTP headers
 	
 	Then HTTP status code equals to '200'
 	Then JSON 'data.permissions[0]'='ReadAccountsBasic'
 	Then JSON 'data.permissions[1]'='ReadAccountsDetail'
+	Then HTTP Header 'x-fapi-interaction-id'='guid'

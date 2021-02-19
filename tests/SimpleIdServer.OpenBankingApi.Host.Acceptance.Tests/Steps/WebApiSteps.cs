@@ -24,7 +24,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
     [Binding]
     public class WebApiSteps
     {
-        private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert" };
+        private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "x-fapi-interaction-id", "Authorization", "X-Testing-ClientCert" };
         private ScenarioContext _scenarioContext;
         private CustomWebApplicationFactory<FakeStartup> _factory;
 
