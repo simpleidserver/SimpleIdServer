@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.OpenBankingApi.Exceptions;
 using System.Net;
 
-namespace SimpleIdServer.OpenBankingApi.Startup.Infrastructure.Filters
+namespace SimpleIdServer.OpenBankingApi.Infrastructure.Filters
 {
     public class HttpGlobalExceptionFilter : IExceptionFilter
     {

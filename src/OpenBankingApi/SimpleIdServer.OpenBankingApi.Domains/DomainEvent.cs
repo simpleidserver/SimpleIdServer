@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleIdServer.OpenBankingApi.Common
+namespace SimpleIdServer.OpenBankingApi.Domains
 {
     [Serializable]
     public class DomainEvent

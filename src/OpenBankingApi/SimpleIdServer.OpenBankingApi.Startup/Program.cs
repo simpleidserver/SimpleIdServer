@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 
 namespace SimpleIdServer.OpenBankingApi.Startup
 {
@@ -14,6 +15,13 @@ namespace SimpleIdServer.OpenBankingApi.Startup
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .ConfigureKestrel(options =>
+                {
+                    options.ConfigureHttpsDefaults(configureOptions =>
+                    {
+                        configureOptions.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+                    });
+                });
     }
 }

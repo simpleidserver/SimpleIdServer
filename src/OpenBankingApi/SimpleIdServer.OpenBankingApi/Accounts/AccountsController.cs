@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OpenBankingApi.Accounts.Queries;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenBankingApi.Startup.Controllers
+namespace SimpleIdServer.OpenBankingApi.Accounts
 {
-    [Route("[controller]")]
+    [Route("accounts")]
     [ApiController]
-    public class AccountsController : ControllerBase
+    public class AccountsController : Controller
     {
         private readonly IMediator _mediator;
 

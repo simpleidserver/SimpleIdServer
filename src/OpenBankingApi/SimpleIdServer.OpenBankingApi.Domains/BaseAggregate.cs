@@ -1,5 +1,4 @@
-﻿using SimpleIdServer.OpenBankingApi.Common;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace SimpleIdServer.OpenBankingApi.Domains
 {
