@@ -40,7 +40,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "AccountAccessContents", "\tCheck /account-access-consents endpoint", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "AccountAccessContents", "\tCheck /account-requests endpoint", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -175,7 +175,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "data",
                             "{ \"permissions\" : [ \"ReadAccountsBasic\", \"ReadAccountsDetail\" ] }"});
 #line 27
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/account-access-consents\'", ((string)(null)), table3, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/account-requests\'", ((string)(null)), table3, "And ");
 #line hidden
 #line 33
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -1,5 +1,5 @@
 ﻿Feature: AccountAccessContents
-	Check /account-access-consents endpoint
+	Check /account-requests endpoint
 
 Scenario: Create Account Access Content
 	When execute HTTP POST JSON request 'https://localhost:8080/register'
@@ -24,7 +24,7 @@ Scenario: Create Account Access Content
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body into 'accessToken'
 
-	And execute HTTP POST JSON request 'https://localhost:8080/account-access-consents'
+	And execute HTTP POST JSON request 'https://localhost:8080/account-requests'
     | Key                  | Value                                                             |
     | Authorization        | Bearer $accessToken$                                              |
     | X-Testing-ClientCert | mtlsClient.crt                                                    |
