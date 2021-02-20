@@ -24,7 +24,7 @@ Scenario: Create Account Access Content
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body into 'accessToken'
 
-	And execute HTTP POST JSON request 'https://localhost:8080/account-requests'
+	And execute HTTP POST JSON request 'https://localhost:8080/v3.1/account-access-consents'
     | Key                   | Value                                                             |
     | Authorization         | Bearer $accessToken$                                              |
     | x-fapi-interaction-id | guid                                                              |
@@ -35,6 +35,10 @@ Scenario: Create Account Access Content
 	And extract HTTP headers
 	
 	Then HTTP status code equals to '200'
-	Then JSON 'data.permissions[0]'='ReadAccountsBasic'
-	Then JSON 'data.permissions[1]'='ReadAccountsDetail'
+	Then JSON exists 'Data.ConsentId'
+	Then JSON exists 'Links.Self'
+	Then JSON 'Data.Permissions[0]'='ReadAccountsBasic'
+	Then JSON 'Data.Permissions[1]'='ReadAccountsDetail'
+	Then JSON 'Data.Status'='AwaitingAuthorisation'
+	Then JSON 'Meta.TotalPages'='1'
 	Then HTTP Header 'x-fapi-interaction-id'='guid'

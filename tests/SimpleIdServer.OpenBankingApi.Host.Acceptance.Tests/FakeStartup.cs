@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OpenBankingApi.AccountAccessContents;
 using SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Middlewares;
@@ -32,7 +33,10 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                 AddMvc(option => option.EnableEndpointRouting = false)
                 .AddApplicationPart(typeof(RegistrationController).Assembly)
                 .AddApplicationPart(typeof(AccountAccessContentsController).Assembly)
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                });
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;

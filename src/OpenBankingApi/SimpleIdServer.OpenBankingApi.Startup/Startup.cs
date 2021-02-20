@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Filters;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Services;
 using SimpleIdServer.OpenBankingApi.Persistences;
@@ -20,7 +21,10 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             {
                 option.EnableEndpointRouting = false;
                 option.Filters.Add(typeof(HttpGlobalExceptionFilter));
-            }).AddNewtonsoftJson();
+            }).AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
 
             services.AddAuthentication()
                 .AddCertificate(o =>

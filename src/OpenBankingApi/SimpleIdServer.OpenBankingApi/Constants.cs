@@ -8,5 +8,12 @@ namespace SimpleIdServer.OpenBankingApi
         {
             public const string Accounts = "accounts";
         }
+
+        public static class RouteNames
+        {
+            public const string AccountAccessContents = ApiVersion + "/account-access-consents";
+        }
+
+        public const string ApiVersion = "v3.1";
     }
 }

@@ -178,7 +178,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "data",
                             "{ \"permissions\" : [ \"ReadAccountsBasic\", \"ReadAccountsDetail\" ] }"});
 #line 27
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/account-requests\'", ((string)(null)), table3, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/v3.1/account-access-consen" +
+                        "ts\'", ((string)(null)), table3, "And ");
 #line hidden
 #line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -190,12 +191,24 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 38
- testRunner.Then("JSON \'data.permissions[0]\'=\'ReadAccountsBasic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON exists \'Data.ConsentId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 39
- testRunner.Then("JSON \'data.permissions[1]\'=\'ReadAccountsDetail\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON exists \'Links.Self\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 40
+ testRunner.Then("JSON \'Data.Permissions[0]\'=\'ReadAccountsBasic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 41
+ testRunner.Then("JSON \'Data.Permissions[1]\'=\'ReadAccountsDetail\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 42
+ testRunner.Then("JSON \'Data.Status\'=\'AwaitingAuthorisation\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 43
+ testRunner.Then("JSON \'Meta.TotalPages\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 44
  testRunner.Then("HTTP Header \'x-fapi-interaction-id\'=\'guid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

@@ -18,9 +18,11 @@ namespace SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands.Handlers
 
         public Task<AccountAccessContentResult> Handle(AddAccountAccessContentCommand request, CancellationToken cancellationToken)
         {
-            var accountAccessConsent = AccountAccessConsentAggregate.Create(request.Data.Permissions, request.Data.ExpirationDateTime, request.Data.TransactionFromDateTime, request.Data.TransactionToDateTime);
+            var risk = request.Risk == null ? string.Empty : request.Risk.ToString();
+            var accountAccessConsent = AccountAccessConsentAggregate.Create(request.Data.Permissions, request.Data.ExpirationDateTime, request.Data.TransactionFromDateTime, request.Data.TransactionToDateTime, risk);
             _commandRepository.Commit(accountAccessConsent);
-            return Task.FromResult(AccountAccessContentResult.ToDto(accountAccessConsent));
+            var url = $"{request.Issuer}/{Constants.RouteNames.AccountAccessContents}/{accountAccessConsent.AggregateId}";
+            return Task.FromResult(AccountAccessContentResult.ToDto(accountAccessConsent, url, 1));
         }
     }
 }

@@ -50,7 +50,7 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
         /// The Risk section is sent by the initiating party to the ASPSP. 
         /// It is used to specify additional details for risk scoring for Account Info.
         /// </summary>
-        public Risk Risk { get; set; }
+        public string Risk { get; set; }
 
         public static AccountAccessConsentAggregate Build(ICollection<DomainEvent> domainEvents)
         {
@@ -63,10 +63,10 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
             return result;
         }
 
-        public static AccountAccessConsentAggregate Create(ICollection<string> permissions, DateTime? expirationDateTime, DateTime? transactionFromDateTime, DateTime? transactionToDateTime)
+        public static AccountAccessConsentAggregate Create(ICollection<string> permissions, DateTime? expirationDateTime, DateTime? transactionFromDateTime, DateTime? transactionToDateTime, string risk)
         {
             var result = new AccountAccessConsentAggregate();
-            var evt = new AccountAccessConsentAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, permissions, expirationDateTime, transactionFromDateTime, transactionToDateTime);
+            var evt = new AccountAccessConsentAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, permissions, expirationDateTime, transactionFromDateTime, transactionToDateTime, risk);
             result.Handle(evt);
             result.DomainEvents.Add(evt);
             return result;
@@ -115,10 +115,12 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
             }
 
             AggregateId = evt.AggregateId;
+            Status = AccountAccessConsentStatus.AwaitingAuthorisation;
             Permissions = permissions;
             ExpirationDateTime = evt.ExpirationDateTime;
             TransactionFromDateTime = evt.TransactionFromDateTime;
             TransactionToDateTime = evt.TransactionToDateTime;
+            Risk = evt.Risk;
         }
     }
 }

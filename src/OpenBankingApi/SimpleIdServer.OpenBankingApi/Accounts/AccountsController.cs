@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenBankingApi.Accounts
 {
-    [Route("accounts")]
+    [Route("v3.1/accounts")]
     [ApiController]
     public class AccountsController : Controller
     {
