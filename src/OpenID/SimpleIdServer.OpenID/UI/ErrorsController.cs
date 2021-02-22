@@ -7,9 +7,9 @@ namespace SimpleIdServer.OpenID.UI
 {
     public class ErrorsController : Controller
     {
-        public IActionResult Index(string code)
+        public IActionResult Index(string code, string message)
         {
-            return View(new ErrorViewModel(code));
+            return View(new ErrorViewModel(code, message));
         }
     }
 }

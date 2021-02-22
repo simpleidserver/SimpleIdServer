@@ -2,21 +2,22 @@
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Events;
 using SimpleIdServer.OpenBankingApi.Persistences;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenBankingApi.AccountAccessContents.EventHandlers
 {
-    public class AccountAccessConsentEventHandler : IEventHandler<AccountAccessConsentAddedEvent>
+    public class AccountAccessConsentEventHandler : 
+        IEventHandler<AccountAccessConsentAddedEvent>,
+        IEventHandler<AccountAccessConsentConfirmedEvent>
     {
-        private readonly IAccountAccessConsentCommandRepository _accountAccessConsentCommandRepository;
+        private readonly IAccountAccessConsentRepository _accountAccessConsentRepository;
 
         public AccountAccessConsentEventHandler(
-            IAccountAccessConsentCommandRepository accountAccessConsentCommandRepository)
+            IAccountAccessConsentRepository accountAccessConsentRepository)
         {
-            _accountAccessConsentCommandRepository = accountAccessConsentCommandRepository;
+            _accountAccessConsentRepository = accountAccessConsentRepository;
         }
 
         public async Task Handle(AccountAccessConsentAddedEvent evt, CancellationToken cancellationToken)
@@ -25,8 +26,16 @@ namespace SimpleIdServer.OpenBankingApi.AccountAccessContents.EventHandlers
             {
                 evt
             });
-            await _accountAccessConsentCommandRepository.Add(result, cancellationToken);
-            await _accountAccessConsentCommandRepository.SaveChanges(cancellationToken);
+            await _accountAccessConsentRepository.Add(result, cancellationToken);
+            await _accountAccessConsentRepository.SaveChanges(cancellationToken);
+        }
+
+        public async Task Handle(AccountAccessConsentConfirmedEvent evt, CancellationToken cancellationToken)
+        {
+            var result = await _accountAccessConsentRepository.Get(evt.AggregateId, cancellationToken);
+            result.Handle(evt);
+            await _accountAccessConsentRepository.Update(result, cancellationToken);
+            await _accountAccessConsentRepository.SaveChanges(cancellationToken);
         }
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NEventStore;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OpenBankingApi;
+using SimpleIdServer.OpenBankingApi.Api.Authorization.Validators;
 using SimpleIdServer.OpenBankingApi.Domains.Account;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Authorizations;
@@ -19,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddOpenBankingApi(this IServiceCollection services, Action<OpenBankingApiOptions> callback = null)
+        public static OpenBankingApiBuilder AddOpenBankingApi(this IServiceCollection services, Action<OpenBankingApiOptions> callback = null)
         {
             if (callback != null)
             {
@@ -39,13 +41,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICommandRepository, CommandRepository>();
             services.RegisterAllAssignableType(typeof(IEventHandler<>), typeof(IEventHandler<>).Assembly);
 
+            services.RemoveAll<IAuthorizationRequestValidator>();
+            services.AddTransient<IAuthorizationRequestValidator, OpenBankingApiAuthorizationRequestValidator>();
+
             var accounts = new ConcurrentBag<AccountAggregate>();
             var accountAccessConsents = new ConcurrentBag<AccountAccessConsentAggregate>();
             var wireup = Wireup.Init().UsingInMemoryPersistence().Build();
             services.TryAddSingleton<IStoreEvents>(wireup);
-            services.AddSingleton<IAccountQueryRepository>(new InMemoryAccountQueryRepository(accounts));
-            services.AddSingleton<IAccountAccessConsentCommandRepository>(new InMemoryAccountAccessConsentRepository(accountAccessConsents));
-            return services;
+            services.AddSingleton<IAccountRepository>(new InMemoryAccountRepository(accounts));
+            services.AddSingleton<IAccountAccessConsentRepository>(new InMemoryAccountAccessConsentRepository(accountAccessConsents));
+            return new OpenBankingApiBuilder(services);
         }
 
         public static IServiceCollection RegisterAllAssignableType<T>(this IServiceCollection services, Assembly assm)

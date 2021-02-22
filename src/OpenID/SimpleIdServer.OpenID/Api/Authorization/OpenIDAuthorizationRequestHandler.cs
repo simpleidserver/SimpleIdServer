@@ -53,10 +53,10 @@ namespace SimpleIdServer.OpenID.Api.Authorization
 
                 return result;
             }
-            catch(OAuthUserConsentRequiredException)
+            catch(OAuthUserConsentRequiredException ex)
             {
                 context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Consents", context.Request.Data);
+                return new RedirectActionAuthorizationResponse(ex.ActionName, ex.ControllerName, context.Request.Data);
             }
             catch (OAuthLoginRequiredException ex)
             {

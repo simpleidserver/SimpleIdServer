@@ -61,11 +61,56 @@ namespace SimpleIdServer.OpenBankingApi.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Account Access Consent &apos;{0}&apos; has been rejected.
+        /// </summary>
+        public static string AccountAccessConsentRejected {
+            get {
+                return ResourceManager.GetString("AccountAccessConsentRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à account access consent &apos;{0}&apos; has been revoked.
+        /// </summary>
+        public static string AccountAccessConsentRevoked {
+            get {
+                return ResourceManager.GetString("AccountAccessConsentRevoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à consentid cannot be extracted from the request.
+        /// </summary>
+        public static string ConsentIdCannotBeExtracted {
+            get {
+                return ResourceManager.GetString("ConsentIdCannotBeExtracted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à consent screen cannot be displayed for the scopes &apos;{0}&apos;.
+        /// </summary>
+        public static string ConsentScreenCannotBeDisplayed {
+            get {
+                return ResourceManager.GetString("ConsentScreenCannotBeDisplayed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à account &apos;{0}&apos; doesn&apos;t exist.
         /// </summary>
         public static string UnknownAccount {
             get {
                 return ResourceManager.GetString("UnknownAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à account access consent &apos;{0}&apos; doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownAccountAccessConsent {
+            get {
+                return ResourceManager.GetString("UnknownAccountAccessConsent", resourceCulture);
             }
         }
     }

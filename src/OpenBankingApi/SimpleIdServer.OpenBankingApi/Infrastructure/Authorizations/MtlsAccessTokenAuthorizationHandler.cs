@@ -112,7 +112,7 @@ namespace SimpleIdServer.OpenBankingApi.Infrastructure.Authorizations
             using (var sha256 = SHA256.Create())
             {
                 var hashed = sha256.ComputeHash(payload);
-                return Base64UrlTextEncoder.Encode(hashed);
+                return Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(hashed);
             }
         }
     }

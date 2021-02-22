@@ -55,9 +55,9 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             {
                 return await BuildResponse(context, token);
             }
-            catch (OAuthUserConsentRequiredException)
+            catch (OAuthUserConsentRequiredException ex)
             {
-                return new RedirectActionAuthorizationResponse("Index", "Consents", context.Request.Data);
+                return new RedirectActionAuthorizationResponse(ex.ActionName, ex.ControllerName, context.Request.Data);
             }
             catch (OAuthLoginRequiredException ex)
             {

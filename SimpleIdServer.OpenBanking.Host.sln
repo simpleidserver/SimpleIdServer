@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. OpenId", "02. OpenId", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenID", "src\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj", "{1C5DC8A0-26BD-465D-B80E-96DB8780C95D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.UI.Authenticate.LoginPassword", "src\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj", "{C1E5BB86-864D-4FD5-8CB4-7DEA1D6FEFEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{1C5DC8A0-26BD-465D-B80E-96DB8780C95D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C5DC8A0-26BD-465D-B80E-96DB8780C95D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C5DC8A0-26BD-465D-B80E-96DB8780C95D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1E5BB86-864D-4FD5-8CB4-7DEA1D6FEFEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1E5BB86-864D-4FD5-8CB4-7DEA1D6FEFEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1E5BB86-864D-4FD5-8CB4-7DEA1D6FEFEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1E5BB86-864D-4FD5-8CB4-7DEA1D6FEFEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{ED94113B-086A-4BAF-B5C0-9C1BC7CFB61D} = {068E0DFD-A185-43F3-8F74-94137789AAFD}
 		{EF7D00E5-A5AA-4337-AEC9-B3731F66BB6E} = {66D571DA-9F35-4818-97E9-D89B56AFCC8C}
 		{1C5DC8A0-26BD-465D-B80E-96DB8780C95D} = {EF7D00E5-A5AA-4337-AEC9-B3731F66BB6E}
+		{C1E5BB86-864D-4FD5-8CB4-7DEA1D6FEFEF} = {EF7D00E5-A5AA-4337-AEC9-B3731F66BB6E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {570C87DE-80F1-44E8-8869-A35488B6C71A}

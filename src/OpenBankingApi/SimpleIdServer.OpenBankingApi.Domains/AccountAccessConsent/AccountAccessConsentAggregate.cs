@@ -1,4 +1,6 @@
-﻿using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license informati
+using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Events;
 using SimpleIdServer.OpenBankingApi.Domains.Resources;
 using System;
@@ -51,6 +53,24 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
         /// It is used to specify additional details for risk scoring for Account Info.
         /// </summary>
         public string Risk { get; set; }
+        /// <summary>
+        /// Get account ids.
+        /// </summary>
+        public IEnumerable<string> AccountIds { get; set; }
+
+        public void Confirm(IEnumerable<string> accountIds)
+        {
+            var evt = new AccountAccessConsentConfirmedEvent(Guid.NewGuid().ToString(), AggregateId, Version + 1, accountIds, DateTime.UtcNow);
+            Handle(evt);
+            DomainEvents.Add(evt);
+        }
+
+        public void Reject()
+        {
+            var evt = new AccountAccessConsentRejectedEvent(Guid.NewGuid().ToString(), AggregateId, Version + 1, DateTime.UtcNow);
+            Handle(evt);
+            DomainEvents.Add(evt);
+        }
 
         public static AccountAccessConsentAggregate Build(ICollection<DomainEvent> domainEvents)
         {
@@ -121,6 +141,21 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
             TransactionFromDateTime = evt.TransactionFromDateTime;
             TransactionToDateTime = evt.TransactionToDateTime;
             Risk = evt.Risk;
+        }
+
+        private void Handle(AccountAccessConsentConfirmedEvent evt)
+        {
+            AccountIds = evt.AccountIds;
+            Status = AccountAccessConsentStatus.Authorised;
+            StatusUpdateDateTime = evt.UpdateDateTime;
+            Version = evt.Version;
+        }
+
+        private void Handle(AccountAccessConsentRejectedEvent evt)
+        {
+            Status = AccountAccessConsentStatus.Rejected;
+            StatusUpdateDateTime = evt.UpdateDateTime;
+            Version = evt.Version;
         }
     }
 }

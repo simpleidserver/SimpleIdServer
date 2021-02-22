@@ -69,7 +69,6 @@ namespace SimpleIdServer.OpenID.UI
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
                 var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _oauthHostOptions.DefaultCulture;
-                var consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                 var claimDescriptions = new List<string>();
                 if (claims != null && claims.Any())
                 {

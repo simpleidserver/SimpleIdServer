@@ -60,6 +60,10 @@ namespace SimpleIdServer.OpenBankingApi.Domains.Account
         /// Party that manages the account on behalf of the account owner, that is manages the registration and booking of entries on the account, calculates balances on the account and provides information about the account.
         /// </summary>
         public Servicer Servicer { get; set; }
+        /// <summary>
+        /// Subject.
+        /// </summary>
+        public string Subject { get; set; }
 
         public override object Clone()
         {
@@ -78,7 +82,8 @@ namespace SimpleIdServer.OpenBankingApi.Domains.Account
                 MaturityDate = MaturityDate,
                 SwitchStatus = SwitchStatus,
                 Accounts = Accounts.Select(a => (CashAccount)a.Clone()).ToList(),
-                Servicer = (Servicer)Servicer?.Clone()
+                Servicer = (Servicer)Servicer?.Clone(),
+                Subject = Subject
             };
         }
 

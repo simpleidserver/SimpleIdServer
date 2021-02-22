@@ -4,13 +4,9 @@
     <Description>OpenBanking API.</Description>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
     <PackageReference Include="MediatR" Version="8.1.0" />
     <PackageReference Include="NEventStore" Version="7.0.0" />
     <PackageReference Include="NEventStore.PollingClient" Version="7.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Global.Designer.cs">
@@ -29,7 +25,7 @@
     <Folder Include="AccountAccessContents\Queries\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
+    <ProjectReference Include="..\..\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj" />
     <ProjectReference Include="..\SimpleIdServer.OpenBankingApi.Domains\SimpleIdServer.OpenBankingApi.Domains.csproj" />
   </ItemGroup>
 </Project>

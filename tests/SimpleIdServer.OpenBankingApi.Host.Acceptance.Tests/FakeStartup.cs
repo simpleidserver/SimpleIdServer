@@ -14,12 +14,12 @@ using Newtonsoft.Json.Serialization;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OpenBankingApi.AccountAccessContents;
 using SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Middlewares;
-using SimpleIdServer.OpenBankingApi.Infrastructure.Authorizations;
-using SimpleIdServer.OpenBankingApi.Infrastructure.Services;
 using SimpleIdServer.OpenBankingApi.Persistences;
+using SimpleIdServer.OpenID;
+using SimpleIdServer.OpenID.Api.UserInfo;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
 {
@@ -32,6 +32,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
             services.
                 AddMvc(option => option.EnableEndpointRouting = false)
                 .AddApplicationPart(typeof(RegistrationController).Assembly)
+                .AddApplicationPart(typeof(UserInfoController).Assembly)
                 .AddApplicationPart(typeof(AccountAccessContentsController).Assembly)
                 .AddNewtonsoftJson(options =>
                 {
@@ -62,14 +63,25 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                 opts.AddOpenBankingAuthorization(CertificateAuthenticationDefaults.AuthenticationScheme);
             });
 
-            services.AddMediatR(typeof(IAccountQueryRepository));
-            services.AddOpenBankingApi();
-            services.AddHostedService<EventStoreHostedService>();
-            services.AddSIDOAuth(o =>
+            services.AddMediatR(typeof(IAccountRepository));
+            services.AddSIDOpenID(opt =>
             {
-                o.MtlsEnabled = true;
+                opt.IsLocalhostAllowed = true;
+                opt.IsRedirectionUrlHTTPSRequired = false;
+                opt.IsInitiateLoginUriHTTPSRequired = true;
+            }, opt =>
+            {
+                opt.MtlsEnabled = true;
+                opt.DefaultScopes = new List<string>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Profile.Name,
+                        SIDOpenIdConstants.StandardScopes.Email.Name,
+                        SIDOpenIdConstants.StandardScopes.Address.Name,
+                        SIDOpenIdConstants.StandardScopes.Phone.Name
+                    };
             })
-                .AddScopes(DefaultConfiguration.Scopes);
+                .AddClients(new List<OpenID.Domains.OpenIdClient>(), DefaultConfiguration.Scopes);
+            services.AddOpenBankingApi();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

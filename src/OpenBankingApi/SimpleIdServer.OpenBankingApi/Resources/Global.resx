@@ -117,7 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountAccessConsentRejected" xml:space="preserve">
+    <value>Account Access Consent '{0}' has been rejected</value>
+  </data>
+  <data name="AccountAccessConsentRevoked" xml:space="preserve">
+    <value>account access consent '{0}' has been revoked</value>
+  </data>
+  <data name="ConsentIdCannotBeExtracted" xml:space="preserve">
+    <value>consentid cannot be extracted from the request</value>
+  </data>
+  <data name="ConsentScreenCannotBeDisplayed" xml:space="preserve">
+    <value>consent screen cannot be displayed for the scopes '{0}'</value>
+  </data>
   <data name="UnknownAccount" xml:space="preserve">
     <value>account '{0}' doesn't exist</value>
+  </data>
+  <data name="UnknownAccountAccessConsent" xml:space="preserve">
+    <value>account access consent '{0}' doesn't exist</value>
   </data>
 </root>

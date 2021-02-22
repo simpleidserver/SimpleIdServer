@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands;
-using SimpleIdServer.OpenBankingApi.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
 

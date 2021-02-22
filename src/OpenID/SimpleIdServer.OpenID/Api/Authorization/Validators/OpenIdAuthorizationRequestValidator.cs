@@ -33,7 +33,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             _jwtParser = jwtParser;
         }
 
-        public async Task Validate(HandlerContext context)
+        public virtual async Task Validate(HandlerContext context)
         {
             var openidClient = (OpenIdClient)context.Client;
             var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
@@ -118,14 +118,15 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 case PromptParameters.Login:
                     throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
                 case PromptParameters.Consent:
-                    throw new OAuthUserConsentRequiredException();
+                    RedirectToConsentView(context);
+                    break;
                 case PromptParameters.SelectAccount :
                     throw new OAuthSelectAccountRequiredException();
             }
 
             if (!context.User.HasOpenIDConsent(clientId, scopes, claims))
             {
-                throw new OAuthUserConsentRequiredException();
+                RedirectToConsentView(context);
             }
 
             if (claims != null)
@@ -137,6 +138,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
                 }
             }
+        }
+
+        protected virtual void RedirectToConsentView(HandlerContext context)
+        {
+            throw new OAuthUserConsentRequiredException();
         }
 
         private Task<bool> CheckRequestParameter(HandlerContext context)
