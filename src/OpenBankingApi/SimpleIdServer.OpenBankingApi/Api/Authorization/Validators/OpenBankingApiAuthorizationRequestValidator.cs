@@ -82,13 +82,13 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 if (accountAccessConsent.Status == AccountAccessConsentStatus.Rejected)
                 {
                     _logger.LogError($"Account Access Consent '{consentId}' has already been rejected");
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AccountAccessConsentRejected, consentId));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AccountAccessConsentRejected);
                 }
 
                 if (accountAccessConsent.Status == AccountAccessConsentStatus.Revoked)
                 {
                     _logger.LogError($"Account Access Consent '{consentId}' has already been revoked");
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AccountAccessConsentRevoked, consentId));
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AccountAccessConsentRevoked);
                 }
 
                 return;

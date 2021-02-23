@@ -80,14 +80,14 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when consentid doesn\'t exist")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when Account Access Consent doesn\'t exist")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when consentid doesn\'t exist")]
-        public virtual void ErrorIsReturnedWhenConsentidDoesntExist()
+        [Xunit.TraitAttribute("Description", "Error is returned when Account Access Consent doesn\'t exist")]
+        public virtual void ErrorIsReturnedWhenAccountAccessConsentDoesntExist()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when consentid doesn\'t exist", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when Account Access Consent doesn\'t exist", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -125,7 +125,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "accounts"});
                 table4.AddRow(new string[] {
                             "redirect_uris",
-                            "[http://localhost:8080]"});
+                            "[https://localhost:8080/callback]"});
                 table4.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "mtlsClient"});
@@ -158,7 +158,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "openid accounts"});
                 table5.AddRow(new string[] {
                             "redirect_uri",
-                            "http://localhost:8080"});
+                            "https://localhost:8080/callback"});
                 table5.AddRow(new string[] {
                             "nonce",
                             "nonce"});
@@ -166,13 +166,121 @@ this.ScenarioInitialize(scenarioInfo);
                             "claims",
                             "{ id_token: { openbanking_intent_id: { value: \"value\", essential : true } } }"});
 #line 17
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table5, "And ");
+ testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table5, "And ");
 #line hidden
 #line 28
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 30
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 31
+ testRunner.Then("JSON \'error_description\'=\'account access consent \'value\' doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when Account Access Consent has been rejected")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when Account Access Consent has been rejected")]
+        public virtual void ErrorIsReturnedWhenAccountAccessConsentHasBeenRejected()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when Account Access Consent has been rejected", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 33
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table6.AddRow(new string[] {
+                            "token_endpoint_auth_method",
+                            "tls_client_auth"});
+                table6.AddRow(new string[] {
+                            "response_types",
+                            "[token,code,id_token]"});
+                table6.AddRow(new string[] {
+                            "grant_types",
+                            "[client_credentials]"});
+                table6.AddRow(new string[] {
+                            "scope",
+                            "accounts"});
+                table6.AddRow(new string[] {
+                            "redirect_uris",
+                            "[https://localhost:8080/callback]"});
+                table6.AddRow(new string[] {
+                            "tls_client_auth_san_dns",
+                            "mtlsClient"});
+#line 34
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table6, "When ");
+#line hidden
+#line 43
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 44
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 46
+ testRunner.And("add rejected Account Access Consent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table7.AddRow(new string[] {
+                            "response_type",
+                            "id_token"});
+                table7.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table7.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table7.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table7.AddRow(new string[] {
+                            "scope",
+                            "openid accounts"});
+                table7.AddRow(new string[] {
+                            "redirect_uri",
+                            "https://localhost:8080/callback"});
+                table7.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table7.AddRow(new string[] {
+                            "claims",
+                            "{ id_token: { openbanking_intent_id: { value: \"$consentId$\", essential : true } }" +
+                                " }"});
+#line 48
+ testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table7, "And ");
+#line hidden
+#line 59
+ testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 61
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 62
+ testRunner.Then("JSON \'error_description\'=\'Account Access Consent has been rejected\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

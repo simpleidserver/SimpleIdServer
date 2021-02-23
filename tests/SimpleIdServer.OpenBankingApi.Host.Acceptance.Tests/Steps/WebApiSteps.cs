@@ -8,6 +8,9 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
+using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
+using SimpleIdServer.OpenBankingApi.Persistences;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,6 +185,19 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             var httpClient = _factory.CreateClient();
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("add rejected Account Access Consent")]
+        public async Task GivenAddRejectedAccountAccessConsent()
+        {
+            var accountAccessConsentRepository = _factory.Server.Host.Services.GetService(typeof(IAccountAccessConsentRepository)) as IAccountAccessConsentRepository;
+            var accountAccessConsent = AccountAccessConsentAggregate.Create(new List<string>
+            {
+                AccountAccessConsentPermission.ReadAccountsBasic.Name
+            }, null, null, null, null);
+            accountAccessConsent.Reject();
+            await accountAccessConsentRepository.Add(accountAccessConsent, CancellationToken.None);
+            _scenarioContext.Set(accountAccessConsent.AggregateId, "consentId");
         }
 
         private string ExtractUrl(string url, Table table)

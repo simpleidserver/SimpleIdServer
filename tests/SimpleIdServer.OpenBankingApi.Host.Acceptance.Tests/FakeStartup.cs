@@ -44,7 +44,10 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                 options.HttpsPort = 8080;
             });
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            services.AddAuthentication(opts =>
+            {
+                opts.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
                 .AddCustomAuthentication(opts =>
                 {
 
@@ -80,6 +83,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                         SIDOpenIdConstants.StandardScopes.Phone.Name
                     };
             })
+                .AddUsers(DefaultConfiguration.Users)
                 .AddClients(new List<OpenID.Domains.OpenIdClient>(), DefaultConfiguration.Scopes);
             services.AddOpenBankingApi();
         }

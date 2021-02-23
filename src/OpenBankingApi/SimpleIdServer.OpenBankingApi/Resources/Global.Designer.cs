@@ -61,7 +61,7 @@ namespace SimpleIdServer.OpenBankingApi.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Account Access Consent &apos;{0}&apos; has been rejected.
+        ///   Recherche une chaîne localisée semblable à Account Access Consent has been rejected.
         /// </summary>
         public static string AccountAccessConsentRejected {
             get {
@@ -70,7 +70,7 @@ namespace SimpleIdServer.OpenBankingApi.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à account access consent &apos;{0}&apos; has been revoked.
+        ///   Recherche une chaîne localisée semblable à account access consent has been revoked.
         /// </summary>
         public static string AccountAccessConsentRevoked {
             get {
