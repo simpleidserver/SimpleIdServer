@@ -208,3 +208,6 @@ FakesAssemblies/
 log-*.txt
 
 docs/_build/
+
+## Ignore Javascript
+wwwroot/

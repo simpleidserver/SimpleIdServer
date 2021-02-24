@@ -27,6 +27,7 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_HTTPS_REDIRECT_URI = "redirect_uri does not contain https scheme";
         public const string INVALID_LOCALHOST_REDIRECT_URI = "redirect_uri must not contain localhost";
         public const string INVALID_SUBJECT_TYPE = "subject_type is invalid";
+        public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
         public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
         public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG = "id_token_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC = "id_token_encrypted_response_enc is not supported";

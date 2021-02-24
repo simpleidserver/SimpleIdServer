@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Authorization.Validators
@@ -33,13 +34,14 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             _jwtParser = jwtParser;
         }
 
-        public virtual async Task Validate(HandlerContext context)
+        public virtual async Task Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = (OpenIdClient)context.Client;
             var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
             var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
             var acrValues = context.Request.Data.GetAcrValuesFromAuthorizationRequest();
             var prompt = context.Request.Data.GetPromptFromAuthorizationRequest();
+            var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
             if (!scopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
@@ -63,7 +65,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.LOGIN_REQUIRED, OAuth.ErrorMessages.LOGIN_IS_REQUIRED);
                 }
 
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
+                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }
 
             if (!await CheckRequestParameter(context))
@@ -74,7 +76,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
             var nonce = context.Request.Data.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
-            var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
             var maxAge = context.Request.Data.GetMaxAgeFromAuthorizationRequest();
             var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(redirectUri))
@@ -91,12 +92,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             {
                 if (DateTime.UtcNow > context.User.AuthenticationTime.Value.AddSeconds(maxAge.Value))
                 {
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
+                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
                 }
             }
             else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.User.AuthenticationTime.Value.AddSeconds(openidClient.DefaultMaxAge.Value))
             {
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
+                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
@@ -116,7 +117,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             switch (prompt)
             {
                 case PromptParameters.Login:
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, openidClient));
+                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
                 case PromptParameters.Consent:
                     RedirectToConsentView(context);
                     break;
@@ -145,7 +146,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             throw new OAuthUserConsentRequiredException();
         }
 
-        private Task<bool> CheckRequestParameter(HandlerContext context)
+        protected Task<bool> CheckRequestParameter(HandlerContext context)
         {
             var request = context.Request.Data.GetRequestFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(request))
@@ -156,7 +157,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             return CheckRequest(context, request);
         }
 
-        private async Task<bool> CheckRequestUriParameter(HandlerContext context)
+        protected async Task<bool> CheckRequestUriParameter(HandlerContext context)
         {
             var requestUri = context.Request.Data.GetRequestUriFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(requestUri))
@@ -179,7 +180,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             }
         }
 
-        private async Task<bool> CheckRequest(HandlerContext context, string request)
+        protected async Task<bool> CheckRequest(HandlerContext context, string request)
         {
             var openidClient = (OpenIdClient)context.Client;
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
@@ -245,9 +246,9 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             return true;
         }
 
-        private async Task<string> GetFirstAmr(IEnumerable<string> acrValues, OpenIdClient client)
+        protected async Task<string> GetFirstAmr(IEnumerable<string> acrValues, IEnumerable<AuthorizationRequestClaimParameter> claims, OpenIdClient client, CancellationToken cancellationToken)
         {
-            var acr = await _amrHelper.FetchDefaultAcr(acrValues, client);
+            var acr = await _amrHelper.FetchDefaultAcr(acrValues, claims, client, cancellationToken);
             if (acr == null)
             {
                 return null;
@@ -256,7 +257,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             return acr.AuthenticationMethodReferences.First();
         }
 
-        private async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint)
+        protected async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint)
         {
             if (!_jwtParser.IsJwsToken(idTokenHint) && !_jwtParser.IsJweToken(idTokenHint))
             {

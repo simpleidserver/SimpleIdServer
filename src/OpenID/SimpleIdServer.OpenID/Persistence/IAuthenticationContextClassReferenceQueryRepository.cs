@@ -9,7 +9,7 @@ namespace SimpleIdServer.OpenID.Persistence
 {
     public interface IAuthenticationContextClassReferenceQueryRepository
     {
-        Task<AuthenticationContextClassReference> FindACRByName(string name);
+        Task<IEnumerable<AuthenticationContextClassReference>> FindACRByNames(IEnumerable<string> names, CancellationToken cancellationToken);
         Task<ICollection<AuthenticationContextClassReference>> GetAllACR(CancellationToken token);
     }
 }

@@ -53,8 +53,9 @@ namespace SimpleIdServer.OpenID.UI
             var query = unprotectedUrl.GetQueries().ToJObj();
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
+            var requestedClaims = query.GetClaimsFromAuthorizationRequest();
             var client = (OpenIdClient)await _oauthClientRepository.FindOAuthClientById(clientId, token);
-            var acr = await _amrHelper.FetchDefaultAcr(acrValues, client);
+            var acr = await _amrHelper.FetchDefaultAcr(acrValues, requestedClaims, client, token);
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {

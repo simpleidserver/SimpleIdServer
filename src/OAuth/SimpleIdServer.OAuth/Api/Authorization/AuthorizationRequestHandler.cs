@@ -84,7 +84,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, cancellationToken));
             foreach (var validator in _authorizationRequestValidators)
             {
-                await validator.Validate(context);
+                await validator.Validate(context, cancellationToken);
             }
 
             var state = context.Request.Data.GetStateFromAuthorizationRequest();

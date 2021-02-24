@@ -100,7 +100,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table1.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table1.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "none"});
@@ -287,7 +287,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table6.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table6.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "none"});
@@ -397,7 +397,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table9.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table9.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES256"});
@@ -509,7 +509,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table12.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table12.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES384"});
@@ -619,7 +619,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table15.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table15.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "ES512"});
@@ -729,7 +729,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table18.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table18.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "HS256"});
@@ -839,7 +839,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table21.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table21.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "HS384"});
@@ -949,7 +949,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table24.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table24.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "HS512"});
@@ -1059,7 +1059,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table27.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table27.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "RS256"});
@@ -1169,7 +1169,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table30.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table30.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "RS384"});
@@ -1290,7 +1290,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[id_token]"});
             table34.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table34.AddRow(new string[] {
                         "id_token_signed_response_alg",
                         "RS512"});
@@ -1412,7 +1412,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table38.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table38.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -1552,7 +1552,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table42.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table42.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -1692,7 +1692,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table46.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table46.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -1832,7 +1832,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table50.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table50.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -1972,7 +1972,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table54.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table54.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -2112,7 +2112,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table58.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table58.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -2252,7 +2252,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table62.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table62.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -2392,7 +2392,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table66.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table66.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -2532,7 +2532,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table70.AddRow(new string[] {
                         "scope",
-                        "email role"});
+                        "openid email role"});
             table70.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -2672,7 +2672,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[code,id_token]"});
             table74.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
             table74.AddRow(new string[] {
                         "request_object_signing_alg",
                         "RS256"});
@@ -2815,7 +2815,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[code,id_token]"});
             table79.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
             table79.AddRow(new string[] {
                         "request_object_signing_alg",
                         "RS256"});
@@ -2956,7 +2956,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table83.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
             table83.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -3051,7 +3051,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token,code]"});
             table86.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
             table86.AddRow(new string[] {
                         "subject_type",
                         "pairwise"});
@@ -3294,7 +3294,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token]"});
             table93.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
 #line 1259
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table93, "And ");
 #line 1266
@@ -3488,7 +3488,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[token,id_token]"});
             table99.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
 #line 1337
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table99, "And ");
 #line 1344
@@ -3587,7 +3587,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[code,id_token]"});
             table102.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
 #line 1377
  testRunner.And("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table102, "And ");
 #line 1384
@@ -3749,7 +3749,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "DisplayName",
                         "Amrs"});
             table107.AddRow(new string[] {
-                        "1",
+                        "sid-load-01",
                         "Level1",
                         "pwd"});
 #line 1443
@@ -3769,7 +3769,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "[code,id_token]"});
             table108.AddRow(new string[] {
                         "scope",
-                        "email"});
+                        "openid email"});
             table108.AddRow(new string[] {
                         "subject_type",
                         "public"});
@@ -3805,7 +3805,7 @@ this.ScenarioInitialize(scenarioInfo);
                         "https://web.com"});
             table109.AddRow(new string[] {
                         "acr_values",
-                        "1"});
+                        "sid-load-01"});
             table109.AddRow(new string[] {
                         "nonce",
                         "nonce"});
@@ -3820,7 +3820,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line 1474
  testRunner.Then("token claim \'sub\'=\'administrator\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line 1475
- testRunner.Then("token claim \'acr\'=\'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("token claim \'acr\'=\'sid-load-01\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

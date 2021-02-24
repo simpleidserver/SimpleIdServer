@@ -17,9 +17,9 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             _acrLst = acrLst;
         }
 
-        public Task<AuthenticationContextClassReference> FindACRByName(string name)
+        public Task<IEnumerable<AuthenticationContextClassReference>> FindACRByNames(IEnumerable<string> names, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_acrLst.FirstOrDefault(a => a.Name == name));
+            return Task.FromResult(_acrLst.Where(a => names.Contains(a.Name)));
         }
 
         public Task<ICollection<AuthenticationContextClassReference>> GetAllACR(CancellationToken token)

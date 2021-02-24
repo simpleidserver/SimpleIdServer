@@ -3,6 +3,7 @@
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Authorization.Validators
@@ -16,7 +17,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
             _userConsentFetcher = userConsentFetcher;
         }
 
-        public Task Validate(HandlerContext context)
+        public Task Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             if (context.User == null)
             {

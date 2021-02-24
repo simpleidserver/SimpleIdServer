@@ -20,7 +20,7 @@ Scenario: Error is returned when Account Access Consent doesn't exist
 	| client_id     | $client_id$                                                                   |
 	| state         | state                                                                         |
 	| response_mode | query                                                                         |
-	| scope         | openid accounts                                                               |
+	| scope         | accounts                                                                      |
 	| redirect_uri  | https://localhost:8080/callback                                               |
 	| nonce         | nonce                                                                         |
 	| claims        | { id_token: { openbanking_intent_id: { value: "value", essential : true } } } |
@@ -51,7 +51,7 @@ Scenario: Error is returned when Account Access Consent has been rejected
 	| client_id     | $client_id$                                                                         |
 	| state         | state                                                                               |
 	| response_mode | query                                                                               |
-	| scope         | openid accounts                                                                     |
+	| scope         | accounts                                                                            |
 	| redirect_uri  | https://localhost:8080/callback                                                     |
 	| nonce         | nonce                                                                               |
 	| claims        | { id_token: { openbanking_intent_id: { value: "$consentId$", essential : true } } } |

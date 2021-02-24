@@ -155,7 +155,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "query"});
                 table5.AddRow(new string[] {
                             "scope",
-                            "openid accounts"});
+                            "accounts"});
                 table5.AddRow(new string[] {
                             "redirect_uri",
                             "https://localhost:8080/callback"});
@@ -259,7 +259,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "query"});
                 table7.AddRow(new string[] {
                             "scope",
-                            "openid accounts"});
+                            "accounts"});
                 table7.AddRow(new string[] {
                             "redirect_uri",
                             "https://localhost:8080/callback"});

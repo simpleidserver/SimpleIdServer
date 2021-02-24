@@ -7,7 +7,7 @@ Scenario: When no access token is issued the resulting claims are returned in th
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | none              |
 	
 	And extract JSON from body
@@ -80,7 +80,7 @@ Scenario: Identity token is returned in JWS format (none)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | none              |
 	
 	And extract JSON from body
@@ -124,7 +124,7 @@ Scenario: Identity token is returned in JWS format (ES256)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | ES256             |
 
 	And extract JSON from body
@@ -169,7 +169,7 @@ Scenario: Identity token is returned in JWS format (ES384)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | ES384             |
 
 	And extract JSON from body
@@ -213,7 +213,7 @@ Scenario: Identity token is returned in JWS format (ES512)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | ES512             |
 
 	And extract JSON from body
@@ -257,7 +257,7 @@ Scenario: Identity token is returned in JWS format (HS256)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | HS256             |
 
 	And extract JSON from body
@@ -301,7 +301,7 @@ Scenario: Identity token is returned in JWS format (HS384)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | HS384             |
 
 	And extract JSON from body
@@ -345,7 +345,7 @@ Scenario: Identity token is returned in JWS format (HS512)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | HS512             |
 
 	And extract JSON from body
@@ -389,7 +389,7 @@ Scenario: Identity token is returned in JWS format (RS256)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | RS256             |
 
 	And extract JSON from body
@@ -433,7 +433,7 @@ Scenario: Identity token is returned in JWS format (RS384)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | RS384             |
 
 	And extract JSON from body
@@ -481,7 +481,7 @@ Scenario: Identity token is returned in JWS format (RS512)
 	| redirect_uris                | [https://web.com] |
 	| grant_types                  | [implicit]        |
 	| response_types               | [id_token]        |
-	| scope                        | email role        |
+	| scope                        | openid email role |
 	| id_token_signed_response_alg | RS512             |
 
 	And extract JSON from body
@@ -529,7 +529,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A128CBC-HS256)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA1_5                        |
@@ -584,7 +584,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A192CBC-HS384)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA1_5                        |
@@ -639,7 +639,7 @@ Scenario: Identity token is returned in JWE format (RSA1_5 & A256CBC-HS512)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA1_5                        |
@@ -694,7 +694,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A128CBC-HS256
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP-256                  |
@@ -749,7 +749,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A192CBC-HS384
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP-256                  |
@@ -804,7 +804,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP-256 & A256CBC-HS512
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP-256                  |
@@ -859,7 +859,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A128CBC-HS256)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP                      |
@@ -914,7 +914,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A192CBC-HS384)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP                      |
@@ -969,7 +969,7 @@ Scenario: Identity token is returned in JWE format (RSA-OAEP & A256CBC-HS512)
 	| redirect_uris                   | [https://web.com]             |
 	| grant_types                     | [implicit,authorization_code] |
 	| response_types                  | [token,id_token,code]         |
-	| scope                           | email role                    |
+	| scope                           | openid email role             |
 	| subject_type                    | public                        |
 	| id_token_signed_response_alg    | RS256                         |
 	| id_token_encrypted_response_alg | RSA-OAEP                      |
@@ -1024,7 +1024,7 @@ Scenario: Use request object (JWS) parameter to get an access token and authoriz
 	| redirect_uris              | [https://web.com]             |
 	| grant_types                | [implicit,authorization_code] |
 	| response_types             | [code,id_token]               |
-	| scope                      | email                         |
+	| scope                      | openid email                  |
 	| request_object_signing_alg | RS256                         |
 	| jwks                       | $jwks_json$                   |
 	
@@ -1079,7 +1079,7 @@ Scenario: Use request object (JWE) parameter to get an access token and authoriz
 	| redirect_uris                 | [https://web.com]             |
 	| grant_types                   | [implicit,authorization_code] |
 	| response_types                | [code,id_token]               |
-	| scope                         | email                         |
+	| scope                         | openid email                  |
 	| request_object_signing_alg    | RS256                         |
 	| request_object_encryption_alg | RSA1_5                        |
 	| request_object_encryption_enc | A128CBC-HS256                 |
@@ -1135,8 +1135,8 @@ Scenario: Public subject is returned in id_token
 	| redirect_uris  | [https://web.com]             |
 	| grant_types    | [implicit,authorization_code] |
 	| response_types | [token,id_token,code]         |
-	| scope          | email                         |
-	| subject_type   | public	                     |
+	| scope          | openid email                  |
+	| subject_type   | public                        |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body
@@ -1172,7 +1172,7 @@ Scenario: Pairwise subject is returned in id_token
 	| redirect_uris  | [https://web.com]             |
 	| grant_types    | [implicit,authorization_code] |
 	| response_types | [token,id_token,code]         |
-	| scope          | email	                     |
+	| scope          | openid email                  |
 	| subject_type   | pairwise                      |
 
 	And extract JSON from body
@@ -1261,7 +1261,7 @@ Scenario: Identity token must contains an auth_time claim when mentionned as ess
 	| redirect_uris  | [https://web.com] |
 	| grant_types    | [implicit]        |
 	| response_types | [token,id_token]  |
-	| scope          | email             |
+	| scope          | openid email      |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
@@ -1339,7 +1339,7 @@ Scenario: Use implicit grant-type to get an access and identity token
 	| redirect_uris  | [https://web.com] |
 	| grant_types    | [implicit]        |
 	| response_types | [token,id_token]  |
-	| scope          | email             |
+	| scope          | openid email      |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
@@ -1379,7 +1379,7 @@ Scenario: Use hybrid grant-type to get an identity token and authorization code
 	| redirect_uris  | [https://web.com]             |
 	| grant_types    | [implicit,authorization_code] |
 	| response_types | [code,id_token]               |
-	| scope          | email                         |
+	| scope          | openid email                  |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
@@ -1441,16 +1441,16 @@ Scenario: Check amr and acr claims are present in the identity token
 	| SIG  | 1   | RS256   |
 
 	And add authentication class references
-	| Name | DisplayName | Amrs |
-	| 1    | Level1      | pwd  |
+	| Name        | DisplayName | Amrs |
+	| sid-load-01 | Level1      | pwd  |
 
 	And execute HTTP POST JSON request 'http://localhost/register'
 	| Key            | Value                         |
 	| redirect_uris  | [https://web.com]             |
 	| grant_types    | [implicit,authorization_code] |
 	| response_types | [code,id_token]               |
-	| scope          | email 						 |
-	| subject_type   | public	                     |
+	| scope          | openid email                  |
+	| subject_type   | public                        |
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
@@ -1464,7 +1464,7 @@ Scenario: Check amr and acr claims are present in the identity token
 	| response_mode | query           |
 	| scope         | openid email    |
 	| redirect_uri  | https://web.com |
-	| acr_values    | 1               |
+	| acr_values    | sid-load-01     |
 	| nonce         | nonce           |
 	
 	And extract 'id_token' from callback
@@ -1472,4 +1472,4 @@ Scenario: Check amr and acr claims are present in the identity token
 	
 	Then token contains 'amr'
 	Then token claim 'sub'='administrator'
-	Then token claim 'acr'='1'
+	Then token claim 'acr'='sid-load-01'

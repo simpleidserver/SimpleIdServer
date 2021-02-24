@@ -160,6 +160,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenBuilder, IdTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenIDAccessTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();
+            services.AddTransient<IClaimsJwsPayloadEnricher, ClaimsJwsPayloadEnricher>();
             services.AddTransient<IAuthorizationRequestEnricher, OpenIDAuthorizationRequestEnricher>();
             services.AddTransient<ISubjectTypeBuilder, PublicSubjectTypeBuilder>();
             services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();

@@ -39,21 +39,11 @@ namespace SimpleIdServer.OpenBankingApi.Startup
         {
             new AuthenticationContextClassReference
             {
-                DisplayName = "First level of assurance",
-                Name = "sid-load-01",
+                DisplayName = "Authenticate without using SCA",
+                Name = "urn:openbanking:psd2:ca",
                 AuthenticationMethodReferences = new List<string>
                 {
                     "pwd"
-                }
-            },
-            new AuthenticationContextClassReference
-            {
-                DisplayName = "Second level of assurance",
-                Name = "sid-load-02",
-                AuthenticationMethodReferences = new List<string>
-                {
-                    "pwd",
-                    "sms"
                 }
             }
         };

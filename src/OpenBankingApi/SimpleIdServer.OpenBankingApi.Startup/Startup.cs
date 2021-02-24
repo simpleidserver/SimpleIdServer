@@ -11,7 +11,6 @@ using Newtonsoft.Json.Serialization;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Filters;
-using SimpleIdServer.OpenBankingApi.Infrastructure.Services;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenID;
 using System.Collections.Generic;

@@ -580,3 +580,32 @@ Scenario: Redirect to the consents page when no consent has been given for the s
 	And extract JSON from body
 	
 	Then redirect url contains 'http://localhost/Consents'
+
+Scenario: Error is returned when an invalid essential acr value is passed in the claims
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key            | Value                         |
+	| redirect_uris  | [https://web.com]             |
+	| scope          | email                         |
+	| response_types | [token,id_token,code]         |
+	| grant_types    | [implicit,authorization_code] |
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body
+	And add user consent : user='administrator', scope='email', clientId='$client_id$'
+	
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value                                                                             |
+	| response_type | code id_token                                                                     |
+	| client_id     | $client_id$                                                                       |
+	| state         | state                                                                             |
+	| response_mode | query                                                                             |
+	| scope         | openid email                                                                      |
+	| redirect_uri  | https://web.com                                                                   |
+	| nonce         | nonce                                                                             |
+	| claims        | { id_token: { acr: { values : ['urn:openbanking:psd2:ca'], essential : true } } } |
+
+	And extract query parameters into JSON
+
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='no essential acr is supported'
+	Then JSON 'state'='state'

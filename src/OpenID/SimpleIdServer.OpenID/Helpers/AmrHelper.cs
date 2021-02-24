@@ -1,43 +1,65 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
+using SimpleIdServer.OAuth;
+using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Helpers
 {
     public class AmrHelper : IAmrHelper
     {
         private readonly IAuthenticationContextClassReferenceQueryRepository _authenticationContextClassReferenceRepository;
-        private readonly OpenIDHostOptions _openidHostOptions;
+        private readonly OpenIDHostOptions _options;
 
-        public AmrHelper(IAuthenticationContextClassReferenceQueryRepository authenticationContextClassReferenceRepository, IOptions<OpenIDHostOptions> openidHostOptions)
+        public AmrHelper(IAuthenticationContextClassReferenceQueryRepository authenticationContextClassReferenceRepository, IOptions<OpenIDHostOptions> options)
         {
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
-            _openidHostOptions = openidHostOptions.Value;
+            _options = options.Value;
         }
 
-        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, OpenIdClient openidClient)
+        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OpenIdClient openIdClient, CancellationToken cancellationToken)
         {
-            var acrs = new List<string>();
-            acrs.AddRange(requestedAcrValues);
-            if (openidClient.DefaultAcrValues.Any())
+            var defaultAcr = await GetSupportedAcr(requestedAcrValues, cancellationToken);
+            if (defaultAcr == null)
             {
-                acrs.AddRange(openidClient.DefaultAcrValues);
+                var acrClaim = requestedClaims.FirstOrDefault(r => r.Name == OAuthClaims.Acr);
+                if (acrClaim != null)
+                {
+                    defaultAcr = await GetSupportedAcr(acrClaim.Values, cancellationToken);
+                    if (defaultAcr == null && acrClaim.IsEssential)
+                    {
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_ESSENTIAL_ACR_IS_SUPPORTED);
+                    }
+                }
+
+                if (defaultAcr == null)
+                {
+                    var acrs = new List<string>();
+                    acrs.AddRange(openIdClient.DefaultAcrValues);
+                    acrs.Add(_options.DefaultAcrValue);
+                    defaultAcr = await GetSupportedAcr(acrs, cancellationToken);
+
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(_openidHostOptions.DefaultAcrValue))
-            {
-                acrs.Add(_openidHostOptions.DefaultAcrValue);
-            }
+            return defaultAcr;
+        }
 
-            foreach(var acrValue in acrs)
+        public async Task<AuthenticationContextClassReference> GetSupportedAcr(IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken)
+        {
+            var acrs = await _authenticationContextClassReferenceRepository.FindACRByNames(requestedAcrValues, cancellationToken);
+            foreach(var acrValue in requestedAcrValues)
             {
-                var acr = await _authenticationContextClassReferenceRepository.FindACRByName(acrValue);
+                var acr = acrs.FirstOrDefault(a => a.Name == acrValue);
                 if (acr != null)
                 {
                     return acr;

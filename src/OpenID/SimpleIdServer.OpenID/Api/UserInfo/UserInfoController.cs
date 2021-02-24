@@ -22,7 +22,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Api.UserInfo
 {
@@ -36,6 +35,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
         private readonly IOAuthClientQueryRepository _oauthClientRepository;
         private readonly IEnumerable<IClaimsSource> _claimsSources;
         private readonly ITokenQueryRepository _tokenQueryRepository;
+        private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
         private readonly ILogger<UserInfoController> _logger;
 
         public UserInfoController(
@@ -46,6 +46,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             IOAuthClientQueryRepository oauthClientRepository,
             IEnumerable<IClaimsSource> claimsSources,
             ITokenQueryRepository tokenQueryRepository,
+            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             ILogger<UserInfoController> logger)
         {
             _jwtParser = jwtParser;
@@ -55,6 +56,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             _oauthClientRepository = oauthClientRepository;
             _claimsSources = claimsSources;
             _tokenQueryRepository = tokenQueryRepository;
+            _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
             _logger = logger;
         }
 
@@ -131,8 +133,8 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
 
                 var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken)).Cast<OpenIdScope>();
                 var payload = new JwsPayload();
-                IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user);
-                IdTokenBuilder.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);
+                IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user, subject);
+                _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);
                 foreach (var claimsSource in _claimsSources)
                 {
                     await claimsSource.Enrich(payload, oauthClient).ConfigureAwait(false);

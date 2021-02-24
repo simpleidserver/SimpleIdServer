@@ -1581,6 +1581,82 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.FactAttribute(DisplayName="Error is returned when an invalid essential acr value is passed in the claims")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when an invalid essential acr value is passed in the claims")]
+        public virtual void ErrorIsReturnedWhenAnInvalidEssentialAcrValueIsPassedInTheClaims()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when an invalid essential acr value is passed in the claims", null, ((string[])(null)));
+#line 584
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line hidden
+            TechTalk.SpecFlow.Table table166 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table166.AddRow(new string[] {
+                        "redirect_uris",
+                        "[https://web.com]"});
+            table166.AddRow(new string[] {
+                        "scope",
+                        "email"});
+            table166.AddRow(new string[] {
+                        "response_types",
+                        "[token,id_token,code]"});
+            table166.AddRow(new string[] {
+                        "grant_types",
+                        "[implicit,authorization_code]"});
+#line 585
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table166, "When ");
+#line 592
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 593
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 594
+ testRunner.And("add user consent : user=\'administrator\', scope=\'email\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            TechTalk.SpecFlow.Table table167 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Key",
+                        "Value"});
+            table167.AddRow(new string[] {
+                        "response_type",
+                        "code id_token"});
+            table167.AddRow(new string[] {
+                        "client_id",
+                        "$client_id$"});
+            table167.AddRow(new string[] {
+                        "state",
+                        "state"});
+            table167.AddRow(new string[] {
+                        "response_mode",
+                        "query"});
+            table167.AddRow(new string[] {
+                        "scope",
+                        "openid email"});
+            table167.AddRow(new string[] {
+                        "redirect_uri",
+                        "https://web.com"});
+            table167.AddRow(new string[] {
+                        "nonce",
+                        "nonce"});
+            table167.AddRow(new string[] {
+                        "claims",
+                        "{ id_token: { acr: { values : [\'urn:openbanking:psd2:ca\'], essential : true } } }" +
+                            ""});
+#line 596
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table167, "And ");
+#line 607
+ testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 609
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 610
+ testRunner.Then("JSON \'error_description\'=\'no essential acr is supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 611
+ testRunner.Then("JSON \'state\'=\'state\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.0.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable
