@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Jwt.Jws;
 using System.Net.Http;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -47,6 +48,14 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.Equal(code, (int)httpResponseMessage.StatusCode);
+        }
+
+        [Then("token claim '(.*)'='(.*)'")]
+        public void ThenIdentityTokenContainsClaim(string key, string value)
+        {
+            var tokenPayload = _scenarioContext["tokenPayload"] as JwsPayload;
+            Assert.True(tokenPayload.ContainsKey(key));
+            Assert.Equal(WebApiSteps.ParseValue(value, _scenarioContext).ToString(), tokenPayload[key].ToString());
         }
     }
 }

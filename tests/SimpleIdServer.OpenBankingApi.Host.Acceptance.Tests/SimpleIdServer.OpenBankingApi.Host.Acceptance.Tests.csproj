@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Authorization - Copier.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationErrors - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +65,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Authorization.feature.cs">
+      <DependentUpon>Authorization.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Configuration.feature.cs">
       <DependentUpon>Configuration.feature</DependentUpon>
     </Compile>
@@ -117,6 +121,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Authorization.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Configuration.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

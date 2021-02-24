@@ -14,6 +14,11 @@ namespace SimpleIdServer.OpenBankingApi
             public const string AccountAccessContents = ApiVersion + "/account-access-consents";
         }
 
+        public static class OpenBankingApiClaimNames
+        {
+            public const string SHash = "s_hash";
+        }
+
         public const string ApiVersion = "v3.1";
     }
 }

@@ -46,6 +46,34 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             mock.Setup(m => m.GetHttpClient()).Returns(client);
         }
 
+        public static object ParseValue(string val, ScenarioContext scenarioContext)
+        {
+            if (val.StartsWith('$') && val.EndsWith('$'))
+            {
+                val = val.TrimStart('$').TrimEnd('$');
+                return scenarioContext.Get<object>(val);
+            }
+
+            if (val.StartsWith('[') && val.EndsWith(']'))
+            {
+                val = val.TrimStart('[').TrimEnd(']');
+                return JArray.FromObject(val.Split(','));
+            }
+
+            var regularExpression = new Regex(@"\$([a-zA-Z]|_)*\$");
+            var result = regularExpression.Replace(val, (m) =>
+            {
+                if (string.IsNullOrWhiteSpace(m.Value))
+                {
+                    return string.Empty;
+                }
+
+                return scenarioContext.Get<string>(m.Value.TrimStart('$').TrimEnd('$'));
+            });
+
+            return result;
+        }
+
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
         public async Task WhenAddUserConsent(string user, string scope, string clientId)
         {
@@ -270,30 +298,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
 
         private object ParseValue(string val)
         {
-            if (val.StartsWith('$') && val.EndsWith('$'))
-            {
-                val = val.TrimStart('$').TrimEnd('$');
-                return _scenarioContext.Get<object>(val);
-            }
-
-            if (val.StartsWith('[') && val.EndsWith(']'))
-            {
-                val = val.TrimStart('[').TrimEnd(']');
-                return JArray.FromObject(val.Split(','));
-            }
-
-            var regularExpression = new Regex(@"\$([a-zA-Z]|_)*\$");
-            var result = regularExpression.Replace(val, (m) =>
-            {
-                if (string.IsNullOrWhiteSpace(m.Value))
-                {
-                    return string.Empty;
-                }
-
-                return _scenarioContext.Get<string>(m.Value.TrimStart('$').TrimEnd('$'));
-            });
-
-            return result;
+            return ParseValue(val, _scenarioContext);
         }
 
         private static IEnumerable<JsonWebKey> ExtractJsonWebKeys(Table table)

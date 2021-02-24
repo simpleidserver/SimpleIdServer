@@ -3,9 +3,11 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
@@ -76,6 +78,24 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         {
             var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
             _scenarioContext.Set(jObj[parameter].ToString(), key);
+        }
+
+
+        [When("extract payload from JWS '(.*)'")]
+        public void WhenExtractJwsPayloadFromAuthorizationRequest(string name)
+        {
+            var jws = WebApiSteps.ParseValue(name, _scenarioContext).ToString();
+            var jwsGenerator = new JwsGeneratorFactory().BuildJwsGenerator();
+            _scenarioContext.Set(jwsGenerator.ExtractPayload(jws), "tokenPayload");
+            _scenarioContext.Set(jwsGenerator.ExtractHeader(jws), "jwsHeader");
+        }
+
+        [When("extract '(.*)' from callback")]
+        public void WhenExtractTokenFromCallback(string paramName)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var paramValue = HttpUtility.ParseQueryString(httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri).Get(paramName);
+            _scenarioContext.Set(paramValue, paramName);
         }
     }
 }

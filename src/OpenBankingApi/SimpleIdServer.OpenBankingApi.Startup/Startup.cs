@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.Jwt.Jwe.CEKHandlers;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Filters;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenID;
@@ -69,6 +70,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 .AddClients(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey), DefaultConfiguration.Scopes)
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
+                .AddJsonWebKeys(GenerateJsonWebKeys())
                 .AddLoginPasswordAuthentication();
             services.AddOpenBankingApi()
                 .AddAccounts(DefaultConfiguration.Accounts);
@@ -110,6 +112,35 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     KeyOperations.Verify
                 }).SetAlg(rsa, algName).Build();
             }
+        }
+
+        private static List<JsonWebKey> GenerateJsonWebKeys()
+        {
+            JsonWebKey sigJsonWebKey;
+            JsonWebKey encJsonWebKey;
+            using (var rsa = RSA.Create())
+            {
+                sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
+                {
+                    KeyOperations.Sign,
+                    KeyOperations.Verify
+                }).SetAlg(rsa, "PS256").Build();
+            }
+
+            using (var rsa = RSA.Create())
+            {
+                encJsonWebKey = new JsonWebKeyBuilder().NewEnc("2", new[]
+                {
+                    KeyOperations.Encrypt,
+                    KeyOperations.Decrypt
+                }).SetAlg(rsa, RSAOAEPCEKHandler.ALG_NAME).Build();
+            }
+
+            return new List<JsonWebKey>
+            {
+                sigJsonWebKey,
+                encJsonWebKey
+            };
         }
     }
 }

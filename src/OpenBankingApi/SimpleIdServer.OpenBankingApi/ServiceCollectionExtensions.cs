@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NEventStore;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
+using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.Validators;
 using SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders;
@@ -47,7 +48,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAuthorizationRequestValidator, OpenBankingApiAuthorizationRequestValidator>();
 
             services.RemoveAll<IClaimsJwsPayloadEnricher>();
+            services.RemoveAll<ITokenBuilder>();
             services.AddTransient<IClaimsJwsPayloadEnricher, OpenBankingApiClaimsJwsPayloadEnricher>();
+            services.AddTransient<ITokenBuilder, OpenBankingApiIdTokenBuilder>();
+            services.AddTransient<ITokenBuilder, OpenIDAccessTokenBuilder>();
+            services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();
 
             var accounts = new ConcurrentBag<AccountAggregate>();
             var accountAccessConsents = new ConcurrentBag<AccountAccessConsentAggregate>();

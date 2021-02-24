@@ -142,8 +142,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     CreateDateTime = DateTime.UtcNow,
                     TokenExpirationTimeInSeconds = 60 * 30,
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
+                    TokenSignedResponseAlg = "PS256",
+                    IdTokenSignedResponseAlg = "PS256",
                     RequestObjectSigningAlg = "PS256",
                     AllowedScopes = new List<OpenIdScope>
                     {
@@ -190,8 +190,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     CreateDateTime = DateTime.UtcNow,
                     TokenExpirationTimeInSeconds = 60 * 30,
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
+                    TokenSignedResponseAlg = "PS256",
+                    IdTokenSignedResponseAlg = "PS256",
                     AllowedScopes = new List<OpenIdScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,

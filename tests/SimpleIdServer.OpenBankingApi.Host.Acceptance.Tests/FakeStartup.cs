@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
+using SimpleIdServer.Jwt;
+using SimpleIdServer.Jwt.Jwe.CEKHandlers;
 using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OpenBankingApi.AccountAccessContents;
 using SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Middlewares;
@@ -19,6 +21,7 @@ using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Api.UserInfo;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
@@ -84,6 +87,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                     };
             })
                 .AddUsers(DefaultConfiguration.Users)
+                .AddJsonWebKeys(GenerateJsonWebKeys())
                 .AddClients(new List<OpenID.Domains.OpenIdClient>(), DefaultConfiguration.Scopes);
             services.AddOpenBankingApi();
         }
@@ -103,6 +107,35 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                     name: "DefaultRoute",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private static List<JsonWebKey> GenerateJsonWebKeys()
+        {
+            JsonWebKey sigJsonWebKey;
+            JsonWebKey encJsonWebKey;
+            using (var rsa = RSA.Create())
+            {
+                sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
+                {
+                    KeyOperations.Sign,
+                    KeyOperations.Verify
+                }).SetAlg(rsa, "PS256").Build();
+            }
+
+            using (var rsa = RSA.Create())
+            {
+                encJsonWebKey = new JsonWebKeyBuilder().NewEnc("2", new[]
+                {
+                    KeyOperations.Encrypt,
+                    KeyOperations.Decrypt
+                }).SetAlg(rsa, RSAOAEPCEKHandler.ALG_NAME).Build();
+            }
+
+            return new List<JsonWebKey>
+            {
+                sigJsonWebKey,
+                encJsonWebKey
+            };
         }
     }
 

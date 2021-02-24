@@ -3,13 +3,15 @@
 
 Scenario: Create Account Access Content
 	When execute HTTP POST JSON request 'https://localhost:8080/register'
-	| Key                        | Value                   |
-	| token_endpoint_auth_method | tls_client_auth         |
-	| response_types             | [token]                 |
-	| grant_types                | [client_credentials]    |
-	| scope                      | accounts                |
-	| redirect_uris              | [http://localhost:8080] |
-	| tls_client_auth_san_dns    | mtlsClient              |
+	| Key                          | Value                   |
+	| token_endpoint_auth_method   | tls_client_auth         |
+	| response_types               | [token]                 |
+	| grant_types                  | [client_credentials]    |
+	| scope                        | accounts                |
+	| redirect_uris                | [http://localhost:8080] |
+	| tls_client_auth_san_dns      | mtlsClient              |
+	| id_token_signed_response_alg | PS256                   |
+	| token_signed_response_alg    | PS256                   |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
