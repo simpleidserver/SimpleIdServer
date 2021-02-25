@@ -80,14 +80,14 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Check s_hash is returned in id_token")]
+        [Xunit.SkippableFactAttribute(DisplayName="Check s_hash & sub is returned in id_token")]
         [Xunit.TraitAttribute("FeatureTitle", "Authorization")]
-        [Xunit.TraitAttribute("Description", "Check s_hash is returned in id_token")]
-        public virtual void CheckS_HashIsReturnedInId_Token()
+        [Xunit.TraitAttribute("Description", "Check s_hash & sub is returned in id_token")]
+        public virtual void CheckS_HashSubIsReturnedInId_Token()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check s_hash is returned in id_token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check s_hash & sub is returned in id_token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -132,14 +132,20 @@ this.ScenarioInitialize(scenarioInfo);
                 table4.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "PS256"});
+                table4.AddRow(new string[] {
+                            "token_signed_response_alg",
+                            "PS256"});
 #line 5
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table4, "When ");
 #line hidden
-#line 15
+#line 16
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 17
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 18
+ testRunner.And("add authorized Account Access Consent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -168,17 +174,24 @@ this.ScenarioInitialize(scenarioInfo);
                 table5.AddRow(new string[] {
                             "state",
                             "MTkCNSYlem"});
-#line 18
+                table5.AddRow(new string[] {
+                            "claims",
+                            "{ id_token: { openbanking_intent_id : { value: \"$consentId$\", essential: true } }" +
+                                " }"});
+#line 20
  testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table5, "And ");
 #line hidden
-#line 29
+#line 32
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 30
+#line 33
  testRunner.And("extract payload from JWS \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 32
+#line 35
  testRunner.Then("token claim \'s_hash\'=\'SE4Dquo5iR6tdijU71HDQg\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 36
+ testRunner.Then("token claim \'sub\'=\'$consentId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

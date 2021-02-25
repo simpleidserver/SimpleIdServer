@@ -215,6 +215,19 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
+        [When("add authorized Account Access Consent")]
+        public async Task GivenAddAuthorizedAccountAccessConsent()
+        {
+            var accountAccessConsentRepository = _factory.Server.Host.Services.GetService(typeof(IAccountAccessConsentRepository)) as IAccountAccessConsentRepository;
+            var accountAccessConsent = AccountAccessConsentAggregate.Create(new List<string>
+            {
+                AccountAccessConsentPermission.ReadAccountsBasic.Name
+            }, null, null, null, null);
+            accountAccessConsent.Confirm(new List<string> { });
+            await accountAccessConsentRepository.Add(accountAccessConsent, CancellationToken.None);
+            _scenarioContext.Set(accountAccessConsent.AggregateId, "consentId");
+        }
+
         [When("add rejected Account Access Consent")]
         public async Task GivenAddRejectedAccountAccessConsent()
         {

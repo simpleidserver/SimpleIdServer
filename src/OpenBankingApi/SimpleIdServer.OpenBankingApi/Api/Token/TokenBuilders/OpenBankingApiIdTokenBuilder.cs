@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Jws;
@@ -26,6 +27,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
     public class OpenBankingApiIdTokenBuilder : IdTokenBuilder
     {
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly OpenBankingApiOptions _options;
         private Dictionary<IEnumerable<string>, Func<byte[], byte[]>> MAPPING_HASH_CALLBACK = new Dictionary<IEnumerable<string>, Func<byte[], byte[]>>
         {
             { new [] { ECDSAP256SignHandler.ALG_NAME, PS256SignHandler.ALG_NAME, RSA256SignHandler.ALG_NAME }, Hash256 },
@@ -34,6 +36,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
         };
 
         public OpenBankingApiIdTokenBuilder(IJwtBuilder jwtBuilder, 
+            IOptions<OpenBankingApiOptions> options,
             IEnumerable<IClaimsSource> claimsSources, 
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
             IAmrHelper amrHelper, 
@@ -41,6 +44,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher) : base(jwtBuilder, claimsSources, subjectTypeBuilders, amrHelper, oauthUserQueryRepository, claimsJwsPayloadEnricher)
         {
             _jwtBuilder = jwtBuilder;
+            _options = options.Value;
         }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext context, CancellationToken cancellationToken)
@@ -66,6 +70,18 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
                 var hash = MAPPING_HASH_CALLBACK.First(k => k.Key.Contains(openidClient.IdTokenSignedResponseAlg)).Value(ASCIIEncoding.ASCII.GetBytes(state));
                 var half = hash.Take((hash.Length / 2)).ToArray();
                 result.Add(Constants.OpenBankingApiClaimNames.SHash, half.Base64EncodeBytes());
+            }
+
+            if (result.ContainsKey(_options.OpenBankingApiConsentClaimName))
+            {
+                if (result.ContainsKey(Jwt.Constants.UserClaims.Subject))
+                {
+                    result[Jwt.Constants.UserClaims.Subject] = result[_options.OpenBankingApiConsentClaimName];
+                }
+                else
+                {
+                    result.Add(Jwt.Constants.UserClaims.Subject, result[_options.OpenBankingApiConsentClaimName]);
+                }
             }
 
             return result;

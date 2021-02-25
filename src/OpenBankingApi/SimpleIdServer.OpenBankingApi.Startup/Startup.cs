@@ -56,6 +56,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 opt.IsLocalhostAllowed = true;
                 opt.IsRedirectionUrlHTTPSRequired = false;
                 opt.IsInitiateLoginUriHTTPSRequired = true;
+                opt.DefaultAcrValue = "urn:openbanking:psd2:ca";
             }, opt =>
             {
                 opt.MtlsEnabled = true;
