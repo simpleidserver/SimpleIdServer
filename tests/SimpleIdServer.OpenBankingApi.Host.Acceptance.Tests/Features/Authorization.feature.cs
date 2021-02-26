@@ -108,35 +108,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "token_endpoint_auth_method",
                             "tls_client_auth"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "response_types",
                             "[token,code,id_token]"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "grant_types",
                             "[client_credentials]"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "scope",
                             "accounts"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "redirect_uris",
                             "[https://localhost:8080/callback]"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "mtlsClient"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "PS256"});
-                table4.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "token_signed_response_alg",
                             "PS256"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table4, "When ");
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table16, "When ");
 #line hidden
 #line 16
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -147,39 +147,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 18
  testRunner.And("add authorized Account Access Consent", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "response_type",
                             "id_token"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "client_id",
                             "$client_id$"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "state",
                             "state"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "scope",
                             "accounts"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "redirect_uri",
                             "https://localhost:8080/callback"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "state",
                             "MTkCNSYlem"});
-                table5.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "claims",
                             "{ id_token: { openbanking_intent_id : { value: \"$consentId$\", essential: true } }" +
                                 " }"});
 #line 20
- testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table5, "And ");
+ testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table17, "And ");
 #line hidden
 #line 32
  testRunner.And("extract \'id_token\' from callback", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="localhost.pfx" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.76" />

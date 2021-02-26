@@ -12,7 +12,6 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static SimpleIdServer.Jwt.Constants;
@@ -21,7 +20,14 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
     public class OpenIDAccessTokenBuilder : AccessTokenBuilder
     {
-        public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IOptions<OAuthHostOptions> options) : base(grantedTokenHelper, jwtBuilder, options) { }
+        private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
+
+        public OpenIDAccessTokenBuilder(IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
+            IGrantedTokenHelper grantedTokenHelper, 
+            IJwtBuilder jwtBuilder, 
+            IOptions<OAuthHostOptions> options) : base(grantedTokenHelper, jwtBuilder, options) {
+            _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
+        }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
@@ -50,39 +56,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 }
             }
 
-            if (claimParameters != null)
-            {
-                var jObj = new JObject();
-                var filtered = claimParameters.Where(cl => cl.Type == AuthorizationRequestClaimTypes.UserInfo);
-                foreach (var record in filtered)
-                {
-                    var value = new JObject();
-                    if (record.IsEssential)
-                    {
-                        value.Add(ClaimsParameter.Essential, true);
-                    }
-
-                    if (record.Values != null && record.Values.Any())
-                    {
-                        if (record.Values.Count() == 1)
-                        {
-                            value.Add(ClaimsParameter.Value, record.Values.First());
-                        }
-                        else
-                        {
-                            value.Add(ClaimsParameter.Values, new JArray(record.Values));
-                        }
-                    }
-
-                    jObj.Add(record.Name, value);
-                }
-
-                if (filtered.Any())
-                {
-                    jwsPayload.Add(AuthorizationRequestParameters.Claims, jObj);
-                }
-            }
-
+            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(jwsPayload, claimParameters);
             return jwsPayload;
         }
     }

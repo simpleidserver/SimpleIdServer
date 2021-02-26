@@ -162,7 +162,6 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     {
                         "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback"
                     },
-                    PreferredTokenProfile = "Bearer",
                     TokenEndPointAuthMethod = "tls_client_auth",
                     ResponseTypes = new List<string>
                     {
@@ -176,7 +175,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     {
                         firstMtlsClientJsonWebKey
                     },
-                    TlsClientAuthSubjectDN = "mtlsClient"
+                    TlsClientAuthSubjectDN = "firstMtlsClient",
+                    PreferredTokenProfile = "Bearer"
                 },
                 new OpenIdClient
                 {
@@ -192,6 +192,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "PS256",
                     IdTokenSignedResponseAlg = "PS256",
+                    RequestObjectSigningAlg = "PS256",
                     AllowedScopes = new List<OpenIdScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
@@ -205,7 +206,6 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                             Name = "accounts"
                         }
                     },
-                    PreferredTokenProfile = "Bearer",
                     TokenEndPointAuthMethod = "tls_client_auth",
                     ResponseTypes = new List<string>
                     {
@@ -215,11 +215,16 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     {
                         "authorization_code", "implicit", "client_credentials"
                     },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum"
+                    },
                     JsonWebKeys = new List<JsonWebKey>
                     {
                         secondMtlsClientJsonWebKey
                     },
-                    TlsClientAuthSubjectDN = "mtlsClient"
+                    TlsClientAuthSubjectDN = "secondMtlsClient",
+                    PreferredTokenProfile = "Bearer"
                 }
             };
         }

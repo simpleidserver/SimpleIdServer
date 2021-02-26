@@ -20,13 +20,13 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
         protected List<string> AllUserClaims { get; private set; }
 
-        public virtual void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user, DateTime? authDateTime, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public virtual void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
         {
             if (requestedClaims != null)
             {
                 foreach (var claim in requestedClaims.Where(c => c.Type == claimType))
                 {
-                    if (AllUserClaims.Contains(claim.Name))
+                    if (AllUserClaims.Contains(claim.Name) && user != null)
                     {
                         payload.AddOrReplace(user.Claims.First(c => c.Type == claim.Name));
                     }

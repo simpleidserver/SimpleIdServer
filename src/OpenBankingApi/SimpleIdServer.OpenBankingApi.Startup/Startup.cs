@@ -14,6 +14,7 @@ using SimpleIdServer.Jwt.Jwe.CEKHandlers;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Filters;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenID;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
@@ -25,6 +26,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            var jsonWebKeys = GenerateJsonWebKeys();
             var firstMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("first_mtlsClient_key.txt", "PS256");
             var secondMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("second_mtlsClient_key.txt", "PS256");
             services.AddMvc(option =>
@@ -142,6 +144,13 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 sigJsonWebKey,
                 encJsonWebKey
             };
+        }
+
+        private static void ExtractCertificate(string path, string pass)
+        {
+            var certificate = new X509Certificate2(path, pass, X509KeyStorageFlags.Exportable);
+            var publicKey = Convert.ToBase64String(certificate.GetRawCertData());
+            var privtateKey = Convert.ToBase64String((certificate.GetRSAPrivateKey() as RSACng).ExportRSAPrivateKey());
         }
     }
 }

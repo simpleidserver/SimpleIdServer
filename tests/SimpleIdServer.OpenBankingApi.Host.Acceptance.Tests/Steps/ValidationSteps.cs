@@ -27,6 +27,15 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             Assert.NotNull(token);
         }
 
+
+        [Then("JSON doesn't exist '(.*)'")]
+        public void ThenDoesntExist(string key)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var token = jsonHttpBody.SelectToken(key);
+            Assert.Null(token);
+        }
+
         [Then("JSON '(.*)'='(.*)'")]
         public void ThenEqualsTo(string key, string value)
         {

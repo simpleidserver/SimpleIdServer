@@ -9,5 +9,6 @@ namespace SimpleIdServer.OpenBankingApi.Persistences
     {
         Task<IEnumerable<AccountAggregate>> GetBySubject(string subject, CancellationToken cancellationToken);
         Task<AccountAggregate> Get(string id, CancellationToken cancellationToken);
+        Task<IEnumerable<AccountAggregate>> Get(IEnumerable<string> ids, CancellationToken cancellationToken);
     }
 }

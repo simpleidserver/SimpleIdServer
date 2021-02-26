@@ -20,7 +20,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
             _options = options.Value;
         }
 
-        public override void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user, DateTime? authDateTime, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public override void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
         {
             base.EnrichWithClaimsParameter(payload, requestedClaims, user, authDateTime, claimType);
             if (requestedClaims != null)

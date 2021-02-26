@@ -3,15 +3,15 @@ using SimpleIdServer.OpenBankingApi.Accounts.Results;
 
 namespace SimpleIdServer.OpenBankingApi.Accounts.Queries
 {
-    public class GetAccountQuery : IRequest<GetAccountsResult>
+    public class GetAccountsQuery : IRequest<GetAccountsResult>
     {
-        public GetAccountQuery(string accountId, string issuer)
+        public GetAccountsQuery(string accessToken, string issuer)
         {
-            AccountId = accountId;
+            AccessToken = accessToken;
             Issuer = issuer;
         }
 
-        public string AccountId { get; set; }
+        public string AccessToken { get; set; }
         public string Issuer { get; set; }
     }
 }

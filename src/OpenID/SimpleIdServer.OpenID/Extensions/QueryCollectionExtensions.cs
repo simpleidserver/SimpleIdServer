@@ -20,13 +20,13 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             redirectUrl = WebUtility.UrlDecode(redirectUrl);
-            var splitted = redirectUrl.Split('?');
-            if (splitted.Count() != 2)
+            var uri = new Uri(redirectUrl);
+            if (string.IsNullOrWhiteSpace(uri.Query))
             {
                 return null;
             }
 
-            return QueryHelpers.ParseQuery(splitted.Last());
+            return QueryHelpers.ParseQuery(uri.Query);
         }
 
         public static JObject ToJObj(this Dictionary<string, StringValues> queries)

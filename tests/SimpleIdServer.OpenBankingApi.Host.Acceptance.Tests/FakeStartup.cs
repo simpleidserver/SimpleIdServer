@@ -89,7 +89,8 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(GenerateJsonWebKeys())
                 .AddClients(new List<OpenID.Domains.OpenIdClient>(), DefaultConfiguration.Scopes);
-            services.AddOpenBankingApi();
+            services.AddOpenBankingApi()
+                .AddAccounts(DefaultConfiguration.Accounts);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

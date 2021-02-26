@@ -7,6 +7,7 @@
             TakeSnapshotEveryNbRevisions = 5;
             WaitInterval = 1000;
             CertificateAuthenticationScheme = "Certificate";
+            JwtBearerAuthenticationScheme = "Bearer";
             AccountsScope = "accounts";
             OpenBankingApiConsentClaimName = "openbanking_intent_id";
         }
@@ -14,6 +15,7 @@
         public int TakeSnapshotEveryNbRevisions { get; set; }
         public int WaitInterval { get; set; }
         public string CertificateAuthenticationScheme { get; set; }
+        public string JwtBearerAuthenticationScheme { get; set; }
         /// <summary>
         /// Scope used to access to the accounts.
         /// </summary>

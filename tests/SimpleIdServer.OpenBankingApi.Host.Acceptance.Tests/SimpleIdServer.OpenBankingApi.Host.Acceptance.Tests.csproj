@@ -48,16 +48,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="3.0.0" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Certificates\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\certificates\mtlsClient.crt" Link="Certificates\mtlsClient.crt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenBankingApi\SimpleIdServer.OpenBankingApi\SimpleIdServer.OpenBankingApi.csproj" />
@@ -65,6 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Accounts.feature.cs">
+      <DependentUpon>Accounts.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Authorization.feature.cs">
       <DependentUpon>Authorization.feature</DependentUpon>
     </Compile>
@@ -121,6 +114,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Accounts.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Authorization.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
@@ -169,5 +167,15 @@
     <SpecFlowFeatureFiles Update="Features\AuthorizationErrors.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
     </SpecFlowFeatureFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Certificates\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\certificates\mtlsClient.crt" Link="Certificates\mtlsClient.crt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

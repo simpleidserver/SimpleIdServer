@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -91,6 +90,7 @@ namespace SimpleIdServer.OpenBankingApi.Infrastructure.Authorizations
             {
                 _logger.LogError($"MTLS authentication failed : {x509AuthResult.Failure?.Message}");
                 await context.ForbidAsync(_options.CertificateAuthenticationScheme);
+                return x509AuthResult;
             }
 
             return x509AuthResult;

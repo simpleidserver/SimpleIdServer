@@ -241,6 +241,30 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(accountAccessConsent.AggregateId, "consentId");
         }
 
+        [When("'(.*)' confirm consent '(.*)' for accounts '(.*)', with scopes '(.*)'")]
+        public async Task GivenConfirmConsent(string login, string consentId, string accountId, string scopes)
+        {
+            consentId = ParseValue(consentId).ToString();
+            var accountAccessConsentRepository = _factory.Server.Host.Services.GetService(typeof(IAccountAccessConsentRepository)) as IAccountAccessConsentRepository;
+            var oauthUserQueryRepository = _factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository)) as IOAuthUserQueryRepository;
+            var oauthUserCommandRepository = _factory.Server.Host.Services.GetService(typeof(IOAuthUserCommandRepository)) as IOAuthUserCommandRepository;
+            var oauthUser = await oauthUserQueryRepository.FindOAuthUserByLogin(login, CancellationToken.None);
+            oauthUser.Consents.Add(new OAuthConsent
+            {
+                Scopes = new List<OAuthScope>
+                {
+                    new OAuthScope
+                    {
+                        Name = "accounts"
+                    }
+                }
+            });
+            await oauthUserCommandRepository.Update(oauthUser, CancellationToken.None);
+            var consent = await accountAccessConsentRepository.Get(consentId, CancellationToken.None);
+            consent.Confirm(accountId.Split(','));
+            await accountAccessConsentRepository.Update(consent, CancellationToken.None);
+        }
+
         private string ExtractUrl(string url, Table table)
         {
             url = ParseValue(url).ToString();

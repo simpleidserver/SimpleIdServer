@@ -1,15 +1,17 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.OpenBankingApi.Accounts.Results;
+using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
 using SimpleIdServer.OpenBankingApi.Exceptions;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenBankingApi.Resources;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
 {
-    public class GetAccountQueryHandler : IRequestHandler<GetAccountQuery, AccountResult>
+    public class GetAccountQueryHandler : IRequestHandler<GetAccountQuery, GetAccountsResult>
     {
         private readonly IAccountRepository _accountQueryRepository;
         private readonly ILogger<GetAccountQueryHandler> _logger;
@@ -22,7 +24,7 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
             _logger = logger;
         }
 
-        public async Task<AccountResult> Handle(GetAccountQuery request, CancellationToken cancellationToken)
+        public async Task<GetAccountsResult> Handle(GetAccountQuery request, CancellationToken cancellationToken)
         {
             var account = await _accountQueryRepository.Get(request.AccountId, cancellationToken);
             if (account == null)
@@ -31,7 +33,8 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
                 throw new UnknownAccountException(string.Format(string.Format(Global.UnknownAccount, request.AccountId)));
             }
 
-            return AccountResult.ToResult(account);
+            var url = $"{request.Issuer}/{Constants.RouteNames.AccountAccessContents}/{request.AccountId}";
+            return GetAccountsResult.ToResult(new[] { account }, new List<AccountAccessConsentPermission>(), url, 1);
         }
     }
 }

@@ -105,6 +105,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 await responseTypeHandler.Enrich(context, cancellationToken);
             }
 
+
             _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }

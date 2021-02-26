@@ -12,6 +12,7 @@ namespace SimpleIdServer.OpenBankingApi
         public static class RouteNames
         {
             public const string AccountAccessContents = ApiVersion + "/account-access-consents";
+            public const string Accounts = ApiVersion + "/accounts";
         }
 
         public static class OpenBankingApiClaimNames

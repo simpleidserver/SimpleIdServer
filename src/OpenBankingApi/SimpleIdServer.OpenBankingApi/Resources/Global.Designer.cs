@@ -97,6 +97,15 @@ namespace SimpleIdServer.OpenBankingApi.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à no permissions to read accounts.
+        /// </summary>
+        public static string NoPermissionToReadAccounts {
+            get {
+                return ResourceManager.GetString("NoPermissionToReadAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à account &apos;{0}&apos; doesn&apos;t exist.
         /// </summary>
         public static string UnknownAccount {

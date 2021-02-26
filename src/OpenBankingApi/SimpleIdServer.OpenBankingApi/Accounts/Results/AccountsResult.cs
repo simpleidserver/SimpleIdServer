@@ -1,11 +1,17 @@
 ﻿using SimpleIdServer.OpenBankingApi.Domains.Account;
+using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleIdServer.OpenBankingApi.Accounts.Results
 {
-    public class AccountResult
+    public class AccountsResult
+    {
+        public IEnumerable<AccountRecordResult> Account { get; set; }
+    }
+    
+    public class AccountRecordResult
     {
         public string AccountId { get; set; }
         public DateTime? StatusUpdateDateTime { get; set; }
@@ -20,23 +26,29 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Results
         public ICollection<CashAccountResult> Accounts { get; set; }
         public ServicerResult Servicer { get; set; }
 
-        public static AccountResult ToResult(AccountAggregate account)
+        public static AccountRecordResult ToResult(AccountAggregate account, IEnumerable<AccountAccessConsentPermission> permissions)
         {
-            return new AccountResult
+            var result = new AccountRecordResult
             {
                 AccountId = account.AggregateId,
-                AccountSubType = account.AccountSubType.Name,
-                AccountType = account.AccountType.Name,
+                AccountSubType = account.AccountSubType?.Name,
+                AccountType = account.AccountType?.Name,
                 Currency = account.Currency,
                 Description = account.Description,
                 MaturityDate = account.MaturityDate,
                 Nickname = account.Nickname,
                 OpeningDate = account.OpeningDate,
-                Servicer = account.Servicer == null ? null : ServicerResult.ToResult(account.Servicer),
                 StatusUpdateDateTime = account.StatusUpdateDateTime,
-                SwitchStatus = account.SwitchStatus.Name,
-                Accounts = account.Accounts.Select(a => CashAccountResult.ToResult(a)).ToList()
+                SwitchStatus = account.SwitchStatus?.Name
             };
+
+            if (permissions.Contains(AccountAccessConsentPermission.ReadAccountsDetail))
+            {
+                result.Servicer = account.Servicer == null ? null : ServicerResult.ToResult(account.Servicer);
+                result.Accounts = account.Accounts.Select(a => CashAccountResult.ToResult(a)).ToList();
+            }
+
+            return result;
         }
     }
 
@@ -53,7 +65,7 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Results
             {
                 Identification = cashAccount.Identification,
                 Name = cashAccount.Name,
-                SchemeName = cashAccount.SchemeName.Name,
+                SchemeName = cashAccount.SchemeName?.Name,
                 SecondaryIdentification = cashAccount.SecondaryIdentification
             };
         }
@@ -69,7 +81,7 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Results
             return new ServicerResult
             {
                 Identification = servicer.Identification,
-                SchemeName = servicer.SchemeName.Name
+                SchemeName = servicer.SchemeName?.Name
             };
         }
     }

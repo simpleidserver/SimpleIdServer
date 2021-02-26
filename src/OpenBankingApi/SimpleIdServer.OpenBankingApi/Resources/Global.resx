@@ -129,6 +129,9 @@
   <data name="ConsentScreenCannotBeDisplayed" xml:space="preserve">
     <value>consent screen cannot be displayed for the scopes '{0}'</value>
   </data>
+  <data name="NoPermissionToReadAccounts" xml:space="preserve">
+    <value>no permissions to read accounts</value>
+  </data>
   <data name="UnknownAccount" xml:space="preserve">
     <value>account '{0}' doesn't exist</value>
   </data>

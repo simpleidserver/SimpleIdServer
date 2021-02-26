@@ -77,7 +77,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         public void GivenExtractParameterFromBody(string parameter, string key)
         {
             var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
-            _scenarioContext.Set(jObj[parameter].ToString(), key);
+            _scenarioContext.Set(jObj.SelectToken(parameter).ToString(), key);
         }
 
 

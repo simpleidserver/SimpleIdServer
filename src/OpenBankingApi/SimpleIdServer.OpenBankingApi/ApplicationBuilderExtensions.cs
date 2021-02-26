@@ -8,6 +8,7 @@ namespace SimpleIdServer.OpenBankingApi
         public static IApplicationBuilder UseOpenBankingAPI(this IApplicationBuilder app)
         {
             app.UseMiddleware<FAPICorrelationMiddleware>();
+            app.UseMiddleware<RedirectHttpStatusMiddleware>();
             return app;
         }
     }

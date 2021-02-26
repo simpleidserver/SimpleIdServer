@@ -10,6 +10,6 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
     public interface IClaimsJwsPayloadEnricher
     {
-        void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user, DateTime? authDateTime, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken);
+        void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user= null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken);
     }
 }
