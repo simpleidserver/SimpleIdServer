@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
-    public class SCIMRepresentation : ICloneable
+    public class SCIMRepresentation : ICloneable, IEquatable<SCIMRepresentation>
     {
         public SCIMRepresentation()
         {
@@ -103,6 +103,18 @@ namespace SimpleIdServer.Scim.Domain
                 Attributes = Attributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList(),
                 Schemas = Schemas.Select(a => (SCIMSchema)a.Clone()).ToList()
             };
+        }
+
+        public bool Equals(SCIMRepresentation other)
+        {
+            if (Object.ReferenceEquals(other, null)) return false;
+            if (Object.ReferenceEquals(this, other)) return true;
+            return Id.Equals(other.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.Uma.DTOs;
 using System.Collections.Generic;
@@ -14,7 +16,15 @@ namespace SimpleIdServer.Uma.Api.Configuration
 {
     public class UMAConfigurationRequestHandler : ConfigurationRequestHandler
     {
-        public UMAConfigurationRequestHandler(IOAuthScopeQueryRepository oauthScopeRepository, IEnumerable<IResponseTypeHandler> authorizationGrantTypeHandlers, IEnumerable<IOAuthResponseMode> oauthResponseModes, IEnumerable<IGrantTypeHandler> grantTypeHandlers, IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers, IEnumerable<ISignHandler> signHandlers) : base(oauthScopeRepository, authorizationGrantTypeHandlers, oauthResponseModes, grantTypeHandlers, oauthClientAuthenticationHandlers, signHandlers)
+        public UMAConfigurationRequestHandler(
+            IOAuthScopeQueryRepository oauthScopeRepository, 
+            IEnumerable<IResponseTypeHandler> authorizationGrantTypeHandlers, 
+            IEnumerable<IOAuthResponseMode> oauthResponseModes, 
+            IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
+            IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers,
+            IEnumerable<ISignHandler> signHandlers,
+            IOptions<OAuthHostOptions> options) 
+            : base(oauthScopeRepository, authorizationGrantTypeHandlers, oauthResponseModes, grantTypeHandlers, oauthClientAuthenticationHandlers, signHandlers, options)
         {
         }
 

@@ -3,8 +3,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -21,11 +19,12 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 {
     public class FakeStartup
     {
-        public FakeStartup(IConfiguration configuration) { }
+        public FakeStartup() { }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(o => o.EnableEndpointRouting = false)
+                .AddNewtonsoftJson();
             services.AddSIDOpenID()
                 .AddClients(new List<OpenIdClient>(), DefaultConfiguration.Scopes)
                 .AddUsers(DefaultConfiguration.Users)
@@ -44,7 +43,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
             ConfigureClient(services);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseMvc(routes =>

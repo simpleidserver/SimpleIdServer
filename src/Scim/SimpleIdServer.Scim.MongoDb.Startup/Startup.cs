@@ -29,13 +29,13 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
         public const string MAPPINGS = "mappings";
         public const bool SUPPORT_TRANSACTION = false;
 
-        public Startup(IHostingEnvironment env, IConfiguration configuration) 
+        public Startup(IWebHostEnvironment env, IConfiguration configuration) 
         {
             Env = env;
             Configuration = configuration;
         }
 
-        public IHostingEnvironment Env { get; }
+        public IWebHostEnvironment Env { get; }
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -50,8 +50,9 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             services.AddMvc(o =>
             {
+                o.EnableEndpointRouting = false;
                 o.AddSCIMValueProviders();
-            });
+            }).AddNewtonsoftJson(o => { });
             services.AddLogging();
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
@@ -110,9 +111,8 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            loggerFactory.AddConsole(LogLevel.Trace);
             app.UseAuthentication();
             app.UseMvc();
         }

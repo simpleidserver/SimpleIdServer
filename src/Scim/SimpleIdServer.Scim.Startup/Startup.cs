@@ -21,12 +21,12 @@ namespace SimpleIdServer.Scim.Startup
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
-        {
-            Env = env;
-        }
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        private IHostingEnvironment Env { get; }
+        public Startup(IWebHostEnvironment  webHostEnvironment)
+        {
+            _webHostEnvironment = webHostEnvironment;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -40,10 +40,12 @@ namespace SimpleIdServer.Scim.Startup
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             services.AddMvc(o =>
             {
+                o.EnableEndpointRouting = false;
                 o.AddSCIMValueProviders();
-            });
+            }).AddNewtonsoftJson(o => { });
             services.AddLogging(opt =>
             {
+                opt.AddConsole();
                 opt.AddFilter((s, l) =>
                 {
                     return s.StartsWith("SimpleIdServer.Scim");
@@ -64,7 +66,7 @@ namespace SimpleIdServer.Scim.Startup
                         IssuerSigningKey = oauthRsaSecurityKey
                     };
                 });
-            var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
+            var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
             var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
             var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
             var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
@@ -116,15 +118,16 @@ namespace SimpleIdServer.Scim.Startup
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SCIM API V1");
             });
-            loggerFactory.AddConsole(LogLevel.Information);
             app.UseAuthentication();
+            app.UseRouting();
+            app.UseAuthorization();
             app.UseMvc();
         }
     }

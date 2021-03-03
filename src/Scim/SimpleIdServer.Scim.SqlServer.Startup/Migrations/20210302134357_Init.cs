@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,11 +11,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMAttributeMappingLst",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    SourceResourceType = table.Column<string>(nullable: true),
-                    SourceAttributeSelector = table.Column<string>(nullable: true),
-                    TargetResourceType = table.Column<string>(nullable: true),
-                    TargetAttributeId = table.Column<string>(nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SourceResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SourceAttributeSelector = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetAttributeId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,12 +26,12 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMRepresentationLst",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    ExternalId = table.Column<string>(nullable: true),
-                    ResourceType = table.Column<string>(nullable: true),
-                    Version = table.Column<string>(nullable: true),
-                    Created = table.Column<DateTime>(nullable: false),
-                    LastModified = table.Column<DateTime>(nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Version = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,11 +42,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMSchemaLst",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    IsRootSchema = table.Column<bool>(nullable: false),
-                    ResourceType = table.Column<string>(nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsRootSchema = table.Column<bool>(type: "bit", nullable: false),
+                    ResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -57,8 +57,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMRepresentationSchemaLst",
                 columns: table => new
                 {
-                    SCIMSchemaId = table.Column<string>(nullable: false),
-                    SCIMRepresentationId = table.Column<string>(nullable: false)
+                    SCIMSchemaId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SCIMRepresentationId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,22 +81,22 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMSchemaAttributeModel",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    ParentId = table.Column<string>(nullable: true),
-                    SchemaId = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    Type = table.Column<int>(nullable: false),
-                    MultiValued = table.Column<bool>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
-                    Required = table.Column<bool>(nullable: false),
-                    CanonicalValues = table.Column<string>(nullable: true),
-                    CaseExact = table.Column<bool>(nullable: false),
-                    Mutability = table.Column<int>(nullable: false),
-                    Returned = table.Column<int>(nullable: false),
-                    Uniqueness = table.Column<int>(nullable: false),
-                    ReferenceTypes = table.Column<string>(nullable: true),
-                    DefaultValueString = table.Column<string>(nullable: true),
-                    DefaultValueInt = table.Column<string>(nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ParentId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SchemaId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    MultiValued = table.Column<bool>(type: "bit", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Required = table.Column<bool>(type: "bit", nullable: false),
+                    CanonicalValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CaseExact = table.Column<bool>(type: "bit", nullable: false),
+                    Mutability = table.Column<int>(type: "int", nullable: false),
+                    Returned = table.Column<int>(type: "int", nullable: false),
+                    Uniqueness = table.Column<int>(type: "int", nullable: false),
+                    ReferenceTypes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DefaultValueString = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DefaultValueInt = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -119,10 +119,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMSchemaExtensionModel",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    Schema = table.Column<string>(nullable: true),
-                    Required = table.Column<bool>(nullable: false),
-                    SCIMSchemaModelId = table.Column<string>(nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Schema = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Required = table.Column<bool>(type: "bit", nullable: false),
+                    SCIMSchemaModelId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -139,10 +139,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMRepresentationAttributeLst",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    ParentId = table.Column<string>(nullable: true),
-                    SchemaAttributeId = table.Column<string>(nullable: true),
-                    RepresentationId = table.Column<string>(nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ParentId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SchemaAttributeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RepresentationId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -171,13 +171,15 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 name: "SCIMRepresentationAttributeValueLst",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    ValueString = table.Column<string>(nullable: true),
-                    ValueInteger = table.Column<int>(nullable: true),
-                    ValueBoolean = table.Column<bool>(nullable: true),
-                    ValueDateTime = table.Column<DateTime>(nullable: true),
-                    ValueReference = table.Column<string>(nullable: true),
-                    SCIMRepresentationAttributeId = table.Column<string>(nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ValueString = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ValueInteger = table.Column<int>(type: "int", nullable: true),
+                    ValueBoolean = table.Column<bool>(type: "bit", nullable: true),
+                    ValueDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ValueDecimal = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    ValueByte = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ValueReference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SCIMRepresentationAttributeId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {

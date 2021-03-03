@@ -284,8 +284,8 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public void WhenExtractRedirectUrlParameter(string parameter)
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            var queryValue = httpResponseMessage.RequestMessage.RequestUri.ParseQueryString()[parameter];
-            _scenarioContext.Set(queryValue, parameter);
+            var queryValue = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query)[parameter];
+            _scenarioContext.Set(queryValue.First(), parameter);
         }
 
         [When("extract JSON from body")]
@@ -300,11 +300,11 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public void WhenExtractQueryParametersIntoJSON()
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            var queryValues = httpResponseMessage.RequestMessage.RequestUri.ParseQueryString();
+            var queryValues = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
             var jObj = new JObject();
-            foreach(var key in queryValues.AllKeys)
+            foreach(var kvp in queryValues)
             {
-                jObj.Add(key, queryValues[key]);
+                jObj.Add(kvp.Key, kvp.Value.First());
             }
 
             _scenarioContext.Set(jObj, "jsonHttpBody");

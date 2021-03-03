@@ -22,9 +22,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {
-            var record = await IncludeRepresentationNavigationProperties(IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
+            var record = await IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => v.ValueString != null && v.ValueString == value))
-                .Select(a => a.Representation))
+                .Select(a => a.Representation)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             if (record == null)
@@ -39,9 +39,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
-            var record = await IncludeRepresentationNavigationProperties(IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
+            var record = await IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => v.ValueInteger != null && v.ValueInteger.Value == value))
-                .Select(a => a.Representation))
+                .Select(a => a.Representation)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(); 
             if (record == null)
@@ -56,13 +56,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string schemaAttributeId, IEnumerable<string> values, string endpoint = null)
         {
-            var records = await IncludeRepresentationNavigationProperties(IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
+            var records = await IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => values.Contains(v.ValueString)))
-                .Select(a => a.Representation))
-                .Distinct()
+                .Select(a => a.Representation)
                 .AsNoTracking()
                 .ToListAsync();
-            return records.Select(r => r.ToDomain());
+            return records.Distinct().Select(r => r.ToDomain());
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
@@ -114,7 +113,14 @@ namespace SimpleIdServer.Scim.Persistence.EF
         private static IQueryable<SCIMRepresentationAttributeModel> IncludeRepresentationAttributeNavigationProperties(IQueryable<SCIMRepresentationAttributeModel> attributes)
         {
             return attributes.Include(a => a.Values)
-                .Include(a => a.Representation);
+                .Include(a => a.Representation).ThenInclude(s => s.Attributes).ThenInclude(s => s.SchemaAttribute)
+                .Include(a => a.Representation).ThenInclude(s => s.Attributes).ThenInclude(s => s.Values)
+                .Include(a => a.Representation).ThenInclude(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(a => a.Representation).ThenInclude(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(a => a.Representation).ThenInclude(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.SchemaAttribute)
+                .Include(a => a.Representation).ThenInclude(s => s.Attributes).ThenInclude(s => s.Children).ThenInclude(s => s.Children).ThenInclude(s => s.Values)
+                .Include(a => a.Representation).ThenInclude(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.Attributes)
+                .Include(a => a.Representation).ThenInclude(s => s.Schemas).ThenInclude(s => s.Schema).ThenInclude(s => s.SchemaExtensions);
         }
 
         private static IQueryable<SCIMRepresentationModel> IncludeRepresentationNavigationProperties(IQueryable<SCIMRepresentationModel> representations)

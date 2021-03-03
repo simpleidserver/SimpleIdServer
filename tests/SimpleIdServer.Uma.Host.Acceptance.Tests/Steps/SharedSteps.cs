@@ -67,7 +67,7 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
                 httpRequestMessage.Headers.Add("Authorization", authHeader);
             }
 
-            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
@@ -251,7 +251,8 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
             }
 
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var jws = jwtBuilder.Sign(jwsPayload, JwksStore.GetInstance().GetJsonWebKey());
+            var jwk = JwksStore.GetInstance().GetJsonWebKey();
+            var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
             _scenarioContext.Set(jws, "claim_token");
         }
 

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System.IO;
 
 namespace SimpleIdServer.Gateway.Host
@@ -10,17 +11,19 @@ namespace SimpleIdServer.Gateway.Host
     {
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureAppConfiguration((hostingContext, config) =>
+            var host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults((cfg) =>
                 {
-                    config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
-                        .AddEnvironmentVariables(prefix: "ASPNETCORE_")
-                        .AddJsonFile($"ocelot.{hostingContext.HostingEnvironment.EnvironmentName}.json");
+                    cfg.UseStartup<Startup>();
+                    cfg.UseUrls("http://*:5001");
+                    cfg.UseContentRoot(Directory.GetCurrentDirectory());
+                    cfg.ConfigureAppConfiguration((hostingContext, config) =>
+                    {
+                        config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
+                            .AddEnvironmentVariables(prefix: "ASPNETCORE_")
+                            .AddJsonFile($"ocelot.{hostingContext.HostingEnvironment.EnvironmentName}.json");
+                    });
                 })
-                .UseUrls("http://*:5001")
-                .UseStartup<Startup>()
                 .Build();
             host.Run();
         }

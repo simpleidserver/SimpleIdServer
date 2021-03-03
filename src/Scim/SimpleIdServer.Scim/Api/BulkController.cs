@@ -29,7 +29,9 @@ namespace SimpleIdServer.Scim.Api
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
 
-        public BulkController(IOptionsMonitor<SCIMHostOptions> options, ILogger<BulkController> logger)
+        public BulkController(
+            IOptionsMonitor<SCIMHostOptions> options, 
+            ILogger<BulkController> logger)
         {
             _options = options.CurrentValue;
             _logger = logger;

@@ -47,7 +47,12 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.IdToken;
 
-        public virtual async Task Build(IEnumerable<string> scopes, HandlerContext context, CancellationToken cancellationToken)
+        public virtual Task Build(IEnumerable<string> scopes, HandlerContext context, CancellationToken cancellationToken)
+        {
+            return Build(scopes, new JObject(), context, cancellationToken);
+        }
+
+        public async Task Build(IEnumerable<string> scopes, JObject claims, HandlerContext context, CancellationToken cancellationToken)
         {
             if (!scopes.Contains(SIDOpenIdConstants.StandardScopes.OpenIdScope.Name) || context.User == null)
             {

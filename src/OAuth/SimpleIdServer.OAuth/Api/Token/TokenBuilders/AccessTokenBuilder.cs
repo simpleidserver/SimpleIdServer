@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
 using SimpleIdServer.OAuth.DTOs;
@@ -11,7 +10,6 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
-using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
@@ -34,9 +32,19 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.AccessToken;
 
-        public async virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
+        {
+            return Build(scopes, new JObject(), handlerContext, cancellationToken);
+        }
+        
+        public async virtual Task Build(IEnumerable<string> scopes, JObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var jwsPayload = BuildPayload(scopes, handlerContext);
+            foreach(var record in jObj)
+            {
+                jwsPayload.Add(record.Key, record.Value);
+            }
+
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 

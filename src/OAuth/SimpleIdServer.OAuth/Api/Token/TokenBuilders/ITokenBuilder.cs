@@ -18,6 +18,15 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         /// <returns></returns>
         Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken);
         /// <summary>
+        /// Build new token.
+        /// </summary>
+        /// <param name="scopes"></param>
+        /// <param name="claims"></param>
+        /// <param name="handlerContext"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task Build(IEnumerable<string> scopes, JObject claims, HandlerContext handlerContext, CancellationToken cancellationToken);
+        /// <summary>
         /// Refresh token from previous one.
         /// </summary>
         /// <param name="previousQueryParameters"></param>

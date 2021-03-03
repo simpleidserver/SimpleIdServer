@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.Api
@@ -58,7 +59,7 @@ namespace SimpleIdServer.Uma.Api
         }        
 
         [HttpGet("confirm/{id}")]
-        public Task<IActionResult> Confirm(string id)
+        public Task<IActionResult> Confirm(string id, CancellationToken cancellationToken)
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
@@ -91,16 +92,16 @@ namespace SimpleIdServer.Uma.Api
                 }
 
                 pendingRequest.Confirm();
-                _umaPendingRequestCommandRepository.Update(pendingRequest);
-                _umaResourceCommandRepository.Update(resource);
-                await _umaResourceCommandRepository.SaveChanges();
-                await _umaPendingRequestCommandRepository.SaveChanges();
+                await _umaPendingRequestCommandRepository.Update(pendingRequest, cancellationToken);
+                await _umaResourceCommandRepository.Update(resource, cancellationToken);
+                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
+                await _umaPendingRequestCommandRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();
             });
         }
 
         [HttpDelete("{id}")]
-        public Task<IActionResult> Reject(string id)
+        public Task<IActionResult> Reject(string id, CancellationToken cancellationToken)
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
@@ -116,8 +117,8 @@ namespace SimpleIdServer.Uma.Api
                 }
 
                 pendingRequest.Reject();
-                _umaPendingRequestCommandRepository.Update(pendingRequest);
-                await _umaPendingRequestCommandRepository.SaveChanges();
+                await _umaPendingRequestCommandRepository.Update(pendingRequest, cancellationToken);
+                await _umaPendingRequestCommandRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();
             });
         }

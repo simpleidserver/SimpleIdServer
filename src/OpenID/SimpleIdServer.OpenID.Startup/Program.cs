@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
+using Microsoft.Extensions.Hosting;
 
 namespace SimpleIdServer.OpenID.Startup
 {
@@ -13,14 +14,17 @@ namespace SimpleIdServer.OpenID.Startup
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .ConfigureKestrel(options =>
+        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults((cfg) =>
                 {
-                    options.ConfigureHttpsDefaults(configureOptions =>
+                    cfg.UseStartup<Startup>();
+                    cfg.ConfigureKestrel(options =>
                     {
-                        configureOptions.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+                        options.ConfigureHttpsDefaults(configureOptions =>
+                        {
+                            configureOptions.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+                        });
                     });
                 });
     }

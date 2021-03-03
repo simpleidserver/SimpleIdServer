@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
@@ -25,13 +24,14 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IConfiguration configuration) 
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public Startup(IWebHostEnvironment webHostEnvironment, IConfiguration configuration) 
         {
-            Env = env;
+            _webHostEnvironment = webHostEnvironment;
             Configuration = configuration;
         }
 
-        public IHostingEnvironment Env { get; }
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -47,8 +47,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             services.AddMvc(o =>
             {
+                o.EnableEndpointRouting = false;
                 o.AddSCIMValueProviders();
-            });
+            }).AddNewtonsoftJson(o => { });
             services.AddLogging();
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
@@ -79,10 +80,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             InitializeDatabase(app);
-            loggerFactory.AddConsole(LogLevel.Trace);
             app.UseAuthentication();
             app.UseMvc();
         }
@@ -94,7 +94,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 using (var context = scope.ServiceProvider.GetService<SCIMDbContext>())
                 {
                     context.Database.Migrate();
-                    var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
+                    var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
                     var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
                     var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
                     var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);

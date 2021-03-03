@@ -7,6 +7,6 @@
     <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
   </ItemGroup>
   <ItemGroup>
-	  <PackageReference Include="MongoDB.Driver" Version="2.10.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.6" />
   </ItemGroup>
 </Project>

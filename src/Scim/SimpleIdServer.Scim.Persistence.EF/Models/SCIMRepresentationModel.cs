@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Models
 {
-    public class SCIMRepresentationModel
+    public class SCIMRepresentationModel : IEquatable<SCIMRepresentationModel>
     {
         public string Id { get; set; }
         public string ExternalId { get; set; }
@@ -15,5 +15,17 @@ namespace SimpleIdServer.Scim.Persistence.EF.Models
         public DateTime LastModified { get; set; }
         public virtual ICollection<SCIMRepresentationAttributeModel> Attributes { get; set; }
         public virtual ICollection<SCIMRepresentationSchemaModel> Schemas { get; set; }
+
+        public bool Equals(SCIMRepresentationModel other)
+        {
+            if (Object.ReferenceEquals(other, null)) return false;
+            if (Object.ReferenceEquals(this, other)) return true;
+            return Id.Equals(other.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

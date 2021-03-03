@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
@@ -70,11 +69,9 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             };
             services.AddMvc(o =>
             {
+                o.EnableEndpointRouting = false;
                 o.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
-            })
-            .AddJsonOptions(options => {
-                // options.SerializerSettings.Converters.Add(new RepresentationParameterConverter());
-            });
+            }).AddNewtonsoftJson(o => { });
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
             services.AddSIDScim(o =>
@@ -84,9 +81,11 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             }).AddSchemas(schemas);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
+            app.UseRouting();
+            app.UseAuthorization();
             app.UseMvc();
         }
     }

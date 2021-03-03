@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.Api
@@ -86,7 +87,7 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] JObject jObj)
+        public async Task<IActionResult> Add([FromBody] JObject jObj, CancellationToken cancellationToken)
         {
             if (!await IsPATAuthorized())
             {
@@ -97,7 +98,7 @@ namespace SimpleIdServer.Uma.Api
             {
                 var umaResource = BuildUMAResource(jObj, true);
                 _umaResourceCommandRepository.Add(umaResource);
-                await _umaResourceCommandRepository.SaveChanges();
+                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, umaResource.Id },
@@ -117,7 +118,7 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] JObject jObj)
+        public async Task<IActionResult> Update(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
         {
             if (!await IsPATAuthorized())
             {
@@ -138,8 +139,8 @@ namespace SimpleIdServer.Uma.Api
                 actualUmaResource.Descriptions = receivedUmaResource.Descriptions;
                 actualUmaResource.Scopes = receivedUmaResource.Scopes;
                 actualUmaResource.Type = receivedUmaResource.Type;
-                _umaResourceCommandRepository.Update(actualUmaResource);
-                await _umaResourceCommandRepository.SaveChanges();
+                await _umaResourceCommandRepository.Update(actualUmaResource, cancellationToken);
+                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, actualUmaResource.Id }
@@ -158,7 +159,7 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
         {
             if (!await IsPATAuthorized())
             {
@@ -171,13 +172,13 @@ namespace SimpleIdServer.Uma.Api
                 return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
             }
 
-            _umaResourceCommandRepository.Delete(actualUmaResource);
-            await _umaResourceCommandRepository.SaveChanges();
+            await _umaResourceCommandRepository.Delete(actualUmaResource, cancellationToken);
+            await _umaResourceCommandRepository.SaveChanges(cancellationToken);
             return new NoContentResult();
         }
 
         [HttpPut("{id}/permissions")]
-        public async Task<IActionResult> AddPermissions(string id, [FromBody] JObject jObj)
+        public async Task<IActionResult> AddPermissions(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
         {
             if (!await IsPATAuthorized())
             {
@@ -194,8 +195,8 @@ namespace SimpleIdServer.Uma.Api
                 }
 
                 umaResource.Permissions = permissions;
-                _umaResourceCommandRepository.Update(umaResource);
-                await _umaResourceCommandRepository.SaveChanges();
+                await _umaResourceCommandRepository.Update(umaResource, cancellationToken);
+                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, umaResource.Id }

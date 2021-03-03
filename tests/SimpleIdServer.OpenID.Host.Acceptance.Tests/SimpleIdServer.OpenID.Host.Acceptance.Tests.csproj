@@ -1,18 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Views\Accounts\Index.cshtml" />
-    <None Remove="Views\Consents\Index.cshtml" />
-    <None Remove="Views\Errors\Index.cshtml" />
-    <None Remove="Views\Home\Index.cshtml" />
-  </ItemGroup>
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Authorization - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
   </ItemGroup>
+  <!--
   <ItemGroup>
     <Content Include="Views\Accounts\Index.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -31,16 +26,17 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
-    <PackageReference Include="SpecFlow" Version="3.0.225" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.225" />
-    <PackageReference Include="SpecFlow.xUnit" Version="3.0.225" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+    <PackageReference Include="SpecFlow" Version="3.7.13" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.7.13" />
+    <PackageReference Include="SpecFlow.xUnit" Version="3.7.13" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="Moq" Version="4.16.0" />
   </ItemGroup>
 
   <ItemGroup>

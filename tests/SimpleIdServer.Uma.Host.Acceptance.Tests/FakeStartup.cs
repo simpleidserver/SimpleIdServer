@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.OAuth.Api.Register;
+using SimpleIdServer.Uma.Api;
 
 namespace SimpleIdServer.Uma.Host.Acceptance.Tests
 {
@@ -8,7 +9,12 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.EnableEndpointRouting = false;
+            }).AddApplicationPart(typeof(RegistrationController).Assembly)
+            .AddApplicationPart(typeof(PermissionsAPIController).Assembly)
+            .AddNewtonsoftJson(o => { });
             services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
             services.AddSIDUma(o =>
             {
@@ -16,19 +22,11 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseStaticFiles();
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                  name: "AreaRoute",
-                  template: "{area}/{controller}/{action=Index}/{id?}");
-                routes.MapRoute(
-                    name: "DefaultRoute",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvc();
         }
     }
 }

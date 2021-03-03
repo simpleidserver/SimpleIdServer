@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.OAuth.Api.Register;
+using SimpleIdServer.Uma.Api;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -20,9 +22,9 @@ namespace SimpleIdServer.Uma.Startup
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             _env = env;
         }
@@ -43,9 +45,13 @@ namespace SimpleIdServer.Uma.Startup
                 options.SupportedUICultures = supportedCultures;
             });
             services.AddLogging();
-            services.AddMvc()
+            services.AddMvc(o =>
+            {
+                o.EnableEndpointRouting = false;
+            })
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix, opts => { opts.ResourcesPath = "Resources"; })
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization()
+                .AddNewtonsoftJson(o => { });
             services.AddAuthentication(opts =>
             {
                 opts.DefaultAuthenticateScheme = UMAConstants.SignInScheme;
@@ -71,9 +77,8 @@ namespace SimpleIdServer.Uma.Startup
             .AddJsonWebKeys(new List<JsonWebKey> { oauthJsonWebKey });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            loggerFactory.AddConsole(LogLevel.Information);
             var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(options.Value);
             app.UseAuthentication();

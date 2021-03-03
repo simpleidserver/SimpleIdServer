@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
@@ -17,7 +15,7 @@ namespace SimpleIdServer.OAuth.Startup
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
+        public Startup() { }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -40,7 +38,10 @@ namespace SimpleIdServer.OAuth.Startup
                 }).SetAlg(rsa, "RS256").Build();
             }
 
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.EnableEndpointRouting = false;
+            }).AddNewtonsoftJson(o => { });
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
@@ -66,7 +67,7 @@ namespace SimpleIdServer.OAuth.Startup
             .AddJsonWebKeys(new List<SimpleIdServer.Jwt.JsonWebKey> { sigJsonWebKey });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseMvc();

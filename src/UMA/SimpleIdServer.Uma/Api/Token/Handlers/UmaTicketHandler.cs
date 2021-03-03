@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.Api.Token.Handlers
@@ -54,12 +55,12 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
         public const string GRANT_TYPE = "urn:ietf:params:oauth:grant-type:uma-ticket";
         public override string GrantType => GRANT_TYPE;
 
-        public override async Task<IActionResult> Handle(HandlerContext context)
+        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             try
             {
                 _umaTicketGrantTypeValidator.Validate(context);
-                var oauthClient = await AuthenticateClient(context);
+                var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var ticket = context.Request.Data.GetTicket();
                 var claimTokenFormat = context.Request.Data.GetClaimTokenFormat();
@@ -159,7 +160,7 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                         _umaPendingRequestCommandRepository.Add(umaPendingRequest);
                     }
 
-                    await _umaPendingRequestCommandRepository.SaveChanges();
+                    await _umaPendingRequestCommandRepository.SaveChanges(cancellationToken);
                     return new ContentResult
                     {
                         ContentType = "application/json",
@@ -188,10 +189,10 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await tokenBuilder.Build(scopes, context, new JObject
+                    await tokenBuilder.Build(scopes, new JObject
                     {
                         { "permissions", jArr }
-                    }).ConfigureAwait(false);
+                    }, context, cancellationToken);
                 }
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);

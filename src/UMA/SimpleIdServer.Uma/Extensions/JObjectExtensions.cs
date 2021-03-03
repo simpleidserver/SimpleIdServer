@@ -18,7 +18,7 @@ namespace SimpleIdServer.Uma.Extensions
 
         public static Dictionary<string, string> GetUMADescriptionFromRequest(this JObject jObj)
         {
-            return jObj.GetTranslationsFromRegisterRequest(UMAResourceNames.Description);
+            return jObj.GetTranslations(UMAResourceNames.Description);
         }
 
         public static string GetUMAIconURIFromRequest(this JObject jObj)
@@ -28,7 +28,7 @@ namespace SimpleIdServer.Uma.Extensions
 
         public static Dictionary<string, string> GetUMANameFromRequest(this JObject jObj)
         {
-            return jObj.GetTranslationsFromRegisterRequest(UMAResourceNames.Name);
+            return jObj.GetTranslations(UMAResourceNames.Name);
         }
 
         public static string GetUMATypeFromRequest(this JObject jObj)

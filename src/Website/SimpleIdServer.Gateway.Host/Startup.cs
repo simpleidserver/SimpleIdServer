@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Ocelot.DependencyInjection;
@@ -21,13 +20,13 @@ namespace SimpleIdServer.Gateway.Host
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IConfiguration configuration) 
+        public Startup(IWebHostEnvironment env, IConfiguration configuration) 
         {
             Env = env;
             Configuration = configuration;
         }
 
-        public IHostingEnvironment Env { get; private set; }
+        public IWebHostEnvironment Env { get; private set; }
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -62,7 +61,7 @@ namespace SimpleIdServer.Gateway.Host
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             if (Configuration.GetChildren().Any(i => i.Key == "pathBase"))
             {

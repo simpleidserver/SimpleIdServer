@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup
 {
@@ -9,15 +9,12 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
     {
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .ConfigureAppConfiguration((context, config) =>
+            var host = Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults((cfg) =>
                 {
-                    config.AddJsonFile("appsettings.json");
-                    config.AddEnvironmentVariables(prefix: "ASPNETCORE_");
+                    cfg.UseUrls("http://*:60002");
+                    cfg.UseStartup<Startup>();
                 })
-                .UseKestrel()
-                .UseUrls("http://*:60002")
-                .UseStartup<Startup>()
                 .Build();
             host.Run();
         }
