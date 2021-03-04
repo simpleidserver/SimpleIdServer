@@ -28,7 +28,7 @@ Scenario: Use client_credentials grant type & use tls_client_auth authentication
 	| grant_types                | [client_credentials]    |
 	| scope                      | scope1                  |
 	| redirect_uris              | [http://localhost:8080] |
-	| tls_client_auth_san_dns    | mtlsClient              |
+	| tls_client_auth_san_dns    | firstMtlsClient         |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body

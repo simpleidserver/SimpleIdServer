@@ -128,7 +128,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[https://localhost:8080/callback]"});
                 table4.AddRow(new string[] {
                             "tls_client_auth_san_dns",
-                            "mtlsClient"});
+                            "firstMtlsClient"});
                 table4.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "PS256"});
@@ -349,7 +349,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[https://localhost:8080/callback]"});
                 table10.AddRow(new string[] {
                             "tls_client_auth_san_dns",
-                            "mtlsClient"});
+                            "firstMtlsClient"});
                 table10.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "PS256"});

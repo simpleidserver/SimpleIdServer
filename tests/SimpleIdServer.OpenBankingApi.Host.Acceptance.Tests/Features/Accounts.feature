@@ -9,7 +9,7 @@ Scenario: Get accounts (Basic)
 	| grant_types                  | [client_credentials,authorization_code,implicit] |
 	| scope                        | accounts                                         |
 	| redirect_uris                | [https://localhost:8080/callback]                |
-	| tls_client_auth_san_dns      | mtlsClient                                       |
+	| tls_client_auth_san_dns      | firstMtlsClient                                  |
 	| id_token_signed_response_alg | PS256                                            |
 	| token_signed_response_alg    | PS256                                            |
 
@@ -86,7 +86,7 @@ Scenario: Get accounts (Detail)
 	| grant_types                  | [client_credentials,authorization_code,implicit] |
 	| scope                        | accounts                                         |
 	| redirect_uris                | [https://localhost:8080/callback]                |
-	| tls_client_auth_san_dns      | mtlsClient                                       |
+	| tls_client_auth_san_dns      | firstMtlsClient                                  |
 	| id_token_signed_response_alg | PS256                                            |
 	| token_signed_response_alg    | PS256                                            |
 

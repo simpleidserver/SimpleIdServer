@@ -9,7 +9,7 @@ Scenario: Check s_hash & sub is returned in id_token
 	| grant_types                  | [client_credentials]              |
 	| scope                        | accounts                          |
 	| redirect_uris                | [https://localhost:8080/callback] |
-	| tls_client_auth_san_dns      | mtlsClient                        |
+	| tls_client_auth_san_dns      | firstMtlsClient                   |
 	| id_token_signed_response_alg | PS256                             |
 	| token_signed_response_alg    | PS256                             |
 

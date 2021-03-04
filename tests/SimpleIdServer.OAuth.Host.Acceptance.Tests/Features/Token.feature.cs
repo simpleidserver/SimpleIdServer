@@ -207,7 +207,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[http://localhost:8080]"});
                 table54.AddRow(new string[] {
                             "tls_client_auth_san_dns",
-                            "mtlsClient"});
+                            "firstMtlsClient"});
 #line 24
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table54, "When ");
 #line hidden

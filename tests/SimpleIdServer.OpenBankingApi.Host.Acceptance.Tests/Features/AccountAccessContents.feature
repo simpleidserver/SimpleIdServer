@@ -9,7 +9,7 @@ Scenario: Create Account Access Content
 	| grant_types                  | [client_credentials]    |
 	| scope                        | accounts                |
 	| redirect_uris                | [http://localhost:8080] |
-	| tls_client_auth_san_dns      | mtlsClient              |
+	| tls_client_auth_san_dns      | firstMtlsClient         |
 	| id_token_signed_response_alg | PS256                   |
 	| token_signed_response_alg    | PS256                   |
 

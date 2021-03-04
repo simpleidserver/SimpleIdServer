@@ -9,7 +9,7 @@ Scenario: Error is returned when Account Access Consent doesn't exist
 	| grant_types                | [client_credentials]              |
 	| scope                      | accounts                          |
 	| redirect_uris              | [https://localhost:8080/callback] |
-	| tls_client_auth_san_dns    | mtlsClient                        |
+	| tls_client_auth_san_dns    | firstMtlsClient                   |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
@@ -38,7 +38,7 @@ Scenario: Error is returned when Account Access Consent has been rejected
 	| grant_types                | [client_credentials]              |
 	| scope                      | accounts                          |
 	| redirect_uris              | [https://localhost:8080/callback] |
-	| tls_client_auth_san_dns    | mtlsClient                        |
+	| tls_client_auth_san_dns    | firstMtlsClient                   |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body

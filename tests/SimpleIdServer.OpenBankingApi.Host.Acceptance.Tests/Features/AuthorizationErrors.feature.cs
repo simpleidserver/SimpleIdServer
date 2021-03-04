@@ -128,7 +128,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[https://localhost:8080/callback]"});
                 table18.AddRow(new string[] {
                             "tls_client_auth_san_dns",
-                            "mtlsClient"});
+                            "firstMtlsClient"});
 #line 5
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table18, "When ");
 #line hidden
@@ -229,7 +229,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[https://localhost:8080/callback]"});
                 table20.AddRow(new string[] {
                             "tls_client_auth_san_dns",
-                            "mtlsClient"});
+                            "firstMtlsClient"});
 #line 34
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table20, "When ");
 #line hidden

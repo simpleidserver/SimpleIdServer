@@ -128,7 +128,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[http://localhost:8080]"});
                 table1.AddRow(new string[] {
                             "tls_client_auth_san_dns",
-                            "mtlsClient"});
+                            "firstMtlsClient"});
                 table1.AddRow(new string[] {
                             "id_token_signed_response_alg",
                             "PS256"});
