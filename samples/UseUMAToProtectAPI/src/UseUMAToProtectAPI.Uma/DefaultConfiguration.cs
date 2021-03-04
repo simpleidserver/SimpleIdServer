@@ -20,7 +20,7 @@ namespace UseUMAToProtectAPI.Uma
                 ClientId = "api",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("apiSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "apiSecret", DateTime.UtcNow.AddDays(2))
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
@@ -51,7 +51,7 @@ namespace UseUMAToProtectAPI.Uma
                 ClientId = "portal",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("portalSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "portalSecret", DateTime.UtcNow.AddDays(2))
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using ProtectAPIFromUndesirableClients.Api.Persistence;
@@ -17,9 +16,9 @@ namespace ProtectAPIFromUndesirableClients.Api
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             _env = env;
         }
@@ -28,6 +27,7 @@ namespace ProtectAPIFromUndesirableClients.Api
         {
             services.AddAuthentication(options =>
             {
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
@@ -51,10 +51,13 @@ namespace ProtectAPIFromUndesirableClients.Api
                 options.AddPolicy("AddUser", p => p.RequireClaim("scope", "add_user"));
             });
             services.AddSingleton<IUserRepository, UserRepository>();
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.EnableEndpointRouting = false;
+            }).AddNewtonsoftJson(o => { });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseMvc(routes =>
@@ -69,16 +72,14 @@ namespace ProtectAPIFromUndesirableClients.Api
         {
             var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, fileName));
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            using (var rsa = RSA.Create())
+            var rsa = RSA.Create();
+            var rsaParameters = new RSAParameters
             {
-                var rsaParameters = new RSAParameters
-                {
-                    Modulus = Convert.FromBase64String(dic["n"].ToString()),
-                    Exponent = Convert.FromBase64String(dic["e"].ToString())
-                };
-                rsa.ImportParameters(rsaParameters);
-                return new RsaSecurityKey(rsa);
-            }
+                Modulus = Convert.FromBase64String(dic["n"].ToString()),
+                Exponent = Convert.FromBase64String(dic["e"].ToString())
+            };
+            rsa.ImportParameters(rsaParameters);
+            return new RsaSecurityKey(rsa);
         }
     }
 }

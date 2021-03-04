@@ -7,18 +7,16 @@
     <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
     <NuspecProperties>$(NuspecProperties);owners=$(Owners)</NuspecProperties>
   </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="Views\CheckSession\EndSession.cshtml.pp" />
   </ItemGroup>
+  
   <ItemGroup>
     <Content Include="Views\CheckSession\EndSession.cshtml.pp">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.113" />
-  </ItemGroup>  
   
   <ItemGroup>
     <ProjectReference Include="..\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj" />

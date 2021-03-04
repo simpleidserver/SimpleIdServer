@@ -62,7 +62,7 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddClients(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey), DefaultConfiguration.Scopes)
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
-                // .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
+                .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication();
             services.Configure<ForwardedHeadersOptions>(options =>
             {

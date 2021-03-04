@@ -353,6 +353,7 @@ namespace SimpleIdServer.OpenID.Startup
                     IdTokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OpenIdScope>
                     {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email
                     },

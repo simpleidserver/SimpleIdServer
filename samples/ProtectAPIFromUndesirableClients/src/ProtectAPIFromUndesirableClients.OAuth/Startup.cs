@@ -16,9 +16,9 @@ namespace ProtectAPIFromUndesirableClients.OAuth
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             _env = env;
         }
@@ -38,7 +38,10 @@ namespace ProtectAPIFromUndesirableClients.OAuth
                 }).SetAlg(rsa, "RS256").Build();
             }
 
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.EnableEndpointRouting = false;
+            }).AddNewtonsoftJson(o => { });
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSIDOAuth()
@@ -47,7 +50,7 @@ namespace ProtectAPIFromUndesirableClients.OAuth
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseMvc();

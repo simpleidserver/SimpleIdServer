@@ -20,9 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\certificates\mtlsClient.pfx" Link="mtlsClient.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="..\..\..\certificates\simpleIdServerClient.crt" Link="simpleIdServerClient.crt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

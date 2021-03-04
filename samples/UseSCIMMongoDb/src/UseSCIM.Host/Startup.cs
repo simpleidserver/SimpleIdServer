@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
@@ -28,13 +27,13 @@ namespace UseSCIM.Host
         public const string SCHEMAS = "schemas";
         public const string MAPPINGS = "mappings";
 
-        public Startup(IHostingEnvironment env, IConfiguration configuration) 
+        public Startup(IWebHostEnvironment env, IConfiguration configuration) 
         {
             Env = env;
             Configuration = configuration;
         }
 
-        public IHostingEnvironment Env { get; }
+        public IWebHostEnvironment Env { get; }
         public IConfiguration Configuration { get; private set; }
 
         public void ConfigureServices(IServiceCollection services)
@@ -48,7 +47,10 @@ namespace UseSCIM.Host
                 Exponent = dic.TryGet(RSAFields.Exponent)
             };
             var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.EnableEndpointRouting = false;
+            }).AddNewtonsoftJson(o => { });
             services.AddLogging();
             services.AddAuthorization(opts =>
             {
@@ -108,9 +110,8 @@ namespace UseSCIM.Host
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            loggerFactory.AddConsole(LogLevel.Trace);
             app.UseAuthentication();
             app.UseMvc();
         }

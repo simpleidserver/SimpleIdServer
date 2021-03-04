@@ -6,11 +6,31 @@ using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace ProtectAPIFromUndesirableUsers.OpenId
 {
     public class DefaultConfiguration
     {
+        public static List<OpenIdScope> Scopes = new List<OpenIdScope>
+        {
+            SIDOpenIdConstants.StandardScopes.OpenIdScope,
+            SIDOpenIdConstants.StandardScopes.Phone,
+            SIDOpenIdConstants.StandardScopes.Profile,
+            SIDOpenIdConstants.StandardScopes.Role,
+            SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
+            SIDOpenIdConstants.StandardScopes.Email,
+            SIDOpenIdConstants.StandardScopes.Address,
+            new OpenIdScope
+            {
+                Name = "scim",
+                Claims = new List<OpenIdScopeClaim>
+                {
+                    new OpenIdScopeClaim("scim_id", true)
+                }
+            }
+        };
+
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
         {
             new AuthenticationContextClassReference
@@ -37,11 +57,11 @@ namespace ProtectAPIFromUndesirableUsers.OpenId
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<KeyValuePair<string, string>>
+                Claims = new List<Claim>
                 {
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "user"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.Name, "User"),
-                    new KeyValuePair<string, string>(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User")
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "user"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "User"),
+                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User")
                 }
             }
         };
@@ -53,7 +73,7 @@ namespace ProtectAPIFromUndesirableUsers.OpenId
                 ClientId = "tradWebsite",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("tradWebsiteSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "tradWebsiteSecret", DateTime.UtcNow.AddDays(2))
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -90,7 +110,7 @@ namespace ProtectAPIFromUndesirableUsers.OpenId
                 ClientId = "userAgentBased",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("userAgentBasedSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "userAgentBasedSecret", DateTime.UtcNow.AddDays(2))
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 ApplicationType = "web",
@@ -125,7 +145,7 @@ namespace ProtectAPIFromUndesirableUsers.OpenId
                 ClientId = "native",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("nativeSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", DateTime.UtcNow.AddDays(2))
                 },
                 TokenEndPointAuthMethod = "pkce",
                 ApplicationType = "web",

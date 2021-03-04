@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.645
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core Layer", "01. Core Layer", "{8C081D0A-A448-42F4-8B80-FC2BBCCE5727}"
 EndProject
@@ -58,6 +58,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{EF556329-4FE6-466A-A298-40E7B674EE11} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}
 		{292710B2-2FAE-41A1-ACD8-95450155E4BD} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}
 		{E90E84DA-7B1A-45E1-A183-06B400B624CF} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}
 		{B3A24DF6-6563-410A-811C-63975F011530} = {8C081D0A-A448-42F4-8B80-FC2BBCCE5727}

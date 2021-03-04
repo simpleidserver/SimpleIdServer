@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionCode="1" android:versionName="1.0" package="com.companyname.SimpleIdServer.XamarinMobile.Android">
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="27" />
-    <application android:label="SimpleIdServer.XamarinMobile.Android">
-      <activity android:name="net.openid.appauth.RedirectUriReceiverActivity" tools:node="replace">
-        <intent-filter>
-          <action android:name="android.intent.action.VIEW" />
-          <category android:name="android.intent.category.DEFAULT" />
-          <category android:name="android.intent.category.BROWSABLE" />
-          <data android:scheme="sid" />
-        </intent-filter>
-      </activity>
-    </application>
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
+	<application android:label="SimpleIdServer.XamarinMobile.Android">
+		<activity android:name="net.openid.appauth.RedirectUriReceiverActivity" tools:node="replace">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="sid" />
+			</intent-filter>
+		</activity>
+	</application>
 </manifest>

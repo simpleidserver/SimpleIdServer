@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
@@ -17,9 +16,9 @@ namespace UseUMAToProtectAPI.OpenId
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             _env = env;
         }
@@ -42,18 +41,19 @@ namespace UseUMAToProtectAPI.OpenId
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
-            services.AddMvc();
+            services.AddMvc(o => o.EnableEndpointRouting = false)
+                .AddNewtonsoftJson();
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSIDOpenID()
                 .AddAcrs(DefaultConfiguration.AcrLst)
-                .AddClients(DefaultConfiguration.Clients)
+                .AddClients(DefaultConfiguration.Clients, DefaultConfiguration.Scopes)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseCors("AllowAll");
             app.UseAuthentication();

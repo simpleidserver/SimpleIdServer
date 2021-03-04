@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json;
@@ -21,9 +20,9 @@ namespace UseUMAToProtectAPI.Uma
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             _env = env;
         }
@@ -55,9 +54,10 @@ namespace UseUMAToProtectAPI.Uma
                 options.SupportedUICultures = supportedCultures;
             });
             services.AddLogging();
-            services.AddMvc()
+            services.AddMvc(o => o.EnableEndpointRouting = false)
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix, opts => { opts.ResourcesPath = "Resources"; })
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization()
+                .AddNewtonsoftJson();
             services.AddAuthentication(opts =>
             {
                 opts.DefaultAuthenticateScheme = UMAConstants.SignInScheme;
@@ -81,9 +81,8 @@ namespace UseUMAToProtectAPI.Uma
             .AddJsonWebKeys(new List<JsonWebKey> { oauthJsonWebKey });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            loggerFactory.AddConsole(LogLevel.Information);
             var options = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(options.Value);
             app.UseAuthentication();

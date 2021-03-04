@@ -8,9 +8,10 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>OPENID provider with bootstrap4 style</description>
     <dependencies>
-      <group targetFramework=".NETStandard2.0">
-  	<dependency id="SimpleIdServer.OpenID" version="$version$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Web.LibraryManager.Build" version="2.0.76" />
+      <group targetFramework=".NETCoreApp5.0">
+        <dependency id="SimpleIdServer.OpenID" version="$version$" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Web.LibraryManager.Build" version="2.1.113" />
+        <dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="5.0.3" />
       </group>
     </dependencies>
   </metadata>

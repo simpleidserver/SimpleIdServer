@@ -72,9 +72,10 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 return;
             }
 
+            var scopes = previousQueryParameters.GetScopes();
             currentContext.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(previousQueryParameters[UserClaims.Subject].ToString(), token));
             var openidClient = (OpenIdClient)currentContext.Client;
-            var payload = await BuildIdToken(currentContext, previousQueryParameters, new string[0], token);
+            var payload = await BuildIdToken(currentContext, previousQueryParameters, scopes, token);
             var idToken = await _jwtBuilder.BuildClientToken(currentContext.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
             currentContext.Response.Add(Name, idToken);
         }

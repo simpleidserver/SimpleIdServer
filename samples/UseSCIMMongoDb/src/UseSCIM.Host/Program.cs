@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace UseSCIM.Host
 {
@@ -9,16 +10,17 @@ namespace UseSCIM.Host
     {
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .ConfigureAppConfiguration((context, config) =>
+            var host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults((cfg) =>
                 {
-                    config.AddJsonFile("appsettings.json");
-                    config.AddEnvironmentVariables(prefix: "ASPNETCORE_");
-                })
-                .UseKestrel()
-                .UseUrls("http://*:60002")
-                .UseStartup<Startup>()
-                .Build();
+                    cfg.UseUrls("http://*:60002");
+                    cfg.UseStartup<Startup>();
+                    cfg.ConfigureAppConfiguration((context, config) =>
+                    {
+                        config.AddJsonFile("appsettings.json");
+                        config.AddEnvironmentVariables(prefix: "ASPNETCORE_");
+                    });
+                }).Build();
             host.Run();
         }
     }

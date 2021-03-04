@@ -1,5 +1,5 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using SimpleIdServer.OpenID.Startup.Resources
+@using $rootnamespace$.Resources
 @using Microsoft.Extensions.Options
 @using SimpleIdServer.OAuth.Options 
 @using System.Globalization

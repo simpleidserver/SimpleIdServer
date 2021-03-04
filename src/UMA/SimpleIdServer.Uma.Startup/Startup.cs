@@ -5,14 +5,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
-using SimpleIdServer.OAuth.Api.Register;
-using SimpleIdServer.Uma.Api;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -32,6 +29,12 @@ namespace SimpleIdServer.Uma.Startup
         public void ConfigureServices(IServiceCollection services)
         {
             var openidJsonWebKey = ExtractOpenIDJsonWebKey();
+            var rsaParameters = new RSAParameters
+            {
+                Modulus = openidJsonWebKey.Content[RSAFields.Modulus].Base64DecodeBytes(),
+                Exponent = openidJsonWebKey.Content[RSAFields.Exponent].Base64DecodeBytes()
+            };
+            var oauthRsaSecurityKey = new Microsoft.IdentityModel.Tokens.RsaSecurityKey(rsaParameters);
             var oauthJsonWebKey = ExtractOAuthJsonWebKey();
             services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -57,13 +60,19 @@ namespace SimpleIdServer.Uma.Startup
                 opts.DefaultAuthenticateScheme = UMAConstants.SignInScheme;
                 opts.DefaultSignInScheme = UMAConstants.SignInScheme;
                 opts.DefaultChallengeScheme = UMAConstants.ChallengeAuthenticationScheme;
-            }).AddCookie(UMAConstants.SignInScheme).AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
+            }).AddCookie(UMAConstants.SignInScheme)
+            .AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
             {
                 options.ClientId = "umaClient";
                 options.ClientSecret = "umaClientSecret";
                 options.Authority = "https://localhost:60000";
                 options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                 options.SaveTokens = true;
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = oauthRsaSecurityKey
+                };
             });
             services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
             services.AddSIDUma(options =>

@@ -50,6 +50,7 @@ task compile -depends clean {
     exec { dotnet build .\SimpleIdServer.OpenId.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Uma.Host.sln -c $config --version-suffix=$buildSuffix }
+    exec { dotnet build .\SimpleIdServer.OpenBanking.Host.sln -c $config --version-suffix=$buildSuffix }
 }
  
 task pack -depends compile {
@@ -68,6 +69,8 @@ task pack -depends compile {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.Bootstrap4\SimpleIdServer.Uma.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi\SimpleIdServer.OpenBankingApi.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Domains\SimpleIdServer.OpenBankingApi.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
 task test {

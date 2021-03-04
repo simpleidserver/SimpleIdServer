@@ -3,17 +3,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace UseUMAToProtectAPI.Portal
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env) { }
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(options =>
@@ -33,10 +29,11 @@ namespace UseUMAToProtectAPI.Portal
                     options.SaveTokens = true;
                 });
             services.AddAuthorization(options => options.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser()));
-            services.AddMvc();
+            services.AddMvc(o => o.EnableEndpointRouting = false)
+                .AddNewtonsoftJson(o => { });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseStaticFiles();

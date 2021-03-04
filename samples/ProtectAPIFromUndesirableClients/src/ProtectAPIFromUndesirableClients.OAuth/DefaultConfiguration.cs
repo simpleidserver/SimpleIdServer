@@ -34,7 +34,7 @@ namespace ProtectAPIFromUndesirableClients.OAuth
                 ClientId = "application",
                 Secrets = new List<ClientSecret>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, PasswordHelper.ComputeHash("applicationSecret"))
+                    new ClientSecret(ClientSecretTypes.SharedSecret, "applicationSecret", DateTime.UtcNow.AddDays(2))
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
