@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
+using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
 using SimpleIdServer.OpenBankingApi.Persistences;
@@ -17,6 +19,7 @@ using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,14 +34,17 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
 
         public OpenBankingApiAuthorizationRequestValidator(
             IOptions<OpenBankingApiOptions> options,
-            ILogger<OpenBankingApiAuthorizationRequestValidator> logger,
             IAccountAccessConsentRepository accountAccessConsentRepository,
+            ILogger<OpenBankingApiAuthorizationRequestValidator> logger,
+            IUserConsentFetcher userConsentFetcher,
+            IEnumerable<IOAuthResponseMode> oauthResponseModes,
+            IHttpClientFactory httpClientFactory,
             IAmrHelper amrHelper, 
-            IJwtParser jwtParser) : base(amrHelper, jwtParser)
+            IJwtParser jwtParser) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser)
         {
             _options = options.Value;
-            _logger = logger;
             _accountAccessConsentRepository = accountAccessConsentRepository;
+            _logger = logger;
         }
 
         public override async Task Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -75,6 +81,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 await CheckRequestUriParameter(context);
             }
 
+            await CommonValidate(context, cancellationToken);
             var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
             var nonce = context.Request.Data.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();

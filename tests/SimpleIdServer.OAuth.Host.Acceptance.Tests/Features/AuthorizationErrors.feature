@@ -66,7 +66,7 @@ Scenario: Error is returned when response_mode is not supported
 	
 	And extract query parameters into JSON
 
-	Then JSON 'error'='unsupported_response_mode'
+	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='response mode invalid is not supported'
 
 Scenario: Error is returned when scope is not supported by the client

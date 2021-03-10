@@ -22,7 +22,7 @@ Scenario: Check s_hash & sub is returned in id_token
 	| response_type | id_token                                                                            |
 	| client_id     | $client_id$                                                                         |
 	| state         | state                                                                               |
-	| response_mode | query                                                                               |
+	| response_mode | fragment                                                                            |
 	| scope         | accounts                                                                            |
 	| redirect_uri  | https://localhost:8080/callback                                                     |
 	| nonce         | nonce                                                                               |

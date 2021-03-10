@@ -395,7 +395,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 69
- testRunner.Then("JSON \'error\'=\'unsupported_response_mode\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 70
  testRunner.Then("JSON \'error_description\'=\'response mode invalid is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

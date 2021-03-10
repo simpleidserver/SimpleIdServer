@@ -47,7 +47,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         public void WhenExtractQueryParametersIntoJSON()
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
-            var queryValues = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
+            var queryValues = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Fragment.Trim('#'));
             var jObj = new JObject();
             foreach (var kvp in queryValues)
             {

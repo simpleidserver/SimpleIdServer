@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NEventStore;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.OAuth.Api.Authorization;
+using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
+using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.Validators;
+using SimpleIdServer.OpenBankingApi.Api.Register;
 using SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi.Domains.Account;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
@@ -53,6 +57,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenBuilder, OpenBankingApiIdTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenIDAccessTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();
+
+            services.RemoveAll<IOAuthResponseMode>();
+            services.RemoveAll<IOAuthResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
+
+            services.RemoveAll<IAddOAuthClientHandler>();
+            services.AddTransient<IAddOAuthClientHandler, AddOpenBankingApiClientHandler>();
 
             var accounts = new ConcurrentBag<AccountAggregate>();
             var accountAccessConsents = new ConcurrentBag<AccountAccessConsentAggregate>();

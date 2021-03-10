@@ -5,6 +5,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Infrastructures;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Domains
@@ -111,21 +112,21 @@ namespace SimpleIdServer.OpenID.Domains
         /// Resolve redirection urls.
         /// </summary>
         /// <returns></returns>
-        public async override Task<IEnumerable<string>> GetRedirectionUrls(IHttpClientFactory httpClientFactory)
+        public async override Task<IEnumerable<string>> GetRedirectionUrls(IHttpClientFactory httpClientFactory, CancellationToken cancellationToken)
         {
-            var result = (await base.GetRedirectionUrls(httpClientFactory)).ToList();
-            result.AddRange(await GetSectorIdentifierUrls(httpClientFactory));
+            var result = (await base.GetRedirectionUrls(httpClientFactory, cancellationToken)).ToList();
+            result.AddRange(await GetSectorIdentifierUrls(httpClientFactory, cancellationToken));
             return result;
         }
 
-        public async Task<IEnumerable<string>> GetSectorIdentifierUrls(IHttpClientFactory httpClientFactory)
+        public async Task<IEnumerable<string>> GetSectorIdentifierUrls(IHttpClientFactory httpClientFactory, CancellationToken cancellationToken)
         {
             var result = new List<string>();
             if (!string.IsNullOrWhiteSpace(SectorIdentifierUri))
             {
                 using (var httpClient = httpClientFactory.GetHttpClient())
                 {
-                    var httpResult = await httpClient.GetAsync(SectorIdentifierUri);
+                    var httpResult = await httpClient.GetAsync(SectorIdentifierUri, cancellationToken);
                     if (httpResult.IsSuccessStatusCode)
                     {
                         var json = await httpResult.Content.ReadAsStringAsync();

@@ -5,9 +5,11 @@ using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
+using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
@@ -23,18 +25,22 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 {
-    public class OpenIDAuthorizationRequestValidator : IAuthorizationRequestValidator
+    public class OpenIDAuthorizationRequestValidator : OAuthAuthorizationRequestValidator
     {
         private readonly IAmrHelper _amrHelper;
         private readonly IJwtParser _jwtParser;
 
-        public OpenIDAuthorizationRequestValidator(IAmrHelper amrHelper, IJwtParser jwtParser)
+        public OpenIDAuthorizationRequestValidator(
+            IUserConsentFetcher userConsentFetcher,
+            IEnumerable<IOAuthResponseMode> oauthResponseModes,
+            IHttpClientFactory httpClientFactory,
+            IAmrHelper amrHelper, IJwtParser jwtParser) : base(userConsentFetcher, oauthResponseModes, httpClientFactory)
         {
             _amrHelper = amrHelper;
             _jwtParser = jwtParser;
         }
 
-        public virtual async Task Validate(HandlerContext context, CancellationToken cancellationToken)
+        public override async Task Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = (OpenIdClient)context.Client;
             var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
@@ -73,6 +79,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 await CheckRequestUriParameter(context);
             }
 
+            await CommonValidate(context, cancellationToken);
             var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
             var nonce = context.Request.Data.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();

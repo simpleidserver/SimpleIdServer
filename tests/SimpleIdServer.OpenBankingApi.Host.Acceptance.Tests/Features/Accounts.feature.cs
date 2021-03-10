@@ -214,7 +214,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "state"});
                 table7.AddRow(new string[] {
                             "response_mode",
-                            "query"});
+                            "fragment"});
                 table7.AddRow(new string[] {
                             "scope",
                             "accounts"});
@@ -435,7 +435,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "state"});
                 table13.AddRow(new string[] {
                             "response_mode",
-                            "query"});
+                            "fragment"});
                 table13.AddRow(new string[] {
                             "scope",
                             "accounts"});

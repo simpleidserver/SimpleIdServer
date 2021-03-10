@@ -96,7 +96,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             var acrValues = queryParameters.GetAcrValuesFromAuthorizationRequest();
             var requestedClaims = queryParameters.GetClaimsFromAuthorizationRequest();
             var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.SubjectType));
-            var subject = await subjectTypeBuilder.Build(currentContext);
+            var subject = await subjectTypeBuilder.Build(currentContext, cancellationToken);
             string accessToken, code;
             if (currentContext.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.AccessToken, out accessToken))
             {

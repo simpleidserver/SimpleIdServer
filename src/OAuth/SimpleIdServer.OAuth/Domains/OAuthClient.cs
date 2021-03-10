@@ -3,11 +3,11 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
-using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Domains
@@ -281,7 +281,7 @@ namespace SimpleIdServer.OAuth.Domains
         /// Get all the redirection urls.
         /// </summary>
         /// <returns></returns>
-        public virtual Task<IEnumerable<string>> GetRedirectionUrls(IHttpClientFactory httpClientFactory)
+        public virtual Task<IEnumerable<string>> GetRedirectionUrls(IHttpClientFactory httpClientFactory, CancellationToken cancellationToken)
         {
             IEnumerable<string> result = RedirectionUrls == null ? new List<string>() : RedirectionUrls.ToList();
             return Task.FromResult(result);

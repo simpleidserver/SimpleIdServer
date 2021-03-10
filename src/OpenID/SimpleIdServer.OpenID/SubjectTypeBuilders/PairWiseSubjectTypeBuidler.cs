@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.SubjectTypeBuilders
@@ -25,12 +26,12 @@ namespace SimpleIdServer.OpenID.SubjectTypeBuilders
         public string SubjectType => SUBJECT_TYPE;
         public static string SUBJECT_TYPE = "pairwise";
 
-        public async Task<string> Build(HandlerContext context)
+        public async Task<string> Build(HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = (OpenIdClient)context.Client;
             var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
             var url = redirectUri;
-            var sectorIdentifierUrls = await openidClient.GetSectorIdentifierUrls(_httpClientFactory);
+            var sectorIdentifierUrls = await openidClient.GetSectorIdentifierUrls(_httpClientFactory, cancellationToken);
             if (sectorIdentifierUrls.Contains(url))
             {
                 url = openidClient.SectorIdentifierUri;

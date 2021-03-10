@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Api;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.SubjectTypeBuilders
@@ -11,7 +12,7 @@ namespace SimpleIdServer.OpenID.SubjectTypeBuilders
 
         public static string SUBJECT_TYPE = "public";
 
-        public Task<string> Build(HandlerContext context)
+        public Task<string> Build(HandlerContext context, CancellationToken cancellationToken)
         {
             return Task.FromResult(context.User.Id);
         }

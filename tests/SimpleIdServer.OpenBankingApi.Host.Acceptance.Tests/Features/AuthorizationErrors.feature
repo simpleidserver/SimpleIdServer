@@ -19,7 +19,7 @@ Scenario: Error is returned when Account Access Consent doesn't exist
 	| response_type | id_token                                                                      |
 	| client_id     | $client_id$                                                                   |
 	| state         | state                                                                         |
-	| response_mode | query                                                                         |
+	| response_mode | fragment                                                                      |
 	| scope         | accounts                                                                      |
 	| redirect_uri  | https://localhost:8080/callback                                               |
 	| nonce         | nonce                                                                         |
@@ -50,7 +50,7 @@ Scenario: Error is returned when Account Access Consent has been rejected
 	| response_type | id_token                                                                            |
 	| client_id     | $client_id$                                                                         |
 	| state         | state                                                                               |
-	| response_mode | query                                                                               |
+	| response_mode | fragment                                                                            |
 	| scope         | accounts                                                                            |
 	| redirect_uri  | https://localhost:8080/callback                                                     |
 	| nonce         | nonce                                                                               |

@@ -26,27 +26,25 @@ namespace SimpleIdServer.OAuth.Api.Authorization
     public class AuthorizationRequestHandler : IAuthorizationRequestHandler
     {
         private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
-        private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
         private readonly IEnumerable<IAuthorizationRequestValidator> _authorizationRequestValidators;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IOAuthClientQueryRepository _oauthClientRepository;
         private readonly IOAuthUserQueryRepository _oauthUserRepository;
-        private readonly IHttpClientFactory _httpClientFactory;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
-            IEnumerable<IOAuthResponseMode> oauthResponseModes, IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
-            IEnumerable<ITokenProfile> tokenProfiles, IAuthorizationRequestEnricher authorizationRequestEnricher, IOAuthClientQueryRepository oauthClientRepository, IOAuthUserQueryRepository oauthUserRepository,
-            IHttpClientFactory httpClientFactory)
+            IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
+            IEnumerable<ITokenProfile> tokenProfiles, 
+            IAuthorizationRequestEnricher authorizationRequestEnricher, 
+            IOAuthClientQueryRepository oauthClientRepository, 
+            IOAuthUserQueryRepository oauthUserRepository)
         {
             _responseTypeHandlers = responseTypeHandlers;
-            _oauthResponseModes = oauthResponseModes;
             _authorizationRequestValidators = authorizationRequestValidators;
             _tokenProfiles = tokenProfiles;
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _oauthClientRepository = oauthClientRepository;
             _oauthUserRepository = oauthUserRepository;
-            _httpClientFactory = httpClientFactory;
         }
 
         public virtual async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
@@ -80,7 +78,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
             }
 
-            context.SetClient(await Validate(context.Request.Data, cancellationToken));
+            context.SetClient(await AuthenticateClient(context.Request.Data, cancellationToken));
             context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, cancellationToken));
             foreach (var validator in _authorizationRequestValidators)
             {
@@ -110,13 +108,9 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 
-        private async Task<OAuthClient> Validate(JObject jObj, CancellationToken cancellationToken)
+        private async Task<OAuthClient> AuthenticateClient(JObject jObj, CancellationToken cancellationToken)
         {
-            var responseTypes = jObj.GetResponseTypesFromAuthorizationRequest();
-            var responseMode = jObj.GetResponseModeFromAuthorizationRequest();
             var clientId = jObj.GetClientIdFromAuthorizationRequest();
-            var state = jObj.GetStateFromAuthorizationRequest();
-            var redirectUri = jObj.GetRedirectUriFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(clientId))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
@@ -126,23 +120,6 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             if (client == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
-            }
-
-            var redirectionUrls = await client.GetRedirectionUrls(_httpClientFactory);
-            if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Contains(redirectUri))
-            {
-                throw new OAuthExceptionBadRequestURIException(redirectUri);
-            }
-
-            if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode))
-            {
-                throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_MODE, string.Format(ErrorMessages.BAD_RESPONSE_MODE, responseMode));
-            }
-
-            var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
-            if (unsupportedResponseTypes.Any())
-            {
-                throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
             }
 
             return client;

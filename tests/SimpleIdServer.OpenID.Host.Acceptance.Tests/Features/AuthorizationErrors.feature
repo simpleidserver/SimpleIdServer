@@ -16,7 +16,6 @@ Scenario: Check state is returned in the callback url
 	| client_id     | $client_id$      |
 	| scope         | openid           |
 	| state         | state            |
-	| request_uri   | uri              |
 	| redirect_uri  | http://localhost |
 	
 	And extract JSON from body

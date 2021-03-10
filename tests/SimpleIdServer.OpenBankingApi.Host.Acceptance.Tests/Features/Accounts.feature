@@ -44,7 +44,7 @@ Scenario: Get accounts (Basic)
 	| response_type        | id_token code                                                                       |
 	| client_id            | $client_id$                                                                         |
 	| state                | state                                                                               |
-	| response_mode        | query                                                                               |
+	| response_mode        | fragment                                                                            |
 	| scope                | accounts                                                                            |
 	| redirect_uri         | https://localhost:8080/callback                                                     |
 	| nonce                | nonce                                                                               |
@@ -121,7 +121,7 @@ Scenario: Get accounts (Detail)
 	| response_type        | id_token code                                                                       |
 	| client_id            | $client_id$                                                                         |
 	| state                | state                                                                               |
-	| response_mode        | query                                                                               |
+	| response_mode        | fragment                                                                            |
 	| scope                | accounts                                                                            |
 	| redirect_uri         | https://localhost:8080/callback                                                     |
 	| nonce                | nonce                                                                               |

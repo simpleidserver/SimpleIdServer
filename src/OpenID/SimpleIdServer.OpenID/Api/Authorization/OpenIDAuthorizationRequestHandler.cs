@@ -10,7 +10,6 @@ using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Exceptions;
@@ -29,7 +28,20 @@ namespace SimpleIdServer.OpenID.Api.Authorization
     {
         private readonly OpenIDHostOptions _openidHostOptions;
 
-        public OpenIDAuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers, IEnumerable<IOAuthResponseMode> oauthResponseModes, IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators, IEnumerable<ITokenProfile> tokenProfiles, IAuthorizationRequestEnricher authorizationRequestEnricher, IOAuthClientQueryRepository oauthClientRepository, IOAuthUserQueryRepository oauthUserRepository, IHttpClientFactory httpClientFactory, IOptions<OpenIDHostOptions> options) : base(responseTypeHandlers, oauthResponseModes, authorizationRequestValidators, tokenProfiles, authorizationRequestEnricher, oauthClientRepository, oauthUserRepository, httpClientFactory)
+        public OpenIDAuthorizationRequestHandler(
+            IEnumerable<IResponseTypeHandler> responseTypeHandlers, 
+            IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
+            IEnumerable<ITokenProfile> tokenProfiles, 
+            IAuthorizationRequestEnricher authorizationRequestEnricher, 
+            IOAuthClientQueryRepository oauthClientRepository,
+            IOAuthUserQueryRepository oauthUserRepository, 
+            IOptions<OpenIDHostOptions> options) : base(
+                responseTypeHandlers, 
+                authorizationRequestValidators, 
+                tokenProfiles, 
+                authorizationRequestEnricher, 
+                oauthClientRepository, 
+                oauthUserRepository)
         {
             _openidHostOptions = options.Value;
         }
