@@ -462,7 +462,6 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
         private static Expression BuildAttributeComparison(SCIMComparisonExpression comparisonExpression, Expression representationAttrExpr)
         {
             var propertySchemaAttribute = Expression.Property(representationAttrExpr, "SchemaAttribute");
-            var caseExactType = Expression.Property(propertySchemaAttribute, "CaseExact");
             var propertySchemaType = Expression.Property(propertySchemaAttribute, "Type");
             var propertyValuesString = Expression.Property(representationAttrExpr, "ValuesString");
             var propertyValuesBoolean = Expression.Property(representationAttrExpr, "ValuesBoolean");
@@ -478,21 +477,17 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             var attrBinary = Expression.Parameter(typeof(byte[]), "prop");
             Expression anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Constant(false), attrInteger),
                 anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Constant(false), attrDateTime),
-                anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Constant(false), attrString),
-                anyCaseNotSensitiveStringLambda = Expression.Equal(Expression.Constant(true), Expression.Constant(false)),
+                anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Constant(false), attrString),
                 anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Constant(false), attrBoolean),
                 anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.Constant(false), attrDecimal),
                 anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.Constant(false), attrBinary);
-            var toLower = Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-            var containsStringMethod = typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Contains" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string));
             Expression equalValue = null;
             switch (comparisonExpression.ComparisonOperator)
             {
                 case SCIMComparisonOperators.NE:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.NotEqual(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.NotEqual(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
-                    anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.NotEqual(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
-                    anyCaseNotSensitiveStringLambda = Expression.Not(Expression.Call(containsStringMethod, propertyValuesString, toLower));
+                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.NotEqual(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
                     anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.NotEqual(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
                     anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.NotEqual(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.NotEqual(attrBinary, Expression.Constant(ParseBinary(comparisonExpression.Value))), attrBinary);
@@ -520,52 +515,28 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 case SCIMComparisonOperators.EQ:
                     anyIntegerLambda = Expression.Lambda<Func<int, bool>>(Expression.Equal(attrInteger, Expression.Constant(ParseInt(comparisonExpression.Value))), attrInteger);
                     anyDateTimeLambda = Expression.Lambda<Func<DateTime, bool>>(Expression.Equal(attrDateTime, Expression.Constant(ParseDateTime(comparisonExpression.Value))), attrDateTime);
-                    {
-                        var equals = typeof(string).GetMethod("Equals", new Type[] { typeof(string) });
-                        var toLowerAttrStr = Expression.Call(attrString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var anyCaseNotSensitiveStringLambdaBody = Expression.Lambda<Func<string, bool>>(Expression.Call(toLowerAttrStr, equals, toLower), attrString);
-                        anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Equal(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
-                        anyCaseNotSensitiveStringLambda = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyCaseNotSensitiveStringLambdaBody);
-                    }
+                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Equal(attrString, Expression.Constant(comparisonExpression.Value)), attrString);
                     anyBooleanLambda = Expression.Lambda<Func<bool, bool>>(Expression.Equal(attrBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value))), attrBoolean);
                     anyDecimalLambda = Expression.Lambda<Func<decimal, bool>>(Expression.Equal(attrDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value))), attrDecimal);
                     anyBinaryLambda = Expression.Lambda<Func<byte[], bool>>(Expression.NotEqual(attrBinary, Expression.Constant(ParseBinary(comparisonExpression.Value))), attrBinary);
                     break;
                 case SCIMComparisonOperators.SW:
-                    {
-                        var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
-                        var toLowerAttrStr = Expression.Call(attrString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var anyCaseNotSensitiveStringLambdaBody = Expression.Lambda<Func<string, bool>>(Expression.Call(toLowerAttrStr, startWith, toLower), attrString);
-                        anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, startWith, Expression.Constant(comparisonExpression.Value)), attrString);
-                        anyCaseNotSensitiveStringLambda = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyCaseNotSensitiveStringLambdaBody);
-                    }
+                    var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
+                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, startWith, Expression.Constant(comparisonExpression.Value)), attrString);
                     break;
                 case SCIMComparisonOperators.EW:
-                    {
-                        var endWith = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
-                        var toLowerAttrStr = Expression.Call(attrString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var anyCaseNotSensitiveStringLambdaBody = Expression.Lambda<Func<string, bool>>(Expression.Call(toLowerAttrStr, endWith, toLower), attrString);
-                        anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, endWith, Expression.Constant(comparisonExpression.Value)), attrString);
-                        anyCaseNotSensitiveStringLambda = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyCaseNotSensitiveStringLambdaBody);
-                    }
+                    var endWith = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
+                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, endWith, Expression.Constant(comparisonExpression.Value)), attrString);
                     break;
                 case SCIMComparisonOperators.CO:
-                    {
-                        var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                        var toLowerAttrStr = Expression.Call(attrString, typeof(string).GetMethod("ToLower", Type.EmptyTypes));
-                        var anyCaseNotSensitiveStringLambdaBody = Expression.Lambda<Func<string, bool>>(Expression.Call(toLowerAttrStr, contains, toLower), attrString);
-                        anyCaseSensitiveStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, contains, Expression.Constant(comparisonExpression.Value)), attrString);
-                        anyCaseNotSensitiveStringLambda = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyCaseNotSensitiveStringLambdaBody);
-                    }
+                    var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    anyStringLambda = Expression.Lambda<Func<string, bool>>(Expression.Call(attrString, contains, Expression.Constant(comparisonExpression.Value)), attrString);
                     break;
             }
 
             var allInteger = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(int)), propertyValuesInt, anyIntegerLambda);
             var allDateTime = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(DateTime)), propertyValuesDateTime, anyDateTimeLambda);
-            var allString = Expression.Or(
-                    Expression.And(Expression.Equal(caseExactType, Expression.Constant(true)), Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyCaseSensitiveStringLambda)),
-                    Expression.And(Expression.Equal(caseExactType, Expression.Constant(false)), anyCaseNotSensitiveStringLambda)
-                );
+            var allString = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(string)), propertyValuesString, anyStringLambda);
             var allBoolean = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(bool)), propertyValuesBoolean, anyBooleanLambda);
             var allDecimal = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(decimal)), propertyValuesDecimal, anyDecimalLambda);
             var allBinary = Expression.Call(typeof(Enumerable).GetMethods().First(m2 => m2.Name == "Any" && m2.GetParameters().Count() == 2).MakeGenericMethod(typeof(byte[])), propertyValuesBinary, anyBinaryLambda);
