@@ -3,9 +3,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
+using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
@@ -31,14 +33,23 @@ namespace SimpleIdServer.OpenID.UI
         private readonly IOAuthClientQueryRepository _oauthClientRepository;
         private readonly IUserConsentFetcher _userConsentFetcher;
         private readonly IDataProtector _dataProtector;
+        private readonly IResponseModeHandler _responseModeHandler;
         private readonly OAuthHostOptions _oauthHostOptions;
 
-        public ConsentsController(IOAuthUserQueryRepository oauthUserRepository, IOAuthUserCommandRepository oauthUserCommandRepository, IOAuthClientQueryRepository oauthClientRepository, IUserConsentFetcher userConsentFetcher, IDataProtectionProvider dataProtectionProvider, IOptions<OAuthHostOptions> opts)
+        public ConsentsController(
+            IOAuthUserQueryRepository oauthUserRepository, 
+            IOAuthUserCommandRepository oauthUserCommandRepository, 
+            IOAuthClientQueryRepository oauthClientRepository, 
+            IUserConsentFetcher userConsentFetcher, 
+            IDataProtectionProvider dataProtectionProvider, 
+            IResponseModeHandler responseModeHandler,
+            IOptions<OAuthHostOptions> opts)
         {
             _oauthUserRepository = oauthUserRepository;
             _oAuthUserCommandRepository = oauthUserCommandRepository;
             _oauthClientRepository = oauthClientRepository;
             _userConsentFetcher = userConsentFetcher;
+            _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _oauthHostOptions = opts.Value;
         }
@@ -54,16 +65,6 @@ namespace SimpleIdServer.OpenID.UI
             {
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
-                var cancellationUrl = query.GetRedirectUriFromAuthorizationRequest();
-                if (!string.IsNullOrWhiteSpace(cancellationUrl))
-                {
-                    var state = query.GetStateFromAuthorizationRequest();
-                    if (!string.IsNullOrWhiteSpace(state))
-                    {
-                        cancellationUrl = QueryHelpers.AddQueryString(cancellationUrl, AuthorizationRequestParameters.State, state);
-                    }
-                }
-
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
@@ -79,14 +80,38 @@ namespace SimpleIdServer.OpenID.UI
                     oauthClient.ClientNames.GetTranslation(defaultLanguage, oauthClient.ClientId),
                     returnUrl,
                     oauthClient.AllowedScopes.Where(c => scopes.Contains(c.Name)).Select(s => s.Name),
-                    claimDescriptions,
-                    cancellationUrl));
+                    claimDescriptions));
             }
             catch(CryptographicException)
             {
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}" });
             }
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public void Reject(RejectConsentViewModel viewModel)
+        {
+            var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
+            var query = unprotectedUrl.GetQueries().ToJObj();
+            var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
+            var state = query.GetStateFromAuthorizationRequest();
+            var jObj = new JObject
+            {
+                { ErrorResponseParameters.Error, ErrorCodes.ACCESS_DENIED },
+                { ErrorResponseParameters.ErrorDescription, ErrorMessages.ACCESS_REVOKED_BY_RESOURCE_OWNER }
+            };
+            if (!string.IsNullOrWhiteSpace(state))
+            {
+                jObj.Add(ErrorResponseParameters.State, state);
+            }
+
+            var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
+            _responseModeHandler.Handle(query, redirectUrlAuthorizationResponse, HttpContext);
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

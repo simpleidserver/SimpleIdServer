@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Web;
 
 namespace SimpleIdServer.OAuth.Extensions
 {
@@ -102,7 +103,9 @@ namespace SimpleIdServer.OAuth.Extensions
 
         public static string GetRedirectUriFromAuthorizationRequest(this JObject jObj)
         {
-            return jObj.GetStr(AuthorizationRequestParameters.RedirectUri);
+            var result = jObj.GetStr(AuthorizationRequestParameters.RedirectUri);
+            result = HttpUtility.UrlDecode(result);
+            return result;
         }
 
         #endregion

@@ -4,11 +4,12 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
+using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
@@ -39,10 +40,11 @@ namespace SimpleIdServer.OpenBankingApi.UI
         private readonly IDataProtector _dataProtector;
         private readonly IAccountAccessConsentRepository _accountAccessConsentRepository;
         private readonly IAccountRepository _accountRepository;
-        private readonly OAuthHostOptions _oauthHostOptions;
-        private readonly ILogger<OpenBankingApiAccountConsentController> _logger;
         private readonly IMediator _mediator;
+        private readonly IResponseModeHandler _responseModeHandler;
+        private readonly OAuthHostOptions _oauthHostOptions;
         private readonly OpenBankingApiOptions _openbankingApiOptions;
+        private readonly ILogger<OpenBankingApiAccountConsentController> _logger;
 
         public OpenBankingApiAccountConsentController(
             IOAuthUserQueryRepository oauthUserRepository, 
@@ -52,6 +54,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
             IDataProtectionProvider dataProtectionProvider,
             IAccountAccessConsentRepository accountAccessConsentRepository,
             IAccountRepository accountRepository,
+            IResponseModeHandler responseModeHandler,
             IMediator mediator,
             ILogger<OpenBankingApiAccountConsentController> logger,
             IOptions<OAuthHostOptions> oauthHostOptions,
@@ -64,6 +67,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _accountAccessConsentRepository = accountAccessConsentRepository;
             _accountRepository = accountRepository;
+            _responseModeHandler = responseModeHandler;
             _mediator = mediator;
             _logger = logger;
             _oauthHostOptions = oauthHostOptions.Value;
@@ -81,16 +85,6 @@ namespace SimpleIdServer.OpenBankingApi.UI
             {
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
-                var cancellationUrl = query.GetRedirectUriFromAuthorizationRequest();
-                if (!string.IsNullOrWhiteSpace(cancellationUrl))
-                {
-                    var state = query.GetStateFromAuthorizationRequest();
-                    if (!string.IsNullOrWhiteSpace(state))
-                    {
-                        cancellationUrl = QueryHelpers.AddQueryString(cancellationUrl, AuthorizationRequestParameters.State, state);
-                    }
-                }
-
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -113,7 +107,6 @@ namespace SimpleIdServer.OpenBankingApi.UI
                 var accounts = await _accountRepository.GetBySubject(claimName.Value, cancellationToken);
                 return View(new OpenBankingApiAccountConsentIndexViewModel(
                     returnUrl,
-                    cancellationUrl,
                     oauthClient.ClientNames.GetTranslation(defaultLanguage, oauthClient.ClientId),
                     accounts.Select(a =>new OpenBankingApiAccountViewModel
                     {
@@ -140,10 +133,26 @@ namespace SimpleIdServer.OpenBankingApi.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(RejectOpenBankingApiAccountConsentViewModel viewModel, CancellationToken cancellationToken)
+        public async Task Reject(RejectOpenBankingApiAccountConsentViewModel viewModel, CancellationToken cancellationToken)
         {
+            var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             await _mediator.Send(new RejectAccountAccessConsentCommand { ConsentId = viewModel.ConsentId }, cancellationToken);
-            return Redirect(viewModel.CancellationUrl);
+            var query = unprotectedUrl.GetQueries().ToJObj();
+            var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
+            var state = query.GetStateFromAuthorizationRequest();
+            var jObj = new JObject
+            {
+                { ErrorResponseParameters.Error, ErrorCodes.ACCESS_DENIED },
+                { ErrorResponseParameters.ErrorDescription, OpenID.ErrorMessages.ACCESS_REVOKED_BY_RESOURCE_OWNER }
+            };
+            if (!string.IsNullOrWhiteSpace(state))
+            {
+                jObj.Add(ErrorResponseParameters.State, state);
+            }
+
+            var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
+            _responseModeHandler.Handle(query, redirectUrlAuthorizationResponse, HttpContext);
         }
 
         [HttpPost]

@@ -46,5 +46,6 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_AUDIENCE = "invalid audiences";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
+        public const string ACCESS_REVOKED_BY_RESOURCE_OWNER = "access has been revoked by the resource owner";
     }
 }

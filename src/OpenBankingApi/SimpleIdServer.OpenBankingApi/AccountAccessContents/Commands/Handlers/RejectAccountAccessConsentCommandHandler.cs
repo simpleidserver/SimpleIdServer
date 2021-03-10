@@ -27,12 +27,13 @@ namespace SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands.Handlers
             var accountAccessConsent = _commandRepository.GetLastAggregate<AccountAccessConsentAggregate>(request.ConsentId);
             if (accountAccessConsent == null)
             {
-                _logger.LogError($"Access Access Consent '{request.ConsentId}' doesn't exist");
+                _logger.LogError($"Account Access Consent '{request.ConsentId}' doesn't exist");
                 throw new UnknownAccountAccessConsentException(string.Format(Global.UnknownAccountAccessConsent, request.ConsentId));
             }
 
             accountAccessConsent.Reject();
             await _commandRepository.Commit(accountAccessConsent, cancellationToken);
+            _logger.LogInformation($"Account Access Consent '{request.ConsentId}' has been rejected");
             return true;
         }
     }

@@ -2,7 +2,7 @@
 {
     public class RejectOpenBankingApiAccountConsentViewModel
     {
-        public string CancellationUrl { get; set; }
+        public string ReturnUrl { get; set; }
         public string ConsentId { get; set; }
     }
 }

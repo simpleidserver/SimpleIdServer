@@ -6,6 +6,11 @@
 	ViewBag.Title = Global.consents;
 }
 
+<form method="post" action="@Url.Action("Reject", "Consents")" id="rejectForm">
+    @Html.AntiForgeryToken()
+    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
+</form>
+
 @using (Html.BeginForm("Index", "Consents", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
@@ -46,7 +51,7 @@
         </div>
         <div class="card-footer">
             <button type="submit" class="btn btn-success card-link">@Global.confirm</button>
-            <a href="@Model.CancellationUrl" class="btn btn-danger">@Global.reject</a>
+            <button type="submit" form="rejectForm" class="btn btn-danger">@Global.reject</button>
         </div>
     </div>
 }

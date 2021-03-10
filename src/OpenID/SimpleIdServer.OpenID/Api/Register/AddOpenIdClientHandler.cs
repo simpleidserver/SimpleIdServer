@@ -15,8 +15,7 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
-using SimpleIdServer.OpenID.SubjectTypeBuilders;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.OpenID.Api.Register
 {
@@ -62,6 +61,18 @@ namespace SimpleIdServer.OpenID.Api.Register
         {
             var openidClient = oauthClient as OpenIdClient;
             return openidClient.ToDto(issuer);
+        }
+
+        protected override void SetDefaultScopes(OAuthClient oauthClient)
+        {
+            base.SetDefaultScopes(oauthClient);
+            var scope = oauthClient.AllowedScopes.FirstOrDefault(s => s.Name == SIDOpenIdConstants.StandardScopes.OpenIdScope.Name);
+            if (scope == null)
+            {
+                var scopes = oauthClient.AllowedScopes.ToList();
+                scopes.Add(SIDOpenIdConstants.StandardScopes.OpenIdScope);
+                oauthClient.AllowedScopes = scopes;
+            }
         }
 
         protected virtual void SetDefaultApplicationType(OpenIdClient openidClient)

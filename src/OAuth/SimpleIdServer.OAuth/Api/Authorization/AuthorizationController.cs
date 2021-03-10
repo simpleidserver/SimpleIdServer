@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.OAuth.Api.Authorization
 {
@@ -71,6 +72,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                     }
                 }
 
+                FormatRedirectUrl(parameters);
                 var queryCollection = new QueryBuilder(parameters);
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
                 var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
@@ -117,6 +119,16 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
             _responseModeHandler.Handle(context.Request.Data, redirectUrlAuthorizationResponse, HttpContext);
+        }
+
+        private static void FormatRedirectUrl(List<KeyValuePair<string, string>> parameters)
+        {
+            var kvp = parameters.FirstOrDefault(k => k.Key == AuthorizationRequestParameters.RedirectUri);
+            if (!kvp.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(kvp.Value))
+            {
+                parameters.Remove(kvp);
+                parameters.Add(new KeyValuePair<string, string>(AuthorizationRequestParameters.RedirectUri, HttpUtility.UrlEncode(kvp.Value)));
+            }
         }
     }
 }

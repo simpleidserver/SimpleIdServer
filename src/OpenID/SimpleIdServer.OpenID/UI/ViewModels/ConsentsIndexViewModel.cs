@@ -6,18 +6,16 @@ namespace SimpleIdServer.OpenID.UI.ViewModels
 {
     public class ConsentsIndexViewModel
     {
-        public ConsentsIndexViewModel(string clientName, string returnUrl, IEnumerable<string> scopeNames, IEnumerable<string> claimNames, string cancellationUrl)
+        public ConsentsIndexViewModel(string clientName, string returnUrl, IEnumerable<string> scopeNames, IEnumerable<string> claimNames)
         {
             ClientName = clientName;
             ReturnUrl = returnUrl;
             ScopeNames = scopeNames;
             ClaimNames = claimNames;
-            CancellationUrl = cancellationUrl;
         }
 
         public string ClientName { get; set; }
         public string ReturnUrl { get; set; }
-        public string CancellationUrl { get; set; }
         public IEnumerable<string> ScopeNames { get; set; }
         public IEnumerable<string> ClaimNames { get; set; }
     }

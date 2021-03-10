@@ -8,7 +8,7 @@
 
 <form method="post" action="@Url.Action("Reject", "OpenBankingApiAccountConsent")" id="rejectForm">
     @Html.AntiForgeryToken()
-    <input name="CancellationUrl" type="hidden" value="@Model.CancellationUrl" />
+    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
     <input name="ConsentId" type="hidden" value="@Model.Consent.Id" />
 </form>
 

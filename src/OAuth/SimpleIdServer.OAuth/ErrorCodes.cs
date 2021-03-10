@@ -18,5 +18,6 @@ namespace SimpleIdServer.OAuth
         public static string UNSUPPORTED_RESPONSE_MODE = "unsupported_response_mode";
         public static string UNSUPPORTED_RESPONSE_TYPE = "unsupported_response_type";
         public static string LOGIN_REQUIRED = "login_required";
+        public static string ACCESS_DENIED = "access_denied";
     }
 }
