@@ -33,7 +33,8 @@ namespace SimpleIdServer.OpenBankingApi.Accounts
         public async Task<IActionResult> Get(string id)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var result = await _mediator.Send(new GetAccountQuery(id, issuer));
+            var token = Request.Headers["Authorization"].ToString().Split(' ').Last();
+            var result = await _mediator.Send(new GetAccountQuery(token, id, issuer));
             return new OkObjectResult(result);
         }
     }

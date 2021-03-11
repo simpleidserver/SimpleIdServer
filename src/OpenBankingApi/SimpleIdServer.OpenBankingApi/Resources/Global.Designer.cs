@@ -61,6 +61,15 @@ namespace SimpleIdServer.OpenBankingApi.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à access token &apos;{0}&apos; is invalid or has beenr revoked.
+        /// </summary>
+        public static string AccessTokenInvalid {
+            get {
+                return ResourceManager.GetString("AccessTokenInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Account Access Consent has been rejected.
         /// </summary>
         public static string AccountAccessConsentRejected {
@@ -75,6 +84,15 @@ namespace SimpleIdServer.OpenBankingApi.Resources {
         public static string AccountAccessConsentRevoked {
             get {
                 return ResourceManager.GetString("AccountAccessConsentRevoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à client is different.
+        /// </summary>
+        public static string ClientDifferent {
+            get {
+                return ResourceManager.GetString("ClientDifferent", resourceCulture);
             }
         }
         

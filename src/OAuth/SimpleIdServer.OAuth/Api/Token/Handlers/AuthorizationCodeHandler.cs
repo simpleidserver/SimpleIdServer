@@ -74,7 +74,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var previousClientId = previousRequest.GetClientId();
                 if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
+                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
                 }
 
                 await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);

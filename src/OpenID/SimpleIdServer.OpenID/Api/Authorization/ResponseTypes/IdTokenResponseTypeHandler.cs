@@ -22,8 +22,9 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
         }
 
         public string GrantType => "implicit";
-        public string ResponseType => "id_token";
+        public string ResponseType => RESPONSE_TYPE;
         public int Order => 3;
+        public static string RESPONSE_TYPE = "id_token";
 
         public Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {

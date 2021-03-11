@@ -34,7 +34,12 @@ namespace SimpleIdServer.OAuth.Api.Token
             var jObjHeader = Request.Headers.ToJObject();
             var jObjBody = Request.Form.ToJObject();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, null, clientCertificate));
-            return await _tokenRequestHandler.Handle(context, token);
+            var result = await _tokenRequestHandler.Handle(context, token);
+            // rfc6749 : the authorization server must include the HTTP "Cache-Control" response header field with a value of "no-store"
+            // in any response containing tokens, credentials, or sensitive information.
+            Response.Headers.Add("Cache-Control", "no-store");
+            Response.Headers.Add("Pragma", "no-cache");
+            return result;
         }
 
         [HttpPost("revoke")]

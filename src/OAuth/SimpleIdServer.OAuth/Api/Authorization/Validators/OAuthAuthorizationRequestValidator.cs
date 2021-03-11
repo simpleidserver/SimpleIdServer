@@ -70,7 +70,6 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
             {
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
             }
-
         }
     }
 }

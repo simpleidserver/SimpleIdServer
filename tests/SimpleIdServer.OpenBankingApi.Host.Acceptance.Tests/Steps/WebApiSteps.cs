@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
@@ -50,6 +51,11 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
 
         public static object ParseValue(string val, ScenarioContext scenarioContext)
         {
+            if (val == "$tomorrow$")
+            {
+                return DateTime.UtcNow.AddDays(1).ConvertToUnixTimestamp().ToString();
+            }
+
             if (val.StartsWith('$') && val.EndsWith('$'))
             {
                 val = val.TrimStart('$').TrimEnd('$');
@@ -263,11 +269,12 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
-        [When("add authorized Account Access Consent")]
-        public async Task GivenAddAuthorizedAccountAccessConsent()
+        [When("add authorized Account Access Consent '(.*)'")]
+        public async Task GivenAddAuthorizedAccountAccessConsent(string clientId)
         {
+            clientId = ParseValue(clientId).ToString();
             var accountAccessConsentRepository = _factory.Server.Host.Services.GetService(typeof(IAccountAccessConsentRepository)) as IAccountAccessConsentRepository;
-            var accountAccessConsent = AccountAccessConsentAggregate.Create(new List<string>
+            var accountAccessConsent = AccountAccessConsentAggregate.Create(clientId, new List<string>
             {
                 AccountAccessConsentPermission.ReadAccountsBasic.Name
             }, null, null, null, null);
@@ -276,11 +283,12 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(accountAccessConsent.AggregateId, "consentId");
         }
 
-        [When("add rejected Account Access Consent")]
-        public async Task GivenAddRejectedAccountAccessConsent()
+        [When("add rejected Account Access Consent '(.*)'")]
+        public async Task GivenAddRejectedAccountAccessConsent(string clientId)
         {
+            clientId = ParseValue(clientId).ToString();
             var accountAccessConsentRepository = _factory.Server.Host.Services.GetService(typeof(IAccountAccessConsentRepository)) as IAccountAccessConsentRepository;
-            var accountAccessConsent = AccountAccessConsentAggregate.Create(new List<string>
+            var accountAccessConsent = AccountAccessConsentAggregate.Create(clientId, new List<string>
             {
                 AccountAccessConsentPermission.ReadAccountsBasic.Name
             }, null, null, null, null);

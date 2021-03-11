@@ -8,6 +8,7 @@ namespace SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands
 {
     public class AddAccountAccessContentCommand : IRequest<AccountAccessContentResult>
     {
+        public string Token { get; set; }
         public AddAccountAccessContentData Data { get; set; }
         public JObject Risk { get; set; }
         public string Issuer { get; set; }

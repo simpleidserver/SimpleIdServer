@@ -2,6 +2,10 @@
 	Check errors returned by authorization
 
 Scenario: Error is returned when Account Access Consent doesn't exist
+	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
+	| Type | Kid | AlgName |
+	| SIG  | 1   | RS256   |
+
 	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                        | Value                             |
 	| token_endpoint_auth_method | tls_client_auth                   |
@@ -10,20 +14,31 @@ Scenario: Error is returned when Account Access Consent doesn't exist
 	| scope                      | accounts                          |
 	| redirect_uris              | [https://localhost:8080/callback] |
 	| tls_client_auth_san_dns    | firstMtlsClient                   |
+	| request_object_signing_alg | RS256                             |
+	| jwks                       | $jwks_json$                       |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
-		
-	And execute HTTP GET request 'https://localhost:8080/authorization'
+	
+	And use '1' JWK from 'jwks' to build JWS and store into 'request'
 	| Key           | Value                                                                         |
-	| response_type | id_token                                                                      |
+	| response_type | code id_token                                                                 |
 	| client_id     | $client_id$                                                                   |
 	| state         | state                                                                         |
 	| response_mode | fragment                                                                      |
 	| scope         | accounts                                                                      |
 	| redirect_uri  | https://localhost:8080/callback                                               |
 	| nonce         | nonce                                                                         |
+	| exp           | $tomorrow$                                                                    |
+	| aud           | https://localhost:8080                                                        |
 	| claims        | { id_token: { openbanking_intent_id: { value: "value", essential : true } } } |
+		
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value         |
+	| response_type | code id_token |
+	| client_id     | $client_id$   |
+	| request       | $request$     |
+	| scope         | accounts      |
 
 	And extract query parameters into JSON
 
@@ -31,6 +46,10 @@ Scenario: Error is returned when Account Access Consent doesn't exist
 	Then JSON 'error_description'='account access consent 'value' doesn't exist'
 
 Scenario: Error is returned when Account Access Consent has been rejected
+	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
+	| Type | Kid | AlgName |
+	| SIG  | 1   | RS256   |
+
 	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                        | Value                             |
 	| token_endpoint_auth_method | tls_client_auth                   |
@@ -39,22 +58,33 @@ Scenario: Error is returned when Account Access Consent has been rejected
 	| scope                      | accounts                          |
 	| redirect_uris              | [https://localhost:8080/callback] |
 	| tls_client_auth_san_dns    | firstMtlsClient                   |
+	| request_object_signing_alg | RS256                             |
+	| jwks                       | $jwks_json$                       |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
 
-	And add rejected Account Access Consent
+	And add rejected Account Access Consent '$client_id$'
 
-	And execute HTTP GET request 'https://localhost:8080/authorization'
+	And use '1' JWK from 'jwks' to build JWS and store into 'request'
 	| Key           | Value                                                                               |
-	| response_type | id_token                                                                            |
+	| response_type | code id_token                                                                       |
 	| client_id     | $client_id$                                                                         |
 	| state         | state                                                                               |
 	| response_mode | fragment                                                                            |
 	| scope         | accounts                                                                            |
 	| redirect_uri  | https://localhost:8080/callback                                                     |
 	| nonce         | nonce                                                                               |
+	| exp           | $tomorrow$                                                                          |
+	| aud           | https://localhost:8080                                                              |
 	| claims        | { id_token: { openbanking_intent_id: { value: "$consentId$", essential : true } } } |
+
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value         |
+	| response_type | code id_token |
+	| client_id     | $client_id$   |
+	| request       | $request$     |
+	| scope         | accounts      |
 
 	And extract query parameters into JSON
 
@@ -145,3 +175,47 @@ Scenario: Error is returned when request object is expired
 
 	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='request object is expired'
+
+Scenario: Error is returned when request object contains invalid audience
+	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
+	| Type | Kid | AlgName |
+	| SIG  | 1   | RS256   |
+
+	And execute HTTP POST JSON request 'https://localhost:8080/register'
+	| Key                        | Value                             |
+	| token_endpoint_auth_method | tls_client_auth                   |
+	| response_types             | [token,code,id_token]             |
+	| grant_types                | [client_credentials]              |
+	| scope                      | accounts                          |
+	| request_object_signing_alg | RS256                             |
+	| jwks                       | $jwks_json$                       |
+	| client_id                  | invalid                           |
+	| redirect_uris              | [https://localhost:8080/callback] |
+	| tls_client_auth_san_dns    | firstMtlsClient                   |
+	
+	And extract JSON from body
+	And extract parameter 'client_id' from JSON body	
+	
+	And use '1' JWK from 'jwks' to build JWS and store into 'request'
+	| Key           | Value                           |
+	| response_type | id_token                        |
+	| client_id     | $client_id$                     |
+	| state         | state                           |
+	| response_mode | fragment                        |
+	| scope         | accounts                        |
+	| redirect_uri  | https://localhost:8080/callback |
+	| nonce         | nonce                           |
+	| exp           | $tomorrow$                      |
+	| aud           | http://web.com                  |
+	
+	And execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value       |
+	| response_type | id_token    |
+	| client_id     | $client_id$ |
+	| request       | $request$   |
+	| scope         | accounts    |
+	
+	And extract query parameters into JSON
+
+	Then JSON 'error'='invalid_request_object'
+	Then JSON 'error_description'='request object has bad audience'

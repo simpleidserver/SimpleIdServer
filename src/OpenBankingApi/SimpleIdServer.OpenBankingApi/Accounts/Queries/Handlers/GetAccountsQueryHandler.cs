@@ -8,6 +8,7 @@ using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenBankingApi.Accounts.Results;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
+using SimpleIdServer.OpenBankingApi.Exceptions;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenBankingApi.Resources;
 using System.Threading;
@@ -46,14 +47,14 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
             if (jwsPayload == null)
             {
                 _logger.LogError("access token is invalid");
-                throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.BAD_TOKEN);
+                throw new UnauthorizedException(ErrorMessages.BAD_TOKEN);
             }
 
             var token = await _tokenQueryRepository.Get(request.AccessToken, cancellationToken);
             if (token == null)
             {
                 _logger.LogError("cannot get accounts because access token has been rejected");
-                throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
+                throw new UnauthorizedException(ErrorMessages.ACCESS_TOKEN_REJECTED);
             }
 
             var consentId = jwsPayload[_options.OpenBankingApiConsentClaimName].ToString();

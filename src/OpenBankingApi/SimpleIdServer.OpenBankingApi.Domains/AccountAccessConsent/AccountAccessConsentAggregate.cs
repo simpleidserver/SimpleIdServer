@@ -57,6 +57,10 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
         /// Get account ids.
         /// </summary>
         public IEnumerable<string> AccountIds { get; set; }
+        /// <summary>
+        /// OAuth clientid.
+        /// </summary>
+        public string ClientId { get; set; }
 
         public void Confirm(IEnumerable<string> accountIds)
         {
@@ -83,10 +87,10 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
             return result;
         }
 
-        public static AccountAccessConsentAggregate Create(ICollection<string> permissions, DateTime? expirationDateTime, DateTime? transactionFromDateTime, DateTime? transactionToDateTime, string risk)
+        public static AccountAccessConsentAggregate Create(string clientId, ICollection<string> permissions, DateTime? expirationDateTime, DateTime? transactionFromDateTime, DateTime? transactionToDateTime, string risk)
         {
             var result = new AccountAccessConsentAggregate();
-            var evt = new AccountAccessConsentAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, permissions, expirationDateTime, transactionFromDateTime, transactionToDateTime, risk);
+            var evt = new AccountAccessConsentAddedEvent(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), 0, clientId, permissions, expirationDateTime, transactionFromDateTime, transactionToDateTime, risk);
             result.Handle(evt);
             result.DomainEvents.Add(evt);
             return result;
@@ -135,6 +139,7 @@ namespace SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent
             }
 
             AggregateId = evt.AggregateId;
+            ClientId = evt.ClientId;
             Status = AccountAccessConsentStatus.AwaitingAuthorisation;
             Permissions = permissions;
             ExpirationDateTime = evt.ExpirationDateTime;

@@ -2,7 +2,11 @@
 	Check /accounts endpoint
 
 Scenario: Get accounts (Basic)
-	When execute HTTP POST JSON request 'https://localhost:8080/register'
+	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
+	| Type | Kid | AlgName |
+	| SIG  | 1   | RS256   |
+
+	And execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                          | Value                                            |
 	| token_endpoint_auth_method   | tls_client_auth                                  |
 	| response_types               | [token,code,id_token]                            |
@@ -12,6 +16,8 @@ Scenario: Get accounts (Basic)
 	| tls_client_auth_san_dns      | firstMtlsClient                                  |
 	| id_token_signed_response_alg | PS256                                            |
 	| token_signed_response_alg    | PS256                                            |
+	| request_object_signing_alg   | RS256                                            |
+	| jwks                         | $jwks_json$                                      |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
@@ -36,20 +42,28 @@ Scenario: Get accounts (Basic)
 	And extract JSON from body
 	And extract parameter 'Data.ConsentId' from JSON body into 'consentId'
 
-	And 'administrator' confirm consent '$consentId$' for accounts '22289', with scopes 'accounts'
+	And 'administrator' confirm consent '$consentId$' for accounts '22289', with scopes 'accounts'	
+	
+	And use '1' JWK from 'jwks' to build JWS and store into 'request'
+	| Key           | Value                                                                               |
+	| response_type | id_token code                                                                       |
+	| client_id     | $client_id$                                                                         |
+	| state         | MTkCNSYlem                                                                          |
+	| response_mode | fragment                                                                            |
+	| scope         | accounts                                                                            |
+	| redirect_uri  | https://localhost:8080/callback                                                     |
+	| nonce         | nonce                                                                               |
+	| claims        | { id_token: { openbanking_intent_id : { value: "$consentId$", essential: true } } } |
+	| exp           | $tomorrow$                                                                          |
+	| aud           | https://localhost:8080                                                              |
 		
 	And execute HTTP GET request 'https://localhost:8080/authorization'
-	| Key                  | Value                                                                               |
-	| X-Testing-ClientCert | mtlsClient.crt                                                                      |
-	| response_type        | id_token code                                                                       |
-	| client_id            | $client_id$                                                                         |
-	| state                | state                                                                               |
-	| response_mode        | fragment                                                                            |
-	| scope                | accounts                                                                            |
-	| redirect_uri         | https://localhost:8080/callback                                                     |
-	| nonce                | nonce                                                                               |
-	| state                | MTkCNSYlem                                                                          |
-	| claims               | { id_token: { openbanking_intent_id : { value: "$consentId$", essential: true } } } |
+	| Key                  | Value          |
+	| X-Testing-ClientCert | mtlsClient.crt |
+	| response_type        | id_token code  |
+	| scope                | accounts       |
+	| client_id            | $client_id$    |
+	| request              | $request$      |
 
 	And extract 'code' from callback
 
@@ -79,7 +93,11 @@ Scenario: Get accounts (Basic)
 	Then JSON doesn't exist 'Data.Account[0].Accounts[0].SecondaryIdentification'
 
 Scenario: Get accounts (Detail)
-	When execute HTTP POST JSON request 'https://localhost:8080/register'
+	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
+	| Type | Kid | AlgName |
+	| SIG  | 1   | RS256   |
+
+	And execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key                          | Value                                            |
 	| token_endpoint_auth_method   | tls_client_auth                                  |
 	| response_types               | [token,code,id_token]                            |
@@ -89,6 +107,8 @@ Scenario: Get accounts (Detail)
 	| tls_client_auth_san_dns      | firstMtlsClient                                  |
 	| id_token_signed_response_alg | PS256                                            |
 	| token_signed_response_alg    | PS256                                            |
+	| request_object_signing_alg   | RS256                                            |
+	| jwks                         | $jwks_json$                                      |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
@@ -113,20 +133,28 @@ Scenario: Get accounts (Detail)
 	And extract JSON from body
 	And extract parameter 'Data.ConsentId' from JSON body into 'consentId'
 
-	And 'administrator' confirm consent '$consentId$' for accounts '22289', with scopes 'accounts'
+	And 'administrator' confirm consent '$consentId$' for accounts '22289', with scopes 'accounts'	
+	
+	And use '1' JWK from 'jwks' to build JWS and store into 'request'
+	| Key           | Value                                                                               |
+	| response_type | id_token code                                                                       |
+	| client_id     | $client_id$                                                                         |
+	| state         | MTkCNSYlem                                                                          |
+	| response_mode | fragment                                                                            |
+	| scope         | accounts                                                                            |
+	| redirect_uri  | https://localhost:8080/callback                                                     |
+	| nonce         | nonce                                                                               |
+	| claims        | { id_token: { openbanking_intent_id : { value: "$consentId$", essential: true } } } |
+	| exp           | $tomorrow$                                                                          |
+	| aud           | https://localhost:8080                                                              |
 		
 	And execute HTTP GET request 'https://localhost:8080/authorization'
-	| Key                  | Value                                                                               |
-	| X-Testing-ClientCert | mtlsClient.crt                                                                      |
-	| response_type        | id_token code                                                                       |
-	| client_id            | $client_id$                                                                         |
-	| state                | state                                                                               |
-	| response_mode        | fragment                                                                            |
-	| scope                | accounts                                                                            |
-	| redirect_uri         | https://localhost:8080/callback                                                     |
-	| nonce                | nonce                                                                               |
-	| state                | MTkCNSYlem                                                                          |
-	| claims               | { id_token: { openbanking_intent_id : { value: "$consentId$", essential: true } } } |
+	| Key                  | Value          |
+	| X-Testing-ClientCert | mtlsClient.crt |
+	| response_type        | id_token code  |
+	| scope                | accounts       |
+	| client_id            | $client_id$    |
+	| request              | $request$      |
 
 	And extract 'code' from callback
 

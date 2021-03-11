@@ -203,6 +203,11 @@ namespace SimpleIdServer.OAuth.Jwt
             }
 
             var jsonWebKey = await GetJsonWebKeyFromClient(client, protectedHeader.Kid);
+            if (jsonWebKey ==null)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_JSON_WEB_KEY, protectedHeader.Kid));
+            }
+
             return Unsign(jws, jsonWebKey);
         }
 

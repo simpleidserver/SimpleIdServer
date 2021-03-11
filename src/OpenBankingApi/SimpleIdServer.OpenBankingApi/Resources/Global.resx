@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessTokenInvalid" xml:space="preserve">
+    <value>access token '{0}' is invalid or has beenr revoked</value>
+  </data>
   <data name="AccountAccessConsentRejected" xml:space="preserve">
     <value>Account Access Consent has been rejected</value>
   </data>
   <data name="AccountAccessConsentRevoked" xml:space="preserve">
     <value>account access consent has been revoked</value>
+  </data>
+  <data name="ClientDifferent" xml:space="preserve">
+    <value>client is different</value>
   </data>
   <data name="ConsentIdCannotBeExtracted" xml:space="preserve">
     <value>consentid cannot be extracted from the request</value>

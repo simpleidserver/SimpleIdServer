@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OpenID.Domains;
 using System.Collections.Generic;
 
@@ -7,6 +8,12 @@ namespace SimpleIdServer.OpenID
 {
     public static class SIDOpenIdConstants
     {
+        public static List<string[]> HybridWorkflows = new List<string[]>
+        {
+            new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE },
+            new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Api.Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE },
+            new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Api.Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
+        };
         public static class EndPoints
         {
             public const string OpenIDConfiguration = ".well-known/openid-configuration";

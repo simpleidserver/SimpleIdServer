@@ -37,7 +37,7 @@ namespace SimpleIdServer.OpenID.Helpers
                     defaultAcr = await GetSupportedAcr(acrClaim.Values, cancellationToken);
                     if (defaultAcr == null && acrClaim.IsEssential)
                     {
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_ESSENTIAL_ACR_IS_SUPPORTED);
+                        throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.NO_ESSENTIAL_ACR_IS_SUPPORTED);
                     }
                 }
 

@@ -77,9 +77,15 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }
 
-            if (!await CheckRequestParameter(context))
+            var containsRequestObject = false;
+            if (!(containsRequestObject = await CheckRequestParameter(context)))
             {
-                await CheckRequestUriParameter(context);
+                containsRequestObject = await CheckRequestUriParameter(context);
+            }
+
+            if (!containsRequestObject)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, string.Join(",", new[] { AuthorizationRequestParameters.Request, AuthorizationRequestParameters.RequestUri })));
             }
 
             await CommonValidate(context, cancellationToken);
@@ -91,6 +97,11 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             if (string.IsNullOrWhiteSpace(redirectUri))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.RedirectUri));
+            }
+
+            if (!OpenID.SIDOpenIdConstants.HybridWorkflows.Any(r => r.Count() == responseTypes.Count() && responseTypes.OrderBy(s => s).SequenceEqual(r.OrderBy(s => s))))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED);
             }
 
             if (responseTypes.Contains(TokenResponseParameters.IdToken) && string.IsNullOrWhiteSpace(nonce))
@@ -159,9 +170,9 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             RedirectToConsentView(context, false);
         }
 
-        protected override void CheckRequestObject(JwsPayload jwsPayload, HandlerContext context)
+        protected override void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, HandlerContext context)
         {
-            base.CheckRequestObject(jwsPayload, context);
+            base.CheckRequestObject(header, jwsPayload, context);
             if (!jwsPayload.ContainsKey(Jwt.Constants.OAuthClaims.ExpirationTime))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, Jwt.Constants.OAuthClaims.ExpirationTime));
@@ -172,6 +183,12 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             if (currentDateTime > exp)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.REQUEST_OBJECT_IS_EXPIRED);
+            }
+
+            var audiences = jwsPayload.GetAudiences();
+            if (audiences.Any() && !audiences.Contains(context.Request.IssuerName))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.REQUEST_OBJECT_BAD_AUDIENCE);
             }
         }
 
@@ -199,6 +216,12 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 {
                     _logger.LogError($"Account Access Consent '{consentId}' doesn't exist");
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAccountAccessConsent, consentId));
+                }
+
+                if (accountAccessConsent.ClientId != context.Client.ClientId)
+                {
+                    _logger.LogError($"Client is different");
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientDifferent);
                 }
 
                 if (accountAccessConsent.Status == AccountAccessConsentStatus.AwaitingAuthorisation)

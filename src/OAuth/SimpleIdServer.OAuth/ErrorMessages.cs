@@ -65,6 +65,10 @@ namespace SimpleIdServer.OAuth
         public const string CERTIFICATE_SAN_DNS_INVALID = "certificate san DNS is invalid";
         public const string CERTIFICATE_SAN_EMAIL_INVALID = "certificate san EMAIL is invalid";
         public const string CERTIFICATE_SAN_IP_INVALID = "certificate san IP is invalid";
+        public const string CERTIFICATE_IS_REQUIRED = "certificate is required";
         public const string REQUEST_OBJECT_IS_EXPIRED = "request object is expired";
+        public const string REQUEST_OBJECT_BAD_AUDIENCE = "request object has bad audience";
+        public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
+        public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
     }
 }

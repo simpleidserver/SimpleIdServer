@@ -169,7 +169,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "authorization_code", "implicit", "client_credentials"
+                        "authorization_code", "implicit", "client_credentials", "refresh_token"
                     },
                     JsonWebKeys = new List<JsonWebKey>
                     {
@@ -213,7 +213,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "authorization_code", "implicit", "client_credentials"
+                        "authorization_code", "implicit", "client_credentials", "refresh_token"
                     },
                     RedirectionUrls = new List<string>
                     {

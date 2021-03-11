@@ -4,7 +4,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Options;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Middlewares
@@ -48,7 +52,14 @@ namespace SimpleIdServer.OAuth.Middlewares
             if (!x509AuthResult.Succeeded)
             {
                 _logger.LogError($"MTLS authentication failed : {x509AuthResult.Failure?.Message}");
-                await context.ForbidAsync(_options.CertificateAuthenticationScheme);
+                var error = new JObject
+                {
+                    { ErrorResponseParameters.Error, ErrorCodes.INVALID_REQUEST },
+                    { ErrorResponseParameters.ErrorDescription, ErrorMessages.CERTIFICATE_IS_REQUIRED }
+                };
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                context.Response.Headers.Add("Content-Type", "application/json");
+                await context.Response.WriteAsync(error.ToString(), Encoding.UTF8);
             }
 
             return x509AuthResult;

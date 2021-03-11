@@ -339,7 +339,7 @@ Scenario: Error is returned when request parameter is a JWS token with an invali
 	And extract JSON from body
 	
 	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='the signature algorithm is invalid'
+	Then JSON 'error_description'='unknown json web key '1''
 
 Scenario: Error is returned when request parameter doesn't contain response_type
 	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
@@ -372,7 +372,7 @@ Scenario: Error is returned when request parameter doesn't contain response_type
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='the response type claim is missing'
 
 Scenario: Error is returned when request parameter doesn't contain client_id
@@ -407,7 +407,7 @@ Scenario: Error is returned when request parameter doesn't contain client_id
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='the client identifier claim is missing'
 
 Scenario: Error is returned when request parameter contains an invalid response_type
@@ -443,8 +443,8 @@ Scenario: Error is returned when request parameter contains an invalid response_
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='the response type claim is invalid'
+	Then JSON 'error'='unsupported_response_type'
+	Then JSON 'error_description'='response types token are not supported by the client'
 
 Scenario: Error is returned when request parameter contains an invalid client identifier
 	When build JSON Web Keys, store JWKS into 'jwks' and store the public keys into 'jwks_json'
@@ -480,7 +480,7 @@ Scenario: Error is returned when request parameter contains an invalid client id
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='the client identifier claim is invalid'
 
 Scenario: Error is returned when request uri is invalid
@@ -605,6 +605,6 @@ Scenario: Error is returned when an invalid essential acr value is passed in the
 
 	And extract query parameters into JSON
 
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='access_denied'
 	Then JSON 'error_description'='no essential acr is supported'
 	Then JSON 'state'='state'

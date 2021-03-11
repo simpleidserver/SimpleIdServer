@@ -9,6 +9,7 @@ using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi;
+using SimpleIdServer.OpenBankingApi.Api.Authorization.ResponseModes;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.Validators;
 using SimpleIdServer.OpenBankingApi.Api.Register;
 using SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders;
@@ -62,6 +63,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.RemoveAll<IOAuthResponseModeHandler>();
             services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
             services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
+
+            services.RemoveAll<IResponseModeHandler>();
+            services.AddTransient<IResponseModeHandler, OpenBankingApiResponseModeHandler>();
 
             services.RemoveAll<IAddOAuthClientHandler>();
             services.AddTransient<IAddOAuthClientHandler, AddOpenBankingApiClientHandler>();

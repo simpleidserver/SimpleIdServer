@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,11 +22,13 @@ namespace SimpleIdServer.OpenBankingApi.AccountAccessContents
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] AddAccountAccessContentCommand addAccountAccessContent, CancellationToken token)
+        public async Task<IActionResult> Add([FromBody] AddAccountAccessContentCommand addAccountAccessContent, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var token = Request.Headers["Authorization"].ToString().Split(' ').Last();
+            addAccountAccessContent.Token = token;
             addAccountAccessContent.Issuer = issuer;
-            var result = await _mediator.Send(addAccountAccessContent, token);
+            var result = await _mediator.Send(addAccountAccessContent, cancellationToken);
             return new OkObjectResult(result);
         }
     }

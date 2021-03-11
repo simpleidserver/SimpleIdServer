@@ -8,7 +8,6 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
@@ -102,7 +101,6 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             {
                 await responseTypeHandler.Enrich(context, cancellationToken);
             }
-
 
             _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);

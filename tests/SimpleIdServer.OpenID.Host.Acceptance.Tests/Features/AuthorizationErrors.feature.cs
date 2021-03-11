@@ -1269,7 +1269,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 342
- testRunner.Then("JSON \'error_description\'=\'the signature algorithm is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error_description\'=\'unknown json web key \'1\'\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -1379,7 +1379,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 375
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 376
  testRunner.Then("JSON \'error_description\'=\'the response type claim is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1495,7 +1495,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 410
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 411
  testRunner.Then("JSON \'error_description\'=\'the client identifier claim is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1614,10 +1614,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 446
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'unsupported_response_type\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 447
- testRunner.Then("JSON \'error_description\'=\'the response type claim is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error_description\'=\'response types token are not supported by the client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -1736,7 +1736,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 483
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 484
  testRunner.Then("JSON \'error_description\'=\'the client identifier claim is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

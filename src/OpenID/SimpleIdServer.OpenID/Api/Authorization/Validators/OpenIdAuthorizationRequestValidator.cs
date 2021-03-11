@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Jwt.Exceptions;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth;
@@ -189,7 +190,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         protected virtual async Task<bool> CheckRequest(HandlerContext context, string request)
         {
-            var openidClient = (OpenIdClient)context.Client;
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
@@ -215,49 +215,56 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
-            if (
-                (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg) ||
-                (string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != NoneSignHandler.ALG_NAME)
-            )
+            JwsPayload jwsPayload;
+            try
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SIGNATURE_ALG);
+                jwsPayload = await _jwtParser.Unsign(jws, context.Client);
+            }
+            catch(JwtException ex)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ex.Message);
             }
 
-            var jwsPayload = await _jwtParser.Unsign(jws, context.Client);
-            if (jwsPayload != null)
-            {
-                context.Request.SetData(JObject.FromObject(jwsPayload));
-            }
-
-            CheckRequestObject(jwsPayload, context);
+            jwsPayload.Add(AuthorizationRequestParameters.Request, request);
+            context.Request.SetData(JObject.FromObject(jwsPayload));
+            CheckRequestObject(header, jwsPayload, context);
             return true;
         }
 
-        protected virtual void CheckRequestObject(JwsPayload jwsPayload, HandlerContext context)
+        protected virtual void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, HandlerContext context)
         {
             if (jwsPayload == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
+            var openidClient = (OpenIdClient)context.Client;
+            if (
+                (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg) ||
+                (string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != NoneSignHandler.ALG_NAME)
+            )
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_SIGNATURE_ALG);
+            }
+
             if (!jwsPayload.ContainsKey(OAuth.DTOs.AuthorizationRequestParameters.ResponseType))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_RESPONSE_TYPE_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_RESPONSE_TYPE_CLAIM);
             }
 
             if (!jwsPayload.ContainsKey(OAuth.DTOs.AuthorizationRequestParameters.ClientId))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_CLIENT_ID_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_CLIENT_ID_CLAIM);
             }
 
-            if (!jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ResponseType].ToString().Split(' ').OrderBy(s => s).SequenceEqual(context.Request.Data.GetResponseTypesFromAuthorizationRequest()))
+            if (!jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ResponseType].ToString().Split(' ').OrderBy(s => s).SequenceEqual(context.Request.Data.GetResponseTypesFromAuthorizationRequest().OrderBy(s => s)))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_RESPONSE_TYPE_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_RESPONSE_TYPE_CLAIM);
             }
 
             if (jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ClientId].ToString() != context.Client.ClientId)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_ID_CLAIM);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_CLIENT_ID_CLAIM);
             }
         }
 
