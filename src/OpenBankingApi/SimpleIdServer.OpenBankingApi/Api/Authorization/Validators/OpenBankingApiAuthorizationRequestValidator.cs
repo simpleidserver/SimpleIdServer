@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
@@ -156,6 +157,22 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
         protected override void RedirectToConsentView(HandlerContext context)
         {
             RedirectToConsentView(context, false);
+        }
+
+        protected override void CheckRequestObject(JwsPayload jwsPayload, HandlerContext context)
+        {
+            base.CheckRequestObject(jwsPayload, context);
+            if (!jwsPayload.ContainsKey(Jwt.Constants.OAuthClaims.ExpirationTime))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, Jwt.Constants.OAuthClaims.ExpirationTime));
+            }
+
+            var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();
+            var exp = jwsPayload.GetExpirationTime();
+            if (currentDateTime > exp)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.REQUEST_OBJECT_IS_EXPIRED);
+            }
         }
 
         private void RedirectToConsentView(HandlerContext context, bool ignoreDefaultRedirection = true)

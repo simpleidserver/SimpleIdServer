@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
@@ -72,6 +74,52 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             });
 
             return result;
+        }
+
+        [When("build JSON Web Keys, store JWKS into '(.*)' and store the public keys into '(.*)'")]
+        public void WhenBuildJwks(string jwksName, string publicKeys, Table table)
+        {
+            var keys = new JArray();
+            var jwks = ExtractJsonWebKeys(table);
+            foreach (var jsonWebKey in jwks)
+            {
+                keys.Add(jsonWebKey.GetPublicJwt());
+            }
+
+            var result = new JObject
+            {
+                { "keys", keys }
+            };
+
+            _scenarioContext.Set(jwks, jwksName);
+            _scenarioContext.Set(result, publicKeys);
+        }
+
+        [When("use '(.*)' JWK from '(.*)' to build JWS and store into '(.*)'")]
+        public void WhenBuildJWS(string kid, string jwksName, string name, Table table)
+        {
+            var jwks = _scenarioContext.Get<List<JsonWebKey>>(jwksName);
+            kid = ParseValue(kid).ToString();
+            name = ParseValue(name).ToString();
+            var jwk = jwks.First(j => j.Kid == kid);
+            var jwsPayload = new JwsPayload();
+            foreach (var row in table.Rows)
+            {
+                var key = row["Key"];
+                var value = ParseValue(row["Value"]);
+                jwsPayload.Add(key, value);
+            }
+
+            var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
+            var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
+            _scenarioContext.Set(jws, name);
+            var tokenCommandRepository = (ITokenCommandRepository)_factory.Server.Host.Services.GetService(typeof(ITokenCommandRepository));
+            tokenCommandRepository.Add(new Token
+            {
+                Id = jws,
+                CreateDateTime = DateTime.UtcNow,
+                TokenType = "access_token"
+            }, CancellationToken.None).Wait();
         }
 
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]

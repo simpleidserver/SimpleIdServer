@@ -13,6 +13,7 @@ namespace SimpleIdServer.OAuth
         public static string INVALID_GRANT = "invalid_grant";
         public static string INVALID_TOKEN = "invalid_token";
         public static string INVALID_SCOPE = "invalid_scope";
+        public static string INVALID_REQUEST_OBJECT = "invalid_request_object";
         public static string UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
         public static string UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
         public static string UNSUPPORTED_RESPONSE_MODE = "unsupported_response_mode";

@@ -187,7 +187,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             }
         }
 
-        protected async Task<bool> CheckRequest(HandlerContext context, string request)
+        protected virtual async Task<bool> CheckRequest(HandlerContext context, string request)
         {
             var openidClient = (OpenIdClient)context.Client;
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
@@ -224,6 +224,17 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             }
 
             var jwsPayload = await _jwtParser.Unsign(jws, context.Client);
+            if (jwsPayload != null)
+            {
+                context.Request.SetData(JObject.FromObject(jwsPayload));
+            }
+
+            CheckRequestObject(jwsPayload, context);
+            return true;
+        }
+
+        protected virtual void CheckRequestObject(JwsPayload jwsPayload, HandlerContext context)
+        {
             if (jwsPayload == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
@@ -248,9 +259,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_ID_CLAIM);
             }
-
-            context.Request.SetData(JObject.FromObject(jwsPayload));
-            return true;
         }
 
         protected async Task<string> GetFirstAmr(IEnumerable<string> acrValues, IEnumerable<AuthorizationRequestClaimParameter> claims, OpenIdClient client, CancellationToken cancellationToken)
