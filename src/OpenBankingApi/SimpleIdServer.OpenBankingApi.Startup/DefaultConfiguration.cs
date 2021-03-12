@@ -25,6 +25,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,
+            OpenBankingApiConstants.OpenBankingApiScopes.Accounts,
             new OpenIdScope
             {
                 Name = "scim",
@@ -207,6 +208,102 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                         }
                     },
                     TokenEndPointAuthMethod = "tls_client_auth",
+                    ResponseTypes = new List<string>
+                    {
+                        "id_token", "token", "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code", "implicit", "client_credentials", "refresh_token"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum"
+                    },
+                    JsonWebKeys = new List<JsonWebKey>
+                    {
+                        secondMtlsClientJsonWebKey
+                    },
+                    TlsClientAuthSubjectDN = "secondMtlsClient",
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "firstPrivateKeyJwtClient",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "privateKeyJwtClientSecret", null)
+                    },
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "PS256",
+                    IdTokenSignedResponseAlg = "PS256",
+                    RequestObjectSigningAlg = "PS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Phone,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Role,
+                        new OpenIdScope
+                        {
+                            CreateDateTime = DateTime.UtcNow,
+                            Name = "accounts"
+                        }
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback"
+                    },
+                    TokenEndPointAuthMethod = "private_key_jwt",
+                    ResponseTypes = new List<string>
+                    {
+                        "id_token", "token", "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code", "implicit", "client_credentials", "refresh_token"
+                    },
+                    JsonWebKeys = new List<JsonWebKey>
+                    {
+                        firstMtlsClientJsonWebKey
+                    },
+                    TlsClientAuthSubjectDN = "firstMtlsClient",
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "secondPrivateKeyJwtClient",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "privateKeyClientSecret", null)
+                    },
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "PS256",
+                    IdTokenSignedResponseAlg = "PS256",
+                    RequestObjectSigningAlg = "PS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Phone,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Role,
+                        new OpenIdScope
+                        {
+                            CreateDateTime = DateTime.UtcNow,
+                            Name = "accounts"
+                        }
+                    },
+                    TokenEndPointAuthMethod = "private_key_jwt",
                     ResponseTypes = new List<string>
                     {
                         "id_token", "token", "code"

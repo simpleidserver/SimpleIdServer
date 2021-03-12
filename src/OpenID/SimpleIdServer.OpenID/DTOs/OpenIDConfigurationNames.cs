@@ -21,5 +21,6 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string UserInfoEncryptionAlgValuesSupported = "userinfo_encryption_alg_values_supported";
         public const string UserInfoEncryptionEncValuesSupported = "userinfo_encryption_enc_values_supported";
         public const string ClaimsSupported = "claims_supported";
+        public const string ClaimsParameterSupported = "claims_parameter_supported";
     }
 }

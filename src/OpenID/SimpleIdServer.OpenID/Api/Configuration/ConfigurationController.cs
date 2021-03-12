@@ -70,6 +70,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JArray.FromObject(_cekHandlers.Select(r => r.AlgName)));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JArray.FromObject(_encHandlers.Select(r => r.EncName)));
             result.Add(OpenIDConfigurationNames.ClaimsSupported, JArray.FromObject(openidScopes));
+            result.Add(OpenIDConfigurationNames.ClaimsParameterSupported, true);
             return new OkObjectResult(result);
         }
     }

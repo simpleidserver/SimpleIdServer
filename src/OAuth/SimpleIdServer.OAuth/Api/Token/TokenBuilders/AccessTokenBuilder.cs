@@ -60,7 +60,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             {
                 handlerContext.Client.ClientId
             }, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
-            if (handlerContext.Client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD && handlerContext.Request.Certificate != null)
+            if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);
                 jwsPayload.Add(SimpleIdServer.Jwt.Constants.OAuthClaims.Cnf, new JObject

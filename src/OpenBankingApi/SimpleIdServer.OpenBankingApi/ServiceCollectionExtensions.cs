@@ -6,11 +6,13 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
+using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.ResponseModes;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.Validators;
+using SimpleIdServer.OpenBankingApi.Api.Configuration;
 using SimpleIdServer.OpenBankingApi.Api.Register;
 using SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi.Domains.Account;
@@ -69,6 +71,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.RemoveAll<IAddOAuthClientHandler>();
             services.AddTransient<IAddOAuthClientHandler, AddOpenBankingApiClientHandler>();
+
+            services.RemoveAll<IConfigurationRequestHandler>();
+            services.AddTransient<IConfigurationRequestHandler, OpenBankingApiConfigurationRequestHandler>();
 
             var accounts = new ConcurrentBag<AccountAggregate>();
             var accountAccessConsents = new ConcurrentBag<AccountAccessConsentAggregate>();
