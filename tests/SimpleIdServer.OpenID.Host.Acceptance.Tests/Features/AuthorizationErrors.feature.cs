@@ -2182,7 +2182,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract query parameters into JSON", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 608
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 609
  testRunner.Then("JSON \'error_description\'=\'no essential acr is supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

@@ -28,21 +28,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<bool> Add(SCIMRepresentation data, CancellationToken token)
         {
-            var record = new SCIMRepresentationModel
-            {
-                Created = data.Created,
-                ExternalId = data.ExternalId,
-                LastModified = data.LastModified,
-                Version = data.Version,
-                ResourceType = data.ResourceType,
-                Id = data.Id,
-                Attributes = data.Attributes.Select(a => a.ToModel(data.Id)).ToList(),
-                Schemas = data.Schemas.Select(s => new SCIMRepresentationSchemaModel
-                {
-                    SCIMRepresentationId = data.Id,
-                    SCIMSchemaId = s.Id
-                }).ToList()
-            };
+            var record = ToModel(data);
             _scimDbContext.SCIMRepresentationLst.Add(record);
             return Task.FromResult(true);
         }
@@ -98,6 +84,26 @@ namespace SimpleIdServer.Scim.Persistence.EF
                     GetAllAttributes(attr.Children, result);
                 }
             }
+        }
+
+        private static SCIMRepresentationModel ToModel(SCIMRepresentation representation)
+        {
+            var result = new SCIMRepresentationModel
+            {
+                Id = representation.Id,
+                Created = representation.Created,
+                ExternalId = representation.ExternalId,
+                LastModified = representation.LastModified,
+                Version = representation.Version,
+                ResourceType = representation.ResourceType,
+                Attributes = representation.Attributes.Select(a => a.ToModel(representation.Id)).ToList(),
+                Schemas = representation.Schemas.Select(s => new SCIMRepresentationSchemaModel
+                {
+                    SCIMRepresentationId = representation.Id,
+                    SCIMSchemaId = s.Id
+                }).ToList()
+            };
+            return result;
         }
     }
 }

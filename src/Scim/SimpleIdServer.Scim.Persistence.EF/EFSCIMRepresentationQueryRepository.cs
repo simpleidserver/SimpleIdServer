@@ -33,7 +33,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             var result = record.ToDomain();
-            _scimDbContext.Entry(record).State = EntityState.Detached;
+            Detach(record);
             return result;
         }
 
@@ -50,7 +50,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             var result = record.ToDomain();
-            _scimDbContext.Entry(record).State = EntityState.Detached;
+            Detach(record);
             return result;
         }
 
@@ -73,7 +73,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             var result = record.ToDomain();
-            _scimDbContext.Entry(record).State = EntityState.Detached;
+            Detach(record);
             return result;
         }
 
@@ -86,7 +86,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             var result = record.ToDomain();
-            _scimDbContext.Entry(record).State = EntityState.Detached;
+            Detach(record);
             return result;
         }
 
@@ -108,6 +108,42 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+        }
+
+        private void Detach(SCIMRepresentationModel representation)
+        {
+            _scimDbContext.Entry(representation).State = EntityState.Detached;
+            var attributes = _scimDbContext.ChangeTracker.Entries().Where(et =>
+            {
+                var att = et.Entity as SCIMRepresentationAttributeModel;
+                if (att == null)
+                {
+                    return false;
+                }
+
+                return att.RepresentationId == representation.Id;
+            });
+            var ids = attributes.Select(_ => ((SCIMRepresentationAttributeModel)_.Entity).Id).ToList();
+            foreach(var attribute in attributes)
+            {
+                _scimDbContext.Entry(attribute.Entity).State= EntityState.Detached;
+            }
+
+            var attributeValues = _scimDbContext.ChangeTracker.Entries().Where(et =>
+            {
+                var att = et.Entity as SCIMRepresentationAttributeValueModel;
+                if (att == null)
+                {
+                    return false;
+                }
+
+                return ids.Contains(att.SCIMRepresentationAttributeId);
+            });
+
+            foreach(var attribute in attributeValues)
+            {
+                _scimDbContext.Entry(attribute.Entity).State = EntityState.Detached;
+            }
         }
 
         private static IQueryable<SCIMRepresentationAttributeModel> IncludeRepresentationAttributeNavigationProperties(IQueryable<SCIMRepresentationAttributeModel> attributes)
