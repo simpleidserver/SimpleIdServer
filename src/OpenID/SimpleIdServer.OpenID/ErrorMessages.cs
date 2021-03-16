@@ -5,12 +5,12 @@ namespace SimpleIdServer.OpenID
     public static class ErrorMessages
     {
         public const string OPENID_SCOPE_MISSING = "openid scope is missing";
+        public const string POST_LOGOUT_REDIRECT_URI_IS_INVALID = "post_logout_redirect_uri {0} is invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
         public const string INVALID_POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri parameter is invalid";
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
-        public const string POST_LOGOUT_REDIRECT_URI_IS_INVALID = "post_logout_redirect_uri {0} is invalid";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_REQUEST_URI_PARAMETER = "request uri parameter is invalid";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
@@ -26,6 +26,7 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_HTTPS_INITIATE_LOGIN_URI = "initiate_login_uri doesn't contain https scheme";
         public const string INVALID_HTTPS_REDIRECT_URI = "redirect_uri does not contain https scheme";
         public const string INVALID_LOCALHOST_REDIRECT_URI = "redirect_uri must not contain localhost";
+        public const string INVALID_AUDIENCE = "invalid audiences";
         public const string INVALID_SUBJECT_TYPE = "subject_type is invalid";
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
         public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
@@ -43,9 +44,15 @@ namespace SimpleIdServer.OpenID
         public const string MISSING_AUD_CLAIM = "the audience claim is missing";
         public const string MISSING_RESPONSE_TYPE_CLAIM = "the response type claim is missing";
         public const string MISSING_CLIENT_ID_CLAIM = "the client identifier claim is missing";
-        public const string INVALID_AUDIENCE = "invalid audiences";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
         public const string ACCESS_REVOKED_BY_RESOURCE_OWNER = "access has been revoked by the resource owner";
+        public const string CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024 = "client_notification_token must not exceed 1024 characters";
+        public const string CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES = "client_notification_token must contains at least 128 bytes";
+        public const string BINDING_MESSAGE_MUST_NOT_EXCEED = "binding_message must not exceed {0} characters";
+        public const string REQUESTED_EXPIRY_MUST_BE_POSITIVE = "requested_expiry must be positive";
+        public const string LOGIN_HINT_TOKEN_IS_EXPIRED = "login_hint_token has expired";
+        public const string UNKNOWN_USER = "unknown user '{0}'";
+        public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
     }
 }

@@ -1,5 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -64,6 +67,7 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication();
+            ConfigureFireBase();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -90,6 +94,14 @@ namespace SimpleIdServer.OpenID.Startup
                 routes.MapRoute(
                     name: "DefaultRoute",
                     template: "{controller=Home}/{action=Index}/{id?}");
+            });
+        }
+
+        private void ConfigureFireBase()
+        {
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential.GetApplicationDefault()
             });
         }
 

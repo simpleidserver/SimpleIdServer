@@ -17,6 +17,8 @@ using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Api.Authorization;
 using SimpleIdServer.OpenID.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OpenID.Api.Authorization.Validators;
+using SimpleIdServer.OpenID.Api.BCAuthorize;
+using SimpleIdServer.OpenID.Api.BCDeviceRegistration;
 using SimpleIdServer.OpenID.Api.Register;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.Domains;
@@ -50,6 +52,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOpenIDStore()
                 .AddOpenIDAuthorizationApi()
                 .AddRegisterApi()
+                .AddBCAuthorizeApi()
+                .AddBCDeviceRegistrationApi()
                 .AddOpenIDAuthentication();
             return builder;
         }
@@ -140,6 +144,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients, scopes));
             services.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
             services.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
+            services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository());
             return services;
         }
 
@@ -165,6 +170,21 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISubjectTypeBuilder, PublicSubjectTypeBuilder>();
             services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();
             services.AddTransient<IAmrHelper, AmrHelper>();
+            return services;
+        }
+
+        private static IServiceCollection AddBCAuthorizeApi(this IServiceCollection services)
+        {
+            services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
+            services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
+            services.AddTransient<IBCNotificationService, BCNotificationService>();
+            return services;
+        }
+
+        private static IServiceCollection AddBCDeviceRegistrationApi(this IServiceCollection services)
+        {
+            services.AddTransient<IBCDeviceRegistrationHandler, BCDeviceRegistrationHandler>();
+            services.AddTransient<IBCDeviceRegistrationValidator, BCDeviceRegistrationValidator>();
             return services;
         }
 

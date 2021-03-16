@@ -20,5 +20,8 @@ namespace SimpleIdServer.OAuth
         public static string UNSUPPORTED_RESPONSE_TYPE = "unsupported_response_type";
         public static string LOGIN_REQUIRED = "login_required";
         public static string ACCESS_DENIED = "access_denied";
+        public static string INVALID_BINDING_MESSAGE = "invalid_binding_message";
+        public static string EXPIRED_LOGIN_HINT_TOKEN = "expired_login_hint_token";
+        public static string UNKNOWN_USER_ID = "unknown_user_id";
     }
 }

@@ -19,6 +19,8 @@ namespace SimpleIdServer.OpenID.Options
             IsRedirectionUrlHTTPSRequired = true;
             IsInitiateLoginUriHTTPSRequired = true;
             IsLocalhostAllowed = false;
+            MaxBindingMessageSize = 150;
+            AuthRequestExpirationTimeInSeconds = 120;
         }
 
         /// <summary>
@@ -63,5 +65,21 @@ namespace SimpleIdServer.OpenID.Options
         /// https://docs.identityserver.io/en/3.1.0/topics/mtls.html
         /// </summary>
         public bool IsMutualTlsEnabled { get; set; }
+        /// <summary>
+        /// Maximum number of characters for the "binding_message".
+        /// </summary>
+        public int MaxBindingMessageSize { get; set; }
+        /// <summary>
+        /// Set the FCM title.
+        /// </summary>
+        public string FcmTitle { get; set; }
+        /// <summary>
+        /// Set the FCM body.
+        /// </summary>
+        public string FcmBody { get; set; }
+        /// <summary>
+        /// Expiration time auth_req_id in seconds.
+        /// </summary>
+        public int AuthRequestExpirationTimeInSeconds { get; set; }
     }
 }

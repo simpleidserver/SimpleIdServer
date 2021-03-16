@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Shell xmlns="http://xamarin.com/schemas/2014/forms" 
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:SimpleIdServer.MobileApp.Views"
+       Title="SimpleIdServer.MobileApp"
+       Shell.NavBarIsVisible="False"
+       x:Class="SimpleIdServer.MobileApp.AppShell">
+    <ShellContent Route="LoginPage" ContentTemplate="{DataTemplate local:HomePage}" />
+</Shell>

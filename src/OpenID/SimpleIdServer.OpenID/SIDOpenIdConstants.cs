@@ -21,6 +21,8 @@ namespace SimpleIdServer.OpenID
             public const string CheckSession = "check_session";
             public const string EndSession = "end_session";
             public const string EndSessionCallback = "end_session_callback";
+            public const string BCAuthorize = OAuth.Constants.EndPoints.MtlsPrefix + "/bc-authorize";
+            public const string BCDeviceRegistration = "bc-device-registration";
         }
 
         public static class StandardClaims

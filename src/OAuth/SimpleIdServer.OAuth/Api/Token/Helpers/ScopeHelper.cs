@@ -12,6 +12,11 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
         public static IEnumerable<string> Validate(string scopeParameter, IEnumerable<string> allowedScopes)
         {
             var scopes = scopeParameter.ToScopes();
+            return Validate(scopes, allowedScopes);
+        }
+
+        public static IEnumerable<string> Validate(IEnumerable<string> scopes, IEnumerable<string> allowedScopes)
+        {
             var duplicates = scopes.GroupBy(p => p)
                 .Where(g => g.Count() > 1)
                 .Select(g => g.Key)

@@ -243,5 +243,43 @@ namespace SimpleIdServer.OpenID.Extensions
         }
 
         #endregion
+
+        #region Back channel authentication request
+
+        public static string GetLoginHintToken(this JObject jObj)
+        {
+            return jObj.GetStr(BCAuthenticationRequestParameters.LoginHintToken);
+        }
+
+        public static string GetClientNotificationToken(this JObject jObj)
+        {
+            return jObj.GetStr(BCAuthenticationRequestParameters.ClientNotificationToken);
+        }
+
+        public static string GetBindingMessage(this JObject jObj)
+        {
+            return jObj.GetStr(BCAuthenticationRequestParameters.BindingMessage);
+        }
+
+        public static string GetUserCode(this JObject jObj)
+        {
+            return jObj.GetStr(BCAuthenticationRequestParameters.UserCode);
+        }
+
+        public static int? GetRequestedExpiry(this JObject jObj)
+        {
+            return jObj.GetInt(BCAuthenticationRequestParameters.RequestedExpiry);
+        }
+
+        #endregion
+
+        #region Back channel device registration
+
+        public static string GetDeviceRegistrationToken(this JObject jObj)
+        {
+            return jObj.GetStr(BCDeviceRegistrationRequestParameters.DeviceRegistrationToken);
+        }
+
+        #endregion
     }
 }

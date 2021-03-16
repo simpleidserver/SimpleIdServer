@@ -19,6 +19,7 @@ namespace SimpleIdServer.OAuth.Domains
         public string Id { get; set; }
         public List<Claim> Claims { get; set; }
         public DateTime? AuthenticationTime { get; set; }
+        public string DeviceRegistrationToken { get; set; }
         public ICollection<OAuthConsent> Consents { get; set; }
         public ICollection<OAuthUserCredential> Credentials { get; set; }
         public DateTime CreateDateTime { get; set; }
@@ -31,6 +32,7 @@ namespace SimpleIdServer.OAuth.Domains
                 Id = Id,
                 Claims = Claims == null ? new List<Claim>() : Claims.Select(_ => new Claim(_.Type, _.Value, _.ValueType)).ToList(),
                 AuthenticationTime = AuthenticationTime,
+                DeviceRegistrationToken = DeviceRegistrationToken,
                 Consents = Consents == null ? new List<OAuthConsent>() : Consents.Select(c => (OAuthConsent)c.Clone()).ToList(),
                 Credentials = Credentials == null ? new List<OAuthUserCredential>() : Credentials.Select(c => (OAuthUserCredential)c.Clone()).ToList(),
                 CreateDateTime = CreateDateTime,

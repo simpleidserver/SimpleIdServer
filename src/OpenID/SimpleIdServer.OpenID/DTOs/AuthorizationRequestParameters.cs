@@ -16,5 +16,6 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string RequestUri = "request_uri";
         public const string SessionState = "session_state";
         public const string UILocales = "ui_locales";
+        public const string AuthReqId = "auth_req_id";
     }
 }
