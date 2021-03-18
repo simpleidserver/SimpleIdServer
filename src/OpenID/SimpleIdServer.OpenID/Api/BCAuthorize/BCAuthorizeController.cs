@@ -21,11 +21,12 @@ namespace SimpleIdServer.OpenID.Api.BCAuthentication
         }
 
         [HttpPost]
-        public Task<IActionResult> Post([FromBody] JObject jObjBody, CancellationToken cancellationToken)
+        public async Task<IActionResult> Post([FromBody] JObject jObjBody, CancellationToken cancellationToken)
         {
             var jObjHeader = Request.Headers.ToJObject();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, null));
-            return _bcAuthorizeHandler.Handle(context, cancellationToken);
+            var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate));
+            return await _bcAuthorizeHandler.Handle(context, cancellationToken);
         }
     }
 }

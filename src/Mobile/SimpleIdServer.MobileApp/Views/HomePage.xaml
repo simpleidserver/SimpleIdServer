@@ -9,7 +9,6 @@
         <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
             <!-- Display image -->
             <StackLayout  AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1" AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button Text="Add notification" Clicked="HandleAddNotification" />
                 <Image Source="SIDLogo.png" VerticalOptions="Center"  HeightRequest="140" />
                 <Label Text="SimpleIdServer" TextColor="White" Font="Bold,30" />
             </StackLayout>
@@ -31,9 +30,9 @@
                                     <TapGestureRecognizer Tapped="HandleNotification" CommandParameter="{Binding .}" />
                                 </Frame.GestureRecognizers>
                                 <StackLayout Orientation="Horizontal">
-                                    <Label Text="Image" />
+                                    <Image WidthRequest="60" Source="authenticate.png" />
                                     <StackLayout Orientation="Vertical">
-                                        <Label Text="{Binding Title}" />
+                                        <Label Text="{Binding Title}" FontSize="14" FontAttributes="Bold" />
                                         <Label Text="{Binding Description}" />
                                     </StackLayout>
                                 </StackLayout>

@@ -39,11 +39,11 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 Token = deviceRegistrationToken,
                 Android =new AndroidConfig
                 {
-                    Notification = new AndroidNotification
+                    Data = new Dictionary<string, string>
                     {
-                        Title = _options.FcmTitle,
-                        Body = _options.FcmBody,
-                        ClickAction = clickAction
+                        { "title", _options.FcmTitle },
+                        { "body", _options.FcmBody },
+                        { "clickAction", clickAction }
                     }
                 }
             }, cancellationToken);

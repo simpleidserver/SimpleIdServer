@@ -46,7 +46,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 string.IsNullOrWhiteSpace(context.Request.Data.GetIdTokenHintFromAuthorizationRequest()),
                 string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintFromAuthorizationRequest())
             };
-            if(tokens.All(_ => !_) || (tokens.Where(_ => _).Count() > 1))
+            if(tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
             }
@@ -92,9 +92,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024);
             }
 
-            if (System.Text.ASCIIEncoding.ASCII.GetByteCount(clientNotificationToken) < 128)
+            if (System.Text.ASCIIEncoding.ASCII.GetByteCount(clientNotificationToken) * 8 < 128)
             {
-                throw new OAuthException(ErrorMessages.INVALID_REQUEST_PARAMETER, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES);
             }
         }
 
@@ -155,7 +155,6 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private void CheckRequestedExpiry(HandlerContext context)
         {
-
             var requestedExpiry = context.Request.Data.GetRequestedExpiry();
             if (requestedExpiry.HasValue && requestedExpiry.Value < 0)
             {

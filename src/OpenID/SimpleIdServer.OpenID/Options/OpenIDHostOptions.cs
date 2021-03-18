@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
-using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
 
 namespace SimpleIdServer.OpenID.Options
@@ -21,6 +20,8 @@ namespace SimpleIdServer.OpenID.Options
             IsLocalhostAllowed = false;
             MaxBindingMessageSize = 150;
             AuthRequestExpirationTimeInSeconds = 120;
+            FcmTitle = "Authenticate";
+            FcmBody = "SimpleIdServer wants to authenticate";
         }
 
         /// <summary>

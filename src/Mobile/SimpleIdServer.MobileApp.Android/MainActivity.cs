@@ -2,6 +2,12 @@
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using Firebase;
+using Firebase.Iid;
+using Firebase.Messaging;
+using SimpleIdServer.MobileApp.Droid.Services;
+using SimpleIdServer.MobileApp.Services;
+using Xamarin.Forms;
 
 namespace SimpleIdServer.MobileApp.Droid
 {
@@ -15,10 +21,12 @@ namespace SimpleIdServer.MobileApp.Droid
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            FirebaseApp.InitializeApp(this.ApplicationContext);
             TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
+
+            RegisterDependencies();
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
@@ -27,8 +35,18 @@ namespace SimpleIdServer.MobileApp.Droid
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        private void RegisterDependencies()
+        {
+            var notification = new AndroidNotificationManager();
+            DependencyService.RegisterSingleton<INotificationManager>(notification);
+        }
+
+        private void DisplayToken()
+        {
+            var token = FirebaseInstanceId.Instance.Token;
         }
     }
 }

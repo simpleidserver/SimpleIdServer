@@ -5,7 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Authorization - Copier.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCDeviceRegistrationErrors - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfo - Copier.feature.cs" />
   </ItemGroup>
   <!--
   <ItemGroup>
@@ -44,6 +46,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\BCDeviceRegistration.feature.cs">
+      <DependentUpon>BCDeviceRegistration.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\BCAuthorizeErrors.feature.cs">
+      <DependentUpon>BCAuthorizeErrors.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\Configuration.feature.cs">
       <DependentUpon>Configuration.feature</DependentUpon>
     </Compile>
@@ -62,6 +70,9 @@
       <DependentUpon>%(Filename)</DependentUpon>
       <LastGenOutput>Token.feature.feature.cs</LastGenOutput>
       <Generator>SpecFlowSingleFileGenerator</Generator>
+    </Compile>
+    <Compile Update="Features\BCDeviceRegistrationErrors.feature.cs">
+      <DependentUpon>BCDeviceRegistrationErrors.feature</DependentUpon>
     </Compile>
     <Compile Update="Features\UserInfo.feature.cs">
       <DependentUpon>UserInfo.feature</DependentUpon>
@@ -97,6 +108,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\BCDeviceRegistration.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\BCAuthorizeErrors.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\Configuration.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
@@ -122,6 +143,11 @@
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <Generator>SpecFlowSingleFileGenerator</Generator>
     </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\BCDeviceRegistrationErrors.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\UserInfo.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
@@ -140,5 +166,15 @@
     <SpecFlowFeatureFiles Update="Features\AuthorizationErrors.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
     </SpecFlowFeatureFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Certificates\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\certificates\mtlsClient.crt" Link="Certificates\mtlsClient.crt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

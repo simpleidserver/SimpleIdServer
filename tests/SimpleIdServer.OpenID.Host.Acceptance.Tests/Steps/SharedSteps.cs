@@ -30,6 +30,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
     [Binding]
     public class SharedSteps
     {
+        private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert" };
         private ScenarioContext _scenarioContext;
         private CustomWebApplicationFactory<FakeStartup> _factory;
 
@@ -103,14 +104,13 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public async Task WhenExecuteHTTPGetRequest(string url, Table table)
         {
             url = ParseValue(url).ToString();
-            string authHeader = null;
+            var headers = ExtractHeaders(table);
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
                 var value = ParseValue(record["Value"]);
-                if (key == "Authorization")
+                if (PARAMETERS_IN_HEADER.Contains(key))
                 {
-                    authHeader = value.ToString();
                     continue;
                 }
 
@@ -122,9 +122,9 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
                 Method = HttpMethod.Get,
                 RequestUri = new Uri(url)
             };
-            if (!string.IsNullOrWhiteSpace(authHeader))
+            foreach (var kvp in headers)
             {
-                httpRequestMessage.Headers.Add("Authorization", authHeader);
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
@@ -135,16 +135,17 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public async Task WhenExecuteHTTPPostRequest(string url, Table table)
         {
             var form = new List<KeyValuePair<string, string>>();
+            var headers = ExtractHeaders(table);
             foreach(var record in table.Rows)
             {
-                var value = record["Value"];
-                if (value.StartsWith('$') && value.EndsWith('$'))
+                var key = record["Key"];
+                var value = ParseValue(record["Value"]);
+                if (PARAMETERS_IN_HEADER.Contains(key))
                 {
-                    value = value.TrimStart('$').TrimEnd('$');
-                    value = _scenarioContext.Get<string>(value);
+                    continue;
                 }
 
-                form.Add(new KeyValuePair<string, string>(record["Key"], value));
+                form.Add(new KeyValuePair<string, string>(key, value.ToString()));
             }
 
             var body = new FormUrlEncodedContent(form);
@@ -154,6 +155,11 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
                 RequestUri = new Uri(url),
                 Content = body
             };
+            foreach (var kvp in headers)
+            {
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
+            }
+
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
@@ -161,18 +167,12 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         [When("execute HTTP POST JSON request '(.*)'")]
         public async Task WhenExecuteHTTPPostJSONRequest(string url, Table table)
         {
-            string authHeader = null;
             var jObj = new JObject();
+            var headers = ExtractHeaders(table);
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
                 var value = ParseValue(record["Value"]);
-                if (key == "Authorization")
-                {
-                    authHeader = value.ToString();
-                    continue;
-                }
-
                 jObj.Add(key, JToken.FromObject(value));
             }
 
@@ -182,9 +182,9 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
                 RequestUri = new Uri(url),
                 Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
             };
-            if (!string.IsNullOrWhiteSpace(authHeader))
+            foreach (var kvp in headers)
             {
-                httpRequestMessage.Headers.Add("Authorization", $"Bearer {authHeader}");
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
@@ -524,6 +524,24 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.True(httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri.Contains(url) == true);
+        }
+
+        private Dictionary<string, string> ExtractHeaders(Table table)
+        {
+            var result = new Dictionary<string, string>();
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = ParseValue(record["Value"]).ToString();
+                if (!PARAMETERS_IN_HEADER.Contains(key))
+                {
+                    continue;
+                }
+
+                result.Add(key, value.ToString());
+            }
+
+            return result;
         }
 
         private object ParseValue(string val)

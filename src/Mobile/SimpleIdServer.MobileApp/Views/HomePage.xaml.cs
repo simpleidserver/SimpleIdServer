@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.MobileApp.ViewModels;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -8,6 +9,7 @@ namespace SimpleIdServer.MobileApp.Views
     public partial class HomePage : ContentPage
     {
         private static HomePageViewModel _viewModel;
+        private bool _notificationClicked = false;
 
         public HomePage()
         {
@@ -18,12 +20,19 @@ namespace SimpleIdServer.MobileApp.Views
 
         private async void HandleNotification(object sender, System.EventArgs e)
         {
-            var tappedEvtArgs = e as TappedEventArgs;
-            var frame = sender as Frame;
-            var scale = frame.Scale;
-            await frame.ScaleTo(scale * 1.02, 200);
-            await frame.ScaleTo(scale, 200);
-            // Redirect the user to ...
+            if (!_notificationClicked)
+            {
+                _notificationClicked = true;
+                var tappedEvtArgs = e as TappedEventArgs;
+                var frame = sender as Frame;
+                var scale = frame.Scale;
+                await frame.ScaleTo(scale * 1.02, 200);
+                await frame.ScaleTo(scale, 200);
+                var notification = tappedEvtArgs.Parameter as Models.Notification;
+                await Browser.OpenAsync(notification.ClickAction);
+                _viewModel.RemoveNotification(notification);
+                _notificationClicked = false;
+            }
         }
 
         private async void HandleViewCellAppearing(object sender, System.EventArgs e)
@@ -37,16 +46,6 @@ namespace SimpleIdServer.MobileApp.Views
                 await frame.FadeTo(1, 400, Easing.SinOut);
                 notification.IsAnimated = true;
             }
-        }
-
-        private void HandleAddNotification(object sender, System.EventArgs e)
-        {
-            _viewModel.AddNotification(new Models.Notification
-            {
-                ClickAction = "clickAction",
-                Description = "description",
-                Title = "title"
-            });
         }
     }
 }

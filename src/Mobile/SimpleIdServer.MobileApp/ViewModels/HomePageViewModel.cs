@@ -1,5 +1,7 @@
 ﻿using SimpleIdServer.MobileApp.Models;
+using SimpleIdServer.MobileApp.Services;
 using System.Collections.ObjectModel;
+using Xamarin.Forms;
 
 namespace SimpleIdServer.MobileApp.ViewModels
 {
@@ -8,7 +10,8 @@ namespace SimpleIdServer.MobileApp.ViewModels
         public HomePageViewModel()
         {
             Notifications = new ObservableCollection<Notification>();
-            // OpenWebCommand = new Command(async () => await Browser.OpenAsync("https://aka.ms/xamarin-quickstart"));
+            var notificationManager = DependencyService.Get<INotificationManager>();
+            notificationManager.NotificationReceived += HandleNotificationAdded;
         }
 
         public ObservableCollection<Notification> Notifications { get; set; }
@@ -16,7 +19,21 @@ namespace SimpleIdServer.MobileApp.ViewModels
         public void AddNotification(Notification notification)
         {
             Notifications.Add(notification);
-            OnPropertyChanged(nameof(Notifications));
+        }
+
+        public void RemoveNotification(Notification notification)
+        {
+            Notifications.Remove(notification);
+        }
+
+        private void HandleNotificationAdded(object sender, NotificationEventArgs e)
+        {
+            Notifications.Add(new Notification
+            {
+                Title = e.Title,
+                Description = e.Description,
+                ClickAction = e.ClickAction
+            });
         }
     }
 }

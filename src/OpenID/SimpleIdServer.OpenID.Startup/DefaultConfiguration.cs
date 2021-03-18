@@ -69,6 +69,7 @@ namespace SimpleIdServer.OpenID.Startup
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
+                DeviceRegistrationToken = "ciyortoPQHGluxo-vIZLu7:APA91bHRrB-mdgHl6IQFu4XNWR5VBXxOjaq-gAAuxCzswQAGeryvFaBqoJqJN_oSEtPZMTknRe2rixJj5cjnaWkCin8NSXm7Gug6peZd9EpJgJ98CNHqOudcFv_h3jp4dpgWn6imb7sR",
                 Claims = new List<Claim>
                 {
                     new Claim(Jwt.Constants.UserClaims.Subject, "sub"),
@@ -243,13 +244,13 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "authorization_code", "implicit", "client_credentials"
+                        "authorization_code", "implicit", "client_credentials", "password"
                     },
                     JsonWebKeys = new List<JsonWebKey>
                     {
                         firstMtlsClientJsonWebKey
                     },
-                    TlsClientAuthSubjectDN = "mtlsClient"
+                    TlsClientAuthSubjectDN = "firstMtlsClient"
                 },
                 new OpenIdClient
                 {
@@ -292,7 +293,7 @@ namespace SimpleIdServer.OpenID.Startup
                     {
                         secondMtlsClientJsonWebKey
                     },
-                    TlsClientAuthSubjectDN = "mtlsClient"
+                    TlsClientAuthSubjectDN = "secondMtlsClient"
                 },
                 new OpenIdClient
                 {
