@@ -21,7 +21,9 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 
         protected override IWebHostBuilder CreateWebHostBuilder()
         {
-            return WebHost.CreateDefaultBuilder().UseStartup(typeof(T));
+            return WebHost.CreateDefaultBuilder()
+                .UseStartup(typeof(T))
+                .UseSetting("https_port", "8080"); ;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)

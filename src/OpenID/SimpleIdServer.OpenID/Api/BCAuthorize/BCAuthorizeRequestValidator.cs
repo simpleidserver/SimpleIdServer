@@ -40,6 +40,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         public virtual async Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
+            // TODO : Check the signature of the authentication request.
             var tokens = new bool[]
             {
                 string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),

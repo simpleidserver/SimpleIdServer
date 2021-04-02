@@ -41,11 +41,11 @@ namespace SimpleIdServer.OpenID.Api.Register
         protected override OAuthClient ExtractClient(HandlerContext handlerContext)
         {
             var openIdClient = handlerContext.Request.Data.ToDomain();
-            EnrichOpenIdClient(openIdClient);
+            EnrichOpenIdClient(openIdClient, handlerContext);
             return openIdClient;
         }
 
-        protected void EnrichOpenIdClient(OpenIdClient openidClient)
+        protected void EnrichOpenIdClient(OpenIdClient openidClient, HandlerContext handlerContext)
         {
             EnrichClient(openidClient);
             SetDefaultApplicationType(openidClient);
@@ -55,6 +55,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             SetDefaultIdTokenEncryptedResponseAlg(openidClient);
             SetUserInfoEncryptedResponseAlg(openidClient);
             SetRequestObjectEncryptionAlg(openidClient);
+            SetBCNotification(openidClient, handlerContext);
         }
 
         protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
@@ -129,6 +130,14 @@ namespace SimpleIdServer.OpenID.Api.Register
             {
                 openidClient.RequestObjectEncryptionEnc = A128CBCHS256EncHandler.ENC_NAME;
             }
+        }
+
+        protected virtual void SetBCNotification(OpenIdClient openidClient, HandlerContext handlerContext)
+        {
+            openidClient.BCTokenDeliveryMode = handlerContext.Request.Data.GetBCTokenDeliveryMode();
+            openidClient.BCClientNotificationEndpoint = handlerContext.Request.Data.GetBCClientNotificationEndpoint();
+            openidClient.BCAuthenticationRequestSigningAlg = handlerContext.Request.Data.GetBCAuthenticationRequestSigningAlg();
+            openidClient.BCUserCodeParameter = handlerContext.Request.Data.GetBCUserCodeParameter();
         }
     }
 }

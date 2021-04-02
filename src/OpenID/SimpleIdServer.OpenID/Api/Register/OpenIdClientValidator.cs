@@ -91,6 +91,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             CheckEncryption(openidClient.UserInfoEncryptedResponseAlg, openidClient.UserInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, OpenIdClientParameters.UserInfoEncryptedResponseAlg);
             CheckSignature(openidClient.RequestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);
             CheckEncryption(openidClient.RequestObjectEncryptionAlg, openidClient.RequestObjectEncryptionEnc, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC, OpenIdClientParameters.RequestObjectEncryptionAlg);
+            CheckBC(openidClient);
             await base.Validate(client, cancellationToken);
         }
 
@@ -114,6 +115,44 @@ namespace SimpleIdServer.OpenID.Api.Register
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_LOCALHOST_REDIRECT_URI);
                 }
+            }
+        }
+
+        protected virtual void CheckBC(OpenIdClient openIdClient)
+        {
+            if (!string.IsNullOrWhiteSpace(openIdClient.BCTokenDeliveryMode))
+            {
+                if (!SIDOpenIdConstants.AllStandardNotificationModes.Contains(openIdClient.BCTokenDeliveryMode))
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_BC_DELIVERY_MODE);
+                }
+
+                if (openIdClient.BCTokenDeliveryMode == SIDOpenIdConstants.StandardNotificationModes.Ping ||
+                    openIdClient.BCTokenDeliveryMode == SIDOpenIdConstants.StandardNotificationModes.Push)
+                {
+                    if (string.IsNullOrWhiteSpace(openIdClient.BCClientNotificationEndpoint))
+                    {
+                        throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OpenIdClientParameters.BCClientNotificationEndpoint));
+                    }
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(openIdClient.BCClientNotificationEndpoint))
+            {
+                if (!Uri.TryCreate(openIdClient.BCClientNotificationEndpoint, UriKind.Absolute, out Uri uri))
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_BC_CLIENT_NOTIFICATION_EDP);
+                }
+
+                if (uri.Scheme != "https")
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_BC_CLIENT_NOTIFICATION_EDP);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(openIdClient.BCAuthenticationRequestSigningAlg))
+            {
+                CheckSignature(openIdClient.BCAuthenticationRequestSigningAlg, ErrorMessages.UNSUPPORTED_BC_AUTHENTICATION_REQUEST_SIGNING_ALG);
             }
         }
     }

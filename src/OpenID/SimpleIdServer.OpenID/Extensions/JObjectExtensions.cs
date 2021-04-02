@@ -97,6 +97,26 @@ namespace SimpleIdServer.OpenID.Extensions
             return jObj.GetStr(OpenIdClientParameters.InitiateLoginUri);
         }
 
+        public static string GetBCTokenDeliveryMode(this JObject jObj)
+        {
+            return jObj.GetStr(OpenIdClientParameters.BCTokenDeliveryMode);
+        }
+
+        public static string GetBCClientNotificationEndpoint(this JObject jObj)
+        {
+            return jObj.GetStr(OpenIdClientParameters.BCClientNotificationEndpoint);
+        }
+
+        public static string GetBCAuthenticationRequestSigningAlg(this JObject jObj)
+        {
+            return jObj.GetStr(OpenIdClientParameters.BCAuthenticationRequestSigningAlg);
+        }
+
+        public static bool GetBCUserCodeParameter(this JObject jObj)
+        {
+            return jObj.GetBoolean(OpenIdClientParameters.BCUserCodeParameter);
+        }
+
         #endregion
 
         #region Authorization request
@@ -271,6 +291,11 @@ namespace SimpleIdServer.OpenID.Extensions
             return jObj.GetInt(BCAuthenticationRequestParameters.RequestedExpiry);
         }
 
+        public static int? GetInterval(this JObject jObj)
+        {
+            return jObj.GetInt(BCAuthenticationRequestParameters.Interval);
+        }
+
         #endregion
 
         #region Back channel device registration
@@ -278,6 +303,15 @@ namespace SimpleIdServer.OpenID.Extensions
         public static string GetDeviceRegistrationToken(this JObject jObj)
         {
             return jObj.GetStr(BCDeviceRegistrationRequestParameters.DeviceRegistrationToken);
+        }
+
+        #endregion
+
+        #region Token request
+
+        public static string GetAuthRequestId(this JObject jObj)
+        {
+            return jObj.GetStr(AuthorizationRequestParameters.AuthReqId);
         }
 
         #endregion

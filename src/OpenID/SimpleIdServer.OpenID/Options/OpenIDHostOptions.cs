@@ -20,8 +20,10 @@ namespace SimpleIdServer.OpenID.Options
             IsLocalhostAllowed = false;
             MaxBindingMessageSize = 150;
             AuthRequestExpirationTimeInSeconds = 120;
+            BlockThreadMS = 2 * 1000;
             FcmTitle = "Authenticate";
             FcmBody = "SimpleIdServer wants to authenticate";
+            DefaultBCAuthorizeWaitIntervalInSeconds = 2;
         }
 
         /// <summary>
@@ -82,5 +84,13 @@ namespace SimpleIdServer.OpenID.Options
         /// Expiration time auth_req_id in seconds.
         /// </summary>
         public int AuthRequestExpirationTimeInSeconds { get; set; }
+        /// <summary>
+        /// Time to block the job in MS.
+        /// </summary>
+        public int BlockThreadMS { get; set; }
+        /// <summary>
+        /// Default interval in seconds.
+        /// </summary>
+        public int DefaultBCAuthorizeWaitIntervalInSeconds { get; set; }
     }
 }

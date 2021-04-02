@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Host.Acceptance.Tests.Middlewares;
 using System;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
 {
@@ -41,6 +43,8 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
                 policy.AddPolicy("ManageScopes", p => p.RequireAssertion(_ => true));
             });
             ConfigureClient(services);
+            services.RemoveAll<IBCNotificationService>();
+            services.AddTransient<IBCNotificationService, FakeNotificationService>();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -60,17 +64,20 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
         private static void ConfigureClient(IServiceCollection services)
         {
             var mo = new Mock<OAuth.Infrastructures.IHttpClientFactory>();
+            var scenarioContext = services.BuildServiceProvider().GetService<ScenarioContext>();
             mo.Setup(m => m.GetHttpClient())
                 .Returns(() =>
                 {
                     var url = "http://domain.com/sector";
                     var jArr = new JArray
                     {
-                        "http://a.domain.com", "http://b.domain.com"
+                        "http://a.domain.com", 
+                        "http://b.domain.com"
                     };
                     var dic = new Dictionary<string, HttpResponseMessage>();
                     dic.Add(url, new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent(jArr.ToString(), Encoding.UTF8, "application/json") });
-                    var fakeHttpMessageHandler = new FakeHttpMessageHandler(dic);
+                    dic.Add("https://localhost:8080/pushNotificationEdp", new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent(jArr.ToString(), Encoding.UTF8, "application/json") });
+                    var fakeHttpMessageHandler = new FakeHttpMessageHandler(scenarioContext, dic);
                     return new HttpClient(fakeHttpMessageHandler);
                 });
             services.RemoveAll<OAuth.Infrastructures.IHttpClientFactory>();

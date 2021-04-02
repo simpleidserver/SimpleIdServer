@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Helpers
 {
-	public class AttributeReferenceEnricher : IAttributeReferenceEnricher
+    public class AttributeReferenceEnricher : IAttributeReferenceEnricher
 	{
 		private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
 		private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
@@ -36,6 +36,16 @@ namespace SimpleIdServer.Scim.Helpers
 					var filteredRepresentations = targetRepresentations.Where(a => a.GetAttributesByAttrSchemaId(attributeMapping.TargetAttributeId).Any(attr => attr.ValuesString.Contains(representation.Id)));
 					if (!filteredRepresentations.Any())
 					{
+						representation.AddAttribute(new SCIMRepresentationAttribute
+						{
+							SchemaAttribute = new SCIMSchemaAttribute(attributeMapping.SourceAttributeSelector)
+							{
+								Name = attributeMapping.SourceAttributeSelector,
+								MultiValued = true,
+								Type = SCIMSchemaAttributeTypes.COMPLEX
+							},
+							Values = new List<SCIMRepresentationAttribute>()
+						});
 						continue;
 					}
 

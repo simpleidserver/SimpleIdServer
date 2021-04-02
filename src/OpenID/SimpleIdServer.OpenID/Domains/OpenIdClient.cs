@@ -107,6 +107,23 @@ namespace SimpleIdServer.OpenID.Domains
         /// URI using the https scheme that a third party can use to initiate a login by the RP.
         /// </summary>
         public string InitiateLoginUri { get; set; }
+        /// <summary>
+        /// One of the following values: poll, ping or push.
+        /// </summary>
+        public string BCTokenDeliveryMode { get; set; }
+        /// <summary>
+        /// This is the endpoint to which the OP will post a notification after a successful or failed end-user authentication.
+        /// </summary>
+        public string BCClientNotificationEndpoint { get; set; }
+        /// <summary>
+        /// The JWS algorithm alg value that the Client will use for signing authentication request.
+        /// When omitted, the Client will not send signed authentication requests.
+        /// </summary>
+        public string BCAuthenticationRequestSigningAlg { get; set; }
+        /// <summary>
+        /// Boolean value specifying whether the Client supports the user_code parameter. 
+        /// </summary>
+        public bool BCUserCodeParameter { get; set; }
 
         /// <summary>
         /// Resolve redirection urls.
@@ -195,7 +212,11 @@ namespace SimpleIdServer.OpenID.Domains
                 UserInfoSignedResponseAlg = UserInfoSignedResponseAlg,
                 RegistrationAccessToken = RegistrationAccessToken,
                 PostLogoutRedirectUris = PostLogoutRedirectUris,
-                InitiateLoginUri = InitiateLoginUri
+                InitiateLoginUri = InitiateLoginUri,
+                BCTokenDeliveryMode = BCTokenDeliveryMode,
+                BCClientNotificationEndpoint = BCClientNotificationEndpoint,
+                BCAuthenticationRequestSigningAlg = BCAuthenticationRequestSigningAlg,
+                BCUserCodeParameter = BCUserCodeParameter
             };
         }
     }

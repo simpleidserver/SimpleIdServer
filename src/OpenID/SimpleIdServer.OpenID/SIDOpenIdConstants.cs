@@ -8,6 +8,20 @@ namespace SimpleIdServer.OpenID
 {
     public static class SIDOpenIdConstants
     {
+        public static List<string> AllStandardNotificationModes = new List<string>
+        {
+            StandardNotificationModes.Ping,
+            StandardNotificationModes.Poll,
+            StandardNotificationModes.Push
+        };
+
+        public static class StandardNotificationModes
+        {
+            public const string Poll = "poll";
+            public const string Ping = "ping";
+            public const string Push = "push";
+        }
+
         public static List<string[]> HybridWorkflows = new List<string[]>
         {
             new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE },

@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Authorization - Copier.feature.cs" />
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCAuthorizeErrors - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCDeviceRegistrationErrors - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfo - Copier.feature.cs" />
@@ -46,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\BCAuthorize.feature.cs">
+      <DependentUpon>BCAuthorize.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\BCDeviceRegistration.feature.cs">
       <DependentUpon>BCDeviceRegistration.feature</DependentUpon>
     </Compile>
@@ -108,6 +112,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\BCAuthorize.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\BCDeviceRegistration.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

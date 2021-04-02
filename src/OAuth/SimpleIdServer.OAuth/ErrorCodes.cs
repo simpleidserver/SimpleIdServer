@@ -23,5 +23,8 @@ namespace SimpleIdServer.OAuth
         public static string INVALID_BINDING_MESSAGE = "invalid_binding_message";
         public static string EXPIRED_LOGIN_HINT_TOKEN = "expired_login_hint_token";
         public static string UNKNOWN_USER_ID = "unknown_user_id";
+        public static string AUTHORIZATION_PENDING = "authorization_pending";
+        public static string EXPIRED_TOKEN = "expired_token";
+        public static string SLOW_DOWN = "slow_down";
     }
 }

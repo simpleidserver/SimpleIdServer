@@ -25,9 +25,13 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_HTTPS_SECTOR_IDENTIFIER_URI = "sector_identifier_uri doesn't contain https scheme";
         public const string INVALID_HTTPS_INITIATE_LOGIN_URI = "initiate_login_uri doesn't contain https scheme";
         public const string INVALID_HTTPS_REDIRECT_URI = "redirect_uri does not contain https scheme";
+        public const string INVALID_HTTPS_BC_CLIENT_NOTIFICATION_EDP = "client notification endpoint doesn't contain https scheme";
         public const string INVALID_LOCALHOST_REDIRECT_URI = "redirect_uri must not contain localhost";
+        public const string INVALID_BC_DELIVERY_MODE = "invalid back channel delivery mode";
+        public const string INVALID_BC_CLIENT_NOTIFICATION_EDP = "invalid back channel client notification endpoint";
         public const string INVALID_AUDIENCE = "invalid audiences";
         public const string INVALID_SUBJECT_TYPE = "subject_type is invalid";
+        public const string INVALID_AUTH_REQUEST_ID = "auth_req_id doesn't exist";
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
         public const string UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg is not supported";
         public const string UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG = "id_token_encrypted_response_alg is not supported";
@@ -38,6 +42,7 @@ namespace SimpleIdServer.OpenID
         public const string UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG = "request_object_signing_alg is not supported";
         public const string UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG = "request_object_encryption_alg is not supported";
         public const string UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC = "request_object_encryption_enc is not supported";
+        public const string UNSUPPORTED_BC_AUTHENTICATION_REQUEST_SIGNING_ALG = "bc_authentication_request_signing_alg is not supported";
         public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
         public const string MISSING_TOKEN = "missing token";
         public const string MISSING_ISSUER_CLAIM = "the issuer claim is missing";
@@ -54,5 +59,8 @@ namespace SimpleIdServer.OpenID
         public const string LOGIN_HINT_TOKEN_IS_EXPIRED = "login_hint_token has expired";
         public const string UNKNOWN_USER = "unknown user '{0}'";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
+        public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
+        public const string AUTH_REQUEST_NOTIFIED = "the authentication request '{0}' has already been notified to the client";
+        public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
     }
 }

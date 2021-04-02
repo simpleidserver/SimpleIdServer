@@ -10,6 +10,7 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Register.Validators;
+using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
@@ -20,15 +21,20 @@ using SimpleIdServer.OpenID.Api.Authorization.Validators;
 using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Api.BCDeviceRegistration;
 using SimpleIdServer.OpenID.Api.Register;
+using SimpleIdServer.OpenID.Api.Token.Handlers;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Helpers;
+using SimpleIdServer.OpenID.Infrastructures.Jobs;
+using SimpleIdServer.OpenID.Infrastructures.Locks;
+using SimpleIdServer.OpenID.Jobs;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.Persistence.InMemory;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
 using SimpleIdServer.OpenID.UI.Infrastructures;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -54,7 +60,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddRegisterApi()
                 .AddBCAuthorizeApi()
                 .AddBCDeviceRegistrationApi()
-                .AddOpenIDAuthentication();
+                .AddOpenIDAuthentication()
+                .AddBCAuthorizeJob()
+                .AddInMemoryLock();
             return builder;
         }
 
@@ -138,13 +146,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 SIDOpenIdConstants.StandardScopes.Phone,
                 SIDOpenIdConstants.StandardScopes.Profile
             };
+            var bcAuthorizeLst = new ConcurrentBag<BCAuthorize>();
             services.AddSingleton<IAuthenticationContextClassReferenceQueryRepository>(new DefaultAuthenticationContextClassReferenceQueryRepository(acrs));
             services.AddSingleton<IAuthenticationContextClassReferenceCommandRepository>(new DefaultAuthenticationContextClassReferenceCommandRepository(acrs));
             services.AddSingleton<IOAuthClientQueryRepository>(new DefaultOpenIdClientQueryRepository(clients));
             services.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients, scopes));
             services.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
             services.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
-            services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository());
+            services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository(bcAuthorizeLst));
             return services;
         }
 
@@ -175,6 +184,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddBCAuthorizeApi(this IServiceCollection services)
         {
+            services.AddTransient<IGrantTypeHandler, CIBAHandler>();
+            services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
             services.AddTransient<IBCNotificationService, BCNotificationService>();
@@ -185,6 +196,22 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IBCDeviceRegistrationHandler, BCDeviceRegistrationHandler>();
             services.AddTransient<IBCDeviceRegistrationValidator, BCDeviceRegistrationValidator>();
+            return services;
+        }
+
+        private static IServiceCollection AddBCAuthorizeJob(this IServiceCollection services)
+        {
+            services.AddHostedService<OpenIdServerHostedService>();
+            services.AddTransient<IOpenIdJobServer, OpenIdJobServer>();
+            services.AddTransient<IBCNotificationHandler, PingNotificationHandler>();
+            services.AddTransient<IBCNotificationHandler, PushNotificationHandler>();
+            services.AddTransient<IJob, BCNotificationJob>();
+            return services;
+        }
+
+        private static IServiceCollection AddInMemoryLock(this IServiceCollection services)
+        {
+            services.AddSingleton<IDistributedLock, InMemoryDistributedLock>();
             return services;
         }
 

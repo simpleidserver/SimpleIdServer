@@ -402,6 +402,34 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwsGenerator.ExtractHeader(jws), "jwsHeader");
         }
 
+        [When("confirm authorization request '(.*)'")]
+        public async Task WhenConfirmAuthorizationRequest(string authRequestId)
+        {
+            authRequestId = ParseValue(authRequestId).ToString();
+            var bcAuthorizeRepository = (IBCAuthorizeRepository)_factory.Server.Host.Services.GetService(typeof(IBCAuthorizeRepository));
+            var auth = await bcAuthorizeRepository.Get(authRequestId, CancellationToken.None);
+            auth.Confirm();
+            await bcAuthorizeRepository.Update(auth, CancellationToken.None);
+            await bcAuthorizeRepository.SaveChanges(CancellationToken.None);
+        }
+
+        [When("poll until '(.*)' is received")]
+        public void WhenPollUntilResultIsReceived(string key)
+        {
+            if (!_scenarioContext.ContainsKey(key))
+            {
+                Thread.Sleep(200);
+                WhenPollUntilResultIsReceived(key);
+                return;
+            }
+        }
+
+        [When("extract JSON from '(.*)'")]
+        public void WhenExtractJSONFromKey(string key)
+        {
+            _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(_scenarioContext.Get<string>(key)), "jsonHttpBody");
+        }
+
         [Then("HTTP status code equals to '(.*)'")]
         public void ThenCheckHttpStatusCode(int code)
         {

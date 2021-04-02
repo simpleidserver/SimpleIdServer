@@ -7,6 +7,8 @@ using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
@@ -54,17 +56,28 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 var user = await _bcAuthorizeRequestValidator.Validate(context, cancellationToken);
                 context.SetUser(user);
                 var requestedExpiry = context.Request.Data.GetRequestedExpiry();
+                var interval = context.Request.Data.GetInterval();
                 if (requestedExpiry == null)
                 {
                     requestedExpiry = _options.AuthRequestExpirationTimeInSeconds;
                 }
 
                 var currentDateTime = DateTime.UtcNow;
+                var openidClient = oauthClient as OpenIdClient;
                 var bcAuthorize = new Domains.BCAuthorize
                 {
                     Id = Guid.NewGuid().ToString(),
-                    ExpirationDateTime = currentDateTime.AddSeconds(requestedExpiry.Value)
+                    ExpirationDateTime = currentDateTime.AddSeconds(requestedExpiry.Value),
+                    ClientId = oauthClient.ClientId,
+                    Interval = interval ?? _options.DefaultBCAuthorizeWaitIntervalInSeconds,
+                    NotificationEdp = openidClient.BCClientNotificationEndpoint,
+                    NotificationMode = openidClient.BCTokenDeliveryMode,
+                    Status = BCAuthorizeStatus.Pending,
+                    Scopes = context.Request.Data.GetScopesFromAuthorizationRequest(),
+                    UserId = context.User.Id,
+                    NotificationToken = context.Request.Data.GetClientNotificationToken()
                 };
+                bcAuthorize.IncrementNextFetchTime();
                 await _bcAuthorizeRepository.Add(bcAuthorize, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 await _bcNotificationService.Notify(context, bcAuthorize.Id, cancellationToken);
