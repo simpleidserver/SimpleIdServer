@@ -90,6 +90,11 @@ namespace SimpleIdServer.Scim.Domain
             ResourceType = resourceType;
         }
 
+        public bool ContainsAttribute(SCIMRepresentationAttribute attr)
+        {
+            return Attributes.Any(a => a.IsSimilar(attr));
+        }
+
         public object Clone()
         {
             return new SCIMRepresentation

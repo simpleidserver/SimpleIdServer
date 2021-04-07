@@ -75,6 +75,7 @@ namespace SimpleIdServer.Scim.Domain
                     case SCIMPatchOperations.ADD:
                         try
                         {
+                            // If the target location already contains the value then do nothing ...
                             if (schemaAttributes == null || !schemaAttributes.Any())
                             {
                                 throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
@@ -159,7 +160,10 @@ namespace SimpleIdServer.Scim.Domain
                                 }
                                 else
                                 {
-                                    representation.Attributes.Add(newAttribute);
+                                    if (!representation.ContainsAttribute(newAttribute))
+                                    {
+                                        representation.Attributes.Add(newAttribute);
+                                    }
                                 }
                             }
                         }

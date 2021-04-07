@@ -140,6 +140,68 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
+        public bool IsSimilar(SCIMRepresentationAttribute attr)
+        {
+            if (attr.SchemaAttribute.Name != SchemaAttribute.Name)
+            {
+                return false;
+            }
+
+            switch(attr.SchemaAttribute.Type)
+            {
+                case SCIMSchemaAttributeTypes.STRING:
+                    if (attr.ValuesString.All(s => ValuesString.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.BINARY:
+                    if (attr.ValuesBinary.All(s => ValuesBinary.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.BOOLEAN:
+                    if (attr.ValuesBoolean.All(s => ValuesBoolean.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.DATETIME:
+                    if (attr.ValuesDateTime.All(s => ValuesDateTime.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.DECIMAL:
+                    if (attr.ValuesDecimal.All(s => ValuesDecimal.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.INTEGER:
+                    if (attr.ValuesInteger.All(s => ValuesInteger.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.REFERENCE:
+                    if (attr.ValuesReference.All(s => ValuesReference.Contains(s)))
+                    {
+                        return true;
+                    }
+                    break;
+                case SCIMSchemaAttributeTypes.COMPLEX:
+                    if (attr.Values.All(s => Values.Any(v => v.IsSimilar(s))))
+                    {
+                        return true;
+                    }
+                    break;
+            }
+
+            return false;
+        }
+
         public object Clone()
         {
             var result = new SCIMRepresentationAttribute(Id)

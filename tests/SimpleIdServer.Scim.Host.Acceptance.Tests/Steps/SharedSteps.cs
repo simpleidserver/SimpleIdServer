@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -244,6 +245,13 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.True(httpResponseMessage.Headers.Contains(key));
+        }
+
+        [Then("'(.*)' length is equals to '(.*)'")]
+        public void ThenLengthIsEqualsTo(string name, int length)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
+            Assert.Equal((jsonHttpBody.SelectToken(name) as JArray).Count(), length);
         }
 
         private string Parse(string val)

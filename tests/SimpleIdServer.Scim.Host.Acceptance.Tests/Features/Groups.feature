@@ -29,6 +29,36 @@ Scenario: Check Group can be created
 	Then JSON 'members[0].$ref'='https://example.com/v2/Users/902c246b-6245-4190-8e05-00816be7344a'
 	Then JSON 'members[0].value'='902c246b-6245-4190-8e05-00816be7344a'
 
+Scenario: Check users cannot be added twice to a group
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                                                                                                                                           |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                                                                                                               |
+	| displayName | Tour Guides                                                                                                                                                     |
+	| members     | [ { "value": "2819c223-7f76-453a-919d-413861904646", "$ref": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", "display": "Babs Jensen" }  ] |
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$id$'
+	| Key        | Value                                                                                                                                                                                                           |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                                                                                                             |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "2819c223-7f76-453a-919d-413861904646", "$ref": "https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646", "display": "Babs Jensen" } ] } ] |
+	And execute HTTP GET request 'http://localhost/Groups/$id$'	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'	
+	Then HTTP HEADER contains 'Location'
+	Then HTTP HEADER contains 'ETag'
+	Then JSON exists 'id'
+	Then JSON exists 'meta.created'
+	Then JSON exists 'meta.lastModified'
+	Then JSON exists 'meta.version'
+	Then JSON exists 'meta.location'
+	Then JSON 'displayName'='Tour Guides'
+	Then JSON 'members[0].display'='Babs Jensen'
+	Then JSON 'members[0].$ref'='https://example.com/v2/Users/2819c223-7f76-453a-919d-413861904646'
+	Then JSON 'members[0].value'='2819c223-7f76-453a-919d-413861904646'
+	Then 'members' length is equals to '1'
+
+
 Scenario: Check user can be added to a group	
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
