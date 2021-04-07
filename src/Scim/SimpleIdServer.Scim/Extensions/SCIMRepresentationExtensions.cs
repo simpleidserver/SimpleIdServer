@@ -26,6 +26,18 @@ namespace SimpleIdServer.Scim.Domain
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}" }
         };
 
+        public static void ApplyEmptyArray(this SCIMRepresentation representation)
+        {
+            var attrs = representation.Schemas.SelectMany(s => s.Attributes.Where(a => a.MultiValued));
+            foreach (var attr in attrs)
+            {
+                if (!representation.Attributes.Any(a => a.SchemaAttribute.Name == attr.Name))
+                {
+                    representation.Attributes.Add(new SCIMRepresentationAttribute { SchemaAttribute = attr });
+                }
+            }
+        }
+
         public static void ApplyPatches(this SCIMRepresentation representation, ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
         {
             var queryableRepresentationAttributes = representation.Attributes.AsQueryable();

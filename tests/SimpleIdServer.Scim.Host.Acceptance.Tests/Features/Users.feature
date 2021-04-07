@@ -48,7 +48,7 @@ Scenario: Check attribute with a mutability equals to readOnly cannot be overrid
 	Then HTTP status code equals to '201'	
 	Then HTTP HEADER contains 'Location'
 	Then HTTP HEADER contains 'ETag'
-	Then JSON doesn't exists 'groups'
+	Then 'groups' length is equals to '0'
 
 Scenario: Check User can be returned
 	When execute HTTP POST JSON request 'http://localhost/Users'

@@ -115,8 +115,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 
 
         public static SCIMRepresentation ToDomain(this SCIMRepresentationModel representation, IMongoDatabase db)
-        {
-            
+        {            
             var result = new SCIMRepresentation
             {
                 Created = representation.Created,

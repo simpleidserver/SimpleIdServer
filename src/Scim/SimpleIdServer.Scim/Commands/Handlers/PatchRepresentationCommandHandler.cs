@@ -51,6 +51,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     await transaction.Commit();
                 }
 
+                existingRepresentation.ApplyEmptyArray();
                 return existingRepresentation;
             }
             finally

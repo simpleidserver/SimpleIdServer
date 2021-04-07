@@ -70,6 +70,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit();
             }
 
+            scimRepresentation.ApplyEmptyArray();
             return scimRepresentation;
         }
 

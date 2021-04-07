@@ -179,6 +179,7 @@ namespace SimpleIdServer.Scim.Api
                 await _attributeReferenceEnricher.Enrich(_resourceType, representations, baseUrl);
                 foreach (var record in representations)
                 {
+                    record.ApplyEmptyArray();
                     JObject newJObj = null;
                     var location = $"{baseUrl}/{_resourceType}/{record.Id}";
                     if (searchRequest.Attributes.Any())
@@ -227,6 +228,7 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
             }
 
+            representation.ApplyEmptyArray();
             await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, Request.GetAbsoluteUriWithVirtualPath());
             return BuildHTTPResult(representation, HttpStatusCode.OK, true);
         }
