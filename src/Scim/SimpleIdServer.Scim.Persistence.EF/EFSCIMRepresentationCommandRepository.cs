@@ -96,6 +96,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 LastModified = representation.LastModified,
                 Version = representation.Version,
                 ResourceType = representation.ResourceType,
+                DisplayName = representation.DisplayName,
                 Attributes = representation.Attributes.Select(a => a.ToModel(representation.Id)).ToList(),
                 Schemas = representation.Schemas.Select(s => new SCIMRepresentationSchemaModel
                 {

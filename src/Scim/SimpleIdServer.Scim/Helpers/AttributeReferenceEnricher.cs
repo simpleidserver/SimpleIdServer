@@ -74,7 +74,7 @@ namespace SimpleIdServer.Scim.Helpers
 								MultiValued = false,
 								Type = SCIMSchemaAttributeTypes.STRING
 							},
-							ValuesString = filteredRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "displayName").ValuesString
+							ValuesString = new List<string> { filteredRepresentation.DisplayName }
 						});
 						refLst.Add(new SCIMRepresentationAttribute
 						{

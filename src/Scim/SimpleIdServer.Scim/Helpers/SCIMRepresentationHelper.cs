@@ -34,6 +34,12 @@ namespace SimpleIdServer.Scim.Helpers
             result.ExternalId = externalId;
             result.Schemas = schemas;
             result.Attributes = BuildRepresentationAttributes(json, attrsSchema, ignoreUnsupportedCanonicalValues);
+            var attr = result.Attributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
+            if (attr != null)
+            {
+                result.DisplayName = attr.ValuesString.First();
+            }
+
             return result;
         }
 

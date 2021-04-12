@@ -11,6 +11,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Models
         public string ExternalId { get; set; }
         public string ResourceType { get; set; }
         public string Version { get; set; }
+        public string DisplayName { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
         public virtual ICollection<SCIMRepresentationAttributeModel> Attributes { get; set; }

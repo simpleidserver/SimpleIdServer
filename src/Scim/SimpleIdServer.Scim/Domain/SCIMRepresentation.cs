@@ -25,6 +25,7 @@ namespace SimpleIdServer.Scim.Domain
         public string ExternalId { get; set; }
         public string ResourceType { get; set; }
         public string Version { get; set; }
+        public string DisplayName { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
         public ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
@@ -105,6 +106,7 @@ namespace SimpleIdServer.Scim.Domain
                 Version = Version,
                 Created = Created,
                 LastModified = LastModified,
+                DisplayName = DisplayName,
                 Attributes = Attributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList(),
                 Schemas = Schemas.Select(a => (SCIMSchema)a.Clone()).ToList()
             };

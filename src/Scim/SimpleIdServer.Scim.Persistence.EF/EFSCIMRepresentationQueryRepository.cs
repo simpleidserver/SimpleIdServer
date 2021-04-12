@@ -56,12 +56,32 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string schemaAttributeId, IEnumerable<string> values, string endpoint = null)
         {
-            var records = await IncludeRepresentationAttributeNavigationProperties(_scimDbContext.SCIMRepresentationAttributeLst)
-                .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => values.Contains(v.ValueString)))
-                .Select(a => a.Representation)
+            var records = await _scimDbContext.SCIMRepresentationAttributeValueLst
+                .Where(a => values.Contains(a.ValueString) && a.RepresentationAttribute.SchemaAttributeId == schemaAttributeId && a.RepresentationAttribute.Representation.ResourceType == endpoint)
+                .Select(_ => new
+                {
+                    RepresentationId = _.RepresentationAttribute.Representation.Id,
+                    RepresentationDisplayName = _.RepresentationAttribute.Representation.DisplayName,
+                    SchemaAttributeId = _.RepresentationAttribute.SchemaAttributeId,
+                    ValueString = _.ValueString
+                })
                 .AsNoTracking()
                 .ToListAsync();
-            return records.Distinct().Select(r => r.ToDomain());
+            var result = records.Select(r => r.RepresentationId).Distinct().Count();
+
+            return records.GroupBy(r => r.RepresentationId).Select(grp => new SCIMRepresentation
+            {
+                Attributes = new List<SCIMRepresentationAttribute>
+                {
+                    new SCIMRepresentationAttribute
+                    {
+                        SchemaAttribute = new SCIMSchemaAttribute(grp.First().SchemaAttributeId),
+                        ValuesString = grp.Select(v => v.ValueString).ToList()
+                    }
+                },
+                DisplayName = grp.First().RepresentationDisplayName,
+                Id = grp.First().RepresentationId
+            });
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)

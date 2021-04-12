@@ -1,7 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.Primitives;
 using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
@@ -11,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Permissions;
 
 namespace SimpleIdServer.Scim.Extensions
 {
