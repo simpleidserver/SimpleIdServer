@@ -93,6 +93,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             {
                 handlerContext.Response.Cookies.Append(_openidHostOptions.SessionCookieName, sessionId, new CookieOptions
                 {
+                    Secure = true,
                     HttpOnly = false,
                     SameSite = SameSiteMode.None
                 });
