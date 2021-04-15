@@ -113,7 +113,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
             IQueryable<SCIMRepresentationModel> queryableRepresentations = IncludeRepresentationNavigationProperties(_scimDbContext.SCIMRepresentationLst)
-                .Where(s => s.ResourceType == parameter.ResourceType);
+                .Where(s => s.ResourceType == parameter.ResourceType)
+                .OrderBy(s => s.Id);
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
