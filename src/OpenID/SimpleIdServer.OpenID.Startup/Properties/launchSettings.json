@@ -3,7 +3,7 @@
     "SimpleIdServer.OpenID.Startup": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:60000",
+      "applicationUrl": "https://0.0.0.0:60000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

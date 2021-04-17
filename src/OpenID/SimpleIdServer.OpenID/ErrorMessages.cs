@@ -61,6 +61,9 @@ namespace SimpleIdServer.OpenID
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
         public const string AUTH_REQUEST_NOTIFIED = "the authentication request '{0}' has already been notified to the client";
+        public const string AUTH_REQUEST_NOT_NOTIFIED = "the authentication request '{0}' has already been confirmed";
+        public const string AUTH_REQUEST_EXPIRED = "the authentication request '{0}' is expired";
         public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
+        public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
     }
 }

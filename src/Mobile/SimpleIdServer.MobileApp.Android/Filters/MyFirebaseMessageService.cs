@@ -14,9 +14,9 @@ namespace SimpleIdServer.MobileApp.Droid.Filters
         {
             var title = GetRecord(message.Data, "title");
             var body = GetRecord(message.Data, "body");
-            var clickAction = GetRecord(message.Data, "clickAction");
+            var authReqId = GetRecord(message.Data, "authReqId");
             var notificationManager = DependencyService.Get<INotificationManager>();
-            notificationManager.ReceiveNotification(title, body, clickAction);
+            notificationManager.ReceiveNotification(title, body, authReqId);
         }
 
         private static string GetRecord(IDictionary<string, string> dic, string key)

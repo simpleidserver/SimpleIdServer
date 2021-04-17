@@ -43,7 +43,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                     {
                         { "title", _options.FcmTitle },
                         { "body", _options.FcmBody },
-                        { "clickAction", clickAction }
+                        { "authReqId", authReqId }
                     }
                 }
             }, cancellationToken);

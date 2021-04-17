@@ -211,6 +211,42 @@ namespace SimpleIdServer.OpenID.Startup
             {
                 new OpenIdClient
                 {
+                    ClientId = "newsAggregatorWebsite",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "newsAggregatorWebsiteSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "pkce",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:4200"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "code"
+                    }
+                },
+                new OpenIdClient
+                {
                     ClientId = "firstMtlsClient",
                     Secrets = new List<ClientSecret>
                     {
@@ -467,6 +503,7 @@ namespace SimpleIdServer.OpenID.Startup
                     IdTokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OpenIdScope>
                     {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email
                     },
@@ -476,7 +513,7 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "sid:/oauth2redirect"
+                        "com.companyname.simpleidserver.mobileapp:/oauth2redirect"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>

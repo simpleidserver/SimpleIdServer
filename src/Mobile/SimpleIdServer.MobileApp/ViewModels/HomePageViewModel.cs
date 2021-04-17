@@ -1,39 +1,50 @@
-﻿using SimpleIdServer.MobileApp.Models;
+﻿using SimpleIdServer.MobileApp.Resources;
 using SimpleIdServer.MobileApp.Services;
-using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace SimpleIdServer.MobileApp.ViewModels
 {
     public class HomePageViewModel : BaseViewModel
     {
+        private readonly ILoginProvider _loginProvider;
+        private readonly ITokenStorage _tokenStorage;
+        private readonly IMessageService _messageService;
+
         public HomePageViewModel()
         {
-            Notifications = new ObservableCollection<Notification>();
-            var notificationManager = DependencyService.Get<INotificationManager>();
-            notificationManager.NotificationReceived += HandleNotificationAdded;
+            var loginProvider = DependencyService.Get<ILoginProvider>();
+            var tokenStorage = DependencyService.Get<ITokenStorage>();
+            var messageService = DependencyService.Get<IMessageService>();
+            _loginProvider = loginProvider;
+            _tokenStorage = tokenStorage;
+            _messageService = messageService;
+            LoginCommand = new Command(async() => await ExecuteLogin(), IsLoginEnabled);
         }
 
-        public ObservableCollection<Notification> Notifications { get; set; }
+        public ICommand LoginCommand { get; private set; }
 
-        public void AddNotification(Notification notification)
+        private async Task ExecuteLogin()
         {
-            Notifications.Add(notification);
-        }
-
-        public void RemoveNotification(Notification notification)
-        {
-            Notifications.Remove(notification);
-        }
-
-        private void HandleNotificationAdded(object sender, NotificationEventArgs e)
-        {
-            Notifications.Add(new Notification
+            var authInfo = await _loginProvider.LoginAsync();
+            if (string.IsNullOrWhiteSpace(authInfo.AccessToken) || !authInfo.IsAuthorized)
             {
-                Title = e.Title,
-                Description = e.Description,
-                ClickAction = e.ClickAction
-            });
+                await _messageService.Show(Global.AppCannotAuthenticate);
+            }
+            else
+            {
+                await _tokenStorage.Store(authInfo);
+                Device.BeginInvokeOnMainThread(async () =>
+                {
+                    await Shell.Current.GoToAsync("//notifications");
+                });
+            }
+        }
+
+        private bool IsLoginEnabled()
+        {
+            return true;
         }
     }
 }

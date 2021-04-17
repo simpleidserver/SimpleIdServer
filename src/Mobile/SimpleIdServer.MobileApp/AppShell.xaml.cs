@@ -1,19 +1,32 @@
-﻿using System;
+﻿using SimpleIdServer.MobileApp.Services;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace SimpleIdServer.MobileApp
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell : Shell
     {
         public AppShell()
         {
             InitializeComponent();
-            // Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
-            // Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
+            RegisterDependencies();
+            Init().Wait();
         }
 
-        private async void OnMenuItemClicked(object sender, EventArgs e)
+        private async Task Init()
         {
-            // await Shell.Current.GoToAsync("//LoginPage");
+            var tokenStorage = DependencyService.Get<ITokenStorage>();
+            var jwtSecurityToken = await tokenStorage.GetToken();
+            if (jwtSecurityToken != null)
+            {
+                await Shell.Current.GoToAsync("//notifications");
+            }
+        }
+
+        private void RegisterDependencies()
+        {
+            DependencyService.Register<ITokenStorage, TokenStorage>();
+            DependencyService.Register<IMessageService, MessageService>();
         }
     }
 }

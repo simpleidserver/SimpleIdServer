@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Persistence;
@@ -22,6 +23,13 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
         public async Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
+            var openidClient = context.Client as OpenIdClient;
+            if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping
+                && openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Poll)
+            {
+                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_PINGORPUSH_MODE_CAN_BE_USED);
+            }
+
             var authRequestId = context.Request.Data.GetAuthRequestId();
             if (string.IsNullOrWhiteSpace(authRequestId))
             {
@@ -55,7 +63,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
             if (currentDateTime > authRequest.ExpirationDateTime)
             {
-                throw new OAuthException(OAuth.ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_NOTIFIED, authRequestId));
+                throw new OAuthException(OAuth.ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_EXPIRED, authRequestId));
             }
 
             return authRequest;

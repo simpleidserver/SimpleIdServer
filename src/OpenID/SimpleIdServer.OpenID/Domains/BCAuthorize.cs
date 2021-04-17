@@ -38,6 +38,32 @@ namespace SimpleIdServer.OpenID.Domains
             UpdateDateTime = DateTime.UtcNow;
         }
 
+        public static BCAuthorize Create(
+            DateTime expirationDateTime, 
+            string clientId, 
+            int interval, 
+            string notificationEdp, 
+            string notificationMode, 
+            IEnumerable<string> scopes,
+            string userId,
+            string notificationToken)
+        {
+            var result = new BCAuthorize
+            {
+                Id = Guid.NewGuid().ToString(),
+                ExpirationDateTime = expirationDateTime,
+                ClientId = clientId,
+                Interval = interval,
+                NotificationEdp = notificationEdp,
+                NotificationMode = notificationMode,
+                Status = notificationMode == SIDOpenIdConstants.StandardNotificationModes.Poll ? BCAuthorizeStatus.Notified : BCAuthorizeStatus.Pending,
+                Scopes = scopes,
+                UserId = userId,
+                NotificationToken = notificationToken
+            };
+            return result;
+        }
+
         public object Clone()
         {
             return new BCAuthorize

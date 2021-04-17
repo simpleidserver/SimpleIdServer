@@ -47,10 +47,10 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
         {
             try
             {
-                var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
-                var user = await _oauthUserQueryRepository.FindOAuthUserByLogin(authRequest.UserId, cancellationToken);
                 context.SetClient(oauthClient);
+                var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
+                var user = await _oauthUserQueryRepository.FindOAuthUserByLogin(authRequest.UserId, cancellationToken);
                 context.SetUser(user);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {

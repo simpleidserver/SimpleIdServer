@@ -13,6 +13,7 @@ using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.OpenID.Persistence;
 using System;
 using System.Linq;
 using System.Threading;
@@ -22,23 +23,26 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 {
     public interface IBCAuthorizeRequestValidator
     {
-        Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken);
+        Task<OAuthUser> ValidateCreate(HandlerContext context, CancellationToken cancellationToken);
+        Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class BCAuthorizeRequestValidator: IBCAuthorizeRequestValidator
     {
         private readonly IJwtParser _jwtParser;
         private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
+        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly OpenIDHostOptions _options;
 
-        public BCAuthorizeRequestValidator(IJwtParser jwtParser, IOAuthUserQueryRepository oauthUserQueryRepository, IOptions<OpenIDHostOptions> options)
+        public BCAuthorizeRequestValidator(IJwtParser jwtParser, IOAuthUserQueryRepository oauthUserQueryRepository, IBCAuthorizeRepository bcAuthorizeRepository, IOptions<OpenIDHostOptions> options)
         {
             _jwtParser = jwtParser;
             _oauthUserQueryRepository = oauthUserQueryRepository;
+            _bcAuthorizeRepository = bcAuthorizeRepository;
             _options = options.Value;
         }
 
-        public virtual async Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken)
+        public virtual async Task<OAuthUser> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
         {
             // TODO : Check the signature of the authentication request.
             var tokens = new bool[]
@@ -67,6 +71,55 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             CheckBindingMessage(context);
             CheckRequestedExpiry(context);
             return user;
+        }
+
+        public virtual async Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var tokens = new bool[]
+            {
+                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),
+                string.IsNullOrWhiteSpace(context.Request.Data.GetIdTokenHintFromAuthorizationRequest()),
+                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintFromAuthorizationRequest())
+            };
+            if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
+            }
+
+            var user = await CheckLoginHintToken(context);
+            if (user == null)
+            {
+                user = await CheckIdTokenHint(context);
+                if (user == null)
+                {
+                    user = await CheckLoginHint(context);
+                }
+            }
+
+            var authRequestId = context.Request.Data.GetAuthRequestId();
+            if (string.IsNullOrWhiteSpace(authRequestId))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, DTOs.AuthorizationRequestParameters.AuthReqId));
+            }
+
+            var authRequest = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
+            if (authRequest == null)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
+            }
+
+            if (authRequest.Status != Domains.BCAuthorizeStatus.Notified)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_NOT_NOTIFIED, authRequestId));
+            }
+
+            var currentDateTime = DateTime.UtcNow;
+            if (currentDateTime > authRequest.ExpirationDateTime)
+            {
+                throw new OAuthException(ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_EXPIRED, authRequestId));
+            }
+
+            return new BCAcceptRequestValidationResult(user, authRequest);
         }
 
         private void CheckScopes(HandlerContext context)

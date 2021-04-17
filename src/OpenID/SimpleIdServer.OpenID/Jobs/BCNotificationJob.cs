@@ -33,7 +33,7 @@ namespace SimpleIdServer.OpenID.Jobs
 
         protected override async Task Execute(CancellationToken cancellationToken)
         {
-            var pendingAuthorizeRequestLst = await _bcAuthorizeRepository.GetConfirmedAuthorizeRequest(cancellationToken);
+            var pendingAuthorizeRequestLst = await _bcAuthorizeRepository.GetPendingAuthorizationRequest(cancellationToken);
             foreach(var pendingAuthorizeRequest in pendingAuthorizeRequestLst)
             {
                 var notificationHandler = _notificationHandlers.FirstOrDefault(n => n.NotificationMode == pendingAuthorizeRequest.NotificationMode);

@@ -11,6 +11,14 @@
         <category android:name="${applicationId}" />
       </intent-filter>
     </receiver>
+    <activity android:name="net.openid.appauth.RedirectUriReceiverActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="com.companyname.simpleidserver.mobileapp"/>
+      </intent-filter>
+    </activity>
   </application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>

@@ -164,6 +164,49 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
+        [When("poll HTTP POST request '(.*)', until '(.*)'='(.*)'")]
+        public async Task WhenPollHTTPPostRequest(string url, string key, string value, Table table)
+        {
+            var form = new List<KeyValuePair<string, string>>();
+            var headers = ExtractHeaders(table);
+            foreach (var record in table.Rows)
+            {
+                var k = record["Key"];
+                var v = ParseValue(record["Value"]);
+                if (PARAMETERS_IN_HEADER.Contains(k))
+                {
+                    continue;
+                }
+
+                form.Add(new KeyValuePair<string, string>(k, v.ToString()));
+            }
+
+            var body = new FormUrlEncodedContent(form);
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url),
+                Content = body
+            };
+            foreach (var kvp in headers)
+            {
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            var json = await httpResponseMessage.Content.ReadAsStringAsync();
+            var jObj = JsonConvert.DeserializeObject<JObject>(json);
+            var token = jObj.SelectToken(key);
+            if (token == null || token.ToString() != value)
+            {
+                Thread.Sleep(200);
+                await WhenPollHTTPPostRequest(url, key, value, table);
+                return;
+            }
+
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("execute HTTP POST JSON request '(.*)'")]
         public async Task WhenExecuteHTTPPostJSONRequest(string url, Table table)
         {
@@ -188,6 +231,40 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             }
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("poll HTTP POST JSON request '(.*)', until HTTP status code ='(.*)'")]
+        public async Task WhenPollHTTPPostRequest(string url, int statusCode, Table table)
+        {
+            var jObj = new JObject();
+            var headers = ExtractHeaders(table);
+            foreach (var record in table.Rows)
+            {
+                var key = record["Key"];
+                var value = ParseValue(record["Value"]);
+                jObj.Add(key, JToken.FromObject(value));
+            }
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url),
+                Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
+            };
+            foreach (var kvp in headers)
+            {
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            if ((int)httpResponseMessage.StatusCode != statusCode)
+            {
+                Thread.Sleep(200);
+                await WhenPollHTTPPostRequest(url, statusCode, table);
+                return;
+            }
+
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
@@ -402,6 +479,17 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwsGenerator.ExtractHeader(jws), "jwsHeader");
         }
 
+        [When("notifiy authorization request '(.*)'")]
+        public async Task WhenNotifyAuthorizationRequest(string authRequestId)
+        {
+            authRequestId = ParseValue(authRequestId).ToString();
+            var bcAuthorizeRepository = (IBCAuthorizeRepository)_factory.Server.Host.Services.GetService(typeof(IBCAuthorizeRepository));
+            var auth = await bcAuthorizeRepository.Get(authRequestId, CancellationToken.None);
+            auth.Notify();
+            await bcAuthorizeRepository.Update(auth, CancellationToken.None);
+            await bcAuthorizeRepository.SaveChanges(CancellationToken.None);
+        }
+
         [When("confirm authorization request '(.*)'")]
         public async Task WhenConfirmAuthorizationRequest(string authRequestId)
         {
@@ -463,7 +551,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         public void ThenEqualsTo(string key, string value)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
-            Assert.Equal(value, jsonHttpBody.SelectToken(key).ToString());
+            Assert.Equal(ParseValue(value).ToString(), jsonHttpBody.SelectToken(key).ToString());
         }
 
         [Then("JSON '(.*)'=(.*)")]

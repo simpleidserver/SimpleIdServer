@@ -7,13 +7,13 @@ namespace SimpleIdServer.MobileApp.Droid.Services
     {
         public event EventHandler<NotificationEventArgs> NotificationReceived;
 
-        public void ReceiveNotification(string title, string description, string clickAction)
+        public void ReceiveNotification(string title, string description, string authReqId)
         {
             var args = new NotificationEventArgs()
             {
                 Title = title,
                 Description = description,
-                ClickAction = clickAction
+                AuthReqId = authReqId
             };
             NotificationReceived?.Invoke(null, args);
         }

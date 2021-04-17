@@ -183,24 +183,21 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 34
- testRunner.And("confirm authorization request \'$auth_req_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 35
  testRunner.And("poll until \'callbackResponse\' is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 36
+#line 35
  testRunner.And("extract JSON from \'callbackResponse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 38
+#line 37
  testRunner.Then("JSON contains \'auth_req_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 39
+#line 38
  testRunner.Then("JSON contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 40
+#line 39
  testRunner.Then("JSON contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 41
+#line 40
  testRunner.Then("JSON contains \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -215,7 +212,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use ping notification mode", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 43
+#line 42
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -243,7 +240,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 44
+#line 43
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table171, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table172 = new TechTalk.SpecFlow.Table(new string[] {
@@ -257,7 +254,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "[token]"});
                 table172.AddRow(new string[] {
                             "grant_types",
-                            "[client_credentials]"});
+                            "[urn:openid:params:grant-type:ciba]"});
                 table172.AddRow(new string[] {
                             "scope",
                             "openid profile"});
@@ -273,13 +270,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table172.AddRow(new string[] {
                             "backchannel_client_notification_endpoint",
                             "https://localhost:8080/pushNotificationEdp"});
-#line 48
+#line 47
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table172, "And ");
 #line hidden
-#line 59
+#line 58
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 60
+#line 59
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table173 = new TechTalk.SpecFlow.Table(new string[] {
@@ -300,26 +297,219 @@ this.ScenarioInitialize(scenarioInfo);
                 table173.AddRow(new string[] {
                             "client_notification_token",
                             "7dc3061e-bad9-4817-bd33-8db789bfb516"});
-#line 62
+#line 61
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table173, "And ");
 #line hidden
-#line 70
+#line 69
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 71
+#line 70
  testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 73
- testRunner.And("confirm authorization request \'$auth_req_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 74
+#line 72
  testRunner.And("poll until \'callbackResponse\' is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 75
- testRunner.And("extract JSON from \'callbackResponse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                TechTalk.SpecFlow.Table table174 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table174.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table174.AddRow(new string[] {
+                            "login_hint",
+                            "administrator"});
+                table174.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 73
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\'" +
+                        "", ((string)(null)), table174, "And ");
 #line hidden
-#line 77
- testRunner.Then("JSON contains \'auth_req_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                TechTalk.SpecFlow.Table table175 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table175.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table175.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table175.AddRow(new string[] {
+                            "grant_type",
+                            "urn:openid:params:grant-type:ciba"});
+                table175.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table175.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 79
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table175, "And ");
+#line hidden
+#line 87
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 89
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Use poll notification mode")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorize")]
+        [Xunit.TraitAttribute("Description", "Use poll notification mode")]
+        public virtual void UsePollNotificationMode()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use poll notification mode", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 91
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table176 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Type",
+                            "Kid",
+                            "AlgName"});
+                table176.AddRow(new string[] {
+                            "SIG",
+                            "1",
+                            "RS256"});
+#line 92
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table176, "When ");
+#line hidden
+                TechTalk.SpecFlow.Table table177 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table177.AddRow(new string[] {
+                            "token_endpoint_auth_method",
+                            "tls_client_auth"});
+                table177.AddRow(new string[] {
+                            "response_types",
+                            "[token]"});
+                table177.AddRow(new string[] {
+                            "grant_types",
+                            "[urn:openid:params:grant-type:ciba]"});
+                table177.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table177.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost:8080]"});
+                table177.AddRow(new string[] {
+                            "tls_client_auth_san_dns",
+                            "firstMtlsClient"});
+                table177.AddRow(new string[] {
+                            "backchannel_token_delivery_mode",
+                            "poll"});
+                table177.AddRow(new string[] {
+                            "backchannel_client_notification_endpoint",
+                            "https://localhost:8080/pushNotificationEdp"});
+#line 96
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table177, "And ");
+#line hidden
+#line 107
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 108
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table178 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table178.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table178.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table178.AddRow(new string[] {
+                            "login_hint",
+                            "administrator"});
+                table178.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table178.AddRow(new string[] {
+                            "client_notification_token",
+                            "7dc3061e-bad9-4817-bd33-8db789bfb516"});
+#line 110
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table178, "And ");
+#line hidden
+#line 118
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 119
+ testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table179.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table179.AddRow(new string[] {
+                            "login_hint",
+                            "administrator"});
+                table179.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 120
+ testRunner.And("poll HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\', u" +
+                        "ntil HTTP status code =\'204\'", ((string)(null)), table179, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table180 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table180.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table180.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table180.AddRow(new string[] {
+                            "grant_type",
+                            "urn:openid:params:grant-type:ciba"});
+                table180.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table180.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 126
+ testRunner.And("poll HTTP POST request \'https://localhost:8080/mtls/token\', until \'token_type\'=\'B" +
+                        "earer\'", ((string)(null)), table180, "And ");
+#line hidden
+#line 134
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 136
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 137
+ testRunner.Then("JSON contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 138
+ testRunner.Then("JSON contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 139
+ testRunner.Then("JSON contains \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

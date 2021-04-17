@@ -22,7 +22,8 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 {
     public interface IBCAuthorizeHandler
     {
-        Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken);
+        Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken);
+        Task<IActionResult> Confirm(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class BCAuthorizeHandler: IBCAuthorizeHandler
@@ -34,7 +35,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private readonly OpenIDHostOptions _options;
 
         public BCAuthorizeHandler(
-            IClientAuthenticationHelper clientAuthenticationHelper, 
+            IClientAuthenticationHelper clientAuthenticationHelper,
             IBCAuthorizeRequestValidator bcAuthorizeRequestValidator,
             IBCNotificationService bcNotificationService,
             IBCAuthorizeRepository bcAuthorizeRepository,
@@ -47,13 +48,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             _options = options.Value;
         }
 
-        public async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
+        public async Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken)
         {
             try
             {
                 var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.Data, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
                 context.SetClient(oauthClient);
-                var user = await _bcAuthorizeRequestValidator.Validate(context, cancellationToken);
+                var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
                 context.SetUser(user);
                 var requestedExpiry = context.Request.Data.GetRequestedExpiry();
                 var interval = context.Request.Data.GetInterval();
@@ -64,19 +65,15 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
                 var currentDateTime = DateTime.UtcNow;
                 var openidClient = oauthClient as OpenIdClient;
-                var bcAuthorize = new Domains.BCAuthorize
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    ExpirationDateTime = currentDateTime.AddSeconds(requestedExpiry.Value),
-                    ClientId = oauthClient.ClientId,
-                    Interval = interval ?? _options.DefaultBCAuthorizeWaitIntervalInSeconds,
-                    NotificationEdp = openidClient.BCClientNotificationEndpoint,
-                    NotificationMode = openidClient.BCTokenDeliveryMode,
-                    Status = BCAuthorizeStatus.Pending,
-                    Scopes = context.Request.Data.GetScopesFromAuthorizationRequest(),
-                    UserId = context.User.Id,
-                    NotificationToken = context.Request.Data.GetClientNotificationToken()
-                };
+                var bcAuthorize = Domains.BCAuthorize.Create(
+                    currentDateTime.AddSeconds(requestedExpiry.Value),
+                    oauthClient.ClientId,
+                    interval ?? _options.DefaultBCAuthorizeWaitIntervalInSeconds,
+                    openidClient.BCClientNotificationEndpoint,
+                    openidClient.BCTokenDeliveryMode,
+                    context.Request.Data.GetScopesFromAuthorizationRequest(),
+                    context.User.Id,
+                    context.Request.Data.GetClientNotificationToken());
                 bcAuthorize.IncrementNextFetchTime();
                 await _bcAuthorizeRepository.Add(bcAuthorize, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
@@ -88,6 +85,23 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 });
             }
             catch(OAuthException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> Confirm(HandlerContext context, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var validationResult = await _bcAuthorizeRequestValidator.ValidateConfirm(context, cancellationToken);
+                context.SetUser(validationResult.User);
+                validationResult.Authorize.Confirm();
+                await _bcAuthorizeRepository.Update(validationResult.Authorize, cancellationToken);
+                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
+                return new NoContentResult();
+            }
+            catch (OAuthException ex)
             {
                 return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
