@@ -22,5 +22,9 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string UserInfoEncryptionEncValuesSupported = "userinfo_encryption_enc_values_supported";
         public const string ClaimsSupported = "claims_supported";
         public const string ClaimsParameterSupported = "claims_parameter_supported";
+        public const string BackchannelTokenDeliveryModesSupported = "backchannel_token_delivery_modes_supported";
+        public const string BackchannelAuthenticationEndpoint = "backchannel_authentication_endpoint";
+        public const string BackchannelAuthenticationRequestSigningAlgValues = "backchannel_authentication_request_signing_alg_values_supported";
+        public const string BackchannelUserCodeParameterSupported = "backchannel_user_code_parameter_supported";
     }
 }

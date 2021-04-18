@@ -30,7 +30,7 @@ namespace SimpleIdServer.MobileApp.ViewModels
             var authInfo = await _loginProvider.LoginAsync();
             if (string.IsNullOrWhiteSpace(authInfo.AccessToken) || !authInfo.IsAuthorized)
             {
-                await _messageService.Show(Global.AppCannotAuthenticate);
+                await _messageService.Show(Global.Error, Global.AppCannotAuthenticate);
             }
             else
             {

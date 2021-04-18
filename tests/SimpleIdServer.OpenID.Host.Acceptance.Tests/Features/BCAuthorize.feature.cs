@@ -322,8 +322,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "auth_req_id",
                             "$auth_req_id$"});
 #line 73
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\'" +
-                        "", ((string)(null)), table174, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table174, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table175 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -471,8 +470,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "auth_req_id",
                             "$auth_req_id$"});
 #line 120
- testRunner.And("poll HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\', u" +
-                        "ntil HTTP status code =\'204\'", ((string)(null)), table179, "And ");
+ testRunner.And("poll HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\', until " +
+                        "HTTP status code =\'204\'", ((string)(null)), table179, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table180 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",

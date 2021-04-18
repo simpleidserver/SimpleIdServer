@@ -240,7 +240,7 @@ Scenario: Error is returned when hint is missing (confirm auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize/confirm'
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
 	| Key                  | Value          |
 	| X-Testing-ClientCert | mtlsClient.crt |
 	| client_id            | $client_id$    |
@@ -274,7 +274,7 @@ Scenario: Error is returned when id_token_hint is invalid (confirm auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize/confirm'
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
 	| Key                       | Value                                |
 	| client_id                 | $client_id$                          |
 	| id_token_hint             | idtokenhint                          |
@@ -308,7 +308,7 @@ Scenario: Error is returned when auth_req_id is missing (confirm auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize/confirm'
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
 	| Key                  | Value          |
 	| client_id            | $client_id$    |
 	| login_hint           | administrator  |
@@ -342,7 +342,7 @@ Scenario: Error is returned when authtorization request doesn't exist (confirm a
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize/confirm'
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
 	| Key                  | Value          |
 	| client_id            | $client_id$    |
 	| login_hint           | administrator  |

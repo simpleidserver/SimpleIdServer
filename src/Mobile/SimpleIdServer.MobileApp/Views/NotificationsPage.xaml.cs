@@ -43,7 +43,7 @@ namespace SimpleIdServer.MobileApp.Views
                 if (await _messageService.Show(Global.Confirmation, Global.ConfirmAuthReqId, Global.Confirm, Global.Reject))
                 {
                     var authInfo = await _tokenStorage.GetAuthInfo();
-
+                    await ConfirmAuthReqId(authInfo.IdToken, notification.AuthReqId);
                 }
 
                 _viewModel.RemoveNotification(notification);
@@ -76,6 +76,7 @@ namespace SimpleIdServer.MobileApp.Views
                 var httpRequestMessage = new HttpRequestMessage
                 {
                     RequestUri = new Uri(Constants.ConfirmAuthReqId),
+                    Method = HttpMethod.Post,
                     Content = new StringContent(jObj.ToString(), Encoding.UTF8, "application/json")
                 };
                 await client.SendAsync(httpRequestMessage);

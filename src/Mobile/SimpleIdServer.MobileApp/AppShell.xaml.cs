@@ -19,7 +19,7 @@ namespace SimpleIdServer.MobileApp
             var jwtSecurityToken = await tokenStorage.GetToken();
             if (jwtSecurityToken != null)
             {
-                await Shell.Current.GoToAsync("//notifications");
+                await GoToAsync("//notifications");
             }
         }
 

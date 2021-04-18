@@ -883,8 +883,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_id",
                             "$client_id$"});
 #line 243
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\'" +
-                        "", ((string)(null)), table208, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table208, "And ");
 #line hidden
 #line 248
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -996,8 +995,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "id_token_hint",
                             "idtokenhint"});
 #line 277
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\'" +
-                        "", ((string)(null)), table212, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table212, "And ");
 #line hidden
 #line 282
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1109,8 +1107,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "login_hint",
                             "administrator"});
 #line 311
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\'" +
-                        "", ((string)(null)), table216, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table216, "And ");
 #line hidden
 #line 316
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1228,8 +1225,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "auth_req_id",
                             "authreqid"});
 #line 345
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize/confirm\'" +
-                        "", ((string)(null)), table220, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table220, "And ");
 #line hidden
 #line 351
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

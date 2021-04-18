@@ -129,6 +129,9 @@
   <data name="ConfirmAuthReqId" xml:space="preserve">
     <value>Do-you want to confirm the authentication request ?</value>
   </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
   </data>

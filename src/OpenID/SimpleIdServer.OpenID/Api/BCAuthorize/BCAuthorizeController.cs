@@ -8,7 +8,7 @@ using SimpleIdServer.OpenID.Api.BCAuthorize;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.Api.BCAuthentication
+namespace SimpleIdServer.OpenID.Api
 {
     [Route(SIDOpenIdConstants.EndPoints.BCAuthorize)]
     public class BCAuthorizeController : Controller
@@ -20,21 +20,12 @@ namespace SimpleIdServer.OpenID.Api.BCAuthentication
             _bcAuthorizeHandler = bcAuthorizeHandler;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] JObject jObjBody, CancellationToken cancellationToken)
-        {
-            var jObjHeader = Request.Headers.ToJObject();
-            var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate));
-            return await _bcAuthorizeHandler.Create(context, cancellationToken);
-        }
 
         [HttpPost("confirm")]
         public async Task<IActionResult> Confirm([FromBody] JObject jObjBody, CancellationToken cancellationToken)
         {
             var jObjHeader = Request.Headers.ToJObject();
-            var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, null));
             return await _bcAuthorizeHandler.Confirm(context, cancellationToken);
         }
     }
