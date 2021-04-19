@@ -49,6 +49,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 result.Add(Path.GetFileName(file), new X509Certificate2(file));
             }
 
+            foreach(var file in Directory.GetFiles(directory, "*.cer"))
+            {
+                result.Add(Path.GetFileName(file), new X509Certificate2(file));
+            }
+
             return result;
         }
     }

@@ -26,9 +26,9 @@ namespace SimpleIdServer.OpenID.Domains
             UpdateDateTime = DateTime.UtcNow;
         }
 
-        public void Notify()
+        public void Finish()
         {
-            Status = BCAuthorizeStatus.Notified;
+            Status = BCAuthorizeStatus.Finished;
             UpdateDateTime = DateTime.UtcNow;
         }
 
@@ -56,7 +56,7 @@ namespace SimpleIdServer.OpenID.Domains
                 Interval = interval,
                 NotificationEdp = notificationEdp,
                 NotificationMode = notificationMode,
-                Status = notificationMode == SIDOpenIdConstants.StandardNotificationModes.Poll ? BCAuthorizeStatus.Notified : BCAuthorizeStatus.Pending,
+                Status = BCAuthorizeStatus.Pending,
                 Scopes = scopes,
                 UserId = userId,
                 NotificationToken = notificationToken

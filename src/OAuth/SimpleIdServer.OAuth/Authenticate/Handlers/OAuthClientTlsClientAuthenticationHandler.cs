@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Logging;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
@@ -12,9 +13,11 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 {
     public class OAuthClientTlsClientAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        public OAuthClientTlsClientAuthenticationHandler()
-        {
+        private ILogger<OAuthClientTlsClientAuthenticationHandler> _logger;
 
+        public OAuthClientTlsClientAuthenticationHandler(ILogger<OAuthClientTlsClientAuthenticationHandler> logger)
+        {
+            _logger = logger;
         }
 
 
@@ -27,6 +30,12 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             if (certificate == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.NO_CLIENT_CERTIFICATE);
+            }
+
+            if (!certificate.IsValid())
+            {
+                _logger.LogError("the certificate is not trusted");
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_IS_NOT_TRUSTED);
             }
 
             if (!string.IsNullOrWhiteSpace(client.TlsClientAuthSubjectDN) && client.TlsClientAuthSubjectDN != certificate.Subject)

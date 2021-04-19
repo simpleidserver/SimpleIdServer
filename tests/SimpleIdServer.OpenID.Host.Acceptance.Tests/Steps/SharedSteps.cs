@@ -479,17 +479,6 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwsGenerator.ExtractHeader(jws), "jwsHeader");
         }
 
-        [When("notifiy authorization request '(.*)'")]
-        public async Task WhenNotifyAuthorizationRequest(string authRequestId)
-        {
-            authRequestId = ParseValue(authRequestId).ToString();
-            var bcAuthorizeRepository = (IBCAuthorizeRepository)_factory.Server.Host.Services.GetService(typeof(IBCAuthorizeRepository));
-            var auth = await bcAuthorizeRepository.Get(authRequestId, CancellationToken.None);
-            auth.Notify();
-            await bcAuthorizeRepository.Update(auth, CancellationToken.None);
-            await bcAuthorizeRepository.SaveChanges(CancellationToken.None);
-        }
-
         [When("confirm authorization request '(.*)'")]
         public async Task WhenConfirmAuthorizationRequest(string authRequestId)
         {

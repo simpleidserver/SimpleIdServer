@@ -57,6 +57,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                     await tokenBuilder.Build(authRequest.Scopes, context, cancellationToken);
                 }
 
+                // TODO : Remove auth_req_id.
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
                 var result = BuildResult(context, authRequest.Scopes);
                 foreach (var kvp in context.Response.Parameters)

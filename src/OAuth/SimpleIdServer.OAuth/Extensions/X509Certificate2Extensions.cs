@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.RegularExpressions;
 
 namespace SimpleIdServer.OAuth.Extensions
 {
@@ -52,6 +51,24 @@ namespace SimpleIdServer.OAuth.Extensions
             }
 
             return lst;
+        }
+
+        public static bool IsSelfSigned(this X509Certificate2 certificate)
+        {
+            return certificate.SubjectName.RawData.SequenceEqual(certificate.IssuerName.RawData);
+        }
+
+        public static bool IsValid(this X509Certificate2 certificate)
+        {
+            // Externalize this options.
+            X509Chain chain = new X509Chain();
+            X509ChainPolicy chainPolicy = new X509ChainPolicy()
+            {
+                RevocationMode = X509RevocationMode.NoCheck,
+                RevocationFlag = X509RevocationFlag.EntireChain
+            };
+            chain.ChainPolicy = chainPolicy;
+            return chain.Build(certificate);
         }
 
         public static byte[] GetExtension(this X509Certificate2 certificate, string oid)

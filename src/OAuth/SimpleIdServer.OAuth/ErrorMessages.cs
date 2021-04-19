@@ -40,6 +40,7 @@ namespace SimpleIdServer.OAuth
         public const string BAD_AUTHORIZATION_CODE = "bad authorization code";
         public const string BAD_RESPONSE_TYPE = "response type must equals to 'code'";
         public const string BAD_RESPONSE_MODE = "response mode {0} is not supported";
+        public const string BAD_SELF_SIGNED_CERTIFICATE = "the certificate is not correct";
         public const string MISSING_PARAMETER = "missing parameter {0}";
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";
@@ -66,6 +67,8 @@ namespace SimpleIdServer.OAuth
         public const string CERTIFICATE_SAN_EMAIL_INVALID = "certificate san EMAIL is invalid";
         public const string CERTIFICATE_SAN_IP_INVALID = "certificate san IP is invalid";
         public const string CERTIFICATE_IS_REQUIRED = "certificate is required";
+        public const string CERTIFICATE_IS_NOT_TRUSTED = "certificate is not trusted";
+        public const string CERTIFICATE_IS_NOT_SELF_SIGNED = "the certificate is not self signed";
         public const string REQUEST_OBJECT_IS_EXPIRED = "request object is expired";
         public const string REQUEST_OBJECT_BAD_AUDIENCE = "request object has bad audience";
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";

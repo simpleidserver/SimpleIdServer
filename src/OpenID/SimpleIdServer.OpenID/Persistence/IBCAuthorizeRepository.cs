@@ -9,7 +9,7 @@ namespace SimpleIdServer.OpenID.Persistence
 {
     public interface IBCAuthorizeRepository
     {
-        Task<IEnumerable<BCAuthorize>> GetPendingAuthorizationRequest(CancellationToken cancellationToken);
+        Task<IEnumerable<BCAuthorize>> GetConfirmedAuthorizationRequest(CancellationToken cancellationToken);
         Task<BCAuthorize> Get(string id, CancellationToken cancellationToken);
         Task Add(BCAuthorize bcAuthorize, CancellationToken cancellationToken);
         Task Update(BCAuthorize bcAuhtorize, CancellationToken cancellationToken);

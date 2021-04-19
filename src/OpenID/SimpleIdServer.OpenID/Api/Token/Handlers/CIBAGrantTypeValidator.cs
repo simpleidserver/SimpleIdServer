@@ -56,11 +56,6 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                 throw new OAuthException(OAuth.ErrorCodes.AUTHORIZATION_PENDING, string.Format(ErrorMessages.AUTH_REQUEST_NOT_CONFIRMED, authRequestId));
             }
 
-            if (authRequest.Status == Domains.BCAuthorizeStatus.Notified)
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_NOTIFIED, authRequestId));
-            }
-
             if (currentDateTime > authRequest.ExpirationDateTime)
             {
                 throw new OAuthException(OAuth.ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_EXPIRED, authRequestId));

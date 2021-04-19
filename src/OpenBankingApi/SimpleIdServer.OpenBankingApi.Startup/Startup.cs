@@ -42,6 +42,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 .AddCookie()
                 .AddCertificate(o =>
                 {
+                    o.AllowedCertificateTypes = CertificateTypes.All;
                     o.RevocationFlag = X509RevocationFlag.EntireChain;
                     o.RevocationMode = X509RevocationMode.NoCheck;
                 });

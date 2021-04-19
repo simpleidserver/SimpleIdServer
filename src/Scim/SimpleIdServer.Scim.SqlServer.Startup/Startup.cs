@@ -72,7 +72,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             });
             services.AddScimStoreEF(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly)).EnableSensitiveDataLogging();
+                options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
             });
             services.AddDistributedLockSQLServer(opts =>
             {

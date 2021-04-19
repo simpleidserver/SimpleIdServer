@@ -78,9 +78,6 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 await _bcAuthorizeRepository.Add(bcAuthorize, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 await _bcNotificationService.Notify(context, bcAuthorize.Id, cancellationToken);
-                bcAuthorize.Notify();
-                await _bcAuthorizeRepository.Update(bcAuthorize, cancellationToken);
-                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(new JObject
                 {
                     { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id },

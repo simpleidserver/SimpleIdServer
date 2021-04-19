@@ -108,11 +108,6 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
             }
 
-            if (authRequest.Status != Domains.BCAuthorizeStatus.Notified)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_NOT_NOTIFIED, authRequestId));
-            }
-
             var currentDateTime = DateTime.UtcNow;
             if (currentDateTime > authRequest.ExpirationDateTime)
             {

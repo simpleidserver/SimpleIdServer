@@ -33,19 +33,19 @@ namespace SimpleIdServer.OpenID.Jobs
 
         protected override async Task Execute(CancellationToken cancellationToken)
         {
-            var pendingAuthorizeRequestLst = await _bcAuthorizeRepository.GetPendingAuthorizationRequest(cancellationToken);
-            foreach(var pendingAuthorizeRequest in pendingAuthorizeRequestLst)
+            var confirmedAuthorizeRequestLst = await _bcAuthorizeRepository.GetConfirmedAuthorizationRequest(cancellationToken);
+            foreach(var confirmedAuthorizeRequest in confirmedAuthorizeRequestLst)
             {
-                var notificationHandler = _notificationHandlers.FirstOrDefault(n => n.NotificationMode == pendingAuthorizeRequest.NotificationMode);
+                var notificationHandler = _notificationHandlers.FirstOrDefault(n => n.NotificationMode == confirmedAuthorizeRequest.NotificationMode);
                 if (notificationHandler == null)
                 {
                     continue;
                 }
 
-                if (await notificationHandler.Notify(pendingAuthorizeRequest, cancellationToken))
+                if (await notificationHandler.Notify(confirmedAuthorizeRequest, cancellationToken))
                 {
-                    pendingAuthorizeRequest.Notify();
-                    await _bcAuthorizeRepository.Update(pendingAuthorizeRequest, cancellationToken);
+                    confirmedAuthorizeRequest.Finish();
+                    await _bcAuthorizeRepository.Update(confirmedAuthorizeRequest, cancellationToken);
                 }
             }
 

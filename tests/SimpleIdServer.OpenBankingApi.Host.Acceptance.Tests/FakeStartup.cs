@@ -57,6 +57,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                 })
                 .AddCertificate(o =>
                 {
+                    o.AllowedCertificateTypes = CertificateTypes.All;
                     o.RevocationFlag = X509RevocationFlag.EntireChain;
                     o.RevocationMode = X509RevocationMode.NoCheck;
                 });

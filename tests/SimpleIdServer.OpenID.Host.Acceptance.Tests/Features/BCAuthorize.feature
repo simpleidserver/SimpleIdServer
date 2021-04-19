@@ -30,6 +30,10 @@ Scenario: Use push notification mode
 
 	And extract JSON from body
 	And extract parameter 'auth_req_id' from JSON body
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
+	| Key         | Value         |
+	| login_hint  | administrator |
+	| auth_req_id | $auth_req_id$ |
 
 	And poll until 'callbackResponse' is received
 	And extract JSON from 'callbackResponse'
@@ -68,6 +72,10 @@ Scenario: Use ping notification mode
 
 	And extract JSON from body
 	And extract parameter 'auth_req_id' from JSON body
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
+	| Key         | Value         |
+	| login_hint  | administrator |
+	| auth_req_id | $auth_req_id$ |
 
 	And poll until 'callbackResponse' is received
 	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
@@ -117,13 +125,12 @@ Scenario: Use poll notification mode
 
 	And extract JSON from body
 	And extract parameter 'auth_req_id' from JSON body
-	And poll HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm', until HTTP status code ='204'
-	| Key                  | Value          |
-	| client_id            | $client_id$    |
-	| login_hint           | administrator  |
-	| auth_req_id          | $auth_req_id$  |
-
-	And poll HTTP POST request 'https://localhost:8080/mtls/token', until 'token_type'='Bearer'
+	And execute HTTP POST JSON request 'https://localhost:8080/bc-authorize/confirm'
+	| Key         | Value         |
+	| login_hint  | administrator |
+	| auth_req_id | $auth_req_id$ |
+	
+	And execute HTTP POST request 'https://localhost:8080/mtls/token'
 	| Key                  | Value                             |
 	| client_id            | $client_id$                       |
 	| scope                | openid profile                    |

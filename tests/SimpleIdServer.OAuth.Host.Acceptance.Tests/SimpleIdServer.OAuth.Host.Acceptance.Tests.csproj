@@ -29,5 +29,8 @@
     <None Include="..\..\certificates\mtlsClient.crt" Link="Certificates\mtlsClient.crt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\..\certificates\selfSignedCertificate.cer" Link="Certificates\selfSignedCertificate.cer">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
