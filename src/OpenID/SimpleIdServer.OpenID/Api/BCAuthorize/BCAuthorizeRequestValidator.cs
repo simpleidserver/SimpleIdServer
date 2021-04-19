@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
@@ -11,7 +12,9 @@ using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using System;
@@ -32,19 +35,26 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private readonly IJwtParser _jwtParser;
         private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
+        private readonly IRequestObjectValidator _requestObjectValidator;
         private readonly OpenIDHostOptions _options;
 
-        public BCAuthorizeRequestValidator(IJwtParser jwtParser, IOAuthUserQueryRepository oauthUserQueryRepository, IBCAuthorizeRepository bcAuthorizeRepository, IOptions<OpenIDHostOptions> options)
+        public BCAuthorizeRequestValidator(
+            IJwtParser jwtParser, 
+            IOAuthUserQueryRepository oauthUserQueryRepository, 
+            IBCAuthorizeRepository bcAuthorizeRepository,
+            IRequestObjectValidator requestObjectValidator,
+            IOptions<OpenIDHostOptions> options)
         {
             _jwtParser = jwtParser;
             _oauthUserQueryRepository = oauthUserQueryRepository;
             _bcAuthorizeRepository = bcAuthorizeRepository;
+            _requestObjectValidator = requestObjectValidator;
             _options = options.Value;
         }
 
         public virtual async Task<OAuthUser> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
         {
-            // TODO : Check the signature of the authentication request.
+            await CheckRequestObject(context, cancellationToken);
             var tokens = new bool[]
             {
                 string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),
@@ -117,6 +127,16 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             return new BCAcceptRequestValidationResult(user, authRequest);
         }
 
+        private async Task CheckRequestObject(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var request = context.Request.Data.GetRequest();
+            if (!string.IsNullOrWhiteSpace(request))
+            {
+                var validationResult = await _requestObjectValidator.Validate(request, (OpenIdClient)context.Client, cancellationToken);
+                context.Request.SetData(JObject.FromObject(validationResult.JwsPayload));
+            }
+        }
+
         private void CheckScopes(HandlerContext context)
         {
             var requestedScopes = context.Request.Data.GetScopesFromAuthorizationRequest();
@@ -131,6 +151,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private void CheckClientNotificationToken(HandlerContext context)
         {
             var clientNotificationToken = context.Request.Data.GetClientNotificationToken();
+            var openidClient = (OpenIdClient)context.Client;
+            if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping && 
+                openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Push)
+            {
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(clientNotificationToken))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, DTOs.BCAuthenticationRequestParameters.ClientNotificationToken));

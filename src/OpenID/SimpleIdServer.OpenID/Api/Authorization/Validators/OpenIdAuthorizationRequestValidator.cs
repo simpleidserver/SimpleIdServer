@@ -30,15 +30,19 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
     {
         private readonly IAmrHelper _amrHelper;
         private readonly IJwtParser _jwtParser;
+        private readonly IRequestObjectValidator _requestObjectValidator;
 
         public OpenIDAuthorizationRequestValidator(
             IUserConsentFetcher userConsentFetcher,
             IEnumerable<IOAuthResponseMode> oauthResponseModes,
             IHttpClientFactory httpClientFactory,
-            IAmrHelper amrHelper, IJwtParser jwtParser) : base(userConsentFetcher, oauthResponseModes, httpClientFactory)
+            IAmrHelper amrHelper, 
+            IJwtParser jwtParser,
+            IRequestObjectValidator requestObjectValidator) : base(userConsentFetcher, oauthResponseModes, httpClientFactory)
         {
             _amrHelper = amrHelper;
             _jwtParser = jwtParser;
+            _requestObjectValidator = requestObjectValidator;
         }
 
         public override async Task Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -159,7 +163,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             var request = context.Request.Data.GetRequestFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(request))
             {
-                return Task.FromResult(false);
+                return Task.FromResult(true);
             }
 
             return CheckRequest(context, request);
@@ -190,55 +194,21 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         protected virtual async Task<bool> CheckRequest(HandlerContext context, string request)
         {
-            if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
-            }
-
-            var jws = request;
-            if (_jwtParser.IsJweToken(request))
-            {
-                jws = await _jwtParser.Decrypt(jws);
-                if (string.IsNullOrWhiteSpace(jws))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWE_REQUEST_PARAMETER);
-                }
-            }
-
-            JwsHeader header = null;
-            try
-            {
-                header = _jwtParser.ExtractJwsHeader(jws);
-            }
-            catch (InvalidOperationException)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
-            }
-
-            JwsPayload jwsPayload;
-            try
-            {
-                jwsPayload = await _jwtParser.Unsign(jws, context.Client);
-            }
-            catch(JwtException ex)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ex.Message);
-            }
-
-            jwsPayload.Add(AuthorizationRequestParameters.Request, request);
-            context.Request.SetData(JObject.FromObject(jwsPayload));
-            CheckRequestObject(header, jwsPayload, context);
+            var openidClient = (OpenIdClient)context.Client;
+            var validationResult = await _requestObjectValidator.Validate(request, openidClient, CancellationToken.None);
+            context.Request.SetData(JObject.FromObject(validationResult.JwsPayload));
+            CheckRequestObject(validationResult.JwsHeader, validationResult.JwsPayload, openidClient, context);
+            validationResult.JwsPayload.Add(AuthorizationRequestParameters.Request, request);
             return true;
         }
 
-        protected virtual void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, HandlerContext context)
+        protected virtual void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, OpenIdClient openidClient, HandlerContext context)
         {
             if (jwsPayload == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
-            var openidClient = (OpenIdClient)context.Client;
             if (
                 (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg) ||
                 (string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != NoneSignHandler.ALG_NAME)

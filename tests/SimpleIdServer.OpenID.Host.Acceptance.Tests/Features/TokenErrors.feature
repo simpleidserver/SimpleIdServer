@@ -164,7 +164,7 @@ Scenario: auth_req_id must be confirmed
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value                                |
 	| X-Testing-ClientCert      | mtlsClient.crt                       |
 	| client_id                 | $client_id$                          |

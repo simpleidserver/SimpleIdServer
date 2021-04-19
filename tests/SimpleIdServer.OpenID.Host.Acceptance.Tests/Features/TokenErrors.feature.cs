@@ -655,7 +655,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_notification_token",
                             "7dc3061e-bad9-4817-bd33-8db789bfb516"});
 #line 167
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table270, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table270, "And ");
 #line hidden
 #line 175
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

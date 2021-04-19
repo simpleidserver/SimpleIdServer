@@ -51,6 +51,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                     var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
                     url = QueryHelpers.AddQueryString(redirectUrlAuthorizationResponse.RedirectUrl, redirectUrlAuthorizationResponse.QueryParameters);
                     _responseModeHandler.Handle(jObjBody, redirectUrlAuthorizationResponse, HttpContext);
+                    HttpContext.Response.Redirect(url);
                     return;
                 }
 

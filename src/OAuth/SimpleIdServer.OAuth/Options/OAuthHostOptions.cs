@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using System.Collections.Generic;
 
@@ -22,6 +23,7 @@ namespace SimpleIdServer.OAuth.Options
             };
             MtlsEnabled = false;
             CertificateAuthenticationScheme = "Certificate";
+            DefaultTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
         }
 
         /// <summary>
@@ -60,5 +62,9 @@ namespace SimpleIdServer.OAuth.Options
         /// Client certificate authentication scheme.
         /// </summary>
         public string CertificateAuthenticationScheme { get; set; }
+        /// <summary>
+        /// Default token signed response algorithm.
+        /// </summary>
+        public string DefaultTokenSignedResponseAlg { get; set; }
     }
 }

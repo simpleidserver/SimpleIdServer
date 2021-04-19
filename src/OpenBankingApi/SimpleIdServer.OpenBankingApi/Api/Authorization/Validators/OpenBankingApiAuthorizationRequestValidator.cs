@@ -41,7 +41,8 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             IEnumerable<IOAuthResponseMode> oauthResponseModes,
             IHttpClientFactory httpClientFactory,
             IAmrHelper amrHelper, 
-            IJwtParser jwtParser) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser)
+            IJwtParser jwtParser,
+            IRequestObjectValidator requestObjectValidator) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser, requestObjectValidator)
         {
             _options = options.Value;
             _accountAccessConsentRepository = accountAccessConsentRepository;
@@ -170,9 +171,9 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             RedirectToConsentView(context, false);
         }
 
-        protected override void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, HandlerContext context)
+        protected override void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, OpenIdClient openidClient, HandlerContext context)
         {
-            base.CheckRequestObject(header, jwsPayload, context);
+            base.CheckRequestObject(header, jwsPayload, openidClient, context);
             if (!jwsPayload.ContainsKey(Jwt.Constants.OAuthClaims.ExpirationTime))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, Jwt.Constants.OAuthClaims.ExpirationTime));

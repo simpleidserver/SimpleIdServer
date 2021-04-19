@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
+using SimpleIdServer.Jwt.Jwe.EncHandlers;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
 
 namespace SimpleIdServer.OpenID.Options
@@ -24,6 +25,7 @@ namespace SimpleIdServer.OpenID.Options
             FcmTitle = "Authenticate";
             FcmBody = "SimpleIdServer wants to authenticate";
             DefaultBCAuthorizeWaitIntervalInSeconds = 2;
+            DefaultRequestObjectEncyptionEnc = A128CBCHS256EncHandler.ENC_NAME;
         }
 
         /// <summary>
@@ -92,5 +94,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Default interval in seconds.
         /// </summary>
         public int DefaultBCAuthorizeWaitIntervalInSeconds { get; set; }
+        /// <summary>
+        /// Default request object encryption.
+        /// </summary>
+        public string DefaultRequestObjectEncyptionEnc { get; set; }
     }
 }

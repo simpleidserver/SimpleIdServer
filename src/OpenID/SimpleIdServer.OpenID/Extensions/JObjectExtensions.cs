@@ -266,6 +266,11 @@ namespace SimpleIdServer.OpenID.Extensions
 
         #region Back channel authentication request
 
+        public static string GetRequest(this JObject jObj)
+        {
+            return jObj.GetStr(BCAuthenticationRequestParameters.Request);
+        }
+
         public static string GetLoginHintToken(this JObject jObj)
         {
             return jObj.GetStr(BCAuthenticationRequestParameters.LoginHintToken);

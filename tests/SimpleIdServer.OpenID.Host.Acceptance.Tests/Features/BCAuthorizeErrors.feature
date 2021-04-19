@@ -25,7 +25,7 @@ Scenario: Error is returned when hint is missing (get auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
 	| X-Testing-ClientCert | mtlsClient.crt |
 	| client_id            | $client_id$    |
@@ -59,7 +59,7 @@ Scenario: Error is returned when scope is missing (get auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
 	| X-Testing-ClientCert | mtlsClient.crt |
 	| client_id            | $client_id$    |
@@ -94,7 +94,7 @@ Scenario: Error is returned when scope is not valid (get auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
 	| X-Testing-ClientCert | mtlsClient.crt |
 	| client_id            | $client_id$    |
@@ -130,7 +130,7 @@ Scenario: Error is returned when client_notification_token is missing (get auth_
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                  | Value          |
 	| X-Testing-ClientCert | mtlsClient.crt |
 	| client_id            | $client_id$    |
@@ -166,7 +166,7 @@ Scenario: Error is returned when client_notification_token is < 128 bits (get au
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value          |
 	| X-Testing-ClientCert      | mtlsClient.crt |
 	| client_id                 | $client_id$    |
@@ -203,7 +203,7 @@ Scenario: Error is returned when id_token_hint is invalid (get auth_req_id)
 	| scope                | scope1             |
 	| grant_type           | client_credentials |
 
-	And execute HTTP POST JSON request 'https://localhost:8080/mtls/bc-authorize'
+	And execute HTTP POST request 'https://localhost:8080/mtls/bc-authorize'
 	| Key                       | Value                                |
 	| X-Testing-ClientCert      | mtlsClient.crt                       |
 	| client_id                 | $client_id$                          |

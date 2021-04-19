@@ -163,7 +163,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
         {
             if (string.IsNullOrWhiteSpace(oauthClient.TokenSignedResponseAlg))
             {
-                oauthClient.TokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
+                oauthClient.TokenSignedResponseAlg = OauthHostOptions.DefaultTokenSignedResponseAlg;
             }
         }
 

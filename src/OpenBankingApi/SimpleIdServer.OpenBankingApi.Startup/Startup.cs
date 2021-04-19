@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -11,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Jwe.CEKHandlers;
+using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Filters;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenID;
@@ -65,11 +68,14 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 opt.MtlsEnabled = true;
                 opt.DefaultScopes = new List<string>
                     {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope.Name,
                         SIDOpenIdConstants.StandardScopes.Profile.Name,
                         SIDOpenIdConstants.StandardScopes.Email.Name,
                         SIDOpenIdConstants.StandardScopes.Address.Name,
-                        SIDOpenIdConstants.StandardScopes.Phone.Name
+                        SIDOpenIdConstants.StandardScopes.Phone.Name,
+                        "accounts"
                     };
+                opt.DefaultTokenSignedResponseAlg = PS256SignHandler.ALG_NAME;
             })
                 .AddClients(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey), DefaultConfiguration.Scopes)
                 .AddAcrs(DefaultConfiguration.AcrLst)
@@ -101,6 +107,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     name: "DefaultRoute",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            ConfigureFireBase();
         }
 
         private static JsonWebKey ExtractJsonWebKeyFromRSA(string fileName, string algName)
@@ -146,6 +153,15 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 encJsonWebKey
             };
         }
+
+        private void ConfigureFireBase()
+        {
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential.GetApplicationDefault()
+            });
+        }
+
 
         private static void ExtractCertificate(string path, string pass)
         {

@@ -76,7 +76,7 @@ namespace SimpleIdServer.MobileApp.Droid.Services
         {
             var authRequest = new AuthorizationRequest.Builder(
                     serviceConfig, Constants.ClientId,
-                    ResponseTypeValues.Code,
+                    $"{ResponseTypeValues.Code} {ResponseTypeValues.Token}",
                     Android.Net.Uri.Parse(Constants.RedirectUri))
                 .SetScope(string.Join(" ", Constants.Scopes))
                 .Build();

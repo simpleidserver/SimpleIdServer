@@ -128,7 +128,7 @@ namespace SimpleIdServer.OpenID.Api.Register
         {
             if (!string.IsNullOrWhiteSpace(openidClient.RequestObjectEncryptionAlg) && string.IsNullOrWhiteSpace(openidClient.RequestObjectEncryptionEnc))
             {
-                openidClient.RequestObjectEncryptionEnc = A128CBCHS256EncHandler.ENC_NAME;
+                openidClient.RequestObjectEncryptionEnc = _openIDHostOptions.DefaultRequestObjectEncyptionEnc;
             }
         }
 

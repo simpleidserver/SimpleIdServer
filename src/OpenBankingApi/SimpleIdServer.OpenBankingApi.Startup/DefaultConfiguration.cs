@@ -100,6 +100,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
+                DeviceRegistrationToken = "ciyortoPQHGluxo-vIZLu7:APA91bHRrB-mdgHl6IQFu4XNWR5VBXxOjaq-gAAuxCzswQAGeryvFaBqoJqJN_oSEtPZMTknRe2rixJj5cjnaWkCin8NSXm7Gug6peZd9EpJgJ98CNHqOudcFv_h3jp4dpgWn6imb7sR",
                 Claims = new List<Claim>
                 {
                     new Claim(Jwt.Constants.UserClaims.Subject, "sub"),
@@ -322,6 +323,42 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     TlsClientAuthSubjectDN = "secondMtlsClient",
                     PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "native",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
+                    },
+                    TokenEndPointAuthMethod = "pkce",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "PS256",
+                    IdTokenSignedResponseAlg = "PS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "com.companyname.simpleidserver.mobileapp:/oauth2redirect"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "code",
+                        "token"
+                    }
                 }
             };
         }

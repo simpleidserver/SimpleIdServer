@@ -174,7 +174,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_notification_token",
                             "7dc3061e-bad9-4817-bd33-8db789bfb516"});
 #line 23
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table170, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table170, "And ");
 #line hidden
 #line 31
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -310,7 +310,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_notification_token",
                             "7dc3061e-bad9-4817-bd33-8db789bfb516"});
 #line 65
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table174, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table174, "And ");
 #line hidden
 #line 73
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -473,7 +473,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "client_notification_token",
                             "7dc3061e-bad9-4817-bd33-8db789bfb516"});
 #line 118
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table180, "And ");
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table180, "And ");
 #line hidden
 #line 126
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
