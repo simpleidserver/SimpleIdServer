@@ -75,6 +75,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     }
                 }
 
+                existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
                 existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())

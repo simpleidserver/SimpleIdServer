@@ -96,6 +96,11 @@ namespace SimpleIdServer.Scim.Domain
             return Attributes.Any(a => a.IsSimilar(attr));
         }
 
+        public void SetDisplayName(string displayName)
+        {
+            DisplayName = displayName;
+        }
+
         public object Clone()
         {
             return new SCIMRepresentation

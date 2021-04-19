@@ -156,6 +156,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 Version = representation.Version,
                 ResourceType = representation.ResourceType,
                 Id = representation.Id,
+                DisplayName = representation.DisplayName,
                 Schemas = representation.Schemas.Select(s => ToDomain(s.Schema)).ToList(),
                 Attributes = representation.Attributes.Where(_ => _.Parent == null).Select(s =>
                 {
