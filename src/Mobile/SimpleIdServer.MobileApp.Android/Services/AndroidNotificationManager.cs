@@ -1,5 +1,6 @@
 ﻿using SimpleIdServer.MobileApp.Services;
 using System;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.MobileApp.Droid.Services
 {
@@ -7,13 +8,14 @@ namespace SimpleIdServer.MobileApp.Droid.Services
     {
         public event EventHandler<NotificationEventArgs> NotificationReceived;
 
-        public void ReceiveNotification(string title, string description, string authReqId)
+        public void ReceiveNotification(string title, string description, string authReqId, ICollection<NotificationPermission> permissions)
         {
             var args = new NotificationEventArgs()
             {
                 Title = title,
                 Description = description,
-                AuthReqId = authReqId
+                AuthReqId = authReqId,
+                Permissions = permissions
             };
             NotificationReceived?.Invoke(null, args);
         }

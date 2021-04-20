@@ -163,7 +163,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             var request = context.Request.Data.GetRequestFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(request))
             {
-                return Task.FromResult(true);
+                return Task.FromResult(false);
             }
 
             return CheckRequest(context, request);

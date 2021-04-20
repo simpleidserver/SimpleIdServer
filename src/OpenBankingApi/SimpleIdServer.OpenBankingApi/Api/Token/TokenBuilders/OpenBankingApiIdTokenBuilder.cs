@@ -12,7 +12,9 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
+using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
@@ -28,6 +30,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
     {
         private readonly IJwtBuilder _jwtBuilder;
         private readonly OpenBankingApiOptions _options;
+        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private Dictionary<IEnumerable<string>, Func<byte[], byte[]>> MAPPING_HASH_CALLBACK = new Dictionary<IEnumerable<string>, Func<byte[], byte[]>>
         {
             { new [] { ECDSAP256SignHandler.ALG_NAME, PS256SignHandler.ALG_NAME, RSA256SignHandler.ALG_NAME }, Hash256 },
@@ -37,6 +40,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
 
         public OpenBankingApiIdTokenBuilder(IJwtBuilder jwtBuilder, 
             IOptions<OpenBankingApiOptions> options,
+            IBCAuthorizeRepository bcAuthorizeRepository,
             IEnumerable<IClaimsSource> claimsSources, 
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
             IAmrHelper amrHelper, 
@@ -45,6 +49,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
         {
             _jwtBuilder = jwtBuilder;
             _options = options.Value;
+            _bcAuthorizeRepository = bcAuthorizeRepository;
         }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext context, CancellationToken cancellationToken)
@@ -81,6 +86,24 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
                 else
                 {
                     result.Add(Jwt.Constants.UserClaims.Subject, result[_options.OpenBankingApiConsentClaimName]);
+                }
+            }
+
+            var authRequestId = currentContext.Request.Data.GetAuthRequestId();
+            if (!string.IsNullOrWhiteSpace(authRequestId))
+            {
+                var authorize = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
+                if (authorize != null && authorize.Permissions.Any())
+                {
+                    var firstPermission = authorize.Permissions.First();
+                    if (result.ContainsKey(_options.OpenBankingApiConsentClaimName))
+                    {
+                        result[_options.OpenBankingApiConsentClaimName] = firstPermission.ConsentId;
+                    }
+                    else
+                    {
+                        result.Add(_options.OpenBankingApiConsentClaimName, firstPermission.ConsentId);
+                    }
                 }
             }
 

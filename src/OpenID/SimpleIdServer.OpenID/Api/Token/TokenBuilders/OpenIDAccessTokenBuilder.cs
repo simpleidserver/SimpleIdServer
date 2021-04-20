@@ -32,7 +32,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var claimParameters = handlerContext.Request.Data.GetClaimsFromAuthorizationRequest();
-            var jwsPayload = BuildOpenIdPayload(scopes, claimParameters, handlerContext);
+            var jwsPayload = await BuildOpenIdPayload(scopes, claimParameters, handlerContext, cancellationToken);
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 
@@ -40,11 +40,11 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             var claimParameters = previousRequest.GetClaimsFromAuthorizationRequest();
-            var jwsPayload = BuildOpenIdPayload(scopes, claimParameters, currentContext);
+            var jwsPayload = await BuildOpenIdPayload(scopes, claimParameters, currentContext, cancellationToken);
             await SetResponse(currentContext, jwsPayload, cancellationToken);
         }
 
-        protected virtual JwsPayload BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claimParameters, HandlerContext handlerContext)
+        protected virtual Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claimParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var jwsPayload = BuildPayload(scopes, handlerContext);
             if (handlerContext.User != null)
@@ -57,7 +57,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             }
 
             _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(jwsPayload, claimParameters);
-            return jwsPayload;
+            return Task.FromResult(jwsPayload);
         }
     }
 }

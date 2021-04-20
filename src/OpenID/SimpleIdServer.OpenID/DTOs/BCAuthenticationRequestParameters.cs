@@ -35,5 +35,9 @@ namespace SimpleIdServer.OpenID.DTOs
         /// Signed authentication request.
         /// </summary>
         public const string Request = "request";
+        /// <summary>
+        /// Permission identifiers.
+        /// </summary>
+        public const string PermissionIds = "permission_ids";
     }
 }

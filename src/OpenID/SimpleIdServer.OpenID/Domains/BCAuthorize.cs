@@ -2,11 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.OpenID.Domains
 {
     public class BCAuthorize : ICloneable
     {
+        public BCAuthorize()
+        {
+            Permissions = new List<BCAuthorizePermission>();
+        }
+
         public string Id { get; set; }
         public string ClientId { get; set; }
         public string UserId { get; set; }
@@ -18,12 +24,18 @@ namespace SimpleIdServer.OpenID.Domains
         public BCAuthorizeStatus Status { get; set; }
         public DateTime ExpirationDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
-        public DateTime NextFetchTime { get; set; }
+        public DateTime? NextFetchTime { get; set; }
+        public IEnumerable<BCAuthorizePermission> Permissions { get; set; }
 
-        public void Confirm()
+        public void Confirm(IEnumerable<string> permissionIds)
         {
             Status = BCAuthorizeStatus.Confirmed;
             UpdateDateTime = DateTime.UtcNow;
+            var permissionsToConfirm = Permissions.Where(p => permissionIds.Contains(p.PermissionId));
+            foreach(var permission in permissionsToConfirm)
+            {
+                permission.Confirm();
+            }
         }
 
         public void Finish()
@@ -34,7 +46,12 @@ namespace SimpleIdServer.OpenID.Domains
 
         public void IncrementNextFetchTime()
         {
-            NextFetchTime.AddSeconds(Interval);
+            if (NextFetchTime == null)
+            {
+                NextFetchTime = DateTime.UtcNow;
+            }
+
+            NextFetchTime.Value.AddSeconds(Interval);
             UpdateDateTime = DateTime.UtcNow;
         }
 
@@ -46,7 +63,8 @@ namespace SimpleIdServer.OpenID.Domains
             string notificationMode, 
             IEnumerable<string> scopes,
             string userId,
-            string notificationToken)
+            string notificationToken,
+            IEnumerable<BCAuthorizePermission> permissions)
         {
             var result = new BCAuthorize
             {
@@ -59,7 +77,8 @@ namespace SimpleIdServer.OpenID.Domains
                 Status = BCAuthorizeStatus.Pending,
                 Scopes = scopes,
                 UserId = userId,
-                NotificationToken = notificationToken
+                NotificationToken = notificationToken,
+                Permissions = permissions
             };
             return result;
         }
@@ -77,6 +96,10 @@ namespace SimpleIdServer.OpenID.Domains
                 Scopes = Scopes,
                 Status = Status,
                 ExpirationDateTime = ExpirationDateTime,
+                Permissions = Permissions.Select(p => (BCAuthorizePermission)p.Clone()).ToList(),
+                Interval = Interval,
+                NextFetchTime = NextFetchTime,
+                UpdateDateTime = UpdateDateTime
             };
         }
     }

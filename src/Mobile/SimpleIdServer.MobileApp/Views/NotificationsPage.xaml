@@ -3,17 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              x:Class="SimpleIdServer.MobileApp.Views.NotificationsPage"
-             xmlns:model="clr-namespace:SimpleIdServer.MobileApp.Models;assembly=SimpleIdServer.MobileApp"
+             xmlns:viewModel="clr-namespace:SimpleIdServer.MobileApp.ViewModels;assembly=SimpleIdServer.MobileApp"
              BackgroundColor="#0c2937">
     <ContentPage.Content>
         <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Button Text="Disconnect" AbsoluteLayout.LayoutBounds="10,10,150,50" Command="{Binding DisconnectCommand}"></Button>
             <!-- Display image -->
             <StackLayout  AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1" AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Image Source="SIDLogo.png" VerticalOptions="Center"  HeightRequest="140" />
                 <Label Text="SimpleIdServer" TextColor="White" Font="Bold,30" />
             </StackLayout>
             <!-- Display notifications -->
-            <ListView x:Name="notifications" SelectionMode="None" RowHeight="80" ItemsSource="{Binding Notifications}" AbsoluteLayout.LayoutBounds="0,1,1,0.5" AbsoluteLayout.LayoutFlags="All">
+            <ListView x:Name="notifications" SelectionMode="None" RowHeight="80" ItemsSource="{Binding Consents}" AbsoluteLayout.LayoutBounds="0,1,1,0.5" AbsoluteLayout.LayoutFlags="All">
                 <!--
                 <d:ListView.ItemsSource>
                     <x:Array Type="{x:Type model:Notification}">
@@ -23,7 +24,7 @@
                 </d:ListView.ItemsSource>
                 -->
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Notification">
+                    <DataTemplate x:DataType="viewModel:ConsentPageViewModel">
                         <ViewCell Appearing="HandleViewCellAppearing">
                             <Frame x:Name="frame" CornerRadius="5" Margin="5" Padding="5" HasShadow="False" BackgroundColor="white">
                                 <Frame.GestureRecognizers>

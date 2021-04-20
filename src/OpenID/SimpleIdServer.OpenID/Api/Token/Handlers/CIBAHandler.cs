@@ -9,6 +9,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID.Persistence;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -24,6 +25,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
         private readonly ICIBAGrantTypeValidator _cibaGrantTypeValidator;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
+        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
@@ -31,13 +33,15 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             ICIBAGrantTypeValidator cibaGrantTypeValidator,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IEnumerable<ITokenProfile> tokensProfiles,
-            IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
+            IClientAuthenticationHelper clientAuthenticationHelper,
+            IBCAuthorizeRepository bcAuthorizeRepository) : base(clientAuthenticationHelper)
         {
             _logger = logger;
             _oauthUserQueryRepository = oauthUserQueryRepository;
             _cibaGrantTypeValidator = cibaGrantTypeValidator;
             _tokenBuilders = tokenBuilders;
             _tokenProfiles = tokensProfiles;
+            _bcAuthorizeRepository = bcAuthorizeRepository;
         }
 
         public const string GRANT_TYPE = "urn:openid:params:grant-type:ciba";
@@ -57,7 +61,6 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                     await tokenBuilder.Build(authRequest.Scopes, context, cancellationToken);
                 }
 
-                // TODO : Remove auth_req_id.
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
                 var result = BuildResult(context, authRequest.Scopes);
                 foreach (var kvp in context.Response.Parameters)
@@ -65,6 +68,8 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                     result.Add(kvp.Key, kvp.Value);
                 }
 
+                await _bcAuthorizeRepository.Delete(authRequest, cancellationToken);
+                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(result);
             }
             catch (OAuthException ex)

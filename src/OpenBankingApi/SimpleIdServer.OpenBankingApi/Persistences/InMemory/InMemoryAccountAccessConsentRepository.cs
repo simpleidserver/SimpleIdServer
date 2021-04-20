@@ -1,6 +1,8 @@
 ﻿using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
+using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +21,11 @@ namespace SimpleIdServer.OpenBankingApi.Persistences.InMemory
         public Task<AccountAccessConsentAggregate> Get(string id, CancellationToken cancellationToken)
         {
             return Task.FromResult(_accountAccessConsents.FirstOrDefault(_ => _.AggregateId == id));
+        }
+
+        public Task<IEnumerable<AccountAccessConsentAggregate>> GetAwaitingAuthorisationAccountAccessConsents(string clientId, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(_accountAccessConsents.Where(a => a.ClientId == clientId && a.Status == AccountAccessConsentStatus.AwaitingAuthorisation));
         }
 
         public Task Add(AccountAccessConsentAggregate accountAccessConsent, CancellationToken cancellationToken)

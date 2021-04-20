@@ -17,8 +17,8 @@ namespace SimpleIdServer.MobileApp.Droid.Services
     {
         private readonly AuthorizationService _authService;
         private static AndroidLoginProvider _instance;
-        private AuthState _authState;
-        private AsyncAutoResetEvent _loginResultWaitHandle;
+        private static AuthState _authState;
+        private static AsyncAutoResetEvent _loginResultWaitHandle;
 
         internal AndroidLoginProvider()
         {
@@ -27,7 +27,6 @@ namespace SimpleIdServer.MobileApp.Droid.Services
                 _instance = this;
             }
 
-            _loginResultWaitHandle = new AsyncAutoResetEvent(false);
             _authService = new AuthorizationService(MainActivity.Instance);
         }
 
@@ -80,7 +79,6 @@ namespace SimpleIdServer.MobileApp.Droid.Services
                     Android.Net.Uri.Parse(Constants.RedirectUri))
                 .SetScope(string.Join(" ", Constants.Scopes))
                 .Build();
-
             var postAuthorizationIntent = CreatePostAuthorizationIntent(MainActivity.Instance, authRequest, serviceConfig.DiscoveryDoc, authState);
             _authService.PerformAuthorizationRequest(authRequest, postAuthorizationIntent);
         }
@@ -132,7 +130,7 @@ namespace SimpleIdServer.MobileApp.Droid.Services
                         }
                         catch (ClientAuthenticationUnsupportedAuthenticationMethod)
                         {
-                            _loginResultWaitHandle.Set();
+                            SetWaitHandle();
                             return;
                         }
 
@@ -164,12 +162,12 @@ namespace SimpleIdServer.MobileApp.Droid.Services
                 }
                 else
                 {
-                    _loginResultWaitHandle.Set();
+                    SetWaitHandle();
                 }
             }
             catch (Exception)
             {
-                _loginResultWaitHandle.Set();
+                SetWaitHandle();
             }
         }
 
@@ -181,6 +179,14 @@ namespace SimpleIdServer.MobileApp.Droid.Services
             }
             catch (Exception) { }
             finally
+            {
+                SetWaitHandle();
+            }
+        }
+
+        private void SetWaitHandle()
+        {
+            if (_loginResultWaitHandle != null)
             {
                 _loginResultWaitHandle.Set();
             }

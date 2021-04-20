@@ -39,6 +39,13 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             return Task.CompletedTask;
         }
 
+        public Task Delete(BCAuthorize bcAuthorize, CancellationToken cancellationToken)
+        {
+            var record = _bcAuthorizeLst.First(_ => _.Id == bcAuthorize.Id);
+            _bcAuthorizeLst.Remove(record);
+            return Task.CompletedTask;
+        }
+
         public Task Add(BCAuthorize bcAuthorize, CancellationToken cancellationToken)
         {
             _bcAuthorizeLst.Add((BCAuthorize)bcAuthorize.Clone());

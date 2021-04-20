@@ -124,6 +124,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_EXPIRED, authRequestId));
             }
 
+            var permissionIds = context.Request.Data.GetPermissionIds();
+            var unknownPermissionIds = permissionIds.Where(pid => !authRequest.Permissions.Any(p => p.PermissionId == pid));
+            if (unknownPermissionIds.Any())
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_PERMISSIONS, string.Join(",", unknownPermissionIds)));
+            }
+
             return new BCAcceptRequestValidationResult(user, authRequest);
         }
 

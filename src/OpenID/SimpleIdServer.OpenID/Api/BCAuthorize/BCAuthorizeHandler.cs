@@ -14,6 +14,8 @@ using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,6 +67,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
                 var currentDateTime = DateTime.UtcNow;
                 var openidClient = oauthClient as OpenIdClient;
+                var permissions = await GetPermissions(context.Client.ClientId, context.User.Id, cancellationToken);
                 var bcAuthorize = Domains.BCAuthorize.Create(
                     currentDateTime.AddSeconds(requestedExpiry.Value),
                     oauthClient.ClientId,
@@ -73,11 +76,16 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                     openidClient.BCTokenDeliveryMode,
                     context.Request.Data.GetScopesFromAuthorizationRequest(),
                     context.User.Id,
-                    context.Request.Data.GetClientNotificationToken());
+                    context.Request.Data.GetClientNotificationToken(),
+                    permissions);
                 bcAuthorize.IncrementNextFetchTime();
                 await _bcAuthorizeRepository.Add(bcAuthorize, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
-                await _bcNotificationService.Notify(context, bcAuthorize.Id, cancellationToken);
+                foreach(var grp in permissions.GroupBy(p => p.ConsentId))
+                {
+                    await _bcNotificationService.Notify(context, bcAuthorize.Id, grp.ToArray(), cancellationToken);
+                }
+
                 return new OkObjectResult(new JObject
                 {
                     { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id },
@@ -96,7 +104,8 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             {
                 var validationResult = await _bcAuthorizeRequestValidator.ValidateConfirm(context, cancellationToken);
                 context.SetUser(validationResult.User);
-                validationResult.Authorize.Confirm();
+                validationResult.Authorize.Confirm(context.Request.Data.GetPermissionIds());
+                await ConfirmPermissions(validationResult.Authorize.Permissions.Where(p => p.IsConfirmed), cancellationToken);
                 await _bcAuthorizeRepository.Update(validationResult.Authorize, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();
@@ -105,6 +114,17 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             {
                 return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
+        }
+
+        protected virtual Task<IEnumerable<BCAuthorizePermission>> GetPermissions(string clientId, string subject, CancellationToken cancellationToken)
+        {
+            IEnumerable<BCAuthorizePermission> result = new List<BCAuthorizePermission>();
+            return Task.FromResult(result);
+        }
+
+        protected virtual Task ConfirmPermissions(IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

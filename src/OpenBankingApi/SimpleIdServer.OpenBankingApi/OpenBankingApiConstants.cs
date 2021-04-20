@@ -9,6 +9,11 @@ namespace SimpleIdServer.OpenBankingApi
 {
     public static class OpenBankingApiConstants
     {
+        public static class NotifiableConsentTypes
+        {
+            public const string AccountAccessConsent = "AccountAccessConsent";
+        }
+
         public static class OpenBankingApiScopes
         {
             public static OpenIdScope Accounts = new OpenIdScope("accounts")

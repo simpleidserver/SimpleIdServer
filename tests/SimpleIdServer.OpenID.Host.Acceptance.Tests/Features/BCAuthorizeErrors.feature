@@ -112,13 +112,15 @@ Scenario: Error is returned when client_notification_token is missing (get auth_
 	| SIG  | 1   | RS256   |
 
 	And execute HTTP POST JSON request 'https://localhost:8080/register'
-	| Key                        | Value                   |
-	| token_endpoint_auth_method | tls_client_auth         |
-	| response_types             | [token]                 |
-	| grant_types                | [client_credentials]    |
-	| scope                      | scope1                  |
-	| redirect_uris              | [http://localhost:8080] |
-	| tls_client_auth_san_dns    | firstMtlsClient         |
+	| Key                                      | Value                                      |
+	| token_endpoint_auth_method               | tls_client_auth                            |
+	| response_types                           | [token]                                    |
+	| grant_types                              | [client_credentials]                       |
+	| scope                                    | scope1                                     |
+	| redirect_uris                            | [http://localhost:8080]                    |
+	| tls_client_auth_san_dns                  | firstMtlsClient                            |
+	| backchannel_token_delivery_mode          | push                                       |
+	| backchannel_client_notification_endpoint | https://localhost:8080/pushNotificationEdp |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body
@@ -148,13 +150,15 @@ Scenario: Error is returned when client_notification_token is < 128 bits (get au
 	| SIG  | 1   | RS256   |
 
 	And execute HTTP POST JSON request 'https://localhost:8080/register'
-	| Key                        | Value                   |
-	| token_endpoint_auth_method | tls_client_auth         |
-	| response_types             | [token]                 |
-	| grant_types                | [client_credentials]    |
-	| scope                      | scope1                  |
-	| redirect_uris              | [http://localhost:8080] |
-	| tls_client_auth_san_dns    | firstMtlsClient         |
+	| Key                                      | Value                                      |
+	| token_endpoint_auth_method               | tls_client_auth                            |
+	| response_types                           | [token]                                    |
+	| grant_types                              | [client_credentials]                       |
+	| scope                                    | scope1                                     |
+	| redirect_uris                            | [http://localhost:8080]                    |
+	| tls_client_auth_san_dns                  | firstMtlsClient                            |
+	| backchannel_token_delivery_mode          | push                                       |
+	| backchannel_client_notification_endpoint | https://localhost:8080/pushNotificationEdp |
 
 	And extract JSON from body	
 	And extract parameter 'client_id' from JSON body

@@ -58,6 +58,7 @@ namespace SimpleIdServer.OpenID
         public const string REQUESTED_EXPIRY_MUST_BE_POSITIVE = "requested_expiry must be positive";
         public const string LOGIN_HINT_TOKEN_IS_EXPIRED = "login_hint_token has expired";
         public const string UNKNOWN_USER = "unknown user '{0}'";
+        public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
         public const string AUTH_REQUEST_NOTIFIED = "the authentication request '{0}' has already been notified to the client";

@@ -485,7 +485,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             authRequestId = ParseValue(authRequestId).ToString();
             var bcAuthorizeRepository = (IBCAuthorizeRepository)_factory.Server.Host.Services.GetService(typeof(IBCAuthorizeRepository));
             var auth = await bcAuthorizeRepository.Get(authRequestId, CancellationToken.None);
-            auth.Confirm();
+            auth.Confirm(new string[0]);
             await bcAuthorizeRepository.Update(auth, CancellationToken.None);
             await bcAuthorizeRepository.SaveChanges(CancellationToken.None);
         }

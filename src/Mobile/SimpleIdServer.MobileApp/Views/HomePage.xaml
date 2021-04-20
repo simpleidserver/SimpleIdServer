@@ -10,7 +10,7 @@
                 <Image Source="SIDLogo.png" VerticalOptions="Center"  HeightRequest="140" />
                 <Label Text="SimpleIdServer" TextColor="White" Font="Bold,30" />
             </StackLayout>
-            <Button Text="Authenticate" Command="{Binding LoginCommand}" AbsoluteLayout.LayoutBounds="0.5,0.9,200,-1" TextColor="White" BackgroundColor="#00b0dc" AbsoluteLayout.LayoutFlags="PositionProportional"></Button>
+            <Button Text="Authenticate" Command="{Binding LoginCommand}" AbsoluteLayout.LayoutBounds="0.5,0.9,200,-1" AbsoluteLayout.LayoutFlags="PositionProportional"></Button>
         </AbsoluteLayout>
     </ContentPage.Content>
 </ContentPage>

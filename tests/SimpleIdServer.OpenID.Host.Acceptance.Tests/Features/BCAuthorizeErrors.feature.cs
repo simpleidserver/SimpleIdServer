@@ -485,13 +485,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table196.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
+                table196.AddRow(new string[] {
+                            "backchannel_token_delivery_mode",
+                            "push"});
+                table196.AddRow(new string[] {
+                            "backchannel_client_notification_endpoint",
+                            "https://localhost:8080/pushNotificationEdp"});
 #line 114
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table196, "And ");
 #line hidden
-#line 123
+#line 125
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 124
+#line 126
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table197 = new TechTalk.SpecFlow.Table(new string[] {
@@ -509,7 +515,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table197.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 126
+#line 128
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table197, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table198 = new TechTalk.SpecFlow.Table(new string[] {
@@ -527,16 +533,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table198.AddRow(new string[] {
                             "scope",
                             "scope1"});
-#line 133
+#line 135
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table198, "And ");
 #line hidden
-#line 140
+#line 142
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 142
+#line 144
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 143
+#line 145
  testRunner.Then("JSON \'error_description\'=\'missing parameter client_notification_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -551,7 +557,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_notification_token is < 128 bits (get auth_req_id)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 145
+#line 147
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -579,7 +585,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 146
+#line 148
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table199, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table200 = new TechTalk.SpecFlow.Table(new string[] {
@@ -603,13 +609,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table200.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 150
+                table200.AddRow(new string[] {
+                            "backchannel_token_delivery_mode",
+                            "push"});
+                table200.AddRow(new string[] {
+                            "backchannel_client_notification_endpoint",
+                            "https://localhost:8080/pushNotificationEdp"});
+#line 152
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table200, "And ");
 #line hidden
-#line 159
+#line 163
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 160
+#line 164
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table201 = new TechTalk.SpecFlow.Table(new string[] {
@@ -627,7 +639,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table201.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 162
+#line 166
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table201, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table202 = new TechTalk.SpecFlow.Table(new string[] {
@@ -648,16 +660,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table202.AddRow(new string[] {
                             "client_notification_token",
                             "1"});
-#line 169
+#line 173
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table202, "And ");
 #line hidden
-#line 177
+#line 181
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 179
+#line 183
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 180
+#line 184
  testRunner.Then("JSON \'error_description\'=\'client_notification_token must contains at least 128 by" +
                         "tes\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -673,7 +685,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when id_token_hint is invalid (get auth_req_id)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 182
+#line 186
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -701,7 +713,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 183
+#line 187
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table203, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table204 = new TechTalk.SpecFlow.Table(new string[] {
@@ -725,13 +737,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table204.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 187
+#line 191
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table204, "And ");
 #line hidden
-#line 196
+#line 200
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 197
+#line 201
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table205 = new TechTalk.SpecFlow.Table(new string[] {
@@ -749,7 +761,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table205.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 199
+#line 203
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table205, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table206 = new TechTalk.SpecFlow.Table(new string[] {
@@ -770,16 +782,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table206.AddRow(new string[] {
                             "client_notification_token",
                             "04bcf708-dfba-4719-a3d3-b213322e2c38"});
-#line 206
+#line 210
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table206, "And ");
 #line hidden
-#line 214
+#line 218
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 216
+#line 220
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 217
+#line 221
  testRunner.Then("JSON \'error_description\'=\'id_token_hint is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -794,7 +806,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when hint is missing (confirm auth_req_id)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 219
+#line 223
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -822,7 +834,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 220
+#line 224
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table207, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table208 = new TechTalk.SpecFlow.Table(new string[] {
@@ -846,13 +858,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table208.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 224
+#line 228
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table208, "And ");
 #line hidden
-#line 233
+#line 237
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 234
+#line 238
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table209 = new TechTalk.SpecFlow.Table(new string[] {
@@ -870,7 +882,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table209.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 236
+#line 240
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table209, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table210 = new TechTalk.SpecFlow.Table(new string[] {
@@ -882,16 +894,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table210.AddRow(new string[] {
                             "client_id",
                             "$client_id$"});
-#line 243
+#line 247
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table210, "And ");
 #line hidden
-#line 248
+#line 252
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 250
+#line 254
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 251
+#line 255
  testRunner.Then("JSON \'error_description\'=\'only one hint can be passed in the request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -906,7 +918,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when id_token_hint is invalid (confirm auth_req_id)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 253
+#line 257
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -934,7 +946,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 254
+#line 258
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table211, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table212 = new TechTalk.SpecFlow.Table(new string[] {
@@ -958,13 +970,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table212.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 258
+#line 262
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table212, "And ");
 #line hidden
-#line 267
+#line 271
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 268
+#line 272
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table213 = new TechTalk.SpecFlow.Table(new string[] {
@@ -982,7 +994,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table213.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 270
+#line 274
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table213, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table214 = new TechTalk.SpecFlow.Table(new string[] {
@@ -994,16 +1006,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table214.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-#line 277
+#line 281
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table214, "And ");
 #line hidden
-#line 282
+#line 286
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 284
+#line 288
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 285
+#line 289
  testRunner.Then("JSON \'error_description\'=\'id_token_hint is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1018,7 +1030,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when auth_req_id is missing (confirm auth_req_id)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 287
+#line 291
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1046,7 +1058,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 288
+#line 292
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table215, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table216 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1070,13 +1082,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table216.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 292
+#line 296
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table216, "And ");
 #line hidden
-#line 301
+#line 305
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 302
+#line 306
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table217 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1094,7 +1106,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table217.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 304
+#line 308
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table217, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table218 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1106,16 +1118,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table218.AddRow(new string[] {
                             "login_hint",
                             "administrator"});
-#line 311
+#line 315
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table218, "And ");
 #line hidden
-#line 316
+#line 320
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 318
+#line 322
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 319
+#line 323
  testRunner.Then("JSON \'error_description\'=\'missing parameter auth_req_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1133,7 +1145,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when authtorization request doesn\'t exist (confirm auth_req_id)" +
                     "", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 321
+#line 325
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1161,7 +1173,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 322
+#line 326
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table219, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table220 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1185,13 +1197,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table220.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 326
+#line 330
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table220, "And ");
 #line hidden
-#line 335
+#line 339
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 336
+#line 340
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table221 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1209,7 +1221,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table221.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 338
+#line 342
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table221, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table222 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1224,16 +1236,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table222.AddRow(new string[] {
                             "auth_req_id",
                             "authreqid"});
-#line 345
+#line 349
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table222, "And ");
 #line hidden
-#line 351
+#line 355
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 353
+#line 357
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 354
+#line 358
  testRunner.Then("JSON \'error_description\'=\'auth_req_id doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

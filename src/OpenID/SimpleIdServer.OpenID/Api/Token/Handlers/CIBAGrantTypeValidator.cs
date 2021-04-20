@@ -39,7 +39,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             var authRequest = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
             if (authRequest == null)
             {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
+                throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_AUTH_REQUEST_ID);
             }
 
             var currentDateTime = DateTime.UtcNow;

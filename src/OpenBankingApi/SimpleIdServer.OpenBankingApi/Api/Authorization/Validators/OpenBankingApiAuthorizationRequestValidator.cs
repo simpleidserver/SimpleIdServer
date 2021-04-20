@@ -84,7 +84,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 containsRequestObject = await CheckRequestUriParameter(context);
             }
 
-            if (!containsRequestObject)
+            if (!containsRequestObject && _options.IsRequestRequired)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, string.Join(",", new[] { AuthorizationRequestParameters.Request, AuthorizationRequestParameters.RequestUri })));
             }

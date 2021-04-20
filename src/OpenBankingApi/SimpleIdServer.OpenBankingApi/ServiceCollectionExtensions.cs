@@ -12,6 +12,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.ResponseModes;
 using SimpleIdServer.OpenBankingApi.Api.Authorization.Validators;
+using SimpleIdServer.OpenBankingApi.Api.BCAuthorize;
 using SimpleIdServer.OpenBankingApi.Api.Configuration;
 using SimpleIdServer.OpenBankingApi.Api.Register;
 using SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders;
@@ -20,6 +21,7 @@ using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Authorizations;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenBankingApi.Persistences.InMemory;
+using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using System;
 using System.Collections.Concurrent;
@@ -56,10 +58,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.RemoveAll<IClaimsJwsPayloadEnricher>();
             services.RemoveAll<ITokenBuilder>();
+            services.RemoveAll<IBCAuthorizeHandler>();
             services.AddTransient<IClaimsJwsPayloadEnricher, OpenBankingApiClaimsJwsPayloadEnricher>();
             services.AddTransient<ITokenBuilder, OpenBankingApiIdTokenBuilder>();
-            services.AddTransient<ITokenBuilder, OpenIDAccessTokenBuilder>();
+            services.AddTransient<ITokenBuilder, OpenBankingApiAccessTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();
+            services.AddTransient<IBCAuthorizeHandler, OpenBankingBCAuthorizeHandler>();
 
             services.RemoveAll<IOAuthResponseMode>();
             services.RemoveAll<IOAuthResponseModeHandler>();

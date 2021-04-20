@@ -82,7 +82,10 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(GenerateJsonWebKeys())
                 .AddLoginPasswordAuthentication();
-            services.AddOpenBankingApi()
+            services.AddOpenBankingApi(cb =>
+            {
+                cb.IsRequestRequired = false;
+            })
                 .AddAccounts(DefaultConfiguration.Accounts);
         }
 

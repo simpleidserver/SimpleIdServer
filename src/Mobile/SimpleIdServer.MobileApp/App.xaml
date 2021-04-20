@@ -4,28 +4,16 @@
              x:Class="SimpleIdServer.MobileApp.App">
     <Application.Resources>
         <ResourceDictionary>
-            <!--
-            <Color x:Key="Primary">#2196F3</Color>
-            <Style TargetType="Button">
-                <Setter Property="TextColor" Value="White"></Setter>
-                <Setter Property="VisualStateManager.VisualStateGroups">
-                    <VisualStateGroupList>
-                        <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Normal">
-                                <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                            <VisualState x:Name="Disabled">
-                                <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="#332196F3" />
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateGroupList>
-                </Setter>
+            <Style x:Key="titleStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="Title" />
             </Style>
-            -->
+            <Style x:Key="errorBtnStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#ffa012" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="BackgroundColor" Value="#00b0dc" />
+            </Style>
         </ResourceDictionary>        
     </Application.Resources>
 </Application>

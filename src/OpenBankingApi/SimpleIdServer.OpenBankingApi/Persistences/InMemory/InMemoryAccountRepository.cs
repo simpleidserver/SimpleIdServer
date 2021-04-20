@@ -30,5 +30,10 @@ namespace SimpleIdServer.OpenBankingApi.Persistences.InMemory
         {
             return Task.FromResult(_accounts.Where(a => ids.Contains(a.AggregateId)));
         }
+
+        public Task<IEnumerable<AccountAggregate>> Get(IEnumerable<string> ids, string subject, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(_accounts.Where(a => ids.Contains(a.AggregateId) && a.Subject == subject));
+        }
     }
 }

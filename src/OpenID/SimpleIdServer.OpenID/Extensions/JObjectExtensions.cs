@@ -312,11 +312,16 @@ namespace SimpleIdServer.OpenID.Extensions
 
         #endregion
 
-        #region Token request
+        #region Back channel confirmation requests
 
         public static string GetAuthRequestId(this JObject jObj)
         {
             return jObj.GetStr(AuthorizationRequestParameters.AuthReqId);
+        }
+
+        public static IEnumerable<string> GetPermissionIds(this JObject jObj)
+        {
+            return jObj.GetArray(BCAuthenticationRequestParameters.PermissionIds);
         }
 
         #endregion

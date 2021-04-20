@@ -493,13 +493,13 @@ Scenario: Error is returned when request uri is invalid
 	And extract parameter 'client_id' from JSON body	
 	
 	And execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value       |
-	| response_type | code        |
-	| client_id     | $client_id$ |
-	| scope         | openid      |
-	| state         | state       |
-	| request_uri   | uri         |
-	| nonce         | nonce       |
+	| Key           | Value            |
+	| response_type | code             |
+	| client_id     | $client_id$      |
+	| scope         | openid           |
+	| state         | state            |
+	| request_uri   | uri              |
+	| nonce         | nonce            |
 	
 	And extract JSON from body
 
