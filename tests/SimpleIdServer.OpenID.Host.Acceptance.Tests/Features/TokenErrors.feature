@@ -146,7 +146,7 @@ Scenario: Error is returned when auth_req_id is invalid
 	And extract JSON from body
 	
 	Then HTTP status code equals to '400'
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_grant'
 	Then JSON 'error_description'='auth_req_id doesn't exist'
 
 Scenario: auth_req_id must be confirmed
