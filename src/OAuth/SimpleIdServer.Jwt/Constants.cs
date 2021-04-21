@@ -34,6 +34,10 @@ namespace SimpleIdServer.Jwt
             public static string Claims = "claims";
             public static string Cnf = "cnf";
             public static string X5TS256 = "x5t#S256";
+            /// <summary>
+            /// The time before which the signed authentication request is unacceptable.
+            /// </summary>
+            public static string Nbf = "nbf";
         }
 
         public static class UserClaims

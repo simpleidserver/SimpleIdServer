@@ -512,7 +512,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "auth_req_id",
                             "$auth_req_id$"});
 #line 133
- testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table182, "And ");
+ testRunner.And("poll HTTP POST request \'https://localhost:8080/mtls/token\', until \'token_type\'=\'B" +
+                        "earer\'", ((string)(null)), table182, "And ");
 #line hidden
 #line 141
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

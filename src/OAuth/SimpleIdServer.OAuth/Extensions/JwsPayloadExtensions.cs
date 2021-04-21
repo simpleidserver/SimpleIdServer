@@ -23,6 +23,11 @@ namespace SimpleIdServer.OAuth.Extensions
             return jwsPayload.GetDoubleClaim(OAuthClaims.ExpirationTime);
         }
 
+        public static double GetIat(this JwsPayload jwsPayload)
+        {
+            return jwsPayload.GetDoubleClaim(OAuthClaims.Iat);
+        }
+
         public static string[] GetScopes(this JwsPayload jwsPayload)
         {
             return jwsPayload.GetArrayClaim(OAuthClaims.Scopes);
@@ -31,6 +36,16 @@ namespace SimpleIdServer.OAuth.Extensions
         public static string GetAzp(this JwsPayload jwsPayload)
         {
             return jwsPayload.GetClaimValue(OAuthClaims.Azp);
+        }
+
+        public static double GetNbf(this JwsPayload jwsPayload)
+        {
+            return jwsPayload.GetDoubleClaim(OAuthClaims.Nbf);
+        }
+
+        public static string GetJti(this JwsPayload jwsPayload)
+        {
+            return jwsPayload.GetClaimValue(OAuthClaims.Jti);
         }
 
         public static DateTime? GetAuthTime(this JwsPayload jwsPayload)

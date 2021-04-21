@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using TechTalk.SpecFlow;
+using SimpleIdServer.OAuth.Extensions;
 using Xunit;
 
 namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
@@ -47,6 +48,13 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             });
             var mock = new Mock<OAuth.Infrastructures.IHttpClientFactory>();
             mock.Setup(m => m.GetHttpClient()).Returns(client);
+        }
+
+        [When("add '(.*)' seconds and store the result into '(.*)'")]
+        public void WhenBuildDateTime(int nbSeconds, string name)
+        {
+            var currentDateTime = DateTime.UtcNow.AddSeconds(nbSeconds);
+            _scenarioContext.Set(currentDateTime.ConvertToUnixTimestamp(), name);
         }
 
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
@@ -339,14 +347,16 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwe, name);
         }
 
-        [When("client '(.*)' build JWS token using the algorithm'(.*)'")]
+        [When("client '(.*)' build JWS token using the algorithm '(.*)'")]
         public async Task WhenBuildJwsToken(string clientId, string algName, Table table)
         {
             clientId = ParseValue(clientId).ToString();
             var jwsPayload = new JwsPayload();
             foreach (var record in table.Rows)
             {
-                jwsPayload.Add(record["Key"].ToString(), record["Value"].ToString());
+                var value = ParseValue(record["Value"]);
+
+                jwsPayload.Add(record["Key"].ToString(), value);
             }
 
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));

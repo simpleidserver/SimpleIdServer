@@ -43,9 +43,10 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             }
 
             var currentDateTime = DateTime.UtcNow;
-            if (authRequest.Status == Domains.BCAuthorizeStatus.Pending)
+            var isSlowDown = currentDateTime <= authRequest.NextFetchTime;
+            if (authRequest.Status == Domains.BCAuthorizeStatus.Pending || isSlowDown)
             {
-                if (currentDateTime <= authRequest.NextFetchTime)
+                if (isSlowDown)
                 {
                     throw new OAuthException(OAuth.ErrorCodes.SLOW_DOWN, string.Format(ErrorMessages.TOO_MANY_AUTH_REQUEST, authRequestId));
                 }
@@ -63,7 +64,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
             if (authRequest.Status == BCAuthorizeStatus.Sent)
             {
-                throw new OAuthException(OAuth.ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.AUTH_REQUEST_SENT, authRequestId));
+                throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.AUTH_REQUEST_SENT, authRequestId));
             }
 
             if (currentDateTime > authRequest.ExpirationDateTime)

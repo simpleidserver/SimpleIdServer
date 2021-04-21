@@ -56,7 +56,7 @@ namespace SimpleIdServer.OpenID.Helpers
             }
             catch (JwtException ex)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ex.Message);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ex.Message);
             }
 
             return new RequestObjectValidatorResult(jwsPayload, header);

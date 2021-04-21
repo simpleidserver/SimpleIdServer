@@ -26,6 +26,7 @@ namespace SimpleIdServer.OpenID.Options
             FcmBody = "SimpleIdServer wants to authenticate";
             DefaultBCAuthorizeWaitIntervalInSeconds = 2;
             DefaultRequestObjectEncyptionEnc = A128CBCHS256EncHandler.ENC_NAME;
+            MaxRequestLifetime = 60 * 5;
         }
 
         /// <summary>
@@ -98,5 +99,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Default request object encryption.
         /// </summary>
         public string DefaultRequestObjectEncyptionEnc { get; set; }
+        /// <summary>
+        /// Set the maximum lifetime of an authorization request.
+        /// </summary>
+        public int MaxRequestLifetime { get; set; }
     }
 }

@@ -32,6 +32,7 @@ namespace SimpleIdServer.OpenID.Startup
             var sigJsonWebKey = ExtractJsonWebKeyFromRSA("openid_key.txt", "RS256");
             var firstMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("first_mtlsClient_key.txt", "PS256");
             var secondMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("second_mtlsClient_key.txt", "PS256");
+            var json = firstMtlsClientJsonWebKey.Serialize().ToString();
             var jObj = secondMtlsClientJsonWebKey.Serialize();
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()

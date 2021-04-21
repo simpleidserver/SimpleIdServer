@@ -67,6 +67,18 @@ namespace SimpleIdServer.OpenID
         public const string AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT = "you're not authorized to reject the authorization request";
         public const string AUTH_REQUEST_REJECTED = "the authentication request '{0}' is rejected";
         public const string AUTH_REQUEST_SENT = "the authentication request '{0}' is finished";
+        public const string AUTH_REQUEST_NO_AUDIENCE = "the request doesn't contain audience";
+        public const string AUTH_REQUEST_BAD_AUDIENCE = "the request doesn't contain correct audience";
+        public const string AUTH_REQUEST_NO_ISSUER = "the request doesn't contain issuer";
+        public const string AUTH_REQUEST_BAD_ISSUER = "the request doesn't contain correct issuer";
+        public const string AUTH_REQUEST_NO_EXPIRATION = "the request doesn't contain expiration time";
+        public const string AUTH_REQUEST_IS_EXPIRED = "the request is expired";
+        public const string AUTH_REQUEST_MAXIMUM_LIFETIME = "the maximum lifetime of the request is '{0}' seconds";
+        public const string AUTH_REQUEST_NO_IAT = "the request doesn't contain iat";
+        public const string AUTH_REQUEST_NO_NBF = "the request doesn't contain nbf";
+        public const string AUTH_REQUEST_BAD_NBF = "the request cannot be received before '{0}'";
+        public const string AUTH_REQUEST_NO_JTI = "the request doesn't contain jti";
+        public const string AUTH_REQUEST_ALG_NOT_VALID = "the request must be signed with '{0}' algorithm";
         public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
         public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
     }

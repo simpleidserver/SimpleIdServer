@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SimpleIdServer.OpenID.Domains
 {
@@ -57,7 +58,7 @@ namespace SimpleIdServer.OpenID.Domains
                 NextFetchTime = DateTime.UtcNow;
             }
 
-            NextFetchTime.Value.AddSeconds(Interval);
+            NextFetchTime = NextFetchTime.Value.AddSeconds(Interval);
             UpdateDateTime = DateTime.UtcNow;
         }
 
@@ -74,7 +75,7 @@ namespace SimpleIdServer.OpenID.Domains
         {
             var result = new BCAuthorize
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = GenerateId(),
                 ExpirationDateTime = expirationDateTime,
                 ClientId = clientId,
                 Interval = interval,
@@ -107,6 +108,20 @@ namespace SimpleIdServer.OpenID.Domains
                 NextFetchTime = NextFetchTime,
                 UpdateDateTime = UpdateDateTime
             };
+        }
+
+        private static string GenerateId()
+        {
+            var builder = new StringBuilder();
+            Enumerable
+               .Range(65, 26)
+                .Select(e => ((char)e).ToString())
+                .Concat(Enumerable.Range(97, 26).Select(e => ((char)e).ToString()))
+                .Concat(Enumerable.Range(0, 10).Select(e => e.ToString()))
+                .OrderBy(e => Guid.NewGuid())
+                .Take(160)
+                .ToList().ForEach(e => builder.Append(e));
+            return builder.ToString();
         }
     }
 }

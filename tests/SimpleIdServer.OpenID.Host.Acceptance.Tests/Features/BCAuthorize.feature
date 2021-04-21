@@ -130,7 +130,7 @@ Scenario: Use poll notification mode
 	| login_hint  | administrator |
 	| auth_req_id | $auth_req_id$ |
 	
-	And execute HTTP POST request 'https://localhost:8080/mtls/token'
+	And poll HTTP POST request 'https://localhost:8080/mtls/token', until 'token_type'='Bearer'
 	| Key                  | Value                             |
 	| client_id            | $client_id$                       |
 	| scope                | openid profile                    |
