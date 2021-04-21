@@ -10,5 +10,6 @@
         public static readonly string BaseUrl = "https://192.168.1.63:60010";
         public static readonly string DiscoveryEndpoint = $"{BaseUrl}/.well-known/openid-configuration";
         public static readonly string ConfirmAuthReqId = $"{BaseUrl}/bc-authorize/confirm";
+        public static readonly string RejectAuthReqId = $"{BaseUrl}/bc-authorize/reject";
     }
 }

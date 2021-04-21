@@ -5,6 +5,7 @@ namespace SimpleIdServer.OpenID.Domains
     {
         Pending = 0,
         Confirmed =  1,
-        Finished = 2
+        Sent = 2,
+        Rejected = 3
     }
 }

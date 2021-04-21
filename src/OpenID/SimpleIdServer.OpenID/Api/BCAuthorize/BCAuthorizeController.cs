@@ -28,5 +28,13 @@ namespace SimpleIdServer.OpenID.Api
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, null));
             return await _bcAuthorizeHandler.Confirm(context, cancellationToken);
         }
+
+        [HttpPost("reject")]
+        public async Task<IActionResult> Reject([FromBody] JObject jObjBody, CancellationToken cancellationToken)
+        {
+            var jObjHeader = Request.Headers.ToJObject();
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, null));
+            return await _bcAuthorizeHandler.Reject(context, cancellationToken);
+        }
     }
 }

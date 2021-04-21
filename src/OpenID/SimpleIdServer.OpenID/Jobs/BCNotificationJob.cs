@@ -44,7 +44,7 @@ namespace SimpleIdServer.OpenID.Jobs
 
                 if (await notificationHandler.Notify(confirmedAuthorizeRequest, cancellationToken))
                 {
-                    confirmedAuthorizeRequest.Finish();
+                    confirmedAuthorizeRequest.Send();
                     await _bcAuthorizeRepository.Update(confirmedAuthorizeRequest, cancellationToken);
                 }
             }

@@ -68,7 +68,8 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                     result.Add(kvp.Key, kvp.Value);
                 }
 
-                await _bcAuthorizeRepository.Delete(authRequest, cancellationToken);
+                authRequest.Send();
+                await _bcAuthorizeRepository.Update(authRequest, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(result);
             }

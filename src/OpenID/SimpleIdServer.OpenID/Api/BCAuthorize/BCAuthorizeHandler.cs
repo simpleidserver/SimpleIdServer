@@ -26,6 +26,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
     {
         Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken);
         Task<IActionResult> Confirm(HandlerContext context, CancellationToken cancellationToken);
+        Task<IActionResult> Reject(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class BCAuthorizeHandler: IBCAuthorizeHandler
@@ -116,6 +117,23 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
         }
 
+        public async Task<IActionResult> Reject(HandlerContext context, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var authRequest = await _bcAuthorizeRequestValidator.ValidateReject(context, cancellationToken);
+                authRequest.Reject();
+                await RejectPermissions(authRequest.Permissions, cancellationToken);
+                await _bcAuthorizeRepository.Update(authRequest, cancellationToken);
+                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
+                return new NoContentResult();
+            }
+            catch(OAuthException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+            }
+        }
+
         protected virtual Task<IEnumerable<BCAuthorizePermission>> GetPermissions(string clientId, string subject, CancellationToken cancellationToken)
         {
             IEnumerable<BCAuthorizePermission> result = new List<BCAuthorizePermission>();
@@ -123,6 +141,11 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         }
 
         protected virtual Task ConfirmPermissions(IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        protected virtual Task RejectPermissions(IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

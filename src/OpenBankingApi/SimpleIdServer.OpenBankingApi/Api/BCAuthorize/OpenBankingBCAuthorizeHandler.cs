@@ -68,5 +68,17 @@ namespace SimpleIdServer.OpenBankingApi.Api.BCAuthorize
 
             await _accountAccessConsentRepository.SaveChanges(cancellationToken);
         }
+
+        protected override async Task RejectPermissions(IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
+        {
+            foreach(var permission in permissions)
+            {
+                var accountAccessConsent = await _accountAccessConsentRepository.Get(permission.ConsentId, cancellationToken);
+                accountAccessConsent.Reject();
+                await _accountAccessConsentRepository.Update(accountAccessConsent, cancellationToken);
+            }
+
+            await _accountAccessConsentRepository.SaveChanges(cancellationToken);
+        }
     }
 }

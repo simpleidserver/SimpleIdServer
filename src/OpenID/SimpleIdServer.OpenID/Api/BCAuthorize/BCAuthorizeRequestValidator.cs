@@ -28,6 +28,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
     {
         Task<OAuthUser> ValidateCreate(HandlerContext context, CancellationToken cancellationToken);
         Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken);
+        Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class BCAuthorizeRequestValidator: IBCAuthorizeRequestValidator
@@ -132,6 +133,49 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
 
             return new BCAcceptRequestValidationResult(user, authRequest);
+        }
+
+        public virtual async Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var tokens = new bool[]
+            {
+                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),
+                string.IsNullOrWhiteSpace(context.Request.Data.GetIdTokenHintFromAuthorizationRequest()),
+                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintFromAuthorizationRequest())
+            };
+            if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
+            }
+
+            var user = await CheckLoginHintToken(context);
+            if (user == null)
+            {
+                user = await CheckIdTokenHint(context);
+                if (user == null)
+                {
+                    user = await CheckLoginHint(context);
+                }
+            }
+
+            var authReqId = context.Request.Data.GetAuthRequestId();
+            if (string.IsNullOrWhiteSpace(authReqId))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, DTOs.AuthorizationRequestParameters.AuthReqId));
+            }
+
+            var authRequest = await _bcAuthorizeRepository.Get(authReqId, cancellationToken);
+            if (authRequest == null)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
+            }
+
+            if (authRequest.UserId != user.Id)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT);
+            }
+
+            return authRequest;
         }
 
         private async Task CheckRequestObject(HandlerContext context, CancellationToken cancellationToken)

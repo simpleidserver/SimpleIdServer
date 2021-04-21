@@ -38,9 +38,15 @@ namespace SimpleIdServer.OpenID.Domains
             }
         }
 
-        public void Finish()
+        public void Send()
         {
-            Status = BCAuthorizeStatus.Finished;
+            Status = BCAuthorizeStatus.Sent;
+            UpdateDateTime = DateTime.UtcNow;
+        }
+
+        public void Reject()
+        {
+            Status = BCAuthorizeStatus.Rejected;
             UpdateDateTime = DateTime.UtcNow;
         }
 
