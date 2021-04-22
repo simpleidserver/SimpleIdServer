@@ -165,7 +165,6 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             });
         }
 
-
         private static void ExtractCertificate(string path, string pass)
         {
             var certificate = new X509Certificate2(path, pass, X509KeyStorageFlags.Exportable);

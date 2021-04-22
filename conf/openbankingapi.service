@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenBankingAPI server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/dotnet /home/ftpuser/src/build/results/services/OpenBankingApi/SimpleIdServer.OpenBankingApi.Startup.dll --server.urls="https://*:60010"
+KillMode=process
+TimeoutStopSec=5s
+Restart=always
+WorkingDirectory=/home/ftpuser/src/build/results/services/OpenBankingApi
+
+[Install]
+WantedBy=multi-user.target
