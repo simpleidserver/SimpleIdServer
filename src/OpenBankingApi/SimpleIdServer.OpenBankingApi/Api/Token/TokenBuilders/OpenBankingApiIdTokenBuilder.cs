@@ -12,9 +12,7 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
-using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
@@ -28,9 +26,9 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
 {
     public class OpenBankingApiIdTokenBuilder : IdTokenBuilder
     {
+        private readonly IOpenBankingApiAuthRequestEnricher _openBankingApiAuthRequestEnricher;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly OpenBankingApiOptions _options;
-        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private Dictionary<IEnumerable<string>, Func<byte[], byte[]>> MAPPING_HASH_CALLBACK = new Dictionary<IEnumerable<string>, Func<byte[], byte[]>>
         {
             { new [] { ECDSAP256SignHandler.ALG_NAME, PS256SignHandler.ALG_NAME, RSA256SignHandler.ALG_NAME }, Hash256 },
@@ -38,18 +36,19 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
             { new [] { ECDSAP512SignHandler.ALG_NAME, PS512SignHandler.ALG_NAME, RSA512SignHandler.ALG_NAME }, Hash512 },
         };
 
-        public OpenBankingApiIdTokenBuilder(IJwtBuilder jwtBuilder, 
+        public OpenBankingApiIdTokenBuilder(
+            IOpenBankingApiAuthRequestEnricher openBankingApiAuthRequestEnricher,
+            IJwtBuilder jwtBuilder, 
             IOptions<OpenBankingApiOptions> options,
-            IBCAuthorizeRepository bcAuthorizeRepository,
             IEnumerable<IClaimsSource> claimsSources, 
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
             IAmrHelper amrHelper, 
             IOAuthUserQueryRepository oauthUserQueryRepository, 
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher) : base(jwtBuilder, claimsSources, subjectTypeBuilders, amrHelper, oauthUserQueryRepository, claimsJwsPayloadEnricher)
         {
+            _openBankingApiAuthRequestEnricher = openBankingApiAuthRequestEnricher;
             _jwtBuilder = jwtBuilder;
             _options = options.Value;
-            _bcAuthorizeRepository = bcAuthorizeRepository;
         }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext context, CancellationToken cancellationToken)
@@ -89,24 +88,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
                 }
             }
 
-            var authRequestId = currentContext.Request.Data.GetAuthRequestId();
-            if (!string.IsNullOrWhiteSpace(authRequestId))
-            {
-                var authorize = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
-                if (authorize != null && authorize.Permissions.Any())
-                {
-                    var firstPermission = authorize.Permissions.First();
-                    if (result.ContainsKey(_options.OpenBankingApiConsentClaimName))
-                    {
-                        result[_options.OpenBankingApiConsentClaimName] = firstPermission.ConsentId;
-                    }
-                    else
-                    {
-                        result.Add(_options.OpenBankingApiConsentClaimName, firstPermission.ConsentId);
-                    }
-                }
-            }
-
+            await _openBankingApiAuthRequestEnricher.Enrich(result, queryParameters, cancellationToken);
             return result;
         }
 

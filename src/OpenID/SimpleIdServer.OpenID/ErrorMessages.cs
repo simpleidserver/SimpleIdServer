@@ -79,6 +79,7 @@ namespace SimpleIdServer.OpenID
         public const string AUTH_REQUEST_BAD_NBF = "the request cannot be received before '{0}'";
         public const string AUTH_REQUEST_NO_JTI = "the request doesn't contain jti";
         public const string AUTH_REQUEST_ALG_NOT_VALID = "the request must be signed with '{0}' algorithm";
+        public const string AUTH_REQUEST_CLIENT_NOT_AUTHORIZED = "the client is not authorized to use the auth_req_id";
         public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
         public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
     }

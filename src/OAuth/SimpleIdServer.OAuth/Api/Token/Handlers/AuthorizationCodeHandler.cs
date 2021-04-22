@@ -93,6 +93,10 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
 
                 return new OkObjectResult(result);
             }
+            catch (OAuthUnauthorizedException ex)
+            {
+                return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+            }
             catch (OAuthException ex)
             {
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);

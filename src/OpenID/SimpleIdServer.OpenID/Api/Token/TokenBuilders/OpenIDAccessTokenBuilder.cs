@@ -32,7 +32,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var claimParameters = handlerContext.Request.Data.GetClaimsFromAuthorizationRequest();
-            var jwsPayload = await BuildOpenIdPayload(scopes, claimParameters, handlerContext, cancellationToken);
+            var jwsPayload = await BuildOpenIdPayload(scopes, claimParameters, handlerContext.Request.Data, handlerContext, cancellationToken);
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 
@@ -40,11 +40,11 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             var claimParameters = previousRequest.GetClaimsFromAuthorizationRequest();
-            var jwsPayload = await BuildOpenIdPayload(scopes, claimParameters, currentContext, cancellationToken);
+            var jwsPayload = await BuildOpenIdPayload(scopes, claimParameters, previousRequest, currentContext, cancellationToken);
             await SetResponse(currentContext, jwsPayload, cancellationToken);
         }
 
-        protected virtual Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claimParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
+        protected virtual Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claimParameters, JObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var jwsPayload = BuildPayload(scopes, handlerContext);
             if (handlerContext.User != null)

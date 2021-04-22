@@ -93,6 +93,10 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                     { BCAuthenticationResponseParameters.ExpiresIn, requestedExpiry.Value }
                 });
             }
+            catch(OAuthUnauthorizedException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+            }
             catch(OAuthException ex)
             {
                 return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);

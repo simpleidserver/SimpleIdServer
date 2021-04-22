@@ -42,6 +42,11 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_AUTH_REQUEST_ID);
             }
 
+            if (authRequest.ClientId != openidClient.ClientId)
+            {
+                throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, ErrorMessages.AUTH_REQUEST_CLIENT_NOT_AUTHORIZED);
+            }
+
             var currentDateTime = DateTime.UtcNow;
             var isSlowDown = currentDateTime <= authRequest.NextFetchTime;
             if (authRequest.Status == Domains.BCAuthorizeStatus.Pending || isSlowDown)

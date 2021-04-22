@@ -146,24 +146,69 @@ this.ScenarioInitialize(scenarioInfo);
                 table169.AddRow(new string[] {
                             "backchannel_client_notification_endpoint",
                             "https://localhost:8080/pushNotificationEdp"});
+                table169.AddRow(new string[] {
+                            "backchannel_authentication_request_signing_alg",
+                            "PS256"});
+                table169.AddRow(new string[] {
+                            "jwks",
+                            "{\"keys\":[{ \"kty\": \"RSA\",  \"use\": \"sig\", \"alg\": \"PS256\",  \"kid\": \"1\", \"key_ops\": [" +
+                                " \"sign\", \"verify\"  ], \"n\": \"ykDUVZX8lDX-O97R6CCqogzTuaLPR71v_0ul2FurEFQaMJYzGZg-" +
+                                "tjSp9smrQUNuaNvxvb4cC0iJwHno-2cg2bFO5Ks-8NyP7fM0QQSPJUyq1-qa-wsOJ3NcGrphSHGN3fJE" +
+                                "eJRIV1R1Yyl2XZBYCdbR1pFqBQ4yw0kiaOjAGr_bQloNjeo3Z-ak8oYfaVJvlCyQZpKoBlsBud8aFmr2" +
+                                "KIuf_q9vJjiDObnoCaWf4ZYtCbeSP-qwshtTuC6YuzQL8IsiqTeUAm0VjV0yZkRStl-mQnHXI2o6du-3" +
+                                "PYFqWXOwMn9USilJ1lYjqqL3jg-mXtQzckOpiXZfy2D8HTwFgQ\", \"e\": \"AQAB\", \"d\": \"mBnlFXA0" +
+                                "gSmRxmitp0pZyICpAWRFSghXH8E-OdXGcgMtpvht-YObNd-pKmVDm1Mgx08RH8bGxF2K6utDoT1PYSeM" +
+                                "0z9NmEnnG-XYmETbeguMN9DBOKZ5wIVq8NbVrmtna1B02dF6DeMAXNCjqX2SF-Qr7pdxCdhBqMdpT0gq" +
+                                "oHHtjARGQT2JjjfQSWuQiU6EOZOqJFPYbER1b_mwbacHKwb3D8bX4JPcTvCMP5SNqUDIkjerWCq9j1Df" +
+                                "nvRpnlcNrTnhlqG-S8mXr1Mt0bn40Kc9Y0-7d7Q3hvj3ObNW4jdEyf7Efb0d0ZjyFgZuAfPa4tkwIym9" +
+                                "cBaz71Asz1-9mQ\", \"p\": \"1imC2zKZXeXONfKNoBJmq-JWyGziMlLvKWGnFdqIqqH9WNkxM8bAYPe2G" +
+                                "8hd5SYOGg2CEWm4BN7cj4tKlegzOHmaVybo-a5odHB5UCo3ZsWtM0tnU6bkdYboLR4nu4j_Fhsu2cHe4" +
+                                "6IaG2BGMnZw4qgKyjoPd81QbOCBfGZR_ac\", \"q\": \"8cO9fplrHh01BQrxCe-yZwUOg2w14j-DkC9Vt" +
+                                "vgFDNeQOv-mGqxldhvCsBzAJ7Jog-lk-vPbMT4OT2lHJ4hhWBSt9mZbAHAL4hZR-95JTmh5crEpyfQYE" +
+                                "oWhI_29uDfRl9nb9d7ef28B_o0yxQcnxaSAvUpk_t_ffrlHTHCiWJc\", \"dp\": \"XM_sp_ZLxQe80GBn" +
+                                "xEF1QXR7y6x0cv7CKxrpAG2O4PQHCaRG0HuID_4KbAvvtUlCv0OvZMB-QY4b5BGnp0PUPttkafSw7tQI" +
+                                "7L15taY2EFIG973r77LaO5zVrgftjDaY5gmtyi1c3SX5TnfwtBnkXjYZRv7WiULvYeAB_dmSGu0\", \"d" +
+                                "q\": \"RKubjHUZVvFm2OrVskPSQa7PA4dd-sidnvvC9fiWvqIQBqIM1TC4lQankwxnjB8Bzs4hb6KKVP9" +
+                                "SYz39Bv6W38Tn8L_8AzDQP0SlvsvRuKK2NFycCQ_7Mm-gaK-vDr9UGjS4ZKsMOdgXEe2bSRmSM3JZWur" +
+                                "hqv995OnNlam8gzs\", \"qi\": \"lR7p9_WQgDdVW5Sq0r4CzqENOScLddmCDb2o9RXUGh0TU-mJ92wuEE" +
+                                "92llrm4JlsaXNFryW7yhKunmPy0onMNjSnYIvwVcmYVV3MrnJbSZmMTRoAmTnTtAoSSf0eGgCepnphI3" +
+                                "lZnfIZAONUXBmdT0zcT3WO6nveLDsCP_MTWLg\" }]}"});
 #line 9
  testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table169, "And ");
 #line hidden
-#line 20
+#line 22
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 21
+#line 23
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 24
+ testRunner.And("add \'2\' seconds and store the result into \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 25
+ testRunner.And("add \'-2\' seconds and store the result into \'nbf\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table170 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table170.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "aud",
+                            "[https://localhost:8080]"});
                 table170.AddRow(new string[] {
-                            "client_id",
+                            "iss",
                             "$client_id$"});
+                table170.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+                table170.AddRow(new string[] {
+                            "iat",
+                            "1587492240"});
+                table170.AddRow(new string[] {
+                            "nbf",
+                            "$nbf$"});
+                table170.AddRow(new string[] {
+                            "jti",
+                            "jti"});
                 table170.AddRow(new string[] {
                             "login_hint",
                             "administrator"});
@@ -173,43 +218,58 @@ this.ScenarioInitialize(scenarioInfo);
                 table170.AddRow(new string[] {
                             "client_notification_token",
                             "7dc3061e-bad9-4817-bd33-8db789bfb516"});
-#line 23
- testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table170, "And ");
-#line hidden
-#line 31
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 32
- testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 27
+ testRunner.And("client \'$client_id$\' build JWS token using the algorithm \'PS256\'", ((string)(null)), table170, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table171 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table171.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table171.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table171.AddRow(new string[] {
+                            "request",
+                            "$requestParameter$"});
+#line 39
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table171, "And ");
+#line hidden
+#line 45
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 46
+ testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table172 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table172.AddRow(new string[] {
                             "login_hint",
                             "administrator"});
-                table171.AddRow(new string[] {
+                table172.AddRow(new string[] {
                             "auth_req_id",
                             "$auth_req_id$"});
-#line 33
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table171, "And ");
+#line 47
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table172, "And ");
 #line hidden
-#line 38
+#line 52
  testRunner.And("poll until \'callbackResponse\' is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 39
+#line 53
  testRunner.And("extract JSON from \'callbackResponse\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 41
+#line 55
  testRunner.Then("JSON contains \'auth_req_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 42
+#line 56
  testRunner.Then("JSON contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 43
+#line 57
  testRunner.Then("JSON contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 44
+#line 58
  testRunner.Then("JSON contains \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -224,7 +284,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use ping notification mode", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 46
+#line 60
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -244,135 +304,196 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table172 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table173 = new TechTalk.SpecFlow.Table(new string[] {
                             "Type",
                             "Kid",
                             "AlgName"});
-                table172.AddRow(new string[] {
+                table173.AddRow(new string[] {
                             "SIG",
                             "1",
                             "RS256"});
-#line 47
- testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table172, "When ");
-#line hidden
-                TechTalk.SpecFlow.Table table173 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table173.AddRow(new string[] {
-                            "token_endpoint_auth_method",
-                            "tls_client_auth"});
-                table173.AddRow(new string[] {
-                            "response_types",
-                            "[token]"});
-                table173.AddRow(new string[] {
-                            "grant_types",
-                            "[urn:openid:params:grant-type:ciba]"});
-                table173.AddRow(new string[] {
-                            "scope",
-                            "openid profile"});
-                table173.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost:8080]"});
-                table173.AddRow(new string[] {
-                            "tls_client_auth_san_dns",
-                            "firstMtlsClient"});
-                table173.AddRow(new string[] {
-                            "backchannel_token_delivery_mode",
-                            "ping"});
-                table173.AddRow(new string[] {
-                            "backchannel_client_notification_endpoint",
-                            "https://localhost:8080/pushNotificationEdp"});
-#line 51
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table173, "And ");
-#line hidden
-#line 62
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 63
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 61
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table173, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table174 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table174.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "token_endpoint_auth_method",
+                            "tls_client_auth"});
                 table174.AddRow(new string[] {
-                            "client_id",
-                            "$client_id$"});
+                            "response_types",
+                            "[token]"});
                 table174.AddRow(new string[] {
-                            "login_hint",
-                            "administrator"});
+                            "grant_types",
+                            "[urn:openid:params:grant-type:ciba]"});
                 table174.AddRow(new string[] {
                             "scope",
                             "openid profile"});
                 table174.AddRow(new string[] {
-                            "client_notification_token",
-                            "7dc3061e-bad9-4817-bd33-8db789bfb516"});
+                            "redirect_uris",
+                            "[http://localhost:8080]"});
+                table174.AddRow(new string[] {
+                            "tls_client_auth_san_dns",
+                            "firstMtlsClient"});
+                table174.AddRow(new string[] {
+                            "backchannel_token_delivery_mode",
+                            "ping"});
+                table174.AddRow(new string[] {
+                            "backchannel_client_notification_endpoint",
+                            "https://localhost:8080/pushNotificationEdp"});
+                table174.AddRow(new string[] {
+                            "backchannel_authentication_request_signing_alg",
+                            "PS256"});
+                table174.AddRow(new string[] {
+                            "jwks",
+                            "{\"keys\":[{ \"kty\": \"RSA\",  \"use\": \"sig\", \"alg\": \"PS256\",  \"kid\": \"1\", \"key_ops\": [" +
+                                " \"sign\", \"verify\"  ], \"n\": \"ykDUVZX8lDX-O97R6CCqogzTuaLPR71v_0ul2FurEFQaMJYzGZg-" +
+                                "tjSp9smrQUNuaNvxvb4cC0iJwHno-2cg2bFO5Ks-8NyP7fM0QQSPJUyq1-qa-wsOJ3NcGrphSHGN3fJE" +
+                                "eJRIV1R1Yyl2XZBYCdbR1pFqBQ4yw0kiaOjAGr_bQloNjeo3Z-ak8oYfaVJvlCyQZpKoBlsBud8aFmr2" +
+                                "KIuf_q9vJjiDObnoCaWf4ZYtCbeSP-qwshtTuC6YuzQL8IsiqTeUAm0VjV0yZkRStl-mQnHXI2o6du-3" +
+                                "PYFqWXOwMn9USilJ1lYjqqL3jg-mXtQzckOpiXZfy2D8HTwFgQ\", \"e\": \"AQAB\", \"d\": \"mBnlFXA0" +
+                                "gSmRxmitp0pZyICpAWRFSghXH8E-OdXGcgMtpvht-YObNd-pKmVDm1Mgx08RH8bGxF2K6utDoT1PYSeM" +
+                                "0z9NmEnnG-XYmETbeguMN9DBOKZ5wIVq8NbVrmtna1B02dF6DeMAXNCjqX2SF-Qr7pdxCdhBqMdpT0gq" +
+                                "oHHtjARGQT2JjjfQSWuQiU6EOZOqJFPYbER1b_mwbacHKwb3D8bX4JPcTvCMP5SNqUDIkjerWCq9j1Df" +
+                                "nvRpnlcNrTnhlqG-S8mXr1Mt0bn40Kc9Y0-7d7Q3hvj3ObNW4jdEyf7Efb0d0ZjyFgZuAfPa4tkwIym9" +
+                                "cBaz71Asz1-9mQ\", \"p\": \"1imC2zKZXeXONfKNoBJmq-JWyGziMlLvKWGnFdqIqqH9WNkxM8bAYPe2G" +
+                                "8hd5SYOGg2CEWm4BN7cj4tKlegzOHmaVybo-a5odHB5UCo3ZsWtM0tnU6bkdYboLR4nu4j_Fhsu2cHe4" +
+                                "6IaG2BGMnZw4qgKyjoPd81QbOCBfGZR_ac\", \"q\": \"8cO9fplrHh01BQrxCe-yZwUOg2w14j-DkC9Vt" +
+                                "vgFDNeQOv-mGqxldhvCsBzAJ7Jog-lk-vPbMT4OT2lHJ4hhWBSt9mZbAHAL4hZR-95JTmh5crEpyfQYE" +
+                                "oWhI_29uDfRl9nb9d7ef28B_o0yxQcnxaSAvUpk_t_ffrlHTHCiWJc\", \"dp\": \"XM_sp_ZLxQe80GBn" +
+                                "xEF1QXR7y6x0cv7CKxrpAG2O4PQHCaRG0HuID_4KbAvvtUlCv0OvZMB-QY4b5BGnp0PUPttkafSw7tQI" +
+                                "7L15taY2EFIG973r77LaO5zVrgftjDaY5gmtyi1c3SX5TnfwtBnkXjYZRv7WiULvYeAB_dmSGu0\", \"d" +
+                                "q\": \"RKubjHUZVvFm2OrVskPSQa7PA4dd-sidnvvC9fiWvqIQBqIM1TC4lQankwxnjB8Bzs4hb6KKVP9" +
+                                "SYz39Bv6W38Tn8L_8AzDQP0SlvsvRuKK2NFycCQ_7Mm-gaK-vDr9UGjS4ZKsMOdgXEe2bSRmSM3JZWur" +
+                                "hqv995OnNlam8gzs\", \"qi\": \"lR7p9_WQgDdVW5Sq0r4CzqENOScLddmCDb2o9RXUGh0TU-mJ92wuEE" +
+                                "92llrm4JlsaXNFryW7yhKunmPy0onMNjSnYIvwVcmYVV3MrnJbSZmMTRoAmTnTtAoSSf0eGgCepnphI3" +
+                                "lZnfIZAONUXBmdT0zcT3WO6nveLDsCP_MTWLg\" }]}"});
 #line 65
- testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table174, "And ");
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table174, "And ");
 #line hidden
-#line 73
+#line 78
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 74
- testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 79
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 80
+ testRunner.And("add \'2\' seconds and store the result into \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 81
+ testRunner.And("add \'-2\' seconds and store the result into \'nbf\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table175 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table175.AddRow(new string[] {
+                            "aud",
+                            "[https://localhost:8080]"});
+                table175.AddRow(new string[] {
+                            "iss",
+                            "$client_id$"});
+                table175.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+                table175.AddRow(new string[] {
+                            "iat",
+                            "1587492240"});
+                table175.AddRow(new string[] {
+                            "nbf",
+                            "$nbf$"});
+                table175.AddRow(new string[] {
+                            "jti",
+                            "jti"});
+                table175.AddRow(new string[] {
                             "login_hint",
                             "administrator"});
                 table175.AddRow(new string[] {
-                            "auth_req_id",
-                            "$auth_req_id$"});
-#line 75
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table175, "And ");
-#line hidden
-#line 80
- testRunner.And("poll until \'callbackResponse\' is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                            "scope",
+                            "openid profile"});
+                table175.AddRow(new string[] {
+                            "client_notification_token",
+                            "7dc3061e-bad9-4817-bd33-8db789bfb516"});
+#line 83
+ testRunner.And("client \'$client_id$\' build JWS token using the algorithm \'PS256\'", ((string)(null)), table175, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table176 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table176.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table176.AddRow(new string[] {
                             "client_id",
                             "$client_id$"});
                 table176.AddRow(new string[] {
-                            "login_hint",
-                            "administrator"});
-                table176.AddRow(new string[] {
-                            "auth_req_id",
-                            "$auth_req_id$"});
-#line 81
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table176, "And ");
+                            "request",
+                            "$requestParameter$"});
+#line 95
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table176, "And ");
+#line hidden
+#line 101
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 102
+ testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table177 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table177.AddRow(new string[] {
-                            "client_id",
-                            "$client_id$"});
-                table177.AddRow(new string[] {
-                            "scope",
-                            "openid profile"});
-                table177.AddRow(new string[] {
-                            "grant_type",
-                            "urn:openid:params:grant-type:ciba"});
-                table177.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "login_hint",
+                            "administrator"});
                 table177.AddRow(new string[] {
                             "auth_req_id",
                             "$auth_req_id$"});
-#line 87
- testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table177, "And ");
+#line 103
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table177, "And ");
 #line hidden
-#line 95
+#line 108
+ testRunner.And("poll until \'callbackResponse\' is received", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table178 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table178.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table178.AddRow(new string[] {
+                            "login_hint",
+                            "administrator"});
+                table178.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 109
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table178, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table179.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table179.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table179.AddRow(new string[] {
+                            "grant_type",
+                            "urn:openid:params:grant-type:ciba"});
+                table179.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table179.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 115
+ testRunner.And("poll HTTP POST request \'https://localhost:8080/mtls/token\', until \'token_type\'=\'B" +
+                        "earer\'", ((string)(null)), table179, "And ");
+#line hidden
+#line 123
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 97
+#line 125
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -387,7 +508,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use poll notification mode", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 99
+#line 127
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -407,127 +528,187 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table178 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table180 = new TechTalk.SpecFlow.Table(new string[] {
                             "Type",
                             "Kid",
                             "AlgName"});
-                table178.AddRow(new string[] {
+                table180.AddRow(new string[] {
                             "SIG",
                             "1",
                             "RS256"});
-#line 100
- testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table178, "When ");
-#line hidden
-                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table179.AddRow(new string[] {
-                            "token_endpoint_auth_method",
-                            "tls_client_auth"});
-                table179.AddRow(new string[] {
-                            "response_types",
-                            "[token]"});
-                table179.AddRow(new string[] {
-                            "grant_types",
-                            "[urn:openid:params:grant-type:ciba]"});
-                table179.AddRow(new string[] {
-                            "scope",
-                            "openid profile"});
-                table179.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost:8080]"});
-                table179.AddRow(new string[] {
-                            "tls_client_auth_san_dns",
-                            "firstMtlsClient"});
-                table179.AddRow(new string[] {
-                            "backchannel_token_delivery_mode",
-                            "poll"});
-                table179.AddRow(new string[] {
-                            "backchannel_client_notification_endpoint",
-                            "https://localhost:8080/pushNotificationEdp"});
-#line 104
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table179, "And ");
-#line hidden
-#line 115
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 116
- testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table180 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table180.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table180.AddRow(new string[] {
-                            "client_id",
-                            "$client_id$"});
-                table180.AddRow(new string[] {
-                            "login_hint",
-                            "administrator"});
-                table180.AddRow(new string[] {
-                            "scope",
-                            "openid profile"});
-                table180.AddRow(new string[] {
-                            "client_notification_token",
-                            "7dc3061e-bad9-4817-bd33-8db789bfb516"});
-#line 118
- testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table180, "And ");
-#line hidden
-#line 126
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 127
- testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 128
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table180, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table181 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table181.AddRow(new string[] {
-                            "login_hint",
-                            "administrator"});
+                            "token_endpoint_auth_method",
+                            "tls_client_auth"});
                 table181.AddRow(new string[] {
-                            "auth_req_id",
-                            "$auth_req_id$"});
-#line 128
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table181, "And ");
+                            "response_types",
+                            "[token]"});
+                table181.AddRow(new string[] {
+                            "grant_types",
+                            "[urn:openid:params:grant-type:ciba]"});
+                table181.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table181.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost:8080]"});
+                table181.AddRow(new string[] {
+                            "tls_client_auth_san_dns",
+                            "firstMtlsClient"});
+                table181.AddRow(new string[] {
+                            "backchannel_token_delivery_mode",
+                            "poll"});
+                table181.AddRow(new string[] {
+                            "backchannel_client_notification_endpoint",
+                            "https://localhost:8080/pushNotificationEdp"});
+                table181.AddRow(new string[] {
+                            "backchannel_authentication_request_signing_alg",
+                            "PS256"});
+                table181.AddRow(new string[] {
+                            "jwks",
+                            "{\"keys\":[{ \"kty\": \"RSA\",  \"use\": \"sig\", \"alg\": \"PS256\",  \"kid\": \"1\", \"key_ops\": [" +
+                                " \"sign\", \"verify\"  ], \"n\": \"ykDUVZX8lDX-O97R6CCqogzTuaLPR71v_0ul2FurEFQaMJYzGZg-" +
+                                "tjSp9smrQUNuaNvxvb4cC0iJwHno-2cg2bFO5Ks-8NyP7fM0QQSPJUyq1-qa-wsOJ3NcGrphSHGN3fJE" +
+                                "eJRIV1R1Yyl2XZBYCdbR1pFqBQ4yw0kiaOjAGr_bQloNjeo3Z-ak8oYfaVJvlCyQZpKoBlsBud8aFmr2" +
+                                "KIuf_q9vJjiDObnoCaWf4ZYtCbeSP-qwshtTuC6YuzQL8IsiqTeUAm0VjV0yZkRStl-mQnHXI2o6du-3" +
+                                "PYFqWXOwMn9USilJ1lYjqqL3jg-mXtQzckOpiXZfy2D8HTwFgQ\", \"e\": \"AQAB\", \"d\": \"mBnlFXA0" +
+                                "gSmRxmitp0pZyICpAWRFSghXH8E-OdXGcgMtpvht-YObNd-pKmVDm1Mgx08RH8bGxF2K6utDoT1PYSeM" +
+                                "0z9NmEnnG-XYmETbeguMN9DBOKZ5wIVq8NbVrmtna1B02dF6DeMAXNCjqX2SF-Qr7pdxCdhBqMdpT0gq" +
+                                "oHHtjARGQT2JjjfQSWuQiU6EOZOqJFPYbER1b_mwbacHKwb3D8bX4JPcTvCMP5SNqUDIkjerWCq9j1Df" +
+                                "nvRpnlcNrTnhlqG-S8mXr1Mt0bn40Kc9Y0-7d7Q3hvj3ObNW4jdEyf7Efb0d0ZjyFgZuAfPa4tkwIym9" +
+                                "cBaz71Asz1-9mQ\", \"p\": \"1imC2zKZXeXONfKNoBJmq-JWyGziMlLvKWGnFdqIqqH9WNkxM8bAYPe2G" +
+                                "8hd5SYOGg2CEWm4BN7cj4tKlegzOHmaVybo-a5odHB5UCo3ZsWtM0tnU6bkdYboLR4nu4j_Fhsu2cHe4" +
+                                "6IaG2BGMnZw4qgKyjoPd81QbOCBfGZR_ac\", \"q\": \"8cO9fplrHh01BQrxCe-yZwUOg2w14j-DkC9Vt" +
+                                "vgFDNeQOv-mGqxldhvCsBzAJ7Jog-lk-vPbMT4OT2lHJ4hhWBSt9mZbAHAL4hZR-95JTmh5crEpyfQYE" +
+                                "oWhI_29uDfRl9nb9d7ef28B_o0yxQcnxaSAvUpk_t_ffrlHTHCiWJc\", \"dp\": \"XM_sp_ZLxQe80GBn" +
+                                "xEF1QXR7y6x0cv7CKxrpAG2O4PQHCaRG0HuID_4KbAvvtUlCv0OvZMB-QY4b5BGnp0PUPttkafSw7tQI" +
+                                "7L15taY2EFIG973r77LaO5zVrgftjDaY5gmtyi1c3SX5TnfwtBnkXjYZRv7WiULvYeAB_dmSGu0\", \"d" +
+                                "q\": \"RKubjHUZVvFm2OrVskPSQa7PA4dd-sidnvvC9fiWvqIQBqIM1TC4lQankwxnjB8Bzs4hb6KKVP9" +
+                                "SYz39Bv6W38Tn8L_8AzDQP0SlvsvRuKK2NFycCQ_7Mm-gaK-vDr9UGjS4ZKsMOdgXEe2bSRmSM3JZWur" +
+                                "hqv995OnNlam8gzs\", \"qi\": \"lR7p9_WQgDdVW5Sq0r4CzqENOScLddmCDb2o9RXUGh0TU-mJ92wuEE" +
+                                "92llrm4JlsaXNFryW7yhKunmPy0onMNjSnYIvwVcmYVV3MrnJbSZmMTRoAmTnTtAoSSf0eGgCepnphI3" +
+                                "lZnfIZAONUXBmdT0zcT3WO6nveLDsCP_MTWLg\" }]}"});
+#line 132
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table181, "And ");
+#line hidden
+#line 145
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 146
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 147
+ testRunner.And("add \'2\' seconds and store the result into \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 148
+ testRunner.And("add \'-2\' seconds and store the result into \'nbf\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table182 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table182.AddRow(new string[] {
-                            "client_id",
+                            "aud",
+                            "[https://localhost:8080]"});
+                table182.AddRow(new string[] {
+                            "iss",
                             "$client_id$"});
+                table182.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+                table182.AddRow(new string[] {
+                            "iat",
+                            "1587492240"});
+                table182.AddRow(new string[] {
+                            "nbf",
+                            "$nbf$"});
+                table182.AddRow(new string[] {
+                            "jti",
+                            "jti"});
+                table182.AddRow(new string[] {
+                            "login_hint",
+                            "administrator"});
                 table182.AddRow(new string[] {
                             "scope",
                             "openid profile"});
                 table182.AddRow(new string[] {
-                            "grant_type",
-                            "urn:openid:params:grant-type:ciba"});
-                table182.AddRow(new string[] {
+                            "client_notification_token",
+                            "7dc3061e-bad9-4817-bd33-8db789bfb516"});
+#line 150
+ testRunner.And("client \'$client_id$\' build JWS token using the algorithm \'PS256\'", ((string)(null)), table182, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table183 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table183.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-                table182.AddRow(new string[] {
-                            "auth_req_id",
-                            "$auth_req_id$"});
-#line 133
- testRunner.And("poll HTTP POST request \'https://localhost:8080/mtls/token\', until \'token_type\'=\'B" +
-                        "earer\'", ((string)(null)), table182, "And ");
+                table183.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table183.AddRow(new string[] {
+                            "request",
+                            "$requestParameter$"});
+#line 162
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table183, "And ");
 #line hidden
-#line 141
+#line 168
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 143
+#line 169
+ testRunner.And("extract parameter \'auth_req_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table184 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table184.AddRow(new string[] {
+                            "login_hint",
+                            "administrator"});
+                table184.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 170
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/bc-authorize/confirm\'", ((string)(null)), table184, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table185 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table185.AddRow(new string[] {
+                            "client_id",
+                            "$client_id$"});
+                table185.AddRow(new string[] {
+                            "scope",
+                            "openid profile"});
+                table185.AddRow(new string[] {
+                            "grant_type",
+                            "urn:openid:params:grant-type:ciba"});
+                table185.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table185.AddRow(new string[] {
+                            "auth_req_id",
+                            "$auth_req_id$"});
+#line 175
+ testRunner.And("poll HTTP POST request \'https://localhost:8080/mtls/token\', until \'token_type\'=\'B" +
+                        "earer\'", ((string)(null)), table185, "And ");
+#line hidden
+#line 183
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 185
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 144
+#line 186
  testRunner.Then("JSON contains \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 145
+#line 187
  testRunner.Then("JSON contains \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 146
+#line 188
  testRunner.Then("JSON contains \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

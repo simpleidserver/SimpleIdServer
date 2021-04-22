@@ -69,7 +69,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 }
             }
 
-            throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_SELF_SIGNED_CERTIFICATE);
+            throw new OAuthUnauthorizedException(ErrorCodes.INVALID_CLIENT, ErrorMessages.BAD_SELF_SIGNED_CERTIFICATE);
         }
     }
 }

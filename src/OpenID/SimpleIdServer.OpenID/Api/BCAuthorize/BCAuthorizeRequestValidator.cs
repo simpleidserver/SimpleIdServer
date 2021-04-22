@@ -7,12 +7,12 @@ using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
@@ -181,86 +181,88 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private async Task CheckRequestObject(HandlerContext context, CancellationToken cancellationToken)
         {
             var request = context.Request.Data.GetRequest();
-            if (!string.IsNullOrWhiteSpace(request))
+            if (string.IsNullOrWhiteSpace(request))
             {
-                var validationResult = await _requestObjectValidator.Validate(request, (OpenIdClient)context.Client, cancellationToken);
-                var audiences = validationResult.JwsPayload.GetAudiences();
-                var issuer = validationResult.JwsPayload.GetIssuer();
-                var exp = validationResult.JwsPayload.GetExpirationTime();
-                var iat = validationResult.JwsPayload.GetIat();
-                var nbf = validationResult.JwsPayload.GetNbf();
-                var jti = validationResult.JwsPayload.GetJti();
-                if (audiences == null || !audiences.Any())
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_AUDIENCE);
-                }
-
-                if (!audiences.Contains(context.Request.IssuerName))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_AUDIENCE);
-                }
-
-                if (string.IsNullOrWhiteSpace(issuer))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_ISSUER);
-                }
-
-                if (issuer != context.Client.ClientId)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_ISSUER);
-                }
-
-                if (exp == default(double))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_EXPIRATION);
-                }
-
-                var expirationDateTime = exp.ConvertFromUnixTimestamp();
-                var currentDateTime = DateTime.UtcNow;
-                if (currentDateTime >= expirationDateTime)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_IS_EXPIRED);
-                }
-
-                if (currentDateTime.AddSeconds(_options.MaxRequestLifetime) <= expirationDateTime)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
-                }
-
-                if (iat == default(double))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_IAT);
-                }
-
-                if (nbf == default(double))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_NBF);
-                }
-
-                if (currentDateTime < nbf.ConvertFromUnixTimestamp())
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_BAD_NBF, nbf.ConvertFromUnixTimestamp()));
-                }
-
-                var minusMaxRequestLifetime = -_options.MaxRequestLifetime;
-                if (currentDateTime.AddSeconds(minusMaxRequestLifetime) > nbf.ConvertFromUnixTimestamp())
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
-                }
-
-                if (string.IsNullOrWhiteSpace(jti))
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_JTI);
-                }
-
-                var openidClient = (OpenIdClient)context.Client;
-                if (openidClient.BCAuthenticationRequestSigningAlg != validationResult.JwsHeader.Alg)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.BCAuthenticationRequestSigningAlg));
-                }
-
-                context.Request.SetData(JObject.FromObject(validationResult.JwsPayload));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, BCAuthenticationRequestParameters.Request));
             }
+
+            var validationResult = await _requestObjectValidator.Validate(request, (OpenIdClient)context.Client, cancellationToken);
+            var audiences = validationResult.JwsPayload.GetAudiences();
+            var issuer = validationResult.JwsPayload.GetIssuer();
+            var exp = validationResult.JwsPayload.GetExpirationTime();
+            var iat = validationResult.JwsPayload.GetIat();
+            var nbf = validationResult.JwsPayload.GetNbf();
+            var jti = validationResult.JwsPayload.GetJti();
+            if (audiences == null || !audiences.Any())
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_AUDIENCE);
+            }
+
+            if (!audiences.Contains(context.Request.IssuerName))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_AUDIENCE);
+            }
+
+            if (string.IsNullOrWhiteSpace(issuer))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_ISSUER);
+            }
+
+            if (issuer != context.Client.ClientId)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_ISSUER);
+            }
+
+            if (exp == default(double))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_EXPIRATION);
+            }
+
+            var expirationDateTime = exp.ConvertFromUnixTimestamp();
+            var currentDateTime = DateTime.UtcNow;
+            if (currentDateTime >= expirationDateTime)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_IS_EXPIRED);
+            }
+
+            if (currentDateTime.AddSeconds(_options.MaxRequestLifetime) <= expirationDateTime)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
+            }
+
+            if (iat == default(double))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_IAT);
+            }
+
+            if (nbf == default(double))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_NBF);
+            }
+
+            if (currentDateTime < nbf.ConvertFromUnixTimestamp())
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_BAD_NBF, nbf.ConvertFromUnixTimestamp()));
+            }
+
+            var minusMaxRequestLifetime = -_options.MaxRequestLifetime;
+            if (currentDateTime.AddSeconds(minusMaxRequestLifetime) > nbf.ConvertFromUnixTimestamp())
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
+            }
+
+            if (string.IsNullOrWhiteSpace(jti))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_JTI);
+            }
+
+            var openidClient = (OpenIdClient)context.Client;
+            if (openidClient.BCAuthenticationRequestSigningAlg != validationResult.JwsHeader.Alg)
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.BCAuthenticationRequestSigningAlg));
+            }
+
+            context.Request.SetData(JObject.FromObject(validationResult.JwsPayload));
         }
 
         private void CheckScopes(HandlerContext context)
@@ -268,7 +270,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             var requestedScopes = context.Request.Data.GetScopesFromAuthorizationRequest();
             if (!requestedScopes.Any())
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Scope));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
             }
 
             ScopeHelper.Validate(requestedScopes, context.Client.AllowedScopes.Select(s => s.Name));

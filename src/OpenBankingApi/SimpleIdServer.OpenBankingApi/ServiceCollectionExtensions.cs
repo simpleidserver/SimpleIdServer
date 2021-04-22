@@ -60,6 +60,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.RemoveAll<ITokenBuilder>();
             services.RemoveAll<IBCAuthorizeHandler>();
             services.AddTransient<IClaimsJwsPayloadEnricher, OpenBankingApiClaimsJwsPayloadEnricher>();
+            services.AddTransient<IOpenBankingApiAuthRequestEnricher, OpenBankingApiAuthRequestEnricher>();
             services.AddTransient<ITokenBuilder, OpenBankingApiIdTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenBankingApiAccessTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();

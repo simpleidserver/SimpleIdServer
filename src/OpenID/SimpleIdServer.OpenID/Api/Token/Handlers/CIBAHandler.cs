@@ -73,6 +73,10 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(result);
             }
+            catch (OAuthUnauthorizedException ex)
+            {
+                return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+            }
             catch (OAuthException ex)
             {
                 _logger.LogError(ex.ToString());
