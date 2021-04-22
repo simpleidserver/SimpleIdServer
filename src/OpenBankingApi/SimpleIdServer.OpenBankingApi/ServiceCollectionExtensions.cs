@@ -56,10 +56,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.RemoveAll<IAuthorizationRequestValidator>();
             services.AddTransient<IAuthorizationRequestValidator, OpenBankingApiAuthorizationRequestValidator>();
 
-            services.RemoveAll<IClaimsJwsPayloadEnricher>();
             services.RemoveAll<ITokenBuilder>();
             services.RemoveAll<IBCAuthorizeHandler>();
-            services.AddTransient<IClaimsJwsPayloadEnricher, OpenBankingApiClaimsJwsPayloadEnricher>();
             services.AddTransient<IOpenBankingApiAuthRequestEnricher, OpenBankingApiAuthRequestEnricher>();
             services.AddTransient<ITokenBuilder, OpenBankingApiIdTokenBuilder>();
             services.AddTransient<ITokenBuilder, OpenBankingApiAccessTokenBuilder>();

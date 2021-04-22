@@ -125,7 +125,13 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 result.Add(OAuthClaims.Acr, defaultAcr.Name);
             }
 
-            var scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
+            IEnumerable<OpenIdScope> scopes = new OpenIdScope[1] { SIDOpenIdConstants.StandardScopes.OpenIdScope };
+            var responseTypes = queryParameters.GetResponseTypesFromAuthorizationRequest();
+            if (responseTypes.Count() == 1 && responseTypes.First() == AuthorizationResponseParameters.IdToken)
+            {
+                scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
+            }
+
             EnrichWithScopeParameter(result, scopes, currentContext.User, subject);
             _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.User.AuthenticationTime);
             foreach (var claimsSource in _claimsSources)

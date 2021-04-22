@@ -28,7 +28,7 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             var claims = jObj[AuthorizationRequestParameters.Claims] as JObject;
-            return claims.ExtractClaims(type);
+            return claims.GetClaims();
         }
     }
 }

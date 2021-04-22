@@ -3,11 +3,13 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Web;
 
 namespace SimpleIdServer.OpenBankingApi.Startup
 {
@@ -15,30 +17,34 @@ namespace SimpleIdServer.OpenBankingApi.Startup
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args).Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        public static IHost CreateWebHostBuilder(string[] args)
         {
-            return new WebHostBuilder()
-                .UseKestrel(options =>
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(cfg =>
                 {
-                    options.Listen(IPAddress.Any, 60010, listenOptions =>
+                    cfg.UseKestrel(options =>
                     {
-                        var serverCertificate = LoadCertificate();
-                        listenOptions.UseHttps(serverCertificate, configureOptions =>
+                        options.Listen(IPAddress.Any, 60010, listenOptions =>
                         {
-                            configureOptions.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
-                            configureOptions.SslProtocols = SslProtocols.Tls12;
-                            configureOptions.ClientCertificateValidation = (certificate2, chain, args) =>
+                            var serverCertificate = LoadCertificate();
+                            listenOptions.UseHttps(serverCertificate, configureOptions =>
                             {
-                                return true;
-                            };
+                                configureOptions.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+                                configureOptions.SslProtocols = SslProtocols.Tls12;
+                                configureOptions.ClientCertificateValidation = (certificate2, chain, args) =>
+                                {
+                                    return true;
+                                };
+                            });
                         });
-                    });
+                    })
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseStartup<Startup>();
                 })
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<Startup>();
+                .Build();                
         }
 
         private static X509Certificate2 LoadCertificate()

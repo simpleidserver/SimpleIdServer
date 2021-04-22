@@ -440,7 +440,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:4200",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>

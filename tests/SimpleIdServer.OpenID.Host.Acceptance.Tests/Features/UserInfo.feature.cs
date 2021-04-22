@@ -682,7 +682,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "$client_id$"});
                 table341.AddRow(new string[] {
                             "claims",
-                            "{ name: { essential : true }, email: { essential : true } }"});
+                            "{ \"userinfo\": { name: { essential : true }, email: { essential : true } } }"});
 #line 182
  testRunner.And("use \'1\' JWK from \'jwks\' to build JWS and store into \'accesstoken\'", ((string)(null)), table341, "And ");
 #line hidden

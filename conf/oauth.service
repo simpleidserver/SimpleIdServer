@@ -3,7 +3,7 @@ Description=OAUTH2.0 server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/dotnet /home/ftpuser/src/build/results/services/OAuth/SimpleIdServer.OAuth.Startup.dll --server.urls="http://*:60001"
+ExecStart=/usr/bin/dotnet /home/ftpuser/src/build/results/services/OAuth/SimpleIdServer.OAuth.Startup.dll --urls "http://*:60001"
 KillMode=process
 TimeoutStopSec=5s
 Restart=always

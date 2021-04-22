@@ -8,7 +8,6 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
-using SimpleIdServer.OpenID.DTOs;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,18 +19,17 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
         private readonly IOpenBankingApiAuthRequestEnricher _openBankingApiAuthRequestEnricher;
 
         public OpenBankingApiAccessTokenBuilder(
-            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             IGrantedTokenHelper grantedTokenHelper,
             IJwtBuilder jwtBuilder,
             IOptions<OAuthHostOptions> options,
-            IOpenBankingApiAuthRequestEnricher openBankingApiAuthRequestEnricher) : base(claimsJwsPayloadEnricher, grantedTokenHelper, jwtBuilder, options)
+            IOpenBankingApiAuthRequestEnricher openBankingApiAuthRequestEnricher) : base(grantedTokenHelper, jwtBuilder, options)
         {
             _openBankingApiAuthRequestEnricher = openBankingApiAuthRequestEnricher;
         }
 
-        protected override async Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claimParameters, JObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
+        protected override async Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, JObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var result = await base.BuildOpenIdPayload(scopes, claimParameters, queryParameters, handlerContext, cancellationToken);
+            var result = await base.BuildOpenIdPayload(scopes, queryParameters, handlerContext, cancellationToken);
             await _openBankingApiAuthRequestEnricher.Enrich(result, queryParameters, cancellationToken);
             return result;
         }

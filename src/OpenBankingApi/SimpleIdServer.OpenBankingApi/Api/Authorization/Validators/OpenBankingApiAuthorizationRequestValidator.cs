@@ -162,8 +162,6 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(SimpleIdServer.OpenID.ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
                 }
             }
-
-            RedirectToConsentView(context, true);
         }
 
         protected override void RedirectToConsentView(HandlerContext context)
@@ -200,10 +198,12 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             var claim = claims.FirstOrDefault(_ => _.Name == _options.OpenBankingApiConsentClaimName);
             if (claim == null)
             {
+                /*
                 if (ignoreDefaultRedirection)
                 {
                     return;
                 }
+                */
 
                 base.RedirectToConsentView(context);
                 return;

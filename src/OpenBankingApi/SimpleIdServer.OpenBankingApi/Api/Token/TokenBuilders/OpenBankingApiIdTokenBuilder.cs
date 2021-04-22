@@ -76,6 +76,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
                 result.Add(Constants.OpenBankingApiClaimNames.SHash, half.Base64EncodeBytes());
             }
 
+            await _openBankingApiAuthRequestEnricher.Enrich(result, queryParameters, cancellationToken);
             if (result.ContainsKey(_options.OpenBankingApiConsentClaimName))
             {
                 if (result.ContainsKey(Jwt.Constants.UserClaims.Subject))
@@ -88,7 +89,6 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
                 }
             }
 
-            await _openBankingApiAuthRequestEnricher.Enrich(result, queryParameters, cancellationToken);
             return result;
         }
 

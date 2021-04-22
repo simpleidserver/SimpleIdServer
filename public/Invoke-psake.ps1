@@ -241,7 +241,7 @@ function Invoke-psake {
 
     try {
         if (-not $nologo) {
-            "psake version {0}`nCopyright (c) 2010-2017 James Kovacs & Contributors`n" -f $psake.version
+            "psake version {0}$($script:nl)Copyright (c) 2010-2018 James Kovacs & Contributors$($script:nl)" -f $psake.version
         }
         if (!$buildFile) {
            $buildFile = Get-DefaultBuildFile
@@ -253,6 +253,8 @@ function Invoke-psake {
             $buildFile = Get-DefaultBuildFile
         }
 
+        $psake.error_message = $null
+
         ExecuteInBuildFileScope $buildFile $MyInvocation.MyCommand.Module {
             param($currentContext, $module)
 
@@ -263,22 +265,28 @@ function Invoke-psake {
                 return
             }
 
-            foreach ($key in $parameters.keys) {
-                if (test-path "variable:\$key") {
-                    set-item -path "variable:\$key" -value $parameters.$key -WhatIf:$false -Confirm:$false | out-null
-                } else {
-                    new-item -path "variable:\$key" -value $parameters.$key -WhatIf:$false -Confirm:$false | out-null
+            try {
+                foreach ($key in $parameters.keys) {
+                    if (test-path "variable:\$key") {
+                        set-variable -name $key -value $parameters.$key -WhatIf:$false -Confirm:$false | out-null
+                    } else {
+                        new-item -path "variable:\$key" -value $parameters.$key -WhatIf:$false -Confirm:$false | out-null
+                    }
                 }
+            } catch {
+                WriteColoredOutput "Parameter '$key' is null" -foregroundcolor Red
+                throw
             }
 
             # The initial dot (.) indicates that variables initialized/modified in the propertyBlock are available in the parent scope.
-            foreach ($propertyBlock in $currentContext.properties) {
+            while ($currentContext.properties.Count -gt 0) {
+                $propertyBlock = $currentContext.properties.Pop()
                 . $propertyBlock
             }
 
             foreach ($key in $properties.keys) {
                 if (test-path "variable:\$key") {
-                    set-item -path "variable:\$key" -value $properties.$key -WhatIf:$false -Confirm:$false | out-null
+                    set-variable -name $key -value $properties.$key -WhatIf:$false -Confirm:$false | out-null
                 }
             }
 
@@ -286,20 +294,26 @@ function Invoke-psake {
             # module's scope in order to initialize variables properly.
             . $module $initialization
 
+            & $currentContext.buildSetupScriptBlock
+
             # Execute the list of tasks or the default task
-            if ($taskList) {
-                foreach ($task in $taskList) {
-                    invoke-task $task
+            try {
+                if ($taskList) {
+                    foreach ($task in $taskList) {
+                        invoke-task $task
+                    }
+                } elseif ($currentContext.tasks.default) {
+                    invoke-task default
+                } else {
+                    throw $msgs.error_no_default_task
                 }
-            } elseif ($currentContext.tasks.default) {
-                invoke-task default
-            } else {
-                throw $msgs.error_no_default_task
+            }
+            finally {
+                & $currentContext.buildTearDownScriptBlock
             }
 
             $successMsg = $msgs.psake_success -f $buildFile
-            WriteColoredOutput ("`n${successMsg}`n") -foregroundcolor Green
-            $psake.error_message = $null
+            WriteColoredOutput ("$($script:nl)${successMsg}$($script:nl)") -foregroundcolor Green
 
             $stopwatch.Stop()
             if (-not $notr) {
@@ -310,24 +324,8 @@ function Invoke-psake {
         $psake.build_success = $true
 
     } catch {
-        $currentConfig = GetCurrentConfigurationOrDefault
-        if ($currentConfig.verboseError) {
-            $error_message = "{0}: An Error Occurred. See Error Details Below: `n" -f (Get-Date)
-            $error_message += ("-" * 70) + "`n"
-            $error_message += "Error: {0}`n" -f (ResolveError $_ -Short)
-            $error_message += ("-" * 70) + "`n"
-            $error_message += ResolveError $_
-            $error_message += ("-" * 70) + "`n"
-            $error_message += "Script Variables" + "`n"
-            $error_message += ("-" * 70) + "`n"
-            $error_message += get-variable -scope script | format-table | out-string
-        } else {
-            # ($_ | Out-String) gets error messages with source information included.
-            $error_message = "Error: {0}: `n{1}" -f (Get-Date), (ResolveError $_ -Short)
-        }
-
         $psake.build_success = $false
-        $psake.error_message = $error_message
+        $psake.error_message = FormatErrorMessage $_
 
         # if we are running in a nested scope (i.e. running a psake script from a psake script) then we need to re-throw the exception
         # so that the parent script will fail otherwise the parent script will report a successful build
@@ -336,7 +334,7 @@ function Invoke-psake {
             throw $_
         } else {
             if (!$psake.run_by_psake_build_tester) {
-                WriteColoredOutput $error_message -foregroundcolor Red
+                WriteColoredOutput $psake.error_message -foregroundcolor Red
             }
         }
     } finally {

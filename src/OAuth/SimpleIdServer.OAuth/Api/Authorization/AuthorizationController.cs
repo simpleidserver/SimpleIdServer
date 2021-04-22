@@ -44,14 +44,11 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), new HandlerContextResponse(Response.Cookies));
             try
             {
-                string url;
                 var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
                 if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
                 {
                     var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
-                    url = QueryHelpers.AddQueryString(redirectUrlAuthorizationResponse.RedirectUrl, redirectUrlAuthorizationResponse.QueryParameters);
                     _responseModeHandler.Handle(jObjBody, redirectUrlAuthorizationResponse, HttpContext);
-                    HttpContext.Response.Redirect(url);
                     return;
                 }
 
@@ -78,7 +75,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
                 var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
                 var uiLocales = context.Request.Data.GetUILocalesFromAuthorizationRequest();
-                url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
+                var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
                 {
                     ReturnUrl = _dataProtector.Protect(returnUrl),
                     area = redirectActionAuthorizationResponse.Area,
@@ -125,11 +122,16 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         private static void FormatRedirectUrl(List<KeyValuePair<string, string>> parameters)
         {
             var kvp = parameters.FirstOrDefault(k => k.Key == AuthorizationRequestParameters.RedirectUri);
-            if (!kvp.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(kvp.Value))
+            if (!kvp.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(kvp.Value) && !IsHtmlEncoded(kvp.Value))
             {
                 parameters.Remove(kvp);
                 parameters.Add(new KeyValuePair<string, string>(AuthorizationRequestParameters.RedirectUri, HttpUtility.UrlEncode(kvp.Value)));
             }
+        }
+
+        private static bool IsHtmlEncoded(string url)
+        {
+            return HttpUtility.UrlDecode(url) != url;
         }
     }
 }

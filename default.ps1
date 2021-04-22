@@ -46,6 +46,7 @@ task compile -depends clean {
 
 	exec { msbuild -version }
 	
+    # exec { msbuild .\SimpleIdServer.Mobile.sln /p:Configuration=$config /p:VersionSuffix=$buildSuffix }
     exec { msbuild .\SimpleIdServer.MSBuild.sln /p:Configuration=$config /p:VersionSuffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.OAuth.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.OpenId.Host.sln -c $config --version-suffix=$buildSuffix }

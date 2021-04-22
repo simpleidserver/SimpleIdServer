@@ -29,28 +29,36 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
         public async Task Enrich(JwsPayload result, JObject queryParameters, CancellationToken cancellationToken)
         {
             var authRequestId = queryParameters.GetAuthRequestId();
-            if (string.IsNullOrWhiteSpace(authRequestId))
+            if (!string.IsNullOrWhiteSpace(authRequestId))
             {
-                return;
+                var authorize = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
+                if (authorize != null && authorize.Permissions.Any())
+                {
+                    var firstPermission = authorize.Permissions.First();
+                    if (result.ContainsKey(_options.OpenBankingApiConsentClaimName))
+                    {
+                        result[_options.OpenBankingApiConsentClaimName] = firstPermission.ConsentId;
+                    }
+                    else
+                    {
+                        result.Add(_options.OpenBankingApiConsentClaimName, firstPermission.ConsentId);
+                    }
+                }
+
+                if (authorize.Scopes.Contains(SIDOpenIdConstants.StandardScopes.OpenIdScope.Name) && !result.ContainsKey(UserClaims.Subject))
+                {
+                    result.Add(UserClaims.Subject, authorize.UserId);
+                }
             }
 
-            var authorize = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
-            if (authorize != null && authorize.Permissions.Any())
+            var requestedClaims = queryParameters.GetClaimsFromAuthorizationRequest();
+            if (requestedClaims != null)
             {
-                var firstPermission = authorize.Permissions.First();
-                if (result.ContainsKey(_options.OpenBankingApiConsentClaimName))
+                var requestedClaim = requestedClaims.FirstOrDefault(c => c.Name == _options.OpenBankingApiConsentClaimName);
+                if (requestedClaim != null)
                 {
-                    result[_options.OpenBankingApiConsentClaimName] = firstPermission.ConsentId;
+                    result.Add(_options.OpenBankingApiConsentClaimName, requestedClaim.Values.First());
                 }
-                else
-                {
-                    result.Add(_options.OpenBankingApiConsentClaimName, firstPermission.ConsentId);
-                }
-            }
-
-            if (authorize.Scopes.Contains(SIDOpenIdConstants.StandardScopes.OpenIdScope.Name) && !result.ContainsKey(UserClaims.Subject))
-            {
-                result.Add(UserClaims.Subject, authorize.UserId);
             }
         }
     }

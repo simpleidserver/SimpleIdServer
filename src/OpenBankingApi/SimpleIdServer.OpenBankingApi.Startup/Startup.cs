@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -20,6 +22,7 @@ using SimpleIdServer.OpenID;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -27,11 +30,21 @@ namespace SimpleIdServer.OpenBankingApi.Startup
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
             var jsonWebKeys = GenerateJsonWebKeys();
             var firstMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("first_mtlsClient_key.txt", "PS256");
             var secondMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("second_mtlsClient_key.txt", "PS256");
+            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()));
             services.AddMvc(option =>
             {
                 option.EnableEndpointRouting = false;
@@ -87,10 +100,21 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 cb.IsRequestRequired = false;
             })
                 .AddAccounts(DefaultConfiguration.Accounts);
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            if (_configuration.GetChildren().Any(i => i.Key == "pathBase"))
+            {
+                app.UsePathBase(_configuration["pathBase"]);
+            }
+
+            app.UseForwardedHeaders();
+            app.UseCors("AllowAll");
             app.UseAuthorization();
             app.UseAuthentication();
             app.UseStaticFiles();

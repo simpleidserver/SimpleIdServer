@@ -59,7 +59,8 @@ namespace SimpleIdServer.OpenID.Startup
                         SIDOpenIdConstants.StandardScopes.Profile.Name,
                         SIDOpenIdConstants.StandardScopes.Email.Name,
                         SIDOpenIdConstants.StandardScopes.Address.Name,
-                        SIDOpenIdConstants.StandardScopes.Phone.Name
+                        SIDOpenIdConstants.StandardScopes.Phone.Name,
+                        SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name
                     };
                 })
                 .AddClients(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey), DefaultConfiguration.Scopes)

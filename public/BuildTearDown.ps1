@@ -1,76 +1,49 @@
-function TaskSetup {
+function BuildTearDown {
     <#
         .SYNOPSIS
-        Adds a scriptblock that will be executed before each task
-
+        Adds a scriptblock that will be executed once at the end of the build
         .DESCRIPTION
-        This function will accept a scriptblock that will be executed before each task in the build script.
-
-        The scriptblock accepts an optional parameter which describes the Task being setup.
-
+        This function will accept a scriptblock that will be executed once at the end of the build, regardless of success or failure
         .PARAMETER setup
         A scriptblock to execute
-
         .EXAMPLE
         A sample build script is shown below:
-
         Task default -depends Test
-
         Task Test -depends Compile, Clean {
         }
-
         Task Compile -depends Clean {
         }
-
         Task Clean {
         }
-
-        TaskSetup {
-            "Running 'TaskSetup' for task $context.Peek().currentTaskName"
+        BuildTearDown {
+            "Running 'BuildTearDown'"
         }
-
         The script above produces the following output:
-
-        Running 'TaskSetup' for task Clean
         Executing task, Clean...
-        Running 'TaskSetup' for task Compile
         Executing task, Compile...
-        Running 'TaskSetup' for task Test
         Executing task, Test...
-
+        Running 'BuildTearDown'
         Build Succeeded
-
         .EXAMPLE
-        A sample build script showing access to the Task context is shown below:
-
+        A failing build script is shown below:
         Task default -depends Test
-
         Task Test -depends Compile, Clean {
+            throw "forced error"
         }
-
         Task Compile -depends Clean {
         }
-
         Task Clean {
         }
-
-        TaskSetup {
-            param($task)
-
-            "Running 'TaskSetup' for task $($task.Name)"
+        BuildTearDown {
+            "Running 'BuildTearDown'"
         }
-
         The script above produces the following output:
-
-        Running 'TaskSetup' for task Clean
         Executing task, Clean...
-        Running 'TaskSetup' for task Compile
         Executing task, Compile...
-        Running 'TaskSetup' for task Test
         Executing task, Test...
-
-        Build Succeeded
-
+        Running 'BuildTearDown'
+        forced error
+        At line:x char:x ...
         .LINK
         Assert
         .LINK
@@ -80,15 +53,15 @@ function TaskSetup {
         .LINK
         Framework
         .LINK
-        Get-PSakeScriptTasks
-        .LINK
-        Include
-        .LINK
         Invoke-psake
         .LINK
         Properties
         .LINK
         Task
+        .LINK
+        BuildSetup
+        .LINK
+        TaskSetup
         .LINK
         TaskTearDown
     #>
@@ -98,5 +71,5 @@ function TaskSetup {
         [scriptblock]$setup
     )
 
-    $psake.context.Peek().taskSetupScriptBlock = $setup
+    $psake.context.Peek().buildTearDownScriptBlock = $setup
 }
