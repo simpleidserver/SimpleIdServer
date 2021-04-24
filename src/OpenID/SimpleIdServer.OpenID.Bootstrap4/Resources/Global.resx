@@ -255,4 +255,10 @@
   <data name="selected_language" xml:space="preserve">
     <value>Current language is '{0}'</value>
   </data>
+  <data name="policy" xml:space="preserve">
+    <value>Policy</value>
+  </data>
+  <data name="tos" xml:space="preserve">
+    <value>Terms of service</value>
+  </data>
 </root>

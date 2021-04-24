@@ -8,15 +8,23 @@ namespace SimpleIdServer.UI.Authenticate.Sms.ViewModels
     {
         public AuthenticateViewModel() { }
 
-        public AuthenticateViewModel(string returnUrl, string phoneNumber)
+        public AuthenticateViewModel(string returnUrl, string phoneNumber, string clientName, string logoUri, string tosUri, string policyUri)
         {
             ReturnUrl = returnUrl;
             PhoneNumber = phoneNumber;
+            ClientName = clientName;
+            LogoUri = logoUri;
+            TosUri = tosUri;
+            PolicyUri = policyUri;
         }
 
         public string ReturnUrl { get; set; }
-        public string Action { get; set; }
         public string PhoneNumber { get; set; }
+        public string ClientName { get; set; }
+        public string LogoUri { get; set; }
+        public string TosUri { get; set; }
+        public string PolicyUri { get; set; }
+        public string Action { get; set; }
         public string ConfirmationCode { get; set; }
         public bool RememberLogin { get; set; }
 

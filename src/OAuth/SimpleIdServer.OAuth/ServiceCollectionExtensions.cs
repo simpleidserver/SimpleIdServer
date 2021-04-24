@@ -11,7 +11,6 @@ using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Jwks;
-using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token;
@@ -172,6 +171,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenBuilder, RefreshTokenBuilder>();
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
+            services.AddTransient<ITranslationHelper, TranslationHelper>();
             return services;
         }
 

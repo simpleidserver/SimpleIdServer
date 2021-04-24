@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.ComponentModel.DataAnnotations;
 
 namespace SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels
 {
@@ -9,14 +8,22 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels
     {
         public AuthenticateViewModel() { }
 
-        public AuthenticateViewModel(string login, string returnUrl)
+        public AuthenticateViewModel(string login, string returnUrl, string clientName, string logoUri, string tosUri, string policyUri)
         {
             Login = login;
             ReturnUrl = returnUrl;
+            ClientName = clientName;
+            LogoUri = logoUri;
+            TosUri = tosUri;
+            PolicyUri = policyUri;
         }
 
-        public string ReturnUrl { get; set; }
         public string Login { get; set; }
+        public string ReturnUrl { get; set; }
+        public string ClientName { get; set; }
+        public string LogoUri { get; set; }
+        public string TosUri { get; set; }
+        public string PolicyUri { get; set; }
         public string Password { get; set; }
         public bool RememberLogin { get; set; }
 

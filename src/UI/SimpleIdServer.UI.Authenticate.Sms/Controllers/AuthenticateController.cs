@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
@@ -19,19 +21,22 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
     public class AuthenticateController : BaseAuthenticateController
     {
         private readonly ISmsAuthService _smsAuthService;
+        private readonly ITranslationHelper _translationHelper;
 
         public AuthenticateController(
             IDataProtectionProvider dataProtectionProvider,
+            ITranslationHelper translateHelper,
             IOAuthClientQueryRepository oauthClientRepository, 
             IOAuthUserCommandRepository oauthUserCommandRepository,
             IAmrHelper amrHelper, 
             ISmsAuthService smsAuthService) : base(dataProtectionProvider, oauthClientRepository, oauthUserCommandRepository, amrHelper)
         {
             _smsAuthService = smsAuthService;
+            _translationHelper = translateHelper;
         }
 
         [HttpGet]
-        public IActionResult Index(string returnUrl)
+        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
             {
@@ -41,8 +46,15 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
             try
             {
                 var query = Unprotect(returnUrl).GetQueries().ToJObj();
+                var clientId = query.GetClientIdFromAuthorizationRequest();
+                var client = await OAuthClientQueryRepository.FindOAuthClientById(clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                return View(new AuthenticateViewModel(returnUrl, loginHint));
+                return View(new AuthenticateViewModel(returnUrl,
+                    loginHint,
+                    _translationHelper.Translate(client.ClientNames),
+                    _translationHelper.Translate(client.LogoUris),
+                    _translationHelper.Translate(client.TosUris),
+                    _translationHelper.Translate(client.PolicyUris)));
             }
             catch (CryptographicException)
             {

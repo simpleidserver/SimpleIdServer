@@ -67,7 +67,8 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
-                .AddLoginPasswordAuthentication();
+                .AddLoginPasswordAuthentication()
+                .AddSMSAuthentication();
             ConfigureFireBase();
             services.Configure<ForwardedHeadersOptions>(options =>
             {

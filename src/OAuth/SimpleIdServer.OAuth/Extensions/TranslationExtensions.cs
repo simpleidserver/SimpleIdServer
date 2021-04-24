@@ -10,7 +10,7 @@ namespace SimpleIdServer.OAuth.Extensions
     {
         public static string GetTranslation(this ICollection<OAuthTranslation> translations, string defaultLanguage, string defaultValue)
         {
-            var translation = translations.FirstOrDefault(t => t.Language == defaultLanguage);
+            var translation = translations.FirstOrDefault(t => t.Language == defaultLanguage || string.IsNullOrEmpty(t.Language));
             return translation == null ? defaultValue : translation.Value;
         }
     }

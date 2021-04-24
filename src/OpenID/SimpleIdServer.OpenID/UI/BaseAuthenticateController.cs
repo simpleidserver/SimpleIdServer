@@ -36,6 +36,8 @@ namespace SimpleIdServer.OpenID.UI
             _amrHelper = amrHelper;
         }
 
+        protected IOAuthClientQueryRepository OAuthClientQueryRepository => _oauthClientRepository;
+
         protected string Unprotect(string returnUrl)
         {
             var unprotectedUrl = _dataProtector.Unprotect(returnUrl);

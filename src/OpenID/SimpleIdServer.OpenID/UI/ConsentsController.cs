@@ -3,20 +3,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -34,7 +32,7 @@ namespace SimpleIdServer.OpenID.UI
         private readonly IUserConsentFetcher _userConsentFetcher;
         private readonly IDataProtector _dataProtector;
         private readonly IResponseModeHandler _responseModeHandler;
-        private readonly OAuthHostOptions _oauthHostOptions;
+        private readonly ITranslationHelper _translationHelper;
 
         public ConsentsController(
             IOAuthUserQueryRepository oauthUserRepository, 
@@ -43,7 +41,7 @@ namespace SimpleIdServer.OpenID.UI
             IUserConsentFetcher userConsentFetcher, 
             IDataProtectionProvider dataProtectionProvider, 
             IResponseModeHandler responseModeHandler,
-            IOptions<OAuthHostOptions> opts)
+            ITranslationHelper translationHelper)
         {
             _oauthUserRepository = oauthUserRepository;
             _oAuthUserCommandRepository = oauthUserCommandRepository;
@@ -51,7 +49,7 @@ namespace SimpleIdServer.OpenID.UI
             _userConsentFetcher = userConsentFetcher;
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
-            _oauthHostOptions = opts.Value;
+            _translationHelper = translationHelper;
         }
 
         public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
@@ -69,7 +67,6 @@ namespace SimpleIdServer.OpenID.UI
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
-                var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _oauthHostOptions.DefaultCulture;
                 var claimDescriptions = new List<string>();
                 if (claims != null && claims.Any())
                 {
@@ -77,7 +74,7 @@ namespace SimpleIdServer.OpenID.UI
                 }
 
                 return View(new ConsentsIndexViewModel(
-                    oauthClient.ClientNames.GetTranslation(defaultLanguage, oauthClient.ClientId),
+                    _translationHelper.Translate(oauthClient.ClientNames, oauthClient.ClientId),
                     returnUrl,
                     oauthClient.AllowedScopes.Where(c => scopes.Contains(c.Name)).Select(s => s.Name),
                     claimDescriptions));

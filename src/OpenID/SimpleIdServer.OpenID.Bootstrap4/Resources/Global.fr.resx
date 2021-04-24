@@ -252,4 +252,10 @@
   <data name="selected_language" xml:space="preserve">
     <value>La langue est '{0}'</value>
   </data>
+  <data name="policy" xml:space="preserve">
+    <value>Politique</value>
+  </data>
+  <data name="tos" xml:space="preserve">
+    <value>Conditions d'utilisation</value>
+  </data>
 </root>

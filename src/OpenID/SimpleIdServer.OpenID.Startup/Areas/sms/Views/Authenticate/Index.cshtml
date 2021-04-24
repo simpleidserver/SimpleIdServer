@@ -9,9 +9,14 @@
     <div class="card">
         <div class="card-header">@Global.authenticate_sms</div>
         <div class="card-body">
+            @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
+            {
+                <img class="card-img-top rounded mx-auto d-block" src="@Model.LogoUri" style="max-width: 300px" />
+            }
+            <h5 class="card-title">@Model.ClientName</h5>
             <div class="row">
                 <div class="col-md-6">
-                    @if(!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
                     {
                         <div class="alert alert-success">@Global.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
                     }
@@ -63,6 +68,19 @@
                     }
 
                 </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div style="float: right">
+                @if (!string.IsNullOrWhiteSpace(Model.TosUri))
+                {
+                    <a href="@Model.TosUri" target="_blank">@Global.tos</a>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
+                {
+                    <a href="@Model.PolicyUri" target="_blank">@Global.policy</a>
+                }
             </div>
         </div>
     </div>
