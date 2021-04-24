@@ -2,13 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Jwt;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Persistence
 {
     public interface IJsonWebKeyQueryRepository
     {
-        Task<List<JsonWebKey>> GetAllJsonWebKeys();
+        Task<List<JsonWebKey>> GetActiveJsonWebKeys();
+        Task<List<JsonWebKey>> GetNotRotatedJsonWebKeys(CancellationToken cancellationToken);
         Task<JsonWebKey> FindJsonWebKeyById(string kid);
         Task<List<JsonWebKey>> FindJsonWebKeys(Usages usage, string alg, KeyOperations[] operations);
     }

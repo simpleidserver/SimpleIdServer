@@ -24,6 +24,7 @@ namespace SimpleIdServer.OAuth.Options
             MtlsEnabled = false;
             CertificateAuthenticationScheme = "Certificate";
             DefaultTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
+            JWKExpirationTimeInSeconds = 60 * 5;
         }
 
         /// <summary>
@@ -66,5 +67,9 @@ namespace SimpleIdServer.OAuth.Options
         /// Default token signed response algorithm.
         /// </summary>
         public string DefaultTokenSignedResponseAlg { get; set; }
+        /// <summary>
+        /// JWK expiration time in seconds.
+        /// </summary>
+        public int JWKExpirationTimeInSeconds { get; set; }
     }
 }

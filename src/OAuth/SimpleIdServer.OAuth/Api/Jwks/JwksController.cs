@@ -27,7 +27,7 @@ namespace SimpleIdServer.OAuth.Api.Jwks
         public async Task<IActionResult> Put(CancellationToken token)
         {
             await _jwksRequestHandler.Rotate(token);
-            return new OkResult();
+            return new NoContentResult();
         }
     }
 }

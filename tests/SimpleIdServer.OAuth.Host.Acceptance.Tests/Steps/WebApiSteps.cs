@@ -90,6 +90,25 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }
 
+        [When("execute HTTP PUT request '(.*)'")]
+        public async Task GivenExecuteHTTPPutRequest(string url, Table table)
+        {
+            url = ExtractUrl(url, table);
+            var headers = ExtractHeaders(table);
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(url)
+            };
+            foreach (var kvp in headers)
+            {
+                httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
+            }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
         [When("execute HTTP DELETE request '(.*)'")]
         public async Task GivenExecuteHTTPDeleteRequest(string url, Table table)
         {

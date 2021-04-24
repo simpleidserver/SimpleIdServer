@@ -163,13 +163,17 @@ namespace SimpleIdServer.Jwt
         /// </summary>
         public string Kid { get; set; }
         /// <summary>
-        /// Gets or sets the serialized key in XML
-        /// </summary>
-        public string SerializedKey { get; set; }
-        /// <summary>
         /// Gets or sets the content of the key.
         /// </summary>
         public Dictionary<string, string> Content { get; set; }
+        /// <summary>
+        /// KID of the rotation key.
+        /// </summary>
+        public string RotationJWKId { get; set; }
+        /// <summary>
+        /// Expiration datetime.
+        /// </summary>
+        public DateTime? ExpirationDateTime { get; set; }
 
         public object Clone()
         {
@@ -180,8 +184,9 @@ namespace SimpleIdServer.Jwt
                 Use = Use,
                 Kid = Kid,
                 Kty = Kty,
-                SerializedKey = SerializedKey,
-                Content = Content == null ? new Dictionary<string, string>() : Content.ToDictionary(s => s.Key, s => s.Value)
+                Content = Content == null ? new Dictionary<string, string>() : Content.ToDictionary(s => s.Key, s => s.Value),
+                RotationJWKId = RotationJWKId,
+                ExpirationDateTime = ExpirationDateTime
             };
         }
 
@@ -332,21 +337,30 @@ namespace SimpleIdServer.Jwt
             return false;
         }
 
-        public void Renew()
+        public JsonWebKey Rotate(int expirationTimeInSeconds)
         {
-            switch(Kty)
+            var result = new JsonWebKey
+            {
+                Kid = Guid.NewGuid().ToString(),
+                Alg = Alg,
+                KeyOps = KeyOps,
+                Kty = Kty,
+                Use = Use,
+                Content = new Dictionary<string, string>()
+            };
+            switch(result.Kty)
             {
                 case KeyTypes.RSA:
                     using (var rsa = RSA.Create())
                     {
                         foreach(var kvp in rsa.ExtractPublicKey())
                         {
-                            Content.Add(kvp.Key, kvp.Value);
+                            result.Content.Add(kvp.Key, kvp.Value);
                         }
 
                         foreach (var kvp in rsa.ExtractPrivateKey())
                         {
-                            Content.Add(kvp.Key, kvp.Value);
+                            result.Content.Add(kvp.Key, kvp.Value);
                         }
                     }
                     break;
@@ -355,22 +369,37 @@ namespace SimpleIdServer.Jwt
                     {
                         foreach (var kvp in ec.ExtractPublicKey())
                         {
-                            Content.Add(kvp.Key, kvp.Value);
+                            result.Content.Add(kvp.Key, kvp.Value);
                         }
 
                         foreach (var kvp in ec.ExtractPrivateKey())
                         {
-                            Content.Add(kvp.Key, kvp.Value);
+                            result.Content.Add(kvp.Key, kvp.Value);
                         }
                     }
                     break;
                 case KeyTypes.OCT:
                     using (var ec = new HMACSHA256())
                     {
-                        Content = ec.ExportKey();
+                        result.Content = ec.ExportKey();
                     }
                     break;
             }
+
+            RotationJWKId = result.Kid;
+            ExpirationDateTime = DateTime.UtcNow.AddSeconds(expirationTimeInSeconds);
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var target = obj as JsonWebKey;
+            if (target == null)
+            {
+                return false;
+            }
+
+            return Equals(target);
         }
 
         public bool Equals(JsonWebKey other)

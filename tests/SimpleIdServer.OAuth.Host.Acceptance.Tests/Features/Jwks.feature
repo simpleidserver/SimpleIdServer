@@ -6,3 +6,9 @@ Scenario: Get the jwks
 	| Key			| Value													|
 
 	Then HTTP status code equals to '200'
+
+Scenario: Rotate jwks
+	When execute HTTP PUT request 'https://localhost:8080/jwks'
+	| Key | Value |
+
+	Then HTTP status code equals to '204'

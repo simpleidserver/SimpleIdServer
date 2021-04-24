@@ -108,18 +108,18 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table13.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "start_index",
                             "0"});
-                table13.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "count",
                             "10"});
 #line 5
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/management/clients/.search" +
-                        "\'", ((string)(null)), table13, "When ");
+                        "\'", ((string)(null)), table14, "When ");
 #line hidden
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
