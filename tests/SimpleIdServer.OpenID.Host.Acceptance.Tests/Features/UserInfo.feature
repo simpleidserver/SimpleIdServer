@@ -126,8 +126,11 @@ Scenario: Check user information are returned (JWS)
 	| Authorization		| Bearer $accesstoken$	|
 
 	And extract string from body
+	And extract payload from JWS '$strHttpBody$'
 	Then HTTP status code equals to '200'
 	Then HTTP header 'Content-Type' contains 'application/jwt'
+	Then token contains 'iss'
+	Then token contains 'aud'
 
 Scenario: Check user information are returned (JWE)
 	When add JSON web key to Authorization Server and store into 'jwks_sig'

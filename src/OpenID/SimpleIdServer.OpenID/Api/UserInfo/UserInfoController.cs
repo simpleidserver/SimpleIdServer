@@ -144,6 +144,11 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 var result = JsonConvert.SerializeObject(payload).ToString();
                 if (!string.IsNullOrWhiteSpace(oauthClient.UserInfoSignedResponseAlg))
                 {
+                    payload.Add(Jwt.Constants.OAuthClaims.Issuer, Request.GetAbsoluteUriWithVirtualPath());
+                    payload.Add(Jwt.Constants.OAuthClaims.Audiences, new string[]
+                    {
+                        token.ClientId
+                    });
                     result = await _jwtBuilder.BuildClientToken(oauthClient, payload, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc);
                     contentType = "application/jwt";
                 }
