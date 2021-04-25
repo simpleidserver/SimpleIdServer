@@ -207,6 +207,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddConfigurationApi(this IServiceCollection services)
         {
             services.AddTransient<IConfigurationRequestHandler, ConfigurationRequestHandler>();
+            services.AddTransient<IOAuthWorkflowConverter, OAuthWorkflowConverter>();
             return services;
         }
 

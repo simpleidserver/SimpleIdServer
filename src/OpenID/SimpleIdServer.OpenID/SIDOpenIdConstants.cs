@@ -22,12 +22,6 @@ namespace SimpleIdServer.OpenID
             public const string Push = "push";
         }
 
-        public static List<string[]> HybridWorkflows = new List<string[]>
-        {
-            new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE },
-            new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Api.Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE },
-            new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Api.Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
-        };
         public static class EndPoints
         {
             public const string OpenIDConfiguration = ".well-known/openid-configuration";

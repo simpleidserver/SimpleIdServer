@@ -36,6 +36,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             IEnumerable<ISignHandler> signHandlers,
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders,
             IOAuthScopeQueryRepository oauthScopeQueryRepository,
+
             IAuthenticationContextClassReferenceQueryRepository authenticationContextClassReferenceQueryRepository) : base(configurationRequestHandler)
         {
             _cekHandlers = cekHandlers;

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
+using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
@@ -20,6 +21,7 @@ using SimpleIdServer.OpenID.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OpenID.Api.Authorization.Validators;
 using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Api.BCDeviceRegistration;
+using SimpleIdServer.OpenID.Api.Configuration;
 using SimpleIdServer.OpenID.Api.Register;
 using SimpleIdServer.OpenID.Api.Token.Handlers;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
@@ -55,6 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSIDOAuth();
             services
                 .AddUI()
+                .AddOpenIdConfiguration()
                 .AddOpenIDStore()
                 .AddOpenIDAuthorizationApi()
                 .AddRegisterApi()
@@ -130,6 +133,13 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddUI(this IServiceCollection services)
         {
             services.AddTransient<ISessionManager, SessionManager>();
+            return services;
+        }
+
+        private static IServiceCollection AddOpenIdConfiguration(this IServiceCollection services)
+        {
+            services.RemoveAll<IOAuthWorkflowConverter>();
+            services.AddTransient<IOAuthWorkflowConverter, OpenIdWorkflowConverter>();
             return services;
         }
 
