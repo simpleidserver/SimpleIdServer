@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
@@ -17,6 +18,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.OpenID.UI
 {
@@ -59,7 +61,7 @@ namespace SimpleIdServer.OpenID.UI
                 var jwsPayload = await Validate(postLogoutRedirectUri, idTokenHint, token);
                 if (Request.QueryString.HasValue)
                 {
-                    url = $"{url}{Request.QueryString.Value}";
+                    url = Request.GetEncodedPathAndQuery().Replace($"/{SIDOpenIdConstants.EndPoints.EndSession}", SIDOpenIdConstants.EndPoints.EndSessionCallback);
                 }
 
                 return View(new RevokeSessionViewModel(url, jwsPayload));
@@ -94,7 +96,7 @@ namespace SimpleIdServer.OpenID.UI
 
                 if (!string.IsNullOrWhiteSpace(state))
                 {
-                    postLogoutRedirectUri = $"{postLogoutRedirectUri}?{RPInitiatedLogoutRequest.State}={state}";
+                    postLogoutRedirectUri = $"{postLogoutRedirectUri}?{RPInitiatedLogoutRequest.State}={HttpUtility.UrlEncode(state)}";
                 }
 
                 return Redirect(postLogoutRedirectUri);
@@ -124,7 +126,7 @@ namespace SimpleIdServer.OpenID.UI
             }
 
             var openidClients = (await _oauthClientQueryRepository.FindOAuthClientByIds(jwsPayload.GetAudiences(), token)).Cast<OpenIdClient>();
-            if (openidClients.SelectMany(c => c.PostLogoutRedirectUris).Contains(postLogoutRedirectUri))
+            if (!openidClients.SelectMany(c => c.PostLogoutRedirectUris).Contains(postLogoutRedirectUri))
             {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_POST_LOGOUT_REDIRECT_URI);
             }

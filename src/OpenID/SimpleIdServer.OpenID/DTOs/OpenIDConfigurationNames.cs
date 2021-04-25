@@ -12,7 +12,7 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string RequestObjectEncryptionEncValuesSupported = "request_object_encryption_enc_values_supported";
         public const string SubjectTypesSupported = "subject_types_supported";
         public const string CheckSessionIframe = "check_session_iframe";
-        public const string EndSessionEndpoint = "check_session_endpoint";
+        public const string EndSessionEndpoint = "end_session_endpoint";
         public const string AcrValuesSupported = "acr_values_supported";
         public const string IdTokenSigningAlgValuesSupported = "id_token_signing_alg_values_supported";
         public const string IdTokenEncryptionAlgValuesSupported = "id_token_encryption_alg_values_supported";

@@ -26,6 +26,24 @@ For project documentation, please visit [readthedocs](https://simpleidserver.rea
 | `SimpleIdServer.OpenBankingApi`							| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenBankingApi.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenBankingApi) 								| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenBankingApi.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi) 						| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenBankingApi.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi)						|
 | `SimpleIdServer.OpenBankingApi.Domains`					| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenBankingApi.Domains.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenBankingApi.Domains) 				| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenBankingApi.Domains.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi.Domains)		| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenBankingApi.Domains.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi.Domains)		|
 
+## Certifications
+
+SimpleIdServer implements the following OPENID conformance profiles :
+
+### OpenID provider
+
+| Profile      	    | Test plans                                                                                                                                                                                                                                                                                     |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Basic OP     	    | [Link](https://www.certification.openid.net/plan-detail.html?plan=TcDgVIcSJLFHg&public=true)                                                                                                                                                                                                   |
+| Implicit OP  	    | [Link](https://www.certification.openid.net/plan-detail.html?plan=ELzlUw0Ml4Cdi&public=true)                                                                                                                                                                                                   |
+| Hybrid OP    	    | [Link](https://www.certification.openid.net/plan-detail.html?plan=hyaf2Ji4pt8c4&public=true)                                                                                                                                                                                                   |
+| Config OP    	    | [Link](https://www.certification.openid.net/log-detail.html?log=eLluAN1FEGFibyC&public=true)                                                                                                                                                                                                   |
+| Dynamic OP   	    | [Link](https://www.certification.openid.net/plan-detail.html?plan=rD0K7iYAcQBDV&public=true)                                                                                                                                                                                                   |
+| Form POST OP   	| [Link 1](https://www.certification.openid.net/plan-detail.html?plan=TcDgVIcSJLFHg&public=true), [Link 2](https://www.certification.openid.net/plan-detail.html?plan=WyVmp1Gj6wJ9p&public=true), [Link 3](https://www.certification.openid.net/plan-detail.html?plan=VB4UtJystIKk8&public=true) |
+| 3rd Party-Init OP | [Link](https://www.certification.openid.net/plan-detail.html?plan=HqBg2tU5qmAFB&public=true)                                                                                                                                                                                                   |
+
+### OpenID provider for logout profile
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
