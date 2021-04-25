@@ -8,7 +8,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
 {
     public class OpenIdWorkflowConverter : OAuthWorkflowConverter
     {
-        protected override List<OAuthWorkflow> GetOAuthWorkflows()
+        public override List<OAuthWorkflow> GetOAuthWorkflows()
         {
             var workflows = base.GetOAuthWorkflows();
             workflows.AddRange(new List<OAuthWorkflow>

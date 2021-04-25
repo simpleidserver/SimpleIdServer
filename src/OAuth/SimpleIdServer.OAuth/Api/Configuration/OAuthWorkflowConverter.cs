@@ -22,7 +22,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             return true;
         }
 
-        protected virtual List<OAuthWorkflow> GetOAuthWorkflows()
+        public virtual List<OAuthWorkflow> GetOAuthWorkflows()
         {
             return new List<OAuthWorkflow>
             {

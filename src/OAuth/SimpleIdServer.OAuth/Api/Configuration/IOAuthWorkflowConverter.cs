@@ -7,5 +7,6 @@ namespace SimpleIdServer.OAuth.Api.Configuration
     public interface IOAuthWorkflowConverter
     {
         bool TryGetWorkflow(IEnumerable<string> responseTypes, out string workflowName);
+        List<OAuthWorkflow> GetOAuthWorkflows();
     }
 }

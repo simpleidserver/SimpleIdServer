@@ -209,10 +209,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
-            if (
-                (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg) ||
-                (string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != NoneSignHandler.ALG_NAME)
-            )
+            if (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_SIGNATURE_ALG);
             }

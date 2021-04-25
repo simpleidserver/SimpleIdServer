@@ -6,6 +6,7 @@ using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
+using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Infrastructures;
@@ -32,6 +33,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
         private readonly OpenBankingApiOptions _options;
         private readonly IAccountAccessConsentRepository _accountAccessConsentRepository;
         private readonly ILogger<OpenBankingApiAuthorizationRequestValidator> _logger;
+        private readonly IOAuthWorkflowConverter _workflowConverter;
 
         public OpenBankingApiAuthorizationRequestValidator(
             IOptions<OpenBankingApiOptions> options,
@@ -42,11 +44,13 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             IHttpClientFactory httpClientFactory,
             IAmrHelper amrHelper, 
             IJwtParser jwtParser,
-            IRequestObjectValidator requestObjectValidator) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser, requestObjectValidator)
+            IRequestObjectValidator requestObjectValidator,
+            IOAuthWorkflowConverter workflowConverter) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser, requestObjectValidator)
         {
             _options = options.Value;
             _accountAccessConsentRepository = accountAccessConsentRepository;
             _logger = logger;
+            _workflowConverter = workflowConverter;
         }
 
         public override async Task Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -100,7 +104,8 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.RedirectUri));
             }
 
-            if (!OpenID.SIDOpenIdConstants.HybridWorkflows.Any(r => r.Count() == responseTypes.Count() && responseTypes.OrderBy(s => s).SequenceEqual(r.OrderBy(s => s))))
+            var workflows = _workflowConverter.GetOAuthWorkflows().Where(w => w.WorkflowName == "hybrid");
+            if (!workflows.Any(r => r.ResponseTypes.Count() == responseTypes.Count() && responseTypes.OrderBy(s => s).SequenceEqual(r.ResponseTypes.OrderBy(s => s))))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED);
             }

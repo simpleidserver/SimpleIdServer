@@ -23,8 +23,9 @@ namespace SimpleIdServer.Uma.Api.Configuration
             IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
             IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers,
             IEnumerable<ISignHandler> signHandlers,
+            IOAuthWorkflowConverter oauthWorkflowConverter,
             IOptions<OAuthHostOptions> options) 
-            : base(oauthScopeRepository, authorizationGrantTypeHandlers, oauthResponseModes, grantTypeHandlers, oauthClientAuthenticationHandlers, signHandlers, options)
+            : base(oauthScopeRepository, authorizationGrantTypeHandlers, oauthResponseModes, grantTypeHandlers, oauthClientAuthenticationHandlers, signHandlers, oauthWorkflowConverter, options)
         {
         }
 

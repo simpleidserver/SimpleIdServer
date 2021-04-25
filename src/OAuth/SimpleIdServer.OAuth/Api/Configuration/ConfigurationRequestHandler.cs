@@ -52,6 +52,8 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             _options = options.Value;
         }
 
+        protected IOAuthWorkflowConverter WorkflowConverter => _oauthWorkflowConverter;
+
         public virtual async Task Enrich(JObject jObj, string issuer)
         {
             jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
