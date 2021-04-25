@@ -393,14 +393,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when scope is not supported")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when redirect_uri contains fragment")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when scope is not supported")]
-        public virtual void ErrorIsReturnedWhenScopeIsNotSupported()
+        [Xunit.TraitAttribute("Description", "Error is returned when redirect_uri contains fragment")]
+        public virtual void ErrorIsReturnedWhenRedirect_UriContainsFragment()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when scope is not supported", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when redirect_uri contains fragment", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 68
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -425,36 +425,39 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
                 table34.AddRow(new string[] {
-                            "scope",
-                            "a"});
+                            "response_types",
+                            "[token]"});
+                table34.AddRow(new string[] {
+                            "grant_types",
+                            "[implicit]"});
                 table34.AddRow(new string[] {
                             "redirect_uris",
-                            "[http://localhost]"});
+                            "[http://localhost#foobar]"});
 #line 69
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table34, "When ");
 #line hidden
-#line 74
+#line 75
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 76
- testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
 #line 77
- testRunner.Then("JSON \'error_description\'=\'scopes a are not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 78
+ testRunner.Then("JSON \'error_description\'=\'the redirect_uri cannot contains fragment\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when software_statement is not a JWS token")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when scope is not supported")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when software_statement is not a JWS token")]
-        public virtual void ErrorIsReturnedWhenSoftware_StatementIsNotAJWSToken()
+        [Xunit.TraitAttribute("Description", "Error is returned when scope is not supported")]
+        public virtual void ErrorIsReturnedWhenScopeIsNotSupported()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when software_statement is not a JWS token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 79
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when scope is not supported", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 80
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -478,33 +481,36 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
                 table35.AddRow(new string[] {
-                            "software_statement",
+                            "scope",
                             "a"});
-#line 80
+                table35.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 81
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table35, "When ");
 #line hidden
-#line 84
+#line 86
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 86
- testRunner.Then("JSON \'error\'=\'invalid_software_statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 88
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 87
- testRunner.Then("JSON \'error_description\'=\'software statement is not a JWS token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 89
+ testRunner.Then("JSON \'error_description\'=\'scopes a are not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when software_statement is a bad JWS token")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when software_statement is not a JWS token")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when software_statement is a bad JWS token")]
-        public virtual void ErrorIsReturnedWhenSoftware_StatementIsABadJWSToken()
+        [Xunit.TraitAttribute("Description", "Error is returned when software_statement is not a JWS token")]
+        public virtual void ErrorIsReturnedWhenSoftware_StatementIsNotAJWSToken()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when software_statement is a bad JWS token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 89
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when software_statement is not a JWS token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 91
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -529,32 +535,32 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table36.AddRow(new string[] {
                             "software_statement",
-                            "a.b.c"});
-#line 90
+                            "a"});
+#line 92
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table36, "When ");
 #line hidden
-#line 94
+#line 96
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 96
+#line 98
  testRunner.Then("JSON \'error\'=\'invalid_software_statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 97
+#line 99
  testRunner.Then("JSON \'error_description\'=\'software statement is not a JWS token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when iss is not correct")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when software_statement is a bad JWS token")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when iss is not correct")]
-        public virtual void ErrorIsReturnedWhenIssIsNotCorrect()
+        [Xunit.TraitAttribute("Description", "Error is returned when software_statement is a bad JWS token")]
+        public virtual void ErrorIsReturnedWhenSoftware_StatementIsABadJWSToken()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when iss is not correct", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 99
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when software_statement is a bad JWS token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 101
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -578,42 +584,33 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
                 table37.AddRow(new string[] {
-                            "iss",
-                            "unknown"});
-#line 100
- testRunner.When("build software statement", ((string)(null)), table37, "When ");
-#line hidden
-                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table38.AddRow(new string[] {
                             "software_statement",
-                            "$softwareStatement$"});
-#line 104
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table38, "When ");
+                            "a.b.c"});
+#line 102
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table37, "When ");
 #line hidden
-#line 108
+#line 106
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 110
+#line 108
  testRunner.Then("JSON \'error\'=\'invalid_software_statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 111
- testRunner.Then("JSON \'error_description\'=\'software statement issuer is not trusted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 109
+ testRunner.Then("JSON \'error_description\'=\'software statement is not a JWS token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and access token is not passed")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when iss is not correct")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is not passed")]
-        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsNotPassed()
+        [Xunit.TraitAttribute("Description", "Error is returned when iss is not correct")]
+        public virtual void ErrorIsReturnedWhenIssIsNotCorrect()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is not passed", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 113
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when iss is not correct", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 111
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -633,37 +630,46 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
+                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table38.AddRow(new string[] {
+                            "iss",
+                            "unknown"});
+#line 112
+ testRunner.When("build software statement", ((string)(null)), table38, "When ");
+#line hidden
                 TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-#line 114
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table39, "When ");
-#line hidden
-#line 117
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 119
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                table39.AddRow(new string[] {
+                            "software_statement",
+                            "$softwareStatement$"});
+#line 116
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table39, "When ");
 #line hidden
 #line 120
- testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 121
- testRunner.Then("JSON \'error_description\'=\'access token is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 122
+ testRunner.Then("JSON \'error\'=\'invalid_software_statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 123
+ testRunner.Then("JSON \'error_description\'=\'software statement issuer is not trusted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and access token is unknown")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and access token is not passed")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is unknown")]
-        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsUnknown()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is not passed")]
+        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsNotPassed()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is unknown", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 123
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is not passed", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 125
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -686,40 +692,34 @@ this.ScenarioInitialize(scenarioInfo);
                 TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table40.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer accesstoken"});
-#line 124
+#line 126
  testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table40, "When ");
 #line hidden
-#line 128
+#line 129
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 130
+#line 131
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 131
+#line 132
  testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 132
- testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 133
+ testRunner.Then("JSON \'error_description\'=\'access token is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and access token is has been issued" +
-            " from a different client")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and access token is unknown")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is has been issued" +
-            " from a different client")]
-        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsHasBeenIssuedFromADifferentClient()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is unknown")]
+        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsUnknown()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is has been issued" +
-                    " from a different client", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 134
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is unknown", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 135
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -743,64 +743,39 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
                 table41.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost]"});
-#line 135
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table41, "When ");
-#line hidden
-#line 139
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                            "Authorization",
+                            "Bearer accesstoken"});
+#line 136
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table41, "When ");
 #line hidden
 #line 140
- testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
-                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table42.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost]"});
 #line 142
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table42, "And ");
-#line hidden
-#line 146
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 147
- testRunner.And("extract parameter \'client_id\' from JSON body into \'secondClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table43.AddRow(new string[] {
-                            "Authorization",
-                            "$firstRegistrationAccessToken$"});
-#line 149
- testRunner.And("execute HTTP GET request \'https://localhost:8080/register/$secondClientId$\'", ((string)(null)), table43, "And ");
-#line hidden
-#line 153
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 155
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 156
+#line 143
  testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 144
+ testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update a client and access token is not passed")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and access token is has been issued" +
+            " from a different client")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to update a client and access token is not passed")]
-        public virtual void ErrorIsReturnedWhenTryingToUpdateAClientAndAccessTokenIsNotPassed()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to get a client and access token is has been issued" +
+            " from a different client")]
+        public virtual void ErrorIsReturnedWhenTryingToGetAClientAndAccessTokenIsHasBeenIssuedFromADifferentClient()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update a client and access token is not passed", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 158
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and access token is has been issued" +
+                    " from a different client", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 146
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -820,40 +795,68 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
+                TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table42.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 147
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table42, "When ");
+#line hidden
+#line 151
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 152
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
+                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table43.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 154
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table43, "And ");
+#line hidden
+#line 158
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 159
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'secondClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
                 TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table44.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost]"});
-#line 159
- testRunner.When("execute HTTP PUT JSON request \'https://localhost:8080/register/ClientId\'", ((string)(null)), table44, "When ");
-#line hidden
-#line 163
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                            "Authorization",
+                            "$firstRegistrationAccessToken$"});
+#line 161
+ testRunner.And("execute HTTP GET request \'https://localhost:8080/register/$secondClientId$\'", ((string)(null)), table44, "And ");
 #line hidden
 #line 165
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 166
- testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 167
- testRunner.Then("JSON \'error_description\'=\'access token is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 168
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update the client and access token is invalid")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update a client and access token is not passed")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to update the client and access token is invalid")]
-        public virtual void ErrorIsReturnedWhenTryingToUpdateTheClientAndAccessTokenIsInvalid()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to update a client and access token is not passed")]
+        public virtual void ErrorIsReturnedWhenTryingToUpdateAClientAndAccessTokenIsNotPassed()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and access token is invalid", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 169
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update a client and access token is not passed", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 170
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -879,10 +882,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table45.AddRow(new string[] {
                             "redirect_uris",
                             "[http://localhost]"});
-                table45.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer accesstoken"});
-#line 170
+#line 171
  testRunner.When("execute HTTP PUT JSON request \'https://localhost:8080/register/ClientId\'", ((string)(null)), table45, "When ");
 #line hidden
 #line 175
@@ -895,23 +895,20 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 179
- testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error_description\'=\'access token is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update the client and access token has been issu" +
-            "ed from a diffrent client")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update the client and access token is invalid")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to update the client and access token has been issu" +
-            "ed from a diffrent client")]
-        public virtual void ErrorIsReturnedWhenTryingToUpdateTheClientAndAccessTokenHasBeenIssuedFromADiffrentClient()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to update the client and access token is invalid")]
+        public virtual void ErrorIsReturnedWhenTryingToUpdateTheClientAndAccessTokenIsInvalid()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and access token has been issu" +
-                    "ed from a diffrent client", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and access token is invalid", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 181
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -938,62 +935,40 @@ this.ScenarioInitialize(scenarioInfo);
                 table46.AddRow(new string[] {
                             "redirect_uris",
                             "[http://localhost]"});
+                table46.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer accesstoken"});
 #line 182
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table46, "When ");
-#line hidden
-#line 186
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("execute HTTP PUT JSON request \'https://localhost:8080/register/ClientId\'", ((string)(null)), table46, "When ");
 #line hidden
 #line 187
- testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
-                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table47.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost]"});
 #line 189
- testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table47, "And ");
-#line hidden
-#line 193
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 194
- testRunner.And("extract parameter \'client_id\' from JSON body into \'secondClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table48.AddRow(new string[] {
-                            "Authorization",
-                            "$firstRegistrationAccessToken$"});
-#line 196
- testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$secondClientId$\'", ((string)(null)), table48, "And ");
-#line hidden
-#line 200
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 202
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 203
+#line 190
  testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 191
+ testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update the client and client_id is different")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update the client and access token has been issu" +
+            "ed from a diffrent client")]
         [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when trying to update the client and client_id is different")]
-        public virtual void ErrorIsReturnedWhenTryingToUpdateTheClientAndClient_IdIsDifferent()
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to update the client and access token has been issu" +
+            "ed from a diffrent client")]
+        public virtual void ErrorIsReturnedWhenTryingToUpdateTheClientAndAccessTokenHasBeenIssuedFromADiffrentClient()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and client_id is different", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 205
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and access token has been issu" +
+                    "ed from a diffrent client", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 193
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1013,47 +988,128 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
+                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table47.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 194
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table47, "When ");
+#line hidden
+#line 198
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 199
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
+                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table48.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 201
+ testRunner.And("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table48, "And ");
+#line hidden
+#line 205
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 206
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'secondClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
                 TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table49.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost]"});
-#line 206
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table49, "When ");
-#line hidden
-#line 210
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 211
- testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
-                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                            "Authorization",
+                            "$firstRegistrationAccessToken$"});
+#line 208
+ testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$secondClientId$\'", ((string)(null)), table49, "And ");
 #line hidden
 #line 212
- testRunner.And("extract parameter \'client_id\' from JSON body into \'firstClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
+#line 214
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 215
+ testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to update the client and client_id is different")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegistrationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when trying to update the client and client_id is different")]
+        public virtual void ErrorIsReturnedWhenTryingToUpdateTheClientAndClient_IdIsDifferent()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and client_id is different", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 217
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
                 TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table50.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer $firstRegistrationAccessToken$"});
-                table50.AddRow(new string[] {
-                            "client_id",
-                            "clientId"});
-#line 214
- testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$firstClientId$\'", ((string)(null)), table50, "And ");
-#line hidden
-#line 219
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 221
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 218
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table50, "When ");
 #line hidden
 #line 222
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 223
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
+                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 224
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'firstClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table51.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $firstRegistrationAccessToken$"});
+                table51.AddRow(new string[] {
+                            "client_id",
+                            "clientId"});
+#line 226
+ testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$firstClientId$\'", ((string)(null)), table51, "And ");
+#line hidden
+#line 231
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 233
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 234
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 235
  testRunner.Then("JSON \'error_description\'=\'client identifier must be identical\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1071,7 +1127,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update the client and client_secret is different" +
                     "", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 225
+#line 237
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1091,50 +1147,50 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table51.AddRow(new string[] {
-                            "redirect_uris",
-                            "[http://localhost]"});
-#line 226
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table51, "When ");
-#line hidden
-#line 230
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 231
- testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
-                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 232
- testRunner.And("extract parameter \'client_id\' from JSON body into \'firstClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table52 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table52.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer $firstRegistrationAccessToken$"});
-                table52.AddRow(new string[] {
-                            "client_id",
-                            "$firstClientId$"});
-                table52.AddRow(new string[] {
-                            "client_secret",
-                            "clientSecret"});
-#line 234
- testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$firstClientId$\'", ((string)(null)), table52, "And ");
-#line hidden
-#line 240
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 238
+ testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table52, "When ");
 #line hidden
 #line 242
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 243
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'firstRegistrat" +
+                        "ionAccessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 244
+ testRunner.And("extract parameter \'client_id\' from JSON body into \'firstClientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table53 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table53.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $firstRegistrationAccessToken$"});
+                table53.AddRow(new string[] {
+                            "client_id",
+                            "$firstClientId$"});
+                table53.AddRow(new string[] {
+                            "client_secret",
+                            "clientSecret"});
+#line 246
+ testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$firstClientId$\'", ((string)(null)), table53, "And ");
+#line hidden
+#line 252
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 254
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 255
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 256
  testRunner.Then("JSON \'error_description\'=\'client secret must be identical\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

@@ -73,5 +73,6 @@ namespace SimpleIdServer.OAuth
         public const string REQUEST_OBJECT_BAD_AUDIENCE = "request object has bad audience";
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
         public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
+        public const string REDIRECT_URI_CONTAINS_FRAGMENT = "the redirect_uri cannot contains fragment";
     }
 }

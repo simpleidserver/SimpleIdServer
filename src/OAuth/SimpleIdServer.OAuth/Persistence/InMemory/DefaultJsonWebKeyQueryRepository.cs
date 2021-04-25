@@ -39,7 +39,11 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
 
         public Task<List<JsonWebKey>> FindJsonWebKeys(Usages usage, string alg, KeyOperations[] operations)
         {
-            var result = _jsonWebKeys.Where(j => j.Use == usage && j.Alg == alg && operations.All(o => j.KeyOps.Contains(o))).Select(j => (JsonWebKey)j.Clone()).ToList();
+            var currentDateTime = DateTime.UtcNow;
+            var result = _jsonWebKeys.Where(j => 
+                (j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime) &&
+                (j.Use == usage && j.Alg == alg && operations.All(o => j.KeyOps.Contains(o)))
+           ).Select(j => (JsonWebKey)j.Clone()).ToList();
             return Task.FromResult(result);
         }
     }

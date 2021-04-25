@@ -52,7 +52,7 @@ namespace SimpleIdServer.OAuth.Api.Jwks
             var jsonWebKeys = await _jsonWebKeyQueryRepository.GetNotRotatedJsonWebKeys(cancellationToken);
             foreach (var jsonWebKey in jsonWebKeys)
             {
-                var newJsonWebKey = jsonWebKey.Rotate(_options.AuthorizationCodeExpirationInSeconds);
+                var newJsonWebKey = jsonWebKey.Rotate(_options.JWKExpirationTimeInSeconds);
                 await _jsonWebKeyCommandRepository.Update(jsonWebKey, cancellationToken);
                 _jsonWebKeyCommandRepository.Add(newJsonWebKey);
             }

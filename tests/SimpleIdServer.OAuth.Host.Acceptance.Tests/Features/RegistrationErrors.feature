@@ -64,6 +64,18 @@ Scenario: Error is returned when redirect_uris is invalid
 
 	Then JSON 'error'='invalid_redirect_uri'
 	Then JSON 'error_description'='redirect uri invalid is not correct'
+
+Scenario: Error is returned when redirect_uri contains fragment
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
+	| Key            | Value                     |
+	| response_types | [token]                   |
+	| grant_types    | [implicit]                |
+	| redirect_uris  | [http://localhost#foobar] |
+	
+	And extract JSON from body
+	
+	Then JSON 'error'='invalid_redirect_uri'
+	Then JSON 'error_description'='the redirect_uri cannot contains fragment'
 	
 Scenario: Error is returned when scope is not supported
 	When execute HTTP POST JSON request 'https://localhost:8080/register'

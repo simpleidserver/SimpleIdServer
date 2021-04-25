@@ -1042,14 +1042,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a native client has invalid redirect_uri")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a web client has redirect_uri with fragment")]
         [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when a native client has invalid redirect_uri")]
-        public virtual void ErrorIsReturnedWhenANativeClientHasInvalidRedirect_Uri()
+        [Xunit.TraitAttribute("Description", "Error is returned when a web client has redirect_uri with fragment")]
+        public virtual void ErrorIsReturnedWhenAWebClientHasRedirect_UriWithFragment()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a native client has invalid redirect_uri", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a web client has redirect_uri with fragment", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 195
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -1075,10 +1075,10 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table299.AddRow(new string[] {
                             "redirect_uris",
-                            "[invalid]"});
+                            "[http://localhost#foobar]"});
                 table299.AddRow(new string[] {
                             "application_type",
-                            "native"});
+                            "web"});
 #line 196
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table299, "When ");
 #line hidden
@@ -1089,21 +1089,21 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 204
- testRunner.Then("JSON \'error_description\'=\'redirect uri invalid is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error_description\'=\'the redirect_uri cannot contains fragment\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a web client has redirect_uri without https scheme")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a native client has invalid redirect_uri")]
         [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when a web client has redirect_uri without https scheme")]
-        public virtual void ErrorIsReturnedWhenAWebClientHasRedirect_UriWithoutHttpsScheme()
+        [Xunit.TraitAttribute("Description", "Error is returned when a native client has invalid redirect_uri")]
+        public virtual void ErrorIsReturnedWhenANativeClientHasInvalidRedirect_Uri()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a web client has redirect_uri without https scheme", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 206
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a native client has invalid redirect_uri", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 207
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1128,32 +1128,35 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table300.AddRow(new string[] {
                             "redirect_uris",
-                            "[http://localhost]"});
-#line 207
+                            "[invalid]"});
+                table300.AddRow(new string[] {
+                            "application_type",
+                            "native"});
+#line 208
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table300, "When ");
 #line hidden
-#line 211
+#line 213
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 213
+#line 215
  testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 214
- testRunner.Then("JSON \'error_description\'=\'redirect_uri does not contain https scheme\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 216
+ testRunner.Then("JSON \'error_description\'=\'redirect uri invalid is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a web client has redirect_uri with localhost")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a web client has redirect_uri without https scheme")]
         [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when a web client has redirect_uri with localhost")]
-        public virtual void ErrorIsReturnedWhenAWebClientHasRedirect_UriWithLocalhost()
+        [Xunit.TraitAttribute("Description", "Error is returned when a web client has redirect_uri without https scheme")]
+        public virtual void ErrorIsReturnedWhenAWebClientHasRedirect_UriWithoutHttpsScheme()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a web client has redirect_uri with localhost", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 216
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a web client has redirect_uri without https scheme", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 218
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1178,17 +1181,67 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table301.AddRow(new string[] {
                             "redirect_uris",
-                            "[https://localhost]"});
-#line 217
+                            "[http://localhost]"});
+#line 219
  testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table301, "When ");
 #line hidden
-#line 221
+#line 223
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 223
+#line 225
  testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 224
+#line 226
+ testRunner.Then("JSON \'error_description\'=\'redirect_uri does not contain https scheme\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a web client has redirect_uri with localhost")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when a web client has redirect_uri with localhost")]
+        public virtual void ErrorIsReturnedWhenAWebClientHasRedirect_UriWithLocalhost()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a web client has redirect_uri with localhost", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 228
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table302 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table302.AddRow(new string[] {
+                            "redirect_uris",
+                            "[https://localhost]"});
+#line 229
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table302, "When ");
+#line hidden
+#line 233
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 235
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 236
  testRunner.Then("JSON \'error_description\'=\'redirect_uri must not contain localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

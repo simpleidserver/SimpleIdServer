@@ -104,6 +104,11 @@ namespace SimpleIdServer.OpenID.Api.Register
             }
 
             var uri = new Uri(redirectUrl);
+            if (!string.IsNullOrWhiteSpace(uri.Fragment))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, OAuth.ErrorMessages.REDIRECT_URI_CONTAINS_FRAGMENT);
+            }
+
             if (openidClient.ApplicationType == "web")
             {
                 if (uri.Scheme.ToLowerInvariant() != "https" && _openIDHostOptions.IsRedirectionUrlHTTPSRequired)

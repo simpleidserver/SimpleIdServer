@@ -125,6 +125,12 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
             {
                 throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, string.Format(ErrorMessages.BAD_REDIRECT_URI, redirectUrl));
             }
+
+            Uri.TryCreate(redirectUrl, UriKind.Absolute, out Uri uri);
+            if (!string.IsNullOrWhiteSpace(uri.Fragment))
+            {
+                throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.REDIRECT_URI_CONTAINS_FRAGMENT);
+            }
         }
 
         protected static void CheckUris(ICollection<OAuthTranslation> translations, string errorMessage)

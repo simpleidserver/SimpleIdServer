@@ -192,6 +192,18 @@ Scenario: Error is returned when a web client has invalid redirect_uri
 	Then JSON 'error'='invalid_redirect_uri'
 	Then JSON 'error_description'='redirect uri invalid is not correct'
 
+Scenario: Error is returned when a web client has redirect_uri with fragment
+	When execute HTTP POST JSON request 'http://localhost/register'
+	| Key              | Value                     |
+	| redirect_uris    | [http://localhost#foobar] |
+	| application_type | web                       |
+
+	And extract JSON from body
+
+	Then JSON 'error'='invalid_redirect_uri'
+	Then JSON 'error_description'='the redirect_uri cannot contains fragment'
+
+
 Scenario: Error is returned when a native client has invalid redirect_uri
 	When execute HTTP POST JSON request 'http://localhost/register'
 	| Key										| Value												|
