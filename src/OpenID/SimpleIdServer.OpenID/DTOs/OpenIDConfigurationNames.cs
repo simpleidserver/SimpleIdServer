@@ -26,5 +26,7 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string BackchannelAuthenticationEndpoint = "backchannel_authentication_endpoint";
         public const string BackchannelAuthenticationRequestSigningAlgValues = "backchannel_authentication_request_signing_alg_values_supported";
         public const string BackchannelUserCodeParameterSupported = "backchannel_user_code_parameter_supported";
+        public const string FrontChannelLogoutSupported = "frontchannel_logout_supported";
+        public const string FrontChannelLogoutSessionSupported = "frontchannel_logout_session_supported";
     }
 }

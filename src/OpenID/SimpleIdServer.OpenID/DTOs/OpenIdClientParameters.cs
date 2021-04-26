@@ -38,5 +38,7 @@ namespace SimpleIdServer.OpenID.DTOs
         /// Boolean value specifying whether the Client supports the user_code parameter. 
         /// </summary>
         public const string BCUserCodeParameter = "backchannel_user_code_parameter";
+        public const string FrontChannelLogoutUri = "frontchannel_logout_uri";
+        public const string FrontChannelLogoutSessionRequired = "frontchannel_logout_session_required";
     }
 }

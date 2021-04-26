@@ -76,6 +76,8 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             result.Add(OpenIDConfigurationNames.BackchannelTokenDeliveryModesSupported, JArray.FromObject(SIDOpenIdConstants.AllStandardNotificationModes));
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationRequestSigningAlgValues, JArray.FromObject(_signHandlers.Select(_ => _.AlgName)));
             result.Add(OpenIDConfigurationNames.BackchannelUserCodeParameterSupported, false);
+            result.Add(OpenIDConfigurationNames.FrontChannelLogoutSupported, true);
+            result.Add(OpenIDConfigurationNames.FrontChannelLogoutSessionSupported, true);
             return new OkObjectResult(result);
         }
     }

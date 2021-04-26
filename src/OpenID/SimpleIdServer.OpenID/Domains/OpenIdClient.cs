@@ -124,6 +124,15 @@ namespace SimpleIdServer.OpenID.Domains
         /// Boolean value specifying whether the Client supports the user_code parameter. 
         /// </summary>
         public bool BCUserCodeParameter { get; set; }
+        /// <summary>
+        /// RP URL that will cause the RP to log itself out when rendered in an iframe by the OP.
+        /// </summary>
+        public string FrontChannelLogoutUri { get; set; }
+        /// <summary>
+        /// Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session
+        /// with the OP when the front_channel_logout_uri is used.
+        /// </summary>
+        public bool FrontChannelLogoutSessionRequired { get; set; }
 
         /// <summary>
         /// Resolve redirection urls.
@@ -216,7 +225,9 @@ namespace SimpleIdServer.OpenID.Domains
                 BCTokenDeliveryMode = BCTokenDeliveryMode,
                 BCClientNotificationEndpoint = BCClientNotificationEndpoint,
                 BCAuthenticationRequestSigningAlg = BCAuthenticationRequestSigningAlg,
-                BCUserCodeParameter = BCUserCodeParameter
+                BCUserCodeParameter = BCUserCodeParameter,
+                FrontChannelLogoutUri = FrontChannelLogoutUri,
+                FrontChannelLogoutSessionRequired = FrontChannelLogoutSessionRequired
             };
         }
     }

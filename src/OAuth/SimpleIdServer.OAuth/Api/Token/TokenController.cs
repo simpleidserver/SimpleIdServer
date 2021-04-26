@@ -37,8 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Token
             var result = await _tokenRequestHandler.Handle(context, token);
             // rfc6749 : the authorization server must include the HTTP "Cache-Control" response header field with a value of "no-store"
             // in any response containing tokens, credentials, or sensitive information.
-            Response.Headers.Add("Cache-Control", "no-store");
-            Response.Headers.Add("Pragma", "no-cache");
+            Response.SetNoCache();
             return result;
         }
 

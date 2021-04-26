@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
@@ -16,6 +17,7 @@ using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -25,7 +27,6 @@ using System.Web;
 
 namespace SimpleIdServer.OpenID.UI
 {
-    [Authorize("IsConnected")]
     public class CheckSessionController : Controller
     {
         private readonly IJwtParser _jwtParser;
@@ -51,6 +52,7 @@ namespace SimpleIdServer.OpenID.UI
             };
         }
 
+        [Authorize("IsConnected")]
         [HttpGet(SIDOpenIdConstants.EndPoints.EndSession)]
         public async Task<IActionResult> EndSession(CancellationToken token)
         {
@@ -72,13 +74,22 @@ namespace SimpleIdServer.OpenID.UI
                     };
                 }
 
-                var jwsPayload = await Validate(postLogoutRedirectUri, idTokenHint, token);
+                var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, token);
                 if (Request.QueryString.HasValue)
                 {
                     url = Request.GetEncodedPathAndQuery().Replace($"/{SIDOpenIdConstants.EndPoints.EndSession}", SIDOpenIdConstants.EndPoints.EndSessionCallback);
                 }
 
-                return View(new RevokeSessionViewModel(url, jwsPayload));
+                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client);
+                if (!string.IsNullOrWhiteSpace(frontChannelLogout))
+                {
+                    Response.SetNoCache();
+                }
+
+                return View(new RevokeSessionViewModel(
+                    url,
+                    validationResult.Payload,
+                    frontChannelLogout));
             }
             catch(OAuthException ex)
             {
@@ -86,6 +97,7 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
+        [Authorize("IsConnected")]
         [HttpGet(SIDOpenIdConstants.EndPoints.EndSessionCallback)]
         public async Task<IActionResult> EndSessionCallback(CancellationToken token)
         {
@@ -111,7 +123,29 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
-        protected virtual async Task<JwsPayload> Validate(string postLogoutRedirectUri, string idTokenHint, CancellationToken cancellationToken)
+        protected string BuildFrontChannelLogoutUrl(OpenIdClient client)
+        {
+            if (string.IsNullOrWhiteSpace(client.FrontChannelLogoutUri))
+            {
+                return null;
+            }
+
+            var url = client.FrontChannelLogoutUri;
+            if (client.FrontChannelLogoutSessionRequired)
+            {
+                var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                var cookie = Request.Cookies[_openidHostOptions.SessionCookieName];
+                url =  QueryHelpers.AddQueryString(url, new Dictionary<string, string>
+                {
+                    { Jwt.Constants.OAuthClaims.Issuer, issuer },
+                    { "sid", cookie }
+                });
+            }
+
+            return url;
+        }
+
+        protected virtual async Task<ValidationResult> Validate(string postLogoutRedirectUri, string idTokenHint, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
             {
@@ -175,7 +209,7 @@ namespace SimpleIdServer.OpenID.UI
                 }
             }
 
-            return jwsPayload;
+            return new ValidationResult(jwsPayload, openidClient);
         }
 
         private async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint)
@@ -220,6 +254,18 @@ namespace SimpleIdServer.OpenID.UI
                 { ErrorResponseParameters.ErrorDescription, message }
             };
             return new BadRequestObjectResult(jObj);
+        }
+
+        protected class ValidationResult
+        {
+            public ValidationResult(JwsPayload payload, OpenIdClient client) 
+            {
+                Payload = payload;
+                Client = client;
+            }
+
+            public JwsPayload Payload { get; set; }
+            public OpenIdClient Client { get; set; }
         }
 
         private const string Html = @"

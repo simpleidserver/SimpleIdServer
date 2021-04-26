@@ -6,4 +6,12 @@
     ViewBag.Title = Global.revoke_session_title;
 }
 
-<a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@Global.revoke_session_title</a>
+@if (!string.IsNullOrWhiteSpace(Model.FrontChannelLogout))
+{
+    <iframe src="@Model.FrontChannelLogout"></iframe>
+}
+else
+{
+
+    <a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@Global.revoke_session_title</a>
+}

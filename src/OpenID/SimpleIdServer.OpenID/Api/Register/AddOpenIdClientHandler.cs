@@ -56,6 +56,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             SetUserInfoEncryptedResponseAlg(openidClient);
             SetRequestObjectEncryptionAlg(openidClient);
             SetBCNotification(openidClient, handlerContext);
+            SetFrontChannel(openidClient, handlerContext);
         }
 
         protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
@@ -138,6 +139,12 @@ namespace SimpleIdServer.OpenID.Api.Register
             openidClient.BCClientNotificationEndpoint = handlerContext.Request.Data.GetBCClientNotificationEndpoint();
             openidClient.BCAuthenticationRequestSigningAlg = handlerContext.Request.Data.GetBCAuthenticationRequestSigningAlg();
             openidClient.BCUserCodeParameter = handlerContext.Request.Data.GetBCUserCodeParameter();
+        }
+
+        protected virtual void SetFrontChannel(OpenIdClient openidClient, HandlerContext handlerContext)
+        {
+            openidClient.FrontChannelLogoutUri = handlerContext.Request.Data.GetFrontChannelLogoutUri();
+            openidClient.FrontChannelLogoutSessionRequired = handlerContext.Request.Data.GetFrontChannelLogoutSessionRequired();
         }
     }
 }
