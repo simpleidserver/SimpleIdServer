@@ -17,6 +17,8 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             _lstData = lstData;
         }
 
+        protected List<T> LstData => _lstData;
+
         public bool Add(T data)
         {
             _lstData.Add((T)data.Clone());

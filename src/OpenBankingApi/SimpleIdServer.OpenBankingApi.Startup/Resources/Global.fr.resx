@@ -276,4 +276,7 @@
   <data name="AccountTypes_Savings" xml:space="preserve">
     <value>Savings</value>
   </data>
+  <data name="manage_consents" xml:space="preserve">
+    <value>Gérer les consentements</value>
+  </data>
 </root>

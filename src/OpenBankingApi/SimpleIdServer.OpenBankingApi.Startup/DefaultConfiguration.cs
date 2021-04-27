@@ -162,7 +162,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback"
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback",
+                        "https://www.certification.openid.net/test/a/simpleidserverOpenBankingApi/callback"
                     },
                     TokenEndPointAuthMethod = "tls_client_auth",
                     ResponseTypes = new List<string>
@@ -219,7 +220,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum"
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum",
+                        "https://www.certification.openid.net/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum"
                     },
                     JsonWebKeys = new List<JsonWebKey>
                     {
@@ -258,7 +260,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback"
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback",
+                        "https://www.certification.openid.net/test/a/simpleidserverOpenBankingApi/callback"
                     },
                     TokenEndPointAuthMethod = "private_key_jwt",
                     ResponseTypes = new List<string>
@@ -315,7 +318,8 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum"
+                        "http://localhost:8080/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum",
+                        "https://www.certification.openid.net/test/a/simpleidserverOpenBankingApi/callback?dummy1=lorem&dummy2=ipsum"
                     },
                     JsonWebKeys = new List<JsonWebKey>
                     {

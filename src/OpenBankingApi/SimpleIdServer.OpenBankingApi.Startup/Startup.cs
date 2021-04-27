@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.OpenBankingApi.Startup
 {
@@ -116,6 +119,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             app.UseForwardedHeaders();
             app.UseCors("AllowAll");
             app.UseAuthorization();
+            app.UseMiddleware<CertificateForwardingMiddleware>();
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseSwagger();
@@ -194,6 +198,30 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             var certificate = new X509Certificate2(path, pass, X509KeyStorageFlags.Exportable);
             var publicKey = Convert.ToBase64String(certificate.GetRawCertData());
             var privtateKey = Convert.ToBase64String((certificate.GetRSAPrivateKey() as RSACng).ExportRSAPrivateKey());
+        }
+
+        private class CertificateForwardingMiddleware
+        {
+            private readonly RequestDelegate _next;
+
+            public CertificateForwardingMiddleware(RequestDelegate next)
+            {
+                _next = next;
+            }
+
+            public async Task InvokeAsync(HttpContext context)
+            {
+                const string headerName = "X-ARR-ClientCert";
+                if (context.Request.Headers.ContainsKey(headerName))
+                {
+                    var header = HttpUtility.UrlDecode(context.Request.Headers[headerName].First());
+                    header = header.Replace("-----BEGIN CERTIFICATE-----", null)
+                        .Replace("-----END CERTIFICATE-----", null);
+                    context.Connection.ClientCertificate = new X509Certificate2(Convert.FromBase64String(header));
+                }
+
+                await _next(context);
+            }
         }
     }
 }

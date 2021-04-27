@@ -261,4 +261,7 @@
   <data name="tos" xml:space="preserve">
     <value>Terms of service</value>
   </data>
+  <data name="manage_consents" xml:space="preserve">
+    <value>Manage the consents</value>
+  </data>
 </root>

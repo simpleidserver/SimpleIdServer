@@ -7,8 +7,6 @@ using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Extensions;
 using System.Linq;
-// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Middlewares

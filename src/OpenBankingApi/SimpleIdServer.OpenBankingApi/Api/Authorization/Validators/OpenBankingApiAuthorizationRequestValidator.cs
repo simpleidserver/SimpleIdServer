@@ -152,7 +152,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                     throw new OAuthSelectAccountRequiredException();
             }
 
-            if (!context.User.HasOpenIDConsent(clientId, scopes, claims))
+            if (!context.User.HasOpenIDConsent(clientId, scopes, claims) || context.Request.Data.GetClaimsFromAuthorizationRequest().Any(c => c.Name == _options.OpenBankingApiConsentClaimName))
             {
                 RedirectToConsentView(context);
                 return;
@@ -203,13 +203,6 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             var claim = claims.FirstOrDefault(_ => _.Name == _options.OpenBankingApiConsentClaimName);
             if (claim == null)
             {
-                /*
-                if (ignoreDefaultRedirection)
-                {
-                    return;
-                }
-                */
-
                 base.RedirectToConsentView(context);
                 return;
             }

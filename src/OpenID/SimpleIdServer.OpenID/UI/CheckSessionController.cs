@@ -91,7 +91,7 @@ namespace SimpleIdServer.OpenID.UI
                 var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
                 if (Request.QueryString.HasValue)
                 {
-                    url = Request.GetEncodedPathAndQuery().Replace($"/{SIDOpenIdConstants.EndPoints.EndSession}", SIDOpenIdConstants.EndPoints.EndSessionCallback);
+                    url = Request.GetEncodedPathAndQuery().Replace($"/{SIDOpenIdConstants.EndPoints.EndSession}", $"/{SIDOpenIdConstants.EndPoints.EndSessionCallback}");
                 }
 
                 var sessionId = await GetSessionId(cancellationToken);

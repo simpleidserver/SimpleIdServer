@@ -260,6 +260,7 @@ server {
 	index index.html index.htm index.nginx-debian.html;
 
 	server_name simpleidserver.northeurope.cloudapp.azure.com;
+	ssl_verify_client optional_no_ca;
     
 	location /openbanking {
 		proxy_pass https://localhost:60010;
@@ -275,6 +276,7 @@ server {
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 		proxy_set_header X-Forwarded-Proto $scheme;
 		proxy_set_header X-URL-SCHEME https;
+		proxy_set_header X-ARR-ClientCert $ssl_client_escaped_cert;
 		client_max_body_size 1M;
 		client_body_buffer_size 4096k;
 		proxy_connect_timeout 90;

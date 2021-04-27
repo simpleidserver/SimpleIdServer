@@ -85,6 +85,40 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
+        public async Task<IActionResult> Manage(CancellationToken cancellationToken)
+        {
+            var nameIdentifier = GetNameIdentifier();
+            var user = await _oauthUserRepository.FindOAuthUserByLogin(nameIdentifier, cancellationToken);
+            var result = new List<ConsentViewModel>();
+            var oauthClients = await _oauthClientRepository.FindOAuthClientByIds(user.Consents.Select(c => c.ClientId), cancellationToken);
+            foreach(var consent in user.Consents)
+            {
+                var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
+                result.Add(new ConsentViewModel(
+                    consent.Id,
+                    _translationHelper.Translate(oauthClient.ClientNames, oauthClient.ClientId),
+                    consent.Scopes.Select(s => s.Name),
+                    consent.Claims));
+            }
+
+            return View(result);
+        }
+
+        public async Task<IActionResult> RejectConsent(string consentId, CancellationToken cancellationToken)
+        {
+            var nameIdentifier = GetNameIdentifier();
+            var user = await _oauthUserRepository.FindOAuthUserByLogin(nameIdentifier, cancellationToken);
+            if (!user.HasOpenIDConsent(consentId))
+            {
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
+            }
+
+            user.RejectConsent(consentId);
+            await _oAuthUserCommandRepository.Update(user, cancellationToken);
+            await _oAuthUserCommandRepository.SaveChanges(cancellationToken);
+            return RedirectToAction("Manage");
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -118,8 +152,8 @@ namespace SimpleIdServer.OpenID.UI
             {
                 var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
-                var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                var user = await _oauthUserRepository.FindOAuthUserByLogin(claimName.Value, token);
+                var nameIdentifier = GetNameIdentifier();
+                var user = await _oauthUserRepository.FindOAuthUserByLogin(nameIdentifier, token);
                 var consent = _userConsentFetcher.FetchFromAuthorizationRequest(user, query);
                 if (consent == null)
                 {
@@ -136,6 +170,12 @@ namespace SimpleIdServer.OpenID.UI
                 ModelState.AddModelError("invalid_request", "invalid_request");
                 return View(confirmConsentsViewModel);
             }
+        }
+
+        private string GetNameIdentifier()
+        {
+            var claimName = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier);
+            return claimName.Value;
         }
     }
 }

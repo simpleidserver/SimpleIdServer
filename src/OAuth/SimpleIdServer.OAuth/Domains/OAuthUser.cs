@@ -26,6 +26,12 @@ namespace SimpleIdServer.OAuth.Domains
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
 
+        public void RejectConsent(string consentId)
+        {
+            var consent = Consents.SingleOrDefault(c => c.Id == consentId);
+            Consents.Remove(consent);
+        }
+
         public bool AddSession(DateTime expirationDateTime)
         {
             foreach(var session in Sessions)

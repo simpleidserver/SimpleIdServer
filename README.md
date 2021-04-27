@@ -44,6 +44,19 @@ SimpleIdServer implements the following OPENID conformance profiles :
 
 ### OpenID provider for logout profile
 
+| Profile          | Test plans 
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RP-Initiated OP  | [Link 1](https://www.certification.openid.net/plan-detail.html?plan=q8zHjO7GKTm2p&public=true), [Link 2](https://www.certification.openid.net/plan-detail.html?plan=9QkOe3rah6OlB&public=true), [Link 3](https://www.certification.openid.net/plan-detail.html?plan=REeuGHwd7zF06&public=true), [Link 4](https://www.certification.openid.net/plan-detail.html?plan=rm5PmSjlmSyMG&public=true), [Link 5](https://www.certification.openid.net/plan-detail.html?plan=WaeVAkjkkgWMC&public=true), [Link 6](https://www.certification.openid.net/plan-detail.html?plan=7IdDirhsWnCow&public=true) |
+| Session OP       | [Link 1](https://www.certification.openid.net/plan-detail.html?plan=XWUs8wUtnDHGN&public=true), [Link 2](https://www.certification.openid.net/plan-detail.html?plan=dw3T1LhVGlgYZ&public=true), [Link 3](https://www.certification.openid.net/plan-detail.html?plan=CWqM7njxqcvGT&public=true), [Link 4](https://www.certification.openid.net/plan-detail.html?plan=nNckls6a5qPwI&public=true), [Link 5](https://www.certification.openid.net/plan-detail.html?plan=lbLrObDfrX35q&public=true), [Link 6](https://www.certification.openid.net/plan-detail.html?plan=zXbSHGtiENBR9&public=true) |
+| Front-Channel OP | [Link 1](https://www.certification.openid.net/plan-detail.html?plan=wPSm8i41v575p&public=true), [Link 2](https://www.certification.openid.net/plan-detail.html?plan=30Lm1qoPnXnCH&public=true), [Link 3](https://www.certification.openid.net/plan-detail.html?plan=CY8Rd3FB7eLKf&public=true), [Link 4](https://www.certification.openid.net/plan-detail.html?plan=QpZXQUeH9SkZs&public=true), [Link 5](https://www.certification.openid.net/plan-detail.html?plan=7aWSiQuoFx8VP&public=true), [Link 6](https://www.certification.openid.net/plan-detail.html?plan=vCnffkwiS15Uu&public=true) |
+| Back-Channel OP  | [Link 1](https://www.certification.openid.net/plan-detail.html?plan=OgMuJOFfX5nF1&public=true), [Link 2](https://www.certification.openid.net/plan-detail.html?plan=eGxdR6kkXr6zN&public=true), [Link 3](https://www.certification.openid.net/plan-detail.html?plan=8W0uIHzbxRV0G&public=true), [Link 4](https://www.certification.openid.net/plan-detail.html?plan=MWNu5J29liR02&public=true), [Link 5](https://www.certification.openid.net/plan-detail.html?plan=OeyRVjGG440I4&public=true), [Link 6](https://www.certification.openid.net/plan-detail.html?plan=H3R0dC5VtPh1b&public=true) |
+
+## Relying party
+
+| Profile  | Basic RP |
+| -------- | -------- |
+| Basic RP | [Link]() |
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.

@@ -258,4 +258,7 @@
   <data name="tos" xml:space="preserve">
     <value>Conditions d'utilisation</value>
   </data>
+  <data name="manage_consents" xml:space="preserve">
+    <value>Gérer les consentements</value>
+  </data>
 </root>

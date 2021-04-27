@@ -22,6 +22,11 @@ namespace SimpleIdServer.OpenID.Extensions
             return user.GetConsent(clientId, scopes, claims, claimType) != null;
         }
 
+        public static bool HasOpenIDConsent(this OAuthUser user, string consentId)
+        {
+            return user.Consents.SingleOrDefault(c => c.Id == consentId) != null;
+        }
+
         public static OAuthConsent GetConsent(this OAuthUser user, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claims, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
         {
             return user.Consents.FirstOrDefault(c => c.ClientId == clientId &&

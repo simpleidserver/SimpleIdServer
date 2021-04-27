@@ -268,6 +268,15 @@ namespace SimpleIdServer.OpenID.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Manage the consents.
+        /// </summary>
+        public static string manage_consents {
+            get {
+                return ResourceManager.GetString("manage_consents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Confirmation code is required.
         /// </summary>
         public static string missing_confirmationcode {
