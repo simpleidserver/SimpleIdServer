@@ -9,18 +9,19 @@ using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
-using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,29 +31,33 @@ namespace SimpleIdServer.OpenID.UI
 {
     public class CheckSessionController : Controller
     {
+        private readonly OpenIDHostOptions _options;
         private readonly IJwtParser _jwtParser;
         private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
         private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
-        private readonly OpenIDHostOptions _openidHostOptions;
+        private readonly IJwtBuilder _jwtBuilder;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public CheckSessionController(
+            IOptions<OpenIDHostOptions> options,
             IJwtParser jwtParser,
             IOAuthUserQueryRepository oAuthUserQueryRepository,
-            IOAuthClientQueryRepository oAuthClientQueryRepository, 
-            IOptions<OpenIDHostOptions> options)
+            IOAuthClientQueryRepository oAuthClientQueryRepository,
+            IJwtBuilder jwtBuilder,
+            IHttpClientFactory httpClientFactory)
         {
+            _options = options.Value;
             _jwtParser = jwtParser;
             _oauthUserQueryRepository = oAuthUserQueryRepository;
             _oauthClientQueryRepository = oAuthClientQueryRepository;
-            _openidHostOptions = options.Value;
+            _jwtBuilder = jwtBuilder;
+            _httpClientFactory = httpClientFactory;
         }
 
-        [Authorize("IsConnected")]
         [HttpGet(SIDOpenIdConstants.EndPoints.CheckSession)]
-        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        public IActionResult Index()
         {
-            var sessionId = await GetSessionId(cancellationToken);
-            var newHtml = Html.Replace("{cookieName}", sessionId);
+            var newHtml = Html.Replace("{cookieName}", _options.SessionCookieName);
             return new ContentResult
             {
                 ContentType = "text/html",
@@ -73,6 +78,7 @@ namespace SimpleIdServer.OpenID.UI
             {
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 {
+                    Response.Cookies.Delete(_options.SessionCookieName);
                     await HttpContext.SignOutAsync();
                     return new ContentResult
                     {
@@ -117,7 +123,9 @@ namespace SimpleIdServer.OpenID.UI
             try
             {
                 var sessionId = await GetSessionId(cancellationToken);
-                await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
+                var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
+                await SendLogoutToken(validationResult.Client, sessionId);
+                Response.Cookies.Delete(_options.SessionCookieName);
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
                 {
@@ -129,6 +137,49 @@ namespace SimpleIdServer.OpenID.UI
             catch (OAuthException ex)
             {
                 return BuildError(ex.Code, ex.Message);
+            }
+        }
+
+        protected async Task SendLogoutToken(OpenIdClient openIdClient, string sessionId)
+        {
+            if (string.IsNullOrWhiteSpace(openIdClient.BackChannelLogoutUri))
+            {
+                return;
+            }
+
+            var currentDateTime = DateTime.UtcNow;
+            var events = new JObject
+            {
+                { "http://schemas.openid.net/event/backchannel-logout", new JObject() }
+            };
+            var jwsPayload = new JwsPayload
+            {
+                { Jwt.Constants.OAuthClaims.Issuer, Request.GetAbsoluteUriWithVirtualPath() },
+                { Jwt.Constants.UserClaims.Subject, User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value },
+                { Jwt.Constants.OAuthClaims.Audiences, openIdClient.ClientId },
+                { Jwt.Constants.OAuthClaims.Iat, currentDateTime.ConvertToUnixTimestamp() },
+                { Jwt.Constants.OAuthClaims.Jti, Guid.NewGuid().ToString() },
+                { Jwt.Constants.OAuthClaims.Events, events }
+            };
+            if (openIdClient.BackChannelLogoutSessionRequired)
+            {
+                jwsPayload.Add(Jwt.Constants.OAuthClaims.Sid, sessionId);
+            }
+
+            var logoutToken = await _jwtBuilder.Sign(jwsPayload, openIdClient.TokenSignedResponseAlg);
+            using (var httpClient = _httpClientFactory.GetHttpClient())
+            {
+                var body = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("logout_token", logoutToken)
+                });
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    Content = body,
+                    RequestUri = new Uri(openIdClient.BackChannelLogoutUri)
+                };
+                await httpClient.SendAsync(request);
             }
         }
 
@@ -283,8 +334,7 @@ namespace SimpleIdServer.OpenID.UI
             public OpenIdClient Client { get; set; }
         }
 
-        private const string Html = @"
-<!DOCTYPE html>
+        private const string Html = @"<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv='X-UA-Compatible' content='IE=edge' />

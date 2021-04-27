@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using SimpleIdServer.OpenID.Options;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +15,13 @@ namespace SimpleIdServer.OpenID.UI
 {
     public class HomeController : Controller
     {
+        private readonly OpenIDHostOptions _options;
+
+        public HomeController(IOptions<OpenIDHostOptions> options)
+        {
+            _options = options.Value;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -31,6 +40,7 @@ namespace SimpleIdServer.OpenID.UI
 
         public async Task<IActionResult> Disconnect()
         {
+            Response.Cookies.Delete(_options.SessionCookieName);
             await HttpContext.SignOutAsync();
             return RedirectToAction("Index");
         }

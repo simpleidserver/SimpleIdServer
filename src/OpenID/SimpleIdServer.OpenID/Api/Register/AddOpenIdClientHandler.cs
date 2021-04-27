@@ -57,6 +57,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             SetRequestObjectEncryptionAlg(openidClient);
             SetBCNotification(openidClient, handlerContext);
             SetFrontChannel(openidClient, handlerContext);
+            SetBackchannelLogoutSupported(openidClient, handlerContext);
         }
 
         protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
@@ -145,6 +146,12 @@ namespace SimpleIdServer.OpenID.Api.Register
         {
             openidClient.FrontChannelLogoutUri = handlerContext.Request.Data.GetFrontChannelLogoutUri();
             openidClient.FrontChannelLogoutSessionRequired = handlerContext.Request.Data.GetFrontChannelLogoutSessionRequired();
+        }
+
+        protected virtual void SetBackchannelLogoutSupported(OpenIdClient openidClient, HandlerContext handlerContext)
+        {
+            openidClient.BackChannelLogoutSessionRequired = handlerContext.Request.Data.GetBackChannelLogoutSessionRequired();
+            openidClient.BackChannelLogoutUri = handlerContext.Request.Data.GetBackChannelLogoutUri();
         }
     }
 }

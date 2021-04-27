@@ -26,23 +26,21 @@ namespace SimpleIdServer.OAuth.Domains
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
 
-        public bool TryAddSession(DateTime expirationDateTime)
+        public bool AddSession(DateTime expirationDateTime)
         {
-            var session = GetActiveSession();
-            if (session != null)
+            foreach(var session in Sessions)
             {
-                session.ExpirationDateTime = expirationDateTime;
-                return false;
+                session.State = OAuthUserSessionStates.Rejected;
             }
 
-            Sessions.Add(new OAuthUserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime });
+            Sessions.Add(new OAuthUserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = OAuthUserSessionStates.Active });
             return true;
         }
 
         public OAuthUserSession GetActiveSession()
         {
             var currentDateTime = DateTime.UtcNow;
-            return Sessions.FirstOrDefault(s => currentDateTime < s.ExpirationDateTime);
+            return Sessions.FirstOrDefault(s => currentDateTime < s.ExpirationDateTime && s.State == OAuthUserSessionStates.Active);
         }
 
         public object Clone()

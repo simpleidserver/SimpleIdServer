@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
@@ -13,7 +12,6 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
-using SimpleIdServer.OpenID.Options;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -25,16 +23,13 @@ namespace SimpleIdServer.OpenID.Api.Authorization
 {
     public class OpenIDAuthorizationRequestHandler : AuthorizationRequestHandler
     {
-        private readonly OpenIDHostOptions _openidHostOptions;
-
         public OpenIDAuthorizationRequestHandler(
             IEnumerable<IResponseTypeHandler> responseTypeHandlers, 
             IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher, 
             IOAuthClientQueryRepository oauthClientRepository,
-            IOAuthUserQueryRepository oauthUserRepository, 
-            IOptions<OpenIDHostOptions> options) : base(
+            IOAuthUserQueryRepository oauthUserRepository) : base(
                 responseTypeHandlers, 
                 authorizationRequestValidators, 
                 tokenProfiles, 
@@ -42,7 +37,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization
                 oauthClientRepository, 
                 oauthUserRepository)
         {
-            _openidHostOptions = options.Value;
         }
 
         public override async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)

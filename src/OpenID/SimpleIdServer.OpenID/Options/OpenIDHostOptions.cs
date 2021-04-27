@@ -14,6 +14,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultMaxAge = null;
             DefaultAcrValue = "sid-load-01";
             AuthenticationScheme = "MultiAccount";
+            SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
             IsRedirectionUrlHTTPSRequired = true;
             IsInitiateLoginUriHTTPSRequired = true;
@@ -103,5 +104,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Cookie auth expiration time in seconds.
         /// </summary>
         public int CookieAuthExpirationTimeInSeconds { get; set; }
+        /// <summary>
+        /// Name of the cookie used to store the session id.
+        /// </summary>
+        public string SessionCookieName { get; set; }
     }
 }

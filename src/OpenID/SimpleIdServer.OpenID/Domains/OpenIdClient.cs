@@ -133,6 +133,12 @@ namespace SimpleIdServer.OpenID.Domains
         /// with the OP when the front_channel_logout_uri is used.
         /// </summary>
         public bool FrontChannelLogoutSessionRequired { get; set; }
+        /// <summary>
+        /// Boolean value specifying whether the OP can pass a SID claim in the Logout token to identify the RP session with the OP.
+        /// If supported, the sid claim is also included in ID tokens issued by the OP.
+        /// </summary>
+        public bool BackChannelLogoutSessionRequired { get; set; }
+        public string BackChannelLogoutUri { get; set; }
 
         /// <summary>
         /// Resolve redirection urls.
@@ -227,7 +233,9 @@ namespace SimpleIdServer.OpenID.Domains
                 BCAuthenticationRequestSigningAlg = BCAuthenticationRequestSigningAlg,
                 BCUserCodeParameter = BCUserCodeParameter,
                 FrontChannelLogoutUri = FrontChannelLogoutUri,
-                FrontChannelLogoutSessionRequired = FrontChannelLogoutSessionRequired
+                FrontChannelLogoutSessionRequired = FrontChannelLogoutSessionRequired,
+                BackChannelLogoutSessionRequired = BackChannelLogoutSessionRequired,
+                BackChannelLogoutUri = BackChannelLogoutUri
             };
         }
     }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Domains;
@@ -11,7 +12,6 @@ using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
-using SimpleIdServer.OpenID.Persistence;
 using System;
 using System.Security.Claims;
 using System.Threading;
@@ -71,15 +71,20 @@ namespace SimpleIdServer.OpenID.UI
                 var claims = user.ToClaims();
                 var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                user.TryAddSession(expirationDateTime);
+                user.AddSession(expirationDateTime);
                 await _oauthUserCommandRepository.Update(user, token);
                 await _oauthUserCommandRepository.SaveChanges(token);
+                Response.Cookies.Append(_options.SessionCookieName, user.GetActiveSession().SessionId,  new CookieOptions
+                {
+                    Secure = true,
+                    HttpOnly = false,
+                    SameSite = SameSiteMode.None
+                });
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
                 {
                     IsPersistent = rememberLogin,
                     ExpiresUtc = expirationDateTime
                 });
-
                 return Redirect(unprotectedUrl);
             }
 

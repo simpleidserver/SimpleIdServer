@@ -40,5 +40,7 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string BCUserCodeParameter = "backchannel_user_code_parameter";
         public const string FrontChannelLogoutUri = "frontchannel_logout_uri";
         public const string FrontChannelLogoutSessionRequired = "frontchannel_logout_session_required";
+        public const string BackChannelLogoutSessionRequired = "backchannel_logout_session_required";
+        public const string BackChannelLogoutUri = "backchannel_logout_uri";
     }
 }

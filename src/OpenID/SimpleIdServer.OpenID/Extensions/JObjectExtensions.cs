@@ -127,6 +127,16 @@ namespace SimpleIdServer.OpenID.Extensions
             return jObj.GetBoolean(OpenIdClientParameters.FrontChannelLogoutSessionRequired);
         }
 
+        public static bool GetBackChannelLogoutSessionRequired(this JObject jObj)
+        {
+            return jObj.GetBoolean(OpenIdClientParameters.BackChannelLogoutSessionRequired);
+        }
+
+        public static string GetBackChannelLogoutUri(this JObject jObj)
+        {
+            return jObj.GetStr(OpenIdClientParameters.BackChannelLogoutUri);
+        }
+
         #endregion
 
         #region Authorization request

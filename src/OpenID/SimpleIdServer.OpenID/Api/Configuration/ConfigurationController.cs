@@ -78,6 +78,8 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             result.Add(OpenIDConfigurationNames.BackchannelUserCodeParameterSupported, false);
             result.Add(OpenIDConfigurationNames.FrontChannelLogoutSupported, true);
             result.Add(OpenIDConfigurationNames.FrontChannelLogoutSessionSupported, true);
+            result.Add(OpenIDConfigurationNames.BackchannelLogoutSupported, true);
+            result.Add(OpenIDConfigurationNames.BackchannelLogoutSessionSupported, true);
             return new OkObjectResult(result);
         }
     }

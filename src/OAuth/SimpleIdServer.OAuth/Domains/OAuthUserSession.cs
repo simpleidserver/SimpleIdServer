@@ -9,6 +9,7 @@ namespace SimpleIdServer.OAuth.Domains
         public string SessionId { get; set; }
         public DateTime AuthenticationDateTime { get; set; }
         public DateTime ExpirationDateTime { get; set; }
+        public OAuthUserSessionStates State { get; set; }
 
         public object Clone()
         {
@@ -16,7 +17,8 @@ namespace SimpleIdServer.OAuth.Domains
             {
                  SessionId = SessionId,
                  AuthenticationDateTime = AuthenticationDateTime,
-                 ExpirationDateTime = ExpirationDateTime
+                 ExpirationDateTime = ExpirationDateTime,
+                 State = State
             };
         }
     }

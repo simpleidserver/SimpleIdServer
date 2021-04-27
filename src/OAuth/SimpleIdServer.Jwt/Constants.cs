@@ -42,6 +42,7 @@ namespace SimpleIdServer.Jwt
             /// entifier for the Session.
             /// </summary>
             public static string Sid = "sid";
+            public static string Events = "events";
         }
 
         public static class UserClaims
