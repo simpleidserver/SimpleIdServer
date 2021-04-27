@@ -2,12 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
+using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.Sms.Services;
 using SimpleIdServer.UI.Authenticate.Sms.ViewModels;
@@ -24,12 +27,13 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
         private readonly ITranslationHelper _translationHelper;
 
         public AuthenticateController(
+            IOptions<OpenIDHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
             ITranslationHelper translateHelper,
             IOAuthClientQueryRepository oauthClientRepository, 
-            IOAuthUserCommandRepository oauthUserCommandRepository,
             IAmrHelper amrHelper, 
-            ISmsAuthService smsAuthService) : base(dataProtectionProvider, oauthClientRepository, oauthUserCommandRepository, amrHelper)
+            ISmsAuthService smsAuthService,
+            IOAuthUserCommandRepository oauthUserCommandRepository) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserCommandRepository)
         {
             _smsAuthService = smsAuthService;
             _translationHelper = translateHelper;

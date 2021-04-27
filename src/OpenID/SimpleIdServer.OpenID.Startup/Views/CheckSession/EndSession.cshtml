@@ -8,10 +8,7 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.FrontChannelLogout))
 {
-    <iframe src="@Model.FrontChannelLogout"></iframe>
+    <iframe src="@Model.FrontChannelLogout" style="display: none"></iframe>
 }
-else
-{
 
-    <a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@Global.revoke_session_title</a>
-}
+<a href="@Model.RevokeSessionCallbackUrl" class="btn btn-danger">@Global.revoke_session_title</a>

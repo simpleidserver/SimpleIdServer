@@ -102,12 +102,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (maxAge != null)
             {
-                if (DateTime.UtcNow > context.User.AuthenticationTime.Value.AddSeconds(maxAge.Value))
+                if (DateTime.UtcNow > context.User.GetActiveSession().AuthenticationDateTime.AddSeconds(maxAge.Value))
                 {
                     throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
                 }
             }
-            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.User.AuthenticationTime.Value.AddSeconds(openidClient.DefaultMaxAge.Value))
+            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.User.GetActiveSession().AuthenticationDateTime.AddSeconds(openidClient.DefaultMaxAge.Value))
             {
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }

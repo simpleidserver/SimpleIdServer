@@ -15,7 +15,6 @@ namespace SimpleIdServer.OpenID.Options
             DefaultAcrValue = "sid-load-01";
             AuthenticationScheme = "MultiAccount";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
-            SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
             IsRedirectionUrlHTTPSRequired = true;
             IsInitiateLoginUriHTTPSRequired = true;
             IsLocalhostAllowed = false;
@@ -27,6 +26,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultBCAuthorizeWaitIntervalInSeconds = 2;
             DefaultRequestObjectEncyptionEnc = A128CBCHS256EncHandler.ENC_NAME;
             MaxRequestLifetime = 60 * 5;
+            CookieAuthExpirationTimeInSeconds = 60 * 5;
         }
 
         /// <summary>
@@ -49,10 +49,6 @@ namespace SimpleIdServer.OpenID.Options
         /// Authentication scheme.
         /// </summary>
         public string AuthenticationScheme { get; set; }
-        /// <summary>
-        /// Session cookie name.
-        /// </summary>
-        public string SessionCookieName { get; set; }
         /// <summary>
         /// Check if the redirection url must be HTTPS.
         /// </summary>
@@ -103,5 +99,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Set the maximum lifetime of an authorization request.
         /// </summary>
         public int MaxRequestLifetime { get; set; }
+        /// <summary>
+        /// Cookie auth expiration time in seconds.
+        /// </summary>
+        public int CookieAuthExpirationTimeInSeconds { get; set; }
     }
 }

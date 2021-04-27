@@ -35,7 +35,13 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         private readonly IOAuthUserQueryRepository _oauthUserRepository;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
 
-        public IdTokenBuilder(IJwtBuilder jwtBuilder, IEnumerable<IClaimsSource> claimsSources, IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IAmrHelper amrHelper, IOAuthUserQueryRepository oauthUserQueryRepository, IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher)
+        public IdTokenBuilder(
+            IJwtBuilder jwtBuilder, 
+            IEnumerable<IClaimsSource> claimsSources, 
+            IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
+            IAmrHelper amrHelper, 
+            IOAuthUserQueryRepository oauthUserQueryRepository, 
+            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher)
         {
             _jwtBuilder = jwtBuilder;
             _claimsSources = claimsSources;
@@ -110,7 +116,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
             if (maxAge != null)
             {
-                result.Add(OAuthClaims.AuthenticationTime, currentContext.User.AuthenticationTime.Value.ConvertToUnixTimestamp());
+                result.Add(OAuthClaims.AuthenticationTime, currentContext.User.GetActiveSession().AuthenticationDateTime.ConvertToUnixTimestamp());
             }
 
             if (!string.IsNullOrWhiteSpace(nonce))
@@ -132,8 +138,9 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
             }
 
+            result.Add(OAuthClaims.Sid, currentContext.User.GetActiveSession().SessionId);
             EnrichWithScopeParameter(result, scopes, currentContext.User, subject);
-            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.User.AuthenticationTime);
+            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.User.GetActiveSession().AuthenticationDateTime);
             foreach (var claimsSource in _claimsSources)
             {
                 await claimsSource.Enrich(result, openidClient).ConfigureAwait(false);

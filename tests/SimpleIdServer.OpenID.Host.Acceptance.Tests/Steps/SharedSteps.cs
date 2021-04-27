@@ -438,7 +438,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         {
             var oauthUserRepository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
             var user = await oauthUserRepository.FindOAuthUserByLogin(login, CancellationToken.None);
-            user.AuthenticationTime = DateTime.UtcNow.AddSeconds(seconds);
+            user.GetActiveSession().AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
         }
 
         [When("extract string from body")]

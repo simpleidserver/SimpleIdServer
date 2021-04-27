@@ -38,6 +38,10 @@ namespace SimpleIdServer.Jwt
             /// The time before which the signed authentication request is unacceptable.
             /// </summary>
             public static string Nbf = "nbf";
+            /// <summary>
+            /// entifier for the Session.
+            /// </summary>
+            public static string Sid = "sid";
         }
 
         public static class UserClaims

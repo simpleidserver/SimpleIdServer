@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 using System.Linq;

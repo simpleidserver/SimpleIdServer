@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Api;
@@ -84,25 +83,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization
 
         private string BuildSessionState(HandlerContext handlerContext)
         {
-            var sessionId = Guid.NewGuid().ToString();
-            if (handlerContext.Request.Cookies.ContainsKey(_openidHostOptions.SessionCookieName))
-            {
-                sessionId = handlerContext.Request.Cookies[_openidHostOptions.SessionCookieName];
-            }
-            else
-            {
-                handlerContext.Response.Cookies.Append(_openidHostOptions.SessionCookieName, sessionId, new CookieOptions
-                {
-                    Secure = true,
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.None
-                });
-            }
-
+            var session = handlerContext.User.GetActiveSession();
             var redirectUrl = handlerContext.Request.Data.GetRedirectUriFromAuthorizationRequest();
             var clientId = handlerContext.Client.ClientId;
             var salt = Guid.NewGuid().ToString();
-            return BuildSessionState(redirectUrl, clientId, salt, sessionId);
+            return BuildSessionState(redirectUrl, clientId, salt, session.SessionId);
         }
 
         public static string BuildSessionState(string redirectUrl, string clientId, string salt, string sessionId)

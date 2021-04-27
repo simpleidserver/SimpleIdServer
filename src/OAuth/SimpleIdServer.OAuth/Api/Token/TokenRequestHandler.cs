@@ -25,7 +25,7 @@ namespace SimpleIdServer.OAuth.Api.Token
             _handlers = handlers;
         }
 
-        public Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
+        public virtual Task<IActionResult> Handle(HandlerContext context, CancellationToken token)
         {
             var handler = _handlers.FirstOrDefault(h => h.GrantType == context.Request.Data.GetGrantType());
             if (handler == null)

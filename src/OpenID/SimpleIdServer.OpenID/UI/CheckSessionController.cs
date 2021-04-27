@@ -15,6 +15,7 @@ using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -30,20 +31,28 @@ namespace SimpleIdServer.OpenID.UI
     public class CheckSessionController : Controller
     {
         private readonly IJwtParser _jwtParser;
+        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
         private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
         private readonly OpenIDHostOptions _openidHostOptions;
 
-        public CheckSessionController(IJwtParser jwtParser, IOAuthClientQueryRepository oAuthClientQueryRepository, IOptions<OpenIDHostOptions> options)
+        public CheckSessionController(
+            IJwtParser jwtParser,
+            IOAuthUserQueryRepository oAuthUserQueryRepository,
+            IOAuthClientQueryRepository oAuthClientQueryRepository, 
+            IOptions<OpenIDHostOptions> options)
         {
             _jwtParser = jwtParser;
+            _oauthUserQueryRepository = oAuthUserQueryRepository;
             _oauthClientQueryRepository = oAuthClientQueryRepository;
             _openidHostOptions = options.Value;
         }
 
+        [Authorize("IsConnected")]
         [HttpGet(SIDOpenIdConstants.EndPoints.CheckSession)]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var newHtml = Html.Replace("{cookieName}", _openidHostOptions.SessionCookieName);
+            var sessionId = await GetSessionId(cancellationToken);
+            var newHtml = Html.Replace("{cookieName}", sessionId);
             return new ContentResult
             {
                 ContentType = "text/html",
@@ -54,7 +63,7 @@ namespace SimpleIdServer.OpenID.UI
 
         [Authorize("IsConnected")]
         [HttpGet(SIDOpenIdConstants.EndPoints.EndSession)]
-        public async Task<IActionResult> EndSession(CancellationToken token)
+        public async Task<IActionResult> EndSession(CancellationToken cancellationToken)
         {
             var url = SIDOpenIdConstants.EndPoints.EndSessionCallback;
             var jObjBody = Request.Query.ToJObject();
@@ -64,7 +73,6 @@ namespace SimpleIdServer.OpenID.UI
             {
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 {
-                    Response.Cookies.Delete(_openidHostOptions.SessionCookieName);
                     await HttpContext.SignOutAsync();
                     return new ContentResult
                     {
@@ -74,13 +82,14 @@ namespace SimpleIdServer.OpenID.UI
                     };
                 }
 
-                var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, token);
+                var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
                 if (Request.QueryString.HasValue)
                 {
                     url = Request.GetEncodedPathAndQuery().Replace($"/{SIDOpenIdConstants.EndPoints.EndSession}", SIDOpenIdConstants.EndPoints.EndSessionCallback);
                 }
 
-                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client);
+                var sessionId = await GetSessionId(cancellationToken);
+                var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, sessionId);
                 if (!string.IsNullOrWhiteSpace(frontChannelLogout))
                 {
                     Response.SetNoCache();
@@ -99,7 +108,7 @@ namespace SimpleIdServer.OpenID.UI
 
         [Authorize("IsConnected")]
         [HttpGet(SIDOpenIdConstants.EndPoints.EndSessionCallback)]
-        public async Task<IActionResult> EndSessionCallback(CancellationToken token)
+        public async Task<IActionResult> EndSessionCallback(CancellationToken cancellationToken)
         {
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
@@ -107,8 +116,8 @@ namespace SimpleIdServer.OpenID.UI
             var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
-                await Validate(postLogoutRedirectUri, idTokenHint, token);
-                Response.Cookies.Delete(_openidHostOptions.SessionCookieName);
+                var sessionId = await GetSessionId(cancellationToken);
+                await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
                 {
@@ -123,7 +132,14 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
-        protected string BuildFrontChannelLogoutUrl(OpenIdClient client)
+        protected async Task<string> GetSessionId(CancellationToken cancellationToken)
+        {
+            var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _oauthUserQueryRepository.FindOAuthUserByLogin(userId, cancellationToken);
+            return user.GetActiveSession().SessionId;
+        }
+
+        protected string BuildFrontChannelLogoutUrl(OpenIdClient client, string sessionId)
         {
             if (string.IsNullOrWhiteSpace(client.FrontChannelLogoutUri))
             {
@@ -134,11 +150,10 @@ namespace SimpleIdServer.OpenID.UI
             if (client.FrontChannelLogoutSessionRequired)
             {
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
-                var cookie = Request.Cookies[_openidHostOptions.SessionCookieName];
                 url =  QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { Jwt.Constants.OAuthClaims.Issuer, issuer },
-                    { "sid", cookie }
+                    { Jwt.Constants.OAuthClaims.Sid, sessionId }
                 });
             }
 

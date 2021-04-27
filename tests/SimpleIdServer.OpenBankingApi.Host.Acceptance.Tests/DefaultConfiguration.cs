@@ -63,7 +63,15 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                AuthenticationTime = DateTime.UtcNow,
+                Sessions = new List<OAuthUserSession>
+                {
+                    new OAuthUserSession
+                    {
+                        AuthenticationDateTime = DateTime.UtcNow,
+                        ExpirationDateTime = DateTime.UtcNow.AddSeconds(5 * 60),
+                        SessionId = Guid.NewGuid().ToString()
+                    }
+                },
                 Claims = new List<Claim>
                 {
                     new Claim(Jwt.Constants.UserClaims.Subject, "administrator"),
