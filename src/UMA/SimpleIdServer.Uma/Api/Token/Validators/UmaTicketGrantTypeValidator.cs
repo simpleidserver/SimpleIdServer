@@ -17,13 +17,13 @@ namespace SimpleIdServer.Uma.Api.Token.Validators
     {
         public void Validate(HandlerContext handlerContext)
         {
-            if (string.IsNullOrWhiteSpace(handlerContext.Request.Data.GetTicket()))
+            if (string.IsNullOrWhiteSpace(handlerContext.Request.RequestData.GetTicket()))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(UMAErrorMessages.MISSING_PARAMETER, UMATokenRequestParameters.Ticket));
             }
 
-            var claimToken = handlerContext.Request.Data.GetClaimToken();
-            var claimTokenFormat = handlerContext.Request.Data.GetClaimTokenFormat();
+            var claimToken = handlerContext.Request.RequestData.GetClaimToken();
+            var claimTokenFormat = handlerContext.Request.RequestData.GetClaimTokenFormat();
             if (!string.IsNullOrWhiteSpace(claimToken) && string.IsNullOrWhiteSpace(claimTokenFormat))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(UMAErrorMessages.MISSING_PARAMETER, UMATokenRequestParameters.ClaimTokenFormat));

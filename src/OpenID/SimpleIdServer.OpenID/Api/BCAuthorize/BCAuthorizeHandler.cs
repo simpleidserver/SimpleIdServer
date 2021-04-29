@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
@@ -55,12 +56,12 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         {
             try
             {
-                var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.Data, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
+                var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken, ErrorCodes.INVALID_REQUEST);
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
                 context.SetUser(user);
-                var requestedExpiry = context.Request.Data.GetRequestedExpiry();
-                var interval = context.Request.Data.GetInterval();
+                var requestedExpiry = context.Request.RequestData.GetRequestedExpiry();
+                var interval = context.Request.RequestData.GetInterval();
                 if (requestedExpiry == null)
                 {
                     requestedExpiry = _options.AuthRequestExpirationTimeInSeconds;
@@ -75,9 +76,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                     interval ?? _options.DefaultBCAuthorizeWaitIntervalInSeconds,
                     openidClient.BCClientNotificationEndpoint,
                     openidClient.BCTokenDeliveryMode,
-                    context.Request.Data.GetScopesFromAuthorizationRequest(),
+                    context.Request.RequestData.GetScopesFromAuthorizationRequest(),
                     context.User.Id,
-                    context.Request.Data.GetClientNotificationToken(),
+                    context.Request.RequestData.GetClientNotificationToken(),
                     permissions);
                 bcAuthorize.IncrementNextFetchTime();
                 await _bcAuthorizeRepository.Add(bcAuthorize, cancellationToken);
@@ -109,7 +110,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             {
                 var validationResult = await _bcAuthorizeRequestValidator.ValidateConfirm(context, cancellationToken);
                 context.SetUser(validationResult.User);
-                validationResult.Authorize.Confirm(context.Request.Data.GetPermissionIds());
+                validationResult.Authorize.Confirm(context.Request.RequestData.GetPermissionIds());
                 await ConfirmPermissions(validationResult.Authorize.Permissions.Where(p => p.IsConfirmed), cancellationToken);
                 await _bcAuthorizeRepository.Update(validationResult.Authorize, cancellationToken);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);

@@ -32,24 +32,24 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "self_signed_tls_client_auth";
         public string AuthMethod => AUTH_METHOD;
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var certificate = authenticateInstruction.Certificate;
             if (certificate == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.NO_CLIENT_CERTIFICATE);
+                throw new OAuthException(errorCode, ErrorMessages.NO_CLIENT_CERTIFICATE);
             }
 
-            await CheckCertificate(certificate, client);
+            await CheckCertificate(certificate, client, errorCode);
             return true;
         }
 
-        private async Task CheckCertificate(X509Certificate2 certificate, OAuthClient client)
+        private async Task CheckCertificate(X509Certificate2 certificate, OAuthClient client, string errorCode)
         {
             if (!certificate.IsSelfSigned())
             {
                 _logger.LogError("the certificate is not self signed");
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_IS_NOT_SELF_SIGNED);
+                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_IS_NOT_SELF_SIGNED);
             }
 
             var jsonWebKeys = await client.ResolveJsonWebKeys(_httpClientFactory);

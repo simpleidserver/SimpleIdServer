@@ -54,17 +54,17 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
             catch (OAuthUserConsentRequiredException ex)
             {
-                return new RedirectActionAuthorizationResponse(ex.ActionName, ex.ControllerName, context.Request.Data);
+                return new RedirectActionAuthorizationResponse(ex.ActionName, ex.ControllerName, context.Request.OriginalRequestData);
             }
             catch (OAuthLoginRequiredException ex)
             {
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.Data, ex.Area);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area);
             }
         }
 
         protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
         {
-            var requestedResponseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
+            var requestedResponseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             if (!requestedResponseTypes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ResponseType));
@@ -77,15 +77,15 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
             }
 
-            context.SetClient(await AuthenticateClient(context.Request.Data, cancellationToken));
+            context.SetClient(await AuthenticateClient(context.Request.RequestData, cancellationToken));
             context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, cancellationToken));
             foreach (var validator in _authorizationRequestValidators)
             {
                 await validator.Validate(context, cancellationToken);
             }
 
-            var state = context.Request.Data.GetStateFromAuthorizationRequest();
-            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
+            var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(state))
             {
                 context.Response.Add(AuthorizationResponseParameters.State, state);

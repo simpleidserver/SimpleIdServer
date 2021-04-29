@@ -30,9 +30,9 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         public virtual async Task Build(IEnumerable<string> scopes, JObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JObject();
-            if (handlerContext.Request.Data != null)
+            if (handlerContext.Request.RequestData != null)
             {
-                foreach (var record in handlerContext.Request.Data)
+                foreach (var record in handlerContext.Request.RequestData)
                 {
                     dic.Add(record.Key, record.Value);
                 }
@@ -41,7 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             var authorizationCode = string.Empty;
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
             {
-                authorizationCode = handlerContext.Request.Data.GetAuthorizationCode();
+                authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
             }
 
             var refreshToken = await _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);

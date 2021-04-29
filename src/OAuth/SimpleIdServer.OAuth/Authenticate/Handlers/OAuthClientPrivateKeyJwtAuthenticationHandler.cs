@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Jwt.Exceptions;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
@@ -25,7 +26,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
         public string AuthMethod => "private_key_jwt";
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
@@ -41,26 +42,35 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             var isJwsToken = _jwtParser.IsJwsToken(clientAssertion);
             if (!isJwsToken)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
             }
 
             var jwsPayload = _jwsGenerator.ExtractPayload(clientAssertion);
             if (jwsPayload == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
             }
 
             var clientId = jwsPayload.GetIssuer();
-            var payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken);
-            if (payload == null)
+            JwsPayload payload;
+            try
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);
+                payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken, errorCode);
+            }
+            catch(JwtException ex)
+            {
+                throw new OAuthException(errorCode, ex.Message);
             }
 
-            return ValidateJwsPayLoad(payload, "");
+            if (payload == null)
+            {
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);
+            }
+
+            return ValidateJwsPayLoad(payload, expectedIssuer, errorCode);
         }
 
-        private bool ValidateJwsPayLoad(JwsPayload jwsPayload, string expectedIssuer)
+        private bool ValidateJwsPayLoad(JwsPayload jwsPayload, string expectedIssuer, string errorCode)
         {
             var jwsIssuer = jwsPayload.GetIssuer();
             var jwsSubject = jwsPayload.GetClaimValue(SimpleIdServer.Jwt.Constants.UserClaims.Subject);
@@ -69,19 +79,19 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             // 1. Check the client is correct.
             if (jwsSubject != jwsIssuer)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
             }
 
             // 2. Check if the audience is correct
             if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(expectedIssuer)))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
             }
 
             // 3. Check the expiration time
             if (DateTime.UtcNow > expirationDateTime)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
             }
 
             return true;

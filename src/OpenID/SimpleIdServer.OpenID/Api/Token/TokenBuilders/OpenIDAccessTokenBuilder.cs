@@ -26,7 +26,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var jwsPayload = await BuildOpenIdPayload(scopes, handlerContext.Request.Data, handlerContext, cancellationToken);
+            var jwsPayload = await BuildOpenIdPayload(scopes, handlerContext.Request.RequestData, handlerContext, cancellationToken);
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 

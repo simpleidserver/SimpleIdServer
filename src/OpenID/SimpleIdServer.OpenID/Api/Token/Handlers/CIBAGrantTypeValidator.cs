@@ -30,7 +30,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_PINGORPUSH_MODE_CAN_BE_USED);
             }
 
-            var authRequestId = context.Request.Data.GetAuthRequestId();
+            var authRequestId = context.Request.RequestData.GetAuthRequestId();
             if (string.IsNullOrWhiteSpace(authRequestId))
             {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));

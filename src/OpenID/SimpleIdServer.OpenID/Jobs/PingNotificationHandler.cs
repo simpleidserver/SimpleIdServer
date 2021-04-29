@@ -32,7 +32,11 @@ namespace SimpleIdServer.OpenID.Jobs
         {
             try
             {
-                using (var httpClient = _httpClientFactory.GetHttpClient())
+                var handler = new HttpClientHandler
+                {
+                    AllowAutoRedirect = false
+                };
+                using (var httpClient = _httpClientFactory.GetHttpClient(handler))
                 {
                     var content = new JObject
                     {
@@ -43,7 +47,7 @@ namespace SimpleIdServer.OpenID.Jobs
                         RequestUri = new Uri(bcAuthorize.NotificationEdp),
                         Content = new StringContent(content.ToString(), Encoding.UTF8, "application/json")
                     };
-                    httpRequestMessage.Headers.Add("Authorization", bcAuthorize.NotificationToken);
+                    httpRequestMessage.Headers.Add("Authorization",  $"Bearer {bcAuthorize.NotificationToken}");
                     var httpResult = await httpClient.SendAsync(httpRequestMessage, cancellationToken);
                     httpResult.EnsureSuccessStatusCode();
                     return true;

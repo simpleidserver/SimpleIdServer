@@ -73,7 +73,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 var queryCollection = new QueryBuilder(parameters);
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
                 var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
-                var uiLocales = context.Request.Data.GetUILocalesFromAuthorizationRequest();
+                var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
                 var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
                 {
                     ReturnUrl = _dataProtector.Protect(returnUrl),
@@ -94,8 +94,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization
 
         private async Task BuildErrorResponse(HandlerContext context, OAuthException ex, bool returnsJSON = false)
         {
-            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
-            var state = context.Request.Data.GetStateFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+            var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
             var jObj = new JObject
                 {
                     { ErrorResponseParameters.Error, ex.Code },
@@ -115,7 +115,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
 
             var dic = jObj.ToEnumerable().ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
-            _responseModeHandler.Handle(context.Request.Data, redirectUrlAuthorizationResponse, HttpContext);
+            _responseModeHandler.Handle(context.Request.RequestData, redirectUrlAuthorizationResponse, HttpContext);
         }
 
         private static void FormatRedirectUrl(List<KeyValuePair<string, string>> parameters)

@@ -78,6 +78,7 @@ namespace SimpleIdServer.MobileApp.Droid.Services
                     $"{ResponseTypeValues.Code} {ResponseTypeValues.Token}",
                     Android.Net.Uri.Parse(Constants.RedirectUri))
                 .SetScope(string.Join(" ", Constants.Scopes))
+                .SetResponseMode("query")
                 .Build();
             var postAuthorizationIntent = CreatePostAuthorizationIntent(MainActivity.Instance, authRequest, serviceConfig.DiscoveryDoc, authState);
             _authService.PerformAuthorizationRequest(authRequest, postAuthorizationIntent);

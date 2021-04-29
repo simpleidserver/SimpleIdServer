@@ -17,9 +17,9 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JObject();
-            if (handlerContext.Request.Data != null)
+            if (handlerContext.Request.RequestData != null)
             {
-                foreach (var record in handlerContext.Request.Data)
+                foreach (var record in handlerContext.Request.RequestData)
                 {
                     dic.Add(record.Key, record.Value);
                 }

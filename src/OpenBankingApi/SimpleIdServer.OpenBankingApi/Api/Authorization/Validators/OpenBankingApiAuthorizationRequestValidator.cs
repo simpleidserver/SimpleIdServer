@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
@@ -44,8 +43,8 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             IHttpClientFactory httpClientFactory,
             IAmrHelper amrHelper, 
             IJwtParser jwtParser,
-            IRequestObjectValidator requestObjectValidator,
-            IOAuthWorkflowConverter workflowConverter) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser, requestObjectValidator)
+            IOAuthWorkflowConverter workflowConverter,
+            IExtractRequestHelper extractRequestHelper) : base(userConsentFetcher, oauthResponseModes, httpClientFactory, amrHelper, jwtParser, extractRequestHelper)
         {
             _options = options.Value;
             _accountAccessConsentRepository = accountAccessConsentRepository;
@@ -56,11 +55,11 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
         public override async Task Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = (OpenIdClient)context.Client;
-            var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
-            var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
-            var acrValues = context.Request.Data.GetAcrValuesFromAuthorizationRequest();
-            var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
-            var prompt = context.Request.Data.GetPromptFromAuthorizationRequest();
+            var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
+            var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
+            var prompt = context.Request.RequestData.GetPromptFromAuthorizationRequest();
             if (!scopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
@@ -82,23 +81,19 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }
 
-            var containsRequestObject = false;
-            if (!(containsRequestObject = await CheckRequestParameter(context)))
-            {
-                containsRequestObject = await CheckRequestUriParameter(context);
-            }
-
-            if (!containsRequestObject && _options.IsRequestRequired)
+            var isValid = await ExtractRequestHelper.Extract(context);
+            var isFapiRequest = IsFAPIAuthRequest(context);
+            if (!isValid && isFapiRequest)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, string.Join(",", new[] { AuthorizationRequestParameters.Request, AuthorizationRequestParameters.RequestUri })));
             }
 
             await CommonValidate(context, cancellationToken);
-            var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
-            var nonce = context.Request.Data.GetNonceFromAuthorizationRequest();
-            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
-            var maxAge = context.Request.Data.GetMaxAgeFromAuthorizationRequest();
-            var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
+            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+            var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+            var maxAge = context.Request.RequestData.GetMaxAgeFromAuthorizationRequest();
+            var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(redirectUri))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.RedirectUri));
@@ -152,7 +147,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
                     throw new OAuthSelectAccountRequiredException();
             }
 
-            if (!context.User.HasOpenIDConsent(clientId, scopes, claims) || context.Request.Data.GetClaimsFromAuthorizationRequest().Any(c => c.Name == _options.OpenBankingApiConsentClaimName))
+            if (!context.User.HasOpenIDConsent(clientId, scopes, claims) || isFapiRequest)
             {
                 RedirectToConsentView(context);
                 return;
@@ -174,32 +169,10 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             RedirectToConsentView(context, false);
         }
 
-        protected override void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, OpenIdClient openidClient, HandlerContext context)
-        {
-            base.CheckRequestObject(header, jwsPayload, openidClient, context);
-            if (!jwsPayload.ContainsKey(Jwt.Constants.OAuthClaims.ExpirationTime))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, Jwt.Constants.OAuthClaims.ExpirationTime));
-            }
-
-            var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();
-            var exp = jwsPayload.GetExpirationTime();
-            if (currentDateTime > exp)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.REQUEST_OBJECT_IS_EXPIRED);
-            }
-
-            var audiences = jwsPayload.GetAudiences();
-            if (audiences.Any() && !audiences.Contains(context.Request.IssuerName))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.REQUEST_OBJECT_BAD_AUDIENCE);
-            }
-        }
-
         private void RedirectToConsentView(HandlerContext context, bool ignoreDefaultRedirection = true)
         {
-            var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
-            var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
             var claim = claims.FirstOrDefault(_ => _.Name == _options.OpenBankingApiConsentClaimName);
             if (claim == null)
             {
@@ -246,6 +219,12 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
             var s = string.Join(",", scopes);
             _logger.LogError($"consent screen cannot be displayed for the scopes '{s}'");
             throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.ConsentScreenCannotBeDisplayed, s));
+        }
+
+        private bool IsFAPIAuthRequest(HandlerContext context)
+        {
+            var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
+            return claims.Any(c => c.Name == _options.OpenBankingApiConsentClaimName);
         }
     }
 }

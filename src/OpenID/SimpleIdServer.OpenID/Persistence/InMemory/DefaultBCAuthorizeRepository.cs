@@ -23,7 +23,12 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
         public Task<IEnumerable<BCAuthorize>> GetConfirmedAuthorizationRequest(CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
-            return Task.FromResult(_bcAuthorizeLst.Where(bc => bc.Status == BCAuthorizeStatus.Confirmed && bc.ExpirationDateTime > currentDateTime));
+            return Task.FromResult(_bcAuthorizeLst.Where(bc => bc.Status == BCAuthorizeStatus.Confirmed));
+        }
+
+        public Task<IEnumerable<BCAuthorize>> GetNotSentRejectedAuthorizationRequest(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(_bcAuthorizeLst.Where(bc => bc.Status == BCAuthorizeStatus.Rejected && bc.RejectionSentDateTime == null));
         }
 
         public Task<BCAuthorize> Get(string id, CancellationToken cancellationToken)

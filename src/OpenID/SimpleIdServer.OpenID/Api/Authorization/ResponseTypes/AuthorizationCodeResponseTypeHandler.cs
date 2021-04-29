@@ -47,17 +47,17 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
                 dic.Add(OAuthClaims.AuthenticationTime, context.User.GetActiveSession()?.AuthenticationDateTime.ConvertToUnixTimestamp());
             }
 
-            foreach(var record in context.Request.Data)
+            foreach(var record in context.Request.RequestData)
             {
                 dic.Add(record.Key, record.Value);
             }
 
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
-            var isScopeContainsOfflineAccess = context.Request.Data.GetScopesFromAuthorizationRequest().Contains(SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name);
+            var isScopeContainsOfflineAccess = context.Request.RequestData.GetScopesFromAuthorizationRequest().Contains(SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeContainsOfflineAccess)
             {
-                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context, cancellationToken);
+                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(context.Request.RequestData.GetScopesFromAuthorizationRequest(), context, cancellationToken);
             }
         }
     }

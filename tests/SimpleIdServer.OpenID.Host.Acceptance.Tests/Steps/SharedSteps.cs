@@ -48,6 +48,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             });
             var mock = new Mock<OAuth.Infrastructures.IHttpClientFactory>();
             mock.Setup(m => m.GetHttpClient()).Returns(client);
+            mock.Setup(m => m.GetHttpClient(It.IsAny<HttpClientHandler>())).Returns(client);
         }
 
         [When("add '(.*)' seconds and store the result into '(.*)'")]

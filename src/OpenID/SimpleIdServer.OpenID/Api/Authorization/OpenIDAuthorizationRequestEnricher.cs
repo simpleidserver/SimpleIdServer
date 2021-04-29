@@ -11,7 +11,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
     {
         public void Enrich(HandlerContext context)
         {
-            var uiLocales = context.Request.Data.GetUILocalesFromAuthorizationRequest();
+            var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
             if (uiLocales.Any())
             {
                 context.Response.Add(OAuth.DTOs.AuthorizationRequestParameters.UILocales, string.Join(" ", uiLocales));

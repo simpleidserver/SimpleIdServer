@@ -60,7 +60,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
 
         public async Task<JObject> Handle(HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            await ExtractSoftwareStatement(handlerContext.Request.Data);
+            await ExtractSoftwareStatement(handlerContext.Request.RequestData);
             var oauthClient = ExtractClient(handlerContext);
             await _oauthClientValidator.Validate(oauthClient, cancellationToken);
             OAuthClientCommandRepository.Add(oauthClient);
@@ -70,7 +70,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
 
         protected virtual OAuthClient ExtractClient(HandlerContext handlerContext)
         {
-            var result = handlerContext.Request.Data.ToDomain();
+            var result = handlerContext.Request.RequestData.ToDomain();
             EnrichClient(result);
             return result;
         }

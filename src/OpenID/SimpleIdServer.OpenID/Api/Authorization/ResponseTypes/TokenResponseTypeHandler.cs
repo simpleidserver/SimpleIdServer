@@ -26,7 +26,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
         public Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
-            return _tokenBuilders.First(t => t.Name == OAuth.DTOs.AuthorizationResponseParameters.AccessToken).Build(context.Request.Data.GetScopesFromAuthorizationRequest(), context, cancellationToken);
+            return _tokenBuilders.First(t => t.Name == OAuth.DTOs.AuthorizationResponseParameters.AccessToken).Build(context.Request.RequestData.GetScopesFromAuthorizationRequest(), context, cancellationToken);
         }
     }
 }

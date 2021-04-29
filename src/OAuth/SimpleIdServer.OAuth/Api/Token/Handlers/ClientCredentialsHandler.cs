@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _clientCredentialsGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                var scopes = ScopeHelper.Validate(context.Request.Data.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
+                var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {

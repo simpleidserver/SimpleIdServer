@@ -62,14 +62,14 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                 _umaTicketGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                var ticket = context.Request.Data.GetTicket();
-                var claimTokenFormat = context.Request.Data.GetClaimTokenFormat();
+                var ticket = context.Request.RequestData.GetTicket();
+                var claimTokenFormat = context.Request.RequestData.GetClaimTokenFormat();
                 if (string.IsNullOrWhiteSpace(claimTokenFormat))
                 {
                     claimTokenFormat = _umaHostOptions.DefaultClaimTokenFormat;
                 }
 
-                var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
+                var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
                 var permissionTicket = await _umaPermissionTicketHelper.GetTicket(ticket);
                 if (permissionTicket == null)
                 {

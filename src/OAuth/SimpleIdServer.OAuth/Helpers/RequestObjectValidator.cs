@@ -2,16 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Jwt.Exceptions;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.Jwt.Jws.Handlers;
-using SimpleIdServer.OAuth;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.Helpers
+namespace SimpleIdServer.OAuth.Helpers
 {
     public class RequestObjectValidator : IRequestObjectValidator
     {
@@ -22,11 +20,11 @@ namespace SimpleIdServer.OpenID.Helpers
             _jwtParser = jwtParser;
         }
 
-        public virtual async Task<RequestObjectValidatorResult> Validate(string request, OpenIdClient openidClient, CancellationToken cancellationToken)
+        public virtual async Task<RequestObjectValidatorResult> Validate(string request, OAuthClient oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
+                throw new OAuthException(errorCode, ErrorMessages.INVALID_REQUEST_PARAMETER);
             }
 
             var jws = request;
@@ -35,7 +33,7 @@ namespace SimpleIdServer.OpenID.Helpers
                 jws = await _jwtParser.Decrypt(jws);
                 if (string.IsNullOrWhiteSpace(jws))
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWE_REQUEST_PARAMETER);
+                    throw new OAuthException(errorCode, ErrorMessages.INVALID_JWE_REQUEST_PARAMETER);
                 }
             }
 
@@ -46,17 +44,17 @@ namespace SimpleIdServer.OpenID.Helpers
             }
             catch (InvalidOperationException)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
+                throw new OAuthException(errorCode, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
             }
 
             JwsPayload jwsPayload;
             try
             {
-                jwsPayload = await _jwtParser.Unsign(jws, openidClient);
+                jwsPayload = await _jwtParser.Unsign(jws, oauthClient, errorCode);
             }
             catch (JwtException ex)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ex.Message);
+                throw new OAuthException(errorCode, ex.Message);
             }
 
             return new RequestObjectValidatorResult(jwsPayload, header);

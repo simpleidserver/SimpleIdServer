@@ -25,6 +25,7 @@ namespace SimpleIdServer.OpenID.Domains
         public BCAuthorizeStatus Status { get; set; }
         public DateTime ExpirationDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        public DateTime? RejectionSentDateTime { get; set; }
         public DateTime? NextFetchTime { get; set; }
         public IEnumerable<BCAuthorizePermission> Permissions { get; set; }
 
@@ -39,6 +40,12 @@ namespace SimpleIdServer.OpenID.Domains
             }
         }
 
+        public void Pong()
+        {
+            Status = BCAuthorizeStatus.Pong;
+            UpdateDateTime = DateTime.UtcNow;
+        }
+
         public void Send()
         {
             Status = BCAuthorizeStatus.Sent;
@@ -49,6 +56,11 @@ namespace SimpleIdServer.OpenID.Domains
         {
             Status = BCAuthorizeStatus.Rejected;
             UpdateDateTime = DateTime.UtcNow;
+        }
+
+        public void NotifyRejection()
+        {
+            RejectionSentDateTime = DateTime.UtcNow;
         }
 
         public void IncrementNextFetchTime()
@@ -106,7 +118,8 @@ namespace SimpleIdServer.OpenID.Domains
                 Permissions = Permissions.Select(p => (BCAuthorizePermission)p.Clone()).ToList(),
                 Interval = Interval,
                 NextFetchTime = NextFetchTime,
-                UpdateDateTime = UpdateDateTime
+                UpdateDateTime = UpdateDateTime,
+                RejectionSentDateTime = RejectionSentDateTime
             };
         }
 

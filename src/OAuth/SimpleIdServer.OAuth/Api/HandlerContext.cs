@@ -57,7 +57,8 @@ namespace SimpleIdServer.OAuth.Api
 
         public HandlerContextRequest(string issuerName, string userSubject, JObject data) : this(issuerName, userSubject)
         {
-            Data = data;
+            OriginalRequestData = data;
+            RequestData = data;
         }
 
         public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader) : this(issuerName, userSubject, data)
@@ -77,14 +78,15 @@ namespace SimpleIdServer.OAuth.Api
 
         public string IssuerName { get; private set; }
         public string UserSubject { get; private set; }
-        public JObject Data { get; private set; }
+        public JObject OriginalRequestData { get; private set; }
+        public JObject RequestData { get; private set; }
         public JObject HttpHeader { get; private set; }
         public IRequestCookieCollection Cookies { get; set; }
         public X509Certificate2 Certificate { get; set; }
 
-        public void SetData(JObject data)
+        public void SetRequestData(JObject data)
         {
-            Data = data;
+            RequestData = data;
         }
 
         public string GetToken(params string[] prefixes)

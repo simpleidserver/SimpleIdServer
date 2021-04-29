@@ -66,7 +66,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             }
 
             var openidClient = (OpenIdClient)context.Client;
-            var payload = await BuildIdToken(context, context.Request.Data, scopes, cancellationToken);
+            var payload = await BuildIdToken(context, context.Request.RequestData, scopes, cancellationToken);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
             context.Response.Add(Name, idToken);
         }

@@ -283,7 +283,7 @@ Scenario: Error is returned when request parameter is not a valid JWT token
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='request parameter is invalid'
 
 Scenario: Error is returned when request parameter is not a valid JWS token
@@ -306,7 +306,7 @@ Scenario: Error is returned when request parameter is not a valid JWS token
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='request parameter is not a valid JWS token'
 
 Scenario: Error is returned when request parameter is a JWS token with an invalid algorithm name
@@ -338,7 +338,7 @@ Scenario: Error is returned when request parameter is a JWS token with an invali
 	
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_request_object'
 	Then JSON 'error_description'='unknown json web key '1''
 
 Scenario: Error is returned when request parameter doesn't contain response_type

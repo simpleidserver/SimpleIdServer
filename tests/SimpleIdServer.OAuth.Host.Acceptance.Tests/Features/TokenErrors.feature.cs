@@ -157,7 +157,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 25
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 26
  testRunner.Then("JSON \'error_description\'=\'missing parameter code_verifier\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -279,7 +279,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 63
- testRunner.Then("JSON \'error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 64
  testRunner.Then("JSON \'error_description\'=\'code_verifier is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -365,7 +365,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 87
- testRunner.Then("JSON \'error\'=\'invalid_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 88
  testRunner.Then("JSON \'error_description\'=\'no client certificate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -454,7 +454,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 112
- testRunner.Then("JSON \'error\'=\'invalid_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 113
  testRunner.Then("JSON \'error_description\'=\'no client certificate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -546,7 +546,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 138
- testRunner.Then("JSON \'error\'=\'invalid_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 139
  testRunner.Then("JSON \'error_description\'=\'certificate san DNS is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -638,7 +638,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 164
- testRunner.Then("JSON \'error\'=\'invalid_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 165
  testRunner.Then("JSON \'error_description\'=\'certificate san EMAIL is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -730,7 +730,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 190
- testRunner.Then("JSON \'error\'=\'invalid_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 191
  testRunner.Then("JSON \'error_description\'=\'certificate san IP is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

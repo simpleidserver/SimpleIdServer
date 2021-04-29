@@ -22,7 +22,7 @@ Scenario: Error is returned when code_verifier parameter is missing
 
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_request'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='missing parameter code_verifier'
 
 Scenario: Error is returned when code_verifier is invalid
@@ -60,7 +60,7 @@ Scenario: Error is returned when code_verifier is invalid
 	
 	And extract JSON from body
 
-	Then JSON 'error'='invalid_grant'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='code_verifier is invalid'
 
 Scenario: Error is returned when certificate is missing
@@ -84,7 +84,7 @@ Scenario: Error is returned when certificate is missing
 
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_client_auth'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='no client certificate'
 
 Scenario: Error is returned when certificate in incorrect
@@ -109,7 +109,7 @@ Scenario: Error is returned when certificate in incorrect
 
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_client_auth'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='no client certificate'
 
 Scenario: Error is returned when certificate doesn't contain the correct SAN DNS
@@ -135,7 +135,7 @@ Scenario: Error is returned when certificate doesn't contain the correct SAN DNS
 
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_client_auth'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='certificate san DNS is invalid'
 
 Scenario: Error is returned when certificate doesn't contain the correct SAN EMAIL
@@ -161,7 +161,7 @@ Scenario: Error is returned when certificate doesn't contain the correct SAN EMA
 
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_client_auth'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='certificate san EMAIL is invalid'
 
 Scenario: Error is returned when certificate doesn't contain the correct SAN IP
@@ -187,5 +187,5 @@ Scenario: Error is returned when certificate doesn't contain the correct SAN IP
 
 	And extract JSON from body
 	
-	Then JSON 'error'='invalid_client_auth'
+	Then JSON 'error'='invalid_client'
 	Then JSON 'error_description'='certificate san IP is invalid'

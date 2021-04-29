@@ -29,8 +29,8 @@ namespace SimpleIdServer.OAuth.Jwt
         JweHeader ExtractJweHeader(string jwe);
         JwsPayload ExtractJwsPayload(string jws);
         Task<JwsPayload> Unsign(string jws);
-        Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken);
-        Task<JwsPayload> Unsign(string jws, OAuthClient client);
+        Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
+        Task<JwsPayload> Unsign(string jws, OAuthClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
         JwsPayload Unsign(string jws, JsonWebKey jwk);
     }
 
@@ -183,18 +183,18 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jwsGenerator.ExtractPayload(jws, jsonWebKey);
         }
 
-        public async Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken)
+        public async Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
             var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
             if (client == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+                throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             }
 
-            return await Unsign(jws, client);
+            return await Unsign(jws, client, errorCode);
         }
 
-        public async Task<JwsPayload> Unsign(string jws, OAuthClient client)
+        public async Task<JwsPayload> Unsign(string jws, OAuthClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
             var protectedHeader = _jwsGenerator.ExtractHeader(jws);
             if (protectedHeader == null)
@@ -203,9 +203,14 @@ namespace SimpleIdServer.OAuth.Jwt
             }
 
             var jsonWebKey = await GetJsonWebKeyFromClient(client, protectedHeader.Kid);
-            if (jsonWebKey ==null)
+            if (jsonWebKey == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_JSON_WEB_KEY, protectedHeader.Kid));
+                throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_JSON_WEB_KEY, protectedHeader.Kid));
+            }
+
+            if (jsonWebKey.Alg != protectedHeader.Alg)
+            {
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ALG);
             }
 
             return Unsign(jws, jsonWebKey);

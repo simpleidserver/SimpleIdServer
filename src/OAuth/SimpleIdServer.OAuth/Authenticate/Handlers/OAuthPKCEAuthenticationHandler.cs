@@ -27,12 +27,12 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "pkce";
         public string AuthMethod => AUTH_METHOD;
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var codeVerifier = authenticateInstruction.RequestData.GetCodeVerifier();
             if (string.IsNullOrWhiteSpace(codeVerifier))
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.CodeVerifier));
+                throw new OAuthException(errorCode, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.CodeVerifier));
             }
 
             var code = authenticateInstruction.RequestData.GetAuthorizationCode();
@@ -58,7 +58,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             var newCodeChallenge = codeChallengeMethodHandler.Calculate(codeVerifier);
             if (newCodeChallenge != codeChallenge)
             {
-                throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_CODE_VERIFIER);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CODE_VERIFIER);
             }
 
             return true;

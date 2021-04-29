@@ -322,7 +322,8 @@ namespace SimpleIdServer.OAuth.Domains
                 TlsClientAuthSanEmail = TlsClientAuthSanEmail,
                 TlsClientAuthSanIP = TlsClientAuthSanIP,
                 TlsClientAuthSanURI = TlsClientAuthSanURI,
-                TlsClientAuthSubjectDN = TlsClientAuthSubjectDN
+                TlsClientAuthSubjectDN = TlsClientAuthSubjectDN,
+                TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken
             };
         }
 

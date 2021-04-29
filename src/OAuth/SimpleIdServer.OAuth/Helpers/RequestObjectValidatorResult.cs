@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Jwt.Jws;
 
-namespace SimpleIdServer.OpenID.Helpers
+namespace SimpleIdServer.OAuth.Helpers
 {
     public class RequestObjectValidatorResult
     {

@@ -178,7 +178,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     {
                         firstMtlsClientJsonWebKey
                     },
-                    TlsClientAuthSubjectDN = "firstMtlsClient",
+                    TlsClientAuthSubjectDN = "CN=firstMtlsClient",
                     PreferredTokenProfile = "Bearer"
                 },
                 new OpenIdClient
@@ -227,7 +227,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     {
                         secondMtlsClientJsonWebKey
                     },
-                    TlsClientAuthSubjectDN = "secondMtlsClient",
+                    TlsClientAuthSubjectDN = "CN=secondMtlsClient",
                     PreferredTokenProfile = "Bearer"
                 },
                 new OpenIdClient

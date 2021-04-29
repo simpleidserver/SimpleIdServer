@@ -34,7 +34,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
         {
             try
             {
-                var deviceRegistrationToken = context.Request.Data.GetDeviceRegistrationToken();
+                var deviceRegistrationToken = context.Request.RequestData.GetDeviceRegistrationToken();
                 var user = await _bcDeviceRegistrationValidator.Validate(context, cancellationToken);
                 user.DeviceRegistrationToken = deviceRegistrationToken;
                 await _oauthUserCommandRepository.Update(user, cancellationToken);

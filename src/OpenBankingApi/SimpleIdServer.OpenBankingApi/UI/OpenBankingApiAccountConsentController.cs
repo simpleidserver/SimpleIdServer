@@ -20,6 +20,7 @@ using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenBankingApi.Resources;
 using SimpleIdServer.OpenBankingApi.UI.ViewModels;
 using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.OpenID.Helpers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -42,6 +43,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
         private readonly IAccountRepository _accountRepository;
         private readonly IMediator _mediator;
         private readonly IResponseModeHandler _responseModeHandler;
+        private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly OAuthHostOptions _oauthHostOptions;
         private readonly OpenBankingApiOptions _openbankingApiOptions;
         private readonly ILogger<OpenBankingApiAccountConsentController> _logger;
@@ -54,6 +56,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
             IDataProtectionProvider dataProtectionProvider,
             IAccountAccessConsentRepository accountAccessConsentRepository,
             IAccountRepository accountRepository,
+            IExtractRequestHelper extractRequestHelper,
             IResponseModeHandler responseModeHandler,
             IMediator mediator,
             ILogger<OpenBankingApiAccountConsentController> logger,
@@ -68,6 +71,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
             _accountAccessConsentRepository = accountAccessConsentRepository;
             _accountRepository = accountRepository;
             _responseModeHandler = responseModeHandler;
+            _extractRequestHelper = extractRequestHelper;
             _mediator = mediator;
             _logger = logger;
             _oauthHostOptions = oauthHostOptions.Value;
@@ -86,10 +90,11 @@ namespace SimpleIdServer.OpenBankingApi.UI
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
+                var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+                query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 var consentId = claims.Single(c => c.Name == _openbankingApiOptions.OpenBankingApiConsentClaimName).Values.First();
-                var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
                 var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _oauthHostOptions.DefaultCulture;
                 var claimDescriptions = new List<string>();
                 if (claims != null && claims.Any())
@@ -138,6 +143,9 @@ namespace SimpleIdServer.OpenBankingApi.UI
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             await _mediator.Send(new RejectAccountAccessConsentCommand { ConsentId = viewModel.ConsentId }, cancellationToken);
             var query = unprotectedUrl.GetQueries().ToJObj();
+            var clientId = query.GetClientIdFromAuthorizationRequest();
+            var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+            query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var state = query.GetStateFromAuthorizationRequest();
             var jObj = new JObject

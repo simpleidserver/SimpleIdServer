@@ -52,7 +52,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _authorizationCodeGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                var code = context.Request.Data.GetAuthorizationCode();
+                var code = context.Request.RequestData.GetAuthorizationCode();
                 var previousRequest = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
                 if (previousRequest == null)
                 {

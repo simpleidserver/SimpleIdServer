@@ -18,7 +18,7 @@ namespace SimpleIdServer.OpenID.Api.Register
 
         protected override OAuthClient ExtractClient(HandlerContext handlerContext)
         {
-            var result = handlerContext.Request.Data.ToDomain();
+            var result = handlerContext.Request.RequestData.ToDomain();
             return result;
         }
     }

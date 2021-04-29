@@ -14,11 +14,8 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";
         public const string INVALID_ALG_USED_TO_SIGN_IDTOKENHINT = "the alg used to sign the id_token_hint is invalid";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
-        public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_REQUEST_URI_PARAMETER = "request uri parameter is invalid";
-        public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
         public const string INVALID_SIGNATURE_ALG = "the signature algorithm is invalid";
-        public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
         public const string INVALID_RESPONSE_TYPE_CLAIM = "the response type claim is invalid";
         public const string INVALID_CLIENT_ID_CLAIM = "the client identifier claim is invalid";
         public const string INVALID_ISSUER_CLAIM = "the issuer claim is invalid";

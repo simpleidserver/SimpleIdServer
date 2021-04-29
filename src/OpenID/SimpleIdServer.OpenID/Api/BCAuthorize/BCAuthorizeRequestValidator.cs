@@ -9,12 +9,12 @@ using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
-using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using System;
@@ -58,9 +58,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             await CheckRequestObject(context, cancellationToken);
             var tokens = new bool[]
             {
-                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),
-                string.IsNullOrWhiteSpace(context.Request.Data.GetIdTokenHintFromAuthorizationRequest()),
-                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintFromAuthorizationRequest())
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintToken()),
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest()),
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintFromAuthorizationRequest())
             };
             if(tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
             {
@@ -88,9 +88,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         {
             var tokens = new bool[]
             {
-                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),
-                string.IsNullOrWhiteSpace(context.Request.Data.GetIdTokenHintFromAuthorizationRequest()),
-                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintFromAuthorizationRequest())
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintToken()),
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest()),
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintFromAuthorizationRequest())
             };
             if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
             {
@@ -107,7 +107,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 }
             }
 
-            var authRequestId = context.Request.Data.GetAuthRequestId();
+            var authRequestId = context.Request.RequestData.GetAuthRequestId();
             if (string.IsNullOrWhiteSpace(authRequestId))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, DTOs.AuthorizationRequestParameters.AuthReqId));
@@ -119,13 +119,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
             }
 
-            var currentDateTime = DateTime.UtcNow;
-            if (currentDateTime > authRequest.ExpirationDateTime)
-            {
-                throw new OAuthException(ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_EXPIRED, authRequestId));
-            }
-
-            var permissionIds = context.Request.Data.GetPermissionIds();
+            var permissionIds = context.Request.RequestData.GetPermissionIds();
             var unknownPermissionIds = permissionIds.Where(pid => !authRequest.Permissions.Any(p => p.PermissionId == pid));
             if (unknownPermissionIds.Any())
             {
@@ -139,9 +133,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         {
             var tokens = new bool[]
             {
-                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintToken()),
-                string.IsNullOrWhiteSpace(context.Request.Data.GetIdTokenHintFromAuthorizationRequest()),
-                string.IsNullOrWhiteSpace(context.Request.Data.GetLoginHintFromAuthorizationRequest())
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintToken()),
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest()),
+                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintFromAuthorizationRequest())
             };
             if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
             {
@@ -158,7 +152,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 }
             }
 
-            var authReqId = context.Request.Data.GetAuthRequestId();
+            var authReqId = context.Request.RequestData.GetAuthRequestId();
             if (string.IsNullOrWhiteSpace(authReqId))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, DTOs.AuthorizationRequestParameters.AuthReqId));
@@ -180,13 +174,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private async Task CheckRequestObject(HandlerContext context, CancellationToken cancellationToken)
         {
-            var request = context.Request.Data.GetRequest();
+            var request = context.Request.RequestData.GetRequest();
             if (string.IsNullOrWhiteSpace(request))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, BCAuthenticationRequestParameters.Request));
             }
 
-            var validationResult = await _requestObjectValidator.Validate(request, (OpenIdClient)context.Client, cancellationToken);
+            var validationResult = await _requestObjectValidator.Validate(request, (OpenIdClient)context.Client, cancellationToken, ErrorCodes.INVALID_REQUEST);
             var audiences = validationResult.JwsPayload.GetAudiences();
             var issuer = validationResult.JwsPayload.GetIssuer();
             var exp = validationResult.JwsPayload.GetExpirationTime();
@@ -262,12 +256,12 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.BCAuthenticationRequestSigningAlg));
             }
 
-            context.Request.SetData(JObject.FromObject(validationResult.JwsPayload));
+            context.Request.SetRequestData(JObject.FromObject(validationResult.JwsPayload));
         }
 
         private void CheckScopes(HandlerContext context)
         {
-            var requestedScopes = context.Request.Data.GetScopesFromAuthorizationRequest();
+            var requestedScopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             if (!requestedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
@@ -278,7 +272,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private void CheckClientNotificationToken(HandlerContext context)
         {
-            var clientNotificationToken = context.Request.Data.GetClientNotificationToken();
+            var clientNotificationToken = context.Request.RequestData.GetClientNotificationToken();
             var openidClient = (OpenIdClient)context.Client;
             if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping && 
                 openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Push)
@@ -304,7 +298,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private async Task<OAuthUser> CheckLoginHintToken(HandlerContext context)
         {
-            var loginHintToken = context.Request.Data.GetLoginHintToken();
+            var loginHintToken = context.Request.RequestData.GetLoginHintToken();
             if (!string.IsNullOrWhiteSpace(loginHintToken))
             {
                 var payload = await ExtractHint(loginHintToken);
@@ -316,7 +310,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private async Task<OAuthUser> CheckIdTokenHint(HandlerContext context)
         {
-            var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
+            var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
                 var payload = await ExtractHint(idTokenHint);
@@ -333,7 +327,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private async Task<OAuthUser> CheckLoginHint(HandlerContext context)
         {
-            var loginHint = context.Request.Data.GetLoginHintFromAuthorizationRequest();
+            var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
             if (!string.IsNullOrEmpty(loginHint))
             {
                 var user = await _oauthUserQueryRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, loginHint);
@@ -350,7 +344,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private void CheckBindingMessage(HandlerContext context)
         {
-            var bindingMessage = context.Request.Data.GetBindingMessage();
+            var bindingMessage = context.Request.RequestData.GetBindingMessage();
             if (!string.IsNullOrWhiteSpace(bindingMessage) && bindingMessage.Count() > _options.MaxBindingMessageSize)
             {
                 throw new OAuthException(ErrorCodes.INVALID_BINDING_MESSAGE, string.Format(ErrorMessages.BINDING_MESSAGE_MUST_NOT_EXCEED, _options.MaxBindingMessageSize));
@@ -359,7 +353,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
         private void CheckRequestedExpiry(HandlerContext context)
         {
-            var requestedExpiry = context.Request.Data.GetRequestedExpiry();
+            var requestedExpiry = context.Request.RequestData.GetRequestedExpiry();
             if (requestedExpiry.HasValue && requestedExpiry.Value < 0)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.REQUESTED_EXPIRY_MUST_BE_POSITIVE);

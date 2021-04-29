@@ -29,7 +29,7 @@ namespace SimpleIdServer.OpenID.SubjectTypeBuilders
         public async Task<string> Build(HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = (OpenIdClient)context.Client;
-            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var url = redirectUri;
             var sectorIdentifierUrls = await openidClient.GetSectorIdentifierUrls(_httpClientFactory, cancellationToken);
             if (sectorIdentifierUrls.Contains(url))

@@ -62,7 +62,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
 
         protected virtual OAuthClient ExtractClient(HandlerContext handlerContext)
         {
-            var result = handlerContext.Request.Data.ToDomain();
+            var result = handlerContext.Request.RequestData.ToDomain();
             return result;
         }
     }

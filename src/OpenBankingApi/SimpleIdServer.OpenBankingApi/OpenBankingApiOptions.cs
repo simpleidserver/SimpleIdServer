@@ -10,7 +10,6 @@
             JwtBearerAuthenticationScheme = "Bearer";
             AccountsScope = "accounts";
             OpenBankingApiConsentClaimName = "openbanking_intent_id";
-            IsRequestRequired = true;
         }
 
         public int TakeSnapshotEveryNbRevisions { get; set; }
@@ -25,9 +24,5 @@
         /// Name of the consent defined by openbankingapi.
         /// </summary>
         public string OpenBankingApiConsentClaimName { get; set; }
-        /// <summary>
-        /// Throw an exception if request or request_uri is not passed in the request.
-        /// </summary>
-        public bool IsRequestRequired { get; set; }
     }
 }

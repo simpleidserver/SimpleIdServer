@@ -44,7 +44,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             try
             {
                 var result = await base.BuildResponse(context, token);
-                var display = context.Request.Data.GetDisplayFromAuthorizationRequest();
+                var display = context.Request.RequestData.GetDisplayFromAuthorizationRequest();
                 if (!string.IsNullOrWhiteSpace(display))
                 {
                     context.Response.Add(AuthorizationRequestParameters.Display, display);
@@ -60,25 +60,25 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             }
             catch(OAuthUserConsentRequiredException ex)
             {
-                context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse(ex.ActionName, ex.ControllerName, context.Request.Data);
+                context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
+                return new RedirectActionAuthorizationResponse(ex.ActionName, ex.ControllerName, context.Request.OriginalRequestData);
             }
             catch (OAuthLoginRequiredException ex)
             {
-                context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.Data, ex.Area);
+                context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area);
             }
             catch (OAuthSelectAccountRequiredException)
             {
-                context.Request.Data.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Accounts", context.Request.Data);
+                context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
+                return new RedirectActionAuthorizationResponse("Index", "Accounts", context.Request.OriginalRequestData);
             }
         }
 
         private string BuildSessionState(HandlerContext handlerContext)
         {
             var session = handlerContext.User.GetActiveSession();
-            var redirectUrl = handlerContext.Request.Data.GetRedirectUriFromAuthorizationRequest();
+            var redirectUrl = handlerContext.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var clientId = handlerContext.Client.ClientId;
             var salt = Guid.NewGuid().ToString();
             return BuildSessionState(redirectUrl, clientId, salt, session.SessionId);

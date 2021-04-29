@@ -27,7 +27,7 @@ namespace SimpleIdServer.Uma.Api.Token.Fetchers
 
         public Task<ClaimTokenFormatFetcherResult> Fetch(HandlerContext context)
         {
-            var claimToken = context.Request.Data.GetClaimToken();
+            var claimToken = context.Request.RequestData.GetClaimToken();
             if (!_jwtParser.IsJwsToken(claimToken))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, UMAErrorMessages.BAD_CLAIM_TOKEN);

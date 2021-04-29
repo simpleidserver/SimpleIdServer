@@ -23,7 +23,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
         public string AuthMethod => "client_secret_jwt";
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
@@ -43,39 +43,39 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             var clientSecret = client.Secrets.FirstOrDefault(s => s.Type == ClientSecretTypes.SharedSecret);
             if (clientSecret == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.NO_CLIENT_SECRET);
+                throw new OAuthException(errorCode, ErrorMessages.NO_CLIENT_SECRET);
             }
 
             var clientAssertion = authenticateInstruction.ClientAssertion;
             var isJweToken = _jwtParser.IsJweToken(clientAssertion);
             if (!isJweToken)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
             }
 
             var clientId = authenticateInstruction.ClientIdFromHttpRequestBody;
             var jws = await _jwtParser.Decrypt(clientAssertion, clientId, clientSecret.Value, cancellationToken);
             if (string.IsNullOrWhiteSpace(jws))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_DECRYPTION);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_DECRYPTION);
             }
 
             var isJwsToken = _jwtParser.IsJwsToken(jws);
             if (!isJwsToken)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
             }
 
-            var payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken);
+            JwsPayload payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken, errorCode);
             if (payload == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);
             }
 
-            return ValidateJwsPayLoad(payload, expectedIssuer);
+            return ValidateJwsPayLoad(payload, expectedIssuer, errorCode);
         }
 
-        private bool ValidateJwsPayLoad(JwsPayload jwsPayload, string expectedIssuer)
+        private bool ValidateJwsPayLoad(JwsPayload jwsPayload, string expectedIssuer, string errorCode)
         {
             var jwsIssuer = jwsPayload.GetIssuer();
             var jwsSubject = jwsPayload.GetClaimValue(SimpleIdServer.Jwt.Constants.UserClaims.Subject);
@@ -84,19 +84,19 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             // 1. Check the client is correct.
             if (jwsSubject != jwsIssuer)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
             }
 
             // 2. Check if the audience is correct
             if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(expectedIssuer)))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
             }
 
             // 3. Check the expiration time
             if (DateTime.UtcNow > expirationDateTime)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
             }
 
             return true;

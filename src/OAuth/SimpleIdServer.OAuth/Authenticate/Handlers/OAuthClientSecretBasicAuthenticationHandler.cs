@@ -16,7 +16,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public string AuthMethod => AUTH_METHOD;
         public const string AUTH_METHOD = "client_secret_basic";
 
-        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
+        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {

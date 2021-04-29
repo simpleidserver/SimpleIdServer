@@ -191,7 +191,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISubjectTypeBuilder, PublicSubjectTypeBuilder>();
             services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();
             services.AddTransient<IAmrHelper, AmrHelper>();
-            services.AddTransient<IRequestObjectValidator, RequestObjectValidator>();
+            services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
             return services;
         }
 

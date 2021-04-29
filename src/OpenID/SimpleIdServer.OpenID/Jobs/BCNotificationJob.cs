@@ -33,8 +33,14 @@ namespace SimpleIdServer.OpenID.Jobs
 
         protected override async Task Execute(CancellationToken cancellationToken)
         {
+            await NotifyConfirmedAuthorizeRequest(cancellationToken);
+            await NotifyNotSentRejectedAuthorizeRequest(cancellationToken);
+        }
+
+        protected virtual async Task NotifyConfirmedAuthorizeRequest(CancellationToken cancellationToken)
+        {
             var confirmedAuthorizeRequestLst = await _bcAuthorizeRepository.GetConfirmedAuthorizationRequest(cancellationToken);
-            foreach(var confirmedAuthorizeRequest in confirmedAuthorizeRequestLst)
+            foreach (var confirmedAuthorizeRequest in confirmedAuthorizeRequestLst)
             {
                 var notificationHandler = _notificationHandlers.FirstOrDefault(n => n.NotificationMode == confirmedAuthorizeRequest.NotificationMode);
                 if (notificationHandler == null)
@@ -42,14 +48,35 @@ namespace SimpleIdServer.OpenID.Jobs
                     continue;
                 }
 
-                if (await notificationHandler.Notify(confirmedAuthorizeRequest, cancellationToken))
+                await notificationHandler.Notify(confirmedAuthorizeRequest, cancellationToken);
+                if (notificationHandler.NotificationMode == SIDOpenIdConstants.StandardNotificationModes.Ping)
+                {
+                    confirmedAuthorizeRequest.Pong();
+                }
+                else
                 {
                     confirmedAuthorizeRequest.Send();
-                    await _bcAuthorizeRepository.Update(confirmedAuthorizeRequest, cancellationToken);
                 }
-            }
 
-            await _bcAuthorizeRepository.SaveChanges(cancellationToken);
+                await _bcAuthorizeRepository.Update(confirmedAuthorizeRequest, cancellationToken);
+            }
+        }
+
+        protected virtual async Task NotifyNotSentRejectedAuthorizeRequest(CancellationToken cancellationToken)
+        {
+            var notSentRejectedAuthorizeRequestLst = await _bcAuthorizeRepository.GetNotSentRejectedAuthorizationRequest(cancellationToken);
+            foreach (var notSentRejectedAuthorizeRequest in notSentRejectedAuthorizeRequestLst)
+            {
+                var notificationHandler = _notificationHandlers.FirstOrDefault(n => n.NotificationMode == notSentRejectedAuthorizeRequest.NotificationMode);
+                if (notificationHandler == null)
+                {
+                    continue;
+                }
+
+                await notificationHandler.Notify(notSentRejectedAuthorizeRequest, cancellationToken);
+                notSentRejectedAuthorizeRequest.NotifyRejection();
+                await _bcAuthorizeRepository.Update(notSentRejectedAuthorizeRequest, cancellationToken);
+            }
         }
     }
 }

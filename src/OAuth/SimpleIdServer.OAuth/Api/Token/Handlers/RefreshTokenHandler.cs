@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
@@ -11,6 +11,7 @@ using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Jwt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly IJwtParser _jwtParser;
+        private readonly IJwsGenerator _jwsGenerator;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -34,12 +37,16 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
+            IJwtParser jwtParser,
+            IJwsGenerator jwsGenerator,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
+            _jwtParser = jwtParser;
+            _jwsGenerator = jwsGenerator;
             _logger = logger;
         }
 
@@ -53,7 +60,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _refreshTokenGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                var refreshToken = context.Request.Data.GetRefreshToken();
+                var refreshToken = context.Request.RequestData.GetRefreshToken();
                 var tokenResult = await _grantedTokenHelper.GetRefreshToken(refreshToken, cancellationToken);
                 if (tokenResult == null)
                 {
@@ -69,8 +76,36 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 }
 
                 var jwsPayload = JObject.Parse(tokenResult.Data);
-                if (!jwsPayload.GetClientIdFromAuthorizationRequest().Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
+                var clientId = jwsPayload.GetClientIdFromAuthorizationRequest();
+                if (string.IsNullOrWhiteSpace(clientId))
                 {
+                    var clientAssertion = jwsPayload.GetClientAssertion();
+                    if (string.IsNullOrWhiteSpace(clientAssertion))
+                    {
+                        _logger.LogError("client identifier cannot be extracted from the initial request");
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED);
+                    }
+
+                    var isJwsToken = _jwtParser.IsJwsToken(clientAssertion);
+                    if (!isJwsToken)
+                    {
+                        _logger.LogError("client_assertion doesn't have a correct JWS format");
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                    }
+
+                    var payload = _jwsGenerator.ExtractPayload(clientAssertion);
+                    if (jwsPayload == null)
+                    {
+                        _logger.LogError("payload cannot be extracted from client_assertion");
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+                    }
+
+                    clientId = payload.GetIssuer();
+                }
+
+                if (!clientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _logger.LogError("refresh token is not issued by the client");
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
                 }
 

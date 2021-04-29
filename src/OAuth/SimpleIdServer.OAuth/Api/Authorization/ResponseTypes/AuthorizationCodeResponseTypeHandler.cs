@@ -38,7 +38,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
         public async Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
             var dic = new JObject();
-            foreach (var record in context.Request.Data)
+            foreach (var record in context.Request.RequestData)
             {
                 dic.Add(record.Key, record.Value);
             }
@@ -50,8 +50,8 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 
         protected virtual void CheckPKCEParameters(HandlerContext handlerContext)
         {
-            var codeChallenge = handlerContext.Request.Data.GetCodeChallengeFromAuthorizationRequest();
-            var codeChallengeMethod = handlerContext.Request.Data.GetCodeChallengeMethodFromAuthorizationRequest();
+            var codeChallenge = handlerContext.Request.RequestData.GetCodeChallengeFromAuthorizationRequest();
+            var codeChallengeMethod = handlerContext.Request.RequestData.GetCodeChallengeMethodFromAuthorizationRequest();
             if (handlerContext.Client.TokenEndPointAuthMethod == OAuthPKCEAuthenticationHandler.AUTH_METHOD && string.IsNullOrWhiteSpace(codeChallenge))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.CodeChallenge));

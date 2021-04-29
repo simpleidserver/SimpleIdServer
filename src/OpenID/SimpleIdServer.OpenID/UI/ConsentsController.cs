@@ -12,6 +12,7 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace SimpleIdServer.OpenID.UI
         private readonly IDataProtector _dataProtector;
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly ITranslationHelper _translationHelper;
+        private readonly IExtractRequestHelper _extractRequestHelper;
 
         public ConsentsController(
             IOAuthUserQueryRepository oauthUserRepository, 
@@ -41,7 +43,8 @@ namespace SimpleIdServer.OpenID.UI
             IUserConsentFetcher userConsentFetcher, 
             IDataProtectionProvider dataProtectionProvider, 
             IResponseModeHandler responseModeHandler,
-            ITranslationHelper translationHelper)
+            ITranslationHelper translationHelper,
+            IExtractRequestHelper extractRequestHelper)
         {
             _oauthUserRepository = oauthUserRepository;
             _oAuthUserCommandRepository = oauthUserCommandRepository;
@@ -50,6 +53,7 @@ namespace SimpleIdServer.OpenID.UI
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _translationHelper = translationHelper;
+            _extractRequestHelper = extractRequestHelper;
         }
 
         public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
@@ -63,10 +67,11 @@ namespace SimpleIdServer.OpenID.UI
             {
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJObj();
-                var scopes = query.GetScopesFromAuthorizationRequest();
-                var claims = query.GetClaimsFromAuthorizationRequest();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+                query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+                var scopes = query.GetScopesFromAuthorizationRequest();
+                var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimDescriptions = new List<string>();
                 if (claims != null && claims.Any())
                 {
@@ -122,10 +127,13 @@ namespace SimpleIdServer.OpenID.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public void Reject(RejectConsentViewModel viewModel)
+        public async Task Reject(RejectConsentViewModel viewModel, CancellationToken cancellationToken)
         {
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             var query = unprotectedUrl.GetQueries().ToJObj();
+            var clientId = query.GetClientIdFromAuthorizationRequest();
+            var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+            query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var state = query.GetStateFromAuthorizationRequest();
             var jObj = new JObject

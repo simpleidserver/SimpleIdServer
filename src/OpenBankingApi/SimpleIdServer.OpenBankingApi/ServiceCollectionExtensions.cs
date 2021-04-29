@@ -16,10 +16,12 @@ using SimpleIdServer.OpenBankingApi.Api.Register;
 using SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenBankingApi.Domains.Account;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent;
+using SimpleIdServer.OpenBankingApi.Helpers;
 using SimpleIdServer.OpenBankingApi.Infrastructure.Authorizations;
 using SimpleIdServer.OpenBankingApi.Persistences;
 using SimpleIdServer.OpenBankingApi.Persistences.InMemory;
 using SimpleIdServer.OpenID.Api.BCAuthorize;
+using SimpleIdServer.OpenID.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -64,10 +66,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.RemoveAll<IOAuthResponseMode>();
             services.RemoveAll<IOAuthResponseModeHandler>();
             services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
+            services.AddTransient<IOAuthResponseMode, QueryResponseModeHandler>();
             services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
+            services.AddTransient<IOAuthResponseModeHandler, QueryResponseModeHandler>();
 
             services.RemoveAll<IResponseModeHandler>();
             services.AddTransient<IResponseModeHandler, OpenBankingApiResponseModeHandler>();
+
+            services.RemoveAll<IExtractRequestHelper>();
+            services.AddTransient<IExtractRequestHelper, OpenBankingApiExtractRequestHelper>();
 
             services.RemoveAll<IAddOAuthClientHandler>();
             services.AddTransient<IAddOAuthClientHandler, AddOpenBankingApiClientHandler>();

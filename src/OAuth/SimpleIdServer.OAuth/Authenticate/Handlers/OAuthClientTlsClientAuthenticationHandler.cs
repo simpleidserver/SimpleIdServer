@@ -24,39 +24,39 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "tls_client_auth";
         public string AuthMethod => "tls_client_auth";
 
-        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken)
+        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var certificate = authenticateInstruction.Certificate;
             if (certificate == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.NO_CLIENT_CERTIFICATE);
+                throw new OAuthException(errorCode, ErrorMessages.NO_CLIENT_CERTIFICATE);
             }
 
             if (!certificate.IsValid())
             {
                 _logger.LogError("the certificate is not trusted");
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_IS_NOT_TRUSTED);
+                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_IS_NOT_TRUSTED);
             }
 
             if (!string.IsNullOrWhiteSpace(client.TlsClientAuthSubjectDN) && client.TlsClientAuthSubjectDN != certificate.Subject)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_SUBJECT_INVALID);
+                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_SUBJECT_INVALID);
             }
 
             var subjectAlternative = certificate.GetSubjectAlternativeName();
             if (!string.IsNullOrWhiteSpace(client.TlsClientAuthSanDNS) && !Check(client.TlsClientAuthSanDNS, SubjectAlternativeNameTypes.DNSNAME, subjectAlternative))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_SAN_DNS_INVALID);
+                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_SAN_DNS_INVALID);
             }
 
             if (!string.IsNullOrWhiteSpace(client.TlsClientAuthSanEmail) && !Check(client.TlsClientAuthSanEmail, SubjectAlternativeNameTypes.EMAIL, subjectAlternative))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_SAN_EMAIL_INVALID);
+                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_SAN_EMAIL_INVALID);
             }
 
             if (!string.IsNullOrWhiteSpace(client.TlsClientAuthSanIP) && !Check(client.TlsClientAuthSanIP, SubjectAlternativeNameTypes.IPADDRESS, subjectAlternative))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.CERTIFICATE_SAN_IP_INVALID);
+                throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_SAN_IP_INVALID);
             }
 
             return Task.FromResult(true);

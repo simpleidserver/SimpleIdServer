@@ -34,14 +34,14 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
             }
 
             await CommonValidate(context, cancellationToken);
-            var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var unsupportedScopes = scopes.Where(s => !context.Client.AllowedScopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
             }
 
-            var consent = _userConsentFetcher.FetchFromAuthorizationRequest(context.User, context.Request.Data);
+            var consent = _userConsentFetcher.FetchFromAuthorizationRequest(context.User, context.Request.RequestData);
             if (consent == null)
             {
                 throw new OAuthUserConsentRequiredException();
@@ -51,9 +51,9 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
         protected async Task CommonValidate(HandlerContext context, CancellationToken cancellationToken)
         {
             var client = context.Client;
-            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
-            var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
-            var responseMode = context.Request.Data.GetResponseModeFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+            var responseMode = context.Request.RequestData.GetResponseModeFromAuthorizationRequest();
             var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
             var redirectionUrls = await client.GetRedirectionUrls(_httpClientFactory, cancellationToken);
             if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Contains(redirectUri))

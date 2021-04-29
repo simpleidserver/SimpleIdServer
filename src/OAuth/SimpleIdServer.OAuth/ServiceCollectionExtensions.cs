@@ -172,6 +172,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
             services.AddTransient<ITranslationHelper, TranslationHelper>();
+            services.AddTransient<IRequestObjectValidator, RequestObjectValidator>();
             return services;
         }
 

@@ -15,7 +15,7 @@ namespace SimpleIdServer.OAuth.Authenticate
 {
     public interface IAuthenticateClient
     {
-        Task<OAuthClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false);
+        Task<OAuthClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
     }
 
     public class AuthenticateClient : IAuthenticateClient
@@ -33,7 +33,7 @@ namespace SimpleIdServer.OAuth.Authenticate
             _handlers = handlers;
         }
 
-        public async Task<OAuthClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false)
+        public async Task<OAuthClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
@@ -49,7 +49,7 @@ namespace SimpleIdServer.OAuth.Authenticate
 
             if (client == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+                throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             }
 
             if (isAuthorizationCodeGrantType)
@@ -61,12 +61,12 @@ namespace SimpleIdServer.OAuth.Authenticate
             var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
             if (handler == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));
+                throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));
             }
 
-            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken))
+            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode))
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_AUTH, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
             }
 
             return client;

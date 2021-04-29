@@ -42,7 +42,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
 
         protected virtual async Task<OAuthUser> ValidateIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
         {
-            var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
+            var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(idTokenHint))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.IdTokenHint));
@@ -58,7 +58,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
 
         protected virtual void ValidateDeviceRegistrationToken(HandlerContext context)
         {
-            var deviceRegistrationToken = context.Request.Data.GetDeviceRegistrationToken();
+            var deviceRegistrationToken = context.Request.RequestData.GetDeviceRegistrationToken();
             if (string.IsNullOrWhiteSpace(deviceRegistrationToken))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, BCDeviceRegistrationRequestParameters.DeviceRegistrationToken));

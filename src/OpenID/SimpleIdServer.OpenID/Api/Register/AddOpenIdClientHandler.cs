@@ -40,7 +40,7 @@ namespace SimpleIdServer.OpenID.Api.Register
 
         protected override OAuthClient ExtractClient(HandlerContext handlerContext)
         {
-            var openIdClient = handlerContext.Request.Data.ToDomain();
+            var openIdClient = handlerContext.Request.RequestData.ToDomain();
             EnrichOpenIdClient(openIdClient, handlerContext);
             return openIdClient;
         }
@@ -136,22 +136,22 @@ namespace SimpleIdServer.OpenID.Api.Register
 
         protected virtual void SetBCNotification(OpenIdClient openidClient, HandlerContext handlerContext)
         {
-            openidClient.BCTokenDeliveryMode = handlerContext.Request.Data.GetBCTokenDeliveryMode();
-            openidClient.BCClientNotificationEndpoint = handlerContext.Request.Data.GetBCClientNotificationEndpoint();
-            openidClient.BCAuthenticationRequestSigningAlg = handlerContext.Request.Data.GetBCAuthenticationRequestSigningAlg();
-            openidClient.BCUserCodeParameter = handlerContext.Request.Data.GetBCUserCodeParameter();
+            openidClient.BCTokenDeliveryMode = handlerContext.Request.RequestData.GetBCTokenDeliveryMode();
+            openidClient.BCClientNotificationEndpoint = handlerContext.Request.RequestData.GetBCClientNotificationEndpoint();
+            openidClient.BCAuthenticationRequestSigningAlg = handlerContext.Request.RequestData.GetBCAuthenticationRequestSigningAlg();
+            openidClient.BCUserCodeParameter = handlerContext.Request.RequestData.GetBCUserCodeParameter();
         }
 
         protected virtual void SetFrontChannel(OpenIdClient openidClient, HandlerContext handlerContext)
         {
-            openidClient.FrontChannelLogoutUri = handlerContext.Request.Data.GetFrontChannelLogoutUri();
-            openidClient.FrontChannelLogoutSessionRequired = handlerContext.Request.Data.GetFrontChannelLogoutSessionRequired();
+            openidClient.FrontChannelLogoutUri = handlerContext.Request.RequestData.GetFrontChannelLogoutUri();
+            openidClient.FrontChannelLogoutSessionRequired = handlerContext.Request.RequestData.GetFrontChannelLogoutSessionRequired();
         }
 
         protected virtual void SetBackchannelLogoutSupported(OpenIdClient openidClient, HandlerContext handlerContext)
         {
-            openidClient.BackChannelLogoutSessionRequired = handlerContext.Request.Data.GetBackChannelLogoutSessionRequired();
-            openidClient.BackChannelLogoutUri = handlerContext.Request.Data.GetBackChannelLogoutUri();
+            openidClient.BackChannelLogoutSessionRequired = handlerContext.Request.RequestData.GetBackChannelLogoutSessionRequired();
+            openidClient.BackChannelLogoutUri = handlerContext.Request.RequestData.GetBackChannelLogoutUri();
         }
     }
 }

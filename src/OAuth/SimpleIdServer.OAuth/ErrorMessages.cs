@@ -11,6 +11,9 @@ namespace SimpleIdServer.OAuth
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string INVALID_SCOPES = "invalid scopes : {0}";
+        public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
+        public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
+        public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";
         public const string BAD_SOFTWARE_STATEMENT_SIGNATURE = "software statement signature is invalid";
@@ -24,6 +27,7 @@ namespace SimpleIdServer.OAuth
         public const string BAD_CLIENT_ASSERTION_FORMAT = "bad client assertion format";
         public const string BAD_CLIENT_ASSERTION_SIGNATURE = "bad client assertion signature";
         public const string BAD_CLIENT_ASSERTION_ISSUER = "bad client assertion issuer";
+        public const string BAD_CLIENT_ASSERTION_ALG = "the algorithm used by client assertion is not correct";
         public const string BAD_RESPONSE_TYPES = "response types {0} are not supported";
         public const string BAD_RESPONSE_TYPES_CLIENT = "response types {0} are not supported by the client";
         public const string BAD_ACCESS_TOKEN = "access token is not correct";
@@ -74,5 +78,6 @@ namespace SimpleIdServer.OAuth
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
         public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
         public const string REDIRECT_URI_CONTAINS_FRAGMENT = "the redirect_uri cannot contains fragment";
+        public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
     }
 }

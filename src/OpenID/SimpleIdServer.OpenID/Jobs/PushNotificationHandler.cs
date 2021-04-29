@@ -46,7 +46,11 @@ namespace SimpleIdServer.OpenID.Jobs
         {
             try
             {
-                using (var httpClient = _httpClientFactory.GetHttpClient())
+                var handler = new HttpClientHandler
+                {
+                    AllowAutoRedirect = false
+                };
+                using (var httpClient = _httpClientFactory.GetHttpClient(handler))
                 {
                     var jObjBody = new JObject();
                     var context = new HandlerContext(new HandlerContextRequest(null, null, jObjBody, null, null, null));

@@ -13,7 +13,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
 {
     public interface IClientAuthenticationHelper
     {
-        Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken);
+        Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
     }
 
     public class ClientAuthenticationHelper : IClientAuthenticationHelper
@@ -25,13 +25,13 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
             _authenticateClient = authenticateClient;
         }
 
-        public async Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
+        public async Task<OAuthClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var authenticateInstruction = BuildAuthenticateInstruction(jObjHeader, jObjBody, certificate);
-            var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken);
+            var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
             if (oauthClient == null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
             }
 
             return oauthClient;

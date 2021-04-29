@@ -65,7 +65,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
         {
             var mo = new Mock<OAuth.Infrastructures.IHttpClientFactory>();
             var scenarioContext = services.BuildServiceProvider().GetService<ScenarioContext>();
-            mo.Setup(m => m.GetHttpClient())
+            mo.Setup(m => m.GetHttpClient(It.IsAny<HttpClientHandler>()))
                 .Returns(() =>
                 {
                     var url = "http://domain.com/sector";

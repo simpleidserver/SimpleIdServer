@@ -76,7 +76,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             var authorizationCode = string.Empty;
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
             {
-                authorizationCode = handlerContext.Request.Data.GetAuthorizationCode();
+                authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
             }
 
             var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, jwsPayload);

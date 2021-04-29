@@ -235,7 +235,13 @@ namespace SimpleIdServer.OpenID.Domains
                 FrontChannelLogoutUri = FrontChannelLogoutUri,
                 FrontChannelLogoutSessionRequired = FrontChannelLogoutSessionRequired,
                 BackChannelLogoutSessionRequired = BackChannelLogoutSessionRequired,
-                BackChannelLogoutUri = BackChannelLogoutUri
+                BackChannelLogoutUri = BackChannelLogoutUri,
+                TlsClientAuthSanDNS = TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = TlsClientAuthSanEmail,
+                TlsClientAuthSanIP = TlsClientAuthSanIP,
+                TlsClientAuthSanURI = TlsClientAuthSanURI,
+                TlsClientAuthSubjectDN = TlsClientAuthSubjectDN,
+                TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken
             };
         }
     }

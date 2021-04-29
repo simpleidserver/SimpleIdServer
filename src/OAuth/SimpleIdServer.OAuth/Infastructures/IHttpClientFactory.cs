@@ -7,5 +7,6 @@ namespace SimpleIdServer.OAuth.Infrastructures
     public interface IHttpClientFactory
     {
         HttpClient GetHttpClient();
+        HttpClient GetHttpClient(HttpClientHandler handler);
     }
 }

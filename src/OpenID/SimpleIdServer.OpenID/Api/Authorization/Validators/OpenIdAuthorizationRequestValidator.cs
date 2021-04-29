@@ -1,9 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Exceptions;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
@@ -20,7 +17,6 @@ using SimpleIdServer.OpenID.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +26,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
     {
         private readonly IAmrHelper _amrHelper;
         private readonly IJwtParser _jwtParser;
-        private readonly IRequestObjectValidator _requestObjectValidator;
+        private readonly IExtractRequestHelper _extractRequestHelper;
 
         public OpenIDAuthorizationRequestValidator(
             IUserConsentFetcher userConsentFetcher,
@@ -38,21 +34,23 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             IHttpClientFactory httpClientFactory,
             IAmrHelper amrHelper, 
             IJwtParser jwtParser,
-            IRequestObjectValidator requestObjectValidator) : base(userConsentFetcher, oauthResponseModes, httpClientFactory)
+            IExtractRequestHelper extractRequestHelper) : base(userConsentFetcher, oauthResponseModes, httpClientFactory)
         {
             _amrHelper = amrHelper;
             _jwtParser = jwtParser;
-            _requestObjectValidator = requestObjectValidator;
+            _extractRequestHelper = extractRequestHelper;
         }
+
+        protected IExtractRequestHelper ExtractRequestHelper => _extractRequestHelper;
 
         public override async Task Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = (OpenIdClient)context.Client;
-            var clientId = context.Request.Data.GetClientIdFromAuthorizationRequest();
-            var scopes = context.Request.Data.GetScopesFromAuthorizationRequest();
-            var acrValues = context.Request.Data.GetAcrValuesFromAuthorizationRequest();
-            var prompt = context.Request.Data.GetPromptFromAuthorizationRequest();
-            var claims = context.Request.Data.GetClaimsFromAuthorizationRequest();
+            var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
+            var prompt = context.Request.RequestData.GetPromptFromAuthorizationRequest();
+            var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
             if (!scopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
@@ -79,17 +77,13 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }
 
-            if (!await CheckRequestParameter(context))
-            {
-                await CheckRequestUriParameter(context);
-            }
-
+            await _extractRequestHelper.Extract(context);
             await CommonValidate(context, cancellationToken);
-            var responseTypes = context.Request.Data.GetResponseTypesFromAuthorizationRequest();
-            var nonce = context.Request.Data.GetNonceFromAuthorizationRequest();
-            var redirectUri = context.Request.Data.GetRedirectUriFromAuthorizationRequest();
-            var maxAge = context.Request.Data.GetMaxAgeFromAuthorizationRequest();
-            var idTokenHint = context.Request.Data.GetIdTokenHintFromAuthorizationRequest();
+            var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
+            var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
+            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+            var maxAge = context.Request.RequestData.GetMaxAgeFromAuthorizationRequest();
+            var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(redirectUri))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.RedirectUri));
@@ -156,83 +150,6 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
         protected virtual void RedirectToConsentView(HandlerContext context)
         {
             throw new OAuthUserConsentRequiredException();
-        }
-
-        protected Task<bool> CheckRequestParameter(HandlerContext context)
-        {
-            var request = context.Request.Data.GetRequestFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(request))
-            {
-                return Task.FromResult(false);
-            }
-
-            return CheckRequest(context, request);
-        }
-
-        protected async Task<bool> CheckRequestUriParameter(HandlerContext context)
-        {
-            var requestUri = context.Request.Data.GetRequestUriFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(requestUri))
-            {
-                return false;
-            }
-
-            Uri uri;
-            if (!Uri.TryCreate(requestUri, UriKind.Absolute, out uri))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_URI_PARAMETER);
-            }
-
-            var cleanedUrl = uri.AbsoluteUri.Replace(uri.Fragment, "");
-            using (var httpClient = new HttpClient())
-            {
-                var httpResult = await httpClient.GetAsync(cleanedUrl);
-                var json = await httpResult.Content.ReadAsStringAsync();
-                return await CheckRequest(context, json);
-            }
-        }
-
-        protected virtual async Task<bool> CheckRequest(HandlerContext context, string request)
-        {
-            var openidClient = (OpenIdClient)context.Client;
-            var validationResult = await _requestObjectValidator.Validate(request, openidClient, CancellationToken.None);
-            context.Request.SetData(JObject.FromObject(validationResult.JwsPayload));
-            CheckRequestObject(validationResult.JwsHeader, validationResult.JwsPayload, openidClient, context);
-            validationResult.JwsPayload.Add(AuthorizationRequestParameters.Request, request);
-            return true;
-        }
-
-        protected virtual void CheckRequestObject(JwsHeader header, JwsPayload jwsPayload, OpenIdClient openidClient, HandlerContext context)
-        {
-            if (jwsPayload == null)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
-            }
-
-            if (!string.IsNullOrWhiteSpace(openidClient.RequestObjectSigningAlg) && header.Alg != openidClient.RequestObjectSigningAlg)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_SIGNATURE_ALG);
-            }
-
-            if (!jwsPayload.ContainsKey(OAuth.DTOs.AuthorizationRequestParameters.ResponseType))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_RESPONSE_TYPE_CLAIM);
-            }
-
-            if (!jwsPayload.ContainsKey(OAuth.DTOs.AuthorizationRequestParameters.ClientId))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.MISSING_CLIENT_ID_CLAIM);
-            }
-
-            if (!jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ResponseType].ToString().Split(' ').OrderBy(s => s).SequenceEqual(context.Request.Data.GetResponseTypesFromAuthorizationRequest().OrderBy(s => s)))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_RESPONSE_TYPE_CLAIM);
-            }
-
-            if (jwsPayload[OAuth.DTOs.AuthorizationRequestParameters.ClientId].ToString() != context.Client.ClientId)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST_OBJECT, ErrorMessages.INVALID_CLIENT_ID_CLAIM);
-            }
         }
 
         protected async Task<string> GetFirstAmr(IEnumerable<string> acrValues, IEnumerable<AuthorizationRequestClaimParameter> claims, OpenIdClient client, CancellationToken cancellationToken)

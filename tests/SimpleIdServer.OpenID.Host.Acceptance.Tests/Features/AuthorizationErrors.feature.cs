@@ -1073,7 +1073,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 286
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 287
  testRunner.Then("JSON \'error_description\'=\'request parameter is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1156,7 +1156,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 309
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 310
  testRunner.Then("JSON \'error_description\'=\'request parameter is not a valid JWS token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1266,7 +1266,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 341
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 342
  testRunner.Then("JSON \'error_description\'=\'unknown json web key \'1\'\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

@@ -100,7 +100,6 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 .AddLoginPasswordAuthentication();
             services.AddOpenBankingApi(cb =>
             {
-                cb.IsRequestRequired = false;
             })
                 .AddAccounts(DefaultConfiguration.Accounts);
             services.Configure<ForwardedHeadersOptions>(options =>
