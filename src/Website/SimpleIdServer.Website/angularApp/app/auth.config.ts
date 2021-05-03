@@ -5,5 +5,7 @@ export const authConfig: AuthConfig = {
   clientId: 'simpleIdServerWebsite',
   scope: 'openid profile email role',
   redirectUri: process.env.REDIRECT_URL,
-  requireHttps: false
+  responseType: 'code',
+  requireHttps: false,
+  showDebugInformation: true
 }

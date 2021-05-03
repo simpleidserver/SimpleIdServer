@@ -1,6 +1,6 @@
 import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { OAuthService, UserInfo } from 'angular-oauth2-oidc';
 import { JwksValidationHandler } from 'angular-oauth2-oidc-jwks';
 import { authConfig } from './auth.config';
 import { Router } from '@angular/router';
@@ -48,7 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.oauthService.customQueryParams = {
         'prompt': 'login'
     };
-    this.oauthService.initImplicitFlow();
+    this.oauthService.initLoginFlow();
     return false;    
   }
 
@@ -56,7 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.oauthService.customQueryParams = {
       'prompt': 'select_account'
     };
-    this.oauthService.initImplicitFlow();
+    this.oauthService.initLoginFlow();
     return false;
   }
 
@@ -85,20 +85,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this.oauthService.events.subscribe((e: any) => {
       if (e.type === "logout") {
           this.isConnected = false;
-      } else if (e.type === "token_received") {
+      } else if (e.type === "user_profile_loaded") {
           this.init();
       }
   });
   }  
 
-  private init() : void {
+  private init(): void {
     var claims: any = this.oauthService.getIdentityClaims();
     if (!claims) {
         this.isConnected = false;;
         return;
     }
 
-    this.name = claims.given_name;
+    this.name = this.oauthService.getIdentityClaims()['given_name'];
     this.isConnected = true;
   }
 
@@ -108,6 +108,8 @@ export class AppComponent implements OnInit, OnDestroy {
     let self = this;
     this.oauthService.loadDiscoveryDocumentAndTryLogin({
       disableOAuth2StateCheck: true
+    }).then(() => {
+      this.oauthService.loadUserProfile();
     });    
     this.sessionCheckTimer = setInterval(function () {
       if (!self.oauthService.hasValidIdToken()) {

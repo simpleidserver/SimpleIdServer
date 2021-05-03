@@ -418,7 +418,7 @@ namespace SimpleIdServer.OpenID.Startup
                     {
                         new ClientSecret(ClientSecretTypes.SharedSecret, "simpleIdServerWebsiteSecret", null)
                     },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -435,23 +435,25 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     GrantTypes = new List<string>
                     {
+                        "authorization_code",
                         "implicit"
                     },
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:4200",
-                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver/"
                     },
                     PostLogoutRedirectUris = new List<string>
                     {
-                        "https://localhost:4200",
-                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
+                        "http://localhost:4200",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver/"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "token",
-                        "id_token"
+                        "id_token",
+                        "code"
                     }
                 },
                 new OpenIdClient
@@ -533,7 +535,7 @@ namespace SimpleIdServer.OpenID.Startup
                     {
                         new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
                     },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -549,19 +551,27 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "implicit"
+                        "implicit",
+                        "authorization_code"
                     },
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:51724",
                         "http://localhost:8080",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagement"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/casemanagement"
+                    },
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "http://localhost:51724",
+                        "http://localhost:8080",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/casemanagement"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "token",
-                        "id_token"
+                        "id_token",
+                        "code"
                     }
                 },
                 new OpenIdClient
@@ -571,7 +581,7 @@ namespace SimpleIdServer.OpenID.Startup
                     {
                         new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
                     },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -587,19 +597,27 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "implicit"
+                        "implicit",
+                        "authorization_code"
                     },
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:51724",
                         "http://localhost:8081",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
+                    },
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "http://localhost:51724",
+                        "http://localhost:8081",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "token",
-                        "id_token"
+                        "id_token",
+                        "code"
                     }
                 },
                 new OpenIdClient
@@ -609,7 +627,7 @@ namespace SimpleIdServer.OpenID.Startup
                     {
                         new ClientSecret(ClientSecretTypes.SharedSecret, "91894b86-c57e-489a-838d-fb82621a67ee", null)
                     },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -625,19 +643,27 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "implicit"
+                        "implicit",
+                        "authorization_code"
                     },
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:51725",
                         "http://localhost:8081",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
+                    },
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "http://localhost:51725",
+                        "http://localhost:8081",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "token",
-                        "id_token"
+                        "id_token",
+                        "code"
                     }
                 },
                 new OpenIdClient
@@ -647,7 +673,7 @@ namespace SimpleIdServer.OpenID.Startup
                     {
                         new ClientSecret(ClientSecretTypes.SharedSecret, "f200eeb0-a6a3-465e-be91-97806e5dd3bc", null)
                     },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -663,18 +689,25 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     GrantTypes = new List<string>
                     {
-                        "implicit"
+                        "implicit",
+                        "authorization_code"
                     },
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:8080",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/medikit"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/medikit"
+                    },
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "http://localhost:8080",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/medikit"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "token",
-                        "id_token"
+                        "id_token",
+                        "code"
                     }
                 }
             };

@@ -1,8 +1,20 @@
 server {
 	listen 80;
+	server_name simpleidserver.northeurope.cloudapp.azure.com;
+	return 301 https://$host$request_uri;
+}
+
+server {
+
+	listen 443 ssl;
+    listen [::]:443 ssl;
 
 	gzip on;
 	gzip_types text/plain text/css application/xml application/json application/javascript;
+	
+	ssl_certificate /etc/letsencrypt/live/simpleidserver.northeurope.cloudapp.azure.com/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/simpleidserver.northeurope.cloudapp.azure.com/privkey.pem;
+	include /etc/letsencrypt/options-ssl-nginx.conf;
 
 	root /var/www/html;
 
@@ -10,53 +22,8 @@ server {
 	index index.html index.htm index.nginx-debian.html;
 
 	server_name simpleidserver.northeurope.cloudapp.azure.com;
-		
-	location /medikit {
-		proxy_pass http://localhost:7001;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection keep-alive;
-		proxy_set_header Host $host;
-		proxy_pass_header Set-Cookie;
-		proxy_pass_request_headers on;
-		proxy_cache_bypass $http_upgrade;
-		proxy_cookie_domain localhost $host;
-		proxy_set_header X-Scheme https;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;
-		proxy_set_header X-URL-SCHEME https;
-		client_max_body_size 1M;
-		client_body_buffer_size 4096k;
-		proxy_connect_timeout 90;
-		proxy_send_timeout 90;
-		proxy_read_timeout 90;
-		proxy_buffer_size 128k;
-		proxy_buffers 32 256k;
-	}
-    
-	location /medikitapi {
-		proxy_pass http://localhost:7001;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection keep-alive;
-		proxy_set_header Host $host;
-		proxy_pass_header Set-Cookie;
-		proxy_pass_request_headers on;
-		proxy_cache_bypass $http_upgrade;
-		proxy_cookie_domain localhost $host;
-		proxy_set_header X-Scheme https;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;
-		proxy_set_header X-URL-SCHEME https;
-		client_max_body_size 1M;
-		client_body_buffer_size 4096k;
-		proxy_connect_timeout 90;
-		proxy_send_timeout 90;
-		proxy_read_timeout 90;
-		proxy_buffer_size 128k;
-		proxy_buffers 32 256k;
-	}
-		
+	ssl_verify_client optional_no_ca;
+	
 	location /statisticalearning {
 		proxy_pass http://localhost:8000;
 		proxy_set_header Upgrade $http_upgrade;
@@ -82,52 +49,6 @@ server {
     
 	location /statisticalearningapi {
 		proxy_pass http://localhost:8001;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection keep-alive;
-		proxy_set_header Host $host;
-		proxy_pass_header Set-Cookie;
-		proxy_pass_request_headers on;
-		proxy_cache_bypass $http_upgrade;
-		proxy_cookie_domain localhost $host;
-		proxy_set_header X-Scheme https;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;
-		proxy_set_header X-URL-SCHEME https;
-		client_max_body_size 1M;
-		client_body_buffer_size 4096k;
-		proxy_connect_timeout 90;
-		proxy_send_timeout 90;
-		proxy_read_timeout 90;
-		proxy_buffer_size 128k;
-		proxy_buffers 32 256k;
-	}
-		
-	location /casemanagement {
-		proxy_pass http://localhost:5002;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection keep-alive;
-		proxy_set_header Host $host;
-		proxy_pass_header Set-Cookie;
-		proxy_pass_request_headers on;
-		proxy_cache_bypass $http_upgrade;
-		proxy_cookie_domain localhost $host;
-		proxy_set_header X-Scheme https;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;
-		proxy_set_header X-URL-SCHEME https;
-		client_max_body_size 1M;
-		client_body_buffer_size 4096k;
-		proxy_connect_timeout 90;
-		proxy_send_timeout 90;
-		proxy_read_timeout 90;
-		proxy_buffer_size 128k;
-		proxy_buffers 32 256k;
-	}		
-		
-	location /tasklist {
-		proxy_pass http://localhost:5003;
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection keep-alive;
 		proxy_set_header Host $host;
@@ -217,50 +138,6 @@ server {
 		proxy_buffer_size 128k;
 		proxy_buffers 32 256k;
 	}
-    
-	location /openid {
-		proxy_pass http://localhost:60000;
-		proxy_set_header Upgrade $http_upgrade;
-		proxy_set_header Connection keep-alive;
-		proxy_set_header Host $host;
-		proxy_pass_header Set-Cookie;
-		proxy_pass_request_headers on;
-		proxy_cache_bypass $http_upgrade;
-		proxy_cookie_domain localhost $host;
-		proxy_set_header X-Scheme https;
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto $scheme;
-		proxy_set_header X-URL-SCHEME https;
-		client_max_body_size 1M;
-		client_body_buffer_size 4096k;
-		proxy_connect_timeout 90;
-		proxy_send_timeout 90;
-		proxy_read_timeout 90;
-		proxy_buffer_size 128k;
-		proxy_buffers 32 256k;
-	}
-}
-
-server {
-
-	listen 443 ssl;
-    listen [::]:443 ssl;
-
-	gzip on;
-	gzip_types text/plain text/css application/xml application/json application/javascript;
-	
-	ssl_certificate /etc/letsencrypt/live/simpleidserver.northeurope.cloudapp.azure.com/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/simpleidserver.northeurope.cloudapp.azure.com/privkey.pem;
-	include /etc/letsencrypt/options-ssl-nginx.conf;
-
-	root /var/www/html;
-
-	# Add index.php to the list if you are using PHP
-	index index.html index.htm index.nginx-debian.html;
-
-	server_name simpleidserver.northeurope.cloudapp.azure.com;
-	ssl_verify_client optional_no_ca;
     
 	location /openbanking {
 		proxy_pass https://localhost:60010;
