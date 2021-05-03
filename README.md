@@ -5,7 +5,7 @@
 [![Documentation Status](https://readthedocs.org/projects/simpleidserver/badge/?version=latest)](https://simpleidserver.readthedocs.io/en/latest/)
 [![Download android application](https://img.shields.io/badge/download-android-green.svg)](https://appcenter.ms/users/agentsimpleidserver-gmail.com/apps/SimpleIdServer/distribute/releases/1)
 
-SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0 and UMA2.0. It streamlines development, configuration and deployment of custom access control servers. 
+SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0, UMA2.0, FAPI and CIBA. It streamlines development, configuration and deployment of custom access control servers. 
 Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more.
 
 For project documentation, please visit [readthedocs](https://simpleidserver.readthedocs.io/en/latest/).
@@ -67,6 +67,12 @@ SimpleIdServer implements the following OPENID conformance profiles :
 | FAPI-CIBA poll w/ Private Key    | [Link](https://www.certification.openid.net/plan-detail.html?plan=8wuC5dpBeggDV?public=true) |
 | FAPI-CIBA OP Ping w/ MTLS        | [Link](https://www.certification.openid.net/plan-detail.html?plan=5IyXAMZmhQPWM&public=true) |
 | FAPI-CIBA OP Ping w/ Private Key | [Link](https://www.certification.openid.net/plan-detail.html?plan=WwqAGNdl7UN6t?public=true) |
+
+## Mobile application
+
+A mobile application is available, it is used to confirm or reject consents received from external Relying parties.
+
+![Mobile application](imgs/mobileapp.png?raw=true "Mobile application")
 
 ## Contributing
 
