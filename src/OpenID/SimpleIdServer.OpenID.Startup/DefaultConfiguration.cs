@@ -442,6 +442,11 @@ namespace SimpleIdServer.OpenID.Startup
                         "http://localhost:4200",
                         "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
                     },
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "https://localhost:4200",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
+                    },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
