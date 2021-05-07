@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Api;
@@ -21,9 +23,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services)
+        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services, Action<IServiceCollectionBusConfigurator> massTransitOptions = null)
         {
             var builder = new SimpleIdServerSCIMBuilder(services);
+            services.AddMassTransit(massTransitOptions != null ? massTransitOptions : (o) =>
+            {
+                o.UsingInMemory();
+            });
             services.AddCommandHandlers()
                 .AddSCIMRepository()
                 .AddHelpers()
@@ -37,10 +43,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services, Action<SCIMHostOptions> options)
+        public static SimpleIdServerSCIMBuilder AddSIDScim(this IServiceCollection services, Action<SCIMHostOptions> options, Action<IServiceCollectionBusConfigurator> massTransitOptions = null)
         {
             services.Configure(options);
-            return services.AddSIDScim();
+            return services.AddSIDScim(massTransitOptions);
         }
 
         private static IServiceCollection AddCommandHandlers(this IServiceCollection services)

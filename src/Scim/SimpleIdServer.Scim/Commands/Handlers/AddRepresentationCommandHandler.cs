@@ -19,7 +19,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
 
-        public AddRepresentationCommandHandler(ISCIMSchemaQueryRepository scimSchemaQueryRepository, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationHelper scimRepresentationHelper, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository)
+        public AddRepresentationCommandHandler(
+            ISCIMSchemaQueryRepository scimSchemaQueryRepository, 
+            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, 
+            ISCIMRepresentationHelper scimRepresentationHelper, 
+            ISCIMRepresentationCommandRepository scimRepresentationCommandRepository)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Startup.Consumers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -100,9 +102,17 @@ namespace SimpleIdServer.Scim.Startup
                 });
             });
             services.AddSCIMSwagger();
-            services.AddSIDScim(_ =>
+            services.AddMassTransitHostedService(true);
+            services.AddSIDScim(options: _ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
+            }, massTransitOptions: _ =>
+            {
+                _.AddConsumer<IntegrationEventConsumer>();
+                _.UsingInMemory((context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                });
             })
             .AddSchemas(schemas)
             .AddAttributeMapping(new List<SCIMAttributeMapping>

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -34,8 +36,9 @@ namespace SimpleIdServer.Scim.Api
         private readonly IAttributeReferenceEnricher _attributeReferenceEnricher;
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
+        private readonly IBusControl _busControl;
 
-        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger)
+        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl)
         {
             _resourceType = resourceType;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
@@ -47,6 +50,7 @@ namespace SimpleIdServer.Scim.Api
             _attributeReferenceEnricher = attributeReferenceEnricher;
             _options = options.CurrentValue;
             _logger = logger;
+            _busControl = busControl;
         }
 
         public string ResourceType => _resourceType;
@@ -245,7 +249,10 @@ namespace SimpleIdServer.Scim.Api
             {
                 var command = new AddRepresentationCommand(_resourceType, jobj);
                 var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
-                return BuildHTTPResult(scimRepresentation, HttpStatusCode.Created, false);
+                var location = GetLocation(scimRepresentation);
+                var content = scimRepresentation.ToResponse(location, false);
+                await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, _resourceType, content));
+                return BuildHTTPResult(HttpStatusCode.Created, location, scimRepresentation.Version, content);
             }
             catch(SCIMSchemaViolatedException ex)
             {
@@ -275,6 +282,7 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType));
+                await _busControl.Publish(new RepresentationRemovedEvent(id, _resourceType));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMNotFoundException ex)
@@ -300,7 +308,10 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter));
-                return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
+                var location = GetLocation(newRepresentation);
+                var content = newRepresentation.ToResponse(location, false);
+                await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, _resourceType, content));
+                return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
             catch (SCIMSchemaViolatedException ex)
             {
@@ -335,7 +346,10 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, patchRepresentation));
-                return BuildHTTPResult(newRepresentation, HttpStatusCode.OK, false);
+                var location = GetLocation(newRepresentation);
+                var content = newRepresentation.ToResponse(location, false);
+                await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, _resourceType, content));
+                return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
             catch (SCIMFilterException ex)
             {
@@ -375,15 +389,26 @@ namespace SimpleIdServer.Scim.Api
 
         protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
         {
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{_resourceType}/{representation.Id}";
+            var location = GetLocation(representation);
+            var content = representation.ToResponse(location, isGetRequest);
+            return BuildHTTPResult(status, location, representation.Version, content);
+        }
+
+        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, string version, JObject content)
+        {
             HttpContext.Response.Headers.Add("Location", location);
-            HttpContext.Response.Headers.Add("ETag", representation.Version);
+            HttpContext.Response.Headers.Add("ETag", version);
             return new ContentResult
             {
                 StatusCode = (int)status,
-                Content = representation.ToResponse(location, isGetRequest).ToString(),
+                Content = content.ToString(),
                 ContentType = SCIMConstants.STANDARD_SCIM_CONTENT_TYPE
             };
+        }
+
+        protected string GetLocation(SCIMRepresentation representation)
+        {
+            return $"{Request.GetAbsoluteUriWithVirtualPath()}/{_resourceType}/{representation.Id}";
         }
     }
 }
