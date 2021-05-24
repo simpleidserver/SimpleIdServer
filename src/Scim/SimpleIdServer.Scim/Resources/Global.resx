@@ -210,6 +210,9 @@
   <data name="PatchResource" xml:space="preserve">
     <value>patch resource {0}</value>
   </data>
+  <data name="PropertyCannotContainsArray" xml:space="preserve">
+    <value>Property {0} cannot contains an array</value>
+  </data>
   <data name="RequestIsNotWellFormatted" xml:space="preserve">
     <value>'{0}' request is not well-formatted</value>
   </data>

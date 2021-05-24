@@ -15,6 +15,22 @@
       "description": "Unique identifier for the User, typically used by the user to directly authenticate to the service provider. Each User MUST include a non-empty userName value. This identifier MUST be unique across the service provider's entire set of Users."
     },
     {
+      "name": "ssin",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite"
+    },
+    {
+      "name": "pinNumber",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite"
+    },
+    {
       "name": "name",
       "type": "complex",
       "multiValued": false,

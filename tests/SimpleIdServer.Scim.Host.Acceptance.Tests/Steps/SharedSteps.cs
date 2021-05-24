@@ -240,6 +240,14 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
             Assert.Equal(value.ToLowerInvariant(), jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
         }
 
+        [Then("JSON with namespace '(.*)' '(.*)'='(.*)'")]
+        public void ThenJSONWithNamespaceEqualsTo(string ns, string key, string value)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
+            var token = jsonHttpBody[ns].SelectToken(key);
+            Assert.Equal(value.ToLowerInvariant(), token.ToString().ToLowerInvariant());
+        }
+
         [Then("HTTP HEADER contains '(.*)'")]
         public void ThenHTTPHeaderContains(string key)
         {

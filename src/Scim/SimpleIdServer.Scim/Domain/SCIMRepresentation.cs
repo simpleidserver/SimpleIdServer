@@ -31,6 +31,26 @@ namespace SimpleIdServer.Scim.Domain
         public ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
         public ICollection<SCIMSchema> Schemas { get; set; }
 
+        public SCIMSchema GetRootSchema()
+        {
+            return Schemas.FirstOrDefault(s => s.IsRootSchema);
+        }
+
+        public IEnumerable<SCIMSchema> GetExtensionSchemas()
+        {
+            return Schemas.Where(s => !s.IsRootSchema);
+        }
+
+        public SCIMSchema GetSchema(SCIMRepresentationAttribute attribute)
+        {
+            return GetSchema(attribute.SchemaAttribute);
+        }
+
+        public SCIMSchema GetSchema(SCIMSchemaAttribute attribute)
+        {
+            return Schemas.FirstOrDefault(s => s.HasAttribute(attribute));
+        }
+
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {
             Attributes.Add(attribute);

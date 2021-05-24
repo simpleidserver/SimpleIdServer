@@ -15,6 +15,22 @@
       "uniqueness": "none"
     },
     {
+      "name": "ssin",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite"
+    },
+    {
+      "name": "pinNumber",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite"
+    },
+    {
       "name": "costCenter",
       "type": "string",
       "multiValued": false,

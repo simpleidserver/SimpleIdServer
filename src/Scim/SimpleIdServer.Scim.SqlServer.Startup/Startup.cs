@@ -95,9 +95,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
+                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User, true);
                     var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
-                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
+                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group, true);
                     userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -115,6 +115,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         var attributeMapping = new SCIMAttributeMapping
                         {
                             Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                             SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                             SourceAttributeSelector = "groups",
                             TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,

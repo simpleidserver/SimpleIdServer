@@ -60,7 +60,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
                 }
 
-                var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation.Attributes, replaceRepresentationCommand.Representation.ExternalId, schemas.ToList());
+                var mainSchema = schemas.First(s => s.Id == schema.Id);
+                var extensionSchemas = schemas.Where(s => s.Id != schema.Id).ToList();
+                var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(
+                    replaceRepresentationCommand.Representation.Attributes,
+                    replaceRepresentationCommand.Representation.ExternalId,
+                    mainSchema,
+                    extensionSchemas);
                 existingRepresentation.RemoveAttributes(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
                 foreach (var updatedAttribute in updatedRepresentation.Attributes)
                 {

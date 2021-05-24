@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
@@ -74,9 +73,9 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 _.IgnoreUnsupportedCanonicalValues = false;
             });
             var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User, true);
             var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group, true);
             userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
             {
                 Id = Guid.NewGuid().ToString(),
@@ -92,7 +91,6 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
             {
                 opt.ConnectionString = CONNECTION_STRING;
                 opt.Database = DATABASE_NAME;
-
                 opt.CollectionMappings = MAPPINGS;
                 opt.CollectionRepresentations = REPRESENTATIONS;
                 opt.CollectionSchemas = SCHEMAS;
@@ -103,6 +101,7 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                     SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,

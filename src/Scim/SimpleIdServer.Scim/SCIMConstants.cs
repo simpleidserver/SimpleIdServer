@@ -121,6 +121,7 @@ namespace SimpleIdServer.Scim
             new SCIMAttributeMapping
             {
                 Id = Guid.NewGuid().ToString(),
+                SourceAttributeId = StandardSchemas.UserSchema.Attributes.First(a => a.Name == "groups").Id,
                 SourceResourceType = StandardSchemas.UserSchema.ResourceType,
                 SourceAttributeSelector = "groups",
                 TargetResourceType = StandardSchemas.GroupSchema.ResourceType,

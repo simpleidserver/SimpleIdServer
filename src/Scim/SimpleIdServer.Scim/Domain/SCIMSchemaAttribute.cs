@@ -88,6 +88,11 @@ namespace SimpleIdServer.Scim.Domain
             SubAttributes.Add(subAttribute);
         }
 
+        public bool HasAttribute(SCIMSchemaAttribute attribute)
+        {
+            return SubAttributes.Any(attr => attr.Id == attribute.Id || attr.HasAttribute(attribute));
+        }
+
         public object Clone()
         {
             return new SCIMSchemaAttribute(Id)

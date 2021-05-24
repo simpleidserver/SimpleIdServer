@@ -69,10 +69,10 @@ namespace SimpleIdServer.Scim.Startup
                     };
                 });
             var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User, true);
             var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
-            var customResource = Builder.SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources")
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group, true);
+            var customResource = Builder.SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources", string.Empty, true)
                 .AddStringAttribute("name")
                 .AddStringAttribute("lastname")
                 .AddDateTimeAttribute("birthDate")
@@ -120,6 +120,7 @@ namespace SimpleIdServer.Scim.Startup
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                     SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,

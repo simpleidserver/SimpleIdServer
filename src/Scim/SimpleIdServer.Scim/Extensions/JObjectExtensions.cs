@@ -9,6 +9,37 @@ namespace SimpleIdServer.Scim.Extensions
 {
     public static class JObjectExtensions
     {
+        public static bool HasNotEmptyElement(this JObject jObj, string name, string schema)
+        {
+            if (jObj.ContainsKey(name) || jObj.ContainsKey($"{schema}:{name}"))
+            {
+                var value = string.Empty;
+                if (jObj.ContainsKey(name))
+                {
+                    value = jObj[name].ToString();
+                }
+                else
+                {
+                    value = jObj[$"{schema}:{name}"].ToString();
+                }
+
+                return !string.IsNullOrEmpty(value);
+            }
+
+            if (!jObj.ContainsKey(schema))
+            {
+                return false;
+            }
+
+            var attr = jObj[schema] as JObject;
+            if (attr == null)
+            {
+                return false;
+            }
+
+            return attr.ContainsKey(name) && !string.IsNullOrWhiteSpace(attr[name].ToString());
+        }
+
         public static IEnumerable<string> GetSchemas(this JObject jObj)
         {
             return GetArray(jObj, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas);

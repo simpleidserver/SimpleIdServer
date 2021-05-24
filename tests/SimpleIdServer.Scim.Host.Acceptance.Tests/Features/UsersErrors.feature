@@ -121,7 +121,7 @@ Scenario: Error is returned when required attribute is missing (HTTP POST)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='schemaViolated'
-	Then JSON 'response.detail'='required attributes userName,employeeNumber are missing'
+	Then JSON 'response.detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 
 Scenario: Error is returned when required attribute is empty (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -135,7 +135,7 @@ Scenario: Error is returned when required attribute is empty (HTTP POST)
 	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='schemaViolated'
-	Then JSON 'response.detail'='required attributes userName,employeeNumber are missing'
+	Then JSON 'response.detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 
 Scenario: Error is returned when schemas attribute is missing (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -271,7 +271,7 @@ Scenario: Error is returned when update and required attribute is missing (HTTP 
 	Then JSON 'status'='400'
 	Then JSON 'response.status'='400'
 	Then JSON 'response.scimType'='schemaViolated'
-	Then JSON 'response.detail'='required attributes userName are missing'
+	Then JSON 'response.detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 	
 
 Scenario: Error is returned when update an immutable attribute (HTTP PUT)

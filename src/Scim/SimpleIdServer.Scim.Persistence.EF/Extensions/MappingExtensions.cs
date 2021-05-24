@@ -138,6 +138,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             return new SCIMAttributeMapping
             {
                 Id = attribute.Id,
+                SourceAttributeId = attribute.SourceAttributeId,
                 SourceAttributeSelector = attribute.SourceAttributeSelector,
                 SourceResourceType = attribute.SourceResourceType,
                 TargetAttributeId = attribute.TargetAttributeId,

@@ -5,6 +5,7 @@ namespace SimpleIdServer.Scim.Domain
     public class SCIMAttributeMapping
     {
         public string Id { get; set; }
+        public string SourceAttributeId { get; set; }
         public string SourceResourceType { get; set; }
         public string SourceAttributeSelector { get; set; }
         public string TargetResourceType { get; set; }

@@ -340,6 +340,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Property {0} cannot contains an array.
+        /// </summary>
+        public static string PropertyCannotContainsArray {
+            get {
+                return ResourceManager.GetString("PropertyCannotContainsArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; request is not well-formatted.
         /// </summary>
         public static string RequestIsNotWellFormatted {

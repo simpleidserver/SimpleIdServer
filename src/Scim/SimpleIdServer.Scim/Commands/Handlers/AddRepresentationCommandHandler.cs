@@ -58,7 +58,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
             var version = Guid.NewGuid().ToString();
-            var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schemas.ToList());
+            var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
             scimRepresentation.Id = Guid.NewGuid().ToString();
             scimRepresentation.SetCreated(DateTime.UtcNow);
             scimRepresentation.SetUpdated(DateTime.UtcNow);

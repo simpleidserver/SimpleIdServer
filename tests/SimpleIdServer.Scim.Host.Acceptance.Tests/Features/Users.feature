@@ -34,6 +34,74 @@ Scenario: Check User can be created
 	Then JSON 'age'='22'
 	Then JSON 'eidCertificate'='aGVsbG8='
 
+Scenario: Check user can be created (use full qualified name properties)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '201'	
+	Then HTTP HEADER contains 'Location'
+	Then HTTP HEADER contains 'ETag'
+
+	Then HTTP status code equals to '201'	
+	Then HTTP HEADER contains 'Location'
+	Then HTTP HEADER contains 'ETag'
+	Then JSON exists 'id'
+	Then JSON exists 'meta.created'
+	Then JSON exists 'meta.lastModified'
+	Then JSON exists 'meta.version'
+	Then JSON exists 'meta.location'
+	Then JSON 'employeeNumber'='number'
+	Then JSON 'externalId'='externalid'
+	Then JSON 'meta.resourceType'='Users'
+	Then JSON 'userName'='bjen'
+	Then JSON 'name.formatted'='formatted'
+	Then JSON 'name.familyName'='familyName'
+	Then JSON 'name.givenName'='givenName'
+	Then JSON 'org'='ENTREPRISE'
+	Then JSON 'eidCertificate'='aGVsbG8='
+
+Scenario: Check user can be created with two properties coming from two different schemas
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber": "employeeNumber", "duplicateAttr" : "secondDuplicateAttr" }                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| duplicateAttr                                              | firstDuplicateAttr                                                                                             |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '201'	
+	Then HTTP HEADER contains 'Location'
+	Then HTTP HEADER contains 'ETag'
+	Then JSON exists 'id'
+	Then JSON exists 'meta.created'
+	Then JSON exists 'meta.lastModified'
+	Then JSON exists 'meta.version'
+	Then JSON exists 'meta.location'
+	Then JSON 'employeeNumber'='employeeNumber'
+	Then JSON 'externalId'='externalid'
+	Then JSON 'meta.resourceType'='Users'
+	Then JSON 'userName'='bjen'
+	Then JSON 'name.formatted'='formatted'
+	Then JSON 'name.familyName'='familyName'
+	Then JSON 'name.givenName'='givenName'
+	Then JSON 'org'='ENTREPRISE'
+	Then JSON 'eidCertificate'='aGVsbG8='
+	Then JSON 'duplicateAttr'='firstDuplicateAttr'
+	Then JSON with namespace 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' 'duplicateAttr'='secondDuplicateAttr'
+
+
 Scenario: Check attribute with a mutability equals to readOnly cannot be overriden
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |

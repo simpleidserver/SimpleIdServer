@@ -13,15 +13,15 @@ namespace SimpleIdServer.Scim
 {
     public class SCIMSchemaExtractor
     {
-        public static SCIMSchema Extract(string filePath, string resourceType)
+        public static SCIMSchema Extract(string filePath, string resourceType, bool isRootSchema = false)
         {
             var content = File.ReadAllText(filePath);
             var jObj = JsonConvert.DeserializeObject<JObject>(content);
             var builder = SCIMSchemaBuilder.Create(jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Id].ToString(), 
                 jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Name].ToString(), 
                 resourceType, 
-                jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Description].ToString(),
-                true);
+                jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Description].ToString(), 
+                isRootSchema);
             var attributes = jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Attributes] as JArray;
             foreach(JObject attribute in attributes)
             {

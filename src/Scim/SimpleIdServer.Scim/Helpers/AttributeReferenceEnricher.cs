@@ -46,6 +46,7 @@ namespace SimpleIdServer.Scim.Helpers
 						{
 							SchemaAttribute = new SCIMSchemaAttribute(attributeMapping.SourceAttributeSelector)
 							{
+								Id = attributeMapping.SourceAttributeId,
 								Name = attributeMapping.SourceAttributeSelector,
 								MultiValued = true,
 								Type = SCIMSchemaAttributeTypes.COMPLEX

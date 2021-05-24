@@ -8,6 +8,7 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Infrastructure.ValueProviders;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim.Host.Acceptance.Tests
 {
@@ -27,6 +28,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddDecimalAttribute("age")
                .AddDateTimeAttribute("birthDate")
                .AddBooleanAttribute("active")
+               .AddStringAttribute("duplicateAttr")
                .AddIntAttribute("nbPoints")
                .AddBinaryAttribute("eidCertificate")
                .AddStringAttribute("immutable", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE)
@@ -39,7 +41,8 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                    opt.AddStringAttribute("phoneNumber", description: "Phone number");
                    opt.AddStringAttribute("type", description: "Type");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
-               .AddComplexAttribute("adRoles", opt => {
+               .AddComplexAttribute("adRoles", opt =>
+               {
                    opt.AddStringAttribute("value", description: "Value");
                    opt.AddStringAttribute("display", description: "Display");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
@@ -58,14 +61,27 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddStringAttribute("org", defaultValue: new List<string> { "ENTREPRISE" }, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddSCIMSchemaExtension("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", true)
                .Build();
-            var enterpriseUser = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", "EnterpriseUser", "Enterprise user")
+            var enterpriseUser = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", "EnterpriseUser", "Enterprise user", string.Empty, false)
                 .AddStringAttribute("employeeNumber", required: true)
+                .AddStringAttribute("duplicateAttr")
                 .Build();
             var schemas = new List<SCIMSchema>
             {
                 userSchema,
                 enterpriseUser,
                 SCIMConstants.StandardSchemas.GroupSchema
+            };
+            var attributesMapping = new List<SCIMAttributeMapping>
+            {
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                    SourceResourceType = userSchema.ResourceType,
+                    SourceAttributeSelector = "groups",
+                    TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    TargetAttributeId = SCIMConstants.StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                }
             };
             services.AddMvc(o =>
             {
@@ -78,7 +94,9 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             {
                 o.MaxOperations = 3;
                 o.IgnoreUnsupportedCanonicalValues = false;
-            }).AddSchemas(schemas);
+            })
+                .AddSchemas(schemas)
+                .AddAttributeMapping(attributesMapping);
         }
 
         public void Configure(IApplicationBuilder app)

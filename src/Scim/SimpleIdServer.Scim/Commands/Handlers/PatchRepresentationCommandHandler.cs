@@ -22,7 +22,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly IDistributedLock _distributedLock;
         private readonly SCIMHostOptions _options;
 
-        public PatchRepresentationCommandHandler(ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IDistributedLock distributedLock, IOptions<SCIMHostOptions> options)
+        public PatchRepresentationCommandHandler(
+            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, 
+            ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, 
+            IDistributedLock distributedLock,
+            IOptions<SCIMHostOptions> options)
         {
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
