@@ -28,6 +28,16 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     new OpenIdScopeClaim("scim_id", true)
                 }
+            },
+            new OpenIdScope
+            {
+                Name = "manage_clients",
+                IsExposedInConfigurationEdp = true
+            },
+            new OpenIdScope
+            {
+                Name = "manage_scopes",
+                IsExposedInConfigurationEdp = true
             }
         };
 
@@ -237,7 +247,8 @@ namespace SimpleIdServer.OpenID.Startup
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "http://localhost:4200"
+                        "http://localhost:4200",
+                        "http://localhost:4200/silent-refresh.html"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
@@ -709,6 +720,40 @@ namespace SimpleIdServer.OpenID.Startup
                         "id_token",
                         "code"
                     }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "gatewayClient",
+                    Secrets = new List<ClientSecret>
+                    {
+                        new ClientSecret(ClientSecretTypes.SharedSecret, "gatewayClientPassword", null)
+                    },
+                    ClientNames = new []
+                    {
+                        new OAuthTranslation("gatewayClient_client_name", "SCIMClient", "fr")
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OpenIdScope>
+                    {
+                        new OpenIdScope
+                        {
+                            Name = "manage_clients"
+                        },
+                        new OpenIdScope
+                        {
+                            Name = "manage_scopes"
+                        }
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
                 }
             };
         }

@@ -29,6 +29,7 @@ namespace SimpleIdServer.OpenID.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var issuerSigningKey = ExtractIssuerSigningKey("openid_key.txt");
             var sigJsonWebKey = ExtractJsonWebKeyFromRSA("openid_key.txt", "RS256");
             var firstMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("first_mtlsClient_key.txt", "PS256");
             var secondMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("second_mtlsClient_key.txt", "PS256");
@@ -41,6 +42,19 @@ namespace SimpleIdServer.OpenID.Startup
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
+                .AddJwtBearer(OAuth.Constants.AuthenticationScheme, cfg =>
+                {
+                    cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidAudiences = new List<string>
+                        {
+                            "gatewayClient"
+                        },
+                        ValidateIssuer = false,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = issuerSigningKey
+                    };
+                })
                 .AddCertificate(o =>
                 {
                     o.RevocationFlag = X509RevocationFlag.EntireChain;
@@ -120,6 +134,18 @@ namespace SimpleIdServer.OpenID.Startup
                     KeyOperations.Verify
                 }).SetAlg(rsa, algName).Build();
             }
+        }
+
+        private static Microsoft.IdentityModel.Tokens.RsaSecurityKey ExtractIssuerSigningKey(string fileName)
+        {
+            var json = File.ReadAllText(fileName);
+            var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            var rsaParameter = new RSAParameters
+            {
+                Modulus = dic.TryGet(RSAFields.Modulus),
+                Exponent = dic.TryGet(RSAFields.Exponent)
+            };
+            return new Microsoft.IdentityModel.Tokens.RsaSecurityKey(rsaParameter);
         }
     }
 }

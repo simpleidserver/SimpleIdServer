@@ -1,0 +1,13 @@
+@import '~@angular/material/theming';
+
+@import 'styles/app.scss';
+@import 'styles/theme.scss';
+@import 'styles/component.themes.scss';
+
+@include mat-core();
+
+.my-theme {
+  @include angular-material-theme($my-theme);
+  @include component-themes($my-theme);
+  @include app-theme($my-theme)
+}

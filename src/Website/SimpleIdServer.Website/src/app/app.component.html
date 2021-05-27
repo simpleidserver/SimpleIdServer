@@ -1,0 +1,38 @@
+<ng-container>
+  <mat-toolbar class="header-toolbar">
+    <a class="no-style" [routerLink]="['/home']">
+
+    </a>
+    <button mat-icon-button (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="spacer"></span>
+    <div *ngIf="isConnected">
+      <button mat-button [matMenuTriggerFor]="welcomeMenu">
+        {{ "menu.welcome" | translate:{name:name} }}
+      </button>
+      <mat-menu #welcomeMenu="matMenu">
+        <button mat-menu-item (click)="disconnect()">{{ "menu.disconnect" | translate }}</button>
+      </mat-menu>
+    </div>
+    <div *ngIf="!isConnected">
+      <button mat-raised-button (click)="login()">{{ "menu.authenticate" | translate }}</button>
+      <button mat-raised-button (click)="chooseSession()">{{ "menu.choose_session" | translate }}</button>
+    </div>
+    <button mat-button [matMenuTriggerFor]="languages">{{ "menu.languages" | translate }}</button>
+    <mat-menu #languages="matMenu">
+      <button mat-menu-item (click)="chooseLanguage('fr')">{{ "menu.french" | translate }}</button>
+      <button mat-menu-item (click)="chooseLanguage('en')">{{ "menu.english" | translate }}</button>
+    </mat-menu>
+  </mat-toolbar>
+  <mat-drawer-container class="drawer-container">
+    <mat-drawer #drawer mode="side" opened>
+      <mat-nav-list *ngIf="isConnected">
+        <a mat-list-item [routerLink]="['/applications']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "applications.list" | translate }}</a>
+      </mat-nav-list>
+    </mat-drawer>
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-drawer-container>
+</ng-container>

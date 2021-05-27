@@ -69,7 +69,6 @@ namespace SimpleIdServer.OAuth.Api.Management
             var parameter = ToParameter(queries);
             var result = await _oauthClientQueryRepository.Find(parameter, CancellationToken.None);
             return new OkObjectResult(ToDto(result, Request.GetAbsoluteUriWithVirtualPath()));
-
         }
 
         private static JObject ToDto(OAuthScope scope)

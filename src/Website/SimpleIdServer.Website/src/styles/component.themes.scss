@@ -1,0 +1,11 @@
+@mixin app-theme($theme) {
+  $primary: map-get($theme, primary);
+
+  .is-active {
+    background-color: rgb(245, 245, 245) !important;
+  }
+}
+
+@mixin component-themes($theme) {
+  @include app-theme($theme);
+}

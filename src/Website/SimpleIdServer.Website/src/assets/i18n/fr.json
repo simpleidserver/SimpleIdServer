@@ -1,0 +1,19 @@
+{
+  "menu": {
+    "welcome": "Bienvenue {{name}}",
+    "disconnect": "Se déconnecter",
+    "authenticate": "Authentifier",
+    "choose_session": "Choisir une session",
+    "languages": "Langues",
+    "french": "Français",
+    "english": "Anglais"
+  },
+  "applications": {
+    "list": "Applications",
+    "basicinfo": "Basic information",
+    "clientId": "Identifiant du client",
+    "clientName": "Nom",
+    "createDateTime": "Date de création",
+    "updateDateTime": "Date de mise à jour"
+  }
+}
