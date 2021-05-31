@@ -32,7 +32,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "self_signed_tls_client_auth";
         public string AuthMethod => AUTH_METHOD;
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, BaseClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var certificate = authenticateInstruction.Certificate;
             if (certificate == null)
@@ -44,7 +44,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             return true;
         }
 
-        private async Task CheckCertificate(X509Certificate2 certificate, OAuthClient client, string errorCode)
+        private async Task CheckCertificate(X509Certificate2 certificate, BaseClient client, string errorCode)
         {
             if (!certificate.IsSelfSigned())
             {

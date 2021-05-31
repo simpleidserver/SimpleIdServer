@@ -1,19 +1,33 @@
 {
+  "close": "Close",
+  "save": "Save",
+  "languages": {
+    "fr": "French",
+    "en": "English"
+  },
   "menu": {
     "welcome": "Welcome {{name}}",
     "disconnect": "Disconnect",
     "authenticate": "Authenticate",
     "choose_session": "Choose session",
-    "languages": "Languages",
-    "french": "French",
-    "english": "English"
+    "languages": "Languages"
   },
   "applications": {
     "list": "Applications",
     "basicinfo": "Basic information",
     "clientId": "Client ID",
     "clientName": "Name",
+    "clientSecret": "Client Secret",
+    "clientLogoUri": "Application Logo",
+    "applicationType": "Application Type",
+    "editClientName": "Edit names",
+    "editLogoUri": "Edit logo",
     "createDateTime": "Creation Datetime",
-    "updateDateTime": "Update Datetime"
+    "updateDateTime": "Update Datetime",
+    "properties": "Application properties",
+    "actions": {
+      "copy": "Copy",
+      "reveal": "Reveal Client Secret"
+    }
   }
 }

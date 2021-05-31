@@ -9,6 +9,7 @@ using SimpleIdServer.Uma.DTOs;
 using SimpleIdServer.Uma.Persistence;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.Api
@@ -83,9 +84,9 @@ namespace SimpleIdServer.Uma.Api
             return await callback(subject, payload);
         }
 
-        protected async Task<bool> IsPATAuthorized()
+        protected async Task<bool> IsPATAuthorized(CancellationToken cancellationToken)
         {
-            var payload = await ExtractPATTokenPayload();
+            var payload = await ExtractPATTokenPayload(cancellationToken);
             if(payload == null)
             {
                 return false;
@@ -111,7 +112,7 @@ namespace SimpleIdServer.Uma.Api
             return _jwtParser.Unsign(token, _umaHostOptions.OpenIdJsonWebKeySignature);
         }
 
-        private async Task<JwsPayload> ExtractPATTokenPayload()
+        private async Task<JwsPayload> ExtractPATTokenPayload(CancellationToken cancellationToken)
         {
             var token = ExtractAuthorizationValue();
             if (string.IsNullOrWhiteSpace(token))
@@ -128,10 +129,10 @@ namespace SimpleIdServer.Uma.Api
 
             if (isJweToken)
             {
-                token = await _jwtParser.Decrypt(token);
+                token = await _jwtParser.Decrypt(token, cancellationToken);
             }
 
-            return await _jwtParser.Unsign(token);
+            return await _jwtParser.Unsign(token, cancellationToken);
         }
 
         private string ExtractAuthorizationValue()

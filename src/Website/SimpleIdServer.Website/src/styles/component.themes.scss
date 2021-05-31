@@ -4,6 +4,21 @@
   .is-active {
     background-color: rgb(245, 245, 245) !important;
   }
+
+  .actions {
+      background-color: white;
+  }
+
+  .mat-form-field-disabled .actions > .copy,
+  .mat-form-field-disabled .actions > .display,
+  .mat-form-field-disabled .actions > .edit {
+    color: rgb(158, 158, 158);
+  }
+
+  .img-editor,
+  .img-editor > .img {
+    border-color: rgb(224, 224, 224);
+  }
 }
 
 @mixin component-themes($theme) {

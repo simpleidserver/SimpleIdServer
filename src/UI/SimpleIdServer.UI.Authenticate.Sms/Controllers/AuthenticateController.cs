@@ -30,10 +30,10 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
             IOptions<OpenIDHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
             ITranslationHelper translateHelper,
-            IOAuthClientQueryRepository oauthClientRepository, 
+            IOAuthClientRepository oauthClientRepository, 
             IAmrHelper amrHelper, 
             ISmsAuthService smsAuthService,
-            IOAuthUserCommandRepository oauthUserCommandRepository) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserCommandRepository)
+            IOAuthUserRepository oauthUserCommandRepository) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserCommandRepository)
         {
             _smsAuthService = smsAuthService;
             _translationHelper = translateHelper;
@@ -97,7 +97,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
 
                     try
                     {
-                        var user = await _smsAuthService.Authenticate(viewModel.PhoneNumber, viewModel.ConfirmationCode);
+                        var user = await _smsAuthService.Authenticate(viewModel.PhoneNumber, viewModel.ConfirmationCode, token);
                         return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
                     }
                     catch (CryptographicException)

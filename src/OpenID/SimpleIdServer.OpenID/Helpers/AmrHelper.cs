@@ -17,10 +17,10 @@ namespace SimpleIdServer.OpenID.Helpers
 {
     public class AmrHelper : IAmrHelper
     {
-        private readonly IAuthenticationContextClassReferenceQueryRepository _authenticationContextClassReferenceRepository;
+        private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly OpenIDHostOptions _options;
 
-        public AmrHelper(IAuthenticationContextClassReferenceQueryRepository authenticationContextClassReferenceRepository, IOptions<OpenIDHostOptions> options)
+        public AmrHelper(IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IOptions<OpenIDHostOptions> options)
         {
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _options = options.Value;

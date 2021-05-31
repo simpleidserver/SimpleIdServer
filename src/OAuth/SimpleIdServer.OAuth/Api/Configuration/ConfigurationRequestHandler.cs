@@ -12,18 +12,19 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Configuration
 {
     public interface IConfigurationRequestHandler
     {
-        Task Enrich(JObject jObj, string issuer);
+        Task Enrich(JObject jObj, string issuer, CancellationToken cancellationToken);
     }
 
     public class ConfigurationRequestHandler : IConfigurationRequestHandler
     {
-        private readonly IOAuthScopeQueryRepository _oauthScopeRepository;
+        private readonly IOAuthScopeRepository _oauthScopeRepository;
         private readonly IEnumerable<IResponseTypeHandler> _authorizationGrantTypeHandlers;
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
         private readonly IEnumerable<IGrantTypeHandler> _grantTypeHandlers;
@@ -33,7 +34,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
         private readonly OAuthHostOptions _options;
 
         public ConfigurationRequestHandler(
-            IOAuthScopeQueryRepository oauthScopeRepository, 
+            IOAuthScopeRepository oauthScopeRepository, 
             IEnumerable<IResponseTypeHandler> authorizationGrantTypeHandlers, 
             IEnumerable<IOAuthResponseMode> oauthResponseModes,
             IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
@@ -54,10 +55,10 @@ namespace SimpleIdServer.OAuth.Api.Configuration
 
         protected IOAuthWorkflowConverter WorkflowConverter => _oauthWorkflowConverter;
 
-        public virtual async Task Enrich(JObject jObj, string issuer)
+        public virtual async Task Enrich(JObject jObj, string issuer, CancellationToken cancellationToken)
         {
             jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
-            jObj.Add(OAuthConfigurationNames.ScopesSupported, JArray.FromObject((await _oauthScopeRepository.GetAllOAuthScopesExposed()).Select(s => s.Name).ToList()));
+            jObj.Add(OAuthConfigurationNames.ScopesSupported, JArray.FromObject((await _oauthScopeRepository.GetAllOAuthScopesExposed(cancellationToken)).Select(s => s.Name).ToList()));
             jObj.Add(OAuthConfigurationNames.ResponseTypesSupported, JArray.FromObject(GetResponseTypes()));
             jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JArray.FromObject(_oauthResponseModes.Select(s => s.ResponseMode)));
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JArray.FromObject(GetGrantTypes()));

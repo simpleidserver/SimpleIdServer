@@ -11,29 +11,26 @@ namespace SimpleIdServer.OAuth.Api.Jwks
 {
     public interface IJwksRequestHandler
     {
-        Task<JObject> Get();
+        Task<JObject> Get(CancellationToken cancellationToken);
         Task<bool> Rotate(CancellationToken token);
     }
 
     public class JwksRequestHandler : IJwksRequestHandler
     {
-        private readonly IJsonWebKeyQueryRepository _jsonWebKeyQueryRepository;
-        private readonly IJsonWebKeyCommandRepository _jsonWebKeyCommandRepository;
+        private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
         private readonly OAuthHostOptions _options;
 
         public JwksRequestHandler(
-            IJsonWebKeyQueryRepository jsonWebKeyQueryRepository, 
-            IJsonWebKeyCommandRepository jsonWebKeyCommandRepository,
+            IJsonWebKeyRepository jsonWebKeyRepository, 
             IOptions<OAuthHostOptions> options)
         {
-            _jsonWebKeyQueryRepository = jsonWebKeyQueryRepository;
-            _jsonWebKeyCommandRepository = jsonWebKeyCommandRepository;
+            _jsonWebKeyRepository = jsonWebKeyRepository;
             _options = options.Value;
         }
 
-        public async Task<JObject> Get()
+        public async Task<JObject> Get(CancellationToken cancellationToken)
         {
-            var jsonWebKeys = await _jsonWebKeyQueryRepository.GetActiveJsonWebKeys();
+            var jsonWebKeys = await _jsonWebKeyRepository.GetActiveJsonWebKeys(cancellationToken);
             var keys = new JArray();
             foreach(var jsonWebKey in jsonWebKeys)
             {
@@ -49,15 +46,15 @@ namespace SimpleIdServer.OAuth.Api.Jwks
 
         public async Task<bool> Rotate(CancellationToken cancellationToken)
         {
-            var jsonWebKeys = await _jsonWebKeyQueryRepository.GetNotRotatedJsonWebKeys(cancellationToken);
+            var jsonWebKeys = await _jsonWebKeyRepository.GetNotRotatedJsonWebKeys(cancellationToken);
             foreach (var jsonWebKey in jsonWebKeys)
             {
                 var newJsonWebKey = jsonWebKey.Rotate(_options.JWKExpirationTimeInSeconds);
-                await _jsonWebKeyCommandRepository.Update(jsonWebKey, cancellationToken);
-                _jsonWebKeyCommandRepository.Add(newJsonWebKey);
+                await _jsonWebKeyRepository.Update(jsonWebKey, cancellationToken);
+                await _jsonWebKeyRepository.Add(newJsonWebKey, cancellationToken);
             }
 
-            await _jsonWebKeyCommandRepository.SaveChanges(cancellationToken);
+            await _jsonWebKeyRepository.SaveChanges(cancellationToken);
             return true;
         }
     }

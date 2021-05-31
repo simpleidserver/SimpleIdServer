@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.OAuth.Domains
 {
@@ -8,6 +10,7 @@ namespace SimpleIdServer.OAuth.Domains
     {
         public OAuthScope()
         {
+            Claims = new List<OAuthScopeClaim>();
         }
 
         public OAuthScope(string name) : this()
@@ -15,10 +18,20 @@ namespace SimpleIdServer.OAuth.Domains
             Name = name;
         }
 
+        #region Properties
+
         public string Name { get; set; }
         public bool IsExposedInConfigurationEdp { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        /// <summary>
+        /// Array of strings that specifies the claims.
+        /// </summary>
+        public ICollection<OAuthScopeClaim> Claims { get; set; }
+        public ICollection<OAuthConsent> Consents { get; set; }
+        public ICollection<OAuthClient> Clients { get; set; }
+
+        #endregion
 
         public virtual object Clone()
         {
@@ -27,7 +40,8 @@ namespace SimpleIdServer.OAuth.Domains
                 Name = Name,
                 IsExposedInConfigurationEdp = IsExposedInConfigurationEdp,
                 CreateDateTime = CreateDateTime,
-                UpdateDateTime = UpdateDateTime
+                UpdateDateTime = UpdateDateTime,
+                Claims = Claims.Select(c => (OAuthScopeClaim)c.Clone()).ToList()
             };
         }
 

@@ -25,12 +25,12 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
     public class BCDeviceRegistrationValidator : IBCDeviceRegistrationValidator
     {
         private readonly IJwtParser _jwtParser;
-        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
 
-        public BCDeviceRegistrationValidator(IJwtParser jwtParser, IOAuthUserQueryRepository oauthUserQueryRepository)
+        public BCDeviceRegistrationValidator(IJwtParser jwtParser, IOAuthUserRepository oauthUserRepository)
         {
             _jwtParser = jwtParser;
-            _oauthUserQueryRepository = oauthUserQueryRepository;
+            _oauthUserRepository = oauthUserRepository;
         }
 
         public async Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -48,12 +48,12 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.IdTokenHint));
             }
 
-            var payload = await ExtractHint(idTokenHint);
+            var payload = await ExtractHint(idTokenHint, cancellationToken);
             if (!payload.GetAudiences().Contains(context.Request.IssuerName))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
             }
-            return await CheckHint(payload);
+            return await CheckHint(payload, cancellationToken);
         }
 
         protected virtual void ValidateDeviceRegistrationToken(HandlerContext context)
@@ -65,7 +65,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
             }
         }
 
-        protected virtual async Task<JwsPayload> ExtractHint(string tokenHint)
+        protected virtual async Task<JwsPayload> ExtractHint(string tokenHint, CancellationToken cancellationToken)
         {
             if (!_jwtParser.IsJwsToken(tokenHint) && !_jwtParser.IsJweToken(tokenHint))
             {
@@ -74,17 +74,17 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
 
             if (_jwtParser.IsJweToken(tokenHint))
             {
-                tokenHint = await _jwtParser.Decrypt(tokenHint);
+                tokenHint = await _jwtParser.Decrypt(tokenHint, cancellationToken);
                 if (string.IsNullOrWhiteSpace(tokenHint))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
                 }
             }
 
-            return await _jwtParser.Unsign(tokenHint);
+            return await _jwtParser.Unsign(tokenHint, cancellationToken);
         }
 
-        protected virtual async Task<OAuthUser> CheckHint(JwsPayload jwsPayload)
+        protected virtual async Task<OAuthUser> CheckHint(JwsPayload jwsPayload, CancellationToken cancellationToken)
         {
             var exp = jwsPayload.GetExpirationTime();
             var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();
@@ -94,7 +94,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
             }
 
             var subject = jwsPayload.GetSub();
-            var user = await _oauthUserQueryRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, subject);
+            var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, subject, cancellationToken);
             if (user == null)
             {
                 throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));

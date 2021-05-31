@@ -1,0 +1,92 @@
+﻿@using SimpleIdServer.OpenBankingApi.EF.Startup.Resources
+@model SimpleIdServer.OpenBankingApi.UI.ViewModels.OpenBankingApiAccountConsentIndexViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = Global.consents;
+}
+
+<form method="post" action="@Url.Action("Reject", "OpenBankingApiAccountConsent")" id="rejectForm">
+    @Html.AntiForgeryToken()
+    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
+    <input name="ConsentId" type="hidden" value="@Model.Consent.Id" />
+</form>
+
+@using (Html.BeginForm("Index", "OpenBankingApiAccountConsent", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul class="list-group">
+                @foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+    <input type="hidden" name="ConsentId" value="@Model.Consent.Id" />
+    <div class="card">
+        <div class="card-header">
+            @string.Format(Global.consent_client_access, Model.ClientName)
+        </div>
+        <div class="card-body">
+            <p>@Global.select_and_confirm_accounts</p>
+            <ul class="list-group">
+                @foreach (var account in Model.Accounts)
+                {
+                    <li class="list-group-item">
+                        <div style="width: 90%; display: inline-block;">
+                            <h5>@Global.ResourceManager.GetString("AccountTypes_" + account.AccountSubType)</h5>
+                            <table>
+                                <tbody>
+                                    @foreach (var cashAccount in account.CashAccounts)
+                                    {
+                                        <tr>
+                                            <td>@cashAccount.Identification</td>
+                                            <td>@cashAccount.SecondaryIdentification</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="display: inline-block;">
+                            <input name="SelectedAccounts" value="@account.Id" type="checkbox" checked />
+                        </div>
+                    </li>
+                }
+            </ul>
+            <div>
+                <h4>@Global.review_sharing_data</h4>
+                <ul class="list-group">
+                    @foreach (var elt in Model.Consent.Permissions)
+                    {
+                        <li class="list-group-item">
+                            @Global.ResourceManager.GetString("Permissions_" + elt)
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div>
+                @if (Model.Consent.ExpirationDateTime == null)
+                {
+                    @Global.access_account_information_unlimited
+                }
+                else
+                {
+                    @Global.access_account_information @Model.Consent.ExpirationDateTime
+                }
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-success card-link">@Global.confirm</button>
+            <button type="submit" form="rejectForm" class="btn btn-danger">@Global.reject</button>
+        </div>
+    </div>
+}

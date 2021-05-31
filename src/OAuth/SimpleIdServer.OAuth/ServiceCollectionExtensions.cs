@@ -117,23 +117,19 @@ namespace Microsoft.Extensions.DependencyInjection
             var users = new List<OAuthUser>();
             var scopes = new List<OAuthScope>();
             var tokens = new ConcurrentBag<Token>();
-            services.TryAddSingleton<IJsonWebKeyQueryRepository>(new DefaultJsonWebKeyQueryRepository(jsonWebKeys));
-            services.TryAddSingleton<IJsonWebKeyCommandRepository>(new DefaultJsonWebKeyCommandRepository(jsonWebKeys));
-            services.TryAddSingleton<IOAuthClientQueryRepository>(new DefaultOAuthClientQueryRepository(clients));
-            services.TryAddSingleton<IOAuthClientCommandRepository>(new DefaultOAuthClientCommandRepository(clients));
-            services.TryAddSingleton<IOAuthUserQueryRepository>(new DefaultOAuthUserQueryRepository(users));
-            services.TryAddSingleton<IOAuthUserCommandRepository>(new DefaultOAuthUserCommandRepository(users));
-            services.TryAddSingleton<IOAuthScopeQueryRepository>(new DefaultOAuthScopeQueryRepository(scopes));
-            services.TryAddSingleton<IOAuthScopeCommandRepository>(new DefaultOAuthScopeCommandRepository(scopes));
-            services.TryAddSingleton<ITokenCommandRepository>(new DefaultTokenCommandRepository(tokens));
-            services.TryAddSingleton<ITokenQueryRepository>(new DefaultTokenQueryRepository(tokens));
+            services.TryAddSingleton<IJsonWebKeyRepository>(new DefaultJsonWebKeyRepository(jsonWebKeys));
+            services.TryAddSingleton<IOAuthClientRepository>(new DefaultOAuthClientRepository(clients));
+            services.TryAddSingleton<IOAuthUserRepository>(new DefaultOAuthUserRepository(users));
+            services.TryAddSingleton<IOAuthScopeRepository>(new DefaultOAuthScopeRepository(scopes));
+            services.TryAddSingleton<ITokenRepository>(new DefaultTokenRepository(tokens));
+            services.TryAddSingleton<ITokenRepository>(new DefaultTokenRepository(tokens));
             return services;
         }
 
         private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
         {
             services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IJwsGenerator>(), s.GetService<IJwtParser>(),
-                s.GetService<IOAuthClientQueryRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>() ));
+                s.GetService<IOAuthClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>() ));
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();

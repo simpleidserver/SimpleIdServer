@@ -23,16 +23,16 @@ namespace SimpleIdServer.OpenID.UI
     {
         private readonly OpenIDHostOptions _options;
         private readonly IDataProtector _dataProtector;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IAmrHelper _amrHelper;
-        private readonly IOAuthUserCommandRepository _oauthUserCommandRepository;
+        private readonly IOAuthUserRepository _oauthUserCommandRepository;
 
         public BaseAuthenticateController(
             IOptions<OpenIDHostOptions> options,
             IDataProtectionProvider dataProtectionProvider, 
-            IOAuthClientQueryRepository oauthClientRepository,
+            IOAuthClientRepository oauthClientRepository,
             IAmrHelper amrHelper,
-            IOAuthUserCommandRepository oauthUserCommandRepository)
+            IOAuthUserRepository oauthUserCommandRepository)
         {
             _options = options.Value;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
@@ -41,7 +41,7 @@ namespace SimpleIdServer.OpenID.UI
             _oauthUserCommandRepository = oauthUserCommandRepository;
         }
 
-        protected IOAuthClientQueryRepository OAuthClientQueryRepository => _oauthClientRepository;
+        protected IOAuthClientRepository OAuthClientQueryRepository => _oauthClientRepository;
 
         protected string Unprotect(string returnUrl)
         {

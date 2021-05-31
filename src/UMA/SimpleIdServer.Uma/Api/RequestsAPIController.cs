@@ -21,39 +21,40 @@ namespace SimpleIdServer.Uma.Api
     [Route(UMAConstants.EndPoints.RequestsAPI)]
     public class RequestsAPIController : BaseAPIController
     {
-        private readonly IUMAPendingRequestCommandRepository _umaPendingRequestCommandRepository;
-        private readonly IUMAPendingRequestQueryRepository _umaPendingRequestQueryRepository;
-        private readonly IUMAResourceCommandRepository _umaResourceCommandRepository;
-        private readonly IUMAResourceQueryRepository _umaResourceQueryRepository;
+        private readonly IUMAPendingRequestRepository _umaPendingRequestRepository;
+        private readonly IUMAResourceRepository _umaResourceRepository;
         private readonly IEnumerable<IClaimTokenFormat> _claimTokenFormats;
 
-        public RequestsAPIController(IUMAPendingRequestCommandRepository umaPendingRequestCommandRepository, IUMAPendingRequestQueryRepository umaPendingRequestQueryRepository, IUMAResourceCommandRepository umaResourceCommandRepository, IUMAResourceQueryRepository umaResourceQueryRepository, IEnumerable<IClaimTokenFormat> claimTokenFormats, IJwtParser jwtParser, IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
+        public RequestsAPIController(
+            IUMAPendingRequestRepository umaPendingRequestRepository,
+            IUMAResourceRepository umaResourceRepository, 
+            IEnumerable<IClaimTokenFormat> claimTokenFormats,
+            IJwtParser jwtParser,
+            IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
         {
-            _umaPendingRequestCommandRepository = umaPendingRequestCommandRepository;
-            _umaPendingRequestQueryRepository = umaPendingRequestQueryRepository;
-            _umaResourceCommandRepository = umaResourceCommandRepository;
-            _umaResourceQueryRepository = umaResourceQueryRepository;
+            _umaPendingRequestRepository = umaPendingRequestRepository;
+            _umaResourceRepository = umaResourceRepository;
             _claimTokenFormats = claimTokenFormats;
         }
                
         [HttpGet(".search/me")]
-        public Task<IActionResult> SearchRequests()
+        public Task<IActionResult> SearchRequests(CancellationToken cancellationToken)
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
                 var searchRequestParameter = ExtractSearchRequestParameter();
-                var searchResult = await _umaPendingRequestQueryRepository.FindByRequester(sub, searchRequestParameter);
+                var searchResult = await _umaPendingRequestRepository.FindByRequester(sub, searchRequestParameter, cancellationToken);
                 return Serialize(searchRequestParameter, searchResult);
             });
         }
 
         [HttpGet(".search/received/me")]
-        public Task<IActionResult> SearchReceivedRequests()
+        public Task<IActionResult> SearchReceivedRequests(CancellationToken cancellationToken)
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
                 var searchRequestParameter = ExtractSearchRequestParameter();
-                var searchResult = await _umaPendingRequestQueryRepository.FindByOwner(sub, searchRequestParameter);
+                var searchResult = await _umaPendingRequestRepository.FindByOwner(sub, searchRequestParameter, cancellationToken);
                 return Serialize(searchRequestParameter, searchResult);
             });
         }        
@@ -63,7 +64,7 @@ namespace SimpleIdServer.Uma.Api
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
-                var pendingRequest = await _umaPendingRequestQueryRepository.FindByTicketIdentifierAndOwner(id, sub);
+                var pendingRequest = await _umaPendingRequestRepository.FindByTicketIdentifierAndOwner(id, sub, cancellationToken);
                 if (pendingRequest == null)
                 {
                     return this.BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED);
@@ -74,7 +75,7 @@ namespace SimpleIdServer.Uma.Api
                     return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, UMAErrorMessages.REQUEST_CANNOT_BE_CONFIRMED);
                 }
 
-                var resource = await _umaResourceQueryRepository.FindByIdentifier(pendingRequest.Resource.Id);
+                var resource = await _umaResourceRepository.FindByIdentifier(pendingRequest.Resource.Id, cancellationToken);
                 foreach(var claimTokenFormat in _claimTokenFormats)
                 {
                     resource.Permissions.Add(new UMAResourcePermission(Guid.NewGuid().ToString(), DateTime.UtcNow)
@@ -92,10 +93,10 @@ namespace SimpleIdServer.Uma.Api
                 }
 
                 pendingRequest.Confirm();
-                await _umaPendingRequestCommandRepository.Update(pendingRequest, cancellationToken);
-                await _umaResourceCommandRepository.Update(resource, cancellationToken);
-                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
-                await _umaPendingRequestCommandRepository.SaveChanges(cancellationToken);
+                await _umaPendingRequestRepository.Update(pendingRequest, cancellationToken);
+                await _umaResourceRepository.Update(resource, cancellationToken);
+                await _umaPendingRequestRepository.SaveChanges(cancellationToken);
+                await _umaResourceRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();
             });
         }
@@ -105,7 +106,7 @@ namespace SimpleIdServer.Uma.Api
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
-                var pendingRequest = await _umaPendingRequestQueryRepository.FindByTicketIdentifierAndOwner(id, sub);
+                var pendingRequest = await _umaPendingRequestRepository.FindByTicketIdentifierAndOwner(id, sub, cancellationToken);
                 if (pendingRequest == null)
                 {
                     return this.BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED);
@@ -117,8 +118,8 @@ namespace SimpleIdServer.Uma.Api
                 }
 
                 pendingRequest.Reject();
-                await _umaPendingRequestCommandRepository.Update(pendingRequest, cancellationToken);
-                await _umaPendingRequestCommandRepository.SaveChanges(cancellationToken);
+                await _umaPendingRequestRepository.Update(pendingRequest, cancellationToken);
+                await _umaPendingRequestRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();
             });
         }

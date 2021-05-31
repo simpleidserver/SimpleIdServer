@@ -14,23 +14,23 @@ namespace SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands.Handlers
     public class AddAccountAccessContentCommandHandler : IRequestHandler<AddAccountAccessContentCommand, AccountAccessContentResult>
     {
         private readonly ICommandRepository _commandRepository;
-        private readonly ITokenQueryRepository _tokenQueryRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly ILogger<AddAccountAccessContentCommandHandler> _logger;
 
         public AddAccountAccessContentCommandHandler(
-            ICommandRepository commandRepository, 
-            ITokenQueryRepository tokenQueryRepository,
+            ICommandRepository commandRepository,
+            ITokenRepository tokenRepository,
             ILogger<AddAccountAccessContentCommandHandler> logger)
         {
             _commandRepository = commandRepository;
-            _tokenQueryRepository = tokenQueryRepository;
+            _tokenRepository = tokenRepository;
             _logger = logger;
         }
 
         public async Task<AccountAccessContentResult> Handle(AddAccountAccessContentCommand request, CancellationToken cancellationToken)
         {
             var risk = request.Risk == null ? string.Empty : request.Risk.ToString();
-            var token = await _tokenQueryRepository.Get(request.Token, cancellationToken);
+            var token = await _tokenRepository.Get(request.Token, cancellationToken);
             if (token == null)
             {
                 _logger.LogError($"Access token '{request.Token}' is invalid or has been revoked");

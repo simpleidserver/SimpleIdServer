@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.Uma.Domains;
 using System;
 using System.Collections.Generic;
@@ -15,15 +14,36 @@ namespace SimpleIdServer.Uma.Startup
         {
             new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow)
             {
-                Descriptions = new List<OAuthTranslation>
+                Translations = new List<UMAResourceTranslation>
                 {
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en"),
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
-                },
-                Names = new List<OAuthTranslation>
-                {
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en"),
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en")
+                        {
+                            Type = "name"
+                        }
+                    },
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
+                        {
+                            Type = "name"
+                        }
+                    },
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en")
+                        {
+                            Type = "description"
+                        }
+                    },
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
+                        {
+                            Type = "description"
+                        }
+                    }
                 },
                 Scopes = new List<string>
                 {
@@ -35,15 +55,36 @@ namespace SimpleIdServer.Uma.Startup
             },
             new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow)
             {
-                Descriptions = new List<OAuthTranslation>
+                Translations = new List<UMAResourceTranslation>
                 {
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en"),
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
-                },
-                Names = new List<OAuthTranslation>
-                {
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en"),
-                    new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en")
+                        {
+                            Type = "name"
+                        }
+                    },
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
+                        {
+                            Type = "name"
+                        }
+                    },
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "first resource", "en")
+                        {
+                            Type = "description"
+                        }
+                    },
+                    new UMAResourceTranslation
+                    {
+                        Translation = new OAuthTranslation(Guid.NewGuid().ToString(), "première ressource", "fr")
+                        {
+                            Type = "description"
+                        }
+                    }
                 },
                 Scopes = new List<string>
                 {
@@ -87,10 +128,7 @@ namespace SimpleIdServer.Uma.Startup
             new OAuthClient
             {
                 ClientId = "api",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "apiSecret", DateTime.UtcNow.AddDays(2))
-                },
+                ClientSecret = "apiSecret",
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow,
@@ -118,10 +156,7 @@ namespace SimpleIdServer.Uma.Startup
             new OAuthClient
             {
                 ClientId = "portal",
-                Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "portalSecret", DateTime.UtcNow.AddDays(2))
-                },
+                ClientSecret = "portalSecret",
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow,

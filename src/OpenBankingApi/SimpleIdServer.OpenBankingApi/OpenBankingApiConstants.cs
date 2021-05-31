@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OAuth.Domains;
 using System;
 using System.Collections.Generic;
 
@@ -16,14 +16,14 @@ namespace SimpleIdServer.OpenBankingApi
 
         public static class OpenBankingApiScopes
         {
-            public static OpenIdScope Accounts = new OpenIdScope("accounts")
+            public static OAuthScope Accounts = new OAuthScope("accounts")
             {
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim("acr", true),
-                    new OpenIdScopeClaim("openbanking_intent_id", true)
+                    new OAuthScopeClaim("acr", true),
+                    new OAuthScopeClaim("openbanking_intent_id", true)
                 }
             };
         }

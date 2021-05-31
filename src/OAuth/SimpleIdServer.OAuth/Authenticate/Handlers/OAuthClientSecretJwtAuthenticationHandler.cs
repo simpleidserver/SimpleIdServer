@@ -23,7 +23,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
         public string AuthMethod => "client_secret_jwt";
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, BaseClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
@@ -35,13 +35,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 throw new ArgumentNullException(nameof(client));
             }
 
-            if (client.Secrets == null)
-            {
-                throw new ArgumentNullException(nameof(client.Secrets));
-            }
-
-            var clientSecret = client.Secrets.FirstOrDefault(s => s.Type == ClientSecretTypes.SharedSecret);
-            if (clientSecret == null)
+            if (string.IsNullOrWhiteSpace(client.ClientSecret))
             {
                 throw new OAuthException(errorCode, ErrorMessages.NO_CLIENT_SECRET);
             }
@@ -54,7 +48,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             }
 
             var clientId = authenticateInstruction.ClientIdFromHttpRequestBody;
-            var jws = await _jwtParser.Decrypt(clientAssertion, clientId, clientSecret.Value, cancellationToken);
+            var jws = await _jwtParser.Decrypt(clientAssertion, clientId, client.ClientSecret, cancellationToken);
             if (string.IsNullOrWhiteSpace(jws))
             {
                 throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_DECRYPTION);

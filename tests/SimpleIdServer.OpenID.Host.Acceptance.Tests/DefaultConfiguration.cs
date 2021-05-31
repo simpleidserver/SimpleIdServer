@@ -45,62 +45,62 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
             }
         };
 
-        public static List<OpenIdScope> Scopes => new List<OpenIdScope>
+        public static List<OAuthScope> Scopes => new List<OAuthScope>
         {
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "scope1",
                 IsExposedInConfigurationEdp = true
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "role",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim("role", true)
+                    new OAuthScopeClaim("role", true)
                 }
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "email",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Email, true),
-                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.EmailVerified, true)
+                    new OAuthScopeClaim(Jwt.Constants.UserClaims.Email, true),
+                    new OAuthScopeClaim(Jwt.Constants.UserClaims.EmailVerified, true)
                 }
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "profile",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Name, true),
-                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.UpdatedAt, true)
+                    new OAuthScopeClaim(Jwt.Constants.UserClaims.Name, true),
+                    new OAuthScopeClaim(Jwt.Constants.UserClaims.UpdatedAt, true)
                 }
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "address",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Address, true)
+                    new OAuthScopeClaim(Jwt.Constants.UserClaims.Address, true)
                 }
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "offline_access",
                 IsExposedInConfigurationEdp = true
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "openid",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim(Jwt.Constants.UserClaims.Subject, true)
+                    new OAuthScopeClaim(Jwt.Constants.UserClaims.Subject, true)
                 },
                 IsExposedInConfigurationEdp = true
             }

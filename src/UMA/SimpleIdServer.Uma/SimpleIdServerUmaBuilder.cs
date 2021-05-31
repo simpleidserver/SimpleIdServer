@@ -22,15 +22,13 @@ namespace SimpleIdServer.Uma
 
         public SimpleIdServerUmaBuilder AddUmaResources(List<UMAResource> umaResources)
         {
-            _serviceCollection.AddSingleton<IUMAResourceCommandRepository>(new DefaultUMAResourceCommandRepository(umaResources));
-            _serviceCollection.AddSingleton<IUMAResourceQueryRepository>(new DefaultUMAResourceQueryRepository(umaResources));
+            _serviceCollection.AddSingleton<IUMAResourceRepository>(new DefaultUMAResourceRepository(umaResources));
             return this;
         }        
         
         public SimpleIdServerUmaBuilder AddUMARequests(List<UMAPendingRequest> umaPendingRequests)
         {
-            _serviceCollection.AddSingleton<IUMAPendingRequestCommandRepository>(new DefaultUMAPendingRequestCommandRepository(umaPendingRequests));
-            _serviceCollection.AddSingleton<IUMAPendingRequestQueryRepository>(new DefaultUMAPendingRequestQueryRepository(umaPendingRequests));
+            _serviceCollection.AddSingleton<IUMAPendingRequestRepository>(new DefaultUMAPendingRequestRepository(umaPendingRequests));
             return this;
         }
     }

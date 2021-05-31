@@ -28,8 +28,8 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher, 
-            IOAuthClientQueryRepository oauthClientRepository,
-            IOAuthUserQueryRepository oauthUserRepository) : base(
+            IOAuthClientRepository oauthClientRepository,
+            IOAuthUserRepository oauthUserRepository) : base(
                 responseTypeHandlers, 
                 authorizationRequestValidators, 
                 tokenProfiles, 

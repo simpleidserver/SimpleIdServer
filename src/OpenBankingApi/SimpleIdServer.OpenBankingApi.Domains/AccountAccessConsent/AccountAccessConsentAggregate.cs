@@ -1,5 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license informati
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Enums;
 using SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.Events;
 using SimpleIdServer.OpenBankingApi.Domains.Resources;

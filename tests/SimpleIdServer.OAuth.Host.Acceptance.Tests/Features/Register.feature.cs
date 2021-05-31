@@ -530,48 +530,45 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON exists \'contacts\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 129
- testRunner.Then("JSON \'client_secret_expires_at\'=\'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 130
  testRunner.Then("JSON \'token_endpoint_auth_method\'=\'client_secret_basic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 131
+#line 130
  testRunner.Then("JSON \'client_uri\'=\'http://localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 132
+#line 131
  testRunner.Then("JSON \'client_uri#fr\'=\'http://localhost/fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 133
+#line 132
  testRunner.Then("JSON \'logo_uri\'=\'http://localhost/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 134
+#line 133
  testRunner.Then("JSON \'logo_uri#fr\'=\'http://localhost/fr/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 135
+#line 134
  testRunner.Then("JSON \'scope\'=\'scope1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 136
+#line 135
  testRunner.Then("JSON \'tos_uri\'=\'http://localhost/tos\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 137
+#line 136
  testRunner.Then("JSON \'policy_uri\'=\'http://localhost/policy\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 138
+#line 137
  testRunner.Then("JSON \'jwks_uri\'=\'http://localhost/jwks\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 139
+#line 138
  testRunner.Then("JSON \'client_name\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 140
+#line 139
  testRunner.Then("JSON \'client_name#fr\'=\'nom\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 141
+#line 140
  testRunner.Then("JSON \'client_name#en\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 142
+#line 141
  testRunner.Then("JSON \'software_id\'=\'software\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 143
+#line 142
  testRunner.Then("JSON \'software_version\'=\'1.0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -586,7 +583,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Update client", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 145
+#line 144
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -663,16 +660,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table22.AddRow(new string[] {
                             "jwks_uri",
                             "http://localhost/jwks"});
-#line 146
+#line 145
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table22, "When ");
 #line hidden
-#line 167
+#line 166
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 168
+#line 167
  testRunner.And("extract parameter \'client_id\' from JSON body into \'clientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 169
+#line 168
  testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'registrationAc" +
                         "cessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -739,7 +736,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table23.AddRow(new string[] {
                             "jwks_uri",
                             "http://jwksuri/jwks"});
-#line 171
+#line 170
  testRunner.And("execute HTTP PUT JSON request \'https://localhost:8080/register/$clientId$\'", ((string)(null)), table23, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
@@ -748,79 +745,76 @@ this.ScenarioInitialize(scenarioInfo);
                 table24.AddRow(new string[] {
                             "Authorization",
                             "Bearer $registrationAccessToken$"});
-#line 194
+#line 193
  testRunner.And("execute HTTP GET request \'https://localhost:8080/register/$clientId$\'", ((string)(null)), table24, "And ");
 #line hidden
-#line 198
+#line 197
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 200
+#line 199
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 201
+#line 200
  testRunner.Then("JSON exists \'client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 202
+#line 201
  testRunner.Then("JSON exists \'client_secret\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 203
+#line 202
  testRunner.Then("JSON exists \'client_id_issued_at\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 204
+#line 203
  testRunner.Then("JSON exists \'grant_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 205
+#line 204
  testRunner.Then("JSON exists \'redirect_uris\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 206
+#line 205
  testRunner.Then("JSON exists \'response_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 207
+#line 206
  testRunner.Then("JSON exists \'contacts\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 208
- testRunner.Then("JSON \'client_secret_expires_at\'=\'0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 209
+#line 207
  testRunner.Then("JSON \'token_endpoint_auth_method\'=\'client_secret_basic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 210
+#line 208
  testRunner.Then("JSON \'client_uri\'=\'http://clienturi\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 211
+#line 209
  testRunner.Then("JSON \'client_uri#fr\'=\'http://clienturi/fr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 212
+#line 210
  testRunner.Then("JSON \'logo_uri\'=\'http://logouri/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 213
+#line 211
  testRunner.Then("JSON \'logo_uri#fr\'=\'http://logouri/fr/1.png\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 214
+#line 212
  testRunner.Then("JSON \'scope\'=\'scope1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 215
+#line 213
  testRunner.Then("JSON \'tos_uri\'=\'http://tosuri/tos\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 216
+#line 214
  testRunner.Then("JSON \'policy_uri\'=\'http://policyuri/policy\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 217
+#line 215
  testRunner.Then("JSON \'jwks_uri\'=\'http://jwksuri/jwks\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 218
+#line 216
  testRunner.Then("JSON \'client_name\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 219
+#line 217
  testRunner.Then("JSON \'client_name#fr\'=\'nom\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 220
+#line 218
  testRunner.Then("JSON \'client_name#en\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 221
+#line 219
  testRunner.Then("JSON \'software_id\'=\'software\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 222
+#line 220
  testRunner.Then("JSON \'software_version\'=\'1.0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -835,7 +829,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Delete client", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 225
+#line 223
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -912,16 +906,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table25.AddRow(new string[] {
                             "jwks_uri",
                             "http://localhost/jwks"});
-#line 226
+#line 224
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table25, "When ");
 #line hidden
-#line 247
+#line 245
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 248
+#line 246
  testRunner.And("extract parameter \'client_id\' from JSON body into \'clientId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 249
+#line 247
  testRunner.And("extract parameter \'registration_access_token\' from JSON body into \'registrationAc" +
                         "cessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -931,7 +925,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table26.AddRow(new string[] {
                             "Authorization",
                             "Bearer $registrationAccessToken$"});
-#line 251
+#line 249
  testRunner.And("execute HTTP DELETE request \'https://localhost:8080/register/$clientId$\'", ((string)(null)), table26, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
@@ -940,19 +934,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table27.AddRow(new string[] {
                             "Authorization",
                             "Bearer $registrationAccessToken$"});
-#line 256
+#line 254
  testRunner.And("execute HTTP GET request \'https://localhost:8080/register/$clientId$\'", ((string)(null)), table27, "And ");
 #line hidden
-#line 260
+#line 258
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 262
+#line 260
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 263
+#line 261
  testRunner.Then("JSON \'error\'=\'invalid_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 264
+#line 262
  testRunner.Then("JSON \'error_description\'=\'access token is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

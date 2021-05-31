@@ -154,6 +154,20 @@ namespace SimpleIdServer.Jwt
         /// Gets or sets the operation(s) that the key is intended to be user for.
         /// </summary>
         public IEnumerable<KeyOperations> KeyOps { get; set; }
+        public ICollection<JsonWebKeyKeyOperation> KeyOperationLst
+        {
+            get
+            {
+                return KeyOps.Select(k => new JsonWebKeyKeyOperation
+                {
+                    Operation = k
+                }).ToList();
+            }
+            set
+            {
+                KeyOps = value.Select(s => s.Operation);
+            }
+        }
         /// <summary>
         /// Gets or sets the algorithm intended for use with the key
         /// </summary>

@@ -19,10 +19,10 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
 
         protected List<T> LstData => _lstData;
 
-        public bool Add(T data)
+        public Task<bool> Add(T data, CancellationToken token)
         {
             _lstData.Add((T)data.Clone());
-            return true;
+            return Task.FromResult(true);
         }
 
         public Task<bool> Update(T data, CancellationToken token)

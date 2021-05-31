@@ -26,8 +26,8 @@ namespace SimpleIdServer.OpenID.Api.Configuration
         private readonly IEnumerable<IEncHandler> _encHandlers;
         private readonly IEnumerable<ISignHandler> _signHandlers;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
-        private readonly IOAuthScopeQueryRepository _oauthScopeQueryRepository;
-        private readonly IAuthenticationContextClassReferenceQueryRepository _authenticationContextClassReferenceQueryRepository;
+        private readonly IOAuthScopeRepository _oauthScopeRepository;
+        private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
 
         public ConfigurationController(
             IConfigurationRequestHandler configurationRequestHandler, 
@@ -35,25 +35,24 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             IEnumerable<IEncHandler> encHandlers,
             IEnumerable<ISignHandler> signHandlers,
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders,
-            IOAuthScopeQueryRepository oauthScopeQueryRepository,
-
-            IAuthenticationContextClassReferenceQueryRepository authenticationContextClassReferenceQueryRepository) : base(configurationRequestHandler)
+            IOAuthScopeRepository oauthScopeRepository,
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configurationRequestHandler)
         {
             _cekHandlers = cekHandlers;
             _encHandlers = encHandlers;
             _signHandlers = signHandlers;
             _subjectTypeBuilders = subjectTypeBuilders;
-            _oauthScopeQueryRepository = oauthScopeQueryRepository;
-            _authenticationContextClassReferenceQueryRepository = authenticationContextClassReferenceQueryRepository;
+            _oauthScopeRepository = oauthScopeRepository;
+            _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         }
 
         [HttpGet]
         public override async Task<IActionResult> Get(CancellationToken token)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var acrLst = await _authenticationContextClassReferenceQueryRepository.GetAllACR(token);
-            var result = await Build();
-            var openidScopes = (await _oauthScopeQueryRepository.GetAllOAuthScopes()).Cast<OpenIdScope>().SelectMany(s => s.Claims).Where(c => c.IsExposed).Select(s => s.ClaimName);
+            var acrLst = await _authenticationContextClassReferenceRepository.GetAllACR(token);
+            var result = await Build(token);
+            var openidScopes = (await _oauthScopeRepository.GetAllOAuthScopes(token)).SelectMany(s => s.Claims).Where(c => c.IsExposed).Select(s => s.ClaimName);
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{SIDOpenIdConstants.EndPoints.UserInfo}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{SIDOpenIdConstants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{SIDOpenIdConstants.EndPoints.EndSession}");

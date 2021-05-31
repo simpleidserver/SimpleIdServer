@@ -61,7 +61,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
         public async Task WhenAddUserConsent(string user, string scope, string clientId)
         {
-            var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
+            var repository = (IOAuthUserRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository));
             var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             oauthUser.Consents.Add(new OAuthConsent
             {
@@ -73,7 +73,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         [When("add authentication class references")]
         public void WhenAddAcrValues(Table table)
         {
-            var repository = (IAuthenticationContextClassReferenceCommandRepository)_factory.Server.Host.Services.GetService(typeof(IAuthenticationContextClassReferenceCommandRepository));
+            var repository = (IAuthenticationContextClassReferenceRepository)_factory.Server.Host.Services.GetService(typeof(IAuthenticationContextClassReferenceRepository));
             foreach (var record in table.Rows)
             {
                 repository.Add(new AuthenticationContextClassReference
@@ -81,14 +81,14 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
                     AuthenticationMethodReferences = record["Amrs"].Split(','),
                     DisplayName = record["DisplayName"],
                     Name = record["Name"]
-                });
+                }, CancellationToken.None).Wait();
             }
         }
 
         [When("add user consent with claim : user='(.*)', scope='(.*)', clientId='(.*)', claim='(.*)'")]
         public async Task WhenAddUserConsent(string user, string scope, string clientId, string claim)
         {
-            var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
+            var repository = (IOAuthUserRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository));
             var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             var claims = claim.Split(' ').Select(s =>
             {
@@ -300,11 +300,11 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         [When("add JSON web key to Authorization Server and store into '(.*)'")]
         public void WhenAddJsonWebKey(string name, Table table)
         {
-            var repository = (IJsonWebKeyCommandRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyCommandRepository));
+            var repository = (IJsonWebKeyRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyRepository));
             var jwks = ExtractJsonWebKeys(table);
             foreach(var jwk in jwks)
             {
-                repository.Add(jwk);
+                repository.Add(jwk, CancellationToken.None).Wait();
             }
 
             _scenarioContext.Set(jwks, name);   
@@ -328,7 +328,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
             var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
             _scenarioContext.Set(jws, name);
-            var tokenCommandRepository = (ITokenCommandRepository)_factory.Server.Host.Services.GetService(typeof(ITokenCommandRepository));
+            var tokenCommandRepository = (ITokenRepository)_factory.Server.Host.Services.GetService(typeof(ITokenRepository));
             tokenCommandRepository.Add(new Token
             {
                 Id = jws,
@@ -361,7 +361,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
             }
 
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var clientRepository = (IOAuthClientQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthClientQueryRepository));
+            var clientRepository = (IOAuthClientRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthClientRepository));
             var oauthClient = await clientRepository.FindOAuthClientById(clientId, CancellationToken.None);
             var jsonWebKey = oauthClient.JsonWebKeys.First(f => f.Use == Usages.SIG && f.Alg == algName);
             var requestParameter = jwtBuilder.Sign(jwsPayload, jsonWebKey, jsonWebKey.Alg);
@@ -437,7 +437,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         [When("add '(.*)' seconds to authentication instant to user '(.*)'")]
         public async Task WhenSubstractAuthenticationInstant(int seconds, string login)
         {
-            var oauthUserRepository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
+            var oauthUserRepository = (IOAuthUserRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository));
             var user = await oauthUserRepository.FindOAuthUserByLogin(login, CancellationToken.None);
             user.GetActiveSession().AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
         }
@@ -463,7 +463,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests.Steps
         {
             var jwtParser = (IJwtParser)_factory.Server.Host.Services.GetService(typeof(IJwtParser));
             var jwe = ParseValue(token).ToString();
-            var jwePayload = jwtParser.Decrypt(jwe);
+            var jwePayload = jwtParser.Decrypt(jwe, CancellationToken.None).Result;
             var jweHeader = jwtParser.ExtractJweHeader(jwe);
             _scenarioContext.Set(jwePayload, name);
             _scenarioContext.Set(jweHeader, "jweHeader");

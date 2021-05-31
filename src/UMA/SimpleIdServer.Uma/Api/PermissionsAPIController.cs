@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.Api
@@ -22,19 +23,23 @@ namespace SimpleIdServer.Uma.Api
     [Route(UMAConstants.EndPoints.PermissionsAPI)]
     public class PermissionsAPIController : BaseAPIController
     {
-        private readonly IUMAResourceQueryRepository _umaResourceQueryRepository;
+        private readonly IUMAResourceRepository _umaResourceRepository;
         private readonly IUMAPermissionTicketHelper _permissionTicketHelper;
 
-        public PermissionsAPIController(IUMAResourceQueryRepository umaResourceQueryRepository, IUMAPermissionTicketHelper permissionTicketHelper, IJwtParser jwtParser, IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
+        public PermissionsAPIController(
+            IUMAResourceRepository umaResourceRepository, 
+            IUMAPermissionTicketHelper permissionTicketHelper, 
+            IJwtParser jwtParser, 
+            IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
         {
-            _umaResourceQueryRepository = umaResourceQueryRepository;
+            _umaResourceRepository = umaResourceRepository;
             _permissionTicketHelper = permissionTicketHelper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Build([FromBody] JToken jToken)
+        public async Task<IActionResult> Build([FromBody] JToken jToken, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
@@ -42,7 +47,7 @@ namespace SimpleIdServer.Uma.Api
             try
             {
                 var permissionTicket = BuildPermissionTicket(jToken);
-                await Check(permissionTicket);
+                await Check(permissionTicket, cancellationToken);
                 await _permissionTicketHelper.SetTicket(permissionTicket);
                 var result = new JObject
                 {
@@ -100,10 +105,10 @@ namespace SimpleIdServer.Uma.Api
             return new UMAPermissionTicket(Guid.NewGuid().ToString(), records);
         }
 
-        private async Task Check(UMAPermissionTicket permissionTicket)
+        private async Task Check(UMAPermissionTicket permissionTicket, CancellationToken cancellationToken)
         {
             var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
-            var umaResources = await _umaResourceQueryRepository.FindByIdentifiers(resourceIds);
+            var umaResources = await _umaResourceRepository.FindByIdentifiers(resourceIds, cancellationToken);
             var unknownResources = resourceIds.Where(rid => !umaResources.Any(r => r.Id == rid));
             if (unknownResources.Any())
             {

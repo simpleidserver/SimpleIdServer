@@ -22,9 +22,9 @@ namespace SimpleIdServer.Uma.Domains
         }
         
         public string Id { get; set; }
-        public ICollection<UMAResourcePermissionClaim> Claims { get; set; }
         public ICollection<string> Scopes { get; set; }
         public DateTime CreateDateTime { get; set; }
+        public ICollection<UMAResourcePermissionClaim> Claims { get; set; }
 
         public object Clone()
         {

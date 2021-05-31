@@ -6,6 +6,7 @@ import { SharedModule } from '@app/shared/shared.module';
 import { AvatarModule } from 'ngx-avatar';
 import { ApplicationsRoutes } from './applications.routes';
 import { ListApplicationsComponent } from './list/list.component';
+import { EditTranslationComponent } from './view/edit-translation.component';
 import { ViewApplicationsComponent } from './view/view.component';
 
 @NgModule({
@@ -19,6 +20,7 @@ import { ViewApplicationsComponent } from './view/view.component';
   declarations: [
     ListApplicationsComponent,
     ViewApplicationsComponent,
+    EditTranslationComponent,
     TranslateEnumPipe
   ]
 })

@@ -27,41 +27,43 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 @NgModule({
-    imports: [ ],
-    declarations: [ ],
-    exports: [
-        MatMenuModule,
-        MatToolbarModule,
-        MatButtonModule,
-        MatInputModule,
-        MatExpansionModule,
-        MatGridListModule,
-        MatCardModule,
-        MatDividerModule,
-        FlexLayoutModule,
-        MatSidenavModule,
-        MatListModule,
-        MatIconModule,
-        MatChipsModule,
-        MatDialogModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatSelectModule,
-        MatDatepickerModule,
-        MatTableModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
-        MatSnackBarModule,
-        MatTabsModule,
-        MatTooltipModule,
-        MatAutocompleteModule,
-        MatPaginatorModule,
-        MatTreeModule,
-        MatStepperModule,
-        MatSortModule
-    ]
+  imports: [],
+  declarations: [],
+  exports: [
+    MatMenuModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatInputModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatCardModule,
+    MatDividerModule,
+    FlexLayoutModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    MatChipsModule,
+    MatDialogModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatTableModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatSnackBarModule,
+    MatTabsModule,
+    MatTooltipModule,
+    MatAutocompleteModule,
+    MatPaginatorModule,
+    MatTreeModule,
+    MatStepperModule,
+    MatSortModule,
+    ClipboardModule
+  ]
 })
 
 export class MaterialModule { }

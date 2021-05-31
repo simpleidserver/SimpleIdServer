@@ -21,7 +21,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
     public class CIBAHandler : BaseCredentialsHandler
     {
         private readonly ILogger<CIBAHandler> _logger;
-        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
         private readonly ICIBAGrantTypeValidator _cibaGrantTypeValidator;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
@@ -29,7 +29,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
         public CIBAHandler(
             ILogger<CIBAHandler> logger,
-            IOAuthUserQueryRepository oauthUserQueryRepository,
+            IOAuthUserRepository oauthUserQueryRepository,
             ICIBAGrantTypeValidator cibaGrantTypeValidator,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IEnumerable<ITokenProfile> tokensProfiles,
@@ -37,7 +37,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             IBCAuthorizeRepository bcAuthorizeRepository) : base(clientAuthenticationHelper)
         {
             _logger = logger;
-            _oauthUserQueryRepository = oauthUserQueryRepository;
+            _oauthUserRepository = oauthUserQueryRepository;
             _cibaGrantTypeValidator = cibaGrantTypeValidator;
             _tokenBuilders = tokenBuilders;
             _tokenProfiles = tokensProfiles;
@@ -54,7 +54,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
-                var user = await _oauthUserQueryRepository.FindOAuthUserByLogin(authRequest.UserId, cancellationToken);
+                var user = await _oauthUserRepository.FindOAuthUserByLogin(authRequest.UserId, cancellationToken);
                 context.SetUser(user);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {

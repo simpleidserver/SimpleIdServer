@@ -12,11 +12,11 @@ namespace SimpleIdServer.OpenID.Api.Register
 {
     public class GetOpenIdClientHandler : GetOAuthClientHandler
     {
-        public GetOpenIdClientHandler(IOAuthClientQueryRepository oauthClientQueryRepository, IOAuthClientCommandRepository oAuthClientCommandRepository, ILogger<GetOAuthClientHandler> logger) : base(oauthClientQueryRepository, oAuthClientCommandRepository, logger)
+        public GetOpenIdClientHandler(IOAuthClientRepository oauthClientRepository, ILogger<GetOAuthClientHandler> logger) : base(oauthClientRepository, logger)
         {
         }
 
-        protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
+        protected override JObject BuildResponse(BaseClient oauthClient, string issuer)
         {
             var openidClient = oauthClient as OpenIdClient;
             return openidClient.ToDto(issuer);

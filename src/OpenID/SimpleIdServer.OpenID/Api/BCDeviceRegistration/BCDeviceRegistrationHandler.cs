@@ -20,11 +20,11 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
     public class BCDeviceRegistrationHandler : IBCDeviceRegistrationHandler
     {
         private readonly IBCDeviceRegistrationValidator _bcDeviceRegistrationValidator;
-        private readonly IOAuthUserCommandRepository _oauthUserCommandRepository;
+        private readonly IOAuthUserRepository _oauthUserCommandRepository;
 
         public BCDeviceRegistrationHandler(
             IBCDeviceRegistrationValidator bcDeviceRegistrationValidator,
-            IOAuthUserCommandRepository oAuthUserCommandRepository)
+            IOAuthUserRepository oAuthUserCommandRepository)
         {
             _bcDeviceRegistrationValidator = bcDeviceRegistrationValidator;
             _oauthUserCommandRepository = oAuthUserCommandRepository;

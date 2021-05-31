@@ -108,7 +108,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = await ExtractIdTokenHint(idTokenHint);
+                var payload = await ExtractIdTokenHint(idTokenHint, cancellationToken);
                 if (context.User.Id != payload.GetSub())
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
@@ -163,7 +163,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
             return acr.AuthenticationMethodReferences.First();
         }
 
-        protected async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint)
+        protected async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint, CancellationToken cancellationToken)
         {
             if (!_jwtParser.IsJwsToken(idTokenHint) && !_jwtParser.IsJweToken(idTokenHint))
             {
@@ -172,14 +172,14 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (_jwtParser.IsJweToken(idTokenHint))
             {
-                idTokenHint = await _jwtParser.Decrypt(idTokenHint);
+                idTokenHint = await _jwtParser.Decrypt(idTokenHint, cancellationToken);
                 if (string.IsNullOrWhiteSpace(idTokenHint))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
                 }
             }
 
-            return await _jwtParser.Unsign(idTokenHint);
+            return await _jwtParser.Unsign(idTokenHint, cancellationToken);
         }
     }
 }

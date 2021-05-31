@@ -32,15 +32,15 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         private readonly IEnumerable<IClaimsSource> _claimsSources;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly IAmrHelper _amrHelper;
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
 
         public IdTokenBuilder(
             IJwtBuilder jwtBuilder, 
             IEnumerable<IClaimsSource> claimsSources, 
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
-            IAmrHelper amrHelper, 
-            IOAuthUserQueryRepository oauthUserQueryRepository, 
+            IAmrHelper amrHelper,
+            IOAuthUserRepository oauthUserQueryRepository, 
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher)
         {
             _jwtBuilder = jwtBuilder;
@@ -67,7 +67,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
             var openidClient = (OpenIdClient)context.Client;
             var payload = await BuildIdToken(context, context.Request.RequestData, scopes, cancellationToken);
-            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
+            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }
 
@@ -82,7 +82,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             currentContext.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(previousQueryParameters[UserClaims.Subject].ToString(), token));
             var openidClient = (OpenIdClient)currentContext.Client;
             var payload = await BuildIdToken(currentContext, previousQueryParameters, scopes, token);
-            var idToken = await _jwtBuilder.BuildClientToken(currentContext.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
+            var idToken = await _jwtBuilder.BuildClientToken(currentContext.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, token);
             currentContext.Response.Add(Name, idToken);
         }
 
@@ -131,11 +131,11 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 result.Add(OAuthClaims.Acr, defaultAcr.Name);
             }
 
-            IEnumerable<OpenIdScope> scopes = new OpenIdScope[1] { SIDOpenIdConstants.StandardScopes.OpenIdScope };
+            IEnumerable<OAuthScope> scopes = new OAuthScope[1] { SIDOpenIdConstants.StandardScopes.OpenIdScope };
             var responseTypes = queryParameters.GetResponseTypesFromAuthorizationRequest();
             if (responseTypes.Count() == 1 && responseTypes.First() == AuthorizationResponseParameters.IdToken)
             {
-                scopes = openidClient.AllowedOpenIdScopes.Where(s => requestedScopes.Any(r => r == s.Name));
+                scopes = openidClient.AllowedScopes.Where(s => requestedScopes.Any(r => r == s.Name));
             }
 
             result.Add(OAuthClaims.Sid, currentContext.User.GetActiveSession().SessionId);
@@ -143,13 +143,13 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.User.GetActiveSession().AuthenticationDateTime);
             foreach (var claimsSource in _claimsSources)
             {
-                await claimsSource.Enrich(result, openidClient).ConfigureAwait(false);
+                await claimsSource.Enrich(result, openidClient, cancellationToken);
             }
 
             return result;
         }
 
-        public static void EnrichWithScopeParameter(JwsPayload payload, IEnumerable<OpenIdScope> scopes, OAuthUser user, string subject)
+        public static void EnrichWithScopeParameter(JwsPayload payload, IEnumerable<OAuthScope> scopes, OAuthUser user, string subject)
         {
             if (scopes != null)
             {

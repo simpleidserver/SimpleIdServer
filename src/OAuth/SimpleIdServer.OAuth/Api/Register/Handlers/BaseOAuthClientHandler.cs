@@ -14,21 +14,18 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
     public class BaseOAuthClientHandler
     {
         public BaseOAuthClientHandler(
-            IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository,
+            IOAuthClientRepository oAuthClientRepository,
             ILogger<BaseOAuthClientHandler> logger)
         {
-            OAuthClientQueryRepository = oauthClientQueryRepository;
-            OAuthClientCommandRepository = oAuthClientCommandRepository;
+            OAuthClientRepository = oAuthClientRepository;
             Logger = logger;
         }
 
 
-        public IOAuthClientQueryRepository OAuthClientQueryRepository { get; set; }
-        public IOAuthClientCommandRepository OAuthClientCommandRepository { get; set; }
+        public IOAuthClientRepository OAuthClientRepository { get; set; }
         public ILogger<BaseOAuthClientHandler> Logger { get; set; }
 
-        public virtual async Task<OAuthClient> GetClient(string clientId, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task<BaseClient> GetClient(string clientId, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var accessToken = handlerContext.Request.GetToken(AutenticationSchemes.Bearer, AutenticationSchemes.Basic);
             if (string.IsNullOrWhiteSpace(accessToken))
@@ -37,7 +34,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
                 throw new OAuthUnauthorizedException(ErrorCodes.INVALID_TOKEN, ErrorMessages.MISSING_ACCESS_TOKEN);
             }
 
-            var clients = await OAuthClientQueryRepository.Find(new Persistence.Parameters.SearchClientParameter
+            var clients = await OAuthClientRepository.Find(new Persistence.Parameters.SearchClientParameter
             {
                 RegistrationAccessToken = accessToken
             }, cancellationToken);
@@ -51,8 +48,8 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             if (client.ClientId != clientId)
             {
                 client.RegistrationAccessToken = null;
-                await OAuthClientCommandRepository.Update(client, cancellationToken);
-                await OAuthClientCommandRepository.SaveChanges(cancellationToken);
+                await OAuthClientRepository.Update(client, cancellationToken);
+                await OAuthClientRepository.SaveChanges(cancellationToken);
                 Logger.LogError($"access token '{accessToken}' can be used for the client '{client.ClientId}' and not for the client '{clientId}'");
                 throw new OAuthUnauthorizedException(ErrorCodes.INVALID_TOKEN, string.Format(ErrorMessages.ACCESS_TOKEN_VALID_CLIENT, client.ClientId, clientId));
             }

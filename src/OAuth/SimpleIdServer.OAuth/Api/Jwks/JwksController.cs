@@ -17,9 +17,9 @@ namespace SimpleIdServer.OAuth.Api.Jwks
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            var jwks = await _jwksRequestHandler.Get();
+            var jwks = await _jwksRequestHandler.Get(cancellationToken);
             return new OkObjectResult(jwks);
         }
 

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OpenID\SimpleIdServer.OpenID.EF\SimpleIdServer.OpenID.EF.csproj" />
+    <ProjectReference Include="..\SimpleIdServer.OpenBankingApi\SimpleIdServer.OpenBankingApi.csproj" />
+  </ItemGroup>
+</Project>

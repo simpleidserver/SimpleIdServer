@@ -19,6 +19,8 @@ import { SharedModule } from './shared/shared.module';
 import { ApplicationEffects } from './stores/applications/effects/application.effects';
 import { ApplicationService } from './stores/applications/services/application.service';
 import { appReducer } from './stores/appstate';
+import { MetadataEffects } from './stores/metadata/effects/metadata.effects';
+import { MetadataService } from './stores/metadata/services/metadata.service';
 import { OAuthScopeEffects } from './stores/scopes/effects/scope.effects';
 import { OAuthScopeService } from './stores/scopes/services/scope.service';
 
@@ -38,7 +40,7 @@ export function createTranslateLoader(http: HttpClient) {
     BrowserAnimationsModule,
     HttpClientModule,
     OAuthModule.forRoot(),
-    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects]),
+    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects]),
     StoreModule.forRoot(appReducer),
     StoreDevtoolsModule.instrument({
       maxAge: 10
@@ -54,7 +56,7 @@ export function createTranslateLoader(http: HttpClient) {
   declarations: [
     AppComponent
   ],
-  providers: [ApplicationService, OAuthScopeService],
+  providers: [ApplicationService, OAuthScopeService, MetadataService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

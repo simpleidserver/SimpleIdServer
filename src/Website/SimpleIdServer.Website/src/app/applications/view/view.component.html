@@ -7,7 +7,7 @@
       <div class="mat-h1">\</div>
     </li>
     <li>
-      <div class="mat-h1">{{clientId}}</div>
+      <div class="mat-h1">{{application.ClientId}}</div>
     </li>
   </ul>
 </div>
@@ -19,12 +19,57 @@
           <h3>{{ 'applications.basicinfo' | translate }}</h3>
         </div>
         <div fxFlex="50%">
+          <!-- Name -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ "applications.clientName" | translate }}</mat-label>
+            <input matInput formControlName="clientName" />
+            <div class="actions">
+              <mat-icon (click)="edit(clientNames, translate('applications.editClientName'))" class="edit">edit</mat-icon>
+            </div>
+          </mat-form-field>
           <!-- Client identifier -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{ "applications.clientId" | translate }}</mat-label>
-            <input matInput formControlName="clientId" formControlName="clientId" />
+            <input matInput formControlName="clientId"  />
+          </mat-form-field>
+          <!-- Client secret -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ "applications.clientSecret" | translate }}</mat-label>
+            <input matInput [type]="clientSecretInputType" formControlName="clientSecret" />
+            <div class="actions">
+              <mat-icon class="copy" [matTooltip]="'applications.actions.copy' | translate" [cdkCopyToClipboard]="getClientSecret()">content_copy</mat-icon>
+              <mat-icon class="display" [matTooltip]="'applications.actions.reveal' | translate" (mousedown)="displayClientSecret()" (mouseup)="hideClientSecret()">visibility</mat-icon>
+            </div>
           </mat-form-field>
         </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div fxLayout="row">
+        <div fxFlex="50%">
+          <h3>{{ 'applications.properties' | translate }}</h3>
+        </div>
+        <div fxFlex="50%">
+          <!-- Logo URI -->
+          <p>{{ 'applications.clientLogoUri' | translate }}</p>
+          <div class="img-editor">
+            <div class="img">
+              <img src="{{ clientLogoUris | translateenum }}" />
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="logoUri" />
+              <div class="actions">
+                <mat-icon (click)="edit(clientLogoUris, translate('applications.editLogoUri'))" class="edit">edit</mat-icon>
+              </div>
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Application type -->
+        <mat-form-field appearance="fill">
+          <mat-label>{{ 'applications.applicationType' | translate }}</mat-label>
+          <select>
+
+          </select>
+        </mat-form-field>
       </div>
     </form>
   </mat-card-content>

@@ -33,23 +33,23 @@ namespace SimpleIdServer.OpenID.UI
     {
         private readonly OpenIDHostOptions _options;
         private readonly IJwtParser _jwtParser;
-        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
-        private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IHttpClientFactory _httpClientFactory;
 
         public CheckSessionController(
             IOptions<OpenIDHostOptions> options,
             IJwtParser jwtParser,
-            IOAuthUserQueryRepository oAuthUserQueryRepository,
-            IOAuthClientQueryRepository oAuthClientQueryRepository,
+            IOAuthUserRepository oAuthUserRepository,
+            IOAuthClientRepository oAuthClientRepository,
             IJwtBuilder jwtBuilder,
             IHttpClientFactory httpClientFactory)
         {
             _options = options.Value;
             _jwtParser = jwtParser;
-            _oauthUserQueryRepository = oAuthUserQueryRepository;
-            _oauthClientQueryRepository = oAuthClientQueryRepository;
+            _oauthUserRepository = oAuthUserRepository;
+            _oauthClientRepository = oAuthClientRepository;
             _jwtBuilder = jwtBuilder;
             _httpClientFactory = httpClientFactory;
         }
@@ -124,7 +124,7 @@ namespace SimpleIdServer.OpenID.UI
             {
                 var sessionId = await GetSessionId(cancellationToken);
                 var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
-                await SendLogoutToken(validationResult.Client, sessionId);
+                await SendLogoutToken(validationResult.Client, sessionId, cancellationToken);
                 Response.Cookies.Delete(_options.SessionCookieName);
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
@@ -140,7 +140,7 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
-        protected async Task SendLogoutToken(OpenIdClient openIdClient, string sessionId)
+        protected async Task SendLogoutToken(OpenIdClient openIdClient, string sessionId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(openIdClient.BackChannelLogoutUri))
             {
@@ -166,7 +166,7 @@ namespace SimpleIdServer.OpenID.UI
                 jwsPayload.Add(Jwt.Constants.OAuthClaims.Sid, sessionId);
             }
 
-            var logoutToken = await _jwtBuilder.Sign(jwsPayload, openIdClient.TokenSignedResponseAlg);
+            var logoutToken = await _jwtBuilder.Sign(jwsPayload, openIdClient.TokenSignedResponseAlg, cancellationToken);
             using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var body = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
@@ -186,7 +186,7 @@ namespace SimpleIdServer.OpenID.UI
         protected async Task<string> GetSessionId(CancellationToken cancellationToken)
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _oauthUserQueryRepository.FindOAuthUserByLogin(userId, cancellationToken);
+            var user = await _oauthUserRepository.FindOAuthUserByLogin(userId, cancellationToken);
             return user.GetActiveSession().SessionId;
         }
 
@@ -224,7 +224,7 @@ namespace SimpleIdServer.OpenID.UI
             }
 
             string jwsHeaderAlg = null, jweHeaderAlg = null, jweHeaderEnc = null;
-            var jwsPayload = await ExtractIdTokenHint(idTokenHint);
+            var jwsPayload = await ExtractIdTokenHint(idTokenHint, cancellationToken);
             if (_jwtParser.IsJweToken(idTokenHint))
             {
                 var jweHeader = _jwtParser.ExtractJweHeader(idTokenHint);
@@ -248,7 +248,7 @@ namespace SimpleIdServer.OpenID.UI
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
             }
 
-            var openidClients = (await _oauthClientQueryRepository.FindOAuthClientByIds(jwsPayload.GetAudiences(), cancellationToken)).Cast<OpenIdClient>();
+            var openidClients = (await _oauthClientRepository.FindOAuthClientByIds(jwsPayload.GetAudiences(), cancellationToken)).Cast<OpenIdClient>();
             if (openidClients == null || !openidClients.Any())
             {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_IDTOKENHINT);
@@ -278,7 +278,7 @@ namespace SimpleIdServer.OpenID.UI
             return new ValidationResult(jwsPayload, openidClient);
         }
 
-        private async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint)
+        private async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint, CancellationToken cancellationToken)
         {
             if (!_jwtParser.IsJwsToken(idTokenHint) && !_jwtParser.IsJweToken(idTokenHint))
             {
@@ -289,7 +289,7 @@ namespace SimpleIdServer.OpenID.UI
             {
                 try
                 {
-                    idTokenHint = await _jwtParser.Decrypt(idTokenHint);
+                    idTokenHint = await _jwtParser.Decrypt(idTokenHint, cancellationToken);
                 }
                 catch(Exception)
                 {
@@ -304,7 +304,7 @@ namespace SimpleIdServer.OpenID.UI
 
             try
             {
-                return await _jwtParser.Unsign(idTokenHint);
+                return await _jwtParser.Unsign(idTokenHint, cancellationToken);
             }
             catch(Exception)
             {

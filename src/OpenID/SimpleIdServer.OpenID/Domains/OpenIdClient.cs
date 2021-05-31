@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Infrastructures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,18 +13,26 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Domains
 {
-    public class OpenIdClient : OAuthClient
+    public class OpenIdClient : BaseClient, ICloneable
     {
-        public OpenIdClient()
+        public OpenIdClient() : base()
         {
-            AllowedScopes = new List<OpenIdScope>();
             DefaultAcrValues = new List<string>();
         }
+
+        #region Properties
 
         /// <summary>
         /// Kind of the application. The default, if omitted, is web. The defined values are “native” or “web”. 
         /// </summary>
         public string ApplicationType { get; set; }
+
+        /// <summary>
+        /// Kind of application, spa etc...
+        /// </summary>
+        public ApplicationKinds? ApplicationKind { get; set; }
+
+        public string ApplicationTypeCategory { get; set; }
 
         /// <summary>
         /// Cryptographic algorithm used to encrypt the JWS identity token.
@@ -99,11 +110,6 @@ namespace SimpleIdServer.OpenID.Domains
         public string PairWiseIdentifierSalt { get; set; }
 
         /// <summary>
-        /// OPENID scopes.
-        /// </summary>
-        public IEnumerable<OpenIdScope> AllowedOpenIdScopes => (IEnumerable<OpenIdScope>)AllowedScopes;
-
-        /// <summary>
         /// URI using the https scheme that a third party can use to initiate a login by the RP.
         /// </summary>
         public string InitiateLoginUri { get; set; }
@@ -139,6 +145,23 @@ namespace SimpleIdServer.OpenID.Domains
         /// </summary>
         public bool BackChannelLogoutSessionRequired { get; set; }
         public string BackChannelLogoutUri { get; set; }
+        public ICollection<OpenIdClientScope> OpenIdAllowedScopes { get; set; }
+        public override ICollection<OAuthScope> AllowedScopes
+        {
+            get
+            {
+                return OpenIdAllowedScopes.Select(o => o.Scope).ToList();
+            }
+            set
+            {
+                OpenIdAllowedScopes = value.Select(v => new OpenIdClientScope
+                {
+                    Scope = v
+                }).ToList();
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Resolve redirection urls.
@@ -180,24 +203,21 @@ namespace SimpleIdServer.OpenID.Domains
             return result;
         }
 
-        public override object Clone()
+        public object Clone()
         {
             return new OpenIdClient
             {
                 ClientId = ClientId,
-                ClientNames = ClientNames == null ? new List<OAuthTranslation>() : ClientNames.Select(c => (OAuthTranslation)c.Clone()).ToList(),
-                ClientUris = ClientUris == null ? new List<OAuthTranslation>() : ClientUris.Select(c => (OAuthTranslation)c.Clone()).ToList(),
-                LogoUris = LogoUris == null ? new List<OAuthTranslation>() : LogoUris.Select(c => (OAuthTranslation)c.Clone()).ToList(),
-                PolicyUris = PolicyUris == null ? new List<OAuthTranslation>() : PolicyUris.Select(c => (OAuthTranslation)c.Clone()).ToList(),
-                TosUris = TosUris == null ? new List<OAuthTranslation>() : TosUris.Select(c => (OAuthTranslation)c.Clone()).ToList(),
+                Translations = Translations == null ? new List<OAuthClientTranslation>() : Translations.Select(c => (OAuthClientTranslation)c.Clone()).ToList(),
                 CreateDateTime = CreateDateTime,
                 JwksUri = JwksUri,
                 RefreshTokenExpirationTimeInSeconds = RefreshTokenExpirationTimeInSeconds,
                 UpdateDateTime = UpdateDateTime,
                 TokenEndPointAuthMethod = TokenEndPointAuthMethod,
                 TokenExpirationTimeInSeconds = TokenExpirationTimeInSeconds,
-                Secrets = Secrets == null ? new List<ClientSecret>() : Secrets.Select(s => (ClientSecret)s.Clone()).ToList(),
-                AllowedScopes = AllowedScopes == null ? new List<OpenIdScope>() : AllowedScopes.Select(s => (OpenIdScope)s.Clone()).ToList(),
+                ClientSecret = ClientSecret,
+                ClientSecretExpirationTime = ClientSecretExpirationTime,
+                AllowedScopes = AllowedScopes == null ? new List<OAuthScope>() : AllowedScopes.Select(s => (OAuthScope)s.Clone()).ToList(),
                 JsonWebKeys = JsonWebKeys == null ? new List<JsonWebKey>() : JsonWebKeys.Select(j => (JsonWebKey)j.Clone()).ToList(),
                 GrantTypes = GrantTypes.ToList(),
                 RedirectionUrls = RedirectionUrls.ToList(),
@@ -241,7 +261,8 @@ namespace SimpleIdServer.OpenID.Domains
                 TlsClientAuthSanIP = TlsClientAuthSanIP,
                 TlsClientAuthSanURI = TlsClientAuthSanURI,
                 TlsClientAuthSubjectDN = TlsClientAuthSubjectDN,
-                TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken
+                TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken,
+                ApplicationKind = ApplicationKind
             };
         }
     }

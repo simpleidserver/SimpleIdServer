@@ -4,8 +4,6 @@
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +11,7 @@ namespace SimpleIdServer.OAuth.Extensions
 {
     public static class DTOJsonExtensions
     {
-        public static JObject ToDto(this OAuthClient client, string issuer)
+        public static JObject ToDto(this BaseClient client, string issuer)
         {
             var result = new JObject();
             result.AddNotEmpty(OAuthClientParameters.ClientId, client.ClientId)
@@ -35,19 +33,11 @@ namespace SimpleIdServer.OAuth.Extensions
                 .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanDNS, client.TlsClientAuthSanDNS)
                 .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanUri, client.TlsClientAuthSanURI)
                 .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanIp, client.TlsClientAuthSanIP)
-                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanEmail, client.TlsClientAuthSanEmail);
+                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanEmail, client.TlsClientAuthSanEmail)
+                .AddNotEmpty(OAuthClientParameters.ClientSecret, client.ClientSecret)
+                .AddNotEmpty(OAuthClientParameters.ClientSecretExpiresAt, client.ClientSecretExpirationTime);
             result.Add(OAuthClientParameters.ClientIdIssuedAt, client.CreateDateTime.ConvertToUnixTimestamp());
             result.Add(OAuthClientParameters.RegistrationClientUri, $"{issuer}/{Constants.EndPoints.Registration}/{client.ClientId}");
-            if (client.Secrets != null && client.Secrets.Any())
-            {
-                var secret = client.Secrets.FirstOrDefault(_ => _.Type == ClientSecretTypes.SharedSecret);
-                if (secret != null)
-                {
-                    result.AddNotEmpty(OAuthClientParameters.ClientSecret, secret.Value);
-                    result.Add(OAuthClientParameters.ClientSecretExpiresAt, secret.ExpirationDateTime == null ? 0 : secret.ExpirationDateTime.Value.ConvertToUnixTimestamp());
-                }
-            }
-
             if (client.AllowedScopes != null && client.AllowedScopes.Any())
             {
                 result.Add(OAuthClientParameters.Scope, string.Join(" ", client.AllowedScopes.Select(_ => _.Name)));
@@ -72,7 +62,7 @@ namespace SimpleIdServer.OAuth.Extensions
             return result;
         }
 
-        public static void EnrichDomain(this JObject jObj, OAuthClient result)
+        public static void EnrichDomain(this JObject jObj, BaseClient result)
         {
             result.ClientId = jObj.GetClientId();
             result.TokenEndPointAuthMethod = jObj.GetTokenEndpointAuthMethod();
@@ -87,7 +77,7 @@ namespace SimpleIdServer.OAuth.Extensions
             result.AllowedScopes = jObj.GetScopes().Select(_ => new OAuthScope
             {
                 Name = _
-            });
+            }).ToList();
             result.TokenSignedResponseAlg = jObj.GetTokenSignedResponseAlg();
             result.TokenEncryptedResponseAlg = jObj.GetTokenEncryptedResponseAlg();
             result.TokenEncryptedResponseEnc = jObj.GetTokenEncryptedResponseEnc();
@@ -97,15 +87,8 @@ namespace SimpleIdServer.OAuth.Extensions
             result.TlsClientAuthSanURI = jObj.GetTlsClientAuthSanUri();
             result.TlsClientAuthSanIP = jObj.GetTlsClientAuthSanIP();
             result.TlsClientAuthSanEmail = jObj.GetTlsClientAuthSanEmail();
+            result.ClientSecret = jObj.GetClientSecret();
             var clientSecret = jObj.GetClientSecret();
-            if (!string.IsNullOrWhiteSpace(clientSecret))
-            {
-                result.Secrets = new List<ClientSecret>
-                {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, clientSecret, null)
-                };
-            }
-
             Dictionary<string, string> clientNames = jObj.GetClientNames(),
                 clientUris = jObj.GetClientUris(),
                 logoUris = jObj.GetLogoUris(),

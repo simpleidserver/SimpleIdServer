@@ -12,7 +12,7 @@ namespace SimpleIdServer.OpenID.Startup
 {
     public class DefaultConfiguration
     {
-        public static List<OpenIdScope> Scopes = new List<OpenIdScope>
+        public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
             SIDOpenIdConstants.StandardScopes.Phone,
@@ -21,20 +21,20 @@ namespace SimpleIdServer.OpenID.Startup
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "scim",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim("scim_id", true)
+                    new OAuthScopeClaim("scim_id", true)
                 }
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "manage_clients",
                 IsExposedInConfigurationEdp = true
             },
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "manage_scopes",
                 IsExposedInConfigurationEdp = true
@@ -222,10 +222,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "newsAggregatorWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "newsAggregatorWebsiteSecret", null)
-                    },
+                    ClientSecret = "newsAggregatorWebsiteSecret",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -234,7 +231,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
@@ -259,10 +256,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "firstMtlsClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "mtsClientSecret", null)
-                    },
+                    ClientSecret = "mtsClientSecret",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -270,14 +264,14 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             CreateDateTime = DateTime.UtcNow,
                             Name = "accounts"
@@ -302,10 +296,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "secondMtlsClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "mtsClientSecret", null)
-                    },
+                    ClientSecret = "mtsClientSecret",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -313,14 +304,14 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             CreateDateTime = DateTime.UtcNow,
                             Name = "accounts"
@@ -345,10 +336,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "scimClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
-                    },
+                    ClientSecret = "scimClientSecret",
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -357,14 +345,14 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             Name = "scim",
-                            Claims = new List<OpenIdScopeClaim>
+                            Claims = new List<OAuthScopeClaim>
                             {
-                                new OpenIdScopeClaim("scim_id", true)
+                                new OAuthScopeClaim("scim_id", true)
                             }
                         }
                     },
@@ -387,10 +375,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "umaClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "umaClientSecret", null)
-                    },
+                    ClientSecret = "umaClientSecret",
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -399,7 +384,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
@@ -425,10 +410,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "simpleIdServerWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "simpleIdServerWebsiteSecret", null)
-                    },
+                    ClientSecret = "simpleIdServerWebsiteSecret",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -437,7 +419,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
@@ -470,10 +452,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "tradWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "tradWebsiteSecret", null)
-                    },
+                    ClientSecret = "tradWebsiteSecret",
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -482,7 +461,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile
@@ -507,10 +486,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "native",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
-                    },
+                    ClientSecret = "nativeSecret",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -519,7 +495,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
@@ -542,10 +518,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "caseManagementWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
-                    },
+                    ClientSecret = "b98113b5-f45f-4a4a-9db5-610b7183e148",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -554,7 +527,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email,
@@ -588,10 +561,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "caseManagementTasklistWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
-                    },
+                    ClientSecret = "b98113b5-f45f-4a4a-9db5-610b7183e148",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -600,7 +570,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email,
@@ -634,10 +604,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "caseManagementPerformanceWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "91894b86-c57e-489a-838d-fb82621a67ee", null)
-                    },
+                    ClientSecret = "91894b86-c57e-489a-838d-fb82621a67ee",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -646,7 +613,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email,
@@ -680,10 +647,7 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "medikitWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "f200eeb0-a6a3-465e-be91-97806e5dd3bc", null)
-                    },
+                    ClientSecret = "f200eeb0-a6a3-465e-be91-97806e5dd3bc",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -692,7 +656,7 @@ namespace SimpleIdServer.OpenID.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email,
@@ -724,13 +688,16 @@ namespace SimpleIdServer.OpenID.Startup
                 new OpenIdClient
                 {
                     ClientId = "gatewayClient",
-                    Secrets = new List<ClientSecret>
+                    ClientSecret = "gatewayClientPassword",
+                    Translations = new List<OAuthClientTranslation>
                     {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "gatewayClientPassword", null)
-                    },
-                    ClientNames = new []
-                    {
-                        new OAuthTranslation("gatewayClient_client_name", "SCIMClient", "fr")
+                        new OAuthClientTranslation
+                        {
+                            Translation = new OAuthTranslation("gatewayClient_client_name", "SCIMClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
+                        }
                     },
                     TokenEndPointAuthMethod = "client_secret_post",
                     UpdateDateTime = DateTime.UtcNow,
@@ -738,13 +705,13 @@ namespace SimpleIdServer.OpenID.Startup
                     TokenExpirationTimeInSeconds = 60 * 30,
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             Name = "manage_clients"
                         },
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             Name = "manage_scopes"
                         }

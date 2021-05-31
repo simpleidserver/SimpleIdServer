@@ -17,7 +17,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
 
     public class GetOAuthClientHandler : BaseOAuthClientHandler, IGetOAuthClientHandler
     {
-        public GetOAuthClientHandler(IOAuthClientQueryRepository oauthClientQueryRepository, IOAuthClientCommandRepository oAuthClientCommandRepository, ILogger<BaseOAuthClientHandler> logger) : base(oauthClientQueryRepository, oAuthClientCommandRepository, logger)
+        public GetOAuthClientHandler(IOAuthClientRepository oauthClientRepository, ILogger<BaseOAuthClientHandler> logger) : base(oauthClientRepository, logger)
         {
         }
 
@@ -27,7 +27,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             return BuildResponse(client, handlerContext.Request.IssuerName);
         }
 
-        protected virtual JObject BuildResponse(OAuthClient oauthClient, string issuer)
+        protected virtual JObject BuildResponse(BaseClient oauthClient, string issuer)
         {
             return oauthClient.ToDto(issuer);
         }

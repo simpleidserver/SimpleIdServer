@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Helpers;
 using System;
 using System.Collections.Generic;
 
@@ -178,13 +177,16 @@ namespace SimpleIdServer.OAuth.Startup
             new OAuthClient
             {
                 ClientId = "bpmnClient",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "bpmnClientSecret",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "bpmnClientSecret", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("bpmnClient_client_name", "BPMN Client", "fr")
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("bpmnClient_client_name", "BPMN Client", "fr")
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
@@ -208,13 +210,16 @@ namespace SimpleIdServer.OAuth.Startup
             new OAuthClient
             {
                 ClientId = "cmmnClient",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "cmmnClientSecret",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "cmmnClientSecret", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("cmmnClient_client_name", "CMMN Client", "fr")
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("cmmnClient_client_name", "CMMN Client", "fr")
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
@@ -238,13 +243,16 @@ namespace SimpleIdServer.OAuth.Startup
             new OAuthClient
             {
                 ClientId = "humanTaskClient",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "humanTaskClientSecret",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "humanTaskClientSecret", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("humanTaskClient_client_name", "HumanTask Client", "fr")
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("humanTaskClient_client_name", "HumanTask Client", "fr")
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
@@ -268,13 +276,16 @@ namespace SimpleIdServer.OAuth.Startup
             new OAuthClient
             {
                 ClientId = "scimClient",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "scimClientSecret",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("scimClient_client_name", "SCIMClient", "fr")
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("scimClient_client_name", "SCIMClient", "fr")
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
@@ -314,13 +325,16 @@ namespace SimpleIdServer.OAuth.Startup
             new OAuthClient
             {
                 ClientId = "gatewayClient",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "gatewayClientPassword",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "gatewayClientPassword", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("gatewayClient_client_name", "SCIMClient", "fr")
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("gatewayClient_client_name", "SCIMClient", "fr")
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
@@ -348,13 +362,16 @@ namespace SimpleIdServer.OAuth.Startup
             new OAuthClient
             {
                 ClientId = "websiteGateway",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "websiteGatewaySecret",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "websiteGatewaySecret", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("websiteGateway_client_name", "Website gateway", "fr")
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("websiteGateway_client_name", "Website gateway", "fr")
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,

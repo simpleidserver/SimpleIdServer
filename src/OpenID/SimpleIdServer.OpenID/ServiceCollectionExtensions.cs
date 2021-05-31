@@ -11,9 +11,9 @@ using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.Api.Register.Validators;
-using SimpleIdServer.OAuth.Api.Token;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
+using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID;
@@ -24,7 +24,6 @@ using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Api.BCDeviceRegistration;
 using SimpleIdServer.OpenID.Api.Configuration;
 using SimpleIdServer.OpenID.Api.Register;
-using SimpleIdServer.OpenID.Api.Token;
 using SimpleIdServer.OpenID.Api.Token.Handlers;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.Domains;
@@ -149,7 +148,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var acrs = new List<AuthenticationContextClassReference>();
             var clients = new List<OpenIdClient>();
-            var scopes = new List<OpenIdScope>
+            var scopes = new List<OAuthScope>
             {
                 SIDOpenIdConstants.StandardScopes.Address,
                 SIDOpenIdConstants.StandardScopes.Email,
@@ -159,12 +158,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 SIDOpenIdConstants.StandardScopes.Profile
             };
             var bcAuthorizeLst = new ConcurrentBag<BCAuthorize>();
-            services.AddSingleton<IAuthenticationContextClassReferenceQueryRepository>(new DefaultAuthenticationContextClassReferenceQueryRepository(acrs));
-            services.AddSingleton<IAuthenticationContextClassReferenceCommandRepository>(new DefaultAuthenticationContextClassReferenceCommandRepository(acrs));
-            services.AddSingleton<IOAuthClientQueryRepository>(new DefaultOpenIdClientQueryRepository(clients));
-            services.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients, scopes));
-            services.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
-            services.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
+            services.AddSingleton<IAuthenticationContextClassReferenceRepository>(new DefaultAuthenticationContextClassReferenceRepository(acrs));
+            services.AddSingleton<IOAuthClientRepository>(new DefaultOpenIdClientRepository(clients));
+            services.AddSingleton<IOAuthScopeRepository>(new DefaultOpenIdScopeRepository(scopes));
             services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository(bcAuthorizeLst));
             return services;
         }

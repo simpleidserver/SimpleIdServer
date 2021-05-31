@@ -27,18 +27,17 @@ namespace SimpleIdServer.OpenID.Api.Register
         private readonly OpenIDHostOptions _openIDHostOptions;
 
         public AddOpenIdClientHandler(
-            IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository,
+            IOAuthClientRepository oauthClientRepository,
             IJwtParser jwtParser,
             IHttpClientFactory httpClientFactory,
             IOAuthClientValidator oauthClientValidator,
             IOptions<OAuthHostOptions> oauthHostOptions,
-            IOptions<OpenIDHostOptions> openidHostOptions) : base(oauthClientQueryRepository, oAuthClientCommandRepository, jwtParser, httpClientFactory, oauthClientValidator, oauthHostOptions)
+            IOptions<OpenIDHostOptions> openidHostOptions) : base(oauthClientRepository, jwtParser, httpClientFactory, oauthClientValidator, oauthHostOptions)
         {
             _openIDHostOptions = openidHostOptions.Value;
         }
 
-        protected override OAuthClient ExtractClient(HandlerContext handlerContext)
+        protected override BaseClient ExtractClient(HandlerContext handlerContext)
         {
             var openIdClient = handlerContext.Request.RequestData.ToDomain();
             EnrichOpenIdClient(openIdClient, handlerContext);
@@ -60,13 +59,13 @@ namespace SimpleIdServer.OpenID.Api.Register
             SetBackchannelLogoutSupported(openidClient, handlerContext);
         }
 
-        protected override JObject BuildResponse(OAuthClient oauthClient, string issuer)
+        protected override JObject BuildResponse(BaseClient oauthClient, string issuer)
         {
             var openidClient = oauthClient as OpenIdClient;
             return openidClient.ToDto(issuer);
         }
 
-        protected override void SetDefaultScopes(OAuthClient oauthClient)
+        protected override void SetDefaultScopes(BaseClient oauthClient)
         {
             base.SetDefaultScopes(oauthClient);
             var scope = oauthClient.AllowedScopes.FirstOrDefault(s => s.Name == SIDOpenIdConstants.StandardScopes.OpenIdScope.Name);

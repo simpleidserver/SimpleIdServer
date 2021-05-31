@@ -1,15 +1,14 @@
 html, body {
-	height: 100%;
+  height: 100%;
 }
 
 body, h1 {
-	margin: 0;
+  margin: 0;
 }
 
 /* Common */
-
 .container {
-    max-width: 1300px;
+  max-width: 1000px;
 }
 
 .spacer {
@@ -17,49 +16,93 @@ body, h1 {
 }
 
 .full-width {
-	width: 100%;
+  width: 100%;
 }
 
 .container, .center {
-	margin-left: auto;
-	margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .padding-td-5 {
-	padding-top: 5px;
-	padding-bottom: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .padding-lr-5 {
-	padding-left: 5px;
-	padding-right: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .padding-b-10 {
-	padding-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .relative {
-	position: relative;
+  position: relative;
 }
 
 /* Breadcrumb */
-
 .breadcrumb {
-    padding: 20px 0px 20px 0px;
+  padding: 20px 0px 20px 0px;
 }
 
 .breadcrumb ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .breadcrumb ul .separator {
-    padding-right: .75rem;
-    padding-left: .75rem;
+  padding-right: .75rem;
+  padding-left: .75rem;
 }
 
 .breadcrumb ul li {
-    display: inline-block;
+  display: inline-block;
+}
+
+
+/* Actions displayed in mat-form-field */
+.actions {
+  position: absolute;
+  top: 5px;
+  right: 0px;
+}
+
+.actions > .copy,
+.actions > .display,
+.actions > .edit {
+  cursor: pointer;
+}
+
+/* Image editor */
+.img-editor {
+    border: 1px solid;
+    border-radius: 5px;
+}
+
+.img-editor > .img {
+    text-align: center;<
+    border-bottom: 1px solid;
+    height: 150px;
+}
+
+.img-editor > .img > img {
+    height: 150px;
+}
+
+.img-editor .mat-form-field-wrapper {
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.img-editor .mat-form-field-outline {
+    color: black;
+}
+
+.img-editor .mat-form-field .mat-form-field-outline-start,
+.img-editor .mat-form-field .mat-form-field-outline-end {
+  border-radius: 0 !important;
+  border: none;
 }

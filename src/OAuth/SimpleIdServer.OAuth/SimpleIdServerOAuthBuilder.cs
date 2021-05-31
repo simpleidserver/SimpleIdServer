@@ -18,31 +18,29 @@ namespace SimpleIdServer.OAuth
             _serviceCollection = serviceCollection;
         }
 
+        public IServiceCollection Services => _serviceCollection;
+
         public SimpleIdServerOAuthBuilder AddUsers(List<OAuthUser> users )
         {
-            _serviceCollection.AddSingleton<IOAuthUserQueryRepository>(new DefaultOAuthUserQueryRepository(users));
-            _serviceCollection.AddSingleton<IOAuthUserCommandRepository>(new DefaultOAuthUserCommandRepository(users));
+            _serviceCollection.AddSingleton<IOAuthUserRepository>(new DefaultOAuthUserRepository(users));
             return this;
         }
 
         public SimpleIdServerOAuthBuilder AddClients(List<OAuthClient> clients)
         {
-            _serviceCollection.AddSingleton<IOAuthClientQueryRepository>(new DefaultOAuthClientQueryRepository(clients));
-            _serviceCollection.AddSingleton<IOAuthClientCommandRepository>(new DefaultOAuthClientCommandRepository(clients));
+            _serviceCollection.AddSingleton<IOAuthClientRepository>(new DefaultOAuthClientRepository(clients));
             return this;
         }
 
         public SimpleIdServerOAuthBuilder AddScopes(List<OAuthScope> scopes)
         {
-            _serviceCollection.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOAuthScopeQueryRepository(scopes));
-            _serviceCollection.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOAuthScopeCommandRepository(scopes));
+            _serviceCollection.AddSingleton<IOAuthScopeRepository>(new DefaultOAuthScopeRepository(scopes));
             return this;
         }
 
         public SimpleIdServerOAuthBuilder AddJsonWebKeys(List<JsonWebKey> jwks)
         {
-            _serviceCollection.AddSingleton<IJsonWebKeyQueryRepository>(new DefaultJsonWebKeyQueryRepository(jwks));
-            _serviceCollection.AddSingleton<IJsonWebKeyCommandRepository>(new DefaultJsonWebKeyCommandRepository(jwks));
+            _serviceCollection.AddSingleton<IJsonWebKeyRepository>(new DefaultJsonWebKeyRepository(jwks));
             return this;
         }
     }

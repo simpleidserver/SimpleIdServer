@@ -12,9 +12,9 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Services
 {
     public class PasswordAuthService : IPasswordAuthService
     {
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
 
-        public PasswordAuthService(IOAuthUserQueryRepository oauthUserRepository)
+        public PasswordAuthService(IOAuthUserRepository oauthUserRepository)
         {
             _oauthUserRepository = oauthUserRepository;
         }

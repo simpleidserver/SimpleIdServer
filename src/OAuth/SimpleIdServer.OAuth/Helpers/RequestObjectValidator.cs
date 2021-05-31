@@ -20,7 +20,7 @@ namespace SimpleIdServer.OAuth.Helpers
             _jwtParser = jwtParser;
         }
 
-        public virtual async Task<RequestObjectValidatorResult> Validate(string request, OAuthClient oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
+        public virtual async Task<RequestObjectValidatorResult> Validate(string request, BaseClient oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request))
             {
@@ -30,7 +30,7 @@ namespace SimpleIdServer.OAuth.Helpers
             var jws = request;
             if (_jwtParser.IsJweToken(request))
             {
-                jws = await _jwtParser.Decrypt(jws);
+                jws = await _jwtParser.Decrypt(jws, cancellationToken);
                 if (string.IsNullOrWhiteSpace(jws))
                 {
                     throw new OAuthException(errorCode, ErrorMessages.INVALID_JWE_REQUEST_PARAMETER);

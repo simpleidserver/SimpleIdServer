@@ -8,7 +8,7 @@ namespace SimpleIdServer.OAuth.Persistence
 {
     public interface ICommandRepository<T> : IDisposable
     {
-        bool Add(T data);
+        Task<bool> Add(T data, CancellationToken token);
         Task<bool> Update(T data, CancellationToken token);
         Task<bool> Delete(T data, CancellationToken token);
         Task<int> SaveChanges(CancellationToken token);

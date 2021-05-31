@@ -141,11 +141,11 @@ namespace SimpleIdServer.OAuth.Api
         }
 
         public OAuthUser User { get; private set; }
-        public OAuthClient Client { get; private set; }
+        public BaseClient Client { get; private set; }
         public HandlerContextRequest Request { get; private set; }
         public HandlerContextResponse Response { get; private set; }
 
-        public void SetClient(OAuthClient client)
+        public void SetClient(BaseClient client)
         {
             Client = client;
         }

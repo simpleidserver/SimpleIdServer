@@ -233,24 +233,3 @@ Scenario: Error is returned when trying to update the client and client_id is di
 	Then HTTP status code equals to '400'
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='client identifier must be identical'
-
-Scenario: Error is returned when trying to update the client and client_secret is different
-	When execute HTTP POST JSON request 'https://localhost:8080/register'
-	| Key           | Value              |
-	| redirect_uris | [http://localhost] |
-
-	And extract JSON from body
-	And extract parameter 'registration_access_token' from JSON body into 'firstRegistrationAccessToken'
-	And extract parameter 'client_id' from JSON body into 'firstClientId'
-
-	And execute HTTP PUT JSON request 'https://localhost:8080/register/$firstClientId$'
-	| Key           | Value                                 |
-	| Authorization | Bearer $firstRegistrationAccessToken$ |
-	| client_id     | $firstClientId$                       |
-	| client_secret | clientSecret                          |
-	
-	And extract JSON from body
-	
-	Then HTTP status code equals to '400'
-	Then JSON 'error'='invalid_request'
-	Then JSON 'error_description'='client secret must be identical'

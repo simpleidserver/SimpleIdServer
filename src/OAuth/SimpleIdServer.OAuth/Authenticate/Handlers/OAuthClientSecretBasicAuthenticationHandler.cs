@@ -16,7 +16,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public string AuthMethod => AUTH_METHOD;
         public const string AUTH_METHOD = "client_secret_basic";
 
-        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, BaseClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
@@ -28,18 +28,12 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 throw new ArgumentNullException(nameof(client));
             }
 
-            if (client.Secrets == null)
+            if (string.IsNullOrWhiteSpace(client.ClientSecret))
             {
                 return Task.FromResult(false);
             }
 
-            var clientSecret = client.Secrets.FirstOrDefault(s => s.Type == ClientSecretTypes.SharedSecret);
-            if (clientSecret == null)
-            {
-                return Task.FromResult(false);
-            }
-
-            var result = string.Compare(clientSecret.Value, authenticateInstruction.ClientSecretFromAuthorizationHeader, StringComparison.CurrentCultureIgnoreCase) == 0;
+            var result = string.Compare(client.ClientSecret, authenticateInstruction.ClientSecretFromAuthorizationHeader, StringComparison.CurrentCultureIgnoreCase) == 0;
             return Task.FromResult(true);
         }
     }

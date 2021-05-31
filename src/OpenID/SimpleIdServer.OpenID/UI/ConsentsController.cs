@@ -27,9 +27,8 @@ namespace SimpleIdServer.OpenID.UI
     [Authorize("IsConnected")]
     public class ConsentsController : Controller
     {
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
-        private readonly IOAuthUserCommandRepository _oAuthUserCommandRepository;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IUserConsentFetcher _userConsentFetcher;
         private readonly IDataProtector _dataProtector;
         private readonly IResponseModeHandler _responseModeHandler;
@@ -37,9 +36,8 @@ namespace SimpleIdServer.OpenID.UI
         private readonly IExtractRequestHelper _extractRequestHelper;
 
         public ConsentsController(
-            IOAuthUserQueryRepository oauthUserRepository, 
-            IOAuthUserCommandRepository oauthUserCommandRepository, 
-            IOAuthClientQueryRepository oauthClientRepository, 
+            IOAuthUserRepository oauthUserRepository, 
+            IOAuthClientRepository oauthClientRepository, 
             IUserConsentFetcher userConsentFetcher, 
             IDataProtectionProvider dataProtectionProvider, 
             IResponseModeHandler responseModeHandler,
@@ -47,7 +45,6 @@ namespace SimpleIdServer.OpenID.UI
             IExtractRequestHelper extractRequestHelper)
         {
             _oauthUserRepository = oauthUserRepository;
-            _oAuthUserCommandRepository = oauthUserCommandRepository;
             _oauthClientRepository = oauthClientRepository;
             _userConsentFetcher = userConsentFetcher;
             _responseModeHandler = responseModeHandler;
@@ -119,8 +116,8 @@ namespace SimpleIdServer.OpenID.UI
             }
 
             user.RejectConsent(consentId);
-            await _oAuthUserCommandRepository.Update(user, cancellationToken);
-            await _oAuthUserCommandRepository.SaveChanges(cancellationToken);
+            await _oauthUserRepository.Update(user, cancellationToken);
+            await _oauthUserRepository.SaveChanges(cancellationToken);
             return RedirectToAction("Manage");
         }
 
@@ -167,8 +164,8 @@ namespace SimpleIdServer.OpenID.UI
                 {
                     consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                     user.Consents.Add(consent);
-                    await _oAuthUserCommandRepository.Update(user, token);
-                    await _oAuthUserCommandRepository.SaveChanges(token);
+                    await _oauthUserRepository.Update(user, token);
+                    await _oauthUserRepository.SaveChanges(token);
                 }
 
                 return Redirect(unprotectedUrl);

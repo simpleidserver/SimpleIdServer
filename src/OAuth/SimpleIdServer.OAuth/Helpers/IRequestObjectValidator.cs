@@ -8,6 +8,6 @@ namespace SimpleIdServer.OAuth.Helpers
 {
     public interface IRequestObjectValidator
     {
-        Task<RequestObjectValidatorResult> Validate(string request, OAuthClient oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
+        Task<RequestObjectValidatorResult> Validate(string request, BaseClient oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
     }
 }

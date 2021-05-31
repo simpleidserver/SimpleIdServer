@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.ClaimsEnrichers
@@ -25,7 +26,7 @@ namespace SimpleIdServer.OpenID.ClaimsEnrichers
             _jwtParser = jwtParser;
         }
 
-        public async Task Enrich(JwsPayload jwsPayload, OpenIdClient client)
+        public async Task Enrich(JwsPayload jwsPayload, OpenIdClient client, CancellationToken cancellationToken)
         {
             var subject = jwsPayload.GetClaimValue(Jwt.Constants.UserClaims.Subject);
             using (var httpClient = new HttpClient())
@@ -51,7 +52,7 @@ namespace SimpleIdServer.OpenID.ClaimsEnrichers
                     if (kvp.Value.Any(v => v.Contains("application/json")))
                     {
                         jObj = JsonConvert.DeserializeObject<JwsPayload>(json);
-                        jwt = await _jwtBuilder.BuildClientToken(client, jObj, client.IdTokenSignedResponseAlg, client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc);
+                        jwt = await _jwtBuilder.BuildClientToken(client, jObj, client.IdTokenSignedResponseAlg, client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc, cancellationToken);
                     }
                     else if (kvp.Value.Any(v => v.Contains("application/jwt")))
                     {

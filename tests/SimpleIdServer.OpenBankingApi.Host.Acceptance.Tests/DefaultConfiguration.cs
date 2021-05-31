@@ -4,7 +4,6 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenBankingApi.Domains.Account;
 using SimpleIdServer.OpenBankingApi.Domains.Account.Enums;
-using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -86,9 +85,9 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
             }
         };
 
-        public static List<OpenIdScope> Scopes => new List<OpenIdScope>
+        public static List<OAuthScope> Scopes => new List<OAuthScope>
         {
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "accounts",
                 IsExposedInConfigurationEdp = true

@@ -34,20 +34,20 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
     public class BCAuthorizeRequestValidator: IBCAuthorizeRequestValidator
     {
         private readonly IJwtParser _jwtParser;
-        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IRequestObjectValidator _requestObjectValidator;
         private readonly OpenIDHostOptions _options;
 
         public BCAuthorizeRequestValidator(
-            IJwtParser jwtParser, 
-            IOAuthUserQueryRepository oauthUserQueryRepository, 
+            IJwtParser jwtParser,
+            IOAuthUserRepository oauthUserRepository, 
             IBCAuthorizeRepository bcAuthorizeRepository,
             IRequestObjectValidator requestObjectValidator,
             IOptions<OpenIDHostOptions> options)
         {
             _jwtParser = jwtParser;
-            _oauthUserQueryRepository = oauthUserQueryRepository;
+            _oauthUserRepository = oauthUserRepository;
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _requestObjectValidator = requestObjectValidator;
             _options = options.Value;
@@ -69,13 +69,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
             CheckScopes(context);
             CheckClientNotificationToken(context);
-            var user = await CheckLoginHintToken(context);
+            var user = await CheckLoginHintToken(context, cancellationToken);
             if (user == null)
             {
-                user = await CheckIdTokenHint(context);
+                user = await CheckIdTokenHint(context, cancellationToken);
                 if (user == null)
                 {
-                    user = await CheckLoginHint(context);
+                    user = await CheckLoginHint(context, cancellationToken);
                 }
             }
 
@@ -97,13 +97,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
             }
 
-            var user = await CheckLoginHintToken(context);
+            var user = await CheckLoginHintToken(context, cancellationToken);
             if (user == null)
             {
-                user = await CheckIdTokenHint(context);
+                user = await CheckIdTokenHint(context, cancellationToken);
                 if (user == null)
                 {
-                    user = await CheckLoginHint(context);
+                    user = await CheckLoginHint(context, cancellationToken);
                 }
             }
 
@@ -142,13 +142,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
             }
 
-            var user = await CheckLoginHintToken(context);
+            var user = await CheckLoginHintToken(context, cancellationToken);
             if (user == null)
             {
-                user = await CheckIdTokenHint(context);
+                user = await CheckIdTokenHint(context, cancellationToken);
                 if (user == null)
                 {
-                    user = await CheckLoginHint(context);
+                    user = await CheckLoginHint(context, cancellationToken);
                 }
             }
 
@@ -296,41 +296,41 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
         }
 
-        private async Task<OAuthUser> CheckLoginHintToken(HandlerContext context)
+        private async Task<OAuthUser> CheckLoginHintToken(HandlerContext context, CancellationToken cancellationToken)
         {
             var loginHintToken = context.Request.RequestData.GetLoginHintToken();
             if (!string.IsNullOrWhiteSpace(loginHintToken))
             {
-                var payload = await ExtractHint(loginHintToken);
-                return await CheckHint(payload);
+                var payload = await ExtractHint(loginHintToken, cancellationToken);
+                return await CheckHint(payload, cancellationToken);
             }
 
             return null;
         }
 
-        private async Task<OAuthUser> CheckIdTokenHint(HandlerContext context)
+        private async Task<OAuthUser> CheckIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
         {
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = await ExtractHint(idTokenHint);
+                var payload = await ExtractHint(idTokenHint, cancellationToken);
                 if (!payload.GetAudiences().Contains(context.Request.IssuerName))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
                 }
 
-                return await CheckHint(payload);
+                return await CheckHint(payload, cancellationToken);
             }
 
             return null;
         }
 
-        private async Task<OAuthUser> CheckLoginHint(HandlerContext context)
+        private async Task<OAuthUser> CheckLoginHint(HandlerContext context, CancellationToken cancellationToken)
         {
             var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
             if (!string.IsNullOrEmpty(loginHint))
             {
-                var user = await _oauthUserQueryRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, loginHint);
+                var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, loginHint, cancellationToken);
                 if (user == null)
                 {
                     throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, loginHint));
@@ -360,7 +360,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
         }
 
-        private async Task<OAuthUser> CheckHint(JwsPayload jwsPayload)
+        private async Task<OAuthUser> CheckHint(JwsPayload jwsPayload, CancellationToken cancellationToken)
         {
             var exp = jwsPayload.GetExpirationTime();
             var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();
@@ -370,7 +370,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
 
             var subject = jwsPayload.GetSub();
-            var user = await _oauthUserQueryRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, subject);
+            var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, subject, cancellationToken);
             if (user == null)
             {
                 throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
@@ -379,7 +379,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             return user;
         }
 
-        protected async Task<JwsPayload> ExtractHint(string tokenHint)
+        protected async Task<JwsPayload> ExtractHint(string tokenHint, CancellationToken cancellationToken)
         {
             if (!_jwtParser.IsJwsToken(tokenHint) && !_jwtParser.IsJweToken(tokenHint))
             {
@@ -388,14 +388,14 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
             if (_jwtParser.IsJweToken(tokenHint))
             {
-                tokenHint = await _jwtParser.Decrypt(tokenHint);
+                tokenHint = await _jwtParser.Decrypt(tokenHint, cancellationToken);
                 if (string.IsNullOrWhiteSpace(tokenHint))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
                 }
             }
 
-            return await _jwtParser.Unsign(tokenHint);
+            return await _jwtParser.Unsign(tokenHint, cancellationToken);
         }
     }
 }

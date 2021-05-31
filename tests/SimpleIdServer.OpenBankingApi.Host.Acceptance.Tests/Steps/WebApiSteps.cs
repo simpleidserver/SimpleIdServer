@@ -119,7 +119,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
             var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
             _scenarioContext.Set(jws, name);
-            var tokenCommandRepository = (ITokenCommandRepository)_factory.Server.Host.Services.GetService(typeof(ITokenCommandRepository));
+            var tokenCommandRepository = (ITokenRepository)_factory.Server.Host.Services.GetService(typeof(ITokenRepository));
             tokenCommandRepository.Add(new Token
             {
                 Id = jws,
@@ -131,7 +131,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
         public async Task WhenAddUserConsent(string user, string scope, string clientId)
         {
-            var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
+            var repository = (IOAuthUserRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository));
             var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             oauthUser.Consents.Add(new OAuthConsent
             {
@@ -143,11 +143,11 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         [When("add JSON web key to Authorization Server and store into '(.*)'")]
         public async Task WhenAddJsonWebKey(string name, Table table)
         {
-            var repository = (IJsonWebKeyCommandRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyCommandRepository));
+            var repository = (IJsonWebKeyRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyRepository));
             var jwks = ExtractJsonWebKeys(table);
             foreach (var jwk in jwks)
             {
-                repository.Add(jwk);
+                repository.Add(jwk, CancellationToken.None).Wait();
             }
 
             await repository.SaveChanges(CancellationToken.None);
@@ -302,9 +302,8 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
         {
             consentId = ParseValue(consentId).ToString();
             var accountAccessConsentRepository = _factory.Server.Host.Services.GetService(typeof(IAccountAccessConsentRepository)) as IAccountAccessConsentRepository;
-            var oauthUserQueryRepository = _factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository)) as IOAuthUserQueryRepository;
-            var oauthUserCommandRepository = _factory.Server.Host.Services.GetService(typeof(IOAuthUserCommandRepository)) as IOAuthUserCommandRepository;
-            var oauthUser = await oauthUserQueryRepository.FindOAuthUserByLogin(login, CancellationToken.None);
+            var oauthUserRepository = _factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository)) as IOAuthUserRepository;
+            var oauthUser = await oauthUserRepository.FindOAuthUserByLogin(login, CancellationToken.None);
             oauthUser.Consents.Add(new OAuthConsent
             {
                 Scopes = new List<OAuthScope>
@@ -315,7 +314,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests.Steps
                     }
                 }
             });
-            await oauthUserCommandRepository.Update(oauthUser, CancellationToken.None);
+            await oauthUserRepository.Update(oauthUser, CancellationToken.None);
             var consent = await accountAccessConsentRepository.Get(consentId, CancellationToken.None);
             consent.Confirm(accountId.Split(','));
             await accountAccessConsentRepository.Update(consent, CancellationToken.None);

@@ -26,7 +26,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         public abstract string GrantType { get; }
         public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken);
 
-        protected async Task<OAuthClient> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
+        protected async Task<BaseClient> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
         {
             var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
             if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType))

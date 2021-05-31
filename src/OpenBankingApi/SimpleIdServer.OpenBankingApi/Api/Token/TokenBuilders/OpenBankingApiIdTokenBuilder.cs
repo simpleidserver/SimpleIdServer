@@ -43,8 +43,8 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
             IEnumerable<IClaimsSource> claimsSources, 
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
             IAmrHelper amrHelper, 
-            IOAuthUserQueryRepository oauthUserQueryRepository, 
-            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher) : base(jwtBuilder, claimsSources, subjectTypeBuilders, amrHelper, oauthUserQueryRepository, claimsJwsPayloadEnricher)
+            IOAuthUserRepository oauthUserRepository, 
+            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher) : base(jwtBuilder, claimsSources, subjectTypeBuilders, amrHelper, oauthUserRepository, claimsJwsPayloadEnricher)
         {
             _openBankingApiAuthRequestEnricher = openBankingApiAuthRequestEnricher;
             _jwtBuilder = jwtBuilder;
@@ -60,7 +60,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
 
             var openidClient = (OpenIdClient)context.Client;
             var payload = await BuildIdToken(context, context.Request.RequestData, scopes, cancellationToken);
-            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc);
+            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }
 

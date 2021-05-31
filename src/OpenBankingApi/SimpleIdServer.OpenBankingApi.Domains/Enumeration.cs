@@ -32,6 +32,11 @@ namespace SimpleIdServer.OpenBankingApi.Domains
             return matchingItem;
         }
 
+        public static T FromId<T>(int id) where T : Enumeration
+        {
+            return GetAll<T>().FirstOrDefault(e => e.Id == id);
+        }
+
         private static T Parse<T, K>(K value, string description, Func<T, bool> predicate) where T : Enumeration
         {
             var matchingItem = GetAll<T>().FirstOrDefault(predicate);

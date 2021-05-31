@@ -124,7 +124,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Authorization.Validators
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = await ExtractIdTokenHint(idTokenHint);
+                var payload = await ExtractIdTokenHint(idTokenHint, cancellationToken);
                 if (context.User.Id != payload.GetSub())
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, OpenID.ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);

@@ -16,17 +16,16 @@ namespace SimpleIdServer.OpenBankingApi.Api.Register
     public class AddOpenBankingApiClientHandler : AddOpenIdClientHandler
     {
         public AddOpenBankingApiClientHandler(
-            IOAuthClientQueryRepository oauthClientQueryRepository, 
-            IOAuthClientCommandRepository oAuthClientCommandRepository, 
+            IOAuthClientRepository oauthClientRepository,
             IJwtParser jwtParser, 
             IHttpClientFactory httpClientFactory, 
             IOAuthClientValidator oauthClientValidator, 
             IOptions<OAuthHostOptions> oauthHostOptions, 
-            IOptions<OpenIDHostOptions> openidHostOptions) : base(oauthClientQueryRepository, oAuthClientCommandRepository, jwtParser, httpClientFactory, oauthClientValidator, oauthHostOptions, openidHostOptions)
+            IOptions<OpenIDHostOptions> openidHostOptions) : base(oauthClientRepository, jwtParser, httpClientFactory, oauthClientValidator, oauthHostOptions, openidHostOptions)
         {
         }
 
-        protected override void SetDefaultScopes(OAuthClient oauthClient)
+        protected override void SetDefaultScopes(BaseClient oauthClient)
         {
             if (!oauthClient.AllowedScopes.Any())
             {

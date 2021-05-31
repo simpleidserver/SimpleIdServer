@@ -51,13 +51,16 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             new OAuthClient
             {
                 ClientId = "f3d35cce-de69-45bf-958c-4a8796f8ed37",
-                Secrets = new List<ClientSecret>
+                ClientSecret = "BankCvSecret",
+                Translations = new List<OAuthClientTranslation>
                 {
-                    new ClientSecret(ClientSecretTypes.SharedSecret, "BankCvSecret", null)
-                },
-                ClientNames = new []
-                {
-                    new OAuthTranslation("f3d35cce-de69-45bf-958c-4a8796f8ed37_client_name", "BankCV website", string.Empty)
+                    new OAuthClientTranslation
+                    {
+                        Translation = new OAuthTranslation("f3d35cce-de69-45bf-958c-4a8796f8ed37_client_name", "BankCV website", string.Empty)
+                        {
+                            Type = "client_name"
+                        }
+                    }
                 },
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,

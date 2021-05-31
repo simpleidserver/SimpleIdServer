@@ -18,10 +18,14 @@ namespace SimpleIdServer.OAuth.Domains
         public string Key { get; set; }
         public string Value { get; set; }
         public string Language { get; set; }
+        public string Type { get; set; }
 
         public object Clone()
         {
-            return new OAuthTranslation(Key, Value, Language);
+            return new OAuthTranslation(Key, Value, Language)
+            {
+                Type = Type
+            };
         }
     }
 }

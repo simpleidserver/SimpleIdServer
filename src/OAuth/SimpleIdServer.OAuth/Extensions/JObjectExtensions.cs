@@ -505,6 +505,16 @@ namespace SimpleIdServer.OAuth.Extensions
             return jObj;
         }
 
+        public static JObject AddNotEmpty(this JObject jObj, string name, DateTime? value)
+        {
+            if (value != null)
+            {
+                jObj.Add(name, value);
+            }
+
+            return jObj;
+        }
+
         public static JObject AddNotEmpty(this JObject jObj, string name, IEnumerable<string> values)
         {
             if (values != null && values.Any())

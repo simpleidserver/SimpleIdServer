@@ -27,31 +27,26 @@ namespace SimpleIdServer.OpenID
 
         public SimpleIdServerOpenIDBuilder AddUsers(List<OAuthUser> users)
         {
-            _serviceCollection.AddSingleton<IOAuthUserQueryRepository>(new DefaultOAuthUserQueryRepository(users));
-            _serviceCollection.AddSingleton<IOAuthUserCommandRepository>(new DefaultOAuthUserCommandRepository(users));
+            _serviceCollection.AddSingleton<IOAuthUserRepository>(new DefaultOAuthUserRepository(users));
             return this;
         }
 
-        public SimpleIdServerOpenIDBuilder AddClients(List<OpenIdClient> clients, List<OpenIdScope> scopes)
+        public SimpleIdServerOpenIDBuilder AddClients(List<OpenIdClient> clients, List<OAuthScope> scopes)
         {
-            _serviceCollection.AddSingleton<IOAuthClientQueryRepository>(new DefaultOpenIdClientQueryRepository(clients));
-            _serviceCollection.AddSingleton<IOAuthClientCommandRepository>(new DefaultOpenIdClientCommandRepository(clients, scopes));
-            _serviceCollection.AddSingleton<IOAuthScopeQueryRepository>(new DefaultOpenIdScopeQueryRepository(scopes));
-            _serviceCollection.AddSingleton<IOAuthScopeCommandRepository>(new DefaultOpenIdScopeCommandRepository(scopes));
+            _serviceCollection.AddSingleton<IOAuthClientRepository>(new DefaultOpenIdClientRepository(clients));
+            _serviceCollection.AddSingleton<IOAuthScopeRepository>(new DefaultOpenIdScopeRepository(scopes));
             return this;
         }
 
         public SimpleIdServerOpenIDBuilder AddJsonWebKeys(List<JsonWebKey> jwks)
         {
-            _serviceCollection.AddSingleton<IJsonWebKeyQueryRepository>(new DefaultJsonWebKeyQueryRepository(jwks));
-            _serviceCollection.AddSingleton<IJsonWebKeyCommandRepository>(new DefaultJsonWebKeyCommandRepository(jwks));
+            _serviceCollection.AddSingleton<IJsonWebKeyRepository>(new DefaultJsonWebKeyRepository(jwks));
             return this;
         }
 
         public SimpleIdServerOpenIDBuilder AddAcrs(List<AuthenticationContextClassReference> acrs)
         {
-            _serviceCollection.AddSingleton<IAuthenticationContextClassReferenceCommandRepository>(new DefaultAuthenticationContextClassReferenceCommandRepository(acrs));
-            _serviceCollection.AddSingleton<IAuthenticationContextClassReferenceQueryRepository>(new DefaultAuthenticationContextClassReferenceQueryRepository(acrs));
+            _serviceCollection.AddSingleton<IAuthenticationContextClassReferenceRepository>(new DefaultAuthenticationContextClassReferenceRepository(acrs));
             return this;
         }
 

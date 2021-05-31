@@ -10,6 +10,7 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.Uma.DTOs;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Uma.Api.Configuration
@@ -17,7 +18,7 @@ namespace SimpleIdServer.Uma.Api.Configuration
     public class UMAConfigurationRequestHandler : ConfigurationRequestHandler
     {
         public UMAConfigurationRequestHandler(
-            IOAuthScopeQueryRepository oauthScopeRepository, 
+            IOAuthScopeRepository oauthScopeRepository, 
             IEnumerable<IResponseTypeHandler> authorizationGrantTypeHandlers, 
             IEnumerable<IOAuthResponseMode> oauthResponseModes, 
             IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
@@ -29,9 +30,9 @@ namespace SimpleIdServer.Uma.Api.Configuration
         {
         }
 
-        public override async Task Enrich(JObject jObj, string issuer)
+        public override async Task Enrich(JObject jObj, string issuer, CancellationToken cancellationToken)
         {
-            await base.Enrich(jObj, issuer);
+            await base.Enrich(jObj, issuer, cancellationToken);
             jObj.Add(UMAConfigurationNames.PermissionEndpoint, $"{issuer}/{UMAConstants.EndPoints.PermissionsAPI}");
             jObj.Add(UMAConfigurationNames.ResourceRegistrationEndpoint, $"{issuer}/{UMAConstants.EndPoints.ResourcesAPI}");
         }

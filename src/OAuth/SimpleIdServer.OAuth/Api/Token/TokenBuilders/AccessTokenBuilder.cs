@@ -79,7 +79,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
             }
 
-            var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, jwsPayload);
+            var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, jwsPayload, cancellationToken);
             await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }

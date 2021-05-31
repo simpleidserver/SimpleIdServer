@@ -22,21 +22,21 @@ namespace SimpleIdServer.OpenID.Jobs
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<PingNotificationHandler> _logger;
-        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
-        private readonly IOAuthClientQueryRepository _oauthClientQueryRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
         public PushNotificationHandler(
             IHttpClientFactory httpClientFactory,
             ILogger<PingNotificationHandler> logger,
-            IOAuthUserQueryRepository oauthUserQueryRepository,
-            IOAuthClientQueryRepository oauthClientQueryRepository,
+            IOAuthUserRepository oauthUserRepository,
+            IOAuthClientRepository oauthClientRepository,
             IEnumerable<ITokenBuilder> tokenBuilders)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
-            _oauthUserQueryRepository = oauthUserQueryRepository;
-            _oauthClientQueryRepository = oauthClientQueryRepository;
+            _oauthUserRepository = oauthUserRepository;
+            _oauthClientRepository = oauthClientRepository;
             _tokenBuilders = tokenBuilders;
         }
 
@@ -54,8 +54,8 @@ namespace SimpleIdServer.OpenID.Jobs
                 {
                     var jObjBody = new JObject();
                     var context = new HandlerContext(new HandlerContextRequest(null, null, jObjBody, null, null, null));
-                    var user = await _oauthUserQueryRepository.FindOAuthUserByLogin(bcAuthorize.UserId, cancellationToken);
-                    var oauthClient = await _oauthClientQueryRepository.FindOAuthClientById(bcAuthorize.ClientId, cancellationToken);
+                    var user = await _oauthUserRepository.FindOAuthUserByLogin(bcAuthorize.UserId, cancellationToken);
+                    var oauthClient = await _oauthClientRepository.FindOAuthClientById(bcAuthorize.ClientId, cancellationToken);
                     context.SetUser(user);
                     context.SetClient(oauthClient);
                     foreach(var tokenBuilder in _tokenBuilders)

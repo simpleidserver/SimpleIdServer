@@ -16,7 +16,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
 {
     public class DefaultConfiguration
     {
-        public static List<OpenIdScope> Scopes = new List<OpenIdScope>
+        public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
             SIDOpenIdConstants.StandardScopes.Phone,
@@ -26,12 +26,12 @@ namespace SimpleIdServer.OpenBankingApi.Startup
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,
             OpenBankingApiConstants.OpenBankingApiScopes.Accounts,
-            new OpenIdScope
+            new OAuthScope
             {
                 Name = "scim",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
-                    new OpenIdScopeClaim("scim_id", true)
+                    new OAuthScopeClaim("scim_id", true)
                 }
             }
         };
@@ -135,10 +135,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 new OpenIdClient
                 {
                     ClientId = "firstMtlsClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "mtsClientSecret", null)
-                    },
+                    ClientSecret = "mtsClientSecret",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -147,14 +144,14 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     TokenSignedResponseAlg = "PS256",
                     IdTokenSignedResponseAlg = "PS256",
                     RequestObjectSigningAlg = "PS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             CreateDateTime = DateTime.UtcNow,
                             Name = "accounts"
@@ -184,10 +181,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 new OpenIdClient
                 {
                     ClientId = "secondMtlsClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "mtsClientSecret", null)
-                    },
+                    ClientSecret = "mtsClientSecret",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -196,14 +190,14 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     TokenSignedResponseAlg = "PS256",
                     IdTokenSignedResponseAlg = "PS256",
                     RequestObjectSigningAlg = "PS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             CreateDateTime = DateTime.UtcNow,
                             Name = "accounts"
@@ -233,10 +227,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 new OpenIdClient
                 {
                     ClientId = "firstPrivateKeyJwtClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "privateKeyJwtClientSecret", null)
-                    },
+                    ClientSecret = "privateKeyJwtClientSecret",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -245,14 +236,14 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     TokenSignedResponseAlg = "PS256",
                     IdTokenSignedResponseAlg = "PS256",
                     RequestObjectSigningAlg = "PS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             CreateDateTime = DateTime.UtcNow,
                             Name = "accounts"
@@ -282,10 +273,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 new OpenIdClient
                 {
                     ClientId = "secondPrivateKeyJwtClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "privateKeyClientSecret", null)
-                    },
+                    ClientSecret = "privateKeyClientSecret",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -294,14 +282,14 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     TokenSignedResponseAlg = "PS256",
                     IdTokenSignedResponseAlg = "PS256",
                     RequestObjectSigningAlg = "PS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.Email,
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OpenIdScope
+                        new OAuthScope
                         {
                             CreateDateTime = DateTime.UtcNow,
                             Name = "accounts"
@@ -331,10 +319,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                 new OpenIdClient
                 {
                     ClientId = "native",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
-                    },
+                    ClientSecret = "nativeSecret",
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -343,7 +328,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "PS256",
                     IdTokenSignedResponseAlg = "PS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,

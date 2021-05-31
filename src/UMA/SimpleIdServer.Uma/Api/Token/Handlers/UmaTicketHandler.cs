@@ -33,21 +33,28 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
         private readonly IUmaTicketGrantTypeValidator _umaTicketGrantTypeValidator;
         private readonly IEnumerable<IClaimTokenFormat> _claimTokenFormatFetchers;
         private readonly IUMAPermissionTicketHelper _umaPermissionTicketHelper;
-        private readonly IUMAResourceQueryRepository _umaResourceQueryRepository;
-        private readonly IUMAPendingRequestCommandRepository _umaPendingRequestCommandRepository;
-        private readonly IUMAPendingRequestQueryRepository _umaPendingRequestQueryRepository;
+        private readonly IUMAResourceRepository _umaResourceRepository;
+        private readonly IUMAPendingRequestRepository _umaPendingRequestRepository;
         private readonly UMAHostOptions _umaHostOptions;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
-        public UmaTicketHandler(IEnumerable<ITokenProfile>  tokenProfiles, IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, IEnumerable<IClaimTokenFormat> claimTokenFormatFetchers, IUMAPermissionTicketHelper umaPermissionTicketHelper, IUMAResourceQueryRepository umaResourceQueryRepository, IUMAPendingRequestCommandRepository umaPendingRequestCommandRepository, IUMAPendingRequestQueryRepository umaPendingRequestQueryRepository, IEnumerable<ITokenBuilder> tokenBuilders, IOptions<UMAHostOptions> umaHostOptions, IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
+        public UmaTicketHandler(
+            IEnumerable<ITokenProfile>  tokenProfiles, 
+            IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, 
+            IEnumerable<IClaimTokenFormat> claimTokenFormatFetchers, 
+            IUMAPermissionTicketHelper umaPermissionTicketHelper,
+            IUMAResourceRepository umaResourceRepository, 
+            IUMAPendingRequestRepository umaPendingRequestRepository, 
+            IEnumerable<ITokenBuilder> tokenBuilders, 
+            IOptions<UMAHostOptions> umaHostOptions, 
+            IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
         {
             _tokenProfiles = tokenProfiles;
             _umaTicketGrantTypeValidator = umaTicketGrantTypeValidator;
             _claimTokenFormatFetchers = claimTokenFormatFetchers;
             _umaPermissionTicketHelper = umaPermissionTicketHelper;
-            _umaResourceQueryRepository = umaResourceQueryRepository;
-            _umaPendingRequestCommandRepository = umaPendingRequestCommandRepository;
-            _umaPendingRequestQueryRepository = umaPendingRequestQueryRepository;
+            _umaResourceRepository = umaResourceRepository;
+            _umaPendingRequestRepository = umaPendingRequestRepository;
             _umaHostOptions = umaHostOptions.Value;
             _tokenBuilders = tokenBuilders;
         }
@@ -99,7 +106,7 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                     throw new OAuthException(ErrorCodes.INVALID_SCOPE, UMAErrorMessages.INVALID_SCOPE);
                 }
 
-                var umaResources = await _umaResourceQueryRepository.FindByIdentifiers(permissionTicket.Records.Select(r => r.ResourceId));
+                var umaResources = await _umaResourceRepository.FindByIdentifiers(permissionTicket.Records.Select(r => r.ResourceId), cancellationToken);
                 var requiredClaims = new List<UMAResourcePermissionClaim>();
                 foreach (var umaResource in umaResources)
                 {
@@ -142,7 +149,7 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                     .All(pr => pr.Claims.All(cl => claimTokenFormatFetcherResult.Payload.Any(c => c.Key == cl.Name && !c.Value.ToString().Equals(cl.Value, StringComparison.InvariantCultureIgnoreCase)))));
                 if (isNotAuthorized)
                 {
-                    var pendingRequests = await _umaPendingRequestQueryRepository.FindByTicketIdentifier(permissionTicket.Id);
+                    var pendingRequests = await _umaPendingRequestRepository.FindByTicketIdentifier(permissionTicket.Id, cancellationToken);
                     if (pendingRequests.Any())
                     {
                         return BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED, UMAErrorMessages.REQUEST_DENIED);
@@ -157,10 +164,10 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                             Scopes = umaResource.Scopes,
                             Resource = umaResource
                         };
-                        _umaPendingRequestCommandRepository.Add(umaPendingRequest);
+                        await _umaPendingRequestRepository.Add(umaPendingRequest, cancellationToken);
                     }
 
-                    await _umaPendingRequestCommandRepository.SaveChanges(cancellationToken);
+                    await _umaPendingRequestRepository.SaveChanges(cancellationToken);
                     return new ContentResult
                     {
                         ContentType = "application/json",

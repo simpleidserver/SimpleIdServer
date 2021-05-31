@@ -28,15 +28,15 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         private readonly IEnumerable<IAuthorizationRequestValidator> _authorizationRequestValidators;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
             IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
             IEnumerable<ITokenProfile> tokenProfiles, 
-            IAuthorizationRequestEnricher authorizationRequestEnricher, 
-            IOAuthClientQueryRepository oauthClientRepository, 
-            IOAuthUserQueryRepository oauthUserRepository)
+            IAuthorizationRequestEnricher authorizationRequestEnricher,
+            IOAuthClientRepository oauthClientRepository,
+            IOAuthUserRepository oauthUserRepository)
         {
             _responseTypeHandlers = responseTypeHandlers;
             _authorizationRequestValidators = authorizationRequestValidators;
@@ -106,7 +106,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 
-        private async Task<OAuthClient> AuthenticateClient(JObject jObj, CancellationToken cancellationToken)
+        private async Task<BaseClient> AuthenticateClient(JObject jObj, CancellationToken cancellationToken)
         {
             var clientId = jObj.GetClientIdFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(clientId))

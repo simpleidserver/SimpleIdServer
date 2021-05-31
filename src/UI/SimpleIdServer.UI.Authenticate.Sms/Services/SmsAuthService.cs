@@ -5,24 +5,25 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Exceptions;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.UI.Authenticate.Sms.Services
 {
     public class SmsAuthService : ISmsAuthService
     {
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
         private readonly IDistributedCache _distributedCache;
 
-        public SmsAuthService(IOAuthUserQueryRepository oauthUserRepository, IDistributedCache distributedCache)
+        public SmsAuthService(IOAuthUserRepository oauthUserRepository, IDistributedCache distributedCache)
         {
             _oauthUserRepository = oauthUserRepository;
             _distributedCache = distributedCache;
         }
 
-        public async Task<OAuthUser> Authenticate(string phoneNumber, string confirmationCode)
+        public async Task<OAuthUser> Authenticate(string phoneNumber, string confirmationCode, CancellationToken cancellationToken)
         {
-            var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.PhoneNumber, phoneNumber);
+            var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.PhoneNumber, phoneNumber, cancellationToken);
             if (user == null)
             {
                 throw new BaseUIException(Exceptions.ErrorCodes.UNKNOWN_PHONENUMBER);

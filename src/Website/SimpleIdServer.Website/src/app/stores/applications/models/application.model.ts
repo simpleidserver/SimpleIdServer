@@ -1,5 +1,4 @@
 import { Translation } from "@app/common/translation";
-import { ApplicationSecret } from './applicationtsecret.model';
 
 export class Application {
   constructor() {
@@ -29,7 +28,7 @@ export class Application {
   Scopes: Array<string>;
   RedirectUris: Array<string>;
   GrantTypes: Array<string>;
-  Secrets: Array<ApplicationSecret>;
+  ClientSecret: string;
   ResponseTypes: Array<string>;
   LogoUris: Translation[];
   ClientNames: Translation[];
@@ -50,6 +49,7 @@ export class Application {
     result.TokenSignedResponseAlg = json["token_signed_response_alg"];
     result.TokenEncryptedResponseAlg = json["token_encrypted_response_alg"];
     result.TokenEncryptedResponseEnc = json["token_encrypted_response_enc"];
+    result.ClientSecret = json["client_secret"];
     result.RefreshTokenExpirationTimeInSeconds = json["refresh_token_expiration_time_seconds"];
     result.TokenExpirationTimeInSeconds = json["token_expiration_time_seconds"];
     result.ClientNames = this.extractTranslations("client_name", json);
@@ -75,10 +75,6 @@ export class Application {
 
     if (json["response_types"]) {
       result.ResponseTypes = json["response_types"];
-    }
-
-    if (json["secrets"]) {
-      result.Secrets = json["secrets"].map((s: any) => ApplicationSecret.fromJson(s));
     }
 
     return result;

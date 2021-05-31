@@ -18,7 +18,7 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
 {
     public class GetAccountsQueryHandler : IRequestHandler<GetAccountsQuery, GetAccountsResult>
     {
-        private readonly ITokenQueryRepository _tokenQueryRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly IJwtParser _jwtParser;
         private readonly IAccountAccessConsentRepository _accountAccessConsentRepository;
         private readonly IAccountRepository _accountRepository;
@@ -26,14 +26,14 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
         private readonly ILogger<GetAccountsQueryHandler> _logger;
 
         public GetAccountsQueryHandler(
-            ITokenQueryRepository tokenQueryRepository,
+            ITokenRepository tokenRepository,
             IJwtParser jwtParser,
             IAccountAccessConsentRepository accountAccessConsentRepository,
             IAccountRepository accountRepository,
             IOptions<OpenBankingApiOptions> options,
             ILogger<GetAccountsQueryHandler> logger)
         {
-            _tokenQueryRepository = tokenQueryRepository;
+            _tokenRepository = tokenRepository;
             _jwtParser = jwtParser;
             _accountAccessConsentRepository = accountAccessConsentRepository;
             _accountRepository = accountRepository;
@@ -43,14 +43,14 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
 
         public async Task<GetAccountsResult> Handle(GetAccountsQuery request, CancellationToken cancellationToken)
         {
-            var jwsPayload = await Extract(request.AccessToken);
+            var jwsPayload = await Extract(request.AccessToken, cancellationToken);
             if (jwsPayload == null)
             {
                 _logger.LogError("access token is invalid");
                 throw new UnauthorizedException(ErrorMessages.BAD_TOKEN);
             }
 
-            var token = await _tokenQueryRepository.Get(request.AccessToken, cancellationToken);
+            var token = await _tokenRepository.Get(request.AccessToken, cancellationToken);
             if (token == null)
             {
                 _logger.LogError("cannot get accounts because access token has been rejected");
@@ -70,7 +70,7 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
             return GetAccountsResult.ToResult(result, consent.Permissions, request.Issuer, 1);
         }
 
-        private async Task<JwsPayload> Extract(string accessToken)
+        private async Task<JwsPayload> Extract(string accessToken, CancellationToken cancellationToken)
         {
             var isJwe = _jwtParser.IsJweToken(accessToken);
             var isJws = _jwtParser.IsJwsToken(accessToken);
@@ -82,10 +82,10 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
             var jws = accessToken;
             if (isJwe)
             {
-                jws = await _jwtParser.Decrypt(accessToken);
+                jws = await _jwtParser.Decrypt(accessToken, cancellationToken);
             }
 
-            return await _jwtParser.Unsign(jws);
+            return await _jwtParser.Unsign(jws, cancellationToken);
         }
     }
 }

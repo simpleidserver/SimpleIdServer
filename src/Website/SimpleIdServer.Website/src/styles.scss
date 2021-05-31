@@ -9,5 +9,4 @@
 .my-theme {
   @include angular-material-theme($my-theme);
   @include component-themes($my-theme);
-  @include app-theme($my-theme)
 }

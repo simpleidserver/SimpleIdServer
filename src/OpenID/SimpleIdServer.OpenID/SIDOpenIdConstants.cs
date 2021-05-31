@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
-using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OpenID
@@ -32,40 +31,41 @@ namespace SimpleIdServer.OpenID
             public const string MTLSBCAuthorize = OAuth.Constants.EndPoints.MtlsPrefix + "/" + BCAuthorize;
             public const string BCAuthorize = "bc-authorize";
             public const string BCDeviceRegistration = "bc-device-registration";
+            public const string Metadata = "metadata";
         }
 
         public static class StandardClaims
         {
-            public static OpenIdScopeClaim Name = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Name, true);
-            public static OpenIdScopeClaim FamilyName = new OpenIdScopeClaim(Jwt.Constants.UserClaims.FamilyName, true);
-            public static OpenIdScopeClaim UniqueName = new OpenIdScopeClaim(Jwt.Constants.UserClaims.UniqueName, true);
-            public static OpenIdScopeClaim GivenName = new OpenIdScopeClaim(Jwt.Constants.UserClaims.GivenName, true);
-            public static OpenIdScopeClaim MiddleName = new OpenIdScopeClaim(Jwt.Constants.UserClaims.MiddleName, true);
-            public static OpenIdScopeClaim NickName = new OpenIdScopeClaim(Jwt.Constants.UserClaims.NickName, true);
-            public static OpenIdScopeClaim PreferredUserName = new OpenIdScopeClaim(Jwt.Constants.UserClaims.PreferredUserName, true);
-            public static OpenIdScopeClaim Profile = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Profile, true);
-            public static OpenIdScopeClaim Picture = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Picture, true);
-            public static OpenIdScopeClaim WebSite = new OpenIdScopeClaim(Jwt.Constants.UserClaims.WebSite, true);
-            public static OpenIdScopeClaim Gender = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Gender, true);
-            public static OpenIdScopeClaim BirthDate = new OpenIdScopeClaim(Jwt.Constants.UserClaims.BirthDate, true);
-            public static OpenIdScopeClaim ZoneInfo = new OpenIdScopeClaim(Jwt.Constants.UserClaims.ZoneInfo, true);
-            public static OpenIdScopeClaim Locale = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Locale, true);
-            public static OpenIdScopeClaim UpdatedAt = new OpenIdScopeClaim(Jwt.Constants.UserClaims.UpdatedAt, true);
-            public static OpenIdScopeClaim Email = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Email, true);
-            public static OpenIdScopeClaim EmailVerified = new OpenIdScopeClaim(Jwt.Constants.UserClaims.EmailVerified, true);
-            public static OpenIdScopeClaim Address = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Address, true);
-            public static OpenIdScopeClaim PhoneNumber = new OpenIdScopeClaim(Jwt.Constants.UserClaims.PhoneNumber, true);
-            public static OpenIdScopeClaim PhoneNumberVerified = new OpenIdScopeClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, true);
-            public static OpenIdScopeClaim Role = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Role, true);
-            public static OpenIdScopeClaim Subject = new OpenIdScopeClaim(Jwt.Constants.UserClaims.Subject, true);
+            public static OAuthScopeClaim Name = new OAuthScopeClaim(Jwt.Constants.UserClaims.Name, true);
+            public static OAuthScopeClaim FamilyName = new OAuthScopeClaim(Jwt.Constants.UserClaims.FamilyName, true);
+            public static OAuthScopeClaim UniqueName = new OAuthScopeClaim(Jwt.Constants.UserClaims.UniqueName, true);
+            public static OAuthScopeClaim GivenName = new OAuthScopeClaim(Jwt.Constants.UserClaims.GivenName, true);
+            public static OAuthScopeClaim MiddleName = new OAuthScopeClaim(Jwt.Constants.UserClaims.MiddleName, true);
+            public static OAuthScopeClaim NickName = new OAuthScopeClaim(Jwt.Constants.UserClaims.NickName, true);
+            public static OAuthScopeClaim PreferredUserName = new OAuthScopeClaim(Jwt.Constants.UserClaims.PreferredUserName, true);
+            public static OAuthScopeClaim Profile = new OAuthScopeClaim(Jwt.Constants.UserClaims.Profile, true);
+            public static OAuthScopeClaim Picture = new OAuthScopeClaim(Jwt.Constants.UserClaims.Picture, true);
+            public static OAuthScopeClaim WebSite = new OAuthScopeClaim(Jwt.Constants.UserClaims.WebSite, true);
+            public static OAuthScopeClaim Gender = new OAuthScopeClaim(Jwt.Constants.UserClaims.Gender, true);
+            public static OAuthScopeClaim BirthDate = new OAuthScopeClaim(Jwt.Constants.UserClaims.BirthDate, true);
+            public static OAuthScopeClaim ZoneInfo = new OAuthScopeClaim(Jwt.Constants.UserClaims.ZoneInfo, true);
+            public static OAuthScopeClaim Locale = new OAuthScopeClaim(Jwt.Constants.UserClaims.Locale, true);
+            public static OAuthScopeClaim UpdatedAt = new OAuthScopeClaim(Jwt.Constants.UserClaims.UpdatedAt, true);
+            public static OAuthScopeClaim Email = new OAuthScopeClaim(Jwt.Constants.UserClaims.Email, true);
+            public static OAuthScopeClaim EmailVerified = new OAuthScopeClaim(Jwt.Constants.UserClaims.EmailVerified, true);
+            public static OAuthScopeClaim Address = new OAuthScopeClaim(Jwt.Constants.UserClaims.Address, true);
+            public static OAuthScopeClaim PhoneNumber = new OAuthScopeClaim(Jwt.Constants.UserClaims.PhoneNumber, true);
+            public static OAuthScopeClaim PhoneNumberVerified = new OAuthScopeClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, true);
+            public static OAuthScopeClaim Role = new OAuthScopeClaim(Jwt.Constants.UserClaims.Role, true);
+            public static OAuthScopeClaim Subject = new OAuthScopeClaim(Jwt.Constants.UserClaims.Subject, true);
         }
 
         public static class StandardScopes
         {
-            public static OpenIdScope Profile = new OpenIdScope
+            public static OAuthScope Profile = new OAuthScope
             {
                 Name = "profile",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
                     StandardClaims.Name,
                     StandardClaims.FamilyName,
@@ -85,54 +85,54 @@ namespace SimpleIdServer.OpenID
                 },
                 IsExposedInConfigurationEdp = true
             };
-            public static OpenIdScope Email = new OpenIdScope
+            public static OAuthScope Email = new OAuthScope
             {
                 Name = "email",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
                 },
                 IsExposedInConfigurationEdp = true
             };
-            public static OpenIdScope Address = new OpenIdScope
+            public static OAuthScope Address = new OAuthScope
             {
                 Name = "address",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
                     StandardClaims.Address
                 },
                 IsExposedInConfigurationEdp = true
             };
-            public static OpenIdScope Phone = new OpenIdScope
+            public static OAuthScope Phone = new OAuthScope
             {
                 Name = "phone",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
                 },
                 IsExposedInConfigurationEdp = true
             };
-            public static OpenIdScope Role = new OpenIdScope
+            public static OAuthScope Role = new OAuthScope
             {
                 Name = "role",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
                     StandardClaims.Role
                 },
                 IsExposedInConfigurationEdp = true
             };
-            public static OpenIdScope OpenIdScope = new OpenIdScope
+            public static OAuthScope OpenIdScope = new OAuthScope
             {
                 Name = "openid",
-                Claims = new List<OpenIdScopeClaim>
+                Claims = new List<OAuthScopeClaim>
                 {
                     StandardClaims.Subject
                 },
                 IsExposedInConfigurationEdp = true
             };
-            public static OpenIdScope OfflineAccessScope = new OpenIdScope
+            public static OAuthScope OfflineAccessScope = new OAuthScope
             {
                 Name = "offline_access",
                 IsExposedInConfigurationEdp = true

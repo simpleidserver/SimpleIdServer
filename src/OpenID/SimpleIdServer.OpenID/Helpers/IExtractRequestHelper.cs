@@ -9,7 +9,7 @@ namespace SimpleIdServer.OpenID.Helpers
 {
     public interface IExtractRequestHelper
     {
-        Task<JObject> Extract(string issuerName, JObject jObj, OAuthClient oauthClient);
+        Task<JObject> Extract(string issuerName, JObject jObj, BaseClient oauthClient);
         Task<bool> Extract(HandlerContext context);
     }
 }

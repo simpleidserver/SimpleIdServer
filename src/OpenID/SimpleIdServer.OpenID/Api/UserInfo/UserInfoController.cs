@@ -30,22 +30,22 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
     {
         private readonly IJwtParser _jwtParser;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly IOAuthScopeQueryRepository _oauthScopeRepository;
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
+        private readonly IOAuthScopeRepository _oauthScopeRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IEnumerable<IClaimsSource> _claimsSources;
-        private readonly ITokenQueryRepository _tokenQueryRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
         private readonly ILogger<UserInfoController> _logger;
 
         public UserInfoController(
             IJwtParser jwtParser,
             IJwtBuilder jwtBuilder,
-            IOAuthScopeQueryRepository oauthScopeRepository,
-            IOAuthUserQueryRepository oauthUserRepository,
-            IOAuthClientQueryRepository oauthClientRepository,
+            IOAuthScopeRepository oauthScopeRepository,
+            IOAuthUserRepository oauthUserRepository,
+            IOAuthClientRepository oauthClientRepository,
             IEnumerable<IClaimsSource> claimsSources,
-            ITokenQueryRepository tokenQueryRepository,
+            ITokenRepository tokenRepository,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             ILogger<UserInfoController> logger)
         {
@@ -55,7 +55,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             _oauthUserRepository = oauthUserRepository;
             _oauthClientRepository = oauthClientRepository;
             _claimsSources = claimsSources;
-            _tokenQueryRepository = tokenQueryRepository;
+            _tokenRepository = tokenRepository;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
             _logger = logger;
         }
@@ -95,7 +95,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             try
             {
                 var accessToken = ExtractAccessToken(content);
-                var jwsPayload = await Extract(accessToken);
+                var jwsPayload = await Extract(accessToken, cancellationToken);
                 if (jwsPayload == null)
                 {
                     throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.BAD_TOKEN);
@@ -124,20 +124,20 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
                 }
 
-                var token = await _tokenQueryRepository.Get(accessToken, cancellationToken);
+                var token = await _tokenRepository.Get(accessToken, cancellationToken);
                 if (token == null)
                 {
                     _logger.LogError("Cannot get user information because access token has been rejected");
                     throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.ACCESS_TOKEN_REJECTED);
                 }
 
-                var oauthScopes = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken)).Cast<OpenIdScope>();
+                var oauthScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken);
                 var payload = new JwsPayload();
                 IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user, subject);
                 _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);
                 foreach (var claimsSource in _claimsSources)
                 {
-                    await claimsSource.Enrich(payload, oauthClient).ConfigureAwait(false);
+                    await claimsSource.Enrich(payload, oauthClient, cancellationToken);
                 }
 
                 string contentType = "application/json";
@@ -149,7 +149,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     {
                         token.ClientId
                     });
-                    result = await _jwtBuilder.BuildClientToken(oauthClient, payload, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc);
+                    result = await _jwtBuilder.BuildClientToken(oauthClient, payload, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
                     contentType = "application/jwt";
                 }
 
@@ -175,7 +175,7 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             }
         }
 
-        private async Task<JwsPayload> Extract(string accessToken)
+        private async Task<JwsPayload> Extract(string accessToken, CancellationToken cancellationToken)
         {
             var isJwe = _jwtParser.IsJweToken(accessToken);
             var isJws = _jwtParser.IsJwsToken(accessToken);
@@ -187,10 +187,10 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             var jws = accessToken;
             if (isJwe)
             {
-                jws = await _jwtParser.Decrypt(accessToken);
+                jws = await _jwtParser.Decrypt(accessToken, cancellationToken);
             }
 
-            return await _jwtParser.Unsign(jws);
+            return await _jwtParser.Unsign(jws, cancellationToken);
         }
 
         private string ExtractAccessToken(JObject jObj)

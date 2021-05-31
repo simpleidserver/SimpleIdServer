@@ -32,8 +32,8 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Controllers
             ITranslationHelper translationHelper,
             IDataProtectionProvider dataProtectionProvider,
             IAmrHelper amrHelper,
-            IOAuthClientQueryRepository oauthClientRepository,
-            IOAuthUserCommandRepository oauthUserCommandRepository) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserCommandRepository)
+            IOAuthClientRepository oauthClientRepository,
+            IOAuthUserRepository oauthUserCommandRepository) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserCommandRepository)
         {
             _passwordAuthService = passwordAuthService;
             _translationHelper = translationHelper;

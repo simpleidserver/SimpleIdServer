@@ -59,10 +59,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var umaResources = new List<UMAResource>();
             var umaPendingRequests = new List<UMAPendingRequest>();
-            services.TryAddSingleton<IUMAResourceCommandRepository>(new DefaultUMAResourceCommandRepository(umaResources));
-            services.TryAddSingleton<IUMAResourceQueryRepository>(new DefaultUMAResourceQueryRepository(umaResources));
-            services.TryAddSingleton<IUMAPendingRequestCommandRepository>(new DefaultUMAPendingRequestCommandRepository(umaPendingRequests));
-            services.TryAddSingleton<IUMAPendingRequestQueryRepository>(new DefaultUMAPendingRequestQueryRepository(umaPendingRequests));
+            services.TryAddSingleton<IUMAResourceRepository>(new DefaultUMAResourceRepository(umaResources));
+            services.TryAddSingleton<IUMAPendingRequestRepository>(new DefaultUMAPendingRequestRepository(umaPendingRequests));
             return services;
         }
 

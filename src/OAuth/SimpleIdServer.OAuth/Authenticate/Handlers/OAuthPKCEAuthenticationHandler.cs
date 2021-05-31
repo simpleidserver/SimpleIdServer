@@ -27,7 +27,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "pkce";
         public string AuthMethod => AUTH_METHOD;
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, BaseClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var codeVerifier = authenticateInstruction.RequestData.GetCodeVerifier();
             if (string.IsNullOrWhiteSpace(codeVerifier))

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jwe.EncHandlers;
-using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
@@ -39,15 +38,13 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
         private readonly IHttpClientFactory _httpClientFactory;
 
         public AddOAuthClientHandler(
-            IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository,
+            IOAuthClientRepository oAuthClientRepository,
             IJwtParser jwtParser,
             IHttpClientFactory httpClientFactory,
             IOAuthClientValidator oauthClientValidator,
             IOptions<OAuthHostOptions> oauthHostOptions)
         {
-            OAuthClientQueryRepository = oauthClientQueryRepository;
-            OAuthClientCommandRepository = oAuthClientCommandRepository;
+            OAuthClientRepository = oAuthClientRepository;
             _jwtParser = jwtParser;
             _httpClientFactory = httpClientFactory;
             _oauthClientValidator = oauthClientValidator;
@@ -55,27 +52,26 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
         }
 
         protected readonly OAuthHostOptions OauthHostOptions;
-        protected IOAuthClientQueryRepository OAuthClientQueryRepository { get; private set; }
-        protected IOAuthClientCommandRepository OAuthClientCommandRepository { get; private set; }
+        protected IOAuthClientRepository OAuthClientRepository { get; private set; }
 
         public async Task<JObject> Handle(HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             await ExtractSoftwareStatement(handlerContext.Request.RequestData);
             var oauthClient = ExtractClient(handlerContext);
             await _oauthClientValidator.Validate(oauthClient, cancellationToken);
-            OAuthClientCommandRepository.Add(oauthClient);
-            await OAuthClientCommandRepository.SaveChanges(cancellationToken);
+            await OAuthClientRepository.Add(oauthClient, cancellationToken);
+            await OAuthClientRepository.SaveChanges(cancellationToken);
             return BuildResponse(oauthClient, handlerContext.Request.IssuerName);
         }
 
-        protected virtual OAuthClient ExtractClient(HandlerContext handlerContext)
+        protected virtual BaseClient ExtractClient(HandlerContext handlerContext)
         {
             var result = handlerContext.Request.RequestData.ToDomain();
             EnrichClient(result);
             return result;
         }
 
-        protected void EnrichClient(OAuthClient oauthClient)
+        protected void EnrichClient(BaseClient oauthClient)
         {
             string clientId = Guid.NewGuid().ToString(),
                 registrationAccessToken = Guid.NewGuid().ToString(),
@@ -94,8 +90,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             oauthClient.RefreshTokenExpirationTimeInSeconds = 60 * 30;
             oauthClient.TokenExpirationTimeInSeconds = 60 * 30;
             oauthClient.PreferredTokenProfile = OauthHostOptions.DefaultTokenProfile;
-            oauthClient.Secrets.Clear();
-            oauthClient.AddSharedSecret(clientSecret, expirationDateTime);
+            oauthClient.SetClientSecret(clientSecret, expirationDateTime);
             SetDefaultClientNames(oauthClient);
             SetDefaultGrantTypes(oauthClient);
             SetDefaultScopes(oauthClient);
@@ -105,12 +100,12 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             SetTokenEncryptedResponseEnc(oauthClient);
         }
 
-        protected virtual JObject BuildResponse(OAuthClient oauthClient, string issuer)
+        protected virtual JObject BuildResponse(BaseClient oauthClient, string issuer)
         {
             return oauthClient.ToDto(issuer);
         }
 
-        protected virtual void SetDefaultClientNames(OAuthClient oauthClient)
+        protected virtual void SetDefaultClientNames(BaseClient oauthClient)
         {
             if (oauthClient.ClientNames != null && !oauthClient.ClientNames.Any())
             {
@@ -118,7 +113,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             }
         }
 
-        protected virtual void SetDefaultGrantTypes(OAuthClient oauthClient)
+        protected virtual void SetDefaultGrantTypes(BaseClient oauthClient)
         {
             if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Any())
             {
@@ -129,7 +124,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             }
         }
 
-        protected virtual void SetDefaultTokenAuthMethod(OAuthClient oauthClient)
+        protected virtual void SetDefaultTokenAuthMethod(BaseClient oauthClient)
         {
             if (string.IsNullOrWhiteSpace(oauthClient.TokenEndPointAuthMethod))
             {
@@ -137,7 +132,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             }
         }
 
-        protected virtual void SetDefaultResponseTypes(OAuthClient oauthClient)
+        protected virtual void SetDefaultResponseTypes(BaseClient oauthClient)
         {
             if (oauthClient.ResponseTypes == null || !oauthClient.ResponseTypes.Any())
             {
@@ -148,7 +143,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             }
         }
 
-        protected virtual void SetDefaultScopes(OAuthClient oauthClient)
+        protected virtual void SetDefaultScopes(BaseClient oauthClient)
         {
             if (!oauthClient.AllowedScopes.Any())
             {
@@ -159,7 +154,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             }
         }
 
-        protected virtual void SetDefaultTokenSignedResponseAlg(OAuthClient oauthClient)
+        protected virtual void SetDefaultTokenSignedResponseAlg(BaseClient oauthClient)
         {
             if (string.IsNullOrWhiteSpace(oauthClient.TokenSignedResponseAlg))
             {
@@ -167,7 +162,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             }
         }
 
-        protected virtual void SetTokenEncryptedResponseEnc(OAuthClient oauthClient)
+        protected virtual void SetTokenEncryptedResponseEnc(BaseClient oauthClient)
         {
             if (!string.IsNullOrWhiteSpace(oauthClient.TokenEncryptedResponseAlg) && string.IsNullOrWhiteSpace(oauthClient.TokenEncryptedResponseEnc))
             {

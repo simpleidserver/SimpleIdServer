@@ -13,7 +13,7 @@ namespace SimpleIdServer.OpenID.Extensions
     {
         public static JObject ToDto(this OpenIdClient openidClient, string issuer)
         {
-            var result = (openidClient as OAuthClient).ToDto(issuer);
+            var result = (openidClient as BaseClient).ToDto(issuer);
             result.AddNotEmpty(OpenIdClientParameters.ApplicationType, openidClient.ApplicationType)
                 .AddNotEmpty(OpenIdClientParameters.SectorIdentifierUri, openidClient.SectorIdentifierUri)
                 .AddNotEmpty(OpenIdClientParameters.SubjectType, openidClient.SubjectType)
@@ -59,7 +59,7 @@ namespace SimpleIdServer.OpenID.Extensions
             result.DefaultAcrValues = jObj.GetDefaultAcrValues();
             result.PostLogoutRedirectUris = jObj.GetPostLogoutRedirectUris();
             result.InitiateLoginUri = jObj.GetInitiateLoginUri();
-            result.AllowedScopes = result.AllowedScopes.Select(s => new OpenIdScope
+            result.AllowedScopes = result.AllowedScopes.Select(s => new OAuthScope
             {
                 Name = s.Name
             }).ToList();

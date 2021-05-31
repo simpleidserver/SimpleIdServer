@@ -21,8 +21,8 @@
     </div>
     <button mat-button [matMenuTriggerFor]="languages">{{ "menu.languages" | translate }}</button>
     <mat-menu #languages="matMenu">
-      <button mat-menu-item (click)="chooseLanguage('fr')">{{ "menu.french" | translate }}</button>
-      <button mat-menu-item (click)="chooseLanguage('en')">{{ "menu.english" | translate }}</button>
+      <button mat-menu-item (click)="chooseLanguage('fr')">{{ "languages.fr" | translate }}</button>
+      <button mat-menu-item (click)="chooseLanguage('en')">{{ "languages.en" | translate }}</button>
     </mat-menu>
   </mat-toolbar>
   <mat-drawer-container class="drawer-container">

@@ -34,9 +34,8 @@ namespace SimpleIdServer.OpenBankingApi.UI
     [Authorize("IsConnected")]
     public class OpenBankingApiAccountConsentController : Controller
     {
-        private readonly IOAuthUserQueryRepository _oauthUserRepository;
-        private readonly IOAuthUserCommandRepository _oAuthUserCommandRepository;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IUserConsentFetcher _userConsentFetcher;
         private readonly IDataProtector _dataProtector;
         private readonly IAccountAccessConsentRepository _accountAccessConsentRepository;
@@ -49,9 +48,8 @@ namespace SimpleIdServer.OpenBankingApi.UI
         private readonly ILogger<OpenBankingApiAccountConsentController> _logger;
 
         public OpenBankingApiAccountConsentController(
-            IOAuthUserQueryRepository oauthUserRepository, 
-            IOAuthUserCommandRepository oauthUserCommandRepository, 
-            IOAuthClientQueryRepository oauthClientRepository, 
+            IOAuthUserRepository oauthUserRepository, 
+            IOAuthClientRepository oauthClientRepository, 
             IUserConsentFetcher userConsentFetcher, 
             IDataProtectionProvider dataProtectionProvider,
             IAccountAccessConsentRepository accountAccessConsentRepository,
@@ -64,7 +62,6 @@ namespace SimpleIdServer.OpenBankingApi.UI
             IOptions<OpenBankingApiOptions> openbankingApiOptions)
         {
             _oauthUserRepository = oauthUserRepository;
-            _oAuthUserCommandRepository = oauthUserCommandRepository;
             _oauthClientRepository = oauthClientRepository;
             _userConsentFetcher = userConsentFetcher;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
@@ -179,8 +176,8 @@ namespace SimpleIdServer.OpenBankingApi.UI
                 {
                     consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
                     user.Consents.Add(consent);
-                    await _oAuthUserCommandRepository.Update(user, cancellationToken);
-                    await _oAuthUserCommandRepository.SaveChanges(cancellationToken);
+                    await _oauthUserRepository.Update(user, cancellationToken);
+                    await _oauthUserRepository.SaveChanges(cancellationToken);
                 }
 
                 return Redirect(unprotectedUrl);

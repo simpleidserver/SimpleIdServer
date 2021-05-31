@@ -4,12 +4,14 @@
     <TypeScriptToolsVersion>3.8</TypeScriptToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="src\app\applications\view\edit-translation.component.ts" />
     <None Remove="src\environments\environments.ts" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\app\applications\view\edit-translation.component.ts" />
     <TypeScriptCompile Include="src\environments\environments.ts" />
   </ItemGroup>
 </Project>

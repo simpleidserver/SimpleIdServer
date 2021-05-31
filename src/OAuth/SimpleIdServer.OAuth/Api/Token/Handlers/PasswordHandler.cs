@@ -21,15 +21,15 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
     public class PasswordHandler : BaseCredentialsHandler
     {
         private readonly IPasswordGrantTypeValidator _passwordGrantTypeValidator;
-        private readonly IOAuthUserQueryRepository _oauthUserQueryRepository;
+        private readonly IOAuthUserRepository _oauthUserRepository;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
-        public PasswordHandler(IPasswordGrantTypeValidator passwordGrantTypeValidator, IOAuthUserQueryRepository oauthUserQueryRepository, IEnumerable<ITokenProfile> tokenProfiles,
+        public PasswordHandler(IPasswordGrantTypeValidator passwordGrantTypeValidator, IOAuthUserRepository oauthUserRepository, IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
-            _oauthUserQueryRepository = oauthUserQueryRepository;
+            _oauthUserRepository = oauthUserRepository;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
         }
@@ -47,7 +47,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
                 var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                 var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
-                var user = await _oauthUserQueryRepository.FindOAuthUserByLoginAndCredential(userName, "pwd", PasswordHelper.ComputeHash(password));
+                var user = await _oauthUserRepository.FindOAuthUserByLoginAndCredential(userName, "pwd", PasswordHelper.ComputeHash(password), cancellationToken);
                 if (user == null)
                 {
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);

@@ -12,11 +12,11 @@ namespace SimpleIdServer.OpenID.Api.Register
 {
     public class UpdateOpenIdClientHandler : UpdateOAuthClientHandler
     {
-        public UpdateOpenIdClientHandler(IOAuthClientValidator oauthClientValidator, IOAuthClientQueryRepository oauthClientQueryRepository, IOAuthClientCommandRepository oAuthClientCommandRepository, ILogger<UpdateOAuthClientHandler> logger) : base(oauthClientValidator, oauthClientQueryRepository, oAuthClientCommandRepository, logger)
+        public UpdateOpenIdClientHandler(IOAuthClientValidator oauthClientValidator, IOAuthClientRepository oauthClientRepository, ILogger<UpdateOAuthClientHandler> logger) : base(oauthClientValidator, oauthClientRepository, logger)
         {
         }
 
-        protected override OAuthClient ExtractClient(HandlerContext handlerContext)
+        protected override BaseClient ExtractClient(HandlerContext handlerContext)
         {
             var result = handlerContext.Request.RequestData.ToDomain();
             return result;

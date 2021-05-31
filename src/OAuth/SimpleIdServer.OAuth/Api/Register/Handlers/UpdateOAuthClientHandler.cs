@@ -8,7 +8,6 @@ using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,9 +24,8 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
 
         public UpdateOAuthClientHandler(
             IOAuthClientValidator oauthClientValidator,
-            IOAuthClientQueryRepository oauthClientQueryRepository,
-            IOAuthClientCommandRepository oAuthClientCommandRepository,
-            ILogger<BaseOAuthClientHandler> logger) : base(oauthClientQueryRepository, oAuthClientCommandRepository, logger)
+            IOAuthClientRepository oAuthClientRepository,
+            ILogger<BaseOAuthClientHandler> logger) : base(oAuthClientRepository, logger)
         {
             _oauthClientValidator = oauthClientValidator;
         }
@@ -42,25 +40,19 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_IDENTIFIER_MUST_BE_IDENTICAL);
             }
 
-            if (extractedClient.Secrets.Any() && extractedClient.Secrets.First(_ => _.Type == ClientSecretTypes.SharedSecret).Value != oauthClient.Secrets.First(_ => _.Type == ClientSecretTypes.SharedSecret).Value)
-            {
-                Logger.LogError("the client secret must be identical");
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_SECRET_MUST_BE_IDENTICAL);
-            }
-
-            extractedClient.ClientId = clientId;
-            extractedClient.Secrets = oauthClient.Secrets;
+            extractedClient.ClientId = oauthClient.ClientId;
+            extractedClient.SetClientSecret(oauthClient.ClientSecret, oauthClient.ClientSecretExpirationTime);
             extractedClient.RegistrationAccessToken = oauthClient.RegistrationAccessToken;
             extractedClient.UpdateDateTime = DateTime.UtcNow;
             extractedClient.CreateDateTime = oauthClient.CreateDateTime;
             await _oauthClientValidator.Validate(extractedClient, cancellationToken);
-            await OAuthClientCommandRepository.Update(extractedClient, cancellationToken);
-            await OAuthClientCommandRepository.SaveChanges(cancellationToken);
+            await OAuthClientRepository.Update(extractedClient, cancellationToken);
+            await OAuthClientRepository.SaveChanges(cancellationToken);
             Logger.LogInformation($"the client '{clientId}' has been updated");
             return null;
         }
 
-        protected virtual OAuthClient ExtractClient(HandlerContext handlerContext)
+        protected virtual BaseClient ExtractClient(HandlerContext handlerContext)
         {
             var result = handlerContext.Request.RequestData.ToDomain();
             return result;

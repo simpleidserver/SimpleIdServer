@@ -20,7 +20,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
 {
     public interface IOAuthClientValidator
     {
-        Task Validate(OAuthClient client, CancellationToken cancellationToken);
+        Task Validate(BaseClient client, CancellationToken cancellationToken);
     }
 
     public class OAuthClientValidator : IOAuthClientValidator
@@ -29,7 +29,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
         private readonly IEnumerable<IGrantTypeHandler> _grantTypeHandlers;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _oauthClientAuthenticationHandlers;
         private readonly IEnumerable<ISignHandler> _signHandlers;
-        private readonly IOAuthScopeQueryRepository _oauthScopeRepository;
+        private readonly IOAuthScopeRepository _oauthScopeRepository;
         private readonly IEnumerable<ICEKHandler> _cekHandlers;
         private readonly IEnumerable<IEncHandler> _encHandlers;
 
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
             IEnumerable<ISignHandler> signHandlers,
             IEnumerable<ICEKHandler> cekHandlers,
             IEnumerable<IEncHandler> encHandlers,
-            IOAuthScopeQueryRepository oauthScopeQueryRepository)
+            IOAuthScopeRepository oauthScopeQueryRepository)
         {
             _responseTypeHandlers = responseTypeHandlers;
             _grantTypeHandlers = grantTypeHandlers;
@@ -51,7 +51,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
             _oauthScopeRepository = oauthScopeQueryRepository;
         }
 
-        public virtual async Task Validate(OAuthClient client, CancellationToken cancellationToken)
+        public virtual async Task Validate(BaseClient client, CancellationToken cancellationToken)
         {
             var authGrantTypes = _responseTypeHandlers.Select(r => r.GrantType);
             var supportedGrantTypes = _grantTypeHandlers.Select(g => g.GrantType).Union(authGrantTypes).Distinct();
@@ -99,13 +99,15 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
             }
 
             var scopes = client.AllowedScopes.Select(_ => _.Name);
-            var existingScopeNames = (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken)).Select(s => s.Name);
+            var existingScopes= (await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken));
+            var existingScopeNames = existingScopes.Select(s => s.Name);
             var unsupportedScopes = scopes.Except(existingScopeNames);
             if (unsupportedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
             }
 
+            client.AllowedScopes = existingScopes;
             CheckUri(client.JwksUri, ErrorMessages.BAD_JWKS_URI);
             CheckUris(client.ClientUris, ErrorMessages.BAD_CLIENT_URI);
             CheckUris(client.LogoUris, ErrorMessages.BAD_LOGO_URI);
@@ -119,7 +121,7 @@ namespace SimpleIdServer.OAuth.Api.Register.Validators
             }
         }
 
-        protected virtual void CheckRedirectUrl(OAuthClient oauthClient, string redirectUrl)
+        protected virtual void CheckRedirectUrl(BaseClient oauthClient, string redirectUrl)
         {
             if (!Uri.IsWellFormedUriString(redirectUrl, UriKind.Absolute))
             {

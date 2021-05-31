@@ -18,6 +18,18 @@
         "AuthenticationProviderKey": "Authenticated",
         "AllowedScopes": []
       }
+    },
+    {
+      "DownstreamPathTemplate": "/metadata/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/metadata/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET" ]
     }
   ],
   "ClientId": "gatewayClient",

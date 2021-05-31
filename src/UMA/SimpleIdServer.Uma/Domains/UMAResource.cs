@@ -14,29 +14,78 @@ namespace SimpleIdServer.Uma.Domains
             Id = id;
             CreateDateTime = createDateTime;
             Scopes = new List<string>();
-            Descriptions = new List<OAuthTranslation>();
-            Names = new List<OAuthTranslation>();
             Permissions = new List<UMAResourcePermission>();
+            Translations = new List<UMAResourceTranslation>();
         }
 
         public string Id { get; set; }
         public ICollection<string> Scopes { get; set; }
-        public ICollection<OAuthTranslation> Descriptions { get; set; }
         public string IconUri { get; set; }
-        public ICollection<OAuthTranslation> Names { get; set; }
         public string Type { get; set; }
         public string Subject { get; set; }
-        public ICollection<UMAResourcePermission> Permissions { get; set; }
         public DateTime CreateDateTime { get; set; }
+        public ICollection<OAuthTranslation> Descriptions
+        {
+            get
+            {
+                return Translations.Select(t => t.Translation).Where(t => t.Type == "description").ToList();
+            }
+        }
+        public ICollection<OAuthTranslation> Names
+        {
+            get
+            {
+                return Translations.Select(t => t.Translation).Where(t => t.Type == "name").ToList();
+            }
+        }
+        public ICollection<UMAResourceTranslation> Translations { get; set; }
+        public ICollection<UMAResourcePermission> Permissions { get; set; }
+
+        public void ClearDescriptions()
+        {
+            ClearTranslations("description");
+        }
+
+        public void ClearNames()
+        {
+            ClearTranslations("name");
+        }
 
         public void AddDescription(string language, string value)
         {
-            Descriptions.Add(new OAuthTranslation($"{Id}_uma_resource", value, language));
+            AddDescription(new OAuthTranslation($"{Id}_uma_resource", value, language));
+        }
+
+        public void AddDescription(OAuthTranslation translation)
+        {
+            translation.Type = "description";
+            Translations.Add(new UMAResourceTranslation
+            {
+                Translation = translation
+            });
         }
 
         public void AddName(string language, string value)
         {
-            Names.Add(new OAuthTranslation($"{Id}_uma_resource", value, language));
+            AddName(new OAuthTranslation($"{Id}_uma_resource", value, language));
+        }
+
+        public void AddName(OAuthTranslation translation)
+        {
+            translation.Type = "name";
+            Translations.Add(new UMAResourceTranslation
+            {
+                Translation = translation
+            });
+        }
+
+        public void ReplacePermissions(ICollection<UMAResourcePermission> permissions)
+        {
+            Permissions.Clear();
+            foreach(var permission in permissions)
+            {
+                Permissions.Add(permission);
+            }
         }
 
         public object Clone()
@@ -44,9 +93,8 @@ namespace SimpleIdServer.Uma.Domains
             return new UMAResource(Id, CreateDateTime)
             {
                 Scopes = Scopes.ToList(),
-                Descriptions = Descriptions.Select(d => (OAuthTranslation)d.Clone()).ToList(),
                 IconUri = IconUri,
-                Names = Names.Select(d => (OAuthTranslation)d.Clone()).ToList(),
+                Translations = Translations.Select(t => (UMAResourceTranslation)t.Clone()).ToList(),
                 Type = Type,
                 Subject = Subject,
                 Permissions = Permissions.Select(p => (UMAResourcePermission)p.Clone()).ToList()
@@ -66,6 +114,19 @@ namespace SimpleIdServer.Uma.Domains
         public override int GetHashCode()
         {
             return Id.GetHashCode();
+        }
+
+        private void ClearTranslations(string type)
+        {
+            int length = Translations.Count;
+            for (int i = length - 1; i >= 0; i--)
+            {
+                var translation = Translations.ElementAt(i);
+                if (translation.Translation.Type == type)
+                {
+                    Translations.Remove(translation);
+                }
+            }
         }
     }
 }

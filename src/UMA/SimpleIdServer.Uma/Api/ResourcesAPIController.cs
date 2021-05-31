@@ -24,45 +24,46 @@ namespace SimpleIdServer.Uma.Api
     public class ResourcesAPIController : BaseAPIController
     {
         public const string UserAccessPolicyUri = "user_access_policy_uri";
-        private readonly IUMAResourceCommandRepository _umaResourceCommandRepository;
-        private readonly IUMAResourceQueryRepository _umaResourceQueryRepository;
+        private readonly IUMAResourceRepository _umaResourceRepository;
 
-        public ResourcesAPIController(IUMAResourceCommandRepository umaResourceCommandRepository, IUMAResourceQueryRepository umaResourceQueryRepository, IJwtParser jwtParser, IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
+        public ResourcesAPIController(
+            IUMAResourceRepository umaResourceRepository, 
+            IJwtParser jwtParser, 
+            IOptions<UMAHostOptions> umaHostoptions) : base(jwtParser, umaHostoptions)
         {
-            _umaResourceCommandRepository = umaResourceCommandRepository;
-            _umaResourceQueryRepository = umaResourceQueryRepository;
+            _umaResourceRepository = umaResourceRepository;
         }
         
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
 
-            var result = await _umaResourceQueryRepository.GetAll();
+            var result = await _umaResourceRepository.GetAll(cancellationToken);
             return new OkObjectResult(result.Select(r => r.Id));
         }
 
         [HttpGet(".search/me")]
-        public Task<IActionResult> SearchMe()
+        public Task<IActionResult> SearchMe(CancellationToken cancellationToken)
         {
             return CallOperationWithAuthenticatedUser((sub, payload) =>
             {
-                return InternalSearch(sub);                
+                return InternalSearch(cancellationToken, sub);                
             });
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
 
-            var result = await _umaResourceQueryRepository.FindByIdentifier(id);
+            var result = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
             if (result == null)
             {
                 return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
@@ -72,11 +73,11 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpGet("me/{id}")]
-        public Task<IActionResult> GetMe(string id)
+        public Task<IActionResult> GetMe(string id, CancellationToken cancellationToken)
         {
             return CallOperationWithAuthenticatedUser(async (sub, payload) =>
             {
-                var result = await _umaResourceQueryRepository.FindByIdentifier(id);
+                var result = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
                 if (result == null)
                 {
                     return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
@@ -89,7 +90,7 @@ namespace SimpleIdServer.Uma.Api
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] JObject jObj, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
@@ -97,8 +98,8 @@ namespace SimpleIdServer.Uma.Api
             try
             {
                 var umaResource = BuildUMAResource(jObj, true);
-                _umaResourceCommandRepository.Add(umaResource);
-                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
+                await _umaResourceRepository.Add(umaResource, cancellationToken);
+                await _umaResourceRepository.SaveChanges(cancellationToken);
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, umaResource.Id },
@@ -120,7 +121,7 @@ namespace SimpleIdServer.Uma.Api
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
@@ -128,19 +129,35 @@ namespace SimpleIdServer.Uma.Api
             try
             {
                 var receivedUmaResource = BuildUMAResource(jObj);
-                var actualUmaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+                var actualUmaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
                 if (actualUmaResource == null)
                 {
                     return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
                 }
 
                 actualUmaResource.IconUri = receivedUmaResource.IconUri;
-                actualUmaResource.Names = receivedUmaResource.Names;
-                actualUmaResource.Descriptions = receivedUmaResource.Descriptions;
+                if (receivedUmaResource.Names != null)
+                {
+                    actualUmaResource.ClearNames();
+                    foreach(var name in receivedUmaResource.Names)
+                    {
+                        actualUmaResource.AddName(name);
+                    }
+                }
+
+                if (receivedUmaResource.Descriptions != null)
+                {
+                    actualUmaResource.ClearDescriptions();
+                    foreach(var description in receivedUmaResource.Descriptions)
+                    {
+                        actualUmaResource.AddDescription(description);
+                    }
+                }
+
                 actualUmaResource.Scopes = receivedUmaResource.Scopes;
                 actualUmaResource.Type = receivedUmaResource.Type;
-                await _umaResourceCommandRepository.Update(actualUmaResource, cancellationToken);
-                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
+                await _umaResourceRepository.Update(actualUmaResource, cancellationToken);
+                await _umaResourceRepository.SaveChanges(cancellationToken);
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, actualUmaResource.Id }
@@ -161,26 +178,26 @@ namespace SimpleIdServer.Uma.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
 
-            var actualUmaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+            var actualUmaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
             if (actualUmaResource == null)
             {
                 return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
             }
 
-            await _umaResourceCommandRepository.Delete(actualUmaResource, cancellationToken);
-            await _umaResourceCommandRepository.SaveChanges(cancellationToken);
+            await _umaResourceRepository.Delete(actualUmaResource, cancellationToken);
+            await _umaResourceRepository.SaveChanges(cancellationToken);
             return new NoContentResult();
         }
 
         [HttpPut("{id}/permissions")]
         public async Task<IActionResult> AddPermissions(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
@@ -188,15 +205,16 @@ namespace SimpleIdServer.Uma.Api
             try
             {
                 var permissions = BuildUMAResourcePermissions(jObj);
-                var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+                var umaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
                 if (umaResource == null)
                 {
                     return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
                 }
 
-                umaResource.Permissions = permissions;
-                await _umaResourceCommandRepository.Update(umaResource, cancellationToken);
-                await _umaResourceCommandRepository.SaveChanges(cancellationToken);
+                umaResource.ReplacePermissions(permissions);
+                umaResource.CreateDateTime = DateTime.UtcNow;
+                await _umaResourceRepository.Update(umaResource, cancellationToken);
+                await _umaResourceRepository.SaveChanges(cancellationToken);
                 var result = new JObject
                 {
                     { UMAResourceNames.Id, umaResource.Id }
@@ -215,14 +233,14 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpGet("{id}/permissions")]
-        public async Task<IActionResult> GetPermissions(string id)
+        public async Task<IActionResult> GetPermissions(string id, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
 
-            var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+            var umaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
             if (umaResource == null)
             {
                 return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
@@ -232,14 +250,14 @@ namespace SimpleIdServer.Uma.Api
         }
 
         [HttpDelete("{id}/permissions")]
-        public async Task<IActionResult> DeletePermissions(string id)
+        public async Task<IActionResult> DeletePermissions(string id, CancellationToken cancellationToken)
         {
-            if (!await IsPATAuthorized())
+            if (!await IsPATAuthorized(cancellationToken))
             {
                 return new UnauthorizedResult();
             }
 
-            var umaResource = await _umaResourceQueryRepository.FindByIdentifier(id);
+            var umaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
             if (umaResource == null)
             {
                 return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
@@ -249,12 +267,12 @@ namespace SimpleIdServer.Uma.Api
             return new NoContentResult();
         }
 
-        private async Task<IActionResult> InternalSearch(string subject = null)
+        private async Task<IActionResult> InternalSearch(CancellationToken cancellationToken, string subject = null)
         {
             var searchUMAResourceParameter = new SearchUMAResourceParameter();
             EnrichSearchRequestParameter(searchUMAResourceParameter);
             searchUMAResourceParameter.Subject = subject;
-            var searchResult = await _umaResourceQueryRepository.Find(searchUMAResourceParameter);
+            var searchResult = await _umaResourceRepository.Find(searchUMAResourceParameter, cancellationToken);
             var result = new JObject
             {
                 { "totalResults", searchResult.TotalResults },

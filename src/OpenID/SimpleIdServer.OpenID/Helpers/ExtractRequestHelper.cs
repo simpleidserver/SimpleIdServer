@@ -29,7 +29,7 @@ namespace SimpleIdServer.OpenID.Helpers
             _requestObjectValidator = requestObjectValidator;
         }
 
-        public async Task<JObject> Extract(string issuerName, JObject jObj, OAuthClient oauthClient)
+        public async Task<JObject> Extract(string issuerName, JObject jObj, BaseClient oauthClient)
         {
             var context = new HandlerContext(new HandlerContextRequest(issuerName, null, jObj), new HandlerContextResponse());
             context.SetClient(oauthClient);

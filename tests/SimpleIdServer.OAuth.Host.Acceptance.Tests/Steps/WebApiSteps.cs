@@ -48,7 +48,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
         public async Task WhenAddUserConsent(string user, string scope, string clientId)
         {
-            var repository = (IOAuthUserQueryRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserQueryRepository));
+            var repository = (IOAuthUserRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository));
             var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
             oauthUser.Consents.Add(new OAuthConsent
             {
@@ -60,11 +60,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("add JSON web key to Authorization Server and store into '(.*)'")]
         public async Task WhenAddJsonWebKey(string name, Table table)
         {
-            var repository = (IJsonWebKeyCommandRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyCommandRepository));
+            var repository = (IJsonWebKeyRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyRepository));
             var jwks = ExtractJsonWebKeys(table);
             foreach (var jwk in jwks)
             {
-                repository.Add(jwk);
+                repository.Add(jwk, CancellationToken.None).Wait();
             }
 
             await repository.SaveChanges(CancellationToken.None);

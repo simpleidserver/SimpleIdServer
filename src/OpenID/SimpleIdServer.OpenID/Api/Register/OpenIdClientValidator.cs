@@ -37,14 +37,14 @@ namespace SimpleIdServer.OpenID.Api.Register
             IEnumerable<ISignHandler> signHandlers, 
             IEnumerable<ICEKHandler> cekHandlers, 
             IEnumerable<IEncHandler> encHandlers, 
-            IOAuthScopeQueryRepository oauthScopeQueryRepository,
-            IOptions<OpenIDHostOptions> openIDHostOptions) : base(responseTypeHandlers, grantTypeHandlers, oAuthClientAuthenticationHandlers, signHandlers, cekHandlers, encHandlers, oauthScopeQueryRepository)
+            IOAuthScopeRepository oauthScopeRepository,
+            IOptions<OpenIDHostOptions> openIDHostOptions) : base(responseTypeHandlers, grantTypeHandlers, oAuthClientAuthenticationHandlers, signHandlers, cekHandlers, encHandlers, oauthScopeRepository)
         {
             _subjectTypeBuilders = subjectTypeBuilders;
             _openIDHostOptions = openIDHostOptions.Value;
         }
 
-        public override async Task Validate(OAuthClient client, CancellationToken cancellationToken)
+        public override async Task Validate(BaseClient client, CancellationToken cancellationToken)
         {
             var openidClient = client as OpenIdClient;
             if (!string.IsNullOrWhiteSpace(openidClient.ApplicationType) && openidClient.ApplicationType != "web" && openidClient.ApplicationType != "native")
@@ -95,7 +95,7 @@ namespace SimpleIdServer.OpenID.Api.Register
             await base.Validate(client, cancellationToken);
         }
 
-        protected override void CheckRedirectUrl(OAuthClient client, string redirectUrl)
+        protected override void CheckRedirectUrl(BaseClient client, string redirectUrl)
         {
             var openidClient = client as OpenIdClient;
             if (!Uri.IsWellFormedUriString(redirectUrl, UriKind.Absolute))

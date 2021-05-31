@@ -9,6 +9,6 @@ namespace SimpleIdServer.OAuth.Authenticate
     public interface IOAuthClientAuthenticationHandler
     {
         string AuthMethod { get; }
-        Task<bool> Handle(AuthenticateInstruction authenticateInstruction, OAuthClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task<bool> Handle(AuthenticateInstruction authenticateInstruction, BaseClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
     }
 }

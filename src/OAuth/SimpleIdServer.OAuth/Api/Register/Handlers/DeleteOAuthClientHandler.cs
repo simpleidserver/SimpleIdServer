@@ -18,25 +18,21 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
     public class DeleteOAuthClientHandler : BaseOAuthClientHandler, IDeleteOAuthClientHandler
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly ITokenQueryRepository _tokenQueryRepository;
-        private readonly IOAuthUserCommandRepository _oauthUserCommandRepository;
+        private readonly ITokenRepository _tokenRepository;
 
         public DeleteOAuthClientHandler(IGrantedTokenHelper grantedTokenHelper,
-            ITokenQueryRepository tokenQueryRepository,
-            IOAuthUserCommandRepository oAuthUserCommandRepository,
-            IOAuthClientQueryRepository oauthClientQueryRepository, 
-            IOAuthClientCommandRepository oAuthClientCommandRepository,
-            ILogger<BaseOAuthClientHandler> logger) : base(oauthClientQueryRepository, oAuthClientCommandRepository, logger)
+            ITokenRepository tokenQueryRepository,
+            IOAuthClientRepository oAuthClientRepository,
+            ILogger<BaseOAuthClientHandler> logger) : base(oAuthClientRepository, logger)
         {
             _grantedTokenHelper = grantedTokenHelper;
-            _tokenQueryRepository = tokenQueryRepository;
-            _oauthUserCommandRepository = oAuthUserCommandRepository;
+            _tokenRepository = tokenQueryRepository;
         }
 
         public virtual async Task Handle(string clientId, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var oauthClient = await GetClient(clientId, handlerContext, cancellationToken);
-            var searchResult = await _tokenQueryRepository.Find(new SearchTokenParameter
+            var searchResult = await _tokenRepository.Find(new SearchTokenParameter
             {
                 ClientId = clientId
             }, cancellationToken);
@@ -46,9 +42,8 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
                 Logger.LogInformation($"the tokens '{string.Join(",", searchResult.Content.Select(_ => _.Id))}' have been revoked");
             }
 
-            await _oauthUserCommandRepository.RemoveAllConsents(clientId, cancellationToken);
             Logger.LogInformation($"the client '{clientId}' has been removed");
-            await OAuthClientCommandRepository.Delete(oauthClient, cancellationToken);
+            await OAuthClientRepository.Delete(oauthClient, cancellationToken);
         }
     }
 }

@@ -25,10 +25,10 @@ namespace SimpleIdServer.OAuth.Api.Configuration
         [HttpGet]
         public virtual async Task<IActionResult> Get(CancellationToken token)
         {
-            return new OkObjectResult(await Build());
+            return new OkObjectResult(await Build(token));
         }
 
-        protected async Task<JObject> Build()
+        protected async Task<JObject> Build(CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var jObj = new JObject
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
                 { OAuthConfigurationNames.RevocationEndpoint, $"{issuer}/{Constants.EndPoints.Token}/revoke" },
                 { OAuthConfigurationNames.JwksUri, $"{issuer}/{Constants.EndPoints.Jwks}" }
             };
-            await _configurationRequestHandler.Enrich(jObj, issuer);
+            await _configurationRequestHandler.Enrich(jObj, issuer, cancellationToken);
             return jObj;
         }
     }

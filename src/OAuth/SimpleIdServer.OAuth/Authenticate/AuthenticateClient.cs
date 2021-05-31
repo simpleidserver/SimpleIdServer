@@ -15,17 +15,17 @@ namespace SimpleIdServer.OAuth.Authenticate
 {
     public interface IAuthenticateClient
     {
-        Task<OAuthClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task<BaseClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
     }
 
     public class AuthenticateClient : IAuthenticateClient
     {
         private readonly IJwsGenerator _jwsGenerator;
         private readonly IJwtParser _jwtParser;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _handlers;
 
-        public AuthenticateClient(IJwsGenerator jwsGenerator, IJwtParser jwtParser, IOAuthClientQueryRepository oauthClientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers)
+        public AuthenticateClient(IJwsGenerator jwsGenerator, IJwtParser jwtParser, IOAuthClientRepository oauthClientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers)
         {
             _jwsGenerator = jwsGenerator;
             _jwtParser = jwtParser;
@@ -33,14 +33,14 @@ namespace SimpleIdServer.OAuth.Authenticate
             _handlers = handlers;
         }
 
-        public async Task<OAuthClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<BaseClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
                 throw new ArgumentNullException(nameof(authenticateInstruction));
             }
 
-            OAuthClient client = null;
+            BaseClient client = null;
             var clientId = TryGettingClientId(authenticateInstruction);
             if (!string.IsNullOrWhiteSpace(clientId))
             {

@@ -14,30 +14,30 @@ namespace SimpleIdServer.OpenBankingApi.Accounts.Queries.Handlers
 {
     public class GetAccountQueryHandler : IRequestHandler<GetAccountQuery, GetAccountsResult>
     {
-        private readonly IAccountRepository _accountQueryRepository;
-        private readonly ITokenQueryRepository _tokenQueryRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly ILogger<GetAccountQueryHandler> _logger;
 
         public GetAccountQueryHandler(
-            IAccountRepository accountQueryRepository,
-            ITokenQueryRepository tokenQueryRepository,
+            IAccountRepository accountRepository,
+            ITokenRepository tokenRepository,
             ILogger<GetAccountQueryHandler> logger)
         {
-            _accountQueryRepository = accountQueryRepository;
-            _tokenQueryRepository = tokenQueryRepository;
+            _accountRepository = accountRepository;
+            _tokenRepository = tokenRepository;
             _logger = logger;
         }
 
         public async Task<GetAccountsResult> Handle(GetAccountQuery request, CancellationToken cancellationToken)
         {
-            var token = await _tokenQueryRepository.Get(request.Token, cancellationToken);
+            var token = await _tokenRepository.Get(request.Token, cancellationToken);
             if (token == null)
             {
                 _logger.LogError($"Access token '{request.Token}' is invalid or has been revoked");
                 throw new UnauthorizedException(string.Format(Global.AccessTokenInvalid, token));
             }
 
-            var account = await _accountQueryRepository.Get(request.AccountId, cancellationToken);
+            var account = await _accountRepository.Get(request.AccountId, cancellationToken);
             if (account == null)
             {
                 _logger.LogError($"the account '{request.AccountId}' doesn't exist");

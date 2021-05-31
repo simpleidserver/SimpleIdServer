@@ -26,11 +26,11 @@ namespace SimpleIdServer.Uma.Domains
 
         public string TicketId { get; set; }
         public string Requester { get; set; }
-        public UMAResource Resource { get; set; }
         public string Owner { get; set; }
         public ICollection<string> Scopes { get; set; }
         public DateTime CreateDateTime { get; set; }
         public UMAPendingRequestStatus Status { get; set; }
+        public UMAResource Resource { get; set; }
 
         public void Confirm()
         {

@@ -19,18 +19,18 @@ namespace SimpleIdServer.OAuth.Jwt
     {
         bool IsJweToken(string jwe);
         bool IsJwsToken(string jws);
-        Task<string> Decrypt(string jwe);
+        Task<string> Decrypt(string jwe, CancellationToken cancellationToken);
         string Decrypt(string jwe, JsonWebKey jsonWebKey);
-        Task<string> DecryptWithPassword(string jwe, string password);
+        Task<string> DecryptWithPassword(string jwe, string password, CancellationToken cancellationToken);
         Task<string> Decrypt(string jwe, string clientId, CancellationToken cancellationToken);
         Task<string> Decrypt(string jwe, OAuthClient client);
         Task<string> Decrypt(string jwe, string clientId, string password, CancellationToken cancellationToken);
         JwsHeader ExtractJwsHeader(string jws);
         JweHeader ExtractJweHeader(string jwe);
         JwsPayload ExtractJwsPayload(string jws);
-        Task<JwsPayload> Unsign(string jws);
+        Task<JwsPayload> Unsign(string jws, CancellationToken cancellationToken);
         Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
-        Task<JwsPayload> Unsign(string jws, OAuthClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
+        Task<JwsPayload> Unsign(string jws, BaseClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
         JwsPayload Unsign(string jws, JsonWebKey jwk);
     }
 
@@ -40,15 +40,15 @@ namespace SimpleIdServer.OAuth.Jwt
         private readonly IJweGenerator _jweGenerator;
         private readonly IJwsGenerator _jwsGenerator;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IOAuthClientQueryRepository _oauthClientRepository;
-        private readonly IJsonWebKeyQueryRepository _jsonWebKeyRepository;
+        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
 
         public JwtParser(
             IJweGenerator jweGenerator,
             IJwsGenerator jwsGenerator,
             IHttpClientFactory httpClientFactory,
-            IOAuthClientQueryRepository oauthClientRepository,
-            IJsonWebKeyQueryRepository jsonWebKeyRepository)
+            IOAuthClientRepository oauthClientRepository,
+            IJsonWebKeyRepository jsonWebKeyRepository)
         {
             _jweGenerator = jweGenerator;
             _jwsGenerator = jwsGenerator;
@@ -69,7 +69,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jwsGenerator.IsValid(jws, out parts);
         }
 
-        public async Task<string> Decrypt(string jwe)
+        public async Task<string> Decrypt(string jwe, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(jwe))
             {
@@ -82,7 +82,7 @@ namespace SimpleIdServer.OAuth.Jwt
                 return string.Empty;
             }
 
-            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid);
+            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid, cancellationToken);
             if (jsonWebKey == null)
             {
                 return string.Empty;
@@ -96,7 +96,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jweGenerator.Decrypt(jwe, jsonWebKey);
         }
 
-        public async Task<string> DecryptWithPassword(string jwe, string password)
+        public async Task<string> DecryptWithPassword(string jwe, string password, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(jwe))
             {
@@ -109,7 +109,7 @@ namespace SimpleIdServer.OAuth.Jwt
                 return string.Empty;
             }
 
-            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid);
+            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid, cancellationToken);
             if (jsonWebKey == null)
             {
                 return string.Empty;
@@ -166,7 +166,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jwsGenerator.ExtractPayload(jws);
         }
 
-        public async Task<JwsPayload> Unsign(string jws)
+        public async Task<JwsPayload> Unsign(string jws, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(jws))
             {
@@ -179,7 +179,7 @@ namespace SimpleIdServer.OAuth.Jwt
                 return null;
             }
 
-            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid);
+            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid, cancellationToken);
             return _jwsGenerator.ExtractPayload(jws, jsonWebKey);
         }
 
@@ -194,7 +194,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return await Unsign(jws, client, errorCode);
         }
 
-        public async Task<JwsPayload> Unsign(string jws, OAuthClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
+        public async Task<JwsPayload> Unsign(string jws, BaseClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
             var protectedHeader = _jwsGenerator.ExtractHeader(jws);
             if (protectedHeader == null)
@@ -232,7 +232,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return await GetJsonWebKeyToDecrypt(jwe, client);
         }
 
-        private Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, OAuthClient client)
+        private Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, BaseClient client)
         {
             var protectedHeader = _jweGenerator.ExtractHeader(jwe);
             if (protectedHeader == null)
@@ -243,7 +243,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return GetJsonWebKeyFromClient(client, protectedHeader.Kid);
         }
 
-        private async Task<JsonWebKey> GetJsonWebKeyFromClient(OAuthClient client, string kid)
+        private async Task<JsonWebKey> GetJsonWebKeyFromClient(BaseClient client, string kid)
         {
             var jsonWebKeys = await client.ResolveJsonWebKeys(_httpClientFactory);
             return jsonWebKeys.FirstOrDefault(j => j.Kid == kid);
