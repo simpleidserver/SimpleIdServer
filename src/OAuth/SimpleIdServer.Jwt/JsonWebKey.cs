@@ -127,7 +127,7 @@ namespace SimpleIdServer.Jwt
         public JsonWebKey()
         {
             Content = new Dictionary<string, string>();
-            KeyOps = new List<KeyOperations>();
+            KeyOperationLst = new List<JsonWebKeyKeyOperation>();
         }
 
         public JsonWebKey(string kid) : this()
@@ -138,7 +138,10 @@ namespace SimpleIdServer.Jwt
         public JsonWebKey(string kid, Usages use, IEnumerable<KeyOperations> keyOperations) : this(kid)
         {
             Use = use;
-            KeyOps = keyOperations;
+            KeyOperationLst = keyOperations.Select(s => new JsonWebKeyKeyOperation
+            {
+                Operation = s
+            }).ToList();
         }
 
         /// <summary>
@@ -153,21 +156,14 @@ namespace SimpleIdServer.Jwt
         /// <summary>
         /// Gets or sets the operation(s) that the key is intended to be user for.
         /// </summary>
-        public IEnumerable<KeyOperations> KeyOps { get; set; }
-        public ICollection<JsonWebKeyKeyOperation> KeyOperationLst
+        public IEnumerable<KeyOperations> KeyOps
         {
             get
             {
-                return KeyOps.Select(k => new JsonWebKeyKeyOperation
-                {
-                    Operation = k
-                }).ToList();
-            }
-            set
-            {
-                KeyOps = value.Select(s => s.Operation);
+                return KeyOperationLst.Select(s => s.Operation);
             }
         }
+        public ICollection<JsonWebKeyKeyOperation> KeyOperationLst { get; set; }
         /// <summary>
         /// Gets or sets the algorithm intended for use with the key
         /// </summary>
@@ -194,7 +190,7 @@ namespace SimpleIdServer.Jwt
             return new JsonWebKey
             {
                 Alg = Alg,
-                KeyOps = KeyOps.ToArray(),
+                KeyOperationLst = KeyOperationLst.Select(s => (JsonWebKeyKeyOperation)s.Clone()).ToList(),
                 Use = Use,
                 Kid = Kid,
                 Kty = Kty,
@@ -312,7 +308,10 @@ namespace SimpleIdServer.Jwt
                         }
                     }
 
-                    result.KeyOps = kos;
+                    result.KeyOperationLst = kos.Select(s => new JsonWebKeyKeyOperation
+                    {
+                        Operation = s
+                    }).ToList();
                 }
             }
 
@@ -357,7 +356,10 @@ namespace SimpleIdServer.Jwt
             {
                 Kid = Guid.NewGuid().ToString(),
                 Alg = Alg,
-                KeyOps = KeyOps,
+                KeyOperationLst = KeyOperationLst.Select(k => new JsonWebKeyKeyOperation
+                {
+                    Operation = k.Operation
+                }).ToList(),
                 Kty = Kty,
                 Use = Use,
                 Content = new Dictionary<string, string>()

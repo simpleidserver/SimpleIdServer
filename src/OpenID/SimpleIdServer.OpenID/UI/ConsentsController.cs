@@ -29,6 +29,7 @@ namespace SimpleIdServer.OpenID.UI
     {
         private readonly IOAuthUserRepository _oauthUserRepository;
         private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IOAuthScopeRepository _oauthScopeRepository;
         private readonly IUserConsentFetcher _userConsentFetcher;
         private readonly IDataProtector _dataProtector;
         private readonly IResponseModeHandler _responseModeHandler;
@@ -37,7 +38,8 @@ namespace SimpleIdServer.OpenID.UI
 
         public ConsentsController(
             IOAuthUserRepository oauthUserRepository, 
-            IOAuthClientRepository oauthClientRepository, 
+            IOAuthClientRepository oauthClientRepository,
+            IOAuthScopeRepository oauthScopeRepository,
             IUserConsentFetcher userConsentFetcher, 
             IDataProtectionProvider dataProtectionProvider, 
             IResponseModeHandler responseModeHandler,
@@ -46,6 +48,7 @@ namespace SimpleIdServer.OpenID.UI
         {
             _oauthUserRepository = oauthUserRepository;
             _oauthClientRepository = oauthClientRepository;
+            _oauthScopeRepository = oauthScopeRepository;
             _userConsentFetcher = userConsentFetcher;
             _responseModeHandler = responseModeHandler;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
@@ -163,6 +166,8 @@ namespace SimpleIdServer.OpenID.UI
                 if (consent == null)
                 {
                     consent = _userConsentFetcher.BuildFromAuthorizationRequest(query);
+                    var scopes = await _oauthScopeRepository.FindOAuthScopesByNames(consent.Scopes.Select(s => s.Name), token);
+                    consent.Scopes = scopes;
                     user.Consents.Add(consent);
                     await _oauthUserRepository.Update(user, token);
                     await _oauthUserRepository.SaveChanges(token);

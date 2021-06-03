@@ -224,7 +224,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             }
         };
 
-        public static List<OpenIdClient> GetClients(JsonWebKey firstMtlsClientJsonWebKey, JsonWebKey secondMtlsClientJsonWebKey)
+        public static List<OpenIdClient> GetClients(JsonWebKey firstMtlsClientJsonWebKey, JsonWebKey secondMtlsClientJsonWebKey, JsonWebKey jsonWebKey)
         {
             return new List<OpenIdClient>
             {
@@ -441,6 +441,10 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         "token",
                         "id_token",
                         "code"
+                    },
+                    JsonWebKeys = new List<JsonWebKey>
+                    {
+                        jsonWebKey
                     }
                 },
                 new OpenIdClient

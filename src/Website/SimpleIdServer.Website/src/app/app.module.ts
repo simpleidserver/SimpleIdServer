@@ -10,7 +10,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { OAuthModule } from 'angular-oauth2-oidc';
+import { OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 import { HomeModule } from './home/home.module';
@@ -56,7 +56,15 @@ export function createTranslateLoader(http: HttpClient) {
   declarations: [
     AppComponent
   ],
-  providers: [ApplicationService, OAuthScopeService, MetadataService],
+  providers: [
+    ApplicationService,
+    OAuthScopeService,
+    MetadataService,
+    {
+      provide: OAuthStorage,
+      useValue: sessionStorage
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

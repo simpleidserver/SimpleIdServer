@@ -23,14 +23,15 @@ namespace SimpleIdServer.OpenID.EF.Repositories
             return _dbContext.JsonWebKeys.FirstOrDefaultAsync(j => j.Kid == kid, cancellationToken);
         }
 
-        public Task<List<JsonWebKey>> FindJsonWebKeys(Usages usage, string alg, KeyOperations[] operations, CancellationToken cancellationToken)
+        public async Task<List<JsonWebKey>> FindJsonWebKeys(Usages usage, string alg, KeyOperations[] operations, CancellationToken cancellationToken)
         {
             var currentDateTime = DateTime.UtcNow;
             int nbOperations = operations.Count();
-            return GetJsonWebKeys().Where(j =>
+            var result = await GetJsonWebKeys().Where(j =>
                 (j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime) &&
                 (j.Use == usage && j.Alg == alg && j.KeyOperationLst.Where(k => operations.Contains(k.Operation)).Count() == nbOperations)
             ).ToListAsync(cancellationToken);
+            return result;
         }
 
         public Task<List<JsonWebKey>> GetActiveJsonWebKeys(CancellationToken cancellationToken)

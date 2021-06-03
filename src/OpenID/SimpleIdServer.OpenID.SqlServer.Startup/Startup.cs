@@ -139,8 +139,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     context.OAuthScopes.AddRange(DefaultConfiguration.Scopes);
                     context.Users.AddRange(DefaultConfiguration.Users);
                     context.Acrs.AddRange(DefaultConfiguration.AcrLst);
-                    context.OpenIdClients.AddRange(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey));
-                    context.JsonWebKeys.Add(sigJsonWebKey);
+                    context.OpenIdClients.AddRange(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey, sigJsonWebKey));
+                    // context.JsonWebKeys.Add(sigJsonWebKey);
                     context.SaveChanges();
                 }
             }

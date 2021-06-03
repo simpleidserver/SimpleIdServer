@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static SimpleIdServerOpenIDBuilder AddOpenIDEF(this SimpleIdServerOpenIDBuilder builder, Action<DbContextOptionsBuilder> optionsAction = null)
         {
             var services = builder.ServiceCollection;
-            services.AddDbContext<OpenIdDBContext>(optionsAction, ServiceLifetime.Transient);
+            services.AddDbContext<OpenIdDBContext>(optionsAction);
             services.AddTransient<IAuthenticationContextClassReferenceRepository, AuthenticationContextClassReferenceRepository>();
             services.AddTransient<IBCAuthorizeRepository, BCAuthorizeRepository>();
             services.AddTransient<IJsonWebKeyRepository, JsonWebKeyRepository>();

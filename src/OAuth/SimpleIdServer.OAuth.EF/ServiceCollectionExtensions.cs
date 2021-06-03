@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static SimpleIdServerOAuthBuilder AdOAuthEF(this SimpleIdServerOAuthBuilder builder, Action<DbContextOptionsBuilder> optionsAction = null)
         {
             var services = builder.Services;
-            services.AddDbContext<OAuthDBContext>(optionsAction, ServiceLifetime.Transient);
+            services.AddDbContext<OAuthDBContext>(optionsAction);
             services.AddTransient<IJsonWebKeyRepository, JsonWebKeyRepository>();
             services.AddTransient<IOAuthClientRepository, OAuthClientRepository>();
             services.AddTransient<IOAuthScopeRepository, OAuthScopeRepository>();
