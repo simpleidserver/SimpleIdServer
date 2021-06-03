@@ -140,27 +140,34 @@ namespace SimpleIdServer.Scim.Helpers
             var result = new List<SCIMRepresentationAttribute>();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                foreach(var jsonProperty in jArr)
+                if (!jArr.Any())
                 {
-                    var rec = jsonProperty as JObject;
-                    if (rec == null)
+                    result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute));
+                }
+                else
+                {
+                    foreach (var jsonProperty in jArr)
                     {
-                        throw new SCIMSchemaViolatedException(string.Format(Global.NotValidJSON, jsonProperty.ToString()));
-                    }
+                        var rec = jsonProperty as JObject;
+                        if (rec == null)
+                        {
+                            throw new SCIMSchemaViolatedException(string.Format(Global.NotValidJSON, jsonProperty.ToString()));
+                        }
 
-                    CheckRequiredAttributes(schema, schemaAttribute.SubAttributes, rec);
-                    var resolutionResult = Resolve(rec, schema, schemaAttribute.SubAttributes);
-                    var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
-                    {
-                        Values = BuildRepresentationAttributes(resolutionResult, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)
-                    };
-                    
-                    foreach (var subAttribute in record.Values)
-                    {
-                        subAttribute.Parent = record;
+                        CheckRequiredAttributes(schema, schemaAttribute.SubAttributes, rec);
+                        var resolutionResult = Resolve(rec, schema, schemaAttribute.SubAttributes);
+                        var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
+                        {
+                            Values = BuildRepresentationAttributes(resolutionResult, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)
+                        };
+
+                        foreach (var subAttribute in record.Values)
+                        {
+                            subAttribute.Parent = record;
+                        }
+
+                        result.Add(record);
                     }
-                    
-                    result.Add(record);
                 }
             }
             else

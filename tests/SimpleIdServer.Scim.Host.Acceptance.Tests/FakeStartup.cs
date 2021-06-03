@@ -31,6 +31,11 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddStringAttribute("duplicateAttr")
                .AddIntAttribute("nbPoints")
                .AddBinaryAttribute("eidCertificate")
+               .AddComplexAttribute("emails", opt =>
+               {
+                   opt.AddStringAttribute("value");
+                   opt.AddStringAttribute("display");
+               }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddStringAttribute("immutable", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE)
                .AddComplexAttribute("groups", opt =>
                {
