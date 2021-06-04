@@ -26,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenRepository, TokenRepository>();
             services.AddTransient<IUMAPendingRequestRepository, UMAPendingRequestRepository>();
             services.AddTransient<IUMAResourceRepository, UMAResourceRepository>();
+            services.AddTransient<ITranslationRepository, TranslationRepository>();
             return builder;
         }
     }

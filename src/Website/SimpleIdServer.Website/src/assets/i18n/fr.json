@@ -1,6 +1,7 @@
 {
   "close": "Fermer",
   "save": "Sauvegarder",
+  "seconds": "Secondes",
   "languages": {
     "fr": "Français",
     "en": "Anglais"
@@ -13,9 +14,24 @@
     "languages": "Langues"
   },
   "applications": {
+    "tokenExpirationTime": "Expiration en secondes des tokens (IdToken & AccessToken)",
+    "refreshTokenExpirationTime": "Expiration en secondes du refresh token",
+    "grantTypes": "Grant Types",
+    "advancedSettings": "Paramètres avancées",
     "list": "Applications",
+    "kind": "Type d'application",
+    "badCallbackUri": "L'URL de callback doit commencer par https",
+    "callbackUrisDescription": "Les URLS de redirection doivent commencer par https",
+    "logoutUris": "Les URLs de Logout",
+    "logoutUriDescription": "",
+    "newLogoutUri": "Nouvelle URL de Logout",
+    "uris": "Les URLS de l'application",
+    "token": "Token",
+    "newCallbackUri": "Nouvelle URL Callback",
+    "callbackUris": "Les URLS de callback",
     "basicinfo": "Informations de base",
     "clientId": "Identifiant du client",
+    "tokenAuthMethod": "Méthode d'authentification du endpoint Token",
     "clientName": "Nom",
     "clientSecret": "Secret du client",
     "clientLogoUri": "Logo de l'application",
@@ -28,6 +44,23 @@
     "actions": {
       "copy": "Copier",
       "reveal": "Afficher le secret du client"
+    },
+    "tokenAuthMethods": {
+      "privateKeyJwt": "Private Key Jwt",
+      "clientSecretBasic": "Client Secret Basic",
+      "clientSecretPost": "Client Secret Post",
+      "clientSecretJwt": "Client Secret Jwt",
+      "tlsClientAuth": "TLS Client Authentication",
+      "selfSignedTlsClientAuth": "Self Signed TLS Client Authentication",
+      "pkce": "PKCE"
+    },
+    "grantType": {
+      "client_credentials": "Client Credentials",
+      "refresh_token": "Refresh Token",
+      "password": "Password",
+      "authorization_code": "Authorization Code",
+      "urn:openid:params:grant-type:ciba": "CIBA",
+      "implicit": "Implicit"
     }
   }
 }

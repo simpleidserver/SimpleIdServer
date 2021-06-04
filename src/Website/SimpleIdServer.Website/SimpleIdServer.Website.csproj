@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\app\applications\view\edit-translation.component.ts" />
+    <TypeScriptCompile Include="src\app\pipes\translatemetadata.ts" />
     <TypeScriptCompile Include="src\environments\environments.ts" />
   </ItemGroup>
 </Project>

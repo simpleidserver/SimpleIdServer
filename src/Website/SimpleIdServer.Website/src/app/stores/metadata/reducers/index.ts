@@ -6,8 +6,16 @@ export interface LanguagesState {
   Languages: Array<Language>;
 }
 
+export interface WellKnownConfigurationState {
+  Configuration: any;
+}
+
 export const initialLanguagesState: LanguagesState = {
   Languages: []
+};
+
+export const initialWellKnownConfiguration: WellKnownConfigurationState = {
+  Configuration: {}
 };
 
 const languagesReducer = createReducer(
@@ -20,6 +28,20 @@ const languagesReducer = createReducer(
   })
 );
 
+const wellKnownConfigurationReducer = createReducer(
+  initialWellKnownConfiguration,
+  on(fromActions.completeGetWellKnownConfiguration, (state, { content }) => {
+    return {
+      ...state,
+      Configuration: { ...content }
+    };
+  })
+);
+
 export function getLanguagesReducer(state: LanguagesState | undefined, action: Action) {
   return languagesReducer(state, action);
+}
+
+export function getWellKnownConfiguration(state: WellKnownConfigurationState | undefined, action: Action) {
+  return wellKnownConfigurationReducer(state, action);
 }

@@ -5,6 +5,9 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.Metadata;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Metadata
@@ -13,10 +16,24 @@ namespace SimpleIdServer.OpenID.Api.Metadata
     public class MetadataController: Controller
     {
         private readonly OAuthHostOptions _options;
+        private readonly IMetadataResultBuilder _metadataResultBuilder;
 
-        public MetadataController(IOptions<OAuthHostOptions> options)
+        public MetadataController(
+            IOptions<OAuthHostOptions> options,
+            IMetadataResultBuilder metadataResultBuilder)
         {
             _options = options.Value;
+            _metadataResultBuilder = metadataResultBuilder;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMetadata(CancellationToken cancellationToken)
+        {
+            var name = Thread.CurrentThread.CurrentCulture.Name;
+            var result = await _metadataResultBuilder
+                .AddTranslatedEnum<ApplicationKinds>("applicationKind")
+                .Build(name, cancellationToken);
+            return new OkObjectResult(result);
         }
 
         [HttpGet("languages")]
@@ -33,12 +50,6 @@ namespace SimpleIdServer.OpenID.Api.Metadata
             }
 
             return new OkObjectResult(result);
-        }
-
-        [HttpGet("applicationtypes")]
-        public async Task<IActionResult> GetApplicationTypes()
-        {
-            return null;
         }
     }
 }

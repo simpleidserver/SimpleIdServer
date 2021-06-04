@@ -11,6 +11,7 @@ export class Application {
     this.RedirectUris = [];
     this.GrantTypes = [];
     this.ResponseTypes = [];
+    this.PostLogoutRedirectUris = [];
   }
 
   ClientId: string;
@@ -27,6 +28,7 @@ export class Application {
   TokenExpirationTimeInSeconds: number;
   Scopes: Array<string>;
   RedirectUris: Array<string>;
+  PostLogoutRedirectUris: Array<string>;
   GrantTypes: Array<string>;
   ClientSecret: string;
   ResponseTypes: Array<string>;
@@ -67,6 +69,10 @@ export class Application {
 
     if (json["redirect_uri"]) {
       result.RedirectUris = json["redirect_uris"];
+    }
+
+    if (json["post_logout_redirect_uris"]) {
+      result.PostLogoutRedirectUris = json["post_logout_redirect_uris"];
     }
 
     if (json["grant_types"]) {

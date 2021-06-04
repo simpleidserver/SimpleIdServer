@@ -4,6 +4,8 @@ import { TranslateEnumPipe } from '@app/pipes/translateenum.pipe';
 import { MaterialModule } from '@app/shared/material.module';
 import { SharedModule } from '@app/shared/shared.module';
 import { AvatarModule } from 'ngx-avatar';
+import { MetadatadataSelector } from '@app/common/components/metadataselector/metadataselector.component';
+import { TranslateMetadataPipe } from '../pipes/translatemetadata';
 import { ApplicationsRoutes } from './applications.routes';
 import { ListApplicationsComponent } from './list/list.component';
 import { EditTranslationComponent } from './view/edit-translation.component';
@@ -21,7 +23,9 @@ import { ViewApplicationsComponent } from './view/view.component';
     ListApplicationsComponent,
     ViewApplicationsComponent,
     EditTranslationComponent,
-    TranslateEnumPipe
+    MetadatadataSelector,
+    TranslateEnumPipe,
+    TranslateMetadataPipe
   ]
 })
 

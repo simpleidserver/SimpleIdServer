@@ -23,4 +23,11 @@ export class MetadataService {
       return result;
     }));
   }
+
+  getWellKnownConfiguration(): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    let targetUrl = environment.openidUrl + "/.well-known/openid-configuration";
+    return this.http.get(targetUrl)
+  }
 }

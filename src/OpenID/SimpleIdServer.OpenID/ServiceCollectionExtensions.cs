@@ -31,6 +31,7 @@ using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Infrastructures.Jobs;
 using SimpleIdServer.OpenID.Infrastructures.Locks;
 using SimpleIdServer.OpenID.Jobs;
+using SimpleIdServer.OpenID.Metadata;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.Persistence.InMemory;
@@ -58,6 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSIDOAuth();
             services
                 .AddUI()
+                .AddMetadata()
                 .AddOpenIdConfiguration()
                 .AddOpenIDStore()
                 .AddOpenIDAuthorizationApi()
@@ -134,6 +136,12 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddUI(this IServiceCollection services)
         {
             services.AddTransient<ISessionManager, SessionManager>();
+            return services;
+        }
+
+        private static IServiceCollection AddMetadata(this IServiceCollection services)
+        {
+            services.AddTransient<IMetadataResultBuilder, MetadataResultBuilder>();
             return services;
         }
 

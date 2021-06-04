@@ -20,6 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOAuthScopeRepository, OAuthScopeRepository>();
             services.AddTransient<IOAuthUserRepository, OAuthUserRepository>();
             services.AddTransient<ITokenRepository, TokenRepository>();
+            services.AddTransient<ITranslationRepository, TranslationRepository>();
             return builder;
         }
     }

@@ -13,6 +13,7 @@ namespace SimpleIdServer.OpenID.Middlewares
 {
     public class UILocalesMiddleware
     {
+        private const string AcceptLanguage = "Accept-Language";
         private readonly RequestDelegate _next;
 
         public UILocalesMiddleware(RequestDelegate next)
@@ -26,14 +27,18 @@ namespace SimpleIdServer.OpenID.Middlewares
             if (context.Request.Query.ContainsKey(AuthorizationRequestParameters.UILocales) && context.Request.Query[AuthorizationRequestParameters.UILocales].Count == 1)
             {
                 var uiLocales = context.Request.Query[AuthorizationRequestParameters.UILocales][0];
-                if (!string.IsNullOrWhiteSpace(uiLocales))
+                if (await UpdateLanguage(uiLocales, opts.Value, context))
                 {
-                    var splittedUILocales = uiLocales.Split(' ');
-                    if (TranslationHelper.TrySwitchCulture(splittedUILocales, opts.Value.SupportedUICultures))
-                    {
-                        await _next(context);
-                        return;
-                    }
+                    return;
+                }
+            }
+
+            if (context.Request.Headers.ContainsKey(AcceptLanguage))
+            {
+                var acceptLanguages = context.Request.Headers[AcceptLanguage].FirstOrDefault();
+                if (await UpdateLanguage(acceptLanguages, opts.Value, context))
+                {
+                    return;
                 }
             }
 
@@ -50,6 +55,23 @@ namespace SimpleIdServer.OpenID.Middlewares
 
             TranslationHelper.SwitchCulture(opts.Value.DefaultCulture);
             await _next(context);
+        }
+
+        private async Task<bool> UpdateLanguage(string languages, OAuthHostOptions opts, HttpContext context)
+        {
+            if (string.IsNullOrWhiteSpace(languages))
+            {
+                return false;
+            }
+
+            var splittedUILocales = languages.Split(' ');
+            if (TranslationHelper.TrySwitchCulture(splittedUILocales, opts.SupportedUICultures))
+            {
+                await _next(context);
+                return true;
+            }
+
+            return false;
         }
     }
 }

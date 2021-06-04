@@ -29,6 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenRepository, TokenRepository>();
             services.AddTransient<IAccountAccessConsentRepository, AccountAccessConsentRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<ITranslationRepository, TranslationRepository>();
             return builder;
         }
     }

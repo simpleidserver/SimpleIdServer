@@ -1,6 +1,7 @@
 {
   "close": "Close",
   "save": "Save",
+  "seconds": "Secondes",
   "languages": {
     "fr": "French",
     "en": "English"
@@ -13,8 +14,23 @@
     "languages": "Languages"
   },
   "applications": {
+    "tokenExpirationTime": "Expiration time in seconds (IdToken & AccessToken)",
+    "refreshTokenExpirationTime": "Expiration time in seconds of the refresh token",
+    "grantTypes": "Grant Types",
+    "advancedSettings": "Advanced Settings",
     "list": "Applications",
+    "kind": "Application Type",
+    "badCallbackUri": "Callback URI must start with https",
+    "callbackUrisDescription": "Callback URIS must start with https",
+    "logoutUris": "Allowed Logout URLs",
+    "logoutUriDescription": "",
+    "token": "Token",
+    "newLogoutUri": "New Logout URI",
+    "uris": "Application URIs",
+    "newCallbackUri": "New Callback URI",
+    "callbackUris": "Callback URIs",
     "basicinfo": "Basic information",
+    "tokenAuthMethod": "Token Endpoint Authentication Method",
     "clientId": "Client ID",
     "clientName": "Name",
     "clientSecret": "Client Secret",
@@ -28,6 +44,23 @@
     "actions": {
       "copy": "Copy",
       "reveal": "Reveal Client Secret"
+    },
+    "tokenAuthMethods": {
+      "privateKeyJwt": "Private Key Jwt",
+      "clientSecretBasic": "Client Secret Basic",
+      "clientSecretPost": "Client Secret Post",
+      "clientSecretJwt": "Client Secret Jwt",
+      "tlsClientAuth": "TLS Client Authentication",
+      "selfSignedTlsClientAuth": "Self Signed TLS Client Authentication",
+      "pkce": "PKCE"
+    },
+    "grantType": {
+      "client_credentials": "Client Credentials",
+      "refresh_token": "Refresh Token",
+      "password": "Password",
+      "authorization_code": "Authorization Code",
+      "urn:openid:params:grant-type:ciba": "CIBA",
+      "implicit": "Implicit"
     }
   }
 }

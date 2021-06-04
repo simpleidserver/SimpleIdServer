@@ -16,5 +16,6 @@ namespace SimpleIdServer.OpenID.EF
         public DbSet<Token> Tokens { get; set; }
         public DbSet<OAuthScope> OAuthScopes { get; set; }
         public DbSet<AuthenticationContextClassReference> Acrs { get; set; }
+        public DbSet<OAuthTranslation> OAuthTranslation { get; set; }
     }
 }

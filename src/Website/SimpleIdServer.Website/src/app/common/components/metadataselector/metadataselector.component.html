@@ -1,0 +1,6 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>{{ label }}</mat-label>
+  <mat-select [formControl]="formControl">
+    <mat-option *ngFor="let option of options" [value]="option.key">{{ option.value }}</mat-option>
+  </mat-select>
+</mat-form-field>

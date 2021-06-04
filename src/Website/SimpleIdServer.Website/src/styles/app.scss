@@ -42,6 +42,10 @@ body, h1 {
   position: relative;
 }
 
+.mat-form-field.no-bottom-padding .mat-form-field-wrapper {
+    padding-bottom: 0px !important;
+}
+
 /* Breadcrumb */
 .breadcrumb {
   padding: 20px 0px 20px 0px;
@@ -78,27 +82,28 @@ body, h1 {
 
 /* Image editor */
 .img-editor {
-    border: 1px solid;
-    border-radius: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+  margin-bottom: 1.34375em;
 }
 
 .img-editor > .img {
-    text-align: center;
-    border-bottom: 1px solid;
-    height: 150px;
+  text-align: center;
+  border-bottom: 1px solid;
+  height: 150px;
 }
 
 .img-editor > .img > img {
-    height: 150px;
+  height: 150px;
 }
 
 .img-editor .mat-form-field-wrapper {
-    padding: 0px !important;
-    margin: 0px !important;
+  padding: 0px !important;
+  margin: 0px !important;
 }
 
 .img-editor .mat-form-field-outline {
-    color: black;
+  color: black;
 }
 
 .img-editor .mat-form-field .mat-form-field-outline-start,

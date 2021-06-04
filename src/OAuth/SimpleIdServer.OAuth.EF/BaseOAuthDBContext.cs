@@ -15,5 +15,6 @@ namespace SimpleIdServer.OAuth.EF
         public DbSet<OAuthUser> Users { get; set; }
         public DbSet<Token> Tokens { get; set; }
         public DbSet<OAuthScope> OAuthScopes { get; set; }
+        public DbSet<OAuthTranslation> OAuthTranslation { get; set; }
     }
 }
