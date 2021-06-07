@@ -46,6 +46,12 @@ body, h1 {
     padding-bottom: 0px !important;
 }
 
+.mat-table .mat-cell > a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Breadcrumb */
 .breadcrumb {
   padding: 20px 0px 20px 0px;

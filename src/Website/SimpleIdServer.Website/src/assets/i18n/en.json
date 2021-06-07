@@ -14,8 +14,23 @@
     "languages": "Languages"
   },
   "applications": {
+    "kty": "Key Type",
+    "alg": "Algorithm",
+    "use": "Usage",
+    "usages": {
+      "sig": "Sign",
+      "enc": "Encrypt"
+    },
+    "messages": {
+      "update": "Application is updated",
+      "errorUpdate": "An error occured while trying to update the application"
+    },
     "tokenExpirationTime": "Expiration time in seconds (IdToken & AccessToken)",
     "refreshTokenExpirationTime": "Expiration time in seconds of the refresh token",
+    "scopes": "Scopes",
+    "certificates": "Certificates",
+    "certificate": "Certificate",
+    "allowedScopes": "Allowed scopes",
     "grantTypes": "Grant Types",
     "advancedSettings": "Advanced Settings",
     "list": "Applications",

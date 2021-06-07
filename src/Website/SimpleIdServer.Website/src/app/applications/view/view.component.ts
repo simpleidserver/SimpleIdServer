@@ -1,33 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { startGet } from '@app/stores/applications/actions/applications.actions';
+import { SelectionResult } from '@app/common/components/multiselector/multiselector.component';
+import { Translation } from '@app/common/translation';
+import { startGet, startUpdate } from '@app/stores/applications/actions/applications.actions';
 import { Application } from '@app/stores/applications/models/application.model';
 import * as fromReducers from '@app/stores/appstate';
 import { startGetLanguages, startGetWellKnownConfiguration } from '@app/stores/metadata/actions/metadata.actions';
-import { select, Store } from '@ngrx/store';
+import { startGetAllScopes } from '@app/stores/scopes/actions/scope.actions';
+import { OAuthScope } from '@app/stores/scopes/models/oauthscope.model';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { Translation } from '../../common/translation';
+import { filter } from 'rxjs/operators';
+import { DisplayJwkComponent } from './displayjwk.component';
 import { EditTranslationComponent } from './edit-translation.component';
-
-class GrantTypeResult {
-  constructor(public name: string, public isSelected: boolean) { }
-}
 
 @Component({
   selector: 'view-application',
   templateUrl: './view.component.html'
 })
 export class ViewApplicationsComponent implements OnInit {
+  displayedJwkColumns: string[] = ['kty', 'alg', 'use'];
   clientId: string | null = null;
   clientNames: Translation[] = [];
   clientLogoUris: Translation[] = [];
   redirectUris: string[];
   logoutUris: string[];
-  grantTypes: GrantTypeResult[] = [];
+  jwks: any[];
+  grantTypes: SelectionResult[] = [];
+  scopes: SelectionResult[] = [];
+  receivedScopes: OAuthScope[] = [];
   application: Application;
   conf: any;
   clientSecretInputType: string = "password";
@@ -49,7 +54,9 @@ export class ViewApplicationsComponent implements OnInit {
     private store: Store<fromReducers.AppState>,
     private route: ActivatedRoute,
     private translateService: TranslateService,
-    private dialog: MatDialog) { }
+    private dialog: MatDialog,
+    private snackbar: MatSnackBar,
+    private actions$: ScannedActionsSubject) { }
 
   ngOnInit(): void {
     this.store.pipe(select(fromReducers.selectApplicationResult)).subscribe((application: Application | null) => {
@@ -60,9 +67,19 @@ export class ViewApplicationsComponent implements OnInit {
       this.clientNames = this.clone(application.ClientNames);
       this.clientLogoUris = this.clone(application.LogoUris);
       this.redirectUris = [...application.RedirectUris];
-      this.logoutUris = [...application.PostLogoutRedirectUris]
+      this.logoutUris = [...application.PostLogoutRedirectUris];
+      this.jwks = application.Jwks;
       this.application = application;
       this.refreshApplication();
+      this.refreshScopes();
+    });
+    this.store.pipe(select(fromReducers.selectOAuthScopesResult)).subscribe((scopes: OAuthScope[] | null) => {
+      if (!scopes) {
+        return;
+      }
+
+      this.receivedScopes = scopes;
+      this.refreshScopes();
     });
     this.store.pipe(select(fromReducers.selectWellKnownConfigurationResult)).subscribe((conf: any | null) => {
       if (!conf || !conf['grant_types_supported']) {
@@ -75,6 +92,20 @@ export class ViewApplicationsComponent implements OnInit {
     this.translateService.onLangChange.subscribe(() => {
       this.refreshApplication();
     });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Applications] COMPLETE_UPDATE_APPLICATON'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('applications.messages.updated'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Applications] ERROR_UPDATE_APPLICATION'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('applications.messages.errorUpdate'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.refresh();
   }
 
@@ -83,9 +114,11 @@ export class ViewApplicationsComponent implements OnInit {
     let getClient = startGet({ id: id });
     let getLanguages = startGetLanguages();
     let getWellKnownConfiguration = startGetWellKnownConfiguration();
+    let getOAuthScopes = startGetAllScopes();
     this.store.dispatch(getClient);
     this.store.dispatch(getLanguages);
     this.store.dispatch(getWellKnownConfiguration);
+    this.store.dispatch(getOAuthScopes);
   }
 
   displayClientSecret() {
@@ -152,7 +185,7 @@ export class ViewApplicationsComponent implements OnInit {
   }
 
   removeLogoutUri(redirectUri: string) {
-    const index = this.redirectUris.indexOf(redirectUri, 0);
+    const index = this.logoutUris.indexOf(redirectUri, 0);
     if (index > -1) {
       this.logoutUris.splice(index, 1);
     }
@@ -167,8 +200,36 @@ export class ViewApplicationsComponent implements OnInit {
     evt.input.value = "";
   }
 
-  grantTypeChanged(evt: MatCheckboxChange, grantType: GrantTypeResult) {
-    grantType.isSelected = evt.checked;
+  displayGrantType(selection: SelectionResult) {
+    return this.translateService.instant('applications.grantType.' + selection.name);
+  }
+
+  displayJwk(evt: any, jwk: any) {
+    evt.preventDefault();
+    this.dialog.open(DisplayJwkComponent, {
+      data: {
+        jwk: jwk
+      },
+      width: '500px'
+    });
+  }
+
+  saveApplication(evt : any, formValue : any) {
+    evt.preventDefault();
+    const request : any = {
+      token_endpoint_auth_method: formValue.tokenAuthMethod,
+      token_expiration_time_seconds: formValue.tokenExpirationTime,
+      refresh_token_expiration_time_seconds: formValue.refreshTokenExpirationTime,
+      scope: this.scopes.filter(s => s.isSelected).map(s => s.name).join(' '),
+      redirect_uris: this.redirectUris,
+      post_logout_redirect_uris: this.logoutUris,
+      grant_types: this.grantTypes.filter(g => g.isSelected).map(g => g.name),
+      application_kind: formValue.applicationKind
+    };
+    this.enrichTranslations(request, 'client_name', this.clientNames);
+    this.enrichTranslations(request, 'logo_uri', this.clientLogoUris);
+    let update = startUpdate({ id: this.application.ClientId, request });
+    this.store.dispatch(update);
   }
 
   private clone(translations: Translation[]) {
@@ -182,13 +243,30 @@ export class ViewApplicationsComponent implements OnInit {
     this.updateApplicationForm.get('logoUri')?.setValue(this.translateApplicationProperty(this.clientLogoUris));
     this.updateApplicationForm.get('tokenExpirationTime')?.setValue(this.application.TokenExpirationTimeInSeconds);
     this.updateApplicationForm.get('refreshTokenExpirationTime')?.setValue(this.application.RefreshTokenExpirationTimeInSeconds);
+    this.updateApplicationForm.get('applicationKind')?.setValue(this.application.ApplicationKind);
+    this.updateApplicationForm.get('tokenAuthMethod')?.setValue(this.application.TokenEndPointAuthMethod);
   }
 
   private refreshMetadata() {
     this.grantTypes = [];
     this.conf['grant_types_supported'].forEach((v: string) => {
       const isSelected = this.application.GrantTypes.indexOf(v) > -1;
-      this.grantTypes.push(new GrantTypeResult(v, isSelected));
+      const record: SelectionResult = { isSelected : isSelected, name: v, value: v };
+      this.grantTypes.push(record);
+    });
+  }
+
+  private refreshScopes() {
+    if (!this.application || !this.receivedScopes) {
+      return;
+    }
+
+    this.scopes = [];
+    this.receivedScopes.forEach((s: OAuthScope) => {
+      const isSelected = this.application.Scopes.indexOf(s.Name) > -1;
+      const record: SelectionResult = { isSelected: isSelected, name: s.Name, value: s };
+      record.isSelected = isSelected;
+      this.scopes.push(record);
     });
   }
 
@@ -200,5 +278,11 @@ export class ViewApplicationsComponent implements OnInit {
     }
 
     return "";
+  }
+
+  private enrichTranslations(request: any, key: string, translations: Translation[]) {
+    translations.forEach((tr: Translation) => {
+      request[key + "#" + tr.Language] = tr.Value;
+    });
   }
 }

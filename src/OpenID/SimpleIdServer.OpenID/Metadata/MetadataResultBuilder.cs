@@ -36,7 +36,7 @@ namespace SimpleIdServer.OpenID.Metadata
         public async Task<MetadataResult> Build(string language, CancellationToken cancellationToken)
         {
             var languages = _options.SupportedUICultures.Select(l => l.Name);
-            var languageExists = languages.Contains(language);
+            var languageExists = !string.IsNullOrWhiteSpace(language) && languages.Contains(language);
             var translationCodes = new List<string>();
             var result = new MetadataResult();
             if (_dic.Any())
@@ -50,18 +50,42 @@ namespace SimpleIdServer.OpenID.Metadata
                 if (languageExists)
                 {
                     translations = await _translationRepository.GetTranslations(translationCodes, language, cancellationToken);
+                    languages = new[] { language };
                 }
                 else
                 {
                     translations = await _translationRepository.GetTranslations(translationCodes, cancellationToken);
                 }
 
-                foreach(var kvp in _dic)
+                translations = SetDefaultValues(translationCodes, languages, translations);
+                foreach (var kvp in _dic)
                 {
                     result.Content.Add(kvp.Key, BuildMetadataRecord(kvp.Value, language, translations));
                 }
             }
 
+            return result;
+        }
+
+        private IEnumerable<OAuthTranslation> SetDefaultValues(List<string> translationCodes, IEnumerable<string> languages, IEnumerable<OAuthTranslation> existingTranslations)
+        {
+            var result = new List<OAuthTranslation>();
+            result.AddRange(existingTranslations);
+            foreach(var lng in languages)
+            {
+                foreach(var translationCode in translationCodes)
+                {
+                    if (!result.Any(t => t.Key == translationCode && t.Language == lng))
+                    {
+                        result.Add(new OAuthTranslation
+                        {
+                            Key = translationCode,
+                            Language = lng,
+                            Value = $"[{translationCode}]"
+                        });
+                    }
+                }
+            }
             return result;
         }
 
@@ -74,24 +98,13 @@ namespace SimpleIdServer.OpenID.Metadata
                 var child = new MetadataRecord();
                 var value = GetValue(type, name);
                 var trs = translations.Where(t => t.Key == GetTranslationCode(type, name));
-                if (!trs.Any())
+                foreach (var tr in trs)
                 {
                     child.Translations.Add(new TranslationResult
                     {
-                        LanguageCode = defaultLanguage,
-                        Value = $"[{name}]"
+                        LanguageCode = tr.Language,
+                        Value = tr.Value
                     });
-                }
-                else
-                {
-                    foreach(var tr in trs)
-                    {
-                        child.Translations.Add(new TranslationResult
-                        {
-                            LanguageCode = tr.Language,
-                            Value = tr.Value
-                        });
-                    }
                 }
 
                 result.Children.Add(value, child);

@@ -58,7 +58,7 @@ export class MultipleFilesHttpLoader implements TranslateLoader {
     const requestLst: any[] = [];
     const options = this.option.build();
     let headers = new HttpHeaders();
-    headers = headers.set('Accept-Language', lang);
+    headers = headers.set('Accept-Language', '');
     options.forEach((location: HttpFileLocationOption) => {
       switch (location.type) {
         case HttpPathType.Relative:

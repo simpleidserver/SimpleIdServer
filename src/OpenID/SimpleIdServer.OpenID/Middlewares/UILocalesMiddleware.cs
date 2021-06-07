@@ -13,7 +13,7 @@ namespace SimpleIdServer.OpenID.Middlewares
 {
     public class UILocalesMiddleware
     {
-        private const string AcceptLanguage = "Accept-Language";
+        public const string AcceptLanguage = "Accept-Language";
         private readonly RequestDelegate _next;
 
         public UILocalesMiddleware(RequestDelegate next)

@@ -11,7 +11,6 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
-import { MultiTranslateHttpLoader } from "ngx-translate-multi-http-loader";
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 import { HomeModule } from './home/home.module';
@@ -29,15 +28,6 @@ import { translationFactory } from './translation.util';
 export function createTranslateLoader(http: HttpClient) {
   let url = environment.baseUrl + 'assets/i18n/';
   return new TranslateHttpLoader(http, url, '.json');
-}
-
-
-export function HttpLoaderFactory(http: HttpClient) {
-  let url = environment.baseUrl + 'assets/i18n/';
-  return new MultiTranslateHttpLoader(http, [
-    { prefix: "./assets/translate/core/", suffix: ".json" },
-    { prefix: "./assets/translate/shared/", suffix: ".json" },
-  ]);
 }
 
 @NgModule({

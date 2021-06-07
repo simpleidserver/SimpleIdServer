@@ -38,6 +38,8 @@ namespace SimpleIdServer.OAuth.Extensions
                 .AddNotEmpty(OAuthClientParameters.ClientSecretExpiresAt, client.ClientSecretExpirationTime);
             result.Add(OAuthClientParameters.ClientIdIssuedAt, client.CreateDateTime.ConvertToUnixTimestamp());
             result.Add(OAuthClientParameters.RegistrationClientUri, $"{issuer}/{Constants.EndPoints.Registration}/{client.ClientId}");
+            result.Add(OAuthClientParameters.TokenExpirationTimeInSeconds, client.TokenExpirationTimeInSeconds);
+            result.Add(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds, client.RefreshTokenExpirationTimeInSeconds);
             if (client.AllowedScopes != null && client.AllowedScopes.Any())
             {
                 result.Add(OAuthClientParameters.Scope, string.Join(" ", client.AllowedScopes.Select(_ => _.Name)));
@@ -88,6 +90,18 @@ namespace SimpleIdServer.OAuth.Extensions
             result.TlsClientAuthSanIP = jObj.GetTlsClientAuthSanIP();
             result.TlsClientAuthSanEmail = jObj.GetTlsClientAuthSanEmail();
             result.ClientSecret = jObj.GetClientSecret();
+            var refreshTokenExpirationTimeInSeconds = jObj.GetRefreshTokenExpirationTimeInSeconds();
+            var tokenExpirationTimeInSeconds = jObj.GetTokenExpirationTimeInSeconds();
+            if (refreshTokenExpirationTimeInSeconds != null)
+            {
+                result.RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds.Value;
+            }
+
+            if (tokenExpirationTimeInSeconds != null)
+            {
+                result.TokenExpirationTimeInSeconds = tokenExpirationTimeInSeconds.Value;
+            }
+
             var clientSecret = jObj.GetClientSecret();
             Dictionary<string, string> clientNames = jObj.GetClientNames(),
                 clientUris = jObj.GetClientUris(),

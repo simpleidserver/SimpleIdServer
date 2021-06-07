@@ -57,6 +57,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthService()
                 .AddJwt()
                 .AddRegisterApi()
+                .AddManagementApi()
                 .AddConfigurationApi();
             return new SimpleIdServerOAuthBuilder(services);
         }
@@ -215,6 +216,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUpdateOAuthClientHandler, UpdateOAuthClientHandler>();
             services.AddTransient<IDeleteOAuthClientHandler, DeleteOAuthClientHandler>();
             services.AddTransient<IOAuthClientValidator, OAuthClientValidator>();
+            return services;
+        }
+
+        private static IServiceCollection AddManagementApi(this IServiceCollection services)
+        {
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOAuthClientHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOAuthClientHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler, SimpleIdServer.OAuth.Api.Management.Handlers.SearchOauthClientsHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateOAuthClientHandler>();
             return services;
         }
     }

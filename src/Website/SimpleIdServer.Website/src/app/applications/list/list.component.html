@@ -10,8 +10,8 @@
         <ng-container matColumnDef="picture">
           <mat-header-cell *matHeaderCellDef></mat-header-cell>
           <mat-cell *matCellDef="let client">
-            <ngx-avatar class="center" *ngIf="client.LogoUris.length > 0" src="{{ client.LogoUris | translateenum }}"></ngx-avatar>
-            <ngx-avatar class="center" *ngIf="client.LogoUris.length == 0" name="{{ client.ClientId }}"></ngx-avatar>
+            <ngx-avatar class="center" size="40" *ngIf="client.LogoUris.length > 0" src="{{ client.LogoUris | translateenum }}"></ngx-avatar>
+            <ngx-avatar class="center" size="40" *ngIf="client.LogoUris.length == 0" name="{{ client.ClientId }}"></ngx-avatar>
           </mat-cell>
         </ng-container>
         <ng-container matColumnDef="client_id">
@@ -24,9 +24,9 @@
           <mat-header-cell *matHeaderCellDef>{{ "applications.clientName" | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let client">{{ client.ClientNames | translateenum }}</mat-cell>
         </ng-container>
-        <ng-container matColumnDef="create_datetime">
-          <mat-header-cell mat-header-cell *matHeaderCellDef mat-sort-header>{{ "applications.createDateTime" | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let client">{{client.CreateDateTime | date:'fullDate'}}</mat-cell>
+        <ng-container matColumnDef="application_kind">
+          <mat-header-cell mat-header-cell *matHeaderCellDef>{{ "applications.kind" | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let client">{{ 'metadata.content.applicationKind.children.' +  client.ApplicationKind | translatemetadata }}</mat-cell>
         </ng-container>
         <ng-container matColumnDef="update_datetime">
           <mat-header-cell *matHeaderCellDef mat-sort-header>{{ "applications.updateDateTime" | translate }}</mat-header-cell>
@@ -35,7 +35,7 @@
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
       </mat-table>
-      <mat-paginator [length]="length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+      <mat-paginator [length]="length" [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
     </div>
   </mat-card-content>
 </mat-card>

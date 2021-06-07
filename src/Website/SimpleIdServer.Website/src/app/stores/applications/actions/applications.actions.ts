@@ -8,3 +8,6 @@ export const errorSearch = createAction('[Applications] ERROR_SEARCH_APPLICATION
 export const startGet = createAction('[Applications] START_GET_APPLICATION', props<{ id: string }>());
 export const completeGet = createAction('[Applications] COMPLETE_GET_APPLICATIONS', props<{ content: Application}>());
 export const errorGet = createAction('[Applications] ERROR_GET_APPLICATION');
+export const startUpdate = createAction('[Applications] START_UPDATE_APPLICATON', props<{ id: string, request: any }>());
+export const completeUpdate = createAction('[Applications] COMPLETE_UPDATE_APPLICATON');
+export const errorUpdate = createAction('[Applications] ERROR_UPDATE_APPLICATION');

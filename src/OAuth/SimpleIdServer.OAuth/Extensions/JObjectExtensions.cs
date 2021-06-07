@@ -204,6 +204,16 @@ namespace SimpleIdServer.OAuth.Extensions
 
         #region OAuth client parameters
 
+        public static int? GetRefreshTokenExpirationTimeInSeconds(this JObject jObj)
+        {
+            return jObj.GetInt(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds);
+        }
+
+        public static int? GetTokenExpirationTimeInSeconds(this JObject jObj)
+        {
+            return jObj.GetInt(OAuthClientParameters.TokenExpirationTimeInSeconds);
+        }
+
         public static string GetTokenSignedResponseAlg(this JObject jObj)
         {
             return jObj.GetStr(OAuthClientParameters.TokenSignedResponseAlg);
@@ -517,6 +527,7 @@ namespace SimpleIdServer.OAuth.Extensions
 
         public static JObject AddNotEmpty(this JObject jObj, string name, IEnumerable<string> values)
         {
+            values = values.Where(v => !string.IsNullOrWhiteSpace(v));
             if (values != null && values.Any())
             {
                 jObj.Add(name, JArray.FromObject(values));

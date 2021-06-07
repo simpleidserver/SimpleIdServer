@@ -13,7 +13,7 @@ import { merge } from 'rxjs';
   templateUrl: './list.component.html'
 })
 export class ListApplicationsComponent implements OnInit {
-  displayedColumns: string[] = ['picture', 'client_id', 'client_name', 'create_datetime', 'update_datetime'];
+  displayedColumns: string[] = ['picture', 'client_id', 'client_name', 'application_kind', 'update_datetime'];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   length: number;

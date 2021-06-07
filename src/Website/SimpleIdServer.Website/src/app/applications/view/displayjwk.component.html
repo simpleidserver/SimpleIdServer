@@ -1,0 +1,9 @@
+<h1 mat-dialog-title>{{ 'applications.certificate' | translate }}</h1>
+<div mat-dialog-content>
+  <mat-form-field class="full-width" appearance="outline">
+    <textarea matInput class="jwk-textarea">{{ data.jwk | json }}</textarea>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button color="warn" mat-dialog-close>{{ 'close' | translate }}</button>
+</div>

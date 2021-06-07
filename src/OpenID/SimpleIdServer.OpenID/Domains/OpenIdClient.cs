@@ -163,6 +163,18 @@ namespace SimpleIdServer.OpenID.Domains
 
         #endregion
 
+        public override void SetAllowedScopes(ICollection<OAuthScope> scopes)
+        {
+            OpenIdAllowedScopes.Clear();
+            foreach (var scope in scopes)
+            {
+                OpenIdAllowedScopes.Add(new OpenIdClientScope
+                {
+                    Scope = scope
+                });
+            }
+        }
+
         /// <summary>
         /// Resolve redirection urls.
         /// </summary>

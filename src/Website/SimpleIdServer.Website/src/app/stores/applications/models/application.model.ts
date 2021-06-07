@@ -26,12 +26,14 @@ export class Application {
   TokenEncryptedResponseEnc: string;
   RefreshTokenExpirationTimeInSeconds: number;
   TokenExpirationTimeInSeconds: number;
+  ApplicationKind: number;
   Scopes: Array<string>;
   RedirectUris: Array<string>;
   PostLogoutRedirectUris: Array<string>;
   GrantTypes: Array<string>;
   ClientSecret: string;
   ResponseTypes: Array<string>;
+  Jwks: Array<any>;
   LogoUris: Translation[];
   ClientNames: Translation[];
   PolicyUris: Translation[];
@@ -51,6 +53,7 @@ export class Application {
     result.TokenSignedResponseAlg = json["token_signed_response_alg"];
     result.TokenEncryptedResponseAlg = json["token_encrypted_response_alg"];
     result.TokenEncryptedResponseEnc = json["token_encrypted_response_enc"];
+    result.ApplicationKind = json["application_kind"];
     result.ClientSecret = json["client_secret"];
     result.RefreshTokenExpirationTimeInSeconds = json["refresh_token_expiration_time_seconds"];
     result.TokenExpirationTimeInSeconds = json["token_expiration_time_seconds"];
@@ -67,7 +70,7 @@ export class Application {
       result.Scopes = json["scope"];
     }
 
-    if (json["redirect_uri"]) {
+    if (json["redirect_uris"]) {
       result.RedirectUris = json["redirect_uris"];
     }
 
@@ -81,6 +84,10 @@ export class Application {
 
     if (json["response_types"]) {
       result.ResponseTypes = json["response_types"];
+    }
+
+    if (json["jwks"]) {
+      result.Jwks = json["jwks"].keys;
     }
 
     return result;

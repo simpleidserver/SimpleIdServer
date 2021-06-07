@@ -43,4 +43,12 @@ export class ApplicationService {
       return Application.fromJson(res);
     }));
   }
+
+  update(id: string, request: any): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/applications/" + id
+    return this.http.put(targetUrl, request, { headers: headers });
+  }
 }

@@ -14,7 +14,7 @@ export class OAuthScopeService {
         let headers = new HttpHeaders();
         headers = headers.set('Accept', 'application/json');
         headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
-        let targetUrl = environment.apiUrl + "/oauth/management/scopes"
+        let targetUrl = environment.apiUrl + "/scopes"
         return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
             var result = res.map((s : any) => OAuthScope.fromJson(s));
             return result;

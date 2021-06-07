@@ -255,6 +255,15 @@ namespace SimpleIdServer.OAuth.Domains
             }
         }
 
+        public void SetClientNames(ICollection<OAuthTranslation> translations)
+        {
+            ClearTranslations("client_name");
+            foreach(var translation in translations)
+            {
+                AddClientName(translation.Language, translation.Value);
+            }
+        }
+
         public void AddClientName(string language, string value)
         {
             Translations.Add(new OAuthClientTranslation
@@ -275,6 +284,15 @@ namespace SimpleIdServer.OAuth.Domains
                     Type = "client_uri"
                 }
             });
+        }
+
+        public void SetLogoUris(ICollection<OAuthTranslation> translations)
+        {
+            ClearTranslations("logo_uri");
+            foreach(var translation in translations)
+            {
+                AddLogoUri(translation.Language, translation.Value);
+            }
         }
 
         public void AddLogoUri(string language, string value)
@@ -316,6 +334,8 @@ namespace SimpleIdServer.OAuth.Domains
             ClientSecretExpirationTime = expirationTime;
         }
 
+        public abstract void SetAllowedScopes(ICollection<OAuthScope> scopes);
+
         /// <summary>
         /// Get all the redirection urls.
         /// </summary>
@@ -350,6 +370,18 @@ namespace SimpleIdServer.OAuth.Domains
         public override int GetHashCode()
         {
             return ClientId.GetHashCode();
+        }
+
+        protected void ClearTranslations(string type)
+        {
+            for (int i = Translations.Count() - 1; i >= 0; i--)
+            {
+                var translation = Translations.ElementAt(i);
+                if (translation.Translation.Type == type)
+                {
+                    Translations.Remove(translation);
+                }
+            }
         }
     }
 }

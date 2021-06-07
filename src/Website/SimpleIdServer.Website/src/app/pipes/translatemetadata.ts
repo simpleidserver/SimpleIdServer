@@ -1,21 +1,24 @@
 import { Injectable, Pipe, PipeTransform } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
-import { map } from "rxjs/operators";
+import { Translation } from "../common/translation";
+import { BaseTranslate } from "./basetranslate";
 
 @Injectable()
 @Pipe({
   name: 'translatemetadata',
   pure: false
 })
-export class TranslateMetadataPipe implements PipeTransform {
-  constructor(private translateService: TranslateService) { }
+export class TranslateMetadataPipe extends BaseTranslate implements PipeTransform {
+  constructor(private ts: TranslateService) {
+    super(ts);
+  }
 
   transform(value: any, ...args: any[]) {
-    if (!value) {
-      return '';
-    }
-
-    const translated = this.translateService.instant(value).translations;
-    return translated ? translated[0].value : '';
+    const translated = this.ts.instant(value).translations;
+    var translations = translated.map((r: any) => {
+      var record: Translation = { Language: r.languageCode, Value: r.value };
+      return record;
+    });
+    return this.translate(translations);
   }
 }

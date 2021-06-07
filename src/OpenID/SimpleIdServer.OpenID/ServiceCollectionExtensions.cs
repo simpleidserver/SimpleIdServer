@@ -67,6 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddBCAuthorizeApi()
                 .AddBCDeviceRegistrationApi()
                 .AddOpenIDAuthentication()
+                .AddManagementApi()
                 .AddBCAuthorizeJob()
                 .AddInMemoryLock();
             return builder;
@@ -242,6 +243,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGetOAuthClientHandler, GetOpenIdClientHandler>();
             services.AddTransient<IUpdateOAuthClientHandler, UpdateOpenIdClientHandler>();
             services.AddTransient<IOAuthClientValidator, OpenIdClientValidator>();
+            return services;
+        }
+
+        private static IServiceCollection AddManagementApi(this IServiceCollection services)
+        {
+            services.RemoveAll<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOAuthClientHandler>();
+            services.RemoveAll<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler>();
+            services.RemoveAll<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.GetOpenIdClientHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler, SimpleIdServer.OpenID.Api.Management.SearchOpenIdClientsHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.UpdateOpenIdClientHandler>();
             return services;
         }
 

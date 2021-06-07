@@ -3,6 +3,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using System.Collections.Generic;
 
@@ -11,6 +12,12 @@ namespace SimpleIdServer.OpenID.Extensions
     public static class JObjectExtensions
     {
         #region Openid client request
+
+        public static ApplicationKinds GetApplicationKind(this JObject jObj)
+        {
+            var kind = jObj.GetInt(OpenIdClientParameters.ApplicationKind);
+            return (ApplicationKinds)kind.Value;
+        }
 
         public static string GetApplicationType(this JObject jObj)
         {

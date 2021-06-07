@@ -10,6 +10,44 @@
         }
       ],
       "UpstreamPathTemplate": "/applications/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/management/scopes/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/scopes/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/management/scopes",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/scopes",
       "UpstreamHttpMethod": [ "POST", "GET" ],
       "DelegatingHandlers": [
         "ManageClientClientCredentialsHandler"

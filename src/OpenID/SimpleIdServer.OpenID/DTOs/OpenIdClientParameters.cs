@@ -42,5 +42,6 @@ namespace SimpleIdServer.OpenID.DTOs
         public const string FrontChannelLogoutSessionRequired = "frontchannel_logout_session_required";
         public const string BackChannelLogoutSessionRequired = "backchannel_logout_session_required";
         public const string BackChannelLogoutUri = "backchannel_logout_uri";
+        public const string ApplicationKind = "application_kind";
     }
 }

@@ -1,0 +1,8 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>{{ label }}</mat-label>
+  <mat-chip-list #scopeChipList>
+    <mat-chip *ngFor="let selection of selections">
+      <mat-checkbox [checked]="selection.isSelected" (change)="handleChecked($event, selection)">{{ display(selection) }}</mat-checkbox>
+    </mat-chip>
+  </mat-chip-list>
+</mat-form-field>

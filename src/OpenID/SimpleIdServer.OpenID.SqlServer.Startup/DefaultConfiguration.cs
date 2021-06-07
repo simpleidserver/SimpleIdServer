@@ -232,6 +232,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "newsAggregatorWebsite",
                     ClientSecret = "newsAggregatorWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -266,6 +267,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "firstMtlsClient",
                     ClientSecret = "mtsClientSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -302,6 +304,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "secondMtlsClient",
                     ClientSecret = "mtsClientSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -338,6 +341,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "scimClient",
                     ClientSecret = "scimClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -370,6 +374,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "umaClient",
                     ClientSecret = "umaClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -405,6 +410,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "simpleIdServerWebsite",
                     ClientSecret = "simpleIdServerWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -451,6 +457,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "tradWebsite",
                     ClientSecret = "tradWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -485,6 +492,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "native",
                     ClientSecret = "nativeSecret",
+                    ApplicationKind = ApplicationKinds.Native,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -517,6 +525,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "caseManagementWebsite",
                     ClientSecret = "b98113b5-f45f-4a4a-9db5-610b7183e148",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -560,6 +569,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "caseManagementTasklistWebsite",
                     ClientSecret = "b98113b5-f45f-4a4a-9db5-610b7183e148",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -603,6 +613,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "caseManagementPerformanceWebsite",
                     ClientSecret = "91894b86-c57e-489a-838d-fb82621a67ee",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -646,6 +657,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "medikitWebsite",
                     ClientSecret = "f200eeb0-a6a3-465e-be91-97806e5dd3bc",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -687,6 +699,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     ClientId = "gatewayClient",
                     ClientSecret = "gatewayClientPassword",
+                    ApplicationKind = ApplicationKinds.Service,
                     Translations = new List<OAuthClientTranslation>
                     {
                         new OAuthClientTranslation

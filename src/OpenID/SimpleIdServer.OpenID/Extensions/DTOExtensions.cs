@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using System.Linq;
 
@@ -35,6 +35,7 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             result.Add(OpenIdClientParameters.RequireAuthTime, openidClient.RequireAuthTime);
+            result.Add(OpenIdClientParameters.ApplicationKind, (int)openidClient.ApplicationKind);
             return result;
         }
 
@@ -59,6 +60,7 @@ namespace SimpleIdServer.OpenID.Extensions
             result.DefaultAcrValues = jObj.GetDefaultAcrValues();
             result.PostLogoutRedirectUris = jObj.GetPostLogoutRedirectUris();
             result.InitiateLoginUri = jObj.GetInitiateLoginUri();
+            result.ApplicationKind = jObj.GetApplicationKind();
             result.AllowedScopes = result.AllowedScopes.Select(s => new OAuthScope
             {
                 Name = s.Name

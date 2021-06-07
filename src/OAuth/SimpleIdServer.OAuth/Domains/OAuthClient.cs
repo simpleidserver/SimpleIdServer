@@ -26,6 +26,19 @@ namespace SimpleIdServer.OAuth.Domains
 
         #endregion
 
+        #region Actions
+
+        public override void SetAllowedScopes(ICollection<OAuthScope> scopes)
+        {
+            OAuthAllowedScopes.Clear();
+            foreach (var scope in scopes)
+            {
+                OAuthAllowedScopes.Add(scope);
+            }
+        }
+
+        #endregion
+
         public object Clone()
         {
             return new OAuthClient

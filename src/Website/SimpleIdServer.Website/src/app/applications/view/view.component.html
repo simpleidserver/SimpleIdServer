@@ -12,14 +12,14 @@
   </ul>
 </div>
 <mat-card>
-  <mat-card-content>
-    <form [formGroup]="updateApplicationForm">
+  <form [formGroup]="updateApplicationForm" (ngSubmit)="saveApplication($event, updateApplicationForm.value)">
+    <mat-card-content>
       <!-- Basic Information -->
       <div fxLayout="row">
-        <div fxFlex="50%">
+        <div fxFlex="30%">
           <h3>{{ 'applications.basicinfo' | translate }}</h3>
         </div>
-        <div fxFlex="50%">
+        <div fxFlex="70%">
           <!-- Name -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{ "applications.clientName" | translate }}</mat-label>
@@ -31,7 +31,7 @@
           <!-- Client identifier -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{ "applications.clientId" | translate }}</mat-label>
-            <input matInput formControlName="clientId"  />
+            <input matInput formControlName="clientId" />
           </mat-form-field>
           <!-- Client secret -->
           <mat-form-field appearance="outline" class="full-width">
@@ -47,10 +47,10 @@
       <mat-divider></mat-divider>
       <!-- Properties -->
       <div fxLayout="row">
-        <div fxFlex="50%">
+        <div fxFlex="30%">
           <h3>{{ 'applications.properties' | translate }}</h3>
         </div>
-        <div fxFlex="50%">
+        <div fxFlex="70%">
           <!-- Logo URI -->
           <p>{{ 'applications.clientLogoUri' | translate }}</p>
           <div class="img-editor">
@@ -65,7 +65,7 @@
             </mat-form-field>
           </div>
           <!-- Application type -->
-          <metadataselector [label]="'applications.kind' | translate" metadata="metadata.content.applicationKind" (changed)="onApplicationKindChanged($event)"></metadataselector>
+          <metadataselector [label]="'applications.kind' | translate" [value]="applicationKind" metadata="metadata.content.applicationKind" (changed)="onApplicationKindChanged($event)"></metadataselector>
           <!-- Token authentication method -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{  'applications.tokenAuthMethod' | translate}}</mat-label>
@@ -78,12 +78,22 @@
         </div>
       </div>
       <mat-divider></mat-divider>
+      <!-- Scopes -->
+      <div>
+        <div fxFlex="30%">
+          <h3>{{ 'applications.scopes' | translate }}</h3>
+        </div>
+        <div fxFlex="70%">
+          <multiselector [label]="'applications.allowedScopes' | translate" [selections]="scopes"></multiselector>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
       <!-- URIS -->
       <div>
-        <div fxFlex="50%">
+        <div fxFlex="30%">
           <h3>{{ 'applications.uris' | translate }}</h3>
         </div>
-        <div fxFlex="50%">
+        <div fxFlex="70%">
           <!-- Callback uris  -->
           <div>
             <mat-form-field appearance="outline" class="full-width no-bottom-padding">
@@ -123,10 +133,10 @@
       <mat-divider></mat-divider>
       <!-- Token -->
       <div>
-        <div fxFlex="50%">
+        <div fxFlex="30%">
           <h3>{{ 'applications.token' | translate }}</h3>
         </div>
-        <div fxFlex="50%">
+        <div fxFlex="70%">
           <!-- Token expiration time -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{ "applications.tokenExpirationTime" | translate }}</mat-label>
@@ -146,18 +156,41 @@
             <mat-panel-title>{{ 'applications.advancedSettings' | translate }}</mat-panel-title>
           </mat-expansion-panel-header>
           <mat-tab-group>
+            <!-- Grant types -->
             <mat-tab [label]="'applications.grantTypes' | translate">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-chip-list #redirectUriChipList>
-                  <mat-chip *ngFor="let grantType of grantTypes">
-                    <mat-checkbox [checked]="grantType.isSelected" (change)="grantTypeChanged($event, grantType)">{{'applications.grantType.' + grantType.name | translate}}</mat-checkbox>
-                  </mat-chip>
-                </mat-chip-list>
-              </mat-form-field>
+              <multiselector [selections]="grantTypes" [displayName]="displayGrantType"></multiselector>
+            </mat-tab>
+            <!-- Certificates -->
+            <mat-tab [label]="'applications.certificates' | translate">
+              <mat-table class="full-width" [dataSource]="jwks">
+                <ng-container matColumnDef="kty">
+                  <mat-header-cell *matHeaderCellDef>{{ "applications.kty" | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let jwk">
+                    <a href="#" (click)="displayJwk($event, jwk)">{{ jwk.kty }}</a>
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="alg">
+                  <mat-header-cell *matHeaderCellDef>{{ "applications.alg" | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let jwk">
+                    {{ jwk.alg }}
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="use">
+                  <mat-header-cell *matHeaderCellDef>{{ "applications.use" | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let jwk">
+                    {{ 'applications.usages.' + jwk.use | translate }}
+                  </mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="displayedJwkColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedJwkColumns;"></mat-row>
+              </mat-table>
             </mat-tab>
           </mat-tab-group>
         </mat-expansion-panel>
       </mat-accordion>
-    </form>
-  </mat-card-content>
+    </mat-card-content>
+    <mat-card-actions>
+      <button type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+    </mat-card-actions>
+  </form>
 </mat-card>

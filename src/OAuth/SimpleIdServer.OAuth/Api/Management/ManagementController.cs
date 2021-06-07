@@ -3,11 +3,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.OAuth.Api.Management.Handlers;
 using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.Parameters;
-using SimpleIdServer.OAuth.Persistence.Results;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,45 +19,72 @@ namespace SimpleIdServer.OAuth.Api.Management
     [Route(Constants.EndPoints.Management)]
     public partial class ManagementController : Controller
     {
-        private readonly IOAuthClientRepository _oauthClientRepository;
         private readonly IOAuthScopeRepository _oauthScopeRepository;
+        private readonly IGetOAuthClientHandler _getOAuthClientHandler;
+        private readonly ISearchOauthClientsHandler _searchOauthClientsHandler;
+        private readonly IUpdateOAuthClientHandler _updateOAuthClientHandler;
 
         public ManagementController(
-            IOAuthClientRepository oauthClientRepository,
-            IOAuthScopeRepository oauthScopeRepository)
+            IOAuthScopeRepository oauthScopeRepository,
+            IGetOAuthClientHandler getOAuthClientHandler,
+            ISearchOauthClientsHandler searchOauthClientsHandler,
+            IUpdateOAuthClientHandler updateOAuthClientHandler)
         {
-            _oauthClientRepository = oauthClientRepository;
             _oauthScopeRepository = oauthScopeRepository;
+            _getOAuthClientHandler = getOAuthClientHandler;
+            _searchOauthClientsHandler = searchOauthClientsHandler;
+            _updateOAuthClientHandler = updateOAuthClientHandler;
         }
+
+        #region Manage clients
 
         [HttpPost("clients/.search")]
         [Authorize("ManageClients")]
-        public virtual Task<IActionResult> SearchClients([FromBody] JObject request)
+        public virtual Task<IActionResult> SearchClients([FromBody] JObject request, CancellationToken cancellationToken)
         {
             var queries = request.ToEnumerable();
-            return InternalSearchClients(queries);
+            return InternalSearchClients(queries, cancellationToken);
         }
 
         [HttpGet("clients/.search")]
         [Authorize("ManageClients")]
-        public virtual Task<IActionResult> SearchClients()
+        public virtual Task<IActionResult> SearchClients(CancellationToken cancellationToken)
         {
             var queries = Request.Query.ToEnumerable();
-            return InternalSearchClients(queries);
+            return InternalSearchClients(queries, cancellationToken);
         }
 
         [HttpGet("clients/{id}")]
         [Authorize("ManageClients")]
         public virtual async Task<IActionResult> GetClient(string id, CancellationToken cancellationToken)
         {
-            var client = await _oauthClientRepository.FindOAuthClientById(id, cancellationToken);
-            if (client == null)
+            var result = await _getOAuthClientHandler.Handle(id, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken);
+            if (result == null)
             {
                 return new NotFoundResult();
             }
 
-            return new OkObjectResult(client.ToDto(Request.GetAbsoluteUriWithVirtualPath()));
+            return new OkObjectResult(result);
         }
+
+        [HttpPut("clients/{id}")]
+        [Authorize("ManageClients")]
+        public virtual async Task<IActionResult> UpdateClient(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _updateOAuthClientHandler.Handle(id, jObj, cancellationToken);
+                return new NoContentResult();
+            }
+            catch(OAuthClientNotFoundException)
+            {
+                return new NotFoundResult();
+            }
+        }
+
+        #endregion
+
+        #region Manage scopes
 
         [HttpGet("scopes")]
         [Authorize("ManageScopes")]
@@ -66,11 +94,12 @@ namespace SimpleIdServer.OAuth.Api.Management
             return new OkObjectResult(result.Select(_ => ToDto(_)));
         }
 
-        private async Task<IActionResult> InternalSearchClients(IEnumerable<KeyValuePair<string, string>> queries)
+        #endregion
+
+        private async Task<IActionResult> InternalSearchClients(IEnumerable<KeyValuePair<string, string>> queries, CancellationToken cancellationToken)
         {
             var parameter = ToParameter(queries);
-            var result = await _oauthClientRepository.Find(parameter, CancellationToken.None);
-            return new OkObjectResult(ToDto(result, Request.GetAbsoluteUriWithVirtualPath()));
+            return new OkObjectResult(await _searchOauthClientsHandler.Handle(parameter, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken));
         }
 
         private static JObject ToDto(OAuthScope scope)
@@ -81,17 +110,6 @@ namespace SimpleIdServer.OAuth.Api.Management
                 { "is_exposed", scope.IsExposedInConfigurationEdp },
                 { "update_datetime", scope.UpdateDateTime },
                 { "create_datetime", scope.CreateDateTime }
-            };
-        }
-
-        private static JObject ToDto(SearchResult<BaseClient> result, string issuer)
-        {
-            return new JObject
-            {
-                { "start_index", result.StartIndex },
-                { "count", result.Count },
-                { "total_length", result.TotalLength },
-                { "content", new JArray(result.Content.Select(_ => _.ToDto(issuer))) }
             };
         }
 

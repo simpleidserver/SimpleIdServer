@@ -14,14 +14,29 @@
     "languages": "Langues"
   },
   "applications": {
+    "kty": "Type de clef",
+    "alg": "Algorithme",
+    "use": "Usage",
+    "usages": {
+      "sig": "Signer",
+      "enc": "Encrypter"
+    },
+    "messages": {
+      "updated": "L'application a été mise à jour",
+      "errorUpdate": "Une erreur est survenue durant la mise à jour de l'application"
+    },
     "tokenExpirationTime": "Expiration en secondes des tokens (IdToken & AccessToken)",
     "refreshTokenExpirationTime": "Expiration en secondes du refresh token",
+    "certificates": "Certificats",
+    "certificate": "Certificat",
+    "scopes": "Scopes",
+    "allowedScopes": "Les scopes autorisés",
     "grantTypes": "Grant Types",
     "advancedSettings": "Paramètres avancées",
     "list": "Applications",
     "kind": "Type d'application",
     "badCallbackUri": "L'URL de callback doit commencer par https",
-    "callbackUrisDescription": "Les URLS de redirection doivent commencer par https",
+    "callbackUrisDescription": "Les URLS de callback doivent commencer par https",
     "logoutUris": "Les URLs de Logout",
     "logoutUriDescription": "",
     "newLogoutUri": "Nouvelle URL de Logout",
