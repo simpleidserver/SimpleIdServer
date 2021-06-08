@@ -87,8 +87,8 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
             oauthClient.RegistrationAccessToken = registrationAccessToken;
             oauthClient.CreateDateTime = DateTime.UtcNow;
             oauthClient.UpdateDateTime = DateTime.UtcNow;
-            oauthClient.RefreshTokenExpirationTimeInSeconds = 60 * 30;
-            oauthClient.TokenExpirationTimeInSeconds = 60 * 30;
+            oauthClient.RefreshTokenExpirationTimeInSeconds = OauthHostOptions.DefaultRefreshTokenExpirationTimeInSeconds;
+            oauthClient.TokenExpirationTimeInSeconds = OauthHostOptions.DefaultTokenExpirationTimeInSeconds;
             oauthClient.PreferredTokenProfile = OauthHostOptions.DefaultTokenProfile;
             oauthClient.SetClientSecret(clientSecret, expirationDateTime);
             SetDefaultClientNames(oauthClient);

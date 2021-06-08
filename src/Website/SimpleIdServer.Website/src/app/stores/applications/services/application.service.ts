@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@envs/environments';
+import { TranslateService } from '@ngx-translate/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -9,7 +10,10 @@ import { SearchResult } from '../models/search.model';
 
 @Injectable()
 export class ApplicationService {
-  constructor(private http: HttpClient, private oauthService: OAuthService) { }
+  constructor(
+    private http: HttpClient,
+    private oauthService: OAuthService,
+    private translateService: TranslateService) { }
 
   search(startIndex: number, count: number, order: string, direction: string): Observable<SearchResult<Application>> {
     let headers = new HttpHeaders();
@@ -50,5 +54,20 @@ export class ApplicationService {
     headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
     let targetUrl = environment.apiUrl + "/applications/" + id
     return this.http.put(targetUrl, request, { headers: headers });
+  }
+
+  add(applicationKind: number, clientName: string): Observable<string> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    headers = headers.set('Accept-Language', this.translateService.currentLang);
+    let targetUrl = environment.apiUrl + "/applications";
+    const request: any = {
+      application_kind: applicationKind,
+      client_name: clientName
+    };
+    return this.http.post(targetUrl, request, { headers: headers }).pipe(map((res: any) => {
+      return res['id'];
+    }));
   }
 }

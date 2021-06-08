@@ -67,5 +67,14 @@ namespace SimpleIdServer.OpenID.Extensions
             }).ToList();
             return result;
         }
+
+        public static CreateOpenIdClientParameter ToCreateOpenIdClientParameter(this JObject jObj)
+        {
+            return new CreateOpenIdClientParameter
+            {
+                ApplicationKind = jObj.GetApplicationKind(),
+                ClientName = jObj.GetClientName()
+            };
+        }
     }
 }

@@ -249,6 +249,11 @@ namespace SimpleIdServer.OAuth.Extensions
             return jObj.GetArray(OAuthClientParameters.ResponseTypes).SelectMany(_ => _.Trim().Split(' '));
         }
 
+        public static string GetClientName(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthClientParameters.ClientName);
+        }
+
         public static Dictionary<string, string> GetClientNames(this JObject jObj)
         {            
             return jObj.GetTranslations(OAuthClientParameters.ClientName);

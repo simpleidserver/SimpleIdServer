@@ -36,6 +36,8 @@ namespace SimpleIdServer.OAuth.Extensions
                 .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanEmail, client.TlsClientAuthSanEmail)
                 .AddNotEmpty(OAuthClientParameters.ClientSecret, client.ClientSecret)
                 .AddNotEmpty(OAuthClientParameters.ClientSecretExpiresAt, client.ClientSecretExpirationTime);
+            result.Add(OAuthClientParameters.UpdateDateTime, client.UpdateDateTime);
+            result.Add(OAuthClientParameters.CreateDateTime, client.CreateDateTime);
             result.Add(OAuthClientParameters.ClientIdIssuedAt, client.CreateDateTime.ConvertToUnixTimestamp());
             result.Add(OAuthClientParameters.RegistrationClientUri, $"{issuer}/{Constants.EndPoints.Registration}/{client.ClientId}");
             result.Add(OAuthClientParameters.TokenExpirationTimeInSeconds, client.TokenExpirationTimeInSeconds);

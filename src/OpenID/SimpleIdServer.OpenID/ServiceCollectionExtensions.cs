@@ -254,6 +254,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.GetOpenIdClientHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler, SimpleIdServer.OpenID.Api.Management.SearchOpenIdClientsHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.UpdateOpenIdClientHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.AddOpenIdClientHandler>();
             return services;
         }
 

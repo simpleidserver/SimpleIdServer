@@ -6,7 +6,7 @@
   }
 
   .actions {
-      background-color: white;
+    background-color: white;
   }
 
   .mat-form-field-disabled .actions > .copy,
@@ -18,6 +18,11 @@
   .img-editor,
   .img-editor > .img {
     border-color: rgb(224, 224, 224);
+  }
+
+  #applicationKinds > .applicationKind.isSelected {
+    box-shadow: inset 0px 0px 0px 1px mat-color($primary, 300);
+    border-color: mat-color($primary, 300)!important;
   }
 }
 

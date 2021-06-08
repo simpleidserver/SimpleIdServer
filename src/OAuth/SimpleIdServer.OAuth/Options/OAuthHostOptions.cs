@@ -25,6 +25,8 @@ namespace SimpleIdServer.OAuth.Options
             CertificateAuthenticationScheme = "Certificate";
             DefaultTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
             JWKExpirationTimeInSeconds = 60 * 5;
+            DefaultTokenExpirationTimeInSeconds= 60 * 30;
+            DefaultRefreshTokenExpirationTimeInSeconds = 60 * 30;
         }
 
         /// <summary>
@@ -71,5 +73,13 @@ namespace SimpleIdServer.OAuth.Options
         /// JWK expiration time in seconds.
         /// </summary>
         public int JWKExpirationTimeInSeconds { get; set; }
+        /// <summary>
+        /// Default Token Expiration Time in seconds.
+        /// </summary>
+        public int DefaultTokenExpirationTimeInSeconds { get; set; }
+        /// <summary>
+        /// Default Refresh Token Expiration Time in seconds.
+        /// </summary>
+        public int DefaultRefreshTokenExpirationTimeInSeconds { get; set; }
     }
 }

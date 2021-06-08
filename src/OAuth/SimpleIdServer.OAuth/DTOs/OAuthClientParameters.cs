@@ -37,5 +37,7 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string TlsClientAuthSanUri = "tls_client_auth_san_uri";
         public const string TlsClientAuthSanIp = "tls_client_auth_san_ip";
         public const string TlsClientAuthSanEmail = "tls_client_auth_san_email";
+        public const string UpdateDateTime = "update_datetime";
+        public const string CreateDateTime = "create_datetime";
     }
 }

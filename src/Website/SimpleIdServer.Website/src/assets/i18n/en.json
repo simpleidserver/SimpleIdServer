@@ -1,7 +1,30 @@
 {
   "close": "Close",
   "save": "Save",
+  "create": "Create",
   "seconds": "Secondes",
+  "applicationKinds": {
+    "0": {
+      "description": "Traditional web application using redirects",
+      "example": "Examples : ASP.NET, Node.JS Express"
+    },
+    "1": {
+      "description": "Web application developed with javascript",
+      "example": "Examples : Angular, React, Vue"
+    },
+    "2": {
+      "description": "Mobile and Desktop application running natively",
+      "example": "Examples : Electron, WPF, Android"
+    },
+    "3": {
+      "description": "Application is running on a server with no direct end user",
+      "example": "Examples : ASP.NET with login & password authentication"
+    },
+    "4": {
+      "description": "Daemon or service running on backend server",
+      "example": "Examples : REST.API"
+    }
+  },
   "languages": {
     "fr": "French",
     "en": "English"
@@ -14,6 +37,7 @@
     "languages": "Languages"
   },
   "applications": {
+    "add": "Create application",
     "kty": "Key Type",
     "alg": "Algorithm",
     "use": "Usage",
@@ -23,7 +47,9 @@
     },
     "messages": {
       "update": "Application is updated",
-      "errorUpdate": "An error occured while trying to update the application"
+      "add": "Application is added",
+      "errorUpdate": "An error occured while trying to update the application",
+      "errorAdd": "An error occured while trying to add the application"
     },
     "tokenExpirationTime": "Expiration time in seconds (IdToken & AccessToken)",
     "refreshTokenExpirationTime": "Expiration time in seconds of the refresh token",
@@ -47,7 +73,9 @@
     "basicinfo": "Basic information",
     "tokenAuthMethod": "Token Endpoint Authentication Method",
     "clientId": "Client ID",
+    "applicationKindRequired": "An application type must be selected",
     "clientName": "Name",
+    "clientNameRequired": "Name is required",
     "clientSecret": "Client Secret",
     "clientLogoUri": "Application Logo",
     "applicationType": "Application Type",

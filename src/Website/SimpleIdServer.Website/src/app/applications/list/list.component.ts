@@ -1,12 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
-import { startSearch } from '@app/stores/applications/actions/applications.actions';
+import { Router } from '@angular/router';
+import { startAdd, startSearch } from '@app/stores/applications/actions/applications.actions';
 import { Application } from '@app/stores/applications/models/application.model';
 import { SearchResult } from '@app/stores/applications/models/search.model';
 import * as fromReducers from '@app/stores/appstate';
-import { select, Store } from '@ngrx/store';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { merge } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { AddApplicationComponent } from './add-application.component';
 
 @Component({
   selector: 'list-applications',
@@ -19,9 +25,30 @@ export class ListApplicationsComponent implements OnInit {
   length: number;
   applications$: Array<Application> = [];
 
-  constructor(private store: Store<fromReducers.AppState>) { }
+  constructor(
+    private store: Store<fromReducers.AppState>,
+    private dialog: MatDialog,
+    private actions$: ScannedActionsSubject,
+    private router: Router,
+    private snackbar: MatSnackBar,
+    private translateService: TranslateService) { }
 
   ngOnInit(): void {
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Applications] COMPLETE_ADD_APPLICATON'))
+      .subscribe((evt: any) => {
+        this.snackbar.open(this.translateService.instant('applications.messages.add'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.router.navigate(['/applications/' + evt.clientId]);
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Applications] ERROR_ADD_APPLICATION'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('applications.messages.errorAdd'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.store.pipe(select(fromReducers.selectApplicationsResult)).subscribe((state: SearchResult<Application> | null) => {
       if (!state) {
         return;
@@ -60,5 +87,19 @@ export class ListApplicationsComponent implements OnInit {
 
     let request = startSearch({ order: active, direction, count, startIndex });
     this.store.dispatch(request);
+  }
+
+  addApplication() {
+    const dialogRef = this.dialog.open(AddApplicationComponent, {
+      width: '800px'
+    });
+    dialogRef.afterClosed().subscribe((opt : any) => {
+      if (!opt) {
+        return;
+      }
+
+      const addApp = startAdd({ applicationKind: opt.applicationKind, name: opt.clientName });
+      this.store.dispatch(addApp);
+    });
   }
 }

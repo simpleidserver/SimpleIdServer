@@ -20,6 +20,25 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/management/clients",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/applications",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/management/scopes/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

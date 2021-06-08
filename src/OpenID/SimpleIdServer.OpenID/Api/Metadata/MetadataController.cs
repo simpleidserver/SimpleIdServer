@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +30,7 @@ namespace SimpleIdServer.OpenID.Api.Metadata
         [HttpGet]
         public async Task<IActionResult> GetMetadata(CancellationToken cancellationToken)
         {
-            var name = this.GetMetadataLanguage(_options);
+            var name = this.GetLanguage(_options);
             var result = await _metadataResultBuilder
                 .AddTranslatedEnum<ApplicationKinds>("applicationKind")
                 .Build(name, cancellationToken);

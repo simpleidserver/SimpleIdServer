@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { completeGet, completeSearch, completeUpdate, errorGet, errorSearch, errorUpdate, startGet, startSearch, startUpdate } from '../actions/applications.actions';
+import { completeAdd, completeGet, completeSearch, completeUpdate, errorAdd, errorGet, errorSearch, errorUpdate, startAdd, startGet, startSearch, startUpdate } from '../actions/applications.actions';
 import { ApplicationService } from '../services/application.service';
 
 @Injectable()
@@ -41,14 +41,14 @@ export class ApplicationEffects {
   );
 
   @Effect()
-  updateOAuthClient$ = this.actions$
+  addOAuthClient$ = this.actions$
     .pipe(
-      ofType(startUpdate),
+      ofType(startAdd),
       mergeMap((evt) => {
-        return this.applicationService.update(evt.id, evt.request)
+        return this.applicationService.add(evt.applicationKind, evt.name)
           .pipe(
-            map(content => completeUpdate()),
-            catchError(() => of(errorUpdate()))
+            map(content => completeAdd({ clientId : content })),
+            catchError(() => of(errorAdd()))
           );
       }
       )

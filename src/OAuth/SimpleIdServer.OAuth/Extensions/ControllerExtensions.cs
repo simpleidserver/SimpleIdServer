@@ -2,18 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OpenID.Middlewares;
 using System.Linq;
 
-namespace SimpleIdServer.OpenID.Extensions
+namespace SimpleIdServer.OAuth.Extensions
 {
     public static class ControllerExtensions
     {
-        public static string GetMetadataLanguage(this Controller controller, OAuthHostOptions options)
+        public static string GetLanguage(this Controller controller, OAuthHostOptions options)
         {
-            if (controller.Request.Headers.ContainsKey(UILocalesMiddleware.AcceptLanguage))
+            if (controller.Request.Headers.ContainsKey(TranslationHelper.AcceptLanguage))
             {
-                var strValues = controller.Request.Headers[UILocalesMiddleware.AcceptLanguage];
+                var strValues = controller.Request.Headers[TranslationHelper.AcceptLanguage];
                 if (strValues.Count == 0)
                 {
                     return null;

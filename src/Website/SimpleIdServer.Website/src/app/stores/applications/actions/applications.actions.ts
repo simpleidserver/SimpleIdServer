@@ -11,3 +11,6 @@ export const errorGet = createAction('[Applications] ERROR_GET_APPLICATION');
 export const startUpdate = createAction('[Applications] START_UPDATE_APPLICATON', props<{ id: string, request: any }>());
 export const completeUpdate = createAction('[Applications] COMPLETE_UPDATE_APPLICATON');
 export const errorUpdate = createAction('[Applications] ERROR_UPDATE_APPLICATION');
+export const startAdd = createAction('[Applications] START_ADD_APPLICATION', props<{ applicationKind: number, name: string }>());
+export const completeAdd = createAction('[Applications] COMPLETE_ADD_APPLICATON', props<{ clientId: string }>());
+export const errorAdd = createAction('[Applications] ERROR_ADD_APPLICATION');

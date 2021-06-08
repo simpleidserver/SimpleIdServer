@@ -3,6 +3,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.OAuth.Api.Token.Handlers;
+using SimpleIdServer.OAuth.Authenticate.Handlers;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Infrastructures;
 using System;
@@ -162,6 +164,53 @@ namespace SimpleIdServer.OpenID.Domains
         }
 
         #endregion
+
+        public static OpenIdClient Create(
+            ApplicationKinds applicationKind, 
+            string clientName, 
+            string language, 
+            DateTime? clientSecretExpirationTime,
+            int tokenExpirationTimeInSeconds,
+            int refreshTokenExpirationTimeInSeconds)
+        {
+            var result = new OpenIdClient
+            {
+                ClientId = Guid.NewGuid().ToString(),
+                ApplicationKind = applicationKind,
+                TokenExpirationTimeInSeconds = tokenExpirationTimeInSeconds,
+                RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds
+            };
+            result.SetClientSecret(Guid.NewGuid().ToString(), clientSecretExpirationTime);
+            result.AddClientName(language, clientName);
+            switch(applicationKind)
+            {
+                case ApplicationKinds.Native:
+                case ApplicationKinds.SPA:
+                    result.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
+                    result.GrantTypes = new string[] { AuthorizationCodeHandler.GRANT_TYPE };
+                    break;
+                case ApplicationKinds.Service:
+                case ApplicationKinds.Web:
+                case ApplicationKinds.Trusted:
+                    result.TokenEndPointAuthMethod = OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD;
+                    if (applicationKind == ApplicationKinds.Trusted)
+                    {
+                        result.GrantTypes = new string[] { PasswordHandler.GRANT_TYPE };
+                    }
+                    else if (applicationKind == ApplicationKinds.Web)
+                    {
+                        result.GrantTypes = new string[] { AuthorizationCodeHandler.GRANT_TYPE };
+                    }
+                    else if (applicationKind == ApplicationKinds.Service)
+                    {
+                        result.GrantTypes = new string[] { ClientCredentialsHandler.GRANT_TYPE };
+                    }
+                    break;
+            }
+            result.UpdateDateTime = DateTime.UtcNow;
+            result.CreateDateTime = DateTime.UtcNow;
+            return result;
+        }
 
         public override void SetAllowedScopes(ICollection<OAuthScope> scopes)
         {

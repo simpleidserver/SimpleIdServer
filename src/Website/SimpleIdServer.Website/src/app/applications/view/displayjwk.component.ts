@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 interface DialogData {
@@ -8,7 +8,7 @@ interface DialogData {
 @Component({
   selector: 'displayjwk',
   templateUrl: './displayjwk.component.html',
-  styleUrls: ['./displayjwk.component.scss'],
+  styleUrls: ['./displayjwk.component.scss']
 })
 export class DisplayJwkComponent {
   constructor(

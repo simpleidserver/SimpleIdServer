@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,6 +62,7 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
             oauthClient.TokenExpirationTimeInSeconds = extractClient.TokenExpirationTimeInSeconds;
             oauthClient.RefreshTokenExpirationTimeInSeconds = extractClient.RefreshTokenExpirationTimeInSeconds;
             oauthClient.GrantTypes = extractClient.GrantTypes;
+            oauthClient.UpdateDateTime = DateTime.UtcNow;
         }
 
         protected virtual BaseClient ExtractClient(JObject content)

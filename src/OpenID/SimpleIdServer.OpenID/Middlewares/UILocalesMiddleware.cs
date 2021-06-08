@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.DTOs;
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Extensions;
 using System.Linq;
@@ -13,7 +14,6 @@ namespace SimpleIdServer.OpenID.Middlewares
 {
     public class UILocalesMiddleware
     {
-        public const string AcceptLanguage = "Accept-Language";
         private readonly RequestDelegate _next;
 
         public UILocalesMiddleware(RequestDelegate next)
@@ -33,9 +33,9 @@ namespace SimpleIdServer.OpenID.Middlewares
                 }
             }
 
-            if (context.Request.Headers.ContainsKey(AcceptLanguage))
+            if (context.Request.Headers.ContainsKey(TranslationHelper.AcceptLanguage))
             {
-                var acceptLanguages = context.Request.Headers[AcceptLanguage].FirstOrDefault();
+                var acceptLanguages = context.Request.Headers[TranslationHelper.AcceptLanguage].FirstOrDefault();
                 if (await UpdateLanguage(acceptLanguages, opts.Value, context))
                 {
                     return;

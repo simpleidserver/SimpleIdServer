@@ -8,6 +8,7 @@ import { SharedModule } from '@app/shared/shared.module';
 import { AvatarModule } from 'ngx-avatar';
 import { TranslateMetadataPipe } from '../pipes/translatemetadata';
 import { ApplicationsRoutes } from './applications.routes';
+import { AddApplicationComponent } from './list/add-application.component';
 import { ListApplicationsComponent } from './list/list.component';
 import { DisplayJwkComponent } from './view/displayjwk.component';
 import { EditTranslationComponent } from './view/edit-translation.component';
@@ -26,6 +27,7 @@ import { ViewApplicationsComponent } from './view/view.component';
     ViewApplicationsComponent,
     EditTranslationComponent,
     DisplayJwkComponent,
+    AddApplicationComponent,
     MetadatadataSelector,
     MultiSelector,
     TranslateEnumPipe,
