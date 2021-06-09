@@ -12,28 +12,29 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
 {
     public class DefaultConfiguration
     {
-        private static OAuthScope AccountsScope = new OAuthScope
+        public static OAuthScope AccountsScope = new OAuthScope
         {
             Name = "accounts",
-            IsExposedInConfigurationEdp = true
-        };
-        private static OAuthScope ScimScope = new OAuthScope
-        {
-            Name = "scim",
-            Claims = new List<OAuthScopeClaim>
-            {
-                new OAuthScopeClaim("scim_id", true)
-            }
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = true,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
         };
         private static OAuthScope ManageClientsScope = new OAuthScope
         {
             Name = "manage_clients",
-            IsExposedInConfigurationEdp = true
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
         };
         private static OAuthScope ManageScopesScope = new OAuthScope
         {
             Name = "manage_scopes",
-            IsExposedInConfigurationEdp = true
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
         };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
@@ -44,10 +45,10 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,
-            ScimScope,
+            SIDOpenIdConstants.StandardScopes.ScimScope,
+            AccountsScope,
             ManageClientsScope,
-            ManageScopesScope,
-            AccountsScope
+            ManageScopesScope
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -352,7 +353,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     IdTokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        ScimScope
+                        SIDOpenIdConstants.StandardScopes.ScimScope
                     },
                     GrantTypes = new List<string>
                     {

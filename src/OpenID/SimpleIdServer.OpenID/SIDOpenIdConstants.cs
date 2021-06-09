@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Domains;
+using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OpenID
@@ -83,7 +84,10 @@ namespace SimpleIdServer.OpenID
                     StandardClaims.Locale,
                     StandardClaims.UpdatedAt
                 },
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             public static OAuthScope Email = new OAuthScope
             {
@@ -93,7 +97,10 @@ namespace SimpleIdServer.OpenID
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
                 },
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             public static OAuthScope Address = new OAuthScope
             {
@@ -102,7 +109,10 @@ namespace SimpleIdServer.OpenID
                 {
                     StandardClaims.Address
                 },
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             public static OAuthScope Phone = new OAuthScope
             {
@@ -112,7 +122,10 @@ namespace SimpleIdServer.OpenID
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
                 },
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             public static OAuthScope Role = new OAuthScope
             {
@@ -121,7 +134,10 @@ namespace SimpleIdServer.OpenID
                 {
                     StandardClaims.Role
                 },
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             public static OAuthScope OpenIdScope = new OAuthScope
             {
@@ -130,12 +146,30 @@ namespace SimpleIdServer.OpenID
                 {
                     StandardClaims.Subject
                 },
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             public static OAuthScope OfflineAccessScope = new OAuthScope
             {
                 Name = "offline_access",
-                IsExposedInConfigurationEdp = true
+                IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static OAuthScope ScimScope = new OAuthScope
+            {
+                Name = "scim",
+                IsExposedInConfigurationEdp = true,
+                Claims = new List<OAuthScopeClaim>
+                {
+                    new OAuthScopeClaim("scim_id", true)
+                },
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
         }
     }

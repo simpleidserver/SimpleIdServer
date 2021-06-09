@@ -18,5 +18,5 @@
     </None>
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties ocelot_1development_1json__JsonSchema="https://gitlab.com/-/snippets/2062623/raw/master/foundryvtt_manifest_schema.json" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties ocelot_1development_1json__JsonSchema="https://json.schemastore.org/aiproj.json" /></VisualStudio></ProjectExtensions>
 </Project>

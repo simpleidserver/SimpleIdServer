@@ -21,6 +21,7 @@ namespace SimpleIdServer.OAuth.Domains
         #region Properties
 
         public string Name { get; set; }
+        public bool IsStandardScope { get; set; }
         public bool IsExposedInConfigurationEdp { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
@@ -41,6 +42,7 @@ namespace SimpleIdServer.OAuth.Domains
                 IsExposedInConfigurationEdp = IsExposedInConfigurationEdp,
                 CreateDateTime = CreateDateTime,
                 UpdateDateTime = UpdateDateTime,
+                IsStandardScope = IsStandardScope,
                 Claims = Claims.Select(c => (OAuthScopeClaim)c.Clone()).ToList()
             };
         }

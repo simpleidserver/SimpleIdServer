@@ -7,6 +7,7 @@ export interface AppState {
   application: fromApplications.ApplicationState;
   applications: fromApplications.SearchApplicationsState;
   languages: fromMetadata.LanguagesState;
+  searchOAuthScopes: fromScopes.SearchOAuthScopesState,
   oauthScopes: fromScopes.OAuthScopesState;
   wellKnownConfiguration: fromMetadata.WellKnownConfigurationState
 }
@@ -14,6 +15,7 @@ export interface AppState {
 export const selectApplication = (state: AppState) => state.application;
 export const selectApplications = (state: AppState) => state.applications;
 export const selectLanguages = (state: AppState) => state.languages;
+export const selectSearchOAuthScopes = (state: AppState) => state.searchOAuthScopes;
 export const selectOAuthScopes = (state: AppState) => state.oauthScopes;
 export const selectWellKnownConfiguration = (state: AppState) => state.wellKnownConfiguration;
 
@@ -48,7 +50,18 @@ export const selectLanguagesResult = createSelector(
 
     return state.Languages;
   }
-); 
+);
+
+export const selectSearchOAuthScopesResult = createSelector(
+  selectSearchOAuthScopes,
+  (state: fromScopes.SearchOAuthScopesState) => {
+    if (!state || state.Scopes === null) {
+      return null;
+    }
+
+    return state.Scopes;
+  }
+);
 
 export const selectOAuthScopesResult = createSelector(
     selectOAuthScopes,
@@ -76,6 +89,7 @@ export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
   languages: fromMetadata.getLanguagesReducer,
+  searchOAuthScopes: fromScopes.getSearchOauthScopesReducer,
   oauthScopes: fromScopes.getOAuthScopesReducer,
   wellKnownConfiguration: fromMetadata.getWellKnownConfiguration
 };

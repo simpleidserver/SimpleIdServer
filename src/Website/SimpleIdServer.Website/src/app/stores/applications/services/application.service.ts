@@ -70,4 +70,13 @@ export class ApplicationService {
       return res['id'];
     }));
   }
+
+  delete(clientId : string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    headers = headers.set('Accept-Language', this.translateService.currentLang);
+    let targetUrl = environment.apiUrl + "/applications/" + clientId;
+    return this.http.delete(targetUrl, { headers: headers });
+  }
 }

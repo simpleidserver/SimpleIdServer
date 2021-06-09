@@ -3,14 +3,14 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectionResult } from '@app/common/components/multiselector/multiselector.component';
 import { Translation } from '@app/common/translation';
-import { startGet, startUpdate } from '@app/stores/applications/actions/applications.actions';
+import { startDelete, startGet, startUpdate } from '@app/stores/applications/actions/applications.actions';
 import { Application } from '@app/stores/applications/models/application.model';
 import * as fromReducers from '@app/stores/appstate';
 import { startGetLanguages, startGetWellKnownConfiguration } from '@app/stores/metadata/actions/metadata.actions';
-import { startGetAllScopes } from '@app/stores/scopes/actions/scope.actions';
+import { startGetAll } from '@app/stores/scopes/actions/scope.actions';
 import { OAuthScope } from '@app/stores/scopes/models/oauthscope.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -56,7 +56,8 @@ export class ViewApplicationsComponent implements OnInit {
     private translateService: TranslateService,
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
-    private actions$: ScannedActionsSubject) { }
+    private actions$: ScannedActionsSubject,
+    private router : Router) { }
 
   ngOnInit(): void {
     this.store.pipe(select(fromReducers.selectApplicationResult)).subscribe((application: Application | null) => {
@@ -95,7 +96,7 @@ export class ViewApplicationsComponent implements OnInit {
     this.actions$.pipe(
       filter((action: any) => action.type === '[Applications] COMPLETE_UPDATE_APPLICATON'))
       .subscribe(() => {
-        this.snackbar.open(this.translateService.instant('applications.messages.updated'), this.translateService.instant('undo'), {
+        this.snackbar.open(this.translateService.instant('applications.messages.update'), this.translateService.instant('undo'), {
           duration: 2000
         });
       });
@@ -103,6 +104,21 @@ export class ViewApplicationsComponent implements OnInit {
       filter((action: any) => action.type === '[Applications] ERROR_UPDATE_APPLICATION'))
       .subscribe(() => {
         this.snackbar.open(this.translateService.instant('applications.messages.errorUpdate'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Applications] COMPLETE_DELETE_APPLICATION'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('applications.messages.delete'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.router.navigate(['/applications']);
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Applications] ERROR_DELETE_APPLICATION'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('applications.messages.errorDelete'), this.translateService.instant('undo'), {
           duration: 2000
         });
       });
@@ -114,7 +130,7 @@ export class ViewApplicationsComponent implements OnInit {
     let getClient = startGet({ id: id });
     let getLanguages = startGetLanguages();
     let getWellKnownConfiguration = startGetWellKnownConfiguration();
-    let getOAuthScopes = startGetAllScopes();
+    let getOAuthScopes = startGetAll();
     this.store.dispatch(getClient);
     this.store.dispatch(getLanguages);
     this.store.dispatch(getWellKnownConfiguration);
@@ -230,6 +246,11 @@ export class ViewApplicationsComponent implements OnInit {
     this.enrichTranslations(request, 'logo_uri', this.clientLogoUris);
     let update = startUpdate({ id: this.application.ClientId, request });
     this.store.dispatch(update);
+  }
+
+  delete() {
+    let deleteApplication = startDelete({ id: this.application.ClientId });
+    this.store.dispatch(deleteApplication);
   }
 
   private clone(translations: Translation[]) {

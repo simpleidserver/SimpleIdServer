@@ -19,7 +19,9 @@ namespace SimpleIdServer.OpenBankingApi
             public static OAuthScope Accounts = new OAuthScope("accounts")
             {
                 IsExposedInConfigurationEdp = true,
+                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
                 Claims = new List<OAuthScopeClaim>
                 {
                     new OAuthScopeClaim("acr", true),

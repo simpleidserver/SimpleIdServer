@@ -16,14 +16,6 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup
 {
     public class DefaultConfiguration
     {
-        public static OAuthScope Scim = new OAuthScope
-        {
-            Name = "scim",
-            Claims = new List<OAuthScopeClaim>
-            {
-                new OAuthScopeClaim("scim_id", true)
-            }
-        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -33,8 +25,8 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,
+            SIDOpenIdConstants.StandardScopes.ScimScope,
             OpenBankingApiConstants.OpenBankingApiScopes.Accounts,
-            Scim
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>

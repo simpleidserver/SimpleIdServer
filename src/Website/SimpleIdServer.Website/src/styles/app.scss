@@ -117,3 +117,18 @@ body, h1 {
   border-radius: 0 !important;
   border: none;
 }
+
+/* Alert */
+.alert {
+  width: 100%;
+  border-radius: .25rem;
+  padding: .75rem 1.25rem;
+  border: 1px solid transparent;
+}
+
+.alert.alert-danger {
+  color: #721c24;
+  background-color: #f17b7b;
+  border-color: #f17b7b;
+  margin-bottom: 20px;
+}

@@ -11,6 +11,18 @@ namespace SimpleIdServer.OAuth.Extensions
 {
     public static class DTOJsonExtensions
     {
+        public static JObject ToDto(this OAuthScope scope)
+        {
+            return new JObject
+            {
+                { OAuthScopeParameters.Name, scope.Name },
+                { OAuthScopeParameters.IsExposed, scope.IsExposedInConfigurationEdp },
+                { OAuthScopeParameters.IsStandard, scope.IsStandardScope },
+                { OAuthScopeParameters.UpdateDateTime, scope.UpdateDateTime },
+                { OAuthScopeParameters.CreateDateTime, scope.CreateDateTime }
+            };
+        }
+
         public static JObject ToDto(this BaseClient client, string issuer)
         {
             var result = new JObject();

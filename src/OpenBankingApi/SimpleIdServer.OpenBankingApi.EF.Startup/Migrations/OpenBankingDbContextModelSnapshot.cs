@@ -141,6 +141,9 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
                     b.Property<bool>("IsExposedInConfigurationEdp")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsStandardScope")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
 

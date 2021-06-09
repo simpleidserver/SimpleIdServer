@@ -12,5 +12,9 @@ export const routes: Routes = [
     path: 'applications',
     loadChildren: async () => (await import('./applications/applications.module')).ApplicationsModule
   },
+  {
+    path: 'scopes',
+    loadChildren: async () => (await import('./scopes/scopes.module')).ScopesModule
+  },
   { path: '**', redirectTo: '/status/404' }
 ];

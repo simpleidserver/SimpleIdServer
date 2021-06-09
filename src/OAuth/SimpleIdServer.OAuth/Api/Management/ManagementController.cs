@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Management.Handlers;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
@@ -27,6 +26,8 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly ISearchOauthClientsHandler _searchOauthClientsHandler;
         private readonly IUpdateOAuthClientHandler _updateOAuthClientHandler;
         private readonly IAddOAuthClientHandler _addOAuthClientHandler;
+        private readonly IDeleteOAuthClientHandler _deleteOAuthClientHandler;
+        private readonly ISearchOAuthScopesHandler _searchOAuthScopesHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -35,6 +36,8 @@ namespace SimpleIdServer.OAuth.Api.Management
             ISearchOauthClientsHandler searchOauthClientsHandler,
             IUpdateOAuthClientHandler updateOAuthClientHandler,
             IAddOAuthClientHandler addOAuthClientHandler,
+            IDeleteOAuthClientHandler deleteOAuthClientHandler,
+            ISearchOAuthScopesHandler searchOAuthScopesHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -42,6 +45,8 @@ namespace SimpleIdServer.OAuth.Api.Management
             _searchOauthClientsHandler = searchOauthClientsHandler;
             _updateOAuthClientHandler = updateOAuthClientHandler;
             _addOAuthClientHandler = addOAuthClientHandler;
+            _deleteOAuthClientHandler = deleteOAuthClientHandler;
+            _searchOAuthScopesHandler = searchOAuthScopesHandler;
             _options = options.Value;
         }
 
@@ -105,40 +110,60 @@ namespace SimpleIdServer.OAuth.Api.Management
             };
         }
 
+        [HttpDelete("clients/{id}")]
+        [Authorize("ManageClients")]
+        public virtual async Task<IActionResult> DeleteClient(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _deleteOAuthClientHandler.Handle(id, cancellationToken);
+                return new NoContentResult();
+            }
+            catch(OAuthClientNotFoundException)
+            {
+                return new NotFoundResult();
+            }
+        }
+
         #endregion
 
         #region Manage scopes
 
         [HttpGet("scopes")]
         [Authorize("ManageScopes")]
-        public virtual async Task<IActionResult> GetScopes(CancellationToken cancellationToken)
+        public virtual async Task<IActionResult> GetAllScopes(CancellationToken cancellationToken)
         {
             var result = await _oauthScopeRepository.GetAllOAuthScopes(cancellationToken);
-            return new OkObjectResult(result.Select(_ => ToDto(_)));
+            return new OkObjectResult(result.Select(s => s.ToDto()));
+        }
+
+        [HttpGet("scopes/.search")]
+        [Authorize("ManageScopes")]
+        public virtual async Task<IActionResult> SearchScopes(CancellationToken cancellationToken)
+        {
+            var queries = Request.Query.ToEnumerable();
+            var parameter = ToSearchScopeParameter(queries);
+            return new OkObjectResult(await _searchOAuthScopesHandler.Handle(parameter, cancellationToken));
         }
 
         #endregion
 
         private async Task<IActionResult> InternalSearchClients(IEnumerable<KeyValuePair<string, string>> queries, CancellationToken cancellationToken)
         {
-            var parameter = ToParameter(queries);
+            var parameter = ToSearchClientParameter(queries);
             return new OkObjectResult(await _searchOauthClientsHandler.Handle(parameter, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken));
         }
 
-        private static JObject ToDto(OAuthScope scope)
-        {
-            return new JObject
-            {
-                { "name", scope.Name },
-                { "is_exposed", scope.IsExposedInConfigurationEdp },
-                { "update_datetime", scope.UpdateDateTime },
-                { "create_datetime", scope.CreateDateTime }
-            };
-        }
-
-        private static SearchClientParameter ToParameter(IEnumerable<KeyValuePair<string, string>> queries)
+        private static SearchClientParameter ToSearchClientParameter(IEnumerable<KeyValuePair<string, string>> queries)
         {
             var result = new SearchClientParameter();
+            result.ExtractSearchParameter(queries);
+            return result;
+        }
+
+        private static SearchScopeParameter ToSearchScopeParameter(IEnumerable<KeyValuePair<string, string>> queries)
+        {
+            var result = new SearchScopeParameter();
             result.ExtractSearchParameter(queries);
             return result;
         }

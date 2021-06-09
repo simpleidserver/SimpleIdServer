@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SimpleIdServer.OpenBankingApi.EF;
+using SimpleIdServer.OpenID.EF;
 
-namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
+namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 {
-    [DbContext(typeof(OpenBankingDbContext))]
-    [Migration("20210602193141_Init")]
+    [DbContext(typeof(OpenIdDBContext))]
+    [Migration("20210609135542_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -141,6 +141,9 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsExposedInConfigurationEdp")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsStandardScope")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdateDateTime")
@@ -304,142 +307,6 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
                     b.HasKey("PkID");
 
                     b.ToTable("Tokens");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.Account.AccountAggregate", b =>
-                {
-                    b.Property<string>("AggregateId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("AccountSubType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AccountType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("MaturityDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nickname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("OpeningDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ServicerIdentification")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("StatusUpdateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Subject")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SwitchStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
-
-                    b.HasKey("AggregateId");
-
-                    b.HasIndex("ServicerIdentification");
-
-                    b.ToTable("Accounts");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.Account.CashAccount", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AccountAggregateAggregateId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Identification")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SchemeName")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SecondaryIdentification")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountAggregateAggregateId");
-
-                    b.ToTable("CashAccount");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.Account.Servicer", b =>
-                {
-                    b.Property<string>("Identification")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("SchemeName")
-                        .HasColumnType("int");
-
-                    b.HasKey("Identification");
-
-                    b.ToTable("Servicer");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.AccountAccessConsent.AccountAccessConsentAggregate", b =>
-                {
-                    b.Property<string>("AggregateId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AccountIds")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClientId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpirationDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Permissions")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Risk")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StatusUpdateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TransactionFromDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TransactionToDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
-
-                    b.HasKey("AggregateId");
-
-                    b.ToTable("AccountAccessConsents");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OpenID.Domains.AuthenticationContextClassReference", b =>
@@ -801,22 +668,6 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.Account.AccountAggregate", b =>
-                {
-                    b.HasOne("SimpleIdServer.OpenBankingApi.Domains.Account.Servicer", "Servicer")
-                        .WithMany()
-                        .HasForeignKey("ServicerIdentification");
-
-                    b.Navigation("Servicer");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.Account.CashAccount", b =>
-                {
-                    b.HasOne("SimpleIdServer.OpenBankingApi.Domains.Account.AccountAggregate", null)
-                        .WithMany("Accounts")
-                        .HasForeignKey("AccountAggregateAggregateId");
-                });
-
             modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorizePermission", b =>
                 {
                     b.HasOne("SimpleIdServer.OpenID.Domains.BCAuthorize", null)
@@ -855,11 +706,6 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
                     b.Navigation("Credentials");
 
                     b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OpenBankingApi.Domains.Account.AccountAggregate", b =>
-                {
-                    b.Navigation("Accounts");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorize", b =>

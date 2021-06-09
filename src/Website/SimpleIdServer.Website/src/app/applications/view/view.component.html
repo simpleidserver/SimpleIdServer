@@ -194,3 +194,12 @@
     </mat-card-actions>
   </form>
 </mat-card>
+<h2>{{ 'applications.dangerZone' | translate }}</h2>
+<div class="alert alert-danger" fxLayout="row">
+  <div fxFlex="90%">
+    <b>{{ 'applications.deleteTitle' | translate }}</b>
+  </div>
+  <div>
+    <button mat-raised-button color="warn" (click)="delete()">{{ 'applications.delete' | translate }}</button>
+  </div>
+</div>

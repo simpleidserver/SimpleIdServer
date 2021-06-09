@@ -48,9 +48,14 @@
     "messages": {
       "update": "Application is updated",
       "add": "Application is added",
+      "delete": "Application is removed",
       "errorUpdate": "An error occured while trying to update the application",
-      "errorAdd": "An error occured while trying to add the application"
+      "errorAdd": "An error occured while trying to add the application",
+      "errorDelete": "An error occured while trying to remove the application"
     },
+    "dangerZone": "Danger zone",
+    "delete": "Delete",
+    "deleteTitle": "Delete this application",
     "tokenExpirationTime": "Expiration time in seconds (IdToken & AccessToken)",
     "refreshTokenExpirationTime": "Expiration time in seconds of the refresh token",
     "scopes": "Scopes",
@@ -105,5 +110,12 @@
       "urn:openid:params:grant-type:ciba": "CIBA",
       "implicit": "Implicit"
     }
+  },
+  "scopes": {
+    "list": "Scopes",
+    "add": "Create scope",
+    "scopeName": "Name",
+    "updateDateTime": "Update Datetime",
+    "isStandard": "Is standard scope ?"
   }
 }

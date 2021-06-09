@@ -16,7 +16,7 @@
       "description": "Application mobile ou de bureau qui tourne nativement sur la machine",
       "example": "Exemples : Electron, WPF, Android"
     },
-    "3" : {
+    "3": {
       "description": "Application qui tourne directement sur le serveur backend sans aucune intéraction avec l'utilisateur",
       "example": "Exemples : ASP.NET avec authentification login & mot de passe"
     },
@@ -48,9 +48,14 @@
     "messages": {
       "updated": "L'application a été mise à jour",
       "add": "L'application a été ajoutée",
+      "delete": "L'application a été supprimée",
       "errorUpdate": "Une erreur est survenue durant la mise à jour de l'application",
-      "errorAdd": "Une erreur est survenue durant l'ajout de l'application"
+      "errorAdd": "Une erreur est survenue durant l'ajout de l'application",
+      "errorDelete": "Une erreur est survenue durant la suppression de l'application"
     },
+    "dangerZone": "Zone de danger",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer cette application",
     "tokenExpirationTime": "Expiration en secondes des tokens (IdToken & AccessToken)",
     "refreshTokenExpirationTime": "Expiration en secondes du refresh token",
     "certificates": "Certificats",
@@ -105,5 +110,12 @@
       "urn:openid:params:grant-type:ciba": "CIBA",
       "implicit": "Implicit"
     }
+  },
+  "scopes": {
+    "list": "Scopes",
+    "add": "Créer un scope",
+    "scopeName": "Nom",
+    "updateDateTime": "Date de mise à jour",
+    "isStandard": "Est un scope standard ?"
   }
 }

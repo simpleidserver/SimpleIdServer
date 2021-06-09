@@ -48,6 +48,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 columns: table => new
                 {
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsStandardScope = table.Column<bool>(type: "bit", nullable: false),
                     IsExposedInConfigurationEdp = table.Column<bool>(type: "bit", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)

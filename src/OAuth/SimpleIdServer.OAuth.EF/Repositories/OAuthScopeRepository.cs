@@ -2,7 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OAuth.Persistence.Parameters;
+using SimpleIdServer.OAuth.Persistence.Results;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,6 +15,12 @@ namespace SimpleIdServer.OAuth.EF.Repositories
 {
     public class OAuthScopeRepository : IOAuthScopeRepository
     {
+        private static Dictionary<string, string> MAPPING_SCOPE_TO_PROPERTYNAME = new Dictionary<string, string>
+        {
+            { "name", "Name" },
+            { "create_datetime", "CreateDateTime" },
+            { "update_datetime", "UpdateDateTime" }
+        };
         private readonly OAuthDBContext _dbContext;
 
         public OAuthScopeRepository(OAuthDBContext dbContext)
@@ -55,6 +64,25 @@ namespace SimpleIdServer.OAuth.EF.Repositories
         {
             _dbContext.OAuthScopes.Update(data);
             return Task.FromResult(true);
+        }
+
+        public async Task<SearchResult<OAuthScope>> Find(SearchScopeParameter parameter, CancellationToken cancellationToken)
+        {
+            var result = _dbContext.OAuthScopes.AsQueryable();
+            if (MAPPING_SCOPE_TO_PROPERTYNAME.ContainsKey(parameter.OrderBy))
+            {
+                result = result.InvokeOrderBy(MAPPING_SCOPE_TO_PROPERTYNAME[parameter.OrderBy], parameter.Order);
+            }
+
+            int totalLength = result.Count();
+            var content = await result.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync(cancellationToken);
+            return new SearchResult<OAuthScope>
+            {
+                StartIndex = parameter.StartIndex,
+                Count = parameter.Count,
+                TotalLength = totalLength,
+                Content = content
+            };
         }
 
         public Task<int> SaveChanges(CancellationToken token)

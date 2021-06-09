@@ -10,7 +10,7 @@
         }
       ],
       "UpstreamPathTemplate": "/applications/{everything}",
-      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ],
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
       "DelegatingHandlers": [
         "ManageClientClientCredentialsHandler"
       ],

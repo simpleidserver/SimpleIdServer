@@ -14,3 +14,6 @@ export const errorUpdate = createAction('[Applications] ERROR_UPDATE_APPLICATION
 export const startAdd = createAction('[Applications] START_ADD_APPLICATION', props<{ applicationKind: number, name: string }>());
 export const completeAdd = createAction('[Applications] COMPLETE_ADD_APPLICATON', props<{ clientId: string }>());
 export const errorAdd = createAction('[Applications] ERROR_ADD_APPLICATION');
+export const startDelete = createAction('[Applications] START_DELETE_APPLICATION', props<{ id: string }>());
+export const completeDelete = createAction('[Applications] COMPLETE_DELETE_APPLICATION');
+export const errorDelete = createAction('[Applications] ERROR_DELETE_APPLICATION');

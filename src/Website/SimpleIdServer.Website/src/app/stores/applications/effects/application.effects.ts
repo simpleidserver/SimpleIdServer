@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { completeAdd, completeGet, completeSearch, completeUpdate, errorAdd, errorGet, errorSearch, errorUpdate, startAdd, startGet, startSearch, startUpdate } from '../actions/applications.actions';
+import { completeAdd, completeDelete, completeGet, completeSearch, errorAdd, errorDelete, errorGet, errorSearch, startAdd, startDelete, startGet, startSearch } from '../actions/applications.actions';
 import { ApplicationService } from '../services/application.service';
 
 @Injectable()
@@ -49,6 +49,20 @@ export class ApplicationEffects {
           .pipe(
             map(content => completeAdd({ clientId : content })),
             catchError(() => of(errorAdd()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  deleteClient$ = this.actions$
+    .pipe(
+      ofType(startDelete),
+      mergeMap((evt) => {
+        return this.applicationService.delete(evt.id)
+          .pipe(
+            map(() => completeDelete()),
+            catchError(() => of(errorDelete()))
           );
       }
       )
