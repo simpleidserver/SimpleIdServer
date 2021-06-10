@@ -6,11 +6,13 @@ import { MatSort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { SearchResult } from '@app/stores/applications/models/search.model';
 import * as fromReducers from '@app/stores/appstate';
-import { startSearch } from '@app/stores/scopes/actions/scope.actions';
+import { startAdd, startSearch } from '@app/stores/scopes/actions/scope.actions';
 import { OAuthScope } from '@app/stores/scopes/models/oauthscope.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { merge } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { AddScopeComponent } from './add-scope.component';
 
 @Component({
   selector: 'list-scopes',
@@ -35,6 +37,21 @@ export class ListScopesComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true;
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[OAuthScopes] COMPLETE_ADD_SCOPE'))
+      .subscribe((evt: any) => {
+        this.snackbar.open(this.translateService.instant('scopes.messages.add'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.router.navigate(['/scopes/' + evt.name]);
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[OAuthScopes] ERROR_ADD_APPLICATION'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('scopes.messages.errorAdd'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.store.pipe(select(fromReducers.selectSearchOAuthScopesResult)).subscribe((state: SearchResult<OAuthScope> | null) => {
       if (!state) {
         return;
@@ -52,7 +69,17 @@ export class ListScopesComponent implements OnInit {
   }
 
   public addScope() {
+    const dialogRef = this.dialog.open(AddScopeComponent, {
+      width: '800px'
+    });
+    dialogRef.afterClosed().subscribe((opt: any) => {
+      if (!opt) {
+        return;
+      }
 
+      const addScope = startAdd({ name: String(opt) });
+      this.store.dispatch(addScope);
+    });
   }
 
   private refresh() {

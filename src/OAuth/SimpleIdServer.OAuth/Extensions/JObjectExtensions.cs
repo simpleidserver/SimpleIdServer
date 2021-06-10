@@ -396,6 +396,11 @@ namespace SimpleIdServer.OAuth.Extensions
 
         #region OAuth Scope parameters
 
+        public static string GetScopeName(this JObject jObj)
+        {
+            return jObj.GetStr(OAuthScopeParameters.Name);
+        }
+
         public static IEnumerable<string> GetClaims(this JObject jObj)
         {
             return jObj.GetArray(OAuthScopeParameters.Claims);

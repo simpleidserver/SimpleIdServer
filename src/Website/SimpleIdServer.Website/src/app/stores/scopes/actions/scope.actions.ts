@@ -14,3 +14,6 @@ export const errorGet = createAction('[OAuthScopes] ERROR_GET_SCOPE');
 export const startUpdate = createAction('[OAuthScopes] START_UPDATE_SCOPE', props<{ name: string, claims: string[] }>());
 export const completeUpdate = createAction('[OAuthScopes] COMPLETE_UPDATE_SCOPE');
 export const errorUpdate = createAction('[OAuthScopes] ERROR_UPDATE_SCOPE');
+export const startAdd = createAction('[OAuthScopes] START_ADD_SCOPE', props<{ name: string }>());
+export const completeAdd = createAction('[OAuthScopes] COMPLETE_ADD_SCOPE', props < { name: string }>());
+export const errorAdd = createAction('[OAuthScopes] ERROR_ADD_SCOPE');

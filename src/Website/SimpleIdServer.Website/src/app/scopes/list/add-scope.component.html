@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>{{ 'scopes.add' | translate }}</h1>
+<form [formGroup]="addScopeFormGroup">
+  <div mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'scopes.scopeName' | translate }}</mat-label>
+      <input matInput formControlName="scopeName" />
+      <mat-error *ngIf="addScopeFormGroup.get('scopeName')?.hasError('required')">
+        {{ 'scopes.scopeNameRequired' | translate }}
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="save()">{{ 'create' | translate }}</button>
+    <button mat-button color="warn" mat-dialog-close>{{ 'close' | translate }}</button>
+  </div>
+</form>

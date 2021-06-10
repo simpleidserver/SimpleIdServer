@@ -114,11 +114,14 @@
   "scopes": {
     "messages": {
       "update": "Scope is updated",
-      "errorUpdate": "An error occured while trying to update the scope"
+      "errorUpdate": "An error occured while trying to update the scope",
+      "add": "Scope is added",
+      "errorAdd": "An error occured while trying to add the scope"
     },
     "list": "Scopes",
     "add": "Create scope",
     "scopeName": "Name",
+    "scopeNameRequired": "Name is required",
     "updateDateTime": "Update Datetime",
     "isStandard": "Is standard scope ?",
     "isStandardScopeCannotBeEdited": "Is a standard scope and cannot be edited",

@@ -34,6 +34,16 @@ namespace SimpleIdServer.OAuth.Domains
 
         #endregion
 
+        public static OAuthScope Create(string scopeName)
+        {
+            return new OAuthScope
+            {
+                Name = scopeName,
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow
+            };
+        }
+
         public void SetClaims(ICollection<OAuthScopeClaim> claims)
         {
             Claims.Clear();

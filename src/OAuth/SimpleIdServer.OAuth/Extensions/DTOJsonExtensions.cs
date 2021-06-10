@@ -83,6 +83,7 @@ namespace SimpleIdServer.OAuth.Extensions
         {
             return new OAuthScope
             {
+                Name = jObj.GetScopeName(),
                 Claims = jObj.GetClaims().Select(c => new OAuthScopeClaim(c, false)).ToList()
             };
         }

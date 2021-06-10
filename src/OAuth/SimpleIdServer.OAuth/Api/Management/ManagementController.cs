@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Management.Handlers;
+using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
@@ -29,6 +30,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IDeleteOAuthClientHandler _deleteOAuthClientHandler;
         private readonly ISearchOAuthScopesHandler _searchOAuthScopesHandler;
         private readonly IUpdateOAuthScopeHandler _updateOAuthScopeHandler;
+        private readonly IAddOAuthScopeHandler _addOAuthScopeHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -40,6 +42,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IDeleteOAuthClientHandler deleteOAuthClientHandler,
             ISearchOAuthScopesHandler searchOAuthScopesHandler,
             IUpdateOAuthScopeHandler updateOAuthScopeHandler,
+            IAddOAuthScopeHandler addOAuthScopeHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -50,6 +53,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _deleteOAuthClientHandler = deleteOAuthClientHandler;
             _searchOAuthScopesHandler = searchOAuthScopesHandler;
             _updateOAuthScopeHandler = updateOAuthScopeHandler;
+            _addOAuthScopeHandler = addOAuthScopeHandler;
             _options = options.Value;
         }
 
@@ -174,6 +178,36 @@ namespace SimpleIdServer.OAuth.Api.Management
             catch(OAuthScopeNotFoundException)
             {
                 return new NotFoundResult();
+            }
+        }
+
+        [HttpPost("scopes")]
+        [Authorize("ManageScopes")]
+        public virtual async Task<IActionResult> AddScope([FromBody] JObject jObj, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var scopeName = await _addOAuthScopeHandler.Handle(jObj, cancellationToken);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JObject.FromObject(new { id = scopeName }).ToString(),
+                    ContentType = "application/json"
+                };
+            }
+            catch(OAuthException ex)
+            {
+                var content = new JObject
+                {
+                    { ErrorResponseParameters.Error, ex.Code },
+                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                };
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Content = content.ToString(),
+                    ContentType = "application/json"
+                };
             }
         }
 

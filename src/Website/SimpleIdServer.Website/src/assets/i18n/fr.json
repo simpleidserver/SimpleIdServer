@@ -114,11 +114,14 @@
   "scopes": {
     "messages": {
       "update": "Le scope a été mise à jour",
-      "errorUpdate": "Une erreur est survenue durant la mise à jour du scope"
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du scope",
+      "add": "Le scope a été ajouté",
+      "errorAdd": "Une erreur est survenue durant l'ajout du scope"
     },
     "list": "Scopes",
     "add": "Créer un scope",
     "scopeName": "Nom",
+    "scopeNameRequired": "Nom est requis",
     "updateDateTime": "Date de mise à jour",
     "isStandard": "Est un scope standard ?",
     "isStandardScopeCannotBeEdited": "Est un scope standard et il ne peut pas être édité",
