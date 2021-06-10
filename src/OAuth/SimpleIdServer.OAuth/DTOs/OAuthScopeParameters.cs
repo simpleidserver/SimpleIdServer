@@ -7,6 +7,7 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string Name = "name";
         public const string IsExposed = "is_exposed";
         public const string IsStandard = "is_standard";
+        public const string Claims = "claims";
         public const string UpdateDateTime = "update_datetime";
         public const string CreateDateTime = "create_datetime";
     }

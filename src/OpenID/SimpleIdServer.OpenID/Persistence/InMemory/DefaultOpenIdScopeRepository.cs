@@ -80,6 +80,11 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             });
         }
 
+        public Task<OAuthScope> GetOAuthScope(string name, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(_scopes.FirstOrDefault(s => s.Name == name));
+        }
+
         public Task<int> SaveChanges(CancellationToken token)
         {
             return Task.FromResult(1);

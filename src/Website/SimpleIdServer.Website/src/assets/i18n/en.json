@@ -116,6 +116,13 @@
     "add": "Create scope",
     "scopeName": "Name",
     "updateDateTime": "Update Datetime",
-    "isStandard": "Is standard scope ?"
+    "isStandard": "Is standard scope ?",
+    "isStandardScopeCannotBeEdited": "Is a standard scope and cannot be edited",
+    "basicinfo": "Basic information",
+    "claims": "Claims",
+    "newClaim": "New Claim",
+    "dangerZone": "Danger zone",
+    "deleteTitle": "Delete this scope",
+    "delete": "Delete"
   }
 }

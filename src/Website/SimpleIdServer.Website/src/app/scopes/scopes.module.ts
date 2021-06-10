@@ -6,6 +6,7 @@ import { AvatarModule } from 'ngx-avatar';
 import { SIDCommonModule } from '@app/common/sidcommon.module';
 import { ListScopesComponent } from './list/list.component';
 import { ScopesRoutes } from './scopes.routes';
+import { ViewScopeComponent } from './view/view.component';
 
 @NgModule({
   imports: [
@@ -17,7 +18,8 @@ import { ScopesRoutes } from './scopes.routes';
     ScopesRoutes
   ],
   declarations: [
-    ListScopesComponent
+    ListScopesComponent,
+    ViewScopeComponent
   ]
 })
 

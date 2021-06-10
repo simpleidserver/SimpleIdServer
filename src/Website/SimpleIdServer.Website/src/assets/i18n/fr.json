@@ -46,7 +46,7 @@
       "enc": "Encrypter"
     },
     "messages": {
-      "updated": "L'application a été mise à jour",
+      "update": "L'application a été mise à jour",
       "add": "L'application a été ajoutée",
       "delete": "L'application a été supprimée",
       "errorUpdate": "Une erreur est survenue durant la mise à jour de l'application",
@@ -116,6 +116,13 @@
     "add": "Créer un scope",
     "scopeName": "Nom",
     "updateDateTime": "Date de mise à jour",
-    "isStandard": "Est un scope standard ?"
+    "isStandard": "Est un scope standard ?",
+    "isStandardScopeCannotBeEdited": "Est un scope standard et il ne peut pas être édité",
+    "basicinfo": "Informations de base",
+    "claims": "Claims",
+    "newClaim": "Nouveau Claim",
+    "dangerZone": "Zone de danger",
+    "deleteTitle": "Supprimer ce scope",
+    "delete": "Supprimer"
   }
 }

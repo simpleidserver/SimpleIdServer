@@ -11,12 +11,20 @@ export interface OAuthScopesState {
   Scopes: OAuthScope[] | null;
 }
 
+export interface OAuthScopeState {
+  Scope: OAuthScope | null;
+}
+
 export const initialSearchOAuthScopesState: SearchOAuthScopesState = {
   Scopes: null
 };
 
 export const initialOAuthScopesState: OAuthScopesState = {
   Scopes: null
+};
+
+export const initialOAuthScopeState: OAuthScopeState = {
+  Scope: null
 };
 
 const searchOauthScopesReducer = createReducer(
@@ -39,10 +47,24 @@ const oauthScopesReducer = createReducer(
   })
 );
 
+const oauthScopeReducer = createReducer(
+  initialOAuthScopeState,
+  on(fromActions.completeGet, (state, { content }) => {
+    return {
+      ...state,
+      Scope: { ...content }
+    };
+  })
+);
+
 export function getSearchOauthScopesReducer(state: SearchOAuthScopesState | undefined, action: Action) {
   return searchOauthScopesReducer(state, action);
 }
 
 export function getOAuthScopesReducer(state: OAuthScopesState | undefined, action: Action) {
   return oauthScopesReducer(state, action);
+}
+
+export function getOAuthScopeReducer(state: OAuthScopeState | undefined, action: Action) {
+  return oauthScopeReducer(state, action);
 }

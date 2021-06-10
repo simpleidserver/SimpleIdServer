@@ -2,7 +2,23 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { completeAdd, completeDelete, completeGet, completeSearch, errorAdd, errorDelete, errorGet, errorSearch, startAdd, startDelete, startGet, startSearch } from '../actions/applications.actions';
+import {
+  completeAdd,
+  completeDelete,
+  completeGet,
+  completeSearch,
+  errorAdd,
+  errorDelete,
+  errorGet,
+  errorSearch,
+  startAdd,
+  startDelete,
+  startGet,
+  startSearch,
+  startUpdate,
+  completeUpdate,
+  errorUpdate
+} from '../actions/applications.actions';
 import { ApplicationService } from '../services/application.service';
 
 @Injectable()
@@ -63,6 +79,20 @@ export class ApplicationEffects {
           .pipe(
             map(() => completeDelete()),
             catchError(() => of(errorDelete()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  updateOAuthClient$ = this.actions$
+    .pipe(
+      ofType(startUpdate),
+      mergeMap((evt) => {
+        return this.applicationService.update(evt.id, evt.request)
+          .pipe(
+            map(content => completeUpdate()),
+            catchError(() => of(errorUpdate()))
           );
       }
       )

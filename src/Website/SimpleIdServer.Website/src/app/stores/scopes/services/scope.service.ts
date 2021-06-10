@@ -41,4 +41,13 @@ export class OAuthScopeService {
       return res.map((r : any) => OAuthScope.fromJson(r));
     }));
   }
+
+  get(scope : string): Observable<OAuthScope> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/scopes/" + scope;
+    return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
+      return OAuthScope.fromJson(res);
+    }));
+  }
 }

@@ -82,6 +82,7 @@ export class ViewApplicationsComponent implements OnInit {
       this.application = application;
       this.refreshApplication();
       this.refreshScopes();
+      this.refreshMetadata();
       this.setIsLoading();
     });
     this.store.pipe(select(fromReducers.selectOAuthScopesResult)).subscribe((scopes: OAuthScope[] | null) => {
@@ -284,6 +285,10 @@ export class ViewApplicationsComponent implements OnInit {
 
   private refreshMetadata() {
     this.grantTypes = [];
+    if (!this.conf || !this.application) {
+      return;
+    }
+
     this.conf['grant_types_supported'].forEach((v: string) => {
       const isSelected = this.application.GrantTypes.indexOf(v) > -1;
       const record: SelectionResult = { isSelected : isSelected, name: v, value: v };

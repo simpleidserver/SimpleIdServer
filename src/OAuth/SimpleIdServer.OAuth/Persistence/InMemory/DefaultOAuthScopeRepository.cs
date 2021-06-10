@@ -57,5 +57,10 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
                 Content = result.ToList()
             });
         }
+
+        public Task<OAuthScope> GetOAuthScope(string name, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(LstData.FirstOrDefault(s => s.Name == name));
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace SimpleIdServer.OAuth.Persistence
 {
     public interface IOAuthScopeRepository : ICommandRepository<OAuthScope>
     {
+        Task<OAuthScope> GetOAuthScope(string name, CancellationToken cancellationToken);
         Task<List<OAuthScope>> GetAllOAuthScopes(CancellationToken cancellationToken);
         Task<List<OAuthScope>> GetAllOAuthScopesExposed(CancellationToken cancellationToken);
         Task<List<OAuthScope>> FindOAuthScopesByNames(IEnumerable<string> names, CancellationToken cancellationToken);

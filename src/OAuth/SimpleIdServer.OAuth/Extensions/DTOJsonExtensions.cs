@@ -19,7 +19,8 @@ namespace SimpleIdServer.OAuth.Extensions
                 { OAuthScopeParameters.IsExposed, scope.IsExposedInConfigurationEdp },
                 { OAuthScopeParameters.IsStandard, scope.IsStandardScope },
                 { OAuthScopeParameters.UpdateDateTime, scope.UpdateDateTime },
-                { OAuthScopeParameters.CreateDateTime, scope.CreateDateTime }
+                { OAuthScopeParameters.CreateDateTime, scope.CreateDateTime },
+                { OAuthScopeParameters.Claims, new JArray(scope.Claims.Select(c => c.ClaimName).ToArray()) }
             };
         }
 

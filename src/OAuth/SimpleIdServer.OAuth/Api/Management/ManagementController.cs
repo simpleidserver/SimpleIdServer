@@ -146,6 +146,19 @@ namespace SimpleIdServer.OAuth.Api.Management
             return new OkObjectResult(await _searchOAuthScopesHandler.Handle(parameter, cancellationToken));
         }
 
+        [HttpGet("scopes/{id}")]
+        [Authorize("ManageScopes")]
+        public virtual async Task<IActionResult> GetScope(string id, CancellationToken cancellationToken)
+        {
+            var scope = await _oauthScopeRepository.GetOAuthScope(id, cancellationToken);
+            if (scope == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(scope.ToDto());
+        }
+
         #endregion
 
         private async Task<IActionResult> InternalSearchClients(IEnumerable<KeyValuePair<string, string>> queries, CancellationToken cancellationToken)

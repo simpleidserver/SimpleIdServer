@@ -85,6 +85,11 @@ namespace SimpleIdServer.OpenID.EF.Repositories
             };
         }
 
+        public Task<OAuthScope> GetOAuthScope(string name, CancellationToken cancellationToken)
+        {
+            return _dbContext.OAuthScopes.Include(s => s.Claims).FirstOrDefaultAsync(s => s.Name == name, cancellationToken);
+        }
+
         public Task<int> SaveChanges(CancellationToken token)
         {
             return _dbContext.SaveChangesAsync(token);

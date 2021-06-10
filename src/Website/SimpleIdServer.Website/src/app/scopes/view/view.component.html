@@ -1,0 +1,69 @@
+<div fxLayout="row" class="breadcrumb">
+  <div fxFlex="80%">
+    <ul>
+      <li>
+        <div class="mat-h1"><a [routerLink]="['/scopes']">{{ "scopes.list" | translate }}</a></div>
+      </li>
+      <li class="separator">
+        <div class="mat-h1">\</div>
+      </li>
+      <li>
+        <div class="mat-h1">{{scope$?.Name}}</div>
+      </li>
+    </ul>
+  </div>
+</div>
+<loader *ngIf="isLoading"></loader>
+<div *ngIf="!isLoading">
+  <div class="alert alert-warning" *ngIf="scope$?.IsStandard">
+    {{ 'scopes.isStandardScopeCannotBeEdited' | translate }}
+  </div>
+  <mat-card>
+    <form [formGroup]="updateScopeForm" (ngSubmit)="saveScope($event, updateScopeForm.value)">
+      <mat-card-content>
+        <!-- Basic information -->
+        <div fxLayout="row">
+          <div fxFlex="30%">
+            <h3>{{ 'scopes.basicinfo' | translate }}</h3>
+          </div>
+          <div fxFlex="70%">
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ "scopes.scopeName" | translate }}</mat-label>
+              <input matInput formControlName="scopeName" />
+            </mat-form-field>
+            <!-- Claims -->
+            <mat-form-field appearance="outline" class="full-width no-bottom-padding">
+              <mat-label>{{ 'scopes.claims' | translate }}</mat-label>
+              <mat-chip-list #claimsChipList>
+                <mat-chip *ngFor="let claim of claims" (removed)="removeClaim(claim)">
+                  {{claim}}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+                <input [placeholder]="'scopes.newClaim' | translate"
+                       [matChipInputFor]="claimsChipList"
+                       matChipInputAddOnBlur="true"
+                       (matChipInputTokenEnd)="addClaim($event)"
+                       [disabled]="scope$?.IsStandard" />
+              </mat-chip-list>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button *ngIf="!scope$?.IsStandard" type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+  <div *ngIf="!scope$?.IsStandard">
+    <h2>{{ 'scopes.dangerZone' | translate }}</h2>
+    <div class="alert alert-danger" fxLayout="row">
+      <div fxFlex="90%">
+        <b>{{ 'scopes.deleteTitle' | translate }}</b>
+      </div>
+      <div>
+        <button mat-raised-button color="warn" (click)="delete()">{{ 'scopes.delete' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>

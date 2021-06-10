@@ -128,11 +128,17 @@ body, h1 {
   border-radius: .25rem;
   padding: .75rem 1.25rem;
   border: 1px solid transparent;
+  margin-bottom: 20px;
 }
 
 .alert.alert-danger {
   color: #721c24;
   background-color: #f17b7b;
   border-color: #f17b7b;
-  margin-bottom: 20px;
+}
+
+.alert.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
 }
