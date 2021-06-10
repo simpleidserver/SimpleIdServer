@@ -1,11 +1,7 @@
 <ng-container>
   <mat-toolbar class="header-toolbar">
-    <a class="no-style" [routerLink]="['/home']">
-
-    </a>
-    <button mat-icon-button (click)="drawer.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
+    <img class="" src="/assets/images/SIDLogo-White.svg" width="25" />
+    SimpleIdServer
     <span class="spacer"></span>
     <div *ngIf="isConnected">
       <button mat-button [matMenuTriggerFor]="welcomeMenu">
@@ -16,8 +12,8 @@
       </mat-menu>
     </div>
     <div *ngIf="!isConnected">
-      <button mat-raised-button (click)="login()">{{ "menu.authenticate" | translate }}</button>
-      <button mat-raised-button (click)="chooseSession()">{{ "menu.choose_session" | translate }}</button>
+      <button mat-button (click)="login()">{{ "menu.authenticate" | translate }}</button>
+      <button mat-button (click)="chooseSession()">{{ "menu.choose_session" | translate }}</button>
     </div>
     <button mat-button [matMenuTriggerFor]="languages">{{ "menu.languages" | translate }}</button>
     <mat-menu #languages="matMenu">

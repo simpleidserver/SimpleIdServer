@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { MetadatadataSelector } from '@app/common/components/metadataselector/metadataselector.component';
-import { MultiSelector } from '@app/common/components/multiselector/multiselector.component';
+import { SIDCommonModule } from '@app/common/sidcommon.module';
 import { TranslateEnumPipe } from '@app/pipes/translateenum.pipe';
 import { MaterialModule } from '@app/shared/material.module';
 import { SharedModule } from '@app/shared/shared.module';
@@ -20,6 +19,7 @@ import { ViewApplicationsComponent } from './view/view.component';
     CommonModule,
     SharedModule,
     MaterialModule,
+    SIDCommonModule,
     ApplicationsRoutes
   ],
   declarations: [
@@ -28,8 +28,6 @@ import { ViewApplicationsComponent } from './view/view.component';
     EditTranslationComponent,
     DisplayJwkComponent,
     AddApplicationComponent,
-    MetadatadataSelector,
-    MultiSelector,
     TranslateEnumPipe,
     TranslateMetadataPipe
   ]

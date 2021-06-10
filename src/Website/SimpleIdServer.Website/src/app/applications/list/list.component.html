@@ -11,7 +11,8 @@
     </button>
   </div>
 </div>
-<div class="mat-elevation-z8 overflow-hidden">
+<loader *ngIf="isLoading"></loader>
+<div class="mat-elevation-z8 overflow-hidden" [style.display]="!isLoading ? 'block' : 'none'">
   <mat-table class="full-width" [dataSource]="applications$" matSortActive="create_datetime" matSortDirection="desc" matSort>
     <ng-container matColumnDef="picture">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>

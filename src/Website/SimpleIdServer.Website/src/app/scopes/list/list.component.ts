@@ -23,6 +23,7 @@ export class ListScopesComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   length: number;
+  isLoading: boolean = true;
 
   constructor(
     private store: Store<fromReducers.AppState>,
@@ -33,6 +34,7 @@ export class ListScopesComponent implements OnInit {
     private translateService: TranslateService) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.store.pipe(select(fromReducers.selectSearchOAuthScopesResult)).subscribe((state: SearchResult<OAuthScope> | null) => {
       if (!state) {
         return;
@@ -40,6 +42,7 @@ export class ListScopesComponent implements OnInit {
 
       this.scopes$ = state.Content;
       this.length = state.TotalLength;
+      this.isLoading = false;
     });
   }
 
@@ -53,8 +56,6 @@ export class ListScopesComponent implements OnInit {
   }
 
   private refresh() {
-    console.log(this.paginator);
-    console.log(this.sort);
     let startIndex: number = 0;
     let count: number = 5;
     if (this.paginator.pageIndex && this.paginator.pageSize) {

@@ -34,7 +34,11 @@ export class ViewApplicationsComponent implements OnInit {
   scopes: SelectionResult[] = [];
   receivedScopes: OAuthScope[] = [];
   application: Application;
+  isApplicationLoaded: boolean = false;
+  isScopesLoaded: boolean = false;
+  isWellKnownConfigurationLoaded: boolean = false;
   conf: any;
+  isLoading: boolean;
   clientSecretInputType: string = "password";
   updateApplicationForm: FormGroup = new FormGroup({
     clientName: new FormControl({ value: '', disabled: true }),
@@ -60,11 +64,16 @@ export class ViewApplicationsComponent implements OnInit {
     private router : Router) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
+    this.isScopesLoaded = false;
+    this.isApplicationLoaded = false;
+    this.isWellKnownConfigurationLoaded = false;
     this.store.pipe(select(fromReducers.selectApplicationResult)).subscribe((application: Application | null) => {
       if (!application) {
         return;
       }
 
+      this.isApplicationLoaded = true;
       this.clientNames = this.clone(application.ClientNames);
       this.clientLogoUris = this.clone(application.LogoUris);
       this.redirectUris = [...application.RedirectUris];
@@ -73,22 +82,27 @@ export class ViewApplicationsComponent implements OnInit {
       this.application = application;
       this.refreshApplication();
       this.refreshScopes();
+      this.setIsLoading();
     });
     this.store.pipe(select(fromReducers.selectOAuthScopesResult)).subscribe((scopes: OAuthScope[] | null) => {
       if (!scopes) {
         return;
       }
 
+      this.isScopesLoaded = true;
       this.receivedScopes = scopes;
       this.refreshScopes();
+      this.setIsLoading();
     });
     this.store.pipe(select(fromReducers.selectWellKnownConfigurationResult)).subscribe((conf: any | null) => {
       if (!conf || !conf['grant_types_supported']) {
         return;
       }
 
+      this.isWellKnownConfigurationLoaded = true;
       this.conf = conf;
       this.refreshMetadata();
+      this.setIsLoading();
     });
     this.translateService.onLangChange.subscribe(() => {
       this.refreshApplication();
@@ -305,5 +319,9 @@ export class ViewApplicationsComponent implements OnInit {
     translations.forEach((tr: Translation) => {
       request[key + "#" + tr.Language] = tr.Value;
     });
+  }
+
+  private setIsLoading() {
+    this.isLoading = !(this.isApplicationLoaded && this.isScopesLoaded && this.isWellKnownConfigurationLoaded);
   }
 }

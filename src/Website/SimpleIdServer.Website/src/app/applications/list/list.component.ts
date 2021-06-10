@@ -16,13 +16,15 @@ import { AddApplicationComponent } from './add-application.component';
 
 @Component({
   selector: 'list-applications',
-  templateUrl: './list.component.html'
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.scss']
 })
 export class ListApplicationsComponent implements OnInit {
   displayedColumns: string[] = ['picture', 'client_id', 'client_name', 'application_kind', 'update_datetime'];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   length: number;
+  isLoading: boolean;
   applications$: Array<Application> = [];
 
   constructor(
@@ -34,6 +36,7 @@ export class ListApplicationsComponent implements OnInit {
     private translateService: TranslateService) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.actions$.pipe(
       filter((action: any) => action.type === '[Applications] COMPLETE_ADD_APPLICATON'))
       .subscribe((evt: any) => {
@@ -56,6 +59,7 @@ export class ListApplicationsComponent implements OnInit {
 
       this.applications$ = state.Content;
       this.length = state.TotalLength;
+      this.isLoading = false;
     });
   }
 

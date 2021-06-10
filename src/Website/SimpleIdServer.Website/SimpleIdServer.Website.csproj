@@ -21,4 +21,7 @@
     <TypeScriptCompile Include="src\app\pipes\translatemetadata.ts" />
     <TypeScriptCompile Include="src\environments\environments.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\assets\images\" />
+  </ItemGroup>
 </Project>
