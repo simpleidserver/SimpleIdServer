@@ -682,7 +682,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 
                     b.HasOne("SimpleIdServer.OAuth.Domains.OAuthScope", "Scope")
                         .WithMany()
-                        .HasForeignKey("ScopeName");
+                        .HasForeignKey("ScopeName")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Scope");
                 });

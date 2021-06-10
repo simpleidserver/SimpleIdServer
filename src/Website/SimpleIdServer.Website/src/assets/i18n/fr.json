@@ -116,7 +116,9 @@
       "update": "Le scope a été mise à jour",
       "errorUpdate": "Une erreur est survenue durant la mise à jour du scope",
       "add": "Le scope a été ajouté",
-      "errorAdd": "Une erreur est survenue durant l'ajout du scope"
+      "errorAdd": "Une erreur est survenue durant l'ajout du scope",
+      "delete": "Le scope a été supprimé",
+      "errorDelete": "Une erreur est survenue durant la suppression du scope"
     },
     "list": "Scopes",
     "add": "Créer un scope",

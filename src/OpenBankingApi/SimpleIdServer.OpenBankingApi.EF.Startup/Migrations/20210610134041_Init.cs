@@ -1,12 +1,34 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
+namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
 {
     public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AccountAccessConsents",
+                columns: table => new
+                {
+                    AggregateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    StatusUpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Permissions = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransactionFromDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransactionToDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Risk = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Version = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountAccessConsents", x => x.AggregateId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Acrs",
                 columns: table => new
@@ -136,6 +158,18 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OpenIdClients", x => x.ClientId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Servicer",
+                columns: table => new
+                {
+                    Identification = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SchemeName = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Servicer", x => x.Identification);
                 });
 
             migrationBuilder.CreateTable(
@@ -285,12 +319,42 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                         column: x => x.ScopeName,
                         principalTable: "OAuthScopes",
                         principalColumn: "Name",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OpenIdClientScope_OpenIdClients_OpenIdClientClientId",
                         column: x => x.OpenIdClientClientId,
                         principalTable: "OpenIdClients",
                         principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Accounts",
+                columns: table => new
+                {
+                    AggregateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    StatusUpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountType = table.Column<int>(type: "int", nullable: true),
+                    AccountSubType = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Nickname = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OpeningDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MaturityDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SwitchStatus = table.Column<int>(type: "int", nullable: true),
+                    ServicerIdentification = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Version = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Accounts", x => x.AggregateId);
+                    table.ForeignKey(
+                        name: "FK_Accounts_Servicer_ServicerIdentification",
+                        column: x => x.ServicerIdentification,
+                        principalTable: "Servicer",
+                        principalColumn: "Identification",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -377,6 +441,29 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CashAccount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SchemeName = table.Column<int>(type: "int", nullable: true),
+                    Identification = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecondaryIdentification = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AccountAggregateAggregateId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CashAccount", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CashAccount_Accounts_AccountAggregateAggregateId",
+                        column: x => x.AccountAggregateAggregateId,
+                        principalTable: "Accounts",
+                        principalColumn: "AggregateId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OAuthConsentOAuthScope",
                 columns: table => new
                 {
@@ -401,9 +488,19 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Accounts_ServicerIdentification",
+                table: "Accounts",
+                column: "ServicerIdentification");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BCAuthorizePermission_BCAuthorizeId",
                 table: "BCAuthorizePermission",
                 column: "BCAuthorizeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CashAccount_AccountAggregateAggregateId",
+                table: "CashAccount",
+                column: "AccountAggregateAggregateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JsonWebKeyKeyOperation_JsonWebKeyKid",
@@ -470,10 +567,16 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AccountAccessConsents");
+
+            migrationBuilder.DropTable(
                 name: "Acrs");
 
             migrationBuilder.DropTable(
                 name: "BCAuthorizePermission");
+
+            migrationBuilder.DropTable(
+                name: "CashAccount");
 
             migrationBuilder.DropTable(
                 name: "JsonWebKeyKeyOperation");
@@ -503,6 +606,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 name: "BCAuthorizeLst");
 
             migrationBuilder.DropTable(
+                name: "Accounts");
+
+            migrationBuilder.DropTable(
                 name: "JsonWebKeys");
 
             migrationBuilder.DropTable(
@@ -513,6 +619,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "OAuthScopes");
+
+            migrationBuilder.DropTable(
+                name: "Servicer");
 
             migrationBuilder.DropTable(
                 name: "OpenIdClients");

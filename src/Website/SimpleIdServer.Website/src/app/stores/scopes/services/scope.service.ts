@@ -72,4 +72,11 @@ export class OAuthScopeService {
       return res["id"];
     }));
   }
+
+  delete(scope: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/scopes/" + scope;
+    return this.http.delete(targetUrl, { headers: headers });
+  }
 }

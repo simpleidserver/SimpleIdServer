@@ -116,7 +116,9 @@
       "update": "Scope is updated",
       "errorUpdate": "An error occured while trying to update the scope",
       "add": "Scope is added",
-      "errorAdd": "An error occured while trying to add the scope"
+      "errorAdd": "An error occured while trying to add the scope",
+      "delete": "Scope is removed",
+      "errorDelete": "An error occured while trying to remove the scope"
     },
     "list": "Scopes",
     "add": "Create scope",

@@ -31,6 +31,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly ISearchOAuthScopesHandler _searchOAuthScopesHandler;
         private readonly IUpdateOAuthScopeHandler _updateOAuthScopeHandler;
         private readonly IAddOAuthScopeHandler _addOAuthScopeHandler;
+        private readonly IDeleteOAuthScopeHandler _deleteOAuthScopeHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -43,6 +44,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             ISearchOAuthScopesHandler searchOAuthScopesHandler,
             IUpdateOAuthScopeHandler updateOAuthScopeHandler,
             IAddOAuthScopeHandler addOAuthScopeHandler,
+            IDeleteOAuthScopeHandler deleteOAuthScopeHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -54,6 +56,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _searchOAuthScopesHandler = searchOAuthScopesHandler;
             _updateOAuthScopeHandler = updateOAuthScopeHandler;
             _addOAuthScopeHandler = addOAuthScopeHandler;
+            _deleteOAuthScopeHandler = deleteOAuthScopeHandler;
             _options = options.Value;
         }
 
@@ -208,6 +211,21 @@ namespace SimpleIdServer.OAuth.Api.Management
                     Content = content.ToString(),
                     ContentType = "application/json"
                 };
+            }
+        }
+
+        [HttpDelete("scopes/{id}")]
+        [Authorize("ManageScopes")]
+        public virtual async Task<IActionResult> DeleteScope(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var scopeName = await _deleteOAuthScopeHandler.Handle(id, cancellationToken);
+                return new NoContentResult();
+            }
+            catch (OAuthScopeNotFoundException)
+            {
+                return new NotFoundResult();
             }
         }
 

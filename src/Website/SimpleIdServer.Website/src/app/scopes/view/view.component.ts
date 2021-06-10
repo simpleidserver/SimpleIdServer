@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startGet, startUpdate } from '@app/stores/scopes/actions/scope.actions';
+import { startDelete, startGet, startUpdate } from '@app/stores/scopes/actions/scope.actions';
 import { OAuthScope } from '@app/stores/scopes/models/oauthscope.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,7 +28,8 @@ export class ViewScopeComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private actions$: ScannedActionsSubject,
-    private snackbar: MatSnackBar) { }
+    private snackbar: MatSnackBar,
+    private router : Router) { }
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -42,7 +43,22 @@ export class ViewScopeComponent implements OnInit {
     this.actions$.pipe(
       filter((action: any) => action.type === '[OAuthScopes] ERROR_UPDATE_SCOPE'))
       .subscribe(() => {
-        this.snackbar.open(this.translateService.instant('scopes.messages.update'), this.translateService.instant('undo'), {
+        this.snackbar.open(this.translateService.instant('scopes.messages.errorUpdate'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[OAuthScopes] COMPLETE_DELETE_SCOPE'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('scopes.messages.delete'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.router.navigate(['/scopes']);
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[OAuthScopes] ERROR_DELETE_SCOPE'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('scopes.messages.errorDelete'), this.translateService.instant('undo'), {
           duration: 2000
         });
       });
@@ -82,7 +98,9 @@ export class ViewScopeComponent implements OnInit {
   }
 
   public delete() {
-
+    const name = this.activatedRoute.snapshot.params['id'];
+    let request = startDelete({ name: name });
+    this.store.dispatch(request);
   }
 
   private refresh() {

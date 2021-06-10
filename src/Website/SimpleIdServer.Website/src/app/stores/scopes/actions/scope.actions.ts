@@ -17,3 +17,6 @@ export const errorUpdate = createAction('[OAuthScopes] ERROR_UPDATE_SCOPE');
 export const startAdd = createAction('[OAuthScopes] START_ADD_SCOPE', props<{ name: string }>());
 export const completeAdd = createAction('[OAuthScopes] COMPLETE_ADD_SCOPE', props < { name: string }>());
 export const errorAdd = createAction('[OAuthScopes] ERROR_ADD_SCOPE');
+export const startDelete = createAction('[OAuthScopes] START_DELETE_SCOPE', props<{ name: string }>());
+export const completeDelete = createAction('[OAuthScopes] COMPLETE_DELETE_SCOPE');
+export const errorDelete = createAction('[OAuthScopes] ERROR_DELETE_SCOPE');

@@ -12,7 +12,7 @@ namespace SimpleIdServer.OpenID.EF.Configurations
         {
             builder.Property<int>("Id").ValueGeneratedOnAdd();
             builder.HasKey("Id");
-            builder.HasOne(c => c.Scope).WithMany();
+            builder.HasOne(c => c.Scope).WithMany().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

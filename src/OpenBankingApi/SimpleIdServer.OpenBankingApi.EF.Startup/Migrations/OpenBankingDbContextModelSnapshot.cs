@@ -834,7 +834,8 @@ namespace SimpleIdServer.OpenBankingApi.EF.Startup.Migrations
 
                     b.HasOne("SimpleIdServer.OAuth.Domains.OAuthScope", "Scope")
                         .WithMany()
-                        .HasForeignKey("ScopeName");
+                        .HasForeignKey("ScopeName")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Scope");
                 });
