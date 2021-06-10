@@ -28,6 +28,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IAddOAuthClientHandler _addOAuthClientHandler;
         private readonly IDeleteOAuthClientHandler _deleteOAuthClientHandler;
         private readonly ISearchOAuthScopesHandler _searchOAuthScopesHandler;
+        private readonly IUpdateOAuthScopeHandler _updateOAuthScopeHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -38,6 +39,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IAddOAuthClientHandler addOAuthClientHandler,
             IDeleteOAuthClientHandler deleteOAuthClientHandler,
             ISearchOAuthScopesHandler searchOAuthScopesHandler,
+            IUpdateOAuthScopeHandler updateOAuthScopeHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -47,6 +49,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _addOAuthClientHandler = addOAuthClientHandler;
             _deleteOAuthClientHandler = deleteOAuthClientHandler;
             _searchOAuthScopesHandler = searchOAuthScopesHandler;
+            _updateOAuthScopeHandler = updateOAuthScopeHandler;
             _options = options.Value;
         }
 
@@ -157,6 +160,21 @@ namespace SimpleIdServer.OAuth.Api.Management
             }
 
             return new OkObjectResult(scope.ToDto());
+        }
+
+        [HttpPut("scopes/{id}")]
+        [Authorize("ManageScopes")]
+        public virtual async Task<IActionResult> UpdateScope(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _updateOAuthScopeHandler.Handle(id, jObj, cancellationToken);
+                return new NoContentResult();
+            }
+            catch(OAuthScopeNotFoundException)
+            {
+                return new NotFoundResult();
+            }
         }
 
         #endregion

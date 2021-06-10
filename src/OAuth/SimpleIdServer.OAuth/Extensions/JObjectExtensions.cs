@@ -394,6 +394,15 @@ namespace SimpleIdServer.OAuth.Extensions
 
         #endregion
 
+        #region OAuth Scope parameters
+
+        public static IEnumerable<string> GetClaims(this JObject jObj)
+        {
+            return jObj.GetArray(OAuthScopeParameters.Claims);
+        }
+
+        #endregion
+
         public static string GetStr(this JObject jObj, string name)
         {
             var result = jObj.GetToken(name);

@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { errorGet } from '../../applications/actions/applications.actions';
-import { completeGet, completeGetAll, completeSearch, errorGetAll, errorSearch, startGet, startGetAll, startSearch } from '../actions/scope.actions';
+import { completeGet, completeGetAll, completeSearch, completeUpdate, errorGet, errorGetAll, errorSearch, errorUpdate, startGet, startGetAll, startSearch, startUpdate } from '../actions/scope.actions';
 import { OAuthScopeService } from '../services/scope.service';
 
 @Injectable()
@@ -50,6 +49,20 @@ export class OAuthScopeEffects {
           .pipe(
             map(content => completeGet({ content: content })),
             catchError(() => of(errorGet()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  updateScope$ = this.actions$
+    .pipe(
+      ofType(startUpdate),
+      mergeMap((evt) => {
+        return this.oauthScopeService.update(evt.name, evt.claims)
+          .pipe(
+            map(content => completeUpdate()),
+            catchError(() => of(errorUpdate()))
           );
       }
       )

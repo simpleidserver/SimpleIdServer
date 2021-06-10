@@ -19,7 +19,7 @@
     {{ 'scopes.isStandardScopeCannotBeEdited' | translate }}
   </div>
   <mat-card>
-    <form [formGroup]="updateScopeForm" (ngSubmit)="saveScope($event, updateScopeForm.value)">
+    <form [formGroup]="updateScopeForm" (ngSubmit)="saveScope($event)">
       <mat-card-content>
         <!-- Basic information -->
         <div fxLayout="row">

@@ -4,6 +4,7 @@ namespace SimpleIdServer.OAuth
 {
     public class ErrorMessages
     {
+        public const string UNKNOWN_SCOPE = "unknown scope {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";
         public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";

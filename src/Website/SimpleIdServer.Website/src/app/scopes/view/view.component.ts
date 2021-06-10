@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startGet } from '@app/stores/scopes/actions/scope.actions';
+import { startGet, startUpdate } from '@app/stores/scopes/actions/scope.actions';
 import { OAuthScope } from '@app/stores/scopes/models/oauthscope.model';
-import { select, Store } from '@ngrx/store';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'view-scope',
@@ -22,10 +25,27 @@ export class ViewScopeComponent implements OnInit {
 
   constructor(
     private store: Store<fromReducers.AppState>,
-    private activatedRoute: ActivatedRoute) { }
+    private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService,
+    private actions$: ScannedActionsSubject,
+    private snackbar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.isLoading = true;
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[OAuthScopes] COMPLETE_UPDATE_SCOPE'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('scopes.messages.update'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[OAuthScopes] ERROR_UPDATE_SCOPE'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('scopes.messages.update'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.store.pipe(select(fromReducers.selectOAuthScopeResult)).subscribe((scope: OAuthScope| null) => {
       if (!scope) {
         return;
@@ -55,9 +75,10 @@ export class ViewScopeComponent implements OnInit {
     evt.input.value = "";
   }
 
-  public saveScope(evt: any, form: any) {
+  public saveScope(evt: any) {
     evt.preventDefault();
-
+    const update = startUpdate({ claims: this.claims, name: this.scope$.Name });
+    this.store.dispatch(update);
   }
 
   public delete() {

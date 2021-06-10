@@ -112,6 +112,10 @@
     }
   },
   "scopes": {
+    "messages": {
+      "update": "Le scope a été mise à jour",
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du scope"
+    },
     "list": "Scopes",
     "add": "Créer un scope",
     "scopeName": "Nom",

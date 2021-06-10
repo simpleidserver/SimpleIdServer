@@ -79,6 +79,14 @@ namespace SimpleIdServer.OAuth.Extensions
             return result;
         }
 
+        public static OAuthScope ToScopeDomain(this JObject jObj)
+        {
+            return new OAuthScope
+            {
+                Claims = jObj.GetClaims().Select(c => new OAuthScopeClaim(c, false)).ToList()
+            };
+        }
+
         public static void EnrichDomain(this JObject jObj, BaseClient result)
         {
             result.ClientId = jObj.GetClientId();

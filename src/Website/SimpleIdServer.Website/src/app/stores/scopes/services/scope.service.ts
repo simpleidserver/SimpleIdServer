@@ -50,4 +50,14 @@ export class OAuthScopeService {
       return OAuthScope.fromJson(res);
     }));
   }
+
+  update(scope: string, claims: string[]): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/scopes/" + scope;
+    const request: any = {
+      claims: claims
+    };
+    return this.http.put(targetUrl, request, { headers: headers });
+  }
 }

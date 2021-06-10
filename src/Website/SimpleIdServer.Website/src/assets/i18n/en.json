@@ -112,6 +112,10 @@
     }
   },
   "scopes": {
+    "messages": {
+      "update": "Scope is updated",
+      "errorUpdate": "An error occured while trying to update the scope"
+    },
     "list": "Scopes",
     "add": "Create scope",
     "scopeName": "Name",

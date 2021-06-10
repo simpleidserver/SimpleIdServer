@@ -34,6 +34,15 @@ namespace SimpleIdServer.OAuth.Domains
 
         #endregion
 
+        public void SetClaims(ICollection<OAuthScopeClaim> claims)
+        {
+            Claims.Clear();
+            foreach(var claim in claims)
+            {
+                Claims.Add(claim);
+            }
+        }
+
         public virtual object Clone()
         {
             return new OAuthScope
