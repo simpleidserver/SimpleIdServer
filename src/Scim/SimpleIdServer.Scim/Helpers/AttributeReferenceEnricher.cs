@@ -30,71 +30,122 @@ namespace SimpleIdServer.Scim.Helpers
 			var ids = representationLst.Select(r => r.Id);
 			foreach (var attributeMapping in attributeMappingLst)
 			{
-				var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttributes(attributeMapping.TargetAttributeId, ids, attributeMapping.TargetResourceType);
-				foreach (var representation in representationLst)
+				await EnrichWithOuterKeys(attributeMapping, representationLst, baseUrl, ids);
+				await EnrichWithInnerKeys(attributeMapping, representationLst, baseUrl);
+			}
+		}
+
+		private async Task EnrichWithOuterKeys(
+			SCIMAttributeMapping attributeMapping, 
+			IEnumerable<SCIMRepresentation> representationLst, 
+			string baseUrl,
+			IEnumerable<string> ids)
+        {
+			var values = representationLst.SelectMany(r => r.GetAttributesByAttrSchemaId(attributeMapping.SourceValueAttributeId)).SelectMany(a => a.ValuesString);
+			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttributes(attributeMapping.TargetAttributeId, ids, attributeMapping.TargetResourceType);
+			if (!targetRepresentations.Any())
+			{
+				targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(values, attributeMapping.TargetResourceType);
+			}
+
+			foreach (var representation in representationLst)
+			{
+				var filteredRepresentations = targetRepresentations.Where(a => a.GetAttributesByAttrSchemaId(attributeMapping.TargetAttributeId).Any(attr => attr.ValuesString.Contains(representation.Id)));
+				if (!filteredRepresentations.Any())
 				{
-					var filteredRepresentations = targetRepresentations.Where(a => a.GetAttributesByAttrSchemaId(attributeMapping.TargetAttributeId).Any(attr => attr.ValuesString.Contains(representation.Id)));
-					if (!filteredRepresentations.Any())
+					continue;
+				}
+
+				foreach (var filteredRepresentation in filteredRepresentations)
+				{
+					var refLst = BuildAttributes(filteredRepresentation, attributeMapping, baseUrl);
+					var refsAttribute = new SCIMRepresentationAttribute
 					{
-						continue;
-					}
-
-					foreach (var filteredRepresentation in filteredRepresentations)
-					{
-						var refLst = new List<SCIMRepresentationAttribute>();
-						var refsAttribute = new SCIMRepresentationAttribute
+						SchemaAttribute = new SCIMSchemaAttribute(attributeMapping.SourceAttributeSelector)
 						{
-							SchemaAttribute = new SCIMSchemaAttribute(attributeMapping.SourceAttributeSelector)
-							{
-								Id = attributeMapping.SourceAttributeId,
-								Name = attributeMapping.SourceAttributeSelector,
-								MultiValued = true,
-								Type = SCIMSchemaAttributeTypes.COMPLEX
-							},
-							Values = refLst
-						};
-
-						refLst.Add(new SCIMRepresentationAttribute
-						{
-							SchemaAttribute = new SCIMSchemaAttribute("value")
-							{
-								Name = "value",
-								MultiValued = false,
-								Type = SCIMSchemaAttributeTypes.STRING
-							},
-							ValuesString = new List<string>
-							{
-								filteredRepresentation.Id
-							}
-						});
-						refLst.Add(new SCIMRepresentationAttribute
-						{
-							SchemaAttribute = new SCIMSchemaAttribute("display")
-							{
-								Name = "display",
-								MultiValued = false,
-								Type = SCIMSchemaAttributeTypes.STRING
-							},
-							ValuesString = new List<string> { filteredRepresentation.DisplayName }
-						});
-						refLst.Add(new SCIMRepresentationAttribute
-						{
-							SchemaAttribute = new SCIMSchemaAttribute("$ref")
-							{
-								Name = "$ref",
-								MultiValued = false,
-								Type = SCIMSchemaAttributeTypes.STRING
-							},
-							ValuesString = new List<string>
-							{
-								$"{baseUrl}/{attributeMapping.TargetResourceType}/{filteredRepresentation.Id}"
-							}
-						});
-
-						representation.AddAttribute(refsAttribute);
-					}
+							Id = attributeMapping.SourceAttributeId,
+							Name = attributeMapping.SourceAttributeSelector,
+							MultiValued = true,
+							Type = SCIMSchemaAttributeTypes.COMPLEX
+						},
+						Values = refLst
+					};
+					representation.AddAttribute(refsAttribute);
 				}
 			}
+		}
+
+		private async Task EnrichWithInnerKeys(
+			SCIMAttributeMapping attributeMapping,
+			IEnumerable<SCIMRepresentation> representationLst,
+			string baseUrl
+			)
+		{
+			var values = representationLst.SelectMany(r => r.GetAttributesByAttrSchemaId(attributeMapping.SourceValueAttributeId))
+				.SelectMany(a => a.ValuesString)
+				.ToList();
+			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(values, attributeMapping.TargetResourceType);
+			if (!targetRepresentations.Any())
+            {
+				return;
+            }
+
+			foreach(var representation in representationLst)
+            {
+				var attr = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).First();
+				attr.Values.Clear();
+				foreach(var targetRepresentation in targetRepresentations)
+                {
+					var newAttributes = BuildAttributes(targetRepresentation, attributeMapping, baseUrl);
+					foreach(var newAttribute in newAttributes)
+                    {
+						attr.Values.Add(newAttribute);
+                    }
+				}
+            }
+		}
+
+		private static List<SCIMRepresentationAttribute> BuildAttributes(SCIMRepresentation representation, SCIMAttributeMapping attributeMapping, string baseUrl)
+        {
+			var refLst = new List<SCIMRepresentationAttribute>();
+			refLst.Add(new SCIMRepresentationAttribute
+			{
+				SchemaAttribute = new SCIMSchemaAttribute("value")
+				{
+					Name = "value",
+					MultiValued = false,
+					Type = SCIMSchemaAttributeTypes.STRING
+				},
+				ValuesString = new List<string>
+				{
+					representation.Id
+				}
+			});
+			refLst.Add(new SCIMRepresentationAttribute
+			{
+				SchemaAttribute = new SCIMSchemaAttribute("display")
+				{
+					Name = "display",
+					MultiValued = false,
+					Type = SCIMSchemaAttributeTypes.STRING
+				},
+				ValuesString = new List<string> { representation.DisplayName }
+			});
+			refLst.Add(new SCIMRepresentationAttribute
+			{
+				SchemaAttribute = new SCIMSchemaAttribute("$ref")
+				{
+					Name = "$ref",
+					MultiValued = false,
+					Type = SCIMSchemaAttributeTypes.STRING
+				},
+				ValuesString = new List<string>
+							{
+								$"{baseUrl}/{attributeMapping.TargetResourceType}/{representation.Id}"
+							}
+			});
+
+			return refLst;
 		}
 	}
 }

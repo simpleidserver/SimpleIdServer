@@ -137,10 +137,24 @@ namespace SimpleIdServer.Scim.Domain
             };
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var target = obj as SCIMRepresentation;
+            if (target == null)
+            {
+                return false;
+            }
+
+            return this.Equals(target);
+        }
+
         public bool Equals(SCIMRepresentation other)
         {
-            if (Object.ReferenceEquals(other, null)) return false;
-            if (Object.ReferenceEquals(this, other)) return true;
             return Id.Equals(other.Id);
         }
 

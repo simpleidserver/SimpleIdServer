@@ -131,6 +131,14 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
         }
 
+        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
+        {
+            IEnumerable<SCIMRepresentationModel> result = await IncludeRepresentationNavigationProperties(_scimDbContext.SCIMRepresentationLst)
+                .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
+                .ToListAsync();
+            return result.Select(r => r.ToDomain());
+        }
+
         private void Detach(SCIMRepresentationModel representation)
         {
             _scimDbContext.Entry(representation).State = EntityState.Detached;
