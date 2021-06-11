@@ -97,10 +97,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+            IEnumerable<SCIMRepresentationModel> result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToMongoListAsync<SCIMRepresentationModel>();
-            return result;
+            return result.Select(r => r.ToDomain(_scimDbContext.Database));
         }
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
