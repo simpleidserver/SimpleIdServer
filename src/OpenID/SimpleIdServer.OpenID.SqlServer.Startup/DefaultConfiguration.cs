@@ -36,6 +36,46 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope QueryScimResource = new OAuthScope
+        {
+            Name = "query_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope AddScimResource = new OAuthScope
+        {
+            Name = "add_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope DeleteScimResource = new OAuthScope
+        {
+            Name = "delete_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope UpdateScimResource = new OAuthScope
+        {
+            Name = "update_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope BulkScimResource = new OAuthScope
+        {
+            Name = "bulk_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -48,7 +88,12 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             SIDOpenIdConstants.StandardScopes.ScimScope,
             AccountsScope,
             ManageClientsScope,
-            ManageScopesScope
+            ManageScopesScope,
+            QueryScimResource,
+            AddScimResource,
+            DeleteScimResource,
+            UpdateScimResource,
+            BulkScimResource
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -720,7 +765,12 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     AllowedScopes = new List<OAuthScope>
                     {
                         ManageClientsScope,
-                        ManageScopesScope
+                        ManageScopesScope,
+                        QueryScimResource,
+                        AddScimResource,
+                        BulkScimResource,
+                        UpdateScimResource,
+                        DeleteScimResource
                     },
                     GrantTypes = new List<string>
                     {

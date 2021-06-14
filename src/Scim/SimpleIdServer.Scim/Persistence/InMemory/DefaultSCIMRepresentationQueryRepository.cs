@@ -54,8 +54,21 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
                 queryableRepresentations = (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
             }
 
+            if (parameter.SortBy != null)
+            {
+                var evaluatedExpression = parameter.SortBy.Evaluate(queryableRepresentations);
+                var ordered = (IOrderedEnumerable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
+                queryableRepresentations = ordered.ToList().AsQueryable();
+            }
+
             int totalResults = queryableRepresentations.Count();
-            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, parameter.Count == 0 ? new List<SCIMRepresentation>() : queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList()));
+            IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
+            if (parameter.Count > 0)
+            {
+                result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList();
+            }
+
+            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
         }
     }
 }

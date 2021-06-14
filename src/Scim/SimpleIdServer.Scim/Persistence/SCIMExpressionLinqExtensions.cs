@@ -9,11 +9,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace SimpleIdServer.Scim.Extensions
 {
     public static class SCIMExpressionLinqExtensions
     {
+        private static Dictionary<SCIMSchemaAttributeTypes, Type> MAPPING_SCHEMATTR_TO_TYPES = new Dictionary<SCIMSchemaAttributeTypes, Type>
+        {
+            { SCIMSchemaAttributeTypes.BOOLEAN, typeof(bool) },
+            { SCIMSchemaAttributeTypes.STRING, typeof(string) },
+            { SCIMSchemaAttributeTypes.INTEGER, typeof(int) },
+            { SCIMSchemaAttributeTypes.DATETIME, typeof(DateTime) },
+            { SCIMSchemaAttributeTypes.DECIMAL, typeof(decimal) }
+        };
         private static Dictionary<string, string> MAPPING_PATH_TO_PROPERTYNAMES = new Dictionary<string, string>
         {
             { SCIMConstants.StandardSCIMRepresentationAttributes.Id, "Id" },
@@ -23,6 +32,130 @@ namespace SimpleIdServer.Scim.Extensions
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}", "LastModified" },
             { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}", "Version" },
         };
+
+        #region Order By
+
+        public static LambdaExpression EvaluateOrderBy(this SCIMExpression expression, IQueryable<SCIMRepresentation> representations, SearchSCIMRepresentationOrders order)
+        {
+            var attrExpression = expression as SCIMAttributeExpression;
+            if (attrExpression == null)
+            {
+                return null;
+            }
+
+            var result = EvaluateOrderByMetadata(attrExpression, representations, order);
+            if (result == null)
+            {
+                result = EvaluateOrderByProperty(attrExpression, representations, order);
+            }
+
+            return result;
+        }
+
+        public static LambdaExpression EvaluateOrderByMetadata(SCIMAttributeExpression attrExpression, IQueryable<SCIMRepresentation> representations, SearchSCIMRepresentationOrders order)
+        {
+            var fullPath = attrExpression.GetFullPath();
+            if (!MAPPING_PATH_TO_PROPERTYNAMES.ContainsKey(fullPath))
+            {
+                return null;
+            }
+
+            var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
+            var propertyName = MAPPING_PATH_TO_PROPERTYNAMES[fullPath];
+            var property = Expression.Property(representationParameter, MAPPING_PATH_TO_PROPERTYNAMES[fullPath]);
+            var propertyType = typeof(SCIMRepresentation).GetProperty(propertyName).PropertyType;
+            var orderBy = GetOrderByType(order, propertyType);
+            var innerLambda = Expression.Lambda(property, new ParameterExpression[] { representationParameter });
+            var orderExpr = Expression.Call(orderBy, Expression.Constant(representations), innerLambda);
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentation>), "f");
+            var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
+            return finalOrderRequestBody;
+        }
+
+        public static LambdaExpression EvaluateOrderByProperty(SCIMAttributeExpression attrExpression, IQueryable<SCIMRepresentation> representations, SearchSCIMRepresentationOrders order)
+        {
+            var lastChild = attrExpression.GetLastChild();
+            var lastChildType = MAPPING_SCHEMATTR_TO_TYPES[lastChild.SchemaAttribute.Type];
+            var orderBy = GetOrderByType(order, lastChildType);
+            var selectMany = typeof(Enumerable).GetMethods()
+                .Where(m => m.Name == "SelectMany" && m.IsGenericMethod)
+                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute), typeof(SCIMRepresentationAttribute));
+            var first = typeof(Enumerable).GetMethods()
+                .Where(m => m.Name == "First" && m.IsGenericMethod)
+                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
+            var firstOrDefault = typeof(Enumerable).GetMethods()
+                .Where(m => m.Name == "FirstOrDefault" && m.IsGenericMethod)
+                .Where(m => m.GetParameters().Count() == 1).First();
+            var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
+            var attributesProperty = Expression.Property(representationParameter, "Attributes");
+            Expression navigationProperty = attributesProperty;
+            Expression innerExpression = null;
+            var nbChildren = attrExpression.NbChildren();
+            if (nbChildren >= 1)
+            {
+                for (int i = nbChildren - 1; i >= 0; i--)
+                {
+                    var representationAttributeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), $"a{i}");
+                    var valuesProperty = Expression.Property(representationAttributeParameter, "Values");
+                    if (innerExpression != null)
+                    {
+                        var selectManyExpression = Expression.Call(selectMany, valuesProperty, innerExpression);
+                        innerExpression = Expression.Lambda(selectManyExpression, new ParameterExpression[] { representationAttributeParameter });
+                    }
+                    else
+                    {
+                        var lambda = Expression.Lambda(valuesProperty, new ParameterExpression[] { representationAttributeParameter });
+                        innerExpression = lambda;
+                    }
+                }
+            }
+
+            if (innerExpression != null)
+            {
+                var selectExpr = Expression.Call(selectMany, attributesProperty, innerExpression);
+                navigationProperty = selectExpr;
+            }
+
+            var att = Expression.Parameter(typeof(SCIMRepresentationAttribute), "att");
+            var schemaAttrProp = Expression.Property(att, "SchemaAttribute");
+            var schemaAttrIdProp = Expression.Property(schemaAttrProp, "Id");
+            var equal = Expression.Equal(schemaAttrIdProp, Expression.Constant(lastChild.SchemaAttribute.Id));
+            var equalLambda = Expression.Lambda(equal, new ParameterExpression[] { att });
+            var firstCall = Expression.Call(first, navigationProperty, equalLambda);
+            Expression property = null;
+            switch (lastChild.SchemaAttribute.Type)
+            {
+                case SCIMSchemaAttributeTypes.STRING:
+                    property = Expression.Property(firstCall, "ValuesString");
+                    break;
+            }
+
+            var innerLambda = Expression.Call(firstOrDefault.MakeGenericMethod(lastChildType), property);
+            var orderLambda = Expression.Lambda(innerLambda, new ParameterExpression[] { representationParameter });
+            var orderExpr = Expression.Call(orderBy, Expression.Constant(representations), orderLambda);
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentation>), "f");
+            var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
+            return finalOrderRequestBody;
+        }
+
+        private static MethodInfo GetOrderByType(SearchSCIMRepresentationOrders order, Type lastChildType)
+        {
+            var orderBy = typeof(Enumerable).GetMethods()
+                .Where(m => m.Name == "OrderBy" && m.IsGenericMethod)
+                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation), lastChildType);
+            if (order == SearchSCIMRepresentationOrders.Descending)
+            {
+                orderBy = typeof(Enumerable).GetMethods()
+                    .Where(m => m.Name == "OrderByDescending" && m.IsGenericMethod)
+                    .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation), lastChildType);
+            }
+
+            return orderBy;
+        }
+
+        #endregion
+
+        #region Filter
 
         public static LambdaExpression Evaluate(this SCIMExpression expression, IQueryable<SCIMRepresentation> representations)
         {
@@ -634,5 +767,7 @@ namespace SimpleIdServer.Scim.Extensions
 
             return Expression.Property(parameterExpression, MAPPING_PATH_TO_PROPERTYNAMES[fullPath]);
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,44 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/Users",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60002
+        }
+      ],
+      "UpstreamPathTemplate": "/users",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/Users/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60002
+        }
+      ],
+      "UpstreamPathTemplate": "/users/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/management/clients/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

@@ -2,6 +2,7 @@ import { createSelector } from '@ngrx/store';
 import * as fromApplications from './applications/reducers';
 import * as fromMetadata from './metadata/reducers';
 import * as fromScopes from './scopes/reducers';
+import * as fromUsers from './users/reducers';
 
 export interface AppState {
   application: fromApplications.ApplicationState;
@@ -10,7 +11,8 @@ export interface AppState {
   searchOAuthScopes: fromScopes.SearchOAuthScopesState,
   oauthScopes: fromScopes.OAuthScopesState;
   oauthScope: fromScopes.OAuthScopeState;
-  wellKnownConfiguration: fromMetadata.WellKnownConfigurationState
+  wellKnownConfiguration: fromMetadata.WellKnownConfigurationState,
+  users: fromUsers.SearchUsersState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -20,6 +22,7 @@ export const selectSearchOAuthScopes = (state: AppState) => state.searchOAuthSco
 export const selectOAuthScopes = (state: AppState) => state.oauthScopes;
 export const selectOAuthScope = (state: AppState) => state.oauthScope;
 export const selectWellKnownConfiguration = (state: AppState) => state.wellKnownConfiguration;
+export const selectUsers = (state: AppState) => state.users;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -98,6 +101,17 @@ export const selectWellKnownConfigurationResult = createSelector(
   }
 );
 
+export const selectUsersResult = createSelector(
+  selectUsers,
+  (state: fromUsers.SearchUsersState) => {
+    if (!state || state.Users === null) {
+      return null;
+    }
+
+    return state.Users;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -105,5 +119,6 @@ export const appReducer = {
   searchOAuthScopes: fromScopes.getSearchOauthScopesReducer,
   oauthScopes: fromScopes.getOAuthScopesReducer,
   oauthScope: fromScopes.getOAuthScopeReducer,
-  wellKnownConfiguration: fromMetadata.getWellKnownConfiguration
+  wellKnownConfiguration: fromMetadata.getWellKnownConfiguration,
+  users: fromUsers.getSearchUsersReducer
 };

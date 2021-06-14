@@ -26,6 +26,7 @@
       <mat-nav-list *ngIf="isConnected">
         <a mat-list-item [routerLink]="['/applications']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "applications.list" | translate }}</a>
         <a mat-list-item [routerLink]="['/scopes']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "scopes.list" | translate }}</a>
+        <a mat-list-item [routerLink]="['/users']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "users.list" | translate }}</a>
       </mat-nav-list>
     </mat-drawer>
     <div class="container">

@@ -133,5 +133,11 @@
     "dangerZone": "Zone de danger",
     "deleteTitle": "Supprimer ce scope",
     "delete": "Supprimer"
+  },
+  "users": {
+    "list": "Utilisateurs",
+    "userName": "Nom",
+    "familyName": "Nom de famille",
+    "lastModified": "Dernière date de modification"
   }
 }

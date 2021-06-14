@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domain;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
 {
@@ -19,6 +19,7 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
 
         public string Name { get; private set; }
         public SCIMAttributeExpression Child { get; set;}
+        public SCIMSchemaAttribute SchemaAttribute { get; set; }
 
         public string GetFullPath()
         {
@@ -27,7 +28,7 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
             return string.Join(".", names);
         }
 
-        public void GetFullPath(List<string> names)
+        protected void GetFullPath(List<string> names)
         {
             names.Add(Name);
             if (Child != null)
@@ -41,6 +42,23 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
             Child = child;
         }
 
+        public SCIMAttributeExpression GetLastChild()
+        {
+            if (Child != null)
+            {
+                return Child.GetLastChild();
+            }
+
+            return this;
+        }
+
+        public int NbChildren()
+        {
+            int nbChildren = 0;
+            IncrementNbChildren(ref nbChildren);
+            return nbChildren;
+        }
+
         public override object Clone()
         {
             return ProtectedClone();
@@ -49,6 +67,15 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
         protected virtual object ProtectedClone()
         {
             return new SCIMAttributeExpression(Name, (SCIMAttributeExpression)Child.Clone());
+        }
+
+        protected void IncrementNbChildren(ref int nbChildren)
+        {
+            if (Child != null)
+            {
+                nbChildren++;
+                Child.IncrementNbChildren(ref nbChildren);
+            }
         }
     }
 }

@@ -23,6 +23,8 @@ import { MetadataEffects } from './stores/metadata/effects/metadata.effects';
 import { MetadataService } from './stores/metadata/services/metadata.service';
 import { OAuthScopeEffects } from './stores/scopes/effects/scope.effects';
 import { OAuthScopeService } from './stores/scopes/services/scope.service';
+import { UserEffects } from './stores/users/effects/user.effects';
+import { UserService } from './stores/users/services/user.service';
 import { translationFactory } from './translation.util';
 
 export function createTranslateLoader(http: HttpClient) {
@@ -41,7 +43,7 @@ export function createTranslateLoader(http: HttpClient) {
     BrowserAnimationsModule,
     HttpClientModule,
     OAuthModule.forRoot(),
-    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects]),
+    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects, UserEffects]),
     StoreModule.forRoot(appReducer),
     StoreDevtoolsModule.instrument({
       maxAge: 10
@@ -60,6 +62,7 @@ export function createTranslateLoader(http: HttpClient) {
   providers: [
     ApplicationService,
     OAuthScopeService,
+    UserService,
     MetadataService,
     {
       provide: OAuthStorage,

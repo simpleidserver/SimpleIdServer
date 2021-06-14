@@ -57,10 +57,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 {
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = "http://localhost:60000",
+                        ValidIssuer = "https://localhost:60000",
                         ValidAudiences = new List<string>
                         {
-                            "scimClient"
+                            "scimClient", "gatewayClient"
                         },
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = oauthRsaSecurityKey
@@ -72,6 +72,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             });
             services.AddScimStoreEF(options =>
             {
+                options.UseLazyLoadingProxies();
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
             });
             services.AddDistributedLockSQLServer(opts =>
