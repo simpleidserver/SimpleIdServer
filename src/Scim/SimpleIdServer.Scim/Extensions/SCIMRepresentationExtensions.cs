@@ -580,6 +580,10 @@ namespace SimpleIdServer.Scim.Domain
                         if (record.Attr.ValuesString != null && record.Attr.ValuesString.Any())
                             jObj.Add(record.Attr.SchemaAttribute.Name, record.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(record.Attr.ValuesString) : record.Attr.ValuesString.First());
                         break;
+                    case SCIMSchemaAttributeTypes.REFERENCE:
+                        if (record.Attr.ValuesReference != null && record.Attr.ValuesReference.Any())
+                            jObj.Add(record.Attr.SchemaAttribute.Name, record.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(record.Attr.ValuesReference) : record.Attr.ValuesReference.First());
+                        break;
                     case SCIMSchemaAttributeTypes.BOOLEAN:
                         if (record.Attr.ValuesBoolean != null && record.Attr.ValuesBoolean.Any())
                             jObj.Add(record.Attr.SchemaAttribute.Name, record.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(record.Attr.ValuesBoolean) : record.Attr.ValuesBoolean.First());

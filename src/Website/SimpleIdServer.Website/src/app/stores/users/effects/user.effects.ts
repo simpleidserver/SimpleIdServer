@@ -8,7 +8,10 @@ import {
   startGet,
   startSearch,
   completeGet,
-  errorGet
+  errorGet,
+  startUpdate,
+  completeUpdate,
+  errorUpdate
 } from '../actions/users.actions';
 import { UserService } from '../services/user.service';
 
@@ -42,6 +45,20 @@ export class UserEffects {
           .pipe(
             map(content => completeGet({ content: content })),
             catchError(() => of(errorGet()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  updateUser$ = this.actions$
+    .pipe(
+      ofType(startUpdate),
+      mergeMap((evt) => {
+        return this.userService.update(evt.userId, evt.request)
+          .pipe(
+            map(content => completeUpdate()),
+            catchError(() => of(errorUpdate()))
           );
       }
       )

@@ -4,10 +4,10 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startGet } from '@app/stores/users/actions/users.actions';
+import { startGet, startUpdate } from '@app/stores/users/actions/users.actions';
 import { User } from '@app/stores/users/models/user.model';
 import { UserPhoto } from '@app/stores/users/models/userphoto.model';
-import { select, Store } from '@ngrx/store';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { Observable, ReplaySubject } from 'rxjs';
 import { UserEmail } from '@app/stores/users/models/useremail.model';
 import { UserPhoneNumber } from '@app/stores/users/models/userphonenumber.model';
@@ -18,6 +18,9 @@ import { UserAddress } from '@app/stores/users/models/useraddress.model';
 import { EditAddressComponent } from './edit-address.component';
 import { UserRole } from '@app/stores/users/models/userrole.model';
 import { EditRoleComponent } from './edit-role.component';
+import { TranslateService } from '@ngx-translate/core';
+import { filter } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 class EmailDataSource extends DataSource<UserEmail> {
   private _dataStream = new ReplaySubject<UserEmail[]>();
@@ -129,6 +132,7 @@ export class ViewUserComponent implements OnInit {
   roles$: RoleDataSource;
   currentPhotoIndex: number = 1;
   editUserFormGroup: FormGroup = new FormGroup({
+    externalId: new FormControl({ value: '' }),
     userName: new FormControl({ value: '' }),
     familyName: new FormControl({ value: '' }),
     givenName: new FormControl({ value: '' }),
@@ -142,7 +146,10 @@ export class ViewUserComponent implements OnInit {
   constructor(
     private store: Store<fromReducers.AppState>,
     private activatedRoute: ActivatedRoute,
-    private dialog : MatDialog) { }
+    private dialog: MatDialog,
+    private actions$: ScannedActionsSubject,
+    private snackbar: MatSnackBar,
+    private translateService: TranslateService) { }
 
   ngOnInit(): void {
     this.store.pipe(select(fromReducers.selectUserResult)).subscribe((user: User | null) => {
@@ -150,15 +157,32 @@ export class ViewUserComponent implements OnInit {
         return;
       }
 
-      this.user$ = user;
-      this.photos$ = [...user.photos];
-      this.emails$ = new EmailDataSource([...user.emails]);
-      this.phoneNumbers$ = new PhoneNumberDataSource([...user.phoneNumbers]);
-      this.addresses$ = new AddressDataSource([...user.addresses]);
-      this.roles$ = new RoleDataSource([...user.roles]);
+      this.user$ = { ...user };
+      this.photos$ = JSON.parse(JSON.stringify(user.photos)) as UserPhoto[];
+      this.emails$ = new EmailDataSource(JSON.parse(JSON.stringify(user.emails)) as UserEmail[]);
+      this.phoneNumbers$ = new PhoneNumberDataSource(JSON.parse(JSON.stringify(user.phoneNumbers)) as UserPhoneNumber[]);
+      this.addresses$ = new AddressDataSource(JSON.parse(JSON.stringify(user.addresses)) as UserAddress[]);
+      this.roles$ = new RoleDataSource(JSON.parse(JSON.stringify(user.roles)) as UserRole[]);
       this.isLoading = false;
       this.refreshEditForm();
     });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Users] ERROR_UPDATE_USER'))
+      .subscribe(() => {
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('users.messages.errorUpdate'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Users] COMPLETE_UPDATE_USER'))
+      .subscribe(() => {
+        this.user$.userName = this.editUserFormGroup.get('userName')?.value;
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('users.messages.update'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.refresh();
   }
 
@@ -169,7 +193,8 @@ export class ViewUserComponent implements OnInit {
     this.store.dispatch(request);
   }
 
-  addPhoto() {
+  addPhoto(evt: any) {
+    evt.preventDefault();
     let photoRecord: UserPhoto = { display: '', type: '', value: '' };
     const dialogRef = this.dialog.open(EditPhotoComponent, {
       data: photoRecord
@@ -183,22 +208,26 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  nextPhoto() {
+  nextPhoto(evt: any) {
+    evt.preventDefault();
     this.currentPhotoIndex++;
   }
 
-  previousPhoto() {
+  previousPhoto(evt: any) {
+    evt.preventDefault();
     this.currentPhotoIndex--;
   }
 
-  removePhoto() {
+  removePhoto(evt: any) {
+    evt.preventDefault();
     this.photos$.splice(this.currentPhotoIndex - 1, 1);
     if (this.currentPhotoIndex > 1) {
       this.currentPhotoIndex--;
     }
   }
 
-  editPhoto() {
+  editPhoto(evt: any) {
+    evt.preventDefault();
     if (this.photos$.length === 0) {
       return;
     }
@@ -212,14 +241,15 @@ export class ViewUserComponent implements OnInit {
         return;
       }
 
-      let p = r as UserPhoto;
-      photo.display = p.display;
-      photo.type = p.type;
-      photo.value = p.value;
+      const updatedPhoto = r as UserPhoto;
+      photo.display = updatedPhoto.display;
+      photo.type = updatedPhoto.type;
+      photo.value = updatedPhoto.value;
     });
   }
 
-  addEmail() {
+  addEmail(evt: any) {
+    evt.preventDefault();
     const userEmail: UserEmail = { display: '', type: '', value: '' };
     const dialogRef = this.dialog.open(EditEmailComponent, {
       data: userEmail
@@ -237,14 +267,16 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  removeEmail(email: UserEmail) {
+  removeEmail(evt: any, email: UserEmail) {
+    evt.preventDefault();
     const emails = this.emails$.data;
     const index = emails.indexOf(email);
     emails.splice(index, 1);
     this.emails$.setData(emails);
   }
 
-  editEmail(email: UserEmail, index : number) {
+  editEmail(evt: any, email: UserEmail, index: number) {
+    evt.preventDefault();
     const dialogRef = this.dialog.open(EditEmailComponent, {
       data: email
     });
@@ -263,7 +295,8 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  addPhoneNumber() {
+  addPhoneNumber(evt: any) {
+    evt.preventDefault();
     const userPhoneNumber: UserPhoneNumber = { display: '', type: '', value: '' };
     const dialogRef = this.dialog.open(EditPhoneNumberComponent, {
       data: userPhoneNumber
@@ -281,14 +314,16 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  removePhoneNumber(phoneNumber: UserPhoneNumber) {
+  removePhoneNumber(evt: any, phoneNumber: UserPhoneNumber) {
+    evt.preventDefault();
     const phoneNumbers = this.phoneNumbers$.data;
     const index = phoneNumbers.indexOf(phoneNumber);
     phoneNumbers.splice(index, 1);
     this.phoneNumbers$.setData(phoneNumbers);
   }
 
-  editPhoneNumber(phoneNumber: UserPhoneNumber, index: number) {
+  editPhoneNumber(evt: any, phoneNumber: UserPhoneNumber, index: number) {
+    evt.preventDefault();
     const dialogRef = this.dialog.open(EditPhoneNumberComponent, {
       data: phoneNumber
     });
@@ -307,7 +342,8 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  addAddress() {
+  addAddress(evt: any) {
+    evt.preventDefault();
     const userAddress: UserAddress = { type: '', country: '', formatted: '', locality: '', postalCode: '', region: '', streetAddress: '' };
     const dialogRef = this.dialog.open(EditAddressComponent, {
       data: userAddress
@@ -325,14 +361,16 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  removeAddress(address: UserAddress) {
+  removeAddress(evt: any, address: UserAddress) {
+    evt.preventDefault();
     const addresses = this.addresses$.data;
     const index = addresses.indexOf(address);
     addresses.splice(index, 1);
     this.addresses$.setData(addresses);
   }
 
-  editAddress(address: UserAddress, index: number) {
+  editAddress(evt: any, address: UserAddress, index: number) {
+    evt.preventDefault();
     const dialogRef = this.dialog.open(EditAddressComponent, {
       data: address
     });
@@ -356,7 +394,8 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  addRole() {
+  addRole(evt: any) {
+    evt.preventDefault();
     const userRole: UserRole = { type: '', display: '', value: ''};
     const dialogRef = this.dialog.open(EditRoleComponent, {
       data: userRole
@@ -374,14 +413,16 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  removeRole(address: UserRole) {
+  removeRole(evt: any, address: UserRole) {
+    evt.preventDefault();
     const roles = this.roles$.data;
     const index = roles.indexOf(address);
     roles.splice(index, 1);
     this.roles$.setData(roles);
   }
 
-  editRole(role: UserRole, index: number) {
+  editRole(evt: any, role: UserRole, index: number) {
+    evt.preventDefault();
     const dialogRef = this.dialog.open(EditRoleComponent, {
       data: role
     });
@@ -400,7 +441,34 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
+  saveUser(evt: any, formValue: any) {
+    evt.preventDefault();
+    var request : any = {
+      schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
+      externalId: formValue.externalId,
+      userName: formValue.userName,
+      name: {
+        familyName: formValue.familyName,
+        givenName: formValue.givenName
+      },
+      displayName: formValue.displayName,
+      nickName: formValue.nickName,
+      title: formValue.title,
+      profileUrl: formValue.profileUrl,
+      userType: formValue.userType,
+      photos: this.photos$,
+      emails: this.emails$.data,
+      phoneNumbers: this.phoneNumbers$.data,
+      addresses: this.addresses$.data,
+      roles: this.roles$.data
+    };
+    this.isLoading = true;
+    const updateUser = startUpdate({ userId: this.user$.id, request: request });
+    this.store.dispatch(updateUser);
+  }
+
   private refreshEditForm() {
+    this.editUserFormGroup.get('externalId')?.setValue(this.user$.externalId);
     this.editUserFormGroup.get('userName')?.setValue(this.user$.userName);
     this.editUserFormGroup.get('familyName')?.setValue(this.user$.familyName);
     this.editUserFormGroup.get('givenName')?.setValue(this.user$.givenName);

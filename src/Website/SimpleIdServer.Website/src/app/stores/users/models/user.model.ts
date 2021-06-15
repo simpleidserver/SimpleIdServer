@@ -13,6 +13,7 @@ export class User {
     this.roles = [];
   }
 
+  externalId: string;
   userName: string;
   displayName: string;
   nickName: string;
@@ -32,6 +33,7 @@ export class User {
 
   public static fromJson(json: any): User {
     var result = new User();
+    result.externalId = json["externalId"];
     result.userName = json["userName"];
     result.displayName = json["displayName"];
     result.nickName = json["nickName"];

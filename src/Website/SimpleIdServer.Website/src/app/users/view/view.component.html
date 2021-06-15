@@ -17,8 +17,13 @@
 </div>
 <loader *ngIf="isLoading"></loader>
 <mat-card [style.display]="!isLoading ? 'block' : 'none'">
-  <form [formGroup]="editUserFormGroup">
+  <form [formGroup]="editUserFormGroup" (ngSubmit)="saveUser($event, editUserFormGroup.value)">
     <mat-card-content>
+      <!--externalId -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.externalId' | translate }}</mat-label>
+        <input matInput type="text" formControlName="externalId" />
+      </mat-form-field>
       <!--userName -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>{{ 'users.userName' | translate }}</mat-label>
@@ -62,16 +67,16 @@
         </div>
         <div class="navigation">
           <span class="navInfo">{{ currentPhotoIndex }} / {{ photos$.length }}</span>
-          <button class="actBtn" mat-icon-button (click)="previousPhoto()" [style.visibility]="currentPhotoIndex > 1 ? 'visible': 'hidden'">
+          <button class="actBtn" mat-icon-button (click)="previousPhoto($event)" [style.visibility]="currentPhotoIndex > 1 ? 'visible': 'hidden'">
             <mat-icon>navigate_before</mat-icon>
           </button>
-          <button class="actBtn" mat-icon-button (click)="nextPhoto()" [style.visibility]="currentPhotoIndex < photos$.length ? 'visible': 'hidden'">
+          <button class="actBtn" mat-icon-button (click)="nextPhoto($event)" [style.visibility]="currentPhotoIndex < photos$.length ? 'visible': 'hidden'">
             <mat-icon>navigate_next</mat-icon>
           </button>
           <div class="actions">
-            <mat-icon class="actBtn" (click)="editPhoto()">edit</mat-icon>
-            <mat-icon class="actBtn" (click)="removePhoto()">delete</mat-icon>
-            <mat-icon class="actBtn" (click)="addPhoto()">add</mat-icon>
+            <mat-icon class="actBtn" (click)="editPhoto($event)">edit</mat-icon>
+            <mat-icon class="actBtn" (click)="removePhoto($event)">delete</mat-icon>
+            <mat-icon class="actBtn" (click)="addPhoto($event)">add</mat-icon>
           </div>
         </div>
       </div>
@@ -82,7 +87,7 @@
             <p>{{ 'users.emails' | translate }}</p>
           </div>
           <div>
-            <button mat-raised-button color="primary" (click)="addEmail()">
+            <button mat-raised-button color="primary" (click)="addEmail($event)">
               <mat-icon>add</mat-icon>
               {{ 'users.addEmail' | translate }}
             </button>
@@ -110,10 +115,10 @@
           <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let email; let i = index">
-              <button mat-icon-button (click)="removeEmail(email)">
+              <button mat-icon-button (click)="removeEmail($event, email)">
                 <mat-icon>delete</mat-icon>
               </button>
-              <button mat-icon-button (click)="editEmail(email, i)">
+              <button mat-icon-button (click)="editEmail($event, email, i)">
                 <mat-icon>edit</mat-icon>
               </button>
             </mat-cell>
@@ -129,7 +134,7 @@
             <p>{{ 'users.phoneNumbers' | translate }}</p>
           </div>
           <div>
-            <button mat-raised-button color="primary" (click)="addPhoneNumber()">
+            <button mat-raised-button color="primary" (click)="addPhoneNumber($event)">
               <mat-icon>add</mat-icon>
               {{ 'users.addPhoneNumber' | translate }}
             </button>
@@ -157,10 +162,10 @@
           <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let phoneNumber; let i = index">
-              <button mat-icon-button (click)="removePhoneNumber(phoneNumber)">
+              <button mat-icon-button (click)="removePhoneNumber($event, phoneNumber)">
                 <mat-icon>delete</mat-icon>
               </button>
-              <button mat-icon-button (click)="editPhoneNumber(phoneNumber, i)">
+              <button mat-icon-button (click)="editPhoneNumber($event, phoneNumber, i)">
                 <mat-icon>edit</mat-icon>
               </button>
             </mat-cell>
@@ -176,7 +181,7 @@
             <p>{{ 'users.addresses' | translate }}</p>
           </div>
           <div>
-            <button mat-raised-button color="primary" (click)="addAddress()">
+            <button mat-raised-button color="primary" (click)="addAddress($event)">
               <mat-icon>add</mat-icon>
               {{ 'users.addAddress' | translate }}
             </button>
@@ -204,10 +209,10 @@
           <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let address; let i = index">
-              <button mat-icon-button (click)="removeAddress(address)">
+              <button mat-icon-button (click)="removeAddress($event, address)">
                 <mat-icon>delete</mat-icon>
               </button>
-              <button mat-icon-button (click)="editAddress(address, i)">
+              <button mat-icon-button (click)="editAddress($event, address, i)">
                 <mat-icon>edit</mat-icon>
               </button>
             </mat-cell>
@@ -223,7 +228,7 @@
             <p>{{ 'users.roles' | translate }}</p>
           </div>
           <div>
-            <button mat-raised-button color="primary" (click)="addRole()">
+            <button mat-raised-button color="primary" (click)="addRole($event)">
               <mat-icon>add</mat-icon>
               {{ 'users.addRole' | translate }}
             </button>
@@ -251,10 +256,10 @@
           <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let role; let i = index">
-              <button mat-icon-button (click)="removeRole(role)">
+              <button mat-icon-button (click)="removeRole($event, role)">
                 <mat-icon>delete</mat-icon>
               </button>
-              <button mat-icon-button (click)="editRole(role, i)">
+              <button mat-icon-button (click)="editRole($event, role, i)">
                 <mat-icon>edit</mat-icon>
               </button>
             </mat-cell>
@@ -264,5 +269,8 @@
         </mat-table>
       </div>
     </mat-card-content>
+    <mat-card-actions>
+      <button type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+    </mat-card-actions>
   </form>
 </mat-card>

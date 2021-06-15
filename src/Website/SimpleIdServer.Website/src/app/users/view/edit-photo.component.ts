@@ -24,7 +24,11 @@ export class EditPhotoComponent {
     private dialogRef: MatDialogRef<EditPhotoComponent>) {
     this.editPhotoForm.get('value')?.setValue(this.data.value);
     this.editPhotoForm.get('display')?.setValue(this.data.display);
-    this.editPhotoForm.get('type')?.setValue(this.data.type);
+    if (this.data.type) {
+      this.editPhotoForm.get('type')?.setValue(this.data.type);
+    } else {
+      this.editPhotoForm.get('type')?.setValue('photo');
+    }
   }
 
   save() {

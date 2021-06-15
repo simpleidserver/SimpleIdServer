@@ -23,7 +23,11 @@ export class EditEmailComponent {
     private dialogRef: MatDialogRef<EditEmailComponent>) {
     this.editEmailForm.get('value')?.setValue(this.data.value);
     this.editEmailForm.get('display')?.setValue(this.data.display);
-    this.editEmailForm.get('type')?.setValue(this.data.type);
+    if (this.data.type) {
+      this.editEmailForm.get('type')?.setValue(this.data.type);
+    } else {
+      this.editEmailForm.get('type')?.setValue('work');
+    }
   }
 
   save() {

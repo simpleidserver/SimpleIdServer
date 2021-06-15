@@ -23,7 +23,11 @@ export class EditPhoneNumberComponent {
     private dialogRef: MatDialogRef<EditPhoneNumberComponent>) {
     this.editPhoneNumberForm.get('value')?.setValue(this.data.value);
     this.editPhoneNumberForm.get('display')?.setValue(this.data.display);
-    this.editPhoneNumberForm.get('type')?.setValue(this.data.type);
+    if (this.data.type) {
+      this.editPhoneNumberForm.get('type')?.setValue(this.data.type);
+    } else {
+      this.editPhoneNumberForm.get('type')?.setValue('work');
+    }
   }
 
   save() {

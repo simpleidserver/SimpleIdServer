@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
-using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;

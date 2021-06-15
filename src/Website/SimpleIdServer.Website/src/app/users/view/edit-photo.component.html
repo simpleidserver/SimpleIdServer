@@ -14,7 +14,10 @@
     <!-- Type -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>{{ 'users.photoType' | translate }}</mat-label>
-      <input matInput formControlName="type" />
+      <mat-select formControlName="type">
+        <mat-option value="photo">{{ 'users.photoTypes.photo' | translate }}</mat-option>
+        <mat-option value="thumbnail">{{ 'users.photoTypes.thumbnail' | translate }}</mat-option>
+      </mat-select>
     </mat-form-field>
   </form>
 </div>

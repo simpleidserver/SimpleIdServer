@@ -192,6 +192,15 @@
     "editRole": "Edit or Add role",
     "roleValue": "Role",
     "roleDisplay": "Description",
-    "roleType": "Type"
+    "roleType": "Type",
+    "externalId": "External Identifier",
+    "messages": {
+      "errorUpdate": "An error occured while trying to update the user",
+      "update": "User has been updated"
+    },
+    "photoTypes": {
+      "photo": "Photo",
+      "thumbnail": "Thumbnail"
+    }
   }
 }

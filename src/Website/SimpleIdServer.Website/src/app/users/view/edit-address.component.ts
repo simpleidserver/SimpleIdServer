@@ -29,7 +29,12 @@ export class EditAddressComponent {
     this.editAddressForm.get('locality')?.setValue(this.data.locality);
     this.editAddressForm.get('region')?.setValue(this.data.region);
     this.editAddressForm.get('postalCode')?.setValue(this.data.postalCode);
-    this.editAddressForm.get('type')?.setValue(this.data.type);
+    if (this.data.type) {
+      this.editAddressForm.get('type')?.setValue(this.data.type);
+    }
+    else {
+      this.editAddressForm.get('type')?.setValue('work');
+    }
   }
 
   save() {

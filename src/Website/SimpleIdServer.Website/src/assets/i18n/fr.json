@@ -192,6 +192,15 @@
     "editRole": "Editer ou ajouter un rôle",
     "roleValue": "Rôle",
     "roleDisplay": "Description",
-    "roleType": "Type"
+    "roleType": "Type",
+    "externalId": "Identifiant externe",
+    "messages": {
+      "errorUpdate": "Une erreur est survenue durant la mise à jour de l'utilisateur",
+      "update": "L'utilisateur a été mis à jour"
+    },
+    "photoTypes": {
+      "photo": "Photo",
+      "thumbnail": "Mignature"
+    }
   }
 }
