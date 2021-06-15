@@ -136,7 +136,7 @@
   },
   "users": {
     "list": "Utilisateurs",
-    "userName": "Nom",
+    "userName": "Identifiant unique",
     "familyName": "Nom de famille",
     "lastModified": "Dernière date de modification",
     "givenName": "Prénom",
@@ -144,6 +144,54 @@
     "photoUrl": "Url",
     "photoDisplay": "Description",
     "photoType": "Type",
-    "photos": "Photos"
+    "photos": "Photos",
+    "displayName": "Nom",
+    "nickName": "Surnom",
+    "title": "Titre",
+    "profileUrl": "URL du profil",
+    "emails": "Emails",
+    "addEmail": "Ajouter un Email",
+    "editEmail": "Editer ou ajouter un email",
+    "emailAddress": "Email",
+    "emailDisplay": "Description",
+    "emailType": "Type",
+    "emailTypes": {
+      "work": "Travail",
+      "home": "Maison",
+      "other": "Autre"
+    },
+    "phoneNumbers": "Numéros de téléphone",
+    "addPhoneNumber": "Ajouter un numéro de téléphone",
+    "editPhoneNumber": "Editer ou ajouter un numéro de téléphone",
+    "phoneNumberValue": "Numéro de téléphone",
+    "phoneNumberDisplay": "Description",
+    "phoneNumberType": "Type",
+    "phoneNumberTypes": {
+      "work": "Travail",
+      "home": "Maison",
+      "mobile": "Mobile",
+      "fax": "Fax",
+      "pager": "Téléavertisseur",
+      "other": "Autre"
+    },
+    "addresses": "Les adresses",
+    "addAddress": "Ajouter une adresse",
+    "streetAddress": "Adresse de la rue",
+    "addressFormatted": "Adresse complète",
+    "addressLocality": "Ville ou localité",
+    "addressRegion": "Etat ou région",
+    "addressPostalCode": "Code ZIP ou code postale",
+    "addressType": "Type",
+    "addressTypes": {
+      "work": "Travail",
+      "home": "Maison",
+      "other": "Autre"
+    },
+    "roles": "Rôles",
+    "addRole": "Ajouter un rôle",
+    "editRole": "Editer ou ajouter un rôle",
+    "roleValue": "Rôle",
+    "roleDisplay": "Description",
+    "roleType": "Type"
   }
 }

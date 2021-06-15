@@ -1,6 +1,6 @@
 :host {
-    display: block;
-    height: 100%;
+  display: block;
+  height: 100%;
 }
 
 .picture {
@@ -25,11 +25,15 @@
 }
 
 .picture > .navigation > .actions {
-    position: absolute;
-    right: 0px;
-    top: 8px;
+  position: absolute;
+  right: 0px;
+  top: 8px;
 }
 
 .picture > .navigation > .actions > .actBtn {
   cursor: pointer;
+}
+
+.lst {
+  margin-bottom: 1.34375em;
 }

@@ -34,18 +34,38 @@
         <mat-label>{{ 'users.familyName' | translate }}</mat-label>
         <input matInput type="text" formControlName="familyName" />
       </mat-form-field>
+      <!--displayName -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.displayName' | translate }}</mat-label>
+        <input matInput type="text" formControlName="displayName" />
+      </mat-form-field>
+      <!--nickName -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.nickName' | translate }}</mat-label>
+        <input matInput type="text" formControlName="nickName" />
+      </mat-form-field>
+      <!--title -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.title' | translate }}</mat-label>
+        <input matInput type="text" formControlName="title" />
+      </mat-form-field>
+      <!--userType -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.profileUrl' | translate }}</mat-label>
+        <input matInput type="text" formControlName="profileUrl" />
+      </mat-form-field>
       <!-- Photos -->
       <p>{{ 'users.photos' | translate }}</p>
       <div class="picture">
         <div class="content">
-          <img *ngFor="let photo of photos; let index = index" class="img" [src]="photo.value" [style.display]="(currentPhotoIndex - 1) === index ? '' : 'none'" />
+          <img *ngFor="let photo of photos$; let index = index" class="img" [src]="photo.value" [style.display]="(currentPhotoIndex - 1) === index ? '' : 'none'" />
         </div>
         <div class="navigation">
-          <span class="navInfo">{{ currentPhotoIndex }} / {{ photos.length }}</span>
+          <span class="navInfo">{{ currentPhotoIndex }} / {{ photos$.length }}</span>
           <button class="actBtn" mat-icon-button (click)="previousPhoto()" [style.visibility]="currentPhotoIndex > 1 ? 'visible': 'hidden'">
             <mat-icon>navigate_before</mat-icon>
           </button>
-          <button class="actBtn" mat-icon-button (click)="nextPhoto()" [style.visibility]="currentPhotoIndex < photos.length ? 'visible': 'hidden'">
+          <button class="actBtn" mat-icon-button (click)="nextPhoto()" [style.visibility]="currentPhotoIndex < photos$.length ? 'visible': 'hidden'">
             <mat-icon>navigate_next</mat-icon>
           </button>
           <div class="actions">
@@ -54,6 +74,194 @@
             <mat-icon class="actBtn" (click)="addPhoto()">add</mat-icon>
           </div>
         </div>
+      </div>
+      <!-- Emails -->
+      <div class="lst">
+        <div fxLayout="row">
+          <div fxFlex="80%">
+            <p>{{ 'users.emails' | translate }}</p>
+          </div>
+          <div>
+            <button mat-raised-button color="primary" (click)="addEmail()">
+              <mat-icon>add</mat-icon>
+              {{ 'users.addEmail' | translate }}
+            </button>
+          </div>
+        </div>
+        <mat-table class="full-width" [dataSource]="emails$">
+          <ng-container matColumnDef="value">
+            <mat-header-cell *matHeaderCellDef>{{ 'users.emailAddress' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let email">
+              {{ email.value }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="display">
+            <mat-header-cell *matHeaderCellDef>{{ "users.emailDisplay" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let email">
+              {{ email.display }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>{{ "users.emailType" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let email">
+              {{ 'users.emailTypes.' + email.type | translate }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let email; let i = index">
+              <button mat-icon-button (click)="removeEmail(email)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editEmail(email, i)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="displayedEmailColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedEmailColumns;"></mat-row>
+        </mat-table>
+      </div>
+      <!-- Phone numbers -->
+      <div class="lst">
+        <div fxLayout="row">
+          <div fxFlex="80%">
+            <p>{{ 'users.phoneNumbers' | translate }}</p>
+          </div>
+          <div>
+            <button mat-raised-button color="primary" (click)="addPhoneNumber()">
+              <mat-icon>add</mat-icon>
+              {{ 'users.addPhoneNumber' | translate }}
+            </button>
+          </div>
+        </div>
+        <mat-table class="full-width" [dataSource]="phoneNumbers$">
+          <ng-container matColumnDef="value">
+            <mat-header-cell *matHeaderCellDef>{{ 'users.phoneNumberValue' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let phoneNumber">
+              {{ phoneNumber.value }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="display">
+            <mat-header-cell *matHeaderCellDef>{{ "users.phoneNumberDisplay" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let phoneNumber">
+              {{ phoneNumber.display }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>{{ "users.phoneNumberType" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let phoneNumber">
+              {{ 'users.phoneNumberTypes.' + phoneNumber.type | translate }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let phoneNumber; let i = index">
+              <button mat-icon-button (click)="removePhoneNumber(phoneNumber)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editPhoneNumber(phoneNumber, i)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="displayedEmailColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedEmailColumns;"></mat-row>
+        </mat-table>
+      </div>
+      <!-- Addresses -->
+      <div class="lst">
+        <div fxLayout="row">
+          <div fxFlex="80%">
+            <p>{{ 'users.addresses' | translate }}</p>
+          </div>
+          <div>
+            <button mat-raised-button color="primary" (click)="addAddress()">
+              <mat-icon>add</mat-icon>
+              {{ 'users.addAddress' | translate }}
+            </button>
+          </div>
+        </div>
+        <mat-table class="full-width" [dataSource]="addresses$">
+          <ng-container matColumnDef="streetAddress">
+            <mat-header-cell *matHeaderCellDef>{{ 'users.streetAddress' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let address">
+              {{ address.streetAddress }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="postalCode">
+            <mat-header-cell *matHeaderCellDef>{{ "users.addressPostalCode" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let address">
+              {{ address.postalCode }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>{{ "users.addressType" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let address">
+              {{ 'users.addressTypes.' + address.type | translate }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let address; let i = index">
+              <button mat-icon-button (click)="removeAddress(address)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editAddress(address, i)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="displayedAddressNumberColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedAddressNumberColumns;"></mat-row>
+        </mat-table>
+      </div>
+      <!-- Roles  -->
+      <div class="lst">
+        <div fxLayout="row">
+          <div fxFlex="80%">
+            <p>{{ 'users.roles' | translate }}</p>
+          </div>
+          <div>
+            <button mat-raised-button color="primary" (click)="addRole()">
+              <mat-icon>add</mat-icon>
+              {{ 'users.addRole' | translate }}
+            </button>
+          </div>
+        </div>
+        <mat-table class="full-width" [dataSource]="roles$">
+          <ng-container matColumnDef="value">
+            <mat-header-cell *matHeaderCellDef>{{ 'users.roleValue' | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let role">
+              {{ role.value }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="display">
+            <mat-header-cell *matHeaderCellDef>{{ "users.roleDisplay" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let role">
+              {{ role.display }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>{{ "users.roleType" | translate }}</mat-header-cell>
+            <mat-cell *matCellDef="let role">
+              {{ role.type }}
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let role; let i = index">
+              <button mat-icon-button (click)="removeRole(role)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editRole(role, i)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="displayedRoleColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedRoleColumns;"></mat-row>
+        </mat-table>
       </div>
     </mat-card-content>
   </form>
