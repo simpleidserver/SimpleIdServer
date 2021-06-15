@@ -3,9 +3,12 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
-    completeSearch,
-    errorSearch,
-    startSearch
+  completeSearch,
+  errorSearch,
+  startGet,
+  startSearch,
+  completeGet,
+  errorGet
 } from '../actions/users.actions';
 import { UserService } from '../services/user.service';
 
@@ -25,7 +28,21 @@ export class UserEffects {
           .pipe(
             map(content => completeSearch({ content: content })),
             catchError(() => of(errorSearch()))
-            );
+          );
+      }
+      )
+    );
+
+  @Effect()
+  getUser$ = this.actions$
+    .pipe(
+      ofType(startGet),
+      mergeMap((evt) => {
+        return this.userService.get(evt.userId)
+          .pipe(
+            map(content => completeGet({ content: content })),
+            catchError(() => of(errorGet()))
+          );
       }
       )
     );

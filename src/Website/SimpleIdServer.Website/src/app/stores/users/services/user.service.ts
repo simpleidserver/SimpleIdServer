@@ -36,4 +36,14 @@ export class UserService {
       return result;
     }));
   }
+
+  get(userId: string): Observable<User> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/users/" + userId;
+    return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
+      return User.fromJson(res);
+    }));
+  }
 }

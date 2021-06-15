@@ -5,3 +5,6 @@ import { User } from '../models/user.model';
 export const startSearch = createAction('[Users] START_SEARCH_USERS', props<{ order: string, direction: string, count: number, startIndex: number }>());
 export const completeSearch = createAction('[Users] COMPLETE_SEARCH_USERS', props<{ content: SearchResult<User> }>());
 export const errorSearch = createAction('[Users] ERROR_SEARCH_USERS');
+export const startGet = createAction('[Users] START_GET_USER', props<{ userId: string }>());
+export const completeGet = createAction('[Users] COMPLETE_GET_USER', props<{ content: User }>());
+export const errorGet = createAction('[Users] ERROR_GET_USER');

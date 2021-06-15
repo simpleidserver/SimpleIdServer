@@ -12,7 +12,8 @@ export interface AppState {
   oauthScopes: fromScopes.OAuthScopesState;
   oauthScope: fromScopes.OAuthScopeState;
   wellKnownConfiguration: fromMetadata.WellKnownConfigurationState,
-  users: fromUsers.SearchUsersState
+  users: fromUsers.SearchUsersState,
+  user: fromUsers.GetUserState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -23,6 +24,7 @@ export const selectOAuthScopes = (state: AppState) => state.oauthScopes;
 export const selectOAuthScope = (state: AppState) => state.oauthScope;
 export const selectWellKnownConfiguration = (state: AppState) => state.wellKnownConfiguration;
 export const selectUsers = (state: AppState) => state.users;
+export const selectUser = (state: AppState) => state.user;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -112,6 +114,17 @@ export const selectUsersResult = createSelector(
   }
 );
 
+export const selectUserResult = createSelector(
+  selectUser,
+  (state: fromUsers.GetUserState) => {
+    if (!state || state.User === null) {
+      return null;
+    }
+
+    return state.User;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -120,5 +133,6 @@ export const appReducer = {
   oauthScopes: fromScopes.getOAuthScopesReducer,
   oauthScope: fromScopes.getOAuthScopeReducer,
   wellKnownConfiguration: fromMetadata.getWellKnownConfiguration,
-  users: fromUsers.getSearchUsersReducer
+  users: fromUsers.getSearchUsersReducer,
+  user: fromUsers.getUserReducer
 };

@@ -1,0 +1,60 @@
+<div fxLayout="row" class="breadcrumb">
+  <div fxFlex="80%">
+    <ul>
+      <li>
+        <div class="mat-h1">
+          <a [routerLink]="['/users']">{{ "users.list" | translate }}</a>
+        </div>
+      </li>
+      <li class="separator">
+        <div class="mat-h1">\</div>
+      </li>
+      <li>
+        <div class="mat-h1">{{user$?.userName}}</div>
+      </li>
+    </ul>
+  </div>
+</div>
+<loader *ngIf="isLoading"></loader>
+<mat-card [style.display]="!isLoading ? 'block' : 'none'">
+  <form [formGroup]="editUserFormGroup">
+    <mat-card-content>
+      <!--userName -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.userName' | translate }}</mat-label>
+        <input matInput type="text" formControlName="userName" />
+      </mat-form-field>
+      <!--givenName -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.givenName' | translate }}</mat-label>
+        <input matInput type="text" formControlName="givenName" />
+      </mat-form-field>
+      <!--familyName -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'users.familyName' | translate }}</mat-label>
+        <input matInput type="text" formControlName="familyName" />
+      </mat-form-field>
+      <!-- Photos -->
+      <p>{{ 'users.photos' | translate }}</p>
+      <div class="picture">
+        <div class="content">
+          <img *ngFor="let photo of photos; let index = index" class="img" [src]="photo.value" [style.display]="(currentPhotoIndex - 1) === index ? '' : 'none'" />
+        </div>
+        <div class="navigation">
+          <span class="navInfo">{{ currentPhotoIndex }} / {{ photos.length }}</span>
+          <button class="actBtn" mat-icon-button (click)="previousPhoto()" [style.visibility]="currentPhotoIndex > 1 ? 'visible': 'hidden'">
+            <mat-icon>navigate_before</mat-icon>
+          </button>
+          <button class="actBtn" mat-icon-button (click)="nextPhoto()" [style.visibility]="currentPhotoIndex < photos.length ? 'visible': 'hidden'">
+            <mat-icon>navigate_next</mat-icon>
+          </button>
+          <div class="actions">
+            <mat-icon class="actBtn" (click)="editPhoto()">edit</mat-icon>
+            <mat-icon class="actBtn" (click)="removePhoto()">delete</mat-icon>
+            <mat-icon class="actBtn" (click)="addPhoto()">add</mat-icon>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </form>
+</mat-card>

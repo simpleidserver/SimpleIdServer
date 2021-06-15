@@ -138,6 +138,12 @@
     "list": "Users",
     "userName": "Name",
     "familyName": "Family Name",
-    "lastModified": "Last Modified Date"
+    "lastModified": "Last Modified Date",
+    "givenName": "Given name",
+    "editPhoto": "Edit or Add a Photo",
+    "photoUrl": "Url",
+    "photoDisplay": "Display",
+    "photoType": "Type",
+    "photos": "Photos"
   }
 }

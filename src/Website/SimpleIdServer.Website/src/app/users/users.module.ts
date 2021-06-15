@@ -5,6 +5,8 @@ import { MaterialModule } from '@app/shared/material.module';
 import { SharedModule } from '@app/shared/shared.module';
 import { ListUsersComponent } from './list/list.component';
 import { UsersRoutes } from './users.routes';
+import { EditPhotoComponent } from './view/edit-photo.component';
+import { ViewUserComponent } from './view/view.component';
 
 @NgModule({
   imports: [
@@ -15,7 +17,9 @@ import { UsersRoutes } from './users.routes';
     UsersRoutes
   ],
   declarations: [
-    ListUsersComponent
+    ListUsersComponent,
+    ViewUserComponent,
+    EditPhotoComponent
   ]
 })
 

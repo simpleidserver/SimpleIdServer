@@ -138,6 +138,12 @@
     "list": "Utilisateurs",
     "userName": "Nom",
     "familyName": "Nom de famille",
-    "lastModified": "Dernière date de modification"
+    "lastModified": "Dernière date de modification",
+    "givenName": "Prénom",
+    "editPhoto": "Editer ou ajouter une photo",
+    "photoUrl": "Url",
+    "photoDisplay": "Description",
+    "photoType": "Type",
+    "photos": "Photos"
   }
 }

@@ -11,13 +11,17 @@
 
   .mat-form-field-disabled .actions > .copy,
   .mat-form-field-disabled .actions > .display,
-  .mat-form-field-disabled .actions > .edit {
-    color: rgb(158, 158, 158);
+  .mat-form-field-disabled .actions > .edit,
+  .picture > .navigation .actBtn,
+  .picture > .navigation > .navInfo {
+    color: rgb(158, 158, 158) !important;
   }
 
   .img-editor,
-  .img-editor > .img {
-    border-color: rgb(224, 224, 224);
+  .img-editor > .img,
+  .picture,
+  .picture > .content {
+    border-color: rgb(224, 224, 224) !important;
   }
 
   #applicationKinds > .applicationKind.isSelected {
@@ -26,8 +30,8 @@
   }
 
   .header-toolbar {
-      background-color: mat-color($primary, 600) !important;
-      color: white !important;
+    background-color: mat-color($primary, 600) !important;
+    color: white !important;
   }
 }
 

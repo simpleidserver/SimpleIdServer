@@ -11,7 +11,9 @@
     <ng-container matColumnDef="userName">
       <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.userName' | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let user">
-        {{ user.userName }}
+        <a href="#" [routerLink]="['/users/' + user.id ]">
+          {{ user.userName }}
+        </a>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="name.familyName">

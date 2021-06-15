@@ -558,7 +558,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JObject jObj, bool isGetRequest = false)
         {
-            foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.Attr.SchemaAttribute.Id))
+            foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.Attr.SchemaAttribute.Name))
             {
                 var record = kvp.First();
                 if (!record.Attr.IsReadable(isGetRequest))
