@@ -3,6 +3,7 @@ import * as fromApplications from './applications/reducers';
 import * as fromMetadata from './metadata/reducers';
 import * as fromScopes from './scopes/reducers';
 import * as fromUsers from './users/reducers';
+import * as fromGroups from './groups/reducers';
 
 export interface AppState {
   application: fromApplications.ApplicationState;
@@ -13,7 +14,8 @@ export interface AppState {
   oauthScope: fromScopes.OAuthScopeState;
   wellKnownConfiguration: fromMetadata.WellKnownConfigurationState,
   users: fromUsers.SearchUsersState,
-  user: fromUsers.GetUserState
+  user: fromUsers.GetUserState,
+  groups: fromGroups.SearchGroupsState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -25,6 +27,7 @@ export const selectOAuthScope = (state: AppState) => state.oauthScope;
 export const selectWellKnownConfiguration = (state: AppState) => state.wellKnownConfiguration;
 export const selectUsers = (state: AppState) => state.users;
 export const selectUser = (state: AppState) => state.user;
+export const selectGroups = (state: AppState) => state.groups;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -125,6 +128,17 @@ export const selectUserResult = createSelector(
   }
 );
 
+export const selectGroupsResult = createSelector(
+  selectGroups,
+  (state: fromGroups.SearchGroupsState) => {
+    if (!state || !state.Groups) {
+      return null;
+    }
+
+    return state.Groups;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -134,5 +148,6 @@ export const appReducer = {
   oauthScope: fromScopes.getOAuthScopeReducer,
   wellKnownConfiguration: fromMetadata.getWellKnownConfiguration,
   users: fromUsers.getSearchUsersReducer,
-  user: fromUsers.getUserReducer
+  user: fromUsers.getUserReducer,
+  groups: fromGroups.getSearchGroupsReducer
 };

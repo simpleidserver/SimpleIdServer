@@ -20,5 +20,9 @@ export const routes: Routes = [
     path: 'users',
     loadChildren: async () => (await import('./users/users.module')).UsersModule
   },
+  {
+    path: 'groups',
+    loadChildren: async () => (await import('./groups/groups.module')).GroupsModule
+  },
   { path: '**', redirectTo: '/status/404' }
 ];

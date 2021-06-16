@@ -207,5 +207,12 @@
     "dangerZone": "Zone de danger",
     "deleteTitle": "Supprimer cet utilisateur",
     "delete": "Supprimer"
+  },
+  "groups": {
+    "list": "Groupes",
+    "displayName": "Nom",
+    "type": "Type",
+    "nbMembers": "Nombre de members",
+    "updateDateTime": "Date de mise à jour"
   }
 }

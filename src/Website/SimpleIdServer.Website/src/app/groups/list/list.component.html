@@ -1,0 +1,38 @@
+<div fxLayout="row" class="breadcrumb">
+  <div fxFlex="80%">
+    <ul>
+      <li><div class="mat-h1">{{ "groups.list" | translate }}</div></li>
+    </ul>
+  </div>
+</div>
+<loader *ngIf="isLoading"></loader>
+<div class="mat-elevation-z8 overflow-hidden" [style.display]="!isLoading ? 'block' : 'none'">
+  <mat-table class="full-width" [dataSource]="groups$" matSortActive="meta.lastModified" matSortDirection="desc" matSort>
+    <ng-container matColumnDef="displayName">
+      <mat-header-cell *matHeaderCellDef>{{ 'groups.displayName' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let group">
+        {{ group.displayName }}
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="groupType">
+      <mat-header-cell *matHeaderCellDef>{{ "groups.type" | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let group">
+        {{ group.groupType }}
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="nbMembers">
+      <mat-header-cell *matHeaderCellDef>{{ "groups.nbMembers" | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let group">
+        {{ group.nbMembers }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="meta.lastModified">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ "groups.updateDateTime" | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let group">
+        {{group.lastModified | date:'fullDate'}}
+      </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="length" [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>

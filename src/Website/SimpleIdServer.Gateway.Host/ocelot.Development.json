@@ -1,6 +1,25 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/Groups",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60002
+        }
+      ],
+      "UpstreamPathTemplate": "/groups",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/Users",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

@@ -7,7 +7,7 @@
 </div>
 <loader *ngIf="isLoading"></loader>
 <div class="mat-elevation-z8 overflow-hidden" [style.display]="!isLoading ? 'block' : 'none'">
-  <mat-table class="full-width" [dataSource]="users$" matSortActive="userName" matSortDirection="asc" matSort>
+  <mat-table class="full-width" [dataSource]="users$" matSortActive="meta.lastModified" matSortDirection="desc" matSort>
     <ng-container matColumnDef="userName">
       <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.userName' | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let user">
