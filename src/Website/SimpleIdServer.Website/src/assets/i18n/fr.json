@@ -196,11 +196,16 @@
     "externalId": "Identifiant externe",
     "messages": {
       "errorUpdate": "Une erreur est survenue durant la mise à jour de l'utilisateur",
-      "update": "L'utilisateur a été mis à jour"
+      "update": "L'utilisateur a été mis à jour",
+      "errorDelete": "Une erreur est survenue durant la suppression de l'utilisateur",
+      "delete": "L'utilisateur a été supprimé"
     },
     "photoTypes": {
       "photo": "Photo",
       "thumbnail": "Mignature"
-    }
+    },
+    "dangerZone": "Zone de danger",
+    "deleteTitle": "Supprimer cet utilisateur",
+    "delete": "Supprimer"
   }
 }

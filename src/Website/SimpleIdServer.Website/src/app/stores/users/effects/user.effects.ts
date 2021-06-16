@@ -11,7 +11,10 @@ import {
   errorGet,
   startUpdate,
   completeUpdate,
-  errorUpdate
+  errorUpdate,
+  startDelete,
+  completeDelete,
+  errorDelete
 } from '../actions/users.actions';
 import { UserService } from '../services/user.service';
 
@@ -59,6 +62,20 @@ export class UserEffects {
           .pipe(
             map(content => completeUpdate()),
             catchError(() => of(errorUpdate()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  deleteUser$ = this.actions$
+    .pipe(
+      ofType(startDelete),
+      mergeMap((evt) => {
+        return this.userService.delete(evt.userId)
+          .pipe(
+            map(content => completeDelete()),
+            catchError(() => of(errorDelete()))
           );
       }
       )

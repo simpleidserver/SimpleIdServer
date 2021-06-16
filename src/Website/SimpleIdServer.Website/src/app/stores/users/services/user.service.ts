@@ -55,4 +55,12 @@ export class UserService {
     let targetUrl = environment.apiUrl + "/users/" + userId;
     return this.http.put(targetUrl, request, { headers: headers });
   }
+
+  delete(userId: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/users/" + userId;
+    return this.http.delete(targetUrl, { headers: headers });
+  }
 }

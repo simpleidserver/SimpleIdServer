@@ -11,3 +11,6 @@ export const errorGet = createAction('[Users] ERROR_GET_USER');
 export const startUpdate = createAction('[Users] START_UPDATE_USER', props<{ userId: string, request: any }>());
 export const completeUpdate = createAction('[Users] COMPLETE_UPDATE_USER');
 export const errorUpdate = createAction('[Users] ERROR_UPDATE_USER');
+export const startDelete = createAction('[Users] START_DELETE_USER', props<{ userId: string }>());
+export const completeDelete = createAction('[Users] COMPLETE_DELETE_USER');
+export const errorDelete = createAction('[Users] ERROR_DELETE_USER');

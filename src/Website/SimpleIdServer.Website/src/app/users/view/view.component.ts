@@ -2,9 +2,9 @@ import { DataSource } from '@angular/cdk/table';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startGet, startUpdate } from '@app/stores/users/actions/users.actions';
+import { startDelete, startGet, startUpdate } from '@app/stores/users/actions/users.actions';
 import { User } from '@app/stores/users/models/user.model';
 import { UserPhoto } from '@app/stores/users/models/userphoto.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
@@ -149,7 +149,8 @@ export class ViewUserComponent implements OnInit {
     private dialog: MatDialog,
     private actions$: ScannedActionsSubject,
     private snackbar: MatSnackBar,
-    private translateService: TranslateService) { }
+    private translateService: TranslateService,
+    private router : Router) { }
 
   ngOnInit(): void {
     this.store.pipe(select(fromReducers.selectUserResult)).subscribe((user: User | null) => {
@@ -182,6 +183,22 @@ export class ViewUserComponent implements OnInit {
         this.snackbar.open(this.translateService.instant('users.messages.update'), this.translateService.instant('undo'), {
           duration: 2000
         });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Users] ERROR_DELETE_USER'))
+      .subscribe(() => {
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('users.messages.errorDelete'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Users] COMPLETE_DELETE_USER'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('users.messages.delete'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.router.navigate(['/users']);
       });
     this.refresh();
   }
@@ -439,6 +456,11 @@ export class ViewUserComponent implements OnInit {
       role.value = updatedRole.value;
       this.roles$.setData(roles);
     });
+  }
+
+  delete() {
+    const deleteUser = startDelete({ userId: this.user$.id });
+    this.store.dispatch(deleteUser);
   }
 
   saveUser(evt: any, formValue: any) {

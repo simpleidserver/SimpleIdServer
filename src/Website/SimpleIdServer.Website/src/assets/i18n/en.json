@@ -196,11 +196,16 @@
     "externalId": "External Identifier",
     "messages": {
       "errorUpdate": "An error occured while trying to update the user",
-      "update": "User has been updated"
+      "update": "User has been updated",
+      "errorDelete": "An error occured while trying to remove the user",
+      "delete": "User has been removed"
     },
     "photoTypes": {
       "photo": "Photo",
       "thumbnail": "Thumbnail"
-    }
+    },
+    "dangerZone": "Danger zone",
+    "deleteTitle": "Delete this user",
+    "delete": "Delete"
   }
 }
