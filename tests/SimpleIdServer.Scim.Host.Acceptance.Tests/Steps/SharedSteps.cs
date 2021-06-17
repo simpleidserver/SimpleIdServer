@@ -237,7 +237,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
         public void ThenJSONEqualsTo(string key, string value)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JToken;
-            Assert.Equal(value.ToLowerInvariant(), jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
+            Assert.Equal(Parse(value).ToLowerInvariant(), jsonHttpBody.SelectToken(key).ToString().ToLowerInvariant());
         }
 
         [Then("JSON with namespace '(.*)' '(.*)'='(.*)'")]

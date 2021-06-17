@@ -11,6 +11,7 @@ namespace SimpleIdServer.Scim.Persistence
         Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter);
         Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId);
         Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType);
+        Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType);
         Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, string value, string endpoint = null);
         Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, int value, string endpoint = null);
         Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string attributeId, IEnumerable<string> values, string endpoint = null);

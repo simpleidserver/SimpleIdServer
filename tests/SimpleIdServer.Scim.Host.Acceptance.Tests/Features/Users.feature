@@ -1,6 +1,86 @@
 ﻿Feature: Users
 	Check the /Users endpoint
 
+Scenario: Check entitlement can be added
+	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
+	| Key      | Value                |
+	| schemas  | [ "urn:customuser" ] |
+	| userName | userName             |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | firstEntitlement      |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstEntitlement'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | secondEntitlement     |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondEntitlement'
+
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value                                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                              |
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/CustomUsers/$userId$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'entitlements[0].value'='$firstEntitlement$'
+	Then JSON 'entitlements[0].display'='firstEntitlement'
+	Then JSON 'entitlements[0].$ref'='http://localhost/Entitlements/$firstEntitlement$'
+	Then JSON 'entitlements[1].value'='$secondEntitlement$'
+	Then JSON 'entitlements[1].display'='secondEntitlement'
+	Then JSON 'entitlements[1].$ref'='http://localhost/Entitlements/$secondEntitlement$'
+
+Scenario: Check emails can be erased	
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| emails                                                     | [ { "value": "value", "display": "display" } ]                                                                 |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key      | Value                                                                               |
+	| schemas  | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                    |
+	| userName | bjen                                                                                |
+	| name     | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" } |
+	| emails   | []                                                                                  |
+
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON exists 'id'
+	Then JSON exists 'meta.created'
+	Then JSON exists 'meta.lastModified'
+	Then JSON exists 'meta.version'
+	Then JSON exists 'meta.location'
+	Then JSON 'employeeNumber'='number'
+	Then JSON 'meta.resourceType'='Users'
+	Then JSON 'userName'='bjen'
+	Then JSON 'name.formatted'='formatted'
+	Then JSON 'name.familyName'='familyName'
+	Then JSON 'name.givenName'='givenName'
+	Then JSON 'org'='ENTREPRISE'
+	Then JSON 'eidCertificate'='aGVsbG8='
+	Then 'emails' length is equals to '0'
+
 Scenario: Check User can be created
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
