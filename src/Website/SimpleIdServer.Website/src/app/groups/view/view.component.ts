@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startGet } from '@app/stores/groups/actions/groups.actions';
+import { startGet, startUpdate } from '@app/stores/groups/actions/groups.actions';
+import { GroupMember } from '@app/stores/groups/models/group-member.model';
+import { Group } from '@app/stores/groups/models/group.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { Group } from '@app/stores/groups/models/group.model';
-import { FormControl, FormGroup } from '@angular/forms';
-import { GroupMember } from '@app/stores/groups/models/group-member.model';
+import { filter } from 'rxjs/operators';
 import { SelectUsersComponent } from './selectusers.component';
 
 @Component({
@@ -35,13 +36,30 @@ export class ViewGroupComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit(): void {
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Groups] ERROR_UPDATE_GROUP'))
+      .subscribe(() => {
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('groups.messages.errorUpdate'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Groups] COMPLETE_UPDATE_GROUP'))
+      .subscribe(() => {
+        this.group$.displayName = this.editGroupFormGroup.get('displayName')?.value;
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('groups.messages.update'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.store.pipe(select(fromReducers.selectGroupResult)).subscribe((group: Group | null) => {
       if (!group) {
         return;
       }
 
-      this.group$ = group;
-      this.members$ = JSON.parse(JSON.stringify(group.members)) as GroupMember[];
+      this.group$ = JSON.parse(JSON.stringify(group)) as Group;
+      this.members$ = group.members;
       this.isLoading = false;
       this.refreshEditForm();
     });
@@ -69,6 +87,20 @@ export class ViewGroupComponent implements OnInit {
 
       this.members$ = r as GroupMember[];
     });
+  }
+
+  saveGroup(evt: any, formValue: any) {
+    evt.preventDefault();
+    const req: any = {
+      schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
+      displayName: formValue.displayName,
+      groupType: formValue.groupType,
+      members: this.members$.map((m: GroupMember) => {
+        return { value: m.value };
+      })
+    };
+    const request = startUpdate({ groupId: this.group$.id, request: req });
+    this.store.dispatch(request);
   }
 
   private refreshEditForm() {

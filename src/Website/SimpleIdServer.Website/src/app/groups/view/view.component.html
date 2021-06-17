@@ -18,7 +18,7 @@
 <loader *ngIf="isLoading"></loader>
 <div *ngIf="!isLoading">
   <mat-card>
-    <form [formGroup]="editGroupFormGroup">
+    <form [formGroup]="editGroupFormGroup" (ngSubmit)="saveGroup($event, editGroupFormGroup.value)">
       <mat-card-content>
         <!--displayName -->
         <mat-form-field appearance="outline" class="full-width">
@@ -43,6 +43,9 @@
           </div>
         </mat-form-field>
       </mat-card-content>
+      <mat-card-actions>
+        <button type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+      </mat-card-actions>
     </form>
   </mat-card>
 </div>

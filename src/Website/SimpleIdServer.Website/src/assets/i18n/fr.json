@@ -218,6 +218,10 @@
     "updateDateTime": "Date de mise à jour",
     "members": "Membres",
     "selectUsers": "Sélectionner les Utilisateurs",
-    "removeSelectedUsers": "Supprimer les Utilisateurs sélectionnés"
+    "removeSelectedUsers": "Supprimer les Utilisateurs sélectionnés",
+    "messages": {
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du groupe",
+      "update": "Le groupe a été mis à jour"
+    }
   }
 }

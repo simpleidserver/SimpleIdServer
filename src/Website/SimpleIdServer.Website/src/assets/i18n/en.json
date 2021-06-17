@@ -218,6 +218,10 @@
     "updateDateTime": "Update Datetime",
     "members": "Members",
     "selectUsers": "Select Users",
-    "removeSelectedUsers": "Remove selected Users"
+    "removeSelectedUsers": "Remove selected Users",
+    "messages": {
+      "errorUpdate": "An error occured while trying to update the group",
+      "update": "Group has been updated"
+    }
   }
 }

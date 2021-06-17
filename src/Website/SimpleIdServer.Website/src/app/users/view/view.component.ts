@@ -465,7 +465,7 @@ export class ViewUserComponent implements OnInit {
 
   saveUser(evt: any, formValue: any) {
     evt.preventDefault();
-    var request : any = {
+    const request : any = {
       schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
       externalId: formValue.externalId,
       userName: formValue.userName,

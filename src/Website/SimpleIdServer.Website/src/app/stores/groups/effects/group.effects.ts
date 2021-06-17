@@ -8,7 +8,10 @@ import {
   startSearch,
   startGet,
   completeGet,
-    errorGet
+    errorGet,
+  startUpdate,
+  completeUpdate,
+  errorUpdate
 } from '../actions/groups.actions';
 import { GroupService } from '../services/group.service';
 
@@ -42,6 +45,20 @@ export class GroupEffects {
           .pipe(
             map(content => completeGet({ content: content })),
             catchError(() => of(errorGet()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  updateGroup$ = this.actions$
+      .pipe(
+        ofType(startUpdate),
+      mergeMap((evt) => {
+        return this.groupService.update(evt.groupId, evt.request)
+          .pipe(
+            map(content => completeUpdate()),
+            catchError(() => of(errorUpdate()))
           );
       }
       )

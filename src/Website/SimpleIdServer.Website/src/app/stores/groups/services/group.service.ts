@@ -46,4 +46,12 @@ export class GroupService {
       return Group.fromJson(res);
     }));
   }
+
+  update(groupId: string, request: any) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/groups/" + groupId;
+    return this.http.put(targetUrl, request, { headers: headers });
+  }
 }

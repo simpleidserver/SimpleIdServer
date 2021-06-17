@@ -8,3 +8,6 @@ export const errorSearch = createAction('[Groups] ERROR_SEARCH_GROUPS');
 export const startGet = createAction('[Groups] START_GET_GROUP', props<{ groupId: string }>());
 export const completeGet = createAction('[Groups] COMPLETE_GET_GROUP', props<{ content: Group }>());
 export const errorGet = createAction('[Groups] ERROR_GET_GROUP');
+export const startUpdate = createAction('[Groups] START_UPDATE_GROUP', props<{ groupId: string, request: any }>());
+export const completeUpdate = createAction('[Groups] COMPLETE_UPDATE_GROUP');
+export const errorUpdate = createAction('[Groups] ERROR_UPDATE_GROUP');
