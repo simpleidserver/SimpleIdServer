@@ -114,6 +114,7 @@ namespace SimpleIdServer.Scim
             public const string Bulk = "Bulk";
             public const string Schemas = "Schemas";
             public const string ResourceType = "ResourceTypes";
+            public const string Provisioning = "Provisioning";
         }
 
         public static List<SCIMAttributeMapping> StandardAttributeMapping = new List<SCIMAttributeMapping>

@@ -6,6 +6,6 @@ namespace SimpleIdServer.Scim.ExternalEvents
 {
     public class RepresentationUpdatedEvent : IntegrationEvent
     {
-        public RepresentationUpdatedEvent(string id, string resourceType, JObject representation) : base(id, resourceType, representation) { }
+        public RepresentationUpdatedEvent(string id, int version, string resourceType, JObject representation) : base(id, version, resourceType, representation) { }
     }
 }

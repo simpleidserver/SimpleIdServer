@@ -19,6 +19,91 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ResourceType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProvisioningConfigurations");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfigurationHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Exception")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExecutionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProvisioningConfigurationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RepresentationId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RepresentationVersion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvisioningConfigurationId");
+
+                    b.ToTable("ProvisioningConfigurationHistory");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfigurationRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsArray")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProvisioningConfigurationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("ProvisioningConfigurationRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ValuesString")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvisioningConfigurationId");
+
+                    b.HasIndex("ProvisioningConfigurationRecordId");
+
+                    b.ToTable("ProvisioningConfigurationRecord");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMAttributeMappingModel", b =>
                 {
                     b.Property<string>("Id")
@@ -253,6 +338,26 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.ToTable("SCIMSchemaLst");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfigurationHistory", b =>
+                {
+                    b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", null)
+                        .WithMany("HistoryLst")
+                        .HasForeignKey("ProvisioningConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfigurationRecord", b =>
+                {
+                    b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", null)
+                        .WithMany("Records")
+                        .HasForeignKey("ProvisioningConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfigurationRecord", null)
+                        .WithMany("Values")
+                        .HasForeignKey("ProvisioningConfigurationRecordId");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", b =>
                 {
                     b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", "Parent")
@@ -322,6 +427,18 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaModel", null)
                         .WithMany("SchemaExtensions")
                         .HasForeignKey("SCIMSchemaModelId");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", b =>
+                {
+                    b.Navigation("HistoryLst");
+
+                    b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfigurationRecord", b =>
+                {
+                    b.Navigation("Values");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", b =>

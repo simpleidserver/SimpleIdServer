@@ -32,6 +32,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IUpdateOAuthScopeHandler _updateOAuthScopeHandler;
         private readonly IAddOAuthScopeHandler _addOAuthScopeHandler;
         private readonly IDeleteOAuthScopeHandler _deleteOAuthScopeHandler;
+        private readonly IUpdateUserBySCIMIdHandler _updateUserBySCIMIdHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -45,6 +46,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IUpdateOAuthScopeHandler updateOAuthScopeHandler,
             IAddOAuthScopeHandler addOAuthScopeHandler,
             IDeleteOAuthScopeHandler deleteOAuthScopeHandler,
+            IUpdateUserBySCIMIdHandler updateUserBySCIMIdHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -57,6 +59,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _updateOAuthScopeHandler = updateOAuthScopeHandler;
             _addOAuthScopeHandler = addOAuthScopeHandler;
             _deleteOAuthScopeHandler = deleteOAuthScopeHandler;
+            _updateUserBySCIMIdHandler = updateUserBySCIMIdHandler;
             _options = options.Value;
         }
 
@@ -227,6 +230,18 @@ namespace SimpleIdServer.OAuth.Api.Management
             {
                 return new NotFoundResult();
             }
+        }
+
+        #endregion
+
+        #region Update user
+
+        [HttpPut("users/scim/{id}")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> UpdateUserByScimId(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
+        {
+            await _updateUserBySCIMIdHandler.Handle(id, jObj, cancellationToken);
+            return new NoContentResult();
         }
 
         #endregion

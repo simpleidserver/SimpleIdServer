@@ -20,9 +20,12 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<OAuthClientSelfSignedTlsClientAuthenticationHandler> _logger;
 
-        public OAuthClientSelfSignedTlsClientAuthenticationHandler(IHttpClientFactory httpClientFactory)
+        public OAuthClientSelfSignedTlsClientAuthenticationHandler(
+            IHttpClientFactory httpClientFactory,
+            ILogger<OAuthClientSelfSignedTlsClientAuthenticationHandler> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         /// <summary>

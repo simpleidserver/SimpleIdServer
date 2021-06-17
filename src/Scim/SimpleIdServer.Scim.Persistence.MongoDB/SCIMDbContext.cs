@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System;
 
@@ -27,6 +28,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		
 		public IMongoCollection<SCIMAttributeMappingModel> SCIMAttributeMappingLst =>
             Database.GetCollection<SCIMAttributeMappingModel>(_options.CollectionMappings);
+
+		public IMongoCollection<ProvisioningConfiguration> ProvisioningConfigurationLst =>
+			Database.GetCollection<ProvisioningConfiguration>(_options.CollectionProvisioningLst);
 
 		public void Dispose() { }
 	}

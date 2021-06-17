@@ -23,11 +23,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
                 }
             }
         };

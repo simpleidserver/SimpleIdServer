@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.1.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />

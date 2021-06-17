@@ -10,7 +10,7 @@ using SimpleIdServer.OpenID.EF;
 namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(OpenIdDBContext))]
-    [Migration("20210610133303_Init")]
+    [Migration("20210617124632_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -209,14 +209,14 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Claims")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DeviceRegistrationToken")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
@@ -224,6 +224,32 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OAuthUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OAuthUserId");
+
+                    b.ToTable("OAuthUserClaim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserCredential", b =>
@@ -652,12 +678,19 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                         .HasForeignKey("OAuthScopeName");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserClaim", b =>
+                {
+                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthUser", null)
+                        .WithMany("OAuthUserClaims")
+                        .HasForeignKey("OAuthUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserCredential", b =>
                 {
                     b.HasOne("SimpleIdServer.OAuth.Domains.OAuthUser", null)
                         .WithMany("Credentials")
-                        .HasForeignKey("OAuthUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("OAuthUserId");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserSession", b =>
@@ -705,6 +738,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.Navigation("Consents");
 
                     b.Navigation("Credentials");
+
+                    b.Navigation("OAuthUserClaims");
 
                     b.Navigation("Sessions");
                 });

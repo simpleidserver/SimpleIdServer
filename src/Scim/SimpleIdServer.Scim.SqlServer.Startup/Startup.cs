@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +70,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
+            }, massTransitOptions: x =>
+            {
+                x.UsingRabbitMq();
             });
             services.AddScimStoreEF(options =>
             {
@@ -135,6 +139,125 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         };
                         context.SCIMAttributeMappingLst.Add(firstAttributeMapping.ToModel());
                         context.SCIMAttributeMappingLst.Add(secondAttributeMapping.ToModel());
+                    }
+
+                    if (!context.ProvisioningConfigurations.Any())
+                    {
+                        context.ProvisioningConfigurations.Add(new ProvisioningConfiguration
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Type = ProvisioningConfigurationTypes.API,
+                            ResourceType = SCIMConstants.SCIMEndpoints.User,
+                            UpdateDateTime = DateTime.UtcNow,
+                            Records = new List<ProvisioningConfigurationRecord>
+                            {
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "tokenEdp",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "https://localhost:60000/token"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "targetUrl",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "https://localhost:60000/management/users/scim"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "clientId",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "provisioningClient"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "clientSecret",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "provisioningClientSecret"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "scopes",
+                                    IsArray = true,
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "manage_users"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "mapping",
+                                    IsArray = true,
+                                    Type = ProvisioningConfigurationRecordTypes.COMPLEX,
+                                    Values = new List<ProvisioningConfigurationRecord>
+                                    {
+                                        // subject
+                                        new ProvisioningConfigurationRecord
+                                        {
+                                            Name = "externalId",
+                                            Type = ProvisioningConfigurationRecordTypes.STRING,
+                                            ValuesString = new List<string>
+                                            {
+                                                "sub"
+                                            }
+                                        },
+                                        // name
+                                        new ProvisioningConfigurationRecord
+                                        {
+                                            Name = "userName",
+                                            Type = ProvisioningConfigurationRecordTypes.STRING,
+                                            ValuesString = new List<string>
+                                            {
+                                                "claims.name"
+                                            }
+                                        },
+                                        // givenName
+                                        new ProvisioningConfigurationRecord
+                                        {
+                                            Name = "name.givenName",
+                                            Type = ProvisioningConfigurationRecordTypes.STRING,
+                                            ValuesString = new List<string>
+                                            {
+                                                "claims.given_name"
+                                            }
+                                        },
+                                        // familyName
+                                        new ProvisioningConfigurationRecord
+                                        {
+                                            Name = "name.familyName",
+                                            Type = ProvisioningConfigurationRecordTypes.STRING,
+                                            ValuesString = new List<string>
+                                            {
+                                                "claims.family_name"
+                                            }
+                                        },
+                                        // middleName
+                                        new ProvisioningConfigurationRecord
+                                        {
+                                            Name = "name.middleName",
+                                            Type = ProvisioningConfigurationRecordTypes.STRING,
+                                            ValuesString = new List<string>
+                                            {
+                                                "claims.middle_name"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
                     }
 
                     context.SaveChanges();

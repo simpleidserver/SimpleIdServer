@@ -6,19 +6,21 @@ namespace SimpleIdServer.Scim.ExternalEvents
 {
     public class IntegrationEvent
     {
-        public IntegrationEvent(string id, string resourceType)
+        public IntegrationEvent(string id, int version, string resourceType)
         {
             Id = id;
+            Version = version;
             ResourceType = resourceType;
         }
 
 
-        public IntegrationEvent(string id, string resourceType, JObject representation) : this(id, resourceType)
+        public IntegrationEvent(string id, int version, string resourceType, JObject representation) : this(id, version, resourceType)
         {
             Representation = representation;
         }
 
         public string Id { get; set; }
+        public int Version { get; set; }
         public string ResourceType { get; set; }
         public JObject Representation { get; set; }
     }

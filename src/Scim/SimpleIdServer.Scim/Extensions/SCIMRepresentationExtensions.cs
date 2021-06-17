@@ -243,9 +243,13 @@ namespace SimpleIdServer.Scim.Domain
                 { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, representation.ResourceType },
                 { SCIMConstants.StandardSCIMMetaAttributes.Created, representation.Created },
                 { SCIMConstants.StandardSCIMMetaAttributes.LastModified, representation.LastModified },
-                { SCIMConstants.StandardSCIMMetaAttributes.Version, representation.Version },
-                { SCIMConstants.StandardSCIMMetaAttributes.Location, location }
+                { SCIMConstants.StandardSCIMMetaAttributes.Version, representation.Version }
             };
+            if (!string.IsNullOrWhiteSpace(location))
+            {
+                meta.Add(SCIMConstants.StandardSCIMMetaAttributes.Location, location);
+            }
+
             var jObj = new JObject
             {
                 { SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id },

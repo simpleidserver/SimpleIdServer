@@ -36,6 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			services.AddSingleton<ISCIMSchemaQueryRepository, SCIMSchemaQueryRepository>();
 			services.AddSingleton<ISCIMSchemaCommandRepository, SCIMSchemaCommandRepository>();
 			services.AddSingleton<ISCIMAttributeMappingQueryRepository, SCIMAttributeMappingQueryRepository>();
+			services.AddSingleton<IProvisioningConfigurationRepository, ProvisioningConfigurationRepository>();
 			return services;
 		}
 	}

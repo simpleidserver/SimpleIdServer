@@ -10,18 +10,6 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 {
     public class InMemoryCommandRepository<T> : ICommandRepository<T> where T : ICloneable
     {
-        private class DefaultTransaction : ITransaction
-        {
-            public Task Commit(CancellationToken token)
-            {
-                return Task.CompletedTask;
-            }
-
-            public void Dispose()
-            {
-            }
-        }
-
         private readonly List<T> _lstData;
 
         public InMemoryCommandRepository(List<T> lstData)

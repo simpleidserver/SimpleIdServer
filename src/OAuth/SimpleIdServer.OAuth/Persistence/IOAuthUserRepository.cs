@@ -9,7 +9,7 @@ namespace SimpleIdServer.OAuth.Persistence
     public interface IOAuthUserRepository : ICommandRepository<OAuthUser>
     {
         Task<OAuthUser> FindOAuthUserByLogin(string login, CancellationToken cancellationToken);
-        Task<OAuthUser> FindOAuthUserByLoginAndCredential(string login, string credentialType, string credentialValue, CancellationToken cancellationToken);
+        Task<OAuthUser> FindOAuthUserByLoginAndCredential(string login, string credentialType, string credentialValue, CancellationToken token);
         Task<OAuthUser> FindOAuthUserByClaim(string claimType, string claimValue, CancellationToken cancellationToken);
     }
 }

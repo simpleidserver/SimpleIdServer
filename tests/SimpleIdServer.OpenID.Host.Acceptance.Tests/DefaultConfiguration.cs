@@ -31,16 +31,16 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
                         SessionId = Guid.NewGuid().ToString()
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new Claim(Jwt.Constants.UserClaims.Name, "Thierry Habart"),
-                    new Claim(Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr"),
-                    new Claim(Jwt.Constants.UserClaims.Role, "role1"),
-                    new Claim(Jwt.Constants.UserClaims.Role, "role2"),
-                    new Claim(Jwt.Constants.UserClaims.UpdatedAt, "1612361922", Jwt.ClaimValueTypes.INTEGER),
-                    new Claim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
-                    new Claim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'region': 'CA' }", Jwt.ClaimValueTypes.JSONOBJECT)
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Name, "Thierry Habart"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Role, "role1"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Role, "role2"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.UpdatedAt, "1612361922", Jwt.ClaimValueTypes.INTEGER),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'region': 'CA' }", Jwt.ClaimValueTypes.JSONOBJECT)
                 }
             }
         };

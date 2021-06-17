@@ -35,9 +35,10 @@ namespace SimpleIdServer.OAuth.EF.Repositories
 
         private IQueryable<OAuthUser> GetUsers()
         {
-            return _dbContext.Users.Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.Claims)
-                .Include(u => u.Consents).ThenInclude(u => u.Scopes).ThenInclude(c => c.Claims)
+            return _dbContext.Users
+                .Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.Claims)
                 .Include(u => u.Sessions)
+                .Include(u => u.OAuthUserClaims)
                 .Include(u => u.Credentials);
         }
 

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.EF.Models;
 using System.Collections.Generic;
 
@@ -20,6 +21,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public DbSet<SCIMRepresentationAttributeModel> SCIMRepresentationAttributeLst { get; set; }
         public DbSet<SCIMRepresentationSchemaModel> SCIMRepresentationSchemaLst { get; set; }
         public DbSet<SCIMRepresentationAttributeValueModel> SCIMRepresentationAttributeValueLst { get; set; }
+        public DbSet<ProvisioningConfiguration> ProvisioningConfigurations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,6 +83,30 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .HasForeignKey(r => r.SCIMRepresentationAttributeId);
             modelBuilder.Entity<SCIMAttributeMappingModel>()
                 .HasKey(r => r.Id);
+            modelBuilder.Entity<ProvisioningConfiguration>()
+                .HasKey(p => p.Id);
+            modelBuilder.Entity<ProvisioningConfiguration>()
+                .HasMany(p => p.HistoryLst)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProvisioningConfiguration>()
+                .HasMany(p => p.Records)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProvisioningConfigurationRecord>()
+                .Property<int>("Id").ValueGeneratedOnAdd();
+            modelBuilder.Entity<ProvisioningConfigurationRecord>()
+                .HasKey("Id");
+            modelBuilder.Entity<ProvisioningConfigurationRecord>()
+                .HasMany(p => p.Values)
+                .WithOne();
+            modelBuilder.Entity<ProvisioningConfigurationRecord>()
+                .Property(s => s.ValuesString)
+                .HasConversion(v => JsonConvert.SerializeObject(v), v => JsonConvert.DeserializeObject<List<string>>(v));
+            modelBuilder.Entity<ProvisioningConfigurationHistory>()
+                .Property<int>("Id").ValueGeneratedOnAdd();
+            modelBuilder.Entity<ProvisioningConfigurationHistory>()
+                .HasKey("Id");
         }
     }
 }

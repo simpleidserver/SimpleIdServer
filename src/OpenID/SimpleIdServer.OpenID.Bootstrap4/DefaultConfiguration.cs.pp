@@ -69,29 +69,29 @@ namespace $rootnamespace$
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "sub"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "name"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, "familyName"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "uniquename"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "givenName"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.MiddleName, "middleName"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.NickName, "nickName"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Locale, "locale"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Picture, "picture"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.WebSite, "website"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Profile, "profile"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Gender, "gender"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.UpdatedAt, "1612355959", SimpleIdServer.Jwt.ClaimValueTypes.INTEGER),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.EmailVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", SimpleIdServer.Jwt.ClaimValueTypes.JSONOBJECT),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumberVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN)
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "sub"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "name"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, "familyName"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "uniquename"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "givenName"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.MiddleName, "middleName"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.NickName, "nickName"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Locale, "locale"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Picture, "picture"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.WebSite, "website"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Profile, "profile"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Gender, "gender"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UpdatedAt, "1612355959", SimpleIdServer.Jwt.ClaimValueTypes.INTEGER),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.EmailVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", SimpleIdServer.Jwt.ClaimValueTypes.JSONOBJECT),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumberVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN)
                 }
             },
             new OAuthUser
@@ -105,11 +105,11 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
                 }
             },
             new OAuthUser
@@ -123,11 +123,11 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
                 }
             },
             new OAuthUser
@@ -141,11 +141,11 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
                 }
             },
             new OAuthUser
@@ -159,10 +159,10 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
-                    new Claim("scim_id", "1")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
+                    new OAuthUserClaim("scim_id", "1")
                 }
             },
             new OAuthUser
@@ -176,11 +176,11 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "umaUser"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "User"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "umaUser"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "User"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User")
                 }
             },
             new OAuthUser
@@ -194,12 +194,12 @@ namespace $rootnamespace$
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "doctor"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Doctor"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "Doctor"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Doctor")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "doctor"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Doctor"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "Doctor"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Doctor")
                 }
             }
         };

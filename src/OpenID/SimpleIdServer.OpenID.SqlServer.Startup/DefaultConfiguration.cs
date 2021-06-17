@@ -6,7 +6,6 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace SimpleIdServer.OpenID.SqlServer.Startup
 {
@@ -76,6 +75,22 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope ScimProvision = new OAuthScope
+        {
+            Name = "scim_provision",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope ManageUsers = new OAuthScope
+        {
+            Name = "manage_users",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -93,7 +108,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             AddScimResource,
             DeleteScimResource,
             UpdateScimResource,
-            BulkScimResource
+            BulkScimResource,
+            ScimProvision,
+            ManageUsers
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -135,29 +152,29 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
                 DeviceRegistrationToken = "ciyortoPQHGluxo-vIZLu7:APA91bHRrB-mdgHl6IQFu4XNWR5VBXxOjaq-gAAuxCzswQAGeryvFaBqoJqJN_oSEtPZMTknRe2rixJj5cjnaWkCin8NSXm7Gug6peZd9EpJgJ98CNHqOudcFv_h3jp4dpgWn6imb7sR",
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(Jwt.Constants.UserClaims.Subject, "sub"),
-                    new Claim(Jwt.Constants.UserClaims.Name, "name"),
-                    new Claim(Jwt.Constants.UserClaims.FamilyName, "familyName"),
-                    new Claim(Jwt.Constants.UserClaims.UniqueName, "uniquename"),
-                    new Claim(Jwt.Constants.UserClaims.GivenName, "givenName"),
-                    new Claim(Jwt.Constants.UserClaims.MiddleName, "middleName"),
-                    new Claim(Jwt.Constants.UserClaims.NickName, "nickName"),
-                    new Claim(Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
-                    new Claim(Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
-                    new Claim(Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
-                    new Claim(Jwt.Constants.UserClaims.Locale, "locale"),
-                    new Claim(Jwt.Constants.UserClaims.Picture, "picture"),
-                    new Claim(Jwt.Constants.UserClaims.WebSite, "website"),
-                    new Claim(Jwt.Constants.UserClaims.Profile, "profile"),
-                    new Claim(Jwt.Constants.UserClaims.Gender, "gender"),
-                    new Claim(Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
-                    new Claim(Jwt.Constants.UserClaims.UpdatedAt, "1612355959", Jwt.ClaimValueTypes.INTEGER),
-                    new Claim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
-                    new Claim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", Jwt.ClaimValueTypes.JSONOBJECT),
-                    new Claim(Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
-                    new Claim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Subject, "sub"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Name, "name"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.FamilyName, "familyName"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.UniqueName, "uniquename"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.GivenName, "givenName"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.MiddleName, "middleName"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.NickName, "nickName"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Locale, "locale"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Picture, "picture"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.WebSite, "website"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Profile, "profile"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Gender, "gender"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.UpdatedAt, "1612355959", Jwt.ClaimValueTypes.INTEGER),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", Jwt.ClaimValueTypes.JSONOBJECT),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
                 }
             },
             new OAuthUser
@@ -171,11 +188,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
                 }
             },
             new OAuthUser
@@ -189,11 +206,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
                 }
             },
             new OAuthUser
@@ -207,11 +224,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
                 }
             },
             new OAuthUser
@@ -225,10 +242,10 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
-                    new Claim("scim_id", "1")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
+                    new OAuthUserClaim("scim_id", "1")
                 }
             },
             new OAuthUser
@@ -242,11 +259,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(Jwt.Constants.UserClaims.Subject, "umaUser"),
-                    new Claim(Jwt.Constants.UserClaims.Name, "User"),
-                    new Claim(Jwt.Constants.UserClaims.UniqueName, "User")
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Subject, "umaUser"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Name, "User"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.UniqueName, "User")
                 }
             },
             new OAuthUser
@@ -260,12 +277,12 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Claims = new List<Claim>
+                OAuthUserClaims = new List<OAuthUserClaim>
                 {
-                    new Claim(Jwt.Constants.UserClaims.Subject, "doctor"),
-                    new Claim(Jwt.Constants.UserClaims.Name, "Doctor"),
-                    new Claim(Jwt.Constants.UserClaims.GivenName, "Doctor"),
-                    new Claim(Jwt.Constants.UserClaims.UniqueName, "Doctor")
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Subject, "doctor"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Name, "Doctor"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.GivenName, "Doctor"),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.UniqueName, "Doctor")
                 }
             }
         };
@@ -770,7 +787,39 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         AddScimResource,
                         BulkScimResource,
                         UpdateScimResource,
-                        DeleteScimResource
+                        DeleteScimResource,
+                        ScimProvision
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "provisioningClient",
+                    ClientSecret = "provisioningClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    Translations = new List<OAuthClientTranslation>
+                    {
+                        new OAuthClientTranslation
+                        {
+                            Translation = new OAuthTranslation("provisioningClient_client_name", "ProvisioningClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
+                        }
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        ManageUsers
                     },
                     GrantTypes = new List<string>
                     {

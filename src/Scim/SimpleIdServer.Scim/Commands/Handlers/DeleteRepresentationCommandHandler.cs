@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -19,7 +20,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
         }
 
-        public async Task<bool> Handle(DeleteRepresentationCommand request)
+        public async Task<SCIMRepresentation> Handle(DeleteRepresentationCommand request)
         {
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(request.Id, request.ResourceType);
             if (representation == null)
@@ -33,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit();
             }
 
-            return true;
+            return representation;
         }
     }
 }
