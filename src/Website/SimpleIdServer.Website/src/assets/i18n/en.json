@@ -219,9 +219,14 @@
     "members": "Members",
     "selectUsers": "Select Users",
     "removeSelectedUsers": "Remove selected Users",
+    "dangerZone": "Danger zone",
+    "deleteTitle": "Delete this group",
+    "delete": "Delete",
     "messages": {
       "errorUpdate": "An error occured while trying to update the group",
-      "update": "Group has been updated"
+      "update": "Group has been updated",
+      "delete": "Group has been removed",
+      "errorDelete": "An error occured while trying to remove the group"
     }
   }
 }

@@ -219,9 +219,14 @@
     "members": "Membres",
     "selectUsers": "Sélectionner les Utilisateurs",
     "removeSelectedUsers": "Supprimer les Utilisateurs sélectionnés",
+    "dangerZone": "Zone de danger",
+    "deleteTitle": "Supprimer ce groupe",
+    "delete": "Supprimer",
     "messages": {
       "errorUpdate": "Une erreur est survenue durant la mise à jour du groupe",
-      "update": "Le groupe a été mis à jour"
+      "update": "Le groupe a été mis à jour",
+      "delete": "Le groupe a été supprimé",
+      "errorDelete": "Une erreur est survenue durant la suppression du groupe"
     }
   }
 }

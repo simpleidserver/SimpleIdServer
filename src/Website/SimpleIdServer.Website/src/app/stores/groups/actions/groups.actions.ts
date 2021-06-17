@@ -11,3 +11,6 @@ export const errorGet = createAction('[Groups] ERROR_GET_GROUP');
 export const startUpdate = createAction('[Groups] START_UPDATE_GROUP', props<{ groupId: string, request: any }>());
 export const completeUpdate = createAction('[Groups] COMPLETE_UPDATE_GROUP');
 export const errorUpdate = createAction('[Groups] ERROR_UPDATE_GROUP');
+export const startDelete = createAction('[Groups] START_DELETE_GROUP', props<{ groupId: string }>());
+export const completeDelete = createAction('[Groups] COMPLETE_DELETE_GROUP');
+export const errorDelete = createAction('[Groups] ERROR_DELETE_GROUP');

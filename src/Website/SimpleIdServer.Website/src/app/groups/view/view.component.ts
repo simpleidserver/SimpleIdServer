@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startGet, startUpdate } from '@app/stores/groups/actions/groups.actions';
+import { startGet, startUpdate, startDelete } from '@app/stores/groups/actions/groups.actions';
 import { GroupMember } from '@app/stores/groups/models/group-member.model';
 import { Group } from '@app/stores/groups/models/group.model';
 import { ScannedActionsSubject, select, Store } from '@ngrx/store';
@@ -52,6 +52,23 @@ export class ViewGroupComponent implements OnInit {
         this.snackbar.open(this.translateService.instant('groups.messages.update'), this.translateService.instant('undo'), {
           duration: 2000
         });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Groups] ERROR_DELETE_GROUP'))
+      .subscribe(() => {
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('groups.messages.errorDelete'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Groups] COMPLETE_DELETE_GROUP'))
+      .subscribe(() => {
+        this.isLoading = false;
+        this.snackbar.open(this.translateService.instant('groups.messages.delete'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.router.navigate(['/groups']);
       });
     this.store.pipe(select(fromReducers.selectGroupResult)).subscribe((group: Group | null) => {
       if (!group) {
@@ -102,6 +119,12 @@ export class ViewGroupComponent implements OnInit {
     };
     const request = startUpdate({ groupId: this.group$.id, request: req });
     this.store.dispatch(request);
+  }
+
+  delete() {
+    this.isLoading = true;
+    const req = startDelete({ groupId: this.group$.id });
+    this.store.dispatch(req);
   }
 
   private refreshEditForm() {

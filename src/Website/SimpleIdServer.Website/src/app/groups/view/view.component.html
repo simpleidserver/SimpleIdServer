@@ -48,4 +48,13 @@
       </mat-card-actions>
     </form>
   </mat-card>
+  <h2>{{ 'groups.dangerZone' | translate }}</h2>
+  <div class="alert alert-danger" fxLayout="row">
+    <div fxFlex="90%">
+      <b>{{ 'groups.deleteTitle' | translate }}</b>
+    </div>
+    <div>
+      <button mat-raised-button color="warn" (click)="delete()">{{ 'groups.delete' | translate }}</button>
+    </div>
+  </div>
 </div>
