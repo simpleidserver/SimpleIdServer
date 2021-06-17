@@ -6,6 +6,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Models
     {
         public string Id { get; set; }
         public string SourceAttributeId { get; set; }
+        public string SourceValueAttributeId { get; set; }
         public string SourceResourceType { get; set; }
         public string SourceAttributeSelector { get; set; }
         public string TargetResourceType { get; set; }

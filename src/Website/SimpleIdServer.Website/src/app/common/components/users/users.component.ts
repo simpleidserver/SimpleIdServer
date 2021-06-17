@@ -16,8 +16,8 @@ import { merge } from 'rxjs';
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
-  displayedColumns: string[] = ['userName', 'name.familyName', 'meta.lastModified'];
-  displayedFilterColumns: string[] = ['userName-filter', 'familyName-filter', 'lastModified-filter'];
+  displayedColumns: string[] = ['userName', 'name.familyName', 'displayName', 'meta.lastModified'];
+  displayedFilterColumns: string[] = ['userName-filter', 'familyName-filter', 'displayName-filter', 'lastModified-filter'];
   userNameControl: FormControl = new FormControl();
   familyNameControl: FormControl = new FormControl();
   @ViewChild(MatPaginator) paginator: MatPaginator;

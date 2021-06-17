@@ -35,7 +35,7 @@
           <mat-label>{{ 'groups.members' | translate }}</mat-label>
           <mat-chip-list #redirectUriChipList>
             <mat-chip *ngFor="let member of members$">
-              {{member.display}}
+              {{ member.display ? member.display : member.value }}
             </mat-chip>
           </mat-chip-list>
           <div class="actions">

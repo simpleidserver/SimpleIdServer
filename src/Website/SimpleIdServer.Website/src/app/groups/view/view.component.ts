@@ -91,6 +91,7 @@ export class ViewGroupComponent implements OnInit {
 
   saveGroup(evt: any, formValue: any) {
     evt.preventDefault();
+    this.isLoading = true;
     const req: any = {
       schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
       displayName: formValue.displayName,

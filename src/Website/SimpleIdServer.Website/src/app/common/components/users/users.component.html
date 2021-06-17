@@ -20,6 +20,13 @@
         {{ user.familyName }}
       </mat-cell>
     </ng-container>
+    <!-- familyName -->
+    <ng-container matColumnDef="displayName">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.displayName' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.displayName }}
+      </mat-cell>
+    </ng-container>
     <!-- lastModified -->
     <ng-container matColumnDef="meta.lastModified">
       <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.lastModified' | translate }}</mat-header-cell>
@@ -55,6 +62,11 @@
         <button mat-icon-button (click)="refresh()">
           <mat-icon>search</mat-icon>
         </button>
+      </mat-header-cell>
+    </ng-container>
+    <!-- filter displayName -->
+    <ng-container matColumnDef="displayName-filter">
+      <mat-header-cell *matHeaderCellDef>
       </mat-header-cell>
     </ng-container>
     <!-- filter lastModified -->
