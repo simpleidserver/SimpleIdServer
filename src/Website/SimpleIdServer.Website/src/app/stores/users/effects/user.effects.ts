@@ -30,7 +30,7 @@ export class UserEffects {
     .pipe(
       ofType(startSearch),
       mergeMap((evt) => {
-        return this.userService.search(evt.startIndex, evt.count, evt.order, evt.direction)
+        return this.userService.search(evt.startIndex, evt.count, evt.order, evt.direction, evt.filter)
           .pipe(
             map(content => completeSearch({ content: content })),
             catchError(() => of(errorSearch()))

@@ -4,11 +4,19 @@ import * as fromActions from '../actions/groups.actions';
 import { Group } from '../models/group.model';
 
 export interface SearchGroupsState {
-  Groups: SearchResult<Group>;
+  Groups: SearchResult<Group> | null;
+}
+
+export interface GroupState {
+  Group: Group | null;
 }
 
 export const initialSearchGroupsState: SearchGroupsState = {
-  Groups: new SearchResult<Group>()
+  Groups: null
+};
+
+export const initialGroupState: GroupState = {
+  Group: null
 };
 
 const searchGroupsReducer = createReducer(
@@ -21,6 +29,20 @@ const searchGroupsReducer = createReducer(
   })
 );
 
+const groupReducer = createReducer(
+  initialGroupState,
+  on(fromActions.completeGet, (state, { content }) => {
+    return {
+      ...state,
+      Group: { ...content }
+    };
+  })
+);
+
 export function getSearchGroupsReducer(state: SearchGroupsState | undefined, action: Action) {
   return searchGroupsReducer(state, action);
+}
+
+export function getGroupReducer(state: GroupState | undefined, action: Action) {
+  return groupReducer(state, action);
 }

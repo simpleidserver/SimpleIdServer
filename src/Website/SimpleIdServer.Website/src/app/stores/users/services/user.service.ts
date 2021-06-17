@@ -15,7 +15,7 @@ export class UserService {
     private oauthService: OAuthService,
     private translateService: TranslateService) { }
 
-  search(startIndex: number, count: number, order: string, direction: string): Observable<SearchResult<User>> {
+  search(startIndex: number, count: number, order: string, direction: string, filter: string): Observable<SearchResult<User>> {
     let headers = new HttpHeaders();
     headers = headers.set('Accept', 'application/json');
     headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
@@ -26,6 +26,10 @@ export class UserService {
 
     if (direction) {
       targetUrl = targetUrl + "&sortOrder=" + direction;
+    }
+
+    if (filter) {
+      targetUrl = targetUrl + "&filter=" + filter;
     }
 
     return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {

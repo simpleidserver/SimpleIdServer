@@ -25,6 +25,7 @@ export class User {
   familyName: string;
   created: string;
   lastModified: string;
+  isSelected: boolean;
   photos: UserPhoto[];
   emails: UserEmail[];
   phoneNumbers: UserPhoneNumber[];

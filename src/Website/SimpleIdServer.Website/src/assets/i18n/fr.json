@@ -3,6 +3,7 @@
   "save": "Sauvegarder",
   "create": "Créer",
   "seconds": "Secondes",
+  "confirm": "Confirmer",
   "applicationKinds": {
     "0": {
       "description": "Application web traditionnelle utilisant des redirections",
@@ -153,6 +154,7 @@
     "addEmail": "Ajouter un Email",
     "editEmail": "Editer ou ajouter un email",
     "emailAddress": "Email",
+    "editAddress": "Editer ou ajouter l'adresse",
     "emailDisplay": "Description",
     "emailType": "Type",
     "emailTypes": {
@@ -213,6 +215,9 @@
     "displayName": "Nom",
     "type": "Type",
     "nbMembers": "Nombre de members",
-    "updateDateTime": "Date de mise à jour"
+    "updateDateTime": "Date de mise à jour",
+    "members": "Membres",
+    "selectUsers": "Sélectionner les Utilisateurs",
+    "removeSelectedUsers": "Supprimer les Utilisateurs sélectionnés"
   }
 }

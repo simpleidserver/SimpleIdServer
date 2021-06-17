@@ -17,6 +17,14 @@
     color: rgb(158, 158, 158) !important;
   }
 
+  .mat-table .mat-row.hovered {
+    background: #ebeeff;
+  }
+
+  .mat-table .mat-row.highlighted {
+    background: #bbc0de;
+  }
+
   .img-editor,
   .img-editor > .img,
   .picture,

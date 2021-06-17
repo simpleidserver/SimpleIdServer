@@ -1,0 +1,82 @@
+<loader *ngIf="isLoading"></loader>
+<div [ngClass]="isShadowEnabled ? 'mat-elevation-z8 overflow-hidden' : 'overflow-hidden'" [style.display]="!isLoading ? 'block' : 'none'">
+  <mat-table class="full-width" [dataSource]="users$" matSortActive="meta.lastModified" matSortDirection="desc" matSort>
+    <!-- userName -->
+    <ng-container matColumnDef="userName">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>
+        {{ 'users.userName' | translate}}
+      </mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        <a href="#" [routerLink]="['/users/' + user.id ]" *ngIf="!isNavigationDisabled">
+          {{ user.userName }}
+        </a>
+        <span *ngIf="isNavigationDisabled">{{ user.userName }}</span>
+      </mat-cell>
+    </ng-container>
+    <!-- familyName -->
+    <ng-container matColumnDef="name.familyName">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.familyName' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.familyName }}
+      </mat-cell>
+    </ng-container>
+    <!-- lastModified -->
+    <ng-container matColumnDef="meta.lastModified">
+      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.lastModified' | translate }}</mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        {{ user.lastModified | date:'fullDate' }}
+      </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="action">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let user">
+        <mat-checkbox disabled [checked]="user.isSelected"></mat-checkbox>
+      </mat-cell>
+    </ng-container>
+    <!-- filter userName -->
+    <ng-container matColumnDef="userName-filter">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field appearance="outline" class="full-width no-bottom-padding" (click)="$event.stopPropagation()">
+          <mat-label>{{ 'users.userName' | translate }}</mat-label>
+          <input matInput type="text" [formControl]="userNameControl" />
+        </mat-form-field>
+        <button mat-icon-button (click)="refresh()">
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-header-cell>
+    </ng-container>
+    <!-- filter familyName -->
+    <ng-container matColumnDef="familyName-filter">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-form-field appearance="outline" class="full-width no-bottom-padding" (click)="$event.stopPropagation()">
+          <mat-label>{{ 'users.familyName' | translate }}</mat-label>
+          <input matInput type="text" [formControl]="familyNameControl" />
+        </mat-form-field>
+        <button mat-icon-button (click)="refresh()">
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-header-cell>
+    </ng-container>
+    <!-- filter lastModified -->
+    <ng-container matColumnDef="lastModified-filter">
+      <mat-header-cell *matHeaderCellDef>
+      </mat-header-cell>
+    </ng-container>
+    <!-- filter action -->
+    <ng-container matColumnDef="action-filter">
+      <mat-header-cell *matHeaderCellDef>
+        <button mat-icon-button (click)="addSelectedUsers($event)">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-header-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+    <mat-header-row *matHeaderRowDef="displayedFilterColumns; sticky: true"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"
+             (click)="select(row)"
+             [ngClass]="{hovered: row.hovered, highlighted: selection.isSelected(row)}"
+             (mouseover)="row.hovered = true"
+             (mouseout)="row.hovered = false"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="length" [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>

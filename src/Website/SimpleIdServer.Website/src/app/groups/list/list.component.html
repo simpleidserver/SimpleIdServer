@@ -11,7 +11,7 @@
     <ng-container matColumnDef="displayName">
       <mat-header-cell *matHeaderCellDef>{{ 'groups.displayName' | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let group">
-        {{ group.displayName }}
+        <a [routerLink]="['/groups/' + group.id]">{{ group.displayName }}</a>
       </mat-cell>
     </ng-container>
     <ng-container matColumnDef="groupType">

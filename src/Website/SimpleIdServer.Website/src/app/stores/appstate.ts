@@ -15,7 +15,8 @@ export interface AppState {
   wellKnownConfiguration: fromMetadata.WellKnownConfigurationState,
   users: fromUsers.SearchUsersState,
   user: fromUsers.GetUserState,
-  groups: fromGroups.SearchGroupsState
+  groups: fromGroups.SearchGroupsState,
+  group: fromGroups.GroupState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -28,6 +29,7 @@ export const selectWellKnownConfiguration = (state: AppState) => state.wellKnown
 export const selectUsers = (state: AppState) => state.users;
 export const selectUser = (state: AppState) => state.user;
 export const selectGroups = (state: AppState) => state.groups;
+export const selectGroup = (state: AppState) => state.group;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -139,6 +141,17 @@ export const selectGroupsResult = createSelector(
   }
 );
 
+export const selectGroupResult = createSelector(
+  selectGroup,
+  (state: fromGroups.GroupState) => {
+    if (!state || !state.Group) {
+      return null;
+    }
+
+    return state.Group;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -149,5 +162,6 @@ export const appReducer = {
   wellKnownConfiguration: fromMetadata.getWellKnownConfiguration,
   users: fromUsers.getSearchUsersReducer,
   user: fromUsers.getUserReducer,
-  groups: fromGroups.getSearchGroupsReducer
+  groups: fromGroups.getSearchGroupsReducer,
+  group: fromGroups.getGroupReducer
 };

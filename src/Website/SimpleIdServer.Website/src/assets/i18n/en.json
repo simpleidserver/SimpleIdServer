@@ -3,6 +3,7 @@
   "save": "Save",
   "create": "Create",
   "seconds": "Secondes",
+  "confirm": "Confirm",
   "applicationKinds": {
     "0": {
       "description": "Traditional web application using redirects",
@@ -155,6 +156,7 @@
     "emailAddress": "Email Address",
     "emailDisplay": "Display",
     "emailType": "Type",
+    "editAddress": "Edit or add the Address",
     "emailTypes": {
       "work": "Work",
       "home": "Home",
@@ -213,6 +215,9 @@
     "displayName": "Name",
     "type": "Type",
     "nbMembers": "Number of members",
-    "updateDateTime": "Update Datetime"
+    "updateDateTime": "Update Datetime",
+    "members": "Members",
+    "selectUsers": "Select Users",
+    "removeSelectedUsers": "Remove selected Users"
   }
 }

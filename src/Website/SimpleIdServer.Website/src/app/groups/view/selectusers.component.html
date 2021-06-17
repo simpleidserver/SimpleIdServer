@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>{{ 'groups.selectUsers' | translate }}</h1>
+<div mat-dialog-content>
+  <div fxFlex="50%">
+    <users [isShadowEnabled]="false" [isSelectionDisabled]="false" [isNavigationDisabled]="true" (usersSeleted)="displayUsers($event)"></users>
+  </div>
+  <div class="rightSide" fxFlex="50%">
+    <button mat-button color="warn" (click)="remove()">{{ 'groups.removeSelectedUsers' | translate }}</button>
+    <mat-selection-list #selectionList>
+      <mat-list-option *ngFor="let user of selectedUsers" [value]="user">
+        {{ user.userName }}
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button color="primary" (click)="confirm()">{{ 'confirm' | translate }}</button>
+  <button mat-button color="warn" mat-dialog-close>{{ 'close' | translate }}</button>
+</div>

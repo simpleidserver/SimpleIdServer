@@ -36,4 +36,14 @@ export class GroupService {
       return result;
     }));
   }
+
+  get(groupId: string): Observable<Group> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/groups/" + groupId;
+    return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
+      return Group.fromJson(res);
+    }));
+  }
 }

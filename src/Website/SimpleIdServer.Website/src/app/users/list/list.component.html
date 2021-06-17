@@ -5,31 +5,4 @@
     </ul>
   </div>
 </div>
-<loader *ngIf="isLoading"></loader>
-<div class="mat-elevation-z8 overflow-hidden" [style.display]="!isLoading ? 'block' : 'none'">
-  <mat-table class="full-width" [dataSource]="users$" matSortActive="meta.lastModified" matSortDirection="desc" matSort>
-    <ng-container matColumnDef="userName">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.userName' | translate }}</mat-header-cell>
-      <mat-cell *matCellDef="let user">
-        <a href="#" [routerLink]="['/users/' + user.id ]">
-          {{ user.userName }}
-        </a>
-      </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="name.familyName">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.familyName' | translate }}</mat-header-cell>
-      <mat-cell *matCellDef="let user">
-        {{ user.familyName }}
-      </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="meta.lastModified">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'users.lastModified' | translate }}</mat-header-cell>
-      <mat-cell *matCellDef="let user">
-        {{ user.lastModified | date:'fullDate' }}
-      </mat-cell>
-    </ng-container>
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
-  <mat-paginator [length]="length" [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
-</div>
+<users></users>

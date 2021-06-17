@@ -6,6 +6,8 @@ import { SharedModule } from '@app/shared/shared.module';
 import { AvatarModule } from 'ngx-avatar';
 import { GroupsRoutes } from './groups.routes';
 import { ListGroupsComponent } from './list/list.component';
+import { SelectUsersComponent } from './view/selectusers.component';
+import { ViewGroupComponent } from './view/view.component';
 
 @NgModule({
   imports: [
@@ -17,7 +19,9 @@ import { ListGroupsComponent } from './list/list.component';
     GroupsRoutes
   ],
   declarations: [
-    ListGroupsComponent
+    ListGroupsComponent,
+    ViewGroupComponent,
+    SelectUsersComponent
   ]
 })
 

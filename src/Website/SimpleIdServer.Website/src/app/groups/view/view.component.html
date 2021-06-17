@@ -1,0 +1,48 @@
+<div fxLayout="row" class="breadcrumb">
+  <div fxFlex="80%">
+    <ul>
+      <li>
+        <div class="mat-h1">
+          <a [routerLink]="['/groups']">{{ "groups.list" | translate }}</a>
+        </div>
+      </li>
+      <li class="separator">
+        <div class="mat-h1">\</div>
+      </li>
+      <li>
+        <div class="mat-h1">{{group$?.displayName}}</div>
+      </li>
+    </ul>
+  </div>
+</div>
+<loader *ngIf="isLoading"></loader>
+<div *ngIf="!isLoading">
+  <mat-card>
+    <form [formGroup]="editGroupFormGroup">
+      <mat-card-content>
+        <!--displayName -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'groups.displayName' | translate }}</mat-label>
+          <input matInput type="text" formControlName="displayName" />
+        </mat-form-field>
+        <!--groupType -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'groups.type' | translate }}</mat-label>
+          <input matInput type="text" formControlName="groupType" />
+        </mat-form-field>
+        <!-- members -->
+        <mat-form-field appearance="outline" class="full-width members">
+          <mat-label>{{ 'groups.members' | translate }}</mat-label>
+          <mat-chip-list #redirectUriChipList>
+            <mat-chip *ngFor="let member of members$">
+              {{member.display}}
+            </mat-chip>
+          </mat-chip-list>
+          <div class="actions">
+            <mat-icon class="add" (click)="selectUsers($event)">add</mat-icon>
+          </div>
+        </mat-form-field>
+      </mat-card-content>
+    </form>
+  </mat-card>
+</div>

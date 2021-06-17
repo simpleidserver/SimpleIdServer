@@ -1,0 +1,8 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+::ng-deep .members > .mat-form-field-wrapper > .mat-form-field-flex {
+  min-height: 60px;
+}

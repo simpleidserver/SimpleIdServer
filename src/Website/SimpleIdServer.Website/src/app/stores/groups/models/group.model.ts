@@ -25,7 +25,7 @@ export class Group {
 
     if (json["members"]) {
       result.members = json["members"].map((r: any) => {
-        var member: GroupMember = { $ref: r["$ref"], type: r["type"], value: r["value"] };
+        var member: GroupMember = { $ref: r["$ref"], type: r["type"], value: r["value"], display: r["display"] };
         return member;
       });
       result.nbMembers = result.members.length;
