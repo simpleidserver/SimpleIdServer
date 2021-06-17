@@ -1,6 +1,47 @@
 ﻿Feature: Users
 	Check the /Users endpoint
 
+Scenario: Check entitlement can be added
+	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
+	| Key      | Value                |
+	| schemas  | [ "urn:customuser" ] |
+	| userName | userName             |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | firstEntitlement      |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstEntitlement'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | secondEntitlement     |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondEntitlement'
+
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value                                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                              |
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/CustomUsers/$userId$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'entitlements[0].value'='$firstEntitlement$'
+	Then JSON 'entitlements[0].display'='firstEntitlement'
+	Then JSON 'entitlements[0].$ref'='http://localhost/Entitlements/$firstEntitlement$'
+	Then JSON 'entitlements[1].value'='$secondEntitlement$'
+	Then JSON 'entitlements[1].display'='secondEntitlement'
+	Then JSON 'entitlements[1].$ref'='http://localhost/Entitlements/$secondEntitlement$'
+
 Scenario: Check emails can be erased	
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key                                                        | Value                                                                                                          |

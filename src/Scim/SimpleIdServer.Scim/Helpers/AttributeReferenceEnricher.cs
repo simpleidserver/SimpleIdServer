@@ -92,14 +92,20 @@ namespace SimpleIdServer.Scim.Helpers
 
 			foreach(var representation in representationLst)
             {
-				var attr = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).First();
-				attr.Values.Clear();
 				foreach(var targetRepresentation in targetRepresentations)
-                {
+				{
+					var attr = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceValueAttributeId).FirstOrDefault(a => a.ValuesString.Contains(targetRepresentation.Id));
+					if (attr == null)
+                    {
+						continue;
+                    }
+
+					var parentAttr = attr.Parent;
+					parentAttr.Values.Clear();
 					var newAttributes = BuildAttributes(targetRepresentation, attributeMapping, baseUrl);
 					foreach(var newAttribute in newAttributes)
                     {
-						attr.Values.Add(newAttribute);
+						parentAttr.Values.Add(newAttribute);
                     }
 				}
             }
