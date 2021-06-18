@@ -7,6 +7,7 @@
     <None Remove="src\app\applications\view\displayjwk.component.ts" />
     <None Remove="src\app\applications\view\edit-translation.component.ts" />
     <None Remove="src\app\pipes\basetranslate.ts" />
+    <None Remove="src\app\stores\users\models\user-openid.model.ts" />
     <None Remove="src\app\stores\users\models\useraddress.model.ts" />
     <None Remove="src\app\stores\users\models\useremail.model.ts" />
     <None Remove="src\app\stores\users\models\userphonenumber.model.ts" />
@@ -29,24 +30,25 @@
     <TypeScriptCompile Include="src\app\applications\view\edit-translation.component.ts" />
     <TypeScriptCompile Include="src\app\pipes\basetranslate.ts" />
     <TypeScriptCompile Include="src\app\pipes\translatemetadata.ts" />
+    <TypeScriptCompile Include="src\app\stores\users\models\user-openid.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\useraddress.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\useremail.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userphonenumber.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userphoto.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userrole.model.ts" />
-    <TypeScriptCompile Include="src\app\users\view\edit-address.component.ts">
+    <TypeScriptCompile Include="src\app\users\view\details\edit-address.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\app\users\view\edit-role.component.ts">
+    <TypeScriptCompile Include="src\app\users\view\details\edit-role.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\app\users\view\edit-phonenumber.component.ts">
+    <TypeScriptCompile Include="src\app\users\view\details\edit-phonenumber.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\app\users\view\edit-email.component.ts">
+    <TypeScriptCompile Include="src\app\users\view\details\edit-email.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="src\app\users\view\edit-photo.component.ts">
+    <TypeScriptCompile Include="src\app\users\view\details\edit-photo.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\environments\environments.ts" />

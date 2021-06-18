@@ -9,11 +9,13 @@ namespace SimpleIdServer.Gateway.Host.Handlers
         public ManageClientClientCredentialsHandler(IConfiguration configuration) : base(configuration, new[] { 
             "manage_clients", 
             "manage_scopes",
+            "manage_users",
             "query_scim_resource",
             "add_scim_resource",
             "delete_scim_resource",
             "update_scim_resource",
-            "bulk_scim_resource"
+            "bulk_scim_resource",
+            "scim_provision"
         }) { }
     }
 }

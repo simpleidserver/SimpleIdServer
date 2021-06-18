@@ -57,7 +57,8 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
             using (var httpClient = new HttpClient())
             {
                 request.Headers.Add("Authorization", $"Bearer {accessToken}");
-                await httpClient.SendAsync(request, cancellationToken);
+                var httpResult = await httpClient.SendAsync(request, cancellationToken);
+                httpResult.EnsureSuccessStatusCode();
             }
         }
 
@@ -116,7 +117,18 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
 
                         if (i == 0)
                         {
-                            result.Add(name, childRecord);
+                            var cl = result.SelectToken(name) as JObject;
+                            if (cl != null)
+                            {
+                                foreach(var kvp in childRecord)
+                                {
+                                    cl.Add(kvp.Key, kvp.Value);
+                                }
+                            }
+                            else
+                            {
+                                result.Add(name, childRecord);
+                            }
                         }
                         else
                         {

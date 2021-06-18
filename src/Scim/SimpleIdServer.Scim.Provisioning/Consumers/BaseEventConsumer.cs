@@ -48,7 +48,7 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
                 try
                 {
                     transaction = await _provisioningConfigurationRepository.StartTransaction(token);
-                    await provisioner.Seed(ProvisioningOperations.ADD,
+                    await provisioner.Seed(Type,
                         context.Message.Id,
                         context.Message.Representation,
                         configuration,

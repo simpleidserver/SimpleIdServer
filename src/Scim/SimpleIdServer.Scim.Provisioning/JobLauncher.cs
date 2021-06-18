@@ -24,6 +24,7 @@ namespace SimpleIdServer.Scim.Provisioning
 
         private static void RegisterProvisioning(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddLogging();
             services.AddScimStoreEF(options =>
             {
                 options.UseLazyLoadingProxies();

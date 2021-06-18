@@ -1,6 +1,5 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ListUsersComponent } from './list/list.component';
-import { ViewUserComponent } from './view/view.component';
 
 
 const routes: Routes = [
@@ -10,7 +9,7 @@ const routes: Routes = [
   },
   {
     path: ':id',
-    component: ViewUserComponent
+    loadChildren: async () => (await import('./view/view.module')).ViewUserModule
   }
 ];
 

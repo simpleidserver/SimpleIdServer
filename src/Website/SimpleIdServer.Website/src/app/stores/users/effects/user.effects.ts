@@ -3,18 +3,57 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import {
-  completeSearch,
-  errorSearch,
-  startGet,
-  startSearch,
-  completeGet,
-  errorGet,
-  startUpdate,
+  completeDelete, completeGet,
+
+
+
+
+
+
+
+
+
+  completeGetOpenId, completeProvision, completeSearch,
+
+
+
+
+
+
   completeUpdate,
+
+
+
+  errorDelete, errorGet,
+
+
+
+
+
+
+
+  errorGetOpenId, errorProvision, errorSearch,
+
+
+
+
+
+
   errorUpdate,
-  startDelete,
-  completeDelete,
-  errorDelete
+  startDelete, startGet,
+
+
+
+
+
+
+
+
+
+  startGetOpenId, startProvision, startSearch,
+
+
+  startUpdate
 } from '../actions/users.actions';
 import { UserService } from '../services/user.service';
 
@@ -51,7 +90,7 @@ export class UserEffects {
           );
       }
       )
-  );
+    );
 
   @Effect()
   updateUser$ = this.actions$
@@ -65,7 +104,7 @@ export class UserEffects {
           );
       }
       )
-  );
+    );
 
   @Effect()
   deleteUser$ = this.actions$
@@ -76,6 +115,34 @@ export class UserEffects {
           .pipe(
             map(content => completeDelete()),
             catchError(() => of(errorDelete()))
+          );
+      }
+      )
+    );
+
+  @Effect()
+  getOpenIdUser$ = this.actions$
+    .pipe(
+      ofType(startGetOpenId),
+      mergeMap((evt) => {
+        return this.userService.getOpenId(evt.scimId)
+          .pipe(
+            map(content => completeGetOpenId({ user: content })),
+            catchError(() => of(errorGetOpenId()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  provision$ = this.actions$
+    .pipe(
+      ofType(startProvision),
+      mergeMap((evt) => {
+        return this.userService.provision(evt.scimId)
+          .pipe(
+            map(() => completeProvision()),
+            catchError(() => of(errorProvision()))
           );
       }
       )

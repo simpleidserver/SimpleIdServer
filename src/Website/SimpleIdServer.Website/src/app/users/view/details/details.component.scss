@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.picture {
+  border: 1px solid;
+  border-radius: 5px;
+  margin-bottom: 1.34375em;
+}
+
+.picture > .content {
+  text-align: center;
+  border-bottom: 1px solid;
+  height: 150px;
+}
+
+.picture > .content > .img {
+  height: 150px;
+}
+
+.picture > .navigation {
+  padding: 0px 5px 0px 5px;
+  position: relative;
+}
+
+.picture > .navigation > .actions {
+  position: absolute;
+  right: 0px;
+  top: 8px;
+}
+
+.picture > .navigation > .actions > .actBtn {
+  cursor: pointer;
+}
+
+.lst {
+  margin-bottom: 1.34375em;
+}

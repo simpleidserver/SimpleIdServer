@@ -783,6 +783,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     {
                         ManageClientsScope,
                         ManageScopesScope,
+                        ManageUsers,
                         QueryScimResource,
                         AddScimResource,
                         BulkScimResource,

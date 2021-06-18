@@ -200,7 +200,9 @@
       "errorUpdate": "An error occured while trying to update the user",
       "update": "User has been updated",
       "errorDelete": "An error occured while trying to remove the user",
-      "delete": "User has been removed"
+      "delete": "User has been removed",
+      "provision": "Provisioning has been requested, please wait some seconds before user is created",
+      "errorProvision": "An error occured while trying to provision the user"
     },
     "photoTypes": {
       "photo": "Photo",
@@ -208,7 +210,14 @@
     },
     "dangerZone": "Danger zone",
     "deleteTitle": "Delete this user",
-    "delete": "Delete"
+    "delete": "Delete",
+    "openidUserDoesntExist": "There is no OPENID user associate to this account, do-you want to create a new one ?",
+    "create": "Create",
+    "cancel": "Cancel",
+    "navs": {
+      "details": "Details",
+      "consents": "Consents"
+    }
   },
   "groups": {
     "list": "Groups",

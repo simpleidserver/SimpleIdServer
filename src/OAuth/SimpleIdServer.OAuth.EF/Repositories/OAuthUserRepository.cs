@@ -20,7 +20,7 @@ namespace SimpleIdServer.OAuth.EF.Repositories
 
         public Task<OAuthUser> FindOAuthUserByClaim(string claimType, string claimValue, CancellationToken cancellationToken)
         {
-            return GetUsers().Include(u => u.Claims).FirstOrDefaultAsync(u => u.Claims.Any(c => c.Type == claimType && c.Value == claimValue), cancellationToken);
+            return GetUsers().FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == claimType && c.Value == claimValue), cancellationToken);
         }
 
         public Task<OAuthUser> FindOAuthUserByLogin(string login, CancellationToken token)

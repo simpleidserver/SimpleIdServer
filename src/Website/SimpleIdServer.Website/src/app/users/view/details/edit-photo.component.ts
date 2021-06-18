@@ -3,7 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as fromReducers from '@app/stores/appstate';
 import { Store } from '@ngrx/store';
-import { UserPhoto } from '../../stores/users/models/userphoto.model';
+import { UserPhoto } from '@app/stores/users/models/userphoto.model';
 
 @Component({
   selector: 'edit-photo',

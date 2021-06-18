@@ -31,7 +31,7 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
             {
                 var newUser = OAuthUser.Create(jObj.GetStr(SimpleIdServer.Jwt.Constants.UserClaims.Subject));
                 UpdateUser(jObj, newUser);
-                await _oauthUserRepository.Add(user, cancellationToken);
+                await _oauthUserRepository.Add(newUser, cancellationToken);
             }
             else
             {
@@ -45,9 +45,9 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
 
         protected virtual void UpdateUser(JObject jObj, OAuthUser user)
         {
-            if (jObj.ContainsKey("claims"))
+            if (jObj.ContainsKey(SimpleIdServer.Jwt.Constants.OAuthClaims.Claims))
             {
-                var claims = jObj["claims"] as JObject;
+                var claims = jObj[SimpleIdServer.Jwt.Constants.OAuthClaims.Claims] as JObject;
                 foreach(var kvp in claims)
                 {
                     user.UpdateClaim(kvp.Key, kvp.Value.ToString());

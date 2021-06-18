@@ -1,6 +1,25 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/Provisioning/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60002
+        }
+      ],
+      "UpstreamPathTemplate": "/Provisioning/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/Groups/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -67,6 +86,25 @@
         }
       ],
       "UpstreamPathTemplate": "/users/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/management/users/scim/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/openidUsers/{everything}",
       "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
       "DelegatingHandlers": [
         "ManageClientClientCredentialsHandler"

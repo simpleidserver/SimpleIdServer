@@ -29,6 +29,7 @@ namespace SimpleIdServer.Scim.Domain
             {
                 RepresentationId = representation,
                 RepresentationVersion = version,
+                Exception = exception,
                 ExecutionDateTime = DateTime.UtcNow,
                 Status = ProvisioningConfigurationHistoryStatus.EXCEPTION
             };

@@ -1,0 +1,10 @@
+<loader *ngIf="isLoadingUser || isLoadingUserOpenId"></loader>
+<div *ngIf="!isLoadingUser && !isLoadingUserOpenId">
+  <div class="alert alert-warning" *ngIf="openidUserDoesntExit">
+    <p>
+      {{ 'users.openidUserDoesntExist' | translate }}
+    </p>
+    <button mat-raised-button color="accent" (click)="create()">{{ 'users.create' | translate }}</button>
+    <button mat-raised-button color="warn" class="cancel" (click)="cancel()">{{ 'users.cancel' | translate }}</button>
+  </div>
+</div>

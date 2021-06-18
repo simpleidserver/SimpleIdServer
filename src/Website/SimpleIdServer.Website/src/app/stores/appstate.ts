@@ -15,6 +15,7 @@ export interface AppState {
   wellKnownConfiguration: fromMetadata.WellKnownConfigurationState,
   users: fromUsers.SearchUsersState,
   user: fromUsers.GetUserState,
+  userOpenId: fromUsers.GetUserOpenIdState,
   groups: fromGroups.SearchGroupsState,
   group: fromGroups.GroupState
 }
@@ -28,6 +29,7 @@ export const selectOAuthScope = (state: AppState) => state.oauthScope;
 export const selectWellKnownConfiguration = (state: AppState) => state.wellKnownConfiguration;
 export const selectUsers = (state: AppState) => state.users;
 export const selectUser = (state: AppState) => state.user;
+export const selectUserOpenId = (state: AppState) => state.userOpenId;
 export const selectGroups = (state: AppState) => state.groups;
 export const selectGroup = (state: AppState) => state.group;
 
@@ -130,6 +132,17 @@ export const selectUserResult = createSelector(
   }
 );
 
+export const selectUserOpenIdResult = createSelector(
+  selectUserOpenId,
+  (state: fromUsers.GetUserOpenIdState) => {
+    if (!state || state.User === null) {
+      return null;
+    }
+
+    return state.User;
+  }
+);
+
 export const selectGroupsResult = createSelector(
   selectGroups,
   (state: fromGroups.SearchGroupsState) => {
@@ -162,6 +175,7 @@ export const appReducer = {
   wellKnownConfiguration: fromMetadata.getWellKnownConfiguration,
   users: fromUsers.getSearchUsersReducer,
   user: fromUsers.getUserReducer,
+  userOpenId: fromUsers.getUserOpenIdReducer,
   groups: fromGroups.getSearchGroupsReducer,
   group: fromGroups.getGroupReducer
 };

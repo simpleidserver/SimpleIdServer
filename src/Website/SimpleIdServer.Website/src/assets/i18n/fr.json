@@ -200,7 +200,9 @@
       "errorUpdate": "Une erreur est survenue durant la mise à jour de l'utilisateur",
       "update": "L'utilisateur a été mis à jour",
       "errorDelete": "Une erreur est survenue durant la suppression de l'utilisateur",
-      "delete": "L'utilisateur a été supprimé"
+      "delete": "L'utilisateur a été supprimé",
+      "provision": "Le provisioning a été demandé, veuillez attendre quelques secondes avant que l'utilisateur soit créé",
+      "errorProvision": "Une erreur est survenue durant le provisioning de l'utilisateur"
     },
     "photoTypes": {
       "photo": "Photo",
@@ -208,7 +210,14 @@
     },
     "dangerZone": "Zone de danger",
     "deleteTitle": "Supprimer cet utilisateur",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "openidUserDoesntExist": "Il n'y a pas d'utilisateur OPENID associé à ce compte, voulez-vous en créer un nouveau ?",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "navs": {
+      "details": "Détails",
+      "consents": "Consentements"
+    }
   },
   "groups": {
     "list": "Groupes",

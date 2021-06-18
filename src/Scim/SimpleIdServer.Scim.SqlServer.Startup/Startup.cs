@@ -214,6 +214,16 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                                 "sub"
                                             }
                                         },
+                                        // scim_id
+                                        new ProvisioningConfigurationRecord
+                                        {
+                                            Name = "id",
+                                            Type = ProvisioningConfigurationRecordTypes.STRING,
+                                            ValuesString = new List<string>
+                                            {
+                                                "claims.scim_id"
+                                            }
+                                        },
                                         // name
                                         new ProvisioningConfigurationRecord
                                         {

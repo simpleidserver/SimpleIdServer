@@ -47,7 +47,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     {
                         ValidAudiences = new List<string>
                         {
-                            "gatewayClient"
+                            "gatewayClient",
+                            "provisioningClient"
                         },
                         ValidateIssuer = false,
                         ValidateIssuerSigningKey = true,

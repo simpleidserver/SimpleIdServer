@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UserOpenId } from '../models/user-openid.model';
 import { User } from '../models/user.model';
 
 @Injectable()
@@ -66,5 +67,21 @@ export class UserService {
     headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
     let targetUrl = environment.apiUrl + "/users/" + userId;
     return this.http.delete(targetUrl, { headers: headers });
+  }
+
+  getOpenId(scimId: string): Observable<UserOpenId> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/openidUsers/" + scimId;
+    return this.http.get<UserOpenId>(targetUrl, { headers: headers });
+  }
+
+  provision(scimId: string) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    let targetUrl = environment.apiUrl + "/Provisioning/" + scimId;
+    return this.http.get<UserOpenId>(targetUrl, { headers: headers });
   }
 }

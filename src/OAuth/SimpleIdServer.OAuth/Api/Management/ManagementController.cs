@@ -33,6 +33,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IAddOAuthScopeHandler _addOAuthScopeHandler;
         private readonly IDeleteOAuthScopeHandler _deleteOAuthScopeHandler;
         private readonly IUpdateUserBySCIMIdHandler _updateUserBySCIMIdHandler;
+        private readonly IGetUserBySCIMIdHandler _getUserBySCIMIdHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -47,6 +48,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IAddOAuthScopeHandler addOAuthScopeHandler,
             IDeleteOAuthScopeHandler deleteOAuthScopeHandler,
             IUpdateUserBySCIMIdHandler updateUserBySCIMIdHandler,
+            IGetUserBySCIMIdHandler getUserBySCIMIdHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -60,6 +62,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _addOAuthScopeHandler = addOAuthScopeHandler;
             _deleteOAuthScopeHandler = deleteOAuthScopeHandler;
             _updateUserBySCIMIdHandler = updateUserBySCIMIdHandler;
+            _getUserBySCIMIdHandler = getUserBySCIMIdHandler;
             _options = options.Value;
         }
 
@@ -235,6 +238,21 @@ namespace SimpleIdServer.OAuth.Api.Management
         #endregion
 
         #region Update user
+
+        [HttpGet("users/scim/{id}")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> GetUserByScimId(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _getUserBySCIMIdHandler.Handle(id, cancellationToken);
+                return new OkObjectResult(result);
+            }
+            catch(OAuthUserNotFoundException)
+            {
+                return new NotFoundResult();
+            }
+        }
 
         [HttpPut("users/scim/{id}")]
         [Authorize("ManageUsers")]
