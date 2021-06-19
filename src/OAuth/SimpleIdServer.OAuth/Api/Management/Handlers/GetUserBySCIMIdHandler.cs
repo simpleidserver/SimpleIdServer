@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Persistence;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -60,8 +61,20 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
             result.Add(OAuthUserParameters.Id, user.Id);
             result.Add(OAuthUserParameters.Status, (int)user.Status);
             result.Add(OAuthUserParameters.CreateDateTime, user.CreateDateTime);
+            result.Add(OAuthUserParameters.Consents, new JArray(user.Consents.Select(c => ToDto(c))));
             result.Add(SimpleIdServer.Jwt.Constants.OAuthClaims.Claims, claims);
             return result;
+        }
+
+        private static JObject ToDto(OAuthConsent consent)
+        {
+            return new JObject
+            {
+                { OAuthUserConsentParameter.Id, consent.Id },
+                { OAuthUserConsentParameter.ClientId, consent.ClientId },
+                { OAuthUserConsentParameter.Scopes, new JArray(consent.Scopes.Select(s => s.Name)) },
+                { OAuthUserConsentParameter.Claims, new JArray(consent.Claims == null ? new string[0] : consent.Claims) }
+            };
         }
     }
 }

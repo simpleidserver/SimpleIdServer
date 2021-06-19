@@ -74,7 +74,9 @@ export class UserService {
     headers = headers.set('Accept', 'application/json');
     headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
     let targetUrl = environment.apiUrl + "/openidUsers/" + scimId;
-    return this.http.get<UserOpenId>(targetUrl, { headers: headers });
+    return this.http.get<UserOpenId>(targetUrl, { headers: headers }).pipe(map((res: any) => {
+      return UserOpenId.fromJson(res);
+    }));
   }
 
   provision(scimId: string) {

@@ -1,10 +1,58 @@
 <loader *ngIf="isLoadingUser || isLoadingUserOpenId"></loader>
 <div *ngIf="!isLoadingUser && !isLoadingUserOpenId">
-  <div class="alert alert-warning" *ngIf="openidUserDoesntExit">
+  <div class="alert alert-warning" *ngIf="isAlertVisible">
     <p>
       {{ 'users.openidUserDoesntExist' | translate }}
     </p>
     <button mat-raised-button color="accent" (click)="create()">{{ 'users.create' | translate }}</button>
     <button mat-raised-button color="warn" class="cancel" (click)="cancel()">{{ 'users.cancel' | translate }}</button>
+  </div>
+  <div *ngIf="isOpenIdUserExits" fxLayout="column" fxLayoutGap="10px">
+    <div class="alert alert-warning" *ngIf="userOpenId?.consents?.length === 0">
+      {{ 'users.noConsent' | translate }}
+    </div>
+    <mat-card *ngFor="let consent of userOpenId?.consents">
+      <mat-card-content>
+        <h2>{{ 'users.consentAccess' | translate : { clientId: consent.clientId } }}</h2>
+        <div fxLayout="column" fxLayoutGap="10px">
+          <div fxLayout="row">
+            <div fxFlex="30%">
+              <span>{{ 'users.scopes' | translate }}</span>
+            </div>
+            <div fxFlex="70%">
+              <div class="alert alert-warning" *ngIf="consent.scopes.length === 0">
+                {{ 'users.noScope' | translate }}
+              </div>
+              <mat-chip-list *ngIf="consent.scopes.length > 0">
+                <mat-chip *ngFor="let scope of consent.scopes">
+                  {{scope}}
+                </mat-chip>
+              </mat-chip-list>
+            </div>
+          </div>
+          <div>
+            <mat-divider></mat-divider>
+          </div>
+          <div fxLayout="row">
+            <div fxFlex="30%">
+              <span>{{ 'users.claims' | translate }}</span>
+            </div>
+            <div fxFlex="70%">
+              <div class="alert alert-warning" *ngIf="consent.claims.length === 0">
+                {{ 'users.noClaim' | translate }}
+              </div>
+              <mat-chip-list *ngIf="consent.claims.length > 0">
+                <mat-chip *ngFor="let claim of consent.claims">
+                  {{claim}}
+                </mat-chip>
+              </mat-chip-list>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="warn">{{ 'users.deleteConsent' | translate }}</button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>

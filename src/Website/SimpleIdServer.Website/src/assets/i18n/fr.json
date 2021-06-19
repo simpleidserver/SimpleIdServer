@@ -217,6 +217,21 @@
     "navs": {
       "details": "Détails",
       "consents": "Consentements"
+    },
+    "consentAccess": "Les accès suivants ont été autorisés par l'utilisateur pour le client {{clientId}}",
+    "scopes": "Scopes",
+    "claims": "Claims",
+    "noClaim": "Aucun claim",
+    "noScope": "Aucun scope",
+    "deleteConsent": "Supprimer ce consentement",
+    "metadata": "Métadonnées",
+    "account": "Compte",
+    "noConsent": "Aucun consentement",
+    "accountStatus": "Statut du compte est : ",
+    "status": {
+      "0": "Créé",
+      "1": "Notifié",
+      "2": "Confirmé"
     }
   },
   "groups": {

@@ -56,6 +56,10 @@ body, h1 {
   white-space: nowrap;
 }
 
+.mat-chip-list.inline {
+    display: inline-block !important;
+}
+
 /* Breadcrumb */
 .breadcrumb {
   padding: 20px 0px 20px 0px;
@@ -125,7 +129,6 @@ body, h1 {
 
 /* Alert */
 .alert {
-  width: 100%;
   border-radius: .25rem;
   padding: .75rem 1.25rem;
   border: 1px solid transparent;

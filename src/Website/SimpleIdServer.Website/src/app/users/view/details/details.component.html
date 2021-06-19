@@ -1,7 +1,28 @@
-<loader *ngIf="isLoading"></loader>
-<div *ngIf="!isLoading">
-  <mat-card>
+<loader *ngIf="isLoading || isLoadingUserOpenId"></loader>
+<div *ngIf="!isLoading && !isLoadingUserOpenId">
+  <div class="alert alert-warning" *ngIf="isAlertVisible">
+    <p>
+      {{ 'users.openidUserDoesntExist' | translate }}
+    </p>
+    <button mat-raised-button color="accent" (click)="create()">{{ 'users.create' | translate }}</button>
+    <button mat-raised-button color="warn" class="cancel" (click)="cancel()">{{ 'users.cancel' | translate }}</button>
+  </div>
+  <!-- Account -->
+  <mat-card *ngIf="isOpenIdUserExits">
+    <mat-card-content>
+      <h2>{{ 'users.account' | translate }}</h2>
+      <p>
+        {{ 'users.accountStatus' | translate}}
+        <mat-chip-list class="inline">
+          <mat-chip>{{ 'users.status.' + userOpenId.status | translate }}</mat-chip>
+        </mat-chip-list>
+      </p>
+    </mat-card-content>
+  </mat-card>
+  <!-- Metadata -->
+  <mat-card class="metadata">
     <form [formGroup]="editUserFormGroup" (ngSubmit)="saveUser($event, editUserFormGroup.value)">
+      <h2>{{ 'users.metadata' | translate }}</h2>
       <mat-card-content>
         <!--externalId -->
         <mat-form-field appearance="outline" class="full-width">

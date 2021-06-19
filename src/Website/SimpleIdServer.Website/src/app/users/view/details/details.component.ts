@@ -1,11 +1,11 @@
 import { DataSource } from '@angular/cdk/table';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
-import { startDelete, startGet, startUpdate } from '@app/stores/users/actions/users.actions';
+import { startDelete, startGet, startGetOpenId, startProvision, startUpdate } from '@app/stores/users/actions/users.actions';
 import { User } from '@app/stores/users/models/user.model';
 import { UserAddress } from '@app/stores/users/models/useraddress.model';
 import { UserEmail } from '@app/stores/users/models/useremail.model';
@@ -16,6 +16,7 @@ import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { UserOpenId } from '@app/stores/users/models/user-openid.model';
 import { EditAddressComponent } from './edit-address.component';
 import { EditEmailComponent } from './edit-email.component';
 import { EditPhoneNumberComponent } from './edit-phonenumber.component';
@@ -119,12 +120,13 @@ class RoleDataSource extends DataSource<UserRole> {
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
 })
-export class ViewDetailsComponent implements OnInit {
+export class ViewDetailsComponent implements OnInit, OnDestroy {
   displayedEmailColumns: string[] = ['value', 'display', 'type', 'action'];
   displayedPhoneNumberColumns: string[] = ['value', 'display', 'type', 'action'];
   displayedAddressNumberColumns: string[] = ['streetAddress', 'postalCode', 'type', 'action'];
   displayedRoleColumns: string[] = ['value', 'display', 'type', 'action'];
   user$: User;
+  userOpenId: UserOpenId;
   photos$: UserPhoto[] = [];
   emails$: EmailDataSource;
   phoneNumbers$: PhoneNumberDataSource;
@@ -143,6 +145,10 @@ export class ViewDetailsComponent implements OnInit {
     userType: new FormControl({ value: '' })
   });
   isLoading: boolean = false;
+  isLoadingUserOpenId: boolean = false;
+  isAlertVisible: boolean;
+  isOpenIdUserExits: boolean;
+  interval: any;
   constructor(
     private store: Store<fromReducers.AppState>,
     private activatedRoute: ActivatedRoute,
@@ -167,6 +173,22 @@ export class ViewDetailsComponent implements OnInit {
       this.isLoading = false;
       this.refreshEditForm();
     });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Users] ERROR_GET_OPENID_USER'))
+      .subscribe(() => {
+        this.isOpenIdUserExits = false;
+        this.isLoadingUserOpenId = false;
+        this.isAlertVisible = true;
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Users] COMPLETE_PROVISION'))
+      .subscribe(() => {
+        this.isLoadingUserOpenId = false;
+        this.snackbar.open(this.translateService.instant('users.messages.provision'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+        this.interval = setInterval(this.refresh.bind(this), 2000);
+      });
     this.actions$.pipe(
       filter((action: any) => action.type === '[Users] ERROR_UPDATE_USER'))
       .subscribe(() => {
@@ -200,14 +222,37 @@ export class ViewDetailsComponent implements OnInit {
         });
         this.router.navigate(['/users']);
       });
+    this.store.pipe(select(fromReducers.selectUserOpenIdResult)).subscribe((user: UserOpenId | null) => {
+      if (!user) {
+        return;
+      }
+
+      this.isLoadingUserOpenId = false;
+      this.isAlertVisible = false;
+      this.isOpenIdUserExits = true;
+      this.userOpenId = user;
+      if (this.interval) {
+        clearInterval(this.interval);
+      }
+    });
     this.refresh();
+  }
+
+  ngOnDestroy() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   refresh() {
     this.isLoading = true;
-    const userId = this.activatedRoute.parent?.snapshot.params['id'];
-    let request = startGet({ userId: userId });
-    this.store.dispatch(request);
+    this.isLoadingUserOpenId = true;
+    this.isOpenIdUserExits = false;
+    const scimId = this.activatedRoute.parent?.snapshot.params['id'];
+    const getUserOpenId = startGetOpenId({ scimId: scimId });
+    const getUser = startGet({ userId: scimId });
+    this.store.dispatch(getUserOpenId);
+    this.store.dispatch(getUser);
   }
 
   addPhoto(evt: any) {
@@ -487,6 +532,17 @@ export class ViewDetailsComponent implements OnInit {
     this.isLoading = true;
     const updateUser = startUpdate({ userId: this.user$.id, request: request });
     this.store.dispatch(updateUser);
+  }
+
+  create() {
+    this.isLoadingUserOpenId = true;
+    const scimId = this.activatedRoute.parent?.snapshot.params['id'];
+    const p = startProvision({ scimId: scimId });
+    this.store.dispatch(p);
+  }
+
+  cancel() {
+    this.isAlertVisible = false;
   }
 
   private refreshEditForm() {

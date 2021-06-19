@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
@@ -14,10 +14,13 @@ import { filter } from 'rxjs/operators';
   templateUrl: './consents.component.html',
   styleUrls: ['./consents.component.scss']
 })
-export class ViewConsentsComponent implements OnInit {
+export class ViewConsentsComponent implements OnInit, OnDestroy {
   isLoadingUserOpenId: boolean;
   isLoadingUser: boolean;
-  openidUserDoesntExit: boolean;
+  isOpenIdUserExits: boolean;
+  isAlertVisible: boolean;
+  userOpenId: UserOpenId | null = null;
+  interval: any = null;
 
   constructor(
     private store: Store<fromReducers.AppState>,
@@ -32,8 +35,9 @@ export class ViewConsentsComponent implements OnInit {
     this.actions$.pipe(
       filter((action: any) => action.type === '[Users] ERROR_GET_OPENID_USER'))
       .subscribe(() => {
-        this.openidUserDoesntExit = true;
+        this.isOpenIdUserExits = false;
         this.isLoadingUserOpenId = false;
+        this.isAlertVisible = true;
       });
     this.actions$.pipe(
       filter((action: any) => action.type === '[Users] COMPLETE_PROVISION'))
@@ -42,6 +46,8 @@ export class ViewConsentsComponent implements OnInit {
         this.snackbar.open(this.translateService.instant('users.messages.provision'), this.translateService.instant('undo'), {
           duration: 2000
         });
+        this.interval = setInterval(this.refresh.bind(this), 2000);
+
       });
     this.actions$.pipe(
       filter((action: any) => action.type === '[Users] ERROR_PROVISION'))
@@ -58,6 +64,12 @@ export class ViewConsentsComponent implements OnInit {
       }
 
       this.isLoadingUserOpenId = false;
+      this.isAlertVisible = false;
+      this.isOpenIdUserExits = true;
+      this.userOpenId = user;
+      if (this.interval) {
+        clearInterval(this.interval);
+      }
     });
     this.store.pipe(select(fromReducers.selectUserResult)).subscribe((user: User | null) => {
       if (!user) {
@@ -69,6 +81,12 @@ export class ViewConsentsComponent implements OnInit {
     this.refresh();
   }
 
+  ngOnDestroy() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+
   create() {
     this.isLoadingUserOpenId = true;
     const scimId = this.activatedRoute.parent?.snapshot.params['id'];
@@ -77,10 +95,11 @@ export class ViewConsentsComponent implements OnInit {
   }
 
   cancel() {
-    this.openidUserDoesntExit = false;
+    this.isAlertVisible = false;
   }
 
   private refresh() {
+    this.isOpenIdUserExits = false;
     this.isLoadingUserOpenId = true;
     this.isLoadingUser = true;
     const scimId = this.activatedRoute.parent?.snapshot.params['id'];
