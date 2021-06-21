@@ -63,7 +63,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             if (parameter.SortBy != null)
             {
                 var evaluatedExpression = parameter.SortBy.Evaluate(queryableRepresentations);
-                var ordered = (IOrderedEnumerable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
+                var ordered = (IEnumerable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
                 queryableRepresentations = ordered.ToList().AsQueryable();
             }
 

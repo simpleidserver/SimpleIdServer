@@ -8,168 +8,207 @@ namespace SimpleIdServer.OAuth.Startup
 {
     public class DefaultConfiguration
     {
+        public static OAuthScope QueryScimResource = new OAuthScope
+        {
+            Name = "query_scim_resource",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope AddScimResource = new OAuthScope
+        {
+            Name = "add_scim_resource",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope DeleteScimResource = new OAuthScope
+        {
+            Name = "delete_scim_resource",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope UpdateScimResource = new OAuthScope
+        {
+            Name = "update_scim_resource",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope BulkScimResource = new OAuthScope
+        {
+            Name = "bulk_scim_resource",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope ManageClients = new OAuthScope
+        {
+            Name = "manage_clients",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope ManageScopes = new OAuthScope
+        {
+            Name = "manage_scopes",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetStatistic = new OAuthScope
+        {
+            Name = "get_statistic",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetPerformance = new OAuthScope
+        {
+            Name = "get_performance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetCasePlan = new OAuthScope
+        {
+            Name = "get_caseplan",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope AddCaseFile = new OAuthScope
+        {
+            Name = "add_casefile",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope UpdateCaseFile = new OAuthScope
+        {
+            Name = "update_casefile",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope PublishCaseFile = new OAuthScope
+        {
+            Name = "publish_casefile",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope AddCaseInstance = new OAuthScope
+        {
+            Name = "add_case_instance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope LaunchCaseInstance = new OAuthScope
+        {
+            Name = "launch_case_intance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetCaseFile = new OAuthScope
+        {
+            Name = "get_casefile",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope SearchCasePlanInstance = new OAuthScope
+        {
+            Name = "search_caseplaninstance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope LaunchCasePlanInstance = new OAuthScope
+        {
+            Name = "launch_caseplaninstance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetFormInstances = new OAuthScope
+        {
+            Name = "get_forminstances",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetCaseWorkerTasks = new OAuthScope
+        {
+            Name = "get_caseworkertasks",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetCasePlanInstance = new OAuthScope
+        {
+            Name = "get_caseplaninstance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope ActiveCasePlanInstance = new OAuthScope
+        {
+            Name = "activate_caseplaninstance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetForm = new OAuthScope
+        {
+            Name = "get_form",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope SearchForm = new OAuthScope
+        {
+            Name = "search_form",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope ConfirmCasePlanInstance = new OAuthScope
+        {
+            Name = "confirm_caseplaninstance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope DeleteRole = new OAuthScope
+        {
+            Name = "delete_role",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope UpdateRole = new OAuthScope
+        {
+            Name = "update_role",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope GetRole = new OAuthScope
+        {
+            Name = "get_role",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope SearchRole = new OAuthScope
+        {
+            Name = "search_role",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope AddRole = new OAuthScope
+        {
+            Name = "add_role",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope CreateHumanTaskInstance = new OAuthScope
+        {
+            Name = "create_humantaskinstance",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope CompleteHumanTask = new OAuthScope
+        {
+            Name = "complete_humantask",
+            IsExposedInConfigurationEdp = true
+        };
+        public static OAuthScope AddScope = new OAuthScope
+        {
+            Name = "add_scope",
+            IsExposedInConfigurationEdp = true
+        };
+
         public static List<OAuthScope> Scopes => new List<OAuthScope>
         {
-            new OAuthScope
-            {
-                Name = "query_scim_resource",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "add_scim_resource",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "delete_scim_resource",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "update_scim_resource",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "bulk_scim_resource",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "manage_clients",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "manage_scopes",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_statistic",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_performance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_caseplan",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "add_casefile",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "update_casefile",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "publish_casefile",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "add_case_instance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "launch_case_intance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_casefile",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "search_caseplaninstance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "add_case_instance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "launch_caseplaninstance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_forminstances",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_caseworkertasks",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_caseplaninstance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "activate_caseplaninstance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_form",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "search_form",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "confirm_caseplaninstance",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "delete_role",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "update_role",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "get_role",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "search_role",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "add_role",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "create_humantaskinstance",
-                IsExposedInConfigurationEdp = true
-            }
+            QueryScimResource,
+            AddScimResource,
+            DeleteScimResource,
+            UpdateScimResource,
+            BulkScimResource,
+            ManageClients,
+            ManageScopes,
+            GetStatistic,
+            GetPerformance,
+            GetCasePlan,
+            AddCaseFile,
+            UpdateCaseFile,
+            PublishCaseFile,
+            AddCaseInstance,
+            LaunchCaseInstance,
+            GetCaseFile,
+            SearchCasePlanInstance,
+            LaunchCasePlanInstance,
+            GetFormInstances,
+            GetCaseWorkerTasks,
+            GetCasePlanInstance,
+            ActiveCasePlanInstance,
+            GetForm,
+            SearchForm,
+            ConfirmCasePlanInstance,
+            DeleteRole,
+            UpdateRole,
+            GetRole,
+            SearchRole,
+            AddRole,
+            CreateHumanTaskInstance,
+            CompleteHumanTask,
+            AddScope
         };
 
         public static List<OAuthClient> Clients => new List<OAuthClient>
@@ -182,7 +221,7 @@ namespace SimpleIdServer.OAuth.Startup
                 {
                     new OAuthClientTranslation
                     {
-                        Translation = new OAuthTranslation("bpmnClient_client_name", "BPMN Client", "fr")
+                        Translation = new OAuthTranslation("humanTaskClient_client_name", "HumanTask Client", "fr")
                         {
                             Type = "client_name"
                         }
@@ -196,10 +235,7 @@ namespace SimpleIdServer.OAuth.Startup
                 TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
-                    new OAuthScope
-                    {
-                        Name = "create_humantaskinstance"
-                    }
+                    CreateHumanTaskInstance
                 },
                 GrantTypes = new List<string>
                 {
@@ -215,7 +251,7 @@ namespace SimpleIdServer.OAuth.Startup
                 {
                     new OAuthClientTranslation
                     {
-                        Translation = new OAuthTranslation("cmmnClient_client_name", "CMMN Client", "fr")
+                        Translation = new OAuthTranslation("humanTaskClient_client_name", "HumanTask Client", "fr")
                         {
                             Type = "client_name"
                         }
@@ -229,10 +265,7 @@ namespace SimpleIdServer.OAuth.Startup
                 TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
-                    new OAuthScope
-                    {
-                        Name = "create_humantaskinstance"
-                    }
+                    CreateHumanTaskInstance
                 },
                 GrantTypes = new List<string>
                 {
@@ -262,10 +295,7 @@ namespace SimpleIdServer.OAuth.Startup
                 TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
-                    new OAuthScope
-                    {
-                        Name = "complete_humantask"
-                    }
+                    CompleteHumanTask
                 },
                 GrantTypes = new List<string>
                 {
@@ -295,26 +325,11 @@ namespace SimpleIdServer.OAuth.Startup
                 TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
-                    new OAuthScope
-                    {
-                        Name = "query_scim_resource"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "add_scim_resource"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "delete_scim_resource"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "update_scim_resource"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "bulk_scim_resource"
-                    }
+                    QueryScimResource,
+                    AddScimResource,
+                    DeleteScimResource,
+                    UpdateScimResource,
+                    BulkScimResource
                 },
                 GrantTypes = new List<string>
                 {
@@ -344,14 +359,8 @@ namespace SimpleIdServer.OAuth.Startup
                 TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
-                    new OAuthScope
-                    {
-                        Name = "manage_clients"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "manage_scopes"
-                    }
+                    ManageClients,
+                    ManageScopes
                 },
                 GrantTypes = new List<string>
                 {
@@ -367,7 +376,7 @@ namespace SimpleIdServer.OAuth.Startup
                 {
                     new OAuthClientTranslation
                     {
-                        Translation = new OAuthTranslation("websiteGateway_client_name", "Website gateway", "fr")
+                        Translation =  new OAuthTranslation("websiteGateway_client_name", "Website gateway", "fr")
                         {
                             Type = "client_name"
                         }
@@ -381,102 +390,29 @@ namespace SimpleIdServer.OAuth.Startup
                 TokenSignedResponseAlg = "RS256",
                 AllowedScopes = new List<OAuthScope>
                 {
-                    new OAuthScope
-                    {
-                        Name = "get_statistic"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_performance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_caseplan"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "add_casefile"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "update_casefile"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "publish_casefile"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "add_case_instance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "launch_case_intance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_casefile"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "search_caseplaninstance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "add_case_instance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "launch_caseplaninstance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_forminstances"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_caseworkertasks"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_caseplaninstance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "activate_caseplaninstance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_form"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "search_form"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "confirm_caseplaninstance"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "delete_role",
-                    },
-                    new OAuthScope
-                    {
-                        Name = "update_role"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "get_role"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "search_role"
-                    },
-                    new OAuthScope
-                    {
-                        Name = "add_scope"
-                    }
+                    GetStatistic,
+                    GetPerformance,
+                    GetCasePlan,
+                    AddCaseFile,
+                    UpdateCaseFile,
+                    PublishCaseFile,
+                    AddCaseInstance,
+                    LaunchCaseInstance,
+                    GetCaseFile,
+                    SearchCasePlanInstance,
+                    LaunchCaseInstance,
+                    GetFormInstances,
+                    GetCaseWorkerTasks,
+                    GetCasePlanInstance,
+                    ActiveCasePlanInstance,
+                    GetForm,
+                    SearchForm,
+                    ConfirmCasePlanInstance,
+                    DeleteRole,
+                    UpdateRole,
+                    GetRole,
+                    SearchRole,
+                    AddScope
                 },
                 GrantTypes = new List<string>
                 {

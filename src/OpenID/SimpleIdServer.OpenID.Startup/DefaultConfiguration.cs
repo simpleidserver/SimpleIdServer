@@ -11,6 +11,86 @@ namespace SimpleIdServer.OpenID.Startup
 {
     public class DefaultConfiguration
     {
+        public static OAuthScope AccountsScope = new OAuthScope
+        {
+            Name = "accounts",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = true,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope ManageClientsScope = new OAuthScope
+        {
+            Name = "manage_clients",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope ManageScopesScope = new OAuthScope
+        {
+            Name = "manage_scopes",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope QueryScimResource = new OAuthScope
+        {
+            Name = "query_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope AddScimResource = new OAuthScope
+        {
+            Name = "add_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope DeleteScimResource = new OAuthScope
+        {
+            Name = "delete_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope UpdateScimResource = new OAuthScope
+        {
+            Name = "update_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope BulkScimResource = new OAuthScope
+        {
+            Name = "bulk_scim_resource",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope ScimProvision = new OAuthScope
+        {
+            Name = "scim_provision",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope ManageUsers = new OAuthScope
+        {
+            Name = "manage_users",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -20,24 +100,17 @@ namespace SimpleIdServer.OpenID.Startup
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,
-            new OAuthScope
-            {
-                Name = "scim",
-                Claims = new List<OAuthScopeClaim>
-                {
-                    new OAuthScopeClaim("scim_id", true)
-                }
-            },
-            new OAuthScope
-            {
-                Name = "manage_clients",
-                IsExposedInConfigurationEdp = true
-            },
-            new OAuthScope
-            {
-                Name = "manage_scopes",
-                IsExposedInConfigurationEdp = true
-            }
+            SIDOpenIdConstants.StandardScopes.ScimScope,
+            AccountsScope,
+            ManageClientsScope,
+            ManageScopesScope,
+            QueryScimResource,
+            AddScimResource,
+            DeleteScimResource,
+            UpdateScimResource,
+            BulkScimResource,
+            ScimProvision,
+            ManageUsers
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -214,7 +287,7 @@ namespace SimpleIdServer.OpenID.Startup
             }
         };
 
-        public static List<OpenIdClient> GetClients(JsonWebKey firstMtlsClientJsonWebKey, JsonWebKey secondMtlsClientJsonWebKey)
+        public static List<OpenIdClient> GetClients(JsonWebKey firstMtlsClientJsonWebKey, JsonWebKey secondMtlsClientJsonWebKey, JsonWebKey jsonWebKey)
         {
             return new List<OpenIdClient>
             {
@@ -222,6 +295,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "newsAggregatorWebsite",
                     ClientSecret = "newsAggregatorWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -256,6 +330,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "firstMtlsClient",
                     ClientSecret = "mtsClientSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -270,11 +345,7 @@ namespace SimpleIdServer.OpenID.Startup
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OAuthScope
-                        {
-                            CreateDateTime = DateTime.UtcNow,
-                            Name = "accounts"
-                        }
+                        AccountsScope
                     },
                     PreferredTokenProfile = "Bearer",
                     TokenEndPointAuthMethod = "tls_client_auth",
@@ -296,6 +367,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "secondMtlsClient",
                     ClientSecret = "mtsClientSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -310,11 +382,7 @@ namespace SimpleIdServer.OpenID.Startup
                         SIDOpenIdConstants.StandardScopes.Phone,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Role,
-                        new OAuthScope
-                        {
-                            CreateDateTime = DateTime.UtcNow,
-                            Name = "accounts"
-                        }
+                        AccountsScope
                     },
                     PreferredTokenProfile = "Bearer",
                     TokenEndPointAuthMethod = "tls_client_auth",
@@ -336,6 +404,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "scimClient",
                     ClientSecret = "scimClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -346,14 +415,7 @@ namespace SimpleIdServer.OpenID.Startup
                     IdTokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        new OAuthScope
-                        {
-                            Name = "scim",
-                            Claims = new List<OAuthScopeClaim>
-                            {
-                                new OAuthScopeClaim("scim_id", true)
-                            }
-                        }
+                        SIDOpenIdConstants.StandardScopes.ScimScope
                     },
                     GrantTypes = new List<string>
                     {
@@ -375,6 +437,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "umaClient",
                     ClientSecret = "umaClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -410,6 +473,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "simpleIdServerWebsite",
                     ClientSecret = "simpleIdServerWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -446,12 +510,17 @@ namespace SimpleIdServer.OpenID.Startup
                         "token",
                         "id_token",
                         "code"
+                    },
+                    JsonWebKeys = new List<JsonWebKey>
+                    {
+                        jsonWebKey
                     }
                 },
                 new OpenIdClient
                 {
                     ClientId = "tradWebsite",
                     ClientSecret = "tradWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -486,6 +555,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "native",
                     ClientSecret = "nativeSecret",
+                    ApplicationKind = ApplicationKinds.Native,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -518,6 +588,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "caseManagementWebsite",
                     ClientSecret = "b98113b5-f45f-4a4a-9db5-610b7183e148",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -561,6 +632,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "caseManagementTasklistWebsite",
                     ClientSecret = "b98113b5-f45f-4a4a-9db5-610b7183e148",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -604,6 +676,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "caseManagementPerformanceWebsite",
                     ClientSecret = "91894b86-c57e-489a-838d-fb82621a67ee",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -647,6 +720,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "medikitWebsite",
                     ClientSecret = "f200eeb0-a6a3-465e-be91-97806e5dd3bc",
+                    ApplicationKind = ApplicationKinds.SPA,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -688,6 +762,7 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     ClientId = "gatewayClient",
                     ClientSecret = "gatewayClientPassword",
+                    ApplicationKind = ApplicationKinds.Service,
                     Translations = new List<OAuthClientTranslation>
                     {
                         new OAuthClientTranslation
@@ -706,14 +781,46 @@ namespace SimpleIdServer.OpenID.Startup
                     TokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        new OAuthScope
+                        ManageClientsScope,
+                        ManageScopesScope,
+                        ManageUsers,
+                        QueryScimResource,
+                        AddScimResource,
+                        BulkScimResource,
+                        UpdateScimResource,
+                        DeleteScimResource,
+                        ScimProvision
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "provisioningClient",
+                    ClientSecret = "provisioningClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    Translations = new List<OAuthClientTranslation>
+                    {
+                        new OAuthClientTranslation
                         {
-                            Name = "manage_clients"
-                        },
-                        new OAuthScope
-                        {
-                            Name = "manage_scopes"
+                            Translation = new OAuthTranslation("provisioningClient_client_name", "ProvisioningClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
                         }
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        ManageUsers
                     },
                     GrantTypes = new List<string>
                     {

@@ -77,7 +77,7 @@ namespace SimpleIdServer.OpenID.Startup
                         SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name
                     };
                 })
-                .AddClients(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey), DefaultConfiguration.Scopes)
+                .AddClients(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey, sigJsonWebKey), DefaultConfiguration.Scopes)
                 .AddAcrs(DefaultConfiguration.AcrLst)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
