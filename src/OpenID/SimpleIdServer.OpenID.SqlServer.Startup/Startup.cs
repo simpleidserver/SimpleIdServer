@@ -83,7 +83,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 })
                 .AddLoginPasswordAuthentication()
                 .AddSMSAuthentication();
-            ConfigureFireBase();
+            // ConfigureFireBase();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;

@@ -83,7 +83,7 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication()
                 .AddSMSAuthentication();
-            ConfigureFireBase();
+            // ConfigureFireBase();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
