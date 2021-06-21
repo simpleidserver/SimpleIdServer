@@ -118,12 +118,14 @@ namespace Microsoft.Extensions.DependencyInjection
             var users = new List<OAuthUser>();
             var scopes = new List<OAuthScope>();
             var tokens = new ConcurrentBag<Token>();
+            var translations = new List<OAuthTranslation>();
             services.TryAddSingleton<IJsonWebKeyRepository>(new DefaultJsonWebKeyRepository(jsonWebKeys));
             services.TryAddSingleton<IOAuthClientRepository>(new DefaultOAuthClientRepository(clients));
             services.TryAddSingleton<IOAuthUserRepository>(new DefaultOAuthUserRepository(users));
             services.TryAddSingleton<IOAuthScopeRepository>(new DefaultOAuthScopeRepository(scopes));
             services.TryAddSingleton<ITokenRepository>(new DefaultTokenRepository(tokens));
             services.TryAddSingleton<ITokenRepository>(new DefaultTokenRepository(tokens));
+            services.TryAddSingleton<ITranslationRepository>(new DefaultTranslationRepository(translations));
             return services;
         }
 
