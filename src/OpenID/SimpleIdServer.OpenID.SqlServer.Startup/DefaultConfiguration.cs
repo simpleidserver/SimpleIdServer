@@ -91,6 +91,14 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope CreateHumanTaskInstance = new OAuthScope
+        {
+            Name = "create_humantaskinstance",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -210,7 +218,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 {
                     new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
                     new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "visitor")
                 }
             },
             new OAuthUser
@@ -807,6 +816,68 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         new OAuthClientTranslation
                         {
                             Translation = new OAuthTranslation("provisioningClient_client_name", "ProvisioningClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
+                        }
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        ManageUsers
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "bpmnClient",
+                    ClientSecret = "bpmnClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    Translations = new List<OAuthClientTranslation>
+                    {
+                        new OAuthClientTranslation
+                        {
+                            Translation = new OAuthTranslation("bpmnClient_client_name", "BpmnClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
+                        }
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        CreateHumanTaskInstance
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "humanTaskClient",
+                    ClientSecret = "humanTaskClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    Translations = new List<OAuthClientTranslation>
+                    {
+                        new OAuthClientTranslation
+                        {
+                            Translation = new OAuthTranslation("humanTaskClient_client_name", "HumanTaskClient", "fr")
                             {
                                 Type = "client_name"
                             }

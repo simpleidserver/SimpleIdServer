@@ -47,6 +47,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     {
                         ValidAudiences = new List<string>
                         {
+                            "humanTaskClient",
                             "gatewayClient",
                             "provisioningClient"
                         },
