@@ -53,7 +53,7 @@ export class ListApplicationsComponent implements OnInit {
         });
       });
     this.store.pipe(select(fromReducers.selectApplicationsResult)).subscribe((state: SearchResult<Application> | null) => {
-      if (!state) {
+      if (!state || !state.Content) {
         return;
       }
 

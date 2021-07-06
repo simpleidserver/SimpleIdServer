@@ -37,6 +37,13 @@
     "choose_session": "Choose session",
     "languages": "Languages"
   },
+  "workflow": {
+    "list": "Workflows",
+    "name": "Name",
+    "nbInstances": "Number of Instances",
+    "createDateTime": "Creation DateTime",
+    "updateDateTime": "Update DateTime"
+  },
   "applications": {
     "add": "Create application",
     "kty": "Key Type",

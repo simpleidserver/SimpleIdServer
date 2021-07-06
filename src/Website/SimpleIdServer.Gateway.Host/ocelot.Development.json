@@ -201,6 +201,18 @@
       ],
       "UpstreamPathTemplate": "/metadata/{everything}",
       "UpstreamHttpMethod": [ "POST", "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/processfiles/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60007
+        }
+      ],
+      "UpstreamPathTemplate": "/workflows/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET" ]
     }
   ],
   "ClientId": "gatewayClient",

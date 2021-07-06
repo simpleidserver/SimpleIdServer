@@ -28,6 +28,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.Services
             }
 
             var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.AMR);
+            var hash = PasswordHelper.ComputeHash(password);
             if (credential == null || credential.Value != PasswordHelper.ComputeHash(password))
             {
                 throw new BaseUIException(Exceptions.ErrorCodes.INVALID_CREDENTIALS);

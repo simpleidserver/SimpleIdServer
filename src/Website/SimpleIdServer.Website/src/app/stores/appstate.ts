@@ -4,6 +4,7 @@ import * as fromMetadata from './metadata/reducers';
 import * as fromScopes from './scopes/reducers';
 import * as fromUsers from './users/reducers';
 import * as fromGroups from './groups/reducers';
+import * as fromWorkflows from './workflows/reducers';
 
 export interface AppState {
   application: fromApplications.ApplicationState;
@@ -17,7 +18,8 @@ export interface AppState {
   user: fromUsers.GetUserState,
   userOpenId: fromUsers.GetUserOpenIdState,
   groups: fromGroups.SearchGroupsState,
-  group: fromGroups.GroupState
+  group: fromGroups.GroupState,
+  workflowFiles: fromWorkflows.SearchWorkflowFilesState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -32,6 +34,7 @@ export const selectUser = (state: AppState) => state.user;
 export const selectUserOpenId = (state: AppState) => state.userOpenId;
 export const selectGroups = (state: AppState) => state.groups;
 export const selectGroup = (state: AppState) => state.group;
+export const selectWorkflowFiles = (state: AppState) => state.workflowFiles;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -165,6 +168,18 @@ export const selectGroupResult = createSelector(
   }
 );
 
+export const selectWorkflowFilesResult = createSelector(
+  selectWorkflowFiles,
+  (state: fromWorkflows.SearchWorkflowFilesState) => {
+    if (!state || !state.WorkflowFiles) {
+      return null;
+    }
+    
+    console.log(state);
+    return state.WorkflowFiles;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -177,5 +192,6 @@ export const appReducer = {
   user: fromUsers.getUserReducer,
   userOpenId: fromUsers.getUserOpenIdReducer,
   groups: fromGroups.getSearchGroupsReducer,
-  group: fromGroups.getGroupReducer
+  group: fromGroups.getGroupReducer,
+  workflowFiles: fromWorkflows.getSearchWorkflowFilesReducer
 };

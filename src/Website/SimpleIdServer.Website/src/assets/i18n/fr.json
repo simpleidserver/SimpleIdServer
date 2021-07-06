@@ -30,6 +30,13 @@
     "fr": "Français",
     "en": "Anglais"
   },
+  "workflow": {
+    "list": "Les workflows",
+    "name": "Nom",
+    "nbInstances": "Nombre d'instances",
+    "createDateTime": "Date de création",
+    "updateDateTime": "Date de mise à jour"
+  },
   "menu": {
     "welcome": "Bienvenue {{name}}",
     "disconnect": "Se déconnecter",

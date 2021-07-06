@@ -14,6 +14,8 @@
     <None Remove="src\app\stores\users\models\userphonenumber.model.ts" />
     <None Remove="src\app\stores\users\models\userphoto.model.ts" />
     <None Remove="src\app\stores\users\models\userrole.model.ts" />
+    <None Remove="src\app\stores\workflows\models\workflowfile.model.ts" />
+    <None Remove="src\app\stores\workflows\services\workflowfile.service.ts" />
     <None Remove="src\app\users\view\edit-address.component.ts" />
     <None Remove="src\app\users\view\edit-email.component.ts" />
     <None Remove="src\app\users\view\edit-phonenumber.component.ts" />
@@ -38,6 +40,8 @@
     <TypeScriptCompile Include="src\app\stores\users\models\userphonenumber.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userphoto.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userrole.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\workflowfile.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\services\workflowfile.service.ts" />
     <TypeScriptCompile Include="src\app\users\view\details\edit-address.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
