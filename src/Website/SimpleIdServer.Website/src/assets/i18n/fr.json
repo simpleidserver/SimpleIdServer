@@ -33,9 +33,42 @@
   "workflow": {
     "list": "Les workflows",
     "name": "Nom",
+    "description": "Description",
     "nbInstances": "Nombre d'instances",
     "createDateTime": "Date de création",
-    "updateDateTime": "Date de mise à jour"
+    "updateDateTime": "Date de mise à jour",
+    "details": "Détails",
+    "editor": {
+      "title": "Editeur",
+      "generalInfo": "Détails",
+      "id": "Identifiant",
+      "name": "Nom",
+      "serviceTaskInfo": "Service Task",
+      "implementation": "Implémentation",
+      "csharpCallback": "C# Callback",
+      "delegate": "Delegate",
+      "userTaskInfo": "User Task",
+      "key": "Clef",
+      "value": "Valeur",
+      "exclusiveGatewayInfo": "Gateway",
+      "gatewayDirections": {
+        "unspecified": "Unspecified",
+        "converging": "Converging",
+        "diverging": "Diverging",
+        "mixed": "Mixed"
+      },
+      "wsHumanTask": "WS HumanTask",
+      "default": "Défaut",
+      "sequenceFlowInfo": "Informations Sequence"
+    },
+    "navs": {
+      "details": "Détails",
+      "editor": "Editeur"
+    },
+    "messages": {
+      "update": "Le workflow a été mis à jour",
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du workflow"
+    }
   },
   "menu": {
     "welcome": "Bienvenue {{name}}",

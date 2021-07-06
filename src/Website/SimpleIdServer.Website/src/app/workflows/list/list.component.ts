@@ -1,10 +1,9 @@
-import { SearchWorkflowFileResult } from '@app/stores/workflows/models/searchworkflowfile.model';
-import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import * as fromReducers from '@app/stores/appstate';
 import * as fromWorkflowActions from '@app/stores/workflows/actions/workflow.actions';
+import { SearchWorkflowFileResult } from '@app/stores/workflows/models/searchworkflowfile.model';
 import { WorkflowFile } from '@app/stores/workflows/models/workflowfile.model';
 import { select, Store } from '@ngrx/store';
 import { merge } from 'rxjs';
@@ -20,7 +19,6 @@ export class ListWorkflowsComponent implements OnInit, OnDestroy {
   subscription: any;
   workflows$: WorkflowFile[] = [];
   length: number;
-  selection: SelectionModel<WorkflowFile> = new SelectionModel<WorkflowFile>(true);
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
@@ -33,7 +31,7 @@ export class ListWorkflowsComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.workflows$ = JSON.parse(JSON.stringify(state.content)) as WorkflowFile[];
+      this.workflows$ = state.content;
       this.length = state.totalLength;
       this.isLoading = false;
     });
@@ -46,11 +44,6 @@ export class ListWorkflowsComponent implements OnInit, OnDestroy {
   ngAfterViewInit() {
     merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.refresh());
     this.refresh();
-  }
-
-  select(row: WorkflowFile) {
-    this.selection.toggle(row);
-    row.isSelected = !row.isSelected;
   }
 
   private refresh() {

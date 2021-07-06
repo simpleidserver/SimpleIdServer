@@ -1,0 +1,146 @@
+<loader *ngIf="isLoading"></loader>
+<div class="mat-elevation-z8 overflow-hidden editor" [style.display]="!isLoading ? 'block' : 'none'">
+  <mat-card>
+    <h2>{{ 'workflow.editor.title' | translate }}</h2>
+    <mat-card-content>
+      <div fxLayout="row">
+        <div fxFlex="80%">
+          <div id="canvas">
+
+          </div>
+        </div>
+        <div fxFlex>
+          <div *ngIf="selectedElt">
+            <form [formGroup]="updatePropertiesForm">
+              <mat-accordion>
+                <!-- General information -->
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    {{ 'workflow.editor.generalInfo' | translate }}
+                  </mat-expansion-panel-header>
+                  <!-- Id -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.id' | translate }}</mat-label>
+                    <input matInput name="id" formControlName="id" />
+                  </mat-form-field>
+                  <!-- Name -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.name' | translate }}</mat-label>
+                    <input matInput name="name" formControlName="name" />
+                  </mat-form-field>
+                </mat-expansion-panel>
+                <!-- Service task information -->
+                <mat-expansion-panel *ngIf="selectedElt.type === 'bpmn:ServiceTask'">
+                  <mat-expansion-panel-header>
+                    {{ 'workflow.editor.serviceTaskInfo' | translate }}
+                  </mat-expansion-panel-header>
+                  <!-- Type -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.implementation' | translate }}</mat-label>
+                    <mat-select formControlName="implementation">
+                      <mat-option value="##csharpcallback">{{ 'workflow.editor.csharpCallback' | translate }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <!-- DelegateId -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.delegate' | translate }}</mat-label>
+                    <mat-select formControlName="delegateId">
+                      <mat-option [value]="delegateId" *ngFor="let delegateId of delegateIds">
+                        {{ delegateId }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </mat-expansion-panel>
+                <!-- User task information -->
+                <mat-expansion-panel *ngIf="selectedElt.type === 'bpmn:UserTask'">
+                  <mat-expansion-panel-header>
+                    {{ 'workflow.editor.userTaskInfo' | translate }}
+                  </mat-expansion-panel-header>
+                  <!-- Type -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.implementation' | translate }}</mat-label>
+                    <mat-select formControlName="implementation">
+                      <mat-option value="##WsHumanTask">{{ 'workflow.editor.wsHumanTask' | translate }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <!-- WS-HumanTaskDef name -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.name' | translate }}</mat-label>
+                    <mat-select formControlName="wsHumanTaskDefName" (selectionChange)="onHumanTaskChanged($event)">
+                      <mat-option [value]="humanTask.name" *ngFor="let humanTask of humanTaskDefs">
+                        {{ humanTask.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <!-- List of input parameters -->
+                  <div *ngIf="inputParameters.length > 0">
+                    <form [formGroup]="addParameterForm" (ngSubmit)="addParameter(addParameterForm.value)">
+                      <!-- Key -->
+                      <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                        <mat-label>{{ 'workflow.editor.key' | translate }}</mat-label>
+                        <mat-select formControlName="key">
+                          <mat-option [value]="inputParameter.name" *ngFor="let inputParameter of inputParameters">{{ inputParameter.name }}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <!-- Value -->
+                      <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                        <mat-label>{{ 'workflow.editor.value' | translate }}</mat-label>
+                        <input matInput name="value" formControlName="value" />
+                      </mat-form-field>
+                      <button mat-raised-button color="primary">{{ 'workflow.editor.add' | translate }}</button>
+                    </form>
+                    <mat-list>
+                      <mat-list-item *ngFor="let parameter of parameters" matTooltip="{{ parameter.key }} = {{ parameter.value }}">
+                        <button mat-icon-button (click)="removeParameter(parameter)"><mat-icon>remove</mat-icon></button>
+                        {{ parameter.key }}
+                      </mat-list-item>
+                    </mat-list>
+                  </div>
+                </mat-expansion-panel>
+                <!-- Exclusive gateway -->
+                <mat-expansion-panel *ngIf="selectedElt.type === 'bpmn:ExclusiveGateway'">
+                  <mat-expansion-panel-header>
+                    {{ 'workflow.editor.exclusiveGatewayInfo' | translate }}
+                  </mat-expansion-panel-header>
+                  <!-- Gateway direction -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.title' | translate }}</mat-label>
+                    <mat-select formControlName="gatewayDirection">
+                      <mat-option value="Unspecified">{{ 'workflow.editor.gatewayDirections.unspecified' | translate }}</mat-option>
+                      <mat-option value="Converging">{{ 'workflow.editor.gatewayDirections.converging' | translate }}</mat-option>
+                      <mat-option value="Diverging">{{ 'workflow.editor.gatewayDirections.diverging' | translate }}</mat-option>
+                      <mat-option value="Mixed">{{ 'workflow.editor.gatewayDirections.mixed' | translate }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <!-- Default -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'workflow.editor.default' | translate }}</mat-label>
+                    <mat-select formControlName="default">
+                      <mat-option [value]="id" *ngFor="let id of outgoingElts">
+                        {{ id }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </mat-expansion-panel>
+                <!-- Sequence flow -->
+                <mat-expansion-panel *ngIf="selectedElt.type === 'bpmn:SequenceFlow'">
+                  <mat-expansion-panel-header>
+                    {{ 'workflow.editor.sequenceFlowInfo' | translate }}
+                  </mat-expansion-panel-header>
+                  <!-- Condition -->
+                  <mat-form-field class="full-width" appearance="outline" floatLabel="always">
+                    <mat-label>{{ 'wokflow.editor.condition' | translate }}</mat-label>
+                    <input matInput name="sequenceFlowCondition" formControlName="sequenceFlowCondition" />
+                  </mat-form-field>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </form>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

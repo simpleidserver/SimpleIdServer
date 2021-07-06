@@ -1,9 +1,11 @@
 import { createSelector } from '@ngrx/store';
 import * as fromApplications from './applications/reducers';
+import * as fromDelegateConfigurations from './delegateconfigurations/reducers';
+import * as fromGroups from './groups/reducers';
+import * as fromHumanTask from './humantasks/reducers';
 import * as fromMetadata from './metadata/reducers';
 import * as fromScopes from './scopes/reducers';
 import * as fromUsers from './users/reducers';
-import * as fromGroups from './groups/reducers';
 import * as fromWorkflows from './workflows/reducers';
 
 export interface AppState {
@@ -19,7 +21,12 @@ export interface AppState {
   userOpenId: fromUsers.GetUserOpenIdState,
   groups: fromGroups.SearchGroupsState,
   group: fromGroups.GroupState,
-  workflowFiles: fromWorkflows.SearchWorkflowFilesState
+  workflowFiles: fromWorkflows.SearchWorkflowFilesState,
+  workflowFile: fromWorkflows.WorkflowFileState,
+  delegateConfigurations: fromDelegateConfigurations.DelegateConfigurationLstState,
+  delegateConfiguration: fromDelegateConfigurations.DelegateConfigurationState,
+  humanTaskDefs: fromHumanTask.HumanTaskDefLstState,
+  humanTaskDef: fromHumanTask.HumanTaskState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -35,6 +42,11 @@ export const selectUserOpenId = (state: AppState) => state.userOpenId;
 export const selectGroups = (state: AppState) => state.groups;
 export const selectGroup = (state: AppState) => state.group;
 export const selectWorkflowFiles = (state: AppState) => state.workflowFiles;
+export const selectWorkflowFile = (state: AppState) => state.workflowFile;
+export const selectDelegateConfigurations = (state: AppState) => state.delegateConfigurations;
+export const selectDelegateConfiguration = (state: AppState) => state.delegateConfiguration;
+export const selectHumanTaskDefs = (state: AppState) => state.humanTaskDefs;
+export const selectHumanTaskDef = (state: AppState) => state.humanTaskDef;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -175,8 +187,84 @@ export const selectWorkflowFilesResult = createSelector(
       return null;
     }
     
-    console.log(state);
     return state.WorkflowFiles;
+  }
+);
+
+export const selectWorkflowFileResult = createSelector(
+  selectWorkflowFile,
+  (state: fromWorkflows.WorkflowFileState) => {
+    if (!state || !state.WorkflowFile) {
+      return null;
+    }
+
+    return state.WorkflowFile;
+  }
+);
+
+export const selectDelegateConfigurationSearchResult = createSelector(
+  selectDelegateConfigurations,
+  (state: fromDelegateConfigurations.DelegateConfigurationLstState) => {
+    if (!state || !state.content) {
+      return null;
+    }
+
+    return state.content;
+  }
+);
+
+export const selectDelegateConfigurationsResult = createSelector(
+  selectDelegateConfigurations,
+  (state: fromDelegateConfigurations.DelegateConfigurationLstState) => {
+    if (!state || !state.lstIds) {
+      return null;
+    }
+
+    return state.lstIds;
+  }
+);
+
+export const selectDelegateConfigurationResult = createSelector(
+  selectDelegateConfiguration,
+  (state: fromDelegateConfigurations.DelegateConfigurationState) => {
+    if (!state || !state.content) {
+      return null;
+    }
+
+    return state.content;
+  }
+);
+
+export const selectHumanTaskDefSearchResult = createSelector(
+  selectHumanTaskDefs,
+  (state: fromHumanTask.HumanTaskDefLstState) => {
+    if (!state || !state.content) {
+      return null;
+    }
+
+    return state.content;
+  }
+);
+
+export const selectHumanTaskDefsResult = createSelector(
+  selectHumanTaskDefs,
+  (state: fromHumanTask.HumanTaskDefLstState) => {
+    if (!state || !state.lst) {
+      return null;
+    }
+
+    return state.lst;
+  }
+);
+
+export const selectHumanTaskDefResult = createSelector(
+  selectHumanTaskDef,
+  (state: fromHumanTask.HumanTaskState) => {
+    if (!state || !state.content) {
+      return null;
+    }
+
+    return state.content;
   }
 );
 
@@ -193,5 +281,10 @@ export const appReducer = {
   userOpenId: fromUsers.getUserOpenIdReducer,
   groups: fromGroups.getSearchGroupsReducer,
   group: fromGroups.getGroupReducer,
-  workflowFiles: fromWorkflows.getSearchWorkflowFilesReducer
+  workflowFiles: fromWorkflows.getSearchWorkflowFilesReducer,
+  workflowFile: fromWorkflows.getWorkflowFileReducer,
+  delegateConfigurations: fromDelegateConfigurations.getDelegateConfigurationLstReducer,
+  delegateConfiguration: fromDelegateConfigurations.getDelegateConfigurationReducer,
+  humanTaskDefs: fromHumanTask.getHumanTaskLstReducer,
+  humanTaskDef: fromHumanTask.getHumanTaskReducer
 };

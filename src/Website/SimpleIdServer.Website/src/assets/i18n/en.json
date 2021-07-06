@@ -40,9 +40,42 @@
   "workflow": {
     "list": "Workflows",
     "name": "Name",
+    "description": "Description",
     "nbInstances": "Number of Instances",
     "createDateTime": "Creation DateTime",
-    "updateDateTime": "Update DateTime"
+    "updateDateTime": "Update DateTime",
+    "details": "Details",
+    "editor": {
+      "title": "Editor",
+      "generalInfo": "Details",
+      "id": "Identifier",
+      "name": "Name",
+      "serviceTaskInfo": "Service Task",
+      "implementation": "Implementation",
+      "csharpCallback": "C# Callback",
+      "delegate": "Delegate",
+      "userTaskInfo": "User Task",
+      "key": "Key",
+      "value": "Value",
+      "exclusiveGatewayInfo": "Gateway",
+      "gatewayDirections": {
+        "unspecified": "Unspecified",
+        "converging": "Converging",
+        "diverging": "Diverging",
+        "mixed": "Mixed"
+      },
+      "wsHumanTask": "WS HumanTask",
+      "default": "Default",
+      "sequenceFlowInfo": "Sequence Flow"
+    },
+    "navs": {
+      "details": "Details",
+      "editor": "Editor"
+    },
+    "messages": {
+      "update": "Workflow is updated",
+      "errorUpdate": "An error occured while trying to update the workflow"
+    }
   },
   "applications": {
     "add": "Create application",

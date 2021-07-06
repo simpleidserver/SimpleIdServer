@@ -7,6 +7,19 @@
     <None Remove="src\app\applications\view\displayjwk.component.ts" />
     <None Remove="src\app\applications\view\edit-translation.component.ts" />
     <None Remove="src\app\pipes\basetranslate.ts" />
+    <None Remove="src\app\stores\delegateconfigurations\models\delegateconfiguration.model.ts" />
+    <None Remove="src\app\stores\delegateconfigurations\models\searchdelegateconfiguration.model.ts" />
+    <None Remove="src\app\stores\delegateconfigurations\services\delegateconfiguration.service.ts" />
+    <None Remove="src\app\stores\humantasks\models\deadline.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\escalation.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\humantaskdef.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\parameter.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\peopleassignment.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\presentationelement.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\presentationparameter.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\searchhumantaskdef.model.ts" />
+    <None Remove="src\app\stores\humantasks\models\topart.model.ts" />
+    <None Remove="src\app\stores\humantasks\services\humantaskdef.service.ts" />
     <None Remove="src\app\stores\users\models\consent.model.ts" />
     <None Remove="src\app\stores\users\models\user-openid.model.ts" />
     <None Remove="src\app\stores\users\models\useraddress.model.ts" />
@@ -14,6 +27,7 @@
     <None Remove="src\app\stores\users\models\userphonenumber.model.ts" />
     <None Remove="src\app\stores\users\models\userphoto.model.ts" />
     <None Remove="src\app\stores\users\models\userrole.model.ts" />
+    <None Remove="src\app\stores\workflows\models\searchworkflowfile.model.ts" />
     <None Remove="src\app\stores\workflows\models\workflowfile.model.ts" />
     <None Remove="src\app\stores\workflows\services\workflowfile.service.ts" />
     <None Remove="src\app\users\view\edit-address.component.ts" />
@@ -33,6 +47,19 @@
     <TypeScriptCompile Include="src\app\applications\view\edit-translation.component.ts" />
     <TypeScriptCompile Include="src\app\pipes\basetranslate.ts" />
     <TypeScriptCompile Include="src\app\pipes\translatemetadata.ts" />
+    <TypeScriptCompile Include="src\app\stores\delegateconfigurations\models\delegateconfiguration.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\delegateconfigurations\models\searchdelegateconfiguration.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\delegateconfigurations\services\delegateconfiguration.service.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\deadline.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\escalation.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\humantaskdef.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\parameter.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\peopleassignment.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\presentationelement.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\presentationparameter.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\searchhumantaskdef.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\models\topart.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\humantasks\services\humantaskdef.service.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\consent.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\user-openid.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\useraddress.model.ts" />
@@ -40,6 +67,9 @@
     <TypeScriptCompile Include="src\app\stores\users\models\userphonenumber.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userphoto.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userrole.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\searchworkflowfile.model.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\app\stores\workflows\models\workflowfile.model.ts" />
     <TypeScriptCompile Include="src\app\stores\workflows\services\workflowfile.service.ts" />
     <TypeScriptCompile Include="src\app\users\view\details\edit-address.component.ts">
@@ -60,6 +90,7 @@
     <TypeScriptCompile Include="src\environments\environments.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="src\app\workflows\view\instances\" />
     <Folder Include="src\assets\images\" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>

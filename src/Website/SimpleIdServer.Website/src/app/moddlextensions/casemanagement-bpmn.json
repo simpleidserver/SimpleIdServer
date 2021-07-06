@@ -1,0 +1,37 @@
+{
+  "name": "CaseManagement",
+  "uri": "https://github.com/simpleidserver/CaseManagement",
+  "prefix": "cmg",
+  "xml": {
+    "tagAlias": "lowerCase"
+  },
+  "associations": [],
+  "types": [
+    {
+      "name": "Parameters",
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "parameter",
+          "isMany": true,
+          "type": "Parameter"
+        }
+      ]
+    },
+    {
+      "name": "Parameter",
+      "properties": [
+        {
+          "name": "key",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "value",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    }
+  ]
+}

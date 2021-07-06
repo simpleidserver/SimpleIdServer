@@ -1,0 +1,32 @@
+<div fxLayout="row" class="breadcrumb">
+  <div fxFlex="80%">
+    <ul>
+      <li>
+        <div class="mat-h1"><a [routerLink]="['/workflows']">{{ "workflow.list" | translate }}</a></div>
+      </li>
+      <li class="separator">
+        <div class="mat-h1">\</div>
+      </li>
+      <li>
+        <div class="mat-h1">{{ workflow$?.name }}</div>
+      </li>
+    </ul>
+  </div>
+</div>
+<nav mat-tab-nav-bar>
+  <a mat-tab-link
+     [routerLink]="['/workflows/'+ workflow$?.id + '/details']"
+     routerLinkActive
+     #rla1="routerLinkActive"
+     [active]="rla1.isActive">
+    {{ 'workflow.navs.details' | translate }}
+  </a>
+  <a mat-tab-link
+     [routerLink]="['/workflows/'+ workflow$?.id +'/editor']"
+     routerLinkActive
+     #rla2="routerLinkActive"
+     [active]="rla2.isActive">
+    {{ 'workflow.navs.editor' | translate }}
+  </a>
+</nav>
+<router-outlet></router-outlet>

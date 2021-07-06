@@ -41,11 +41,7 @@
       </mat-cell>
     </ng-container>
     <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"
-             (click)="select(row)"
-             [ngClass]="{hovered: row.hovered, highlighted: selection.isSelected(row)}"
-             (mouseover)="row.hovered = true"
-             (mouseout)="row.hovered = false"></mat-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
   </mat-table>
   <mat-paginator [length]="length" [pageSize]="50" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
 </div>

@@ -212,7 +212,55 @@
         }
       ],
       "UpstreamPathTemplate": "/workflows/{everything}",
-      "UpstreamHttpMethod": [ "POST", "GET" ]
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/delegateconfigurations",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60007
+        }
+      ],
+      "UpstreamPathTemplate": "/delegateconfigurations",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/delegateconfigurations/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60007
+        }
+      ],
+      "UpstreamPathTemplate": "/delegateconfigurations/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/humantasksdefs",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60006
+        }
+      ],
+      "UpstreamPathTemplate": "/humantasksdefs",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/humantasksdefs/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60006
+        }
+      ],
+      "UpstreamPathTemplate": "/humantasksdefs/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
     }
   ],
   "ClientId": "gatewayClient",

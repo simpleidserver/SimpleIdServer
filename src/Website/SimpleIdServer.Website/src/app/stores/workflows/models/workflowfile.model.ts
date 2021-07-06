@@ -6,5 +6,4 @@ export class WorkflowFile {
   createDateTime: Date;
   updateDateTime: Date;
   payload: string;
-  isSelected: boolean;
 }
