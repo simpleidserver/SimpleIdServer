@@ -22,6 +22,7 @@ export class ViewInstancesComponent implements OnInit, OnDestroy {
   length: number;
   firstSubscription: any;
   secondSubscription: any;
+  thirdSubscription: any;
   workflowFile$: WorkflowFile;
   isLoading: boolean = false;
   workflowInstances$: WorkflowInstance[];
@@ -81,10 +82,15 @@ export class ViewInstancesComponent implements OnInit, OnDestroy {
 
       this.workflowFile$ = file;
     });
+    this.thirdSubscription = this.activatedRoute.parent?.params.subscribe((e) => {
+      this.refresh();
+    });
   }
 
   ngOnDestroy() {
     this.firstSubscription.unsubscribe();
+    this.secondSubscription.unsubscribe();
+    this.thirdSubscription.unsubscribe();
   }
 
   ngAfterViewInit() {
@@ -106,7 +112,11 @@ export class ViewInstancesComponent implements OnInit, OnDestroy {
   }
 
   private refresh() {
-    const id = this.activatedRoute.snapshot.params['id'];
+    if (!this.paginator || !this.sort) {
+      return;
+    }
+
+    const id = this.activatedRoute.parent?.snapshot.params['id'];
     let startIndex: number = 0;
     let count: number = 5;
     if (this.paginator.pageIndex && this.paginator.pageSize) {

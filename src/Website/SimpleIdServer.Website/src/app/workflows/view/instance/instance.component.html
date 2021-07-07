@@ -1,0 +1,79 @@
+<loader *ngIf="isLoading"></loader>
+<div class="mat-elevation-z8 overflow-hidden instance" [style.display]="!isLoading ? 'block' : 'none'">
+  <mat-card>
+    <h2>{{ 'workflow.instance.title' | translate }}</h2>
+    <span>{{ 'workflow.instance.selectExecutionPath' | translate }}</span>
+    <mat-form-field appearance="outline" floatLabel="always">
+      <mat-label>{{ 'workflow.instance.executionPath' | translate }}</mat-label>
+      <mat-select [formControl]="executionPathFormControl" (selectionChange)="updateExecutionPath()">
+        <mat-option *ngFor="let execPath of workflowInstance$?.executionPaths; let i = index;" [value]="execPath.id">
+          {{ 'workflow.instance.executionPathInfo' | translate : { index : (workflowInstance$.executionPaths.length - i), receptionDate : (execPath.createDateTime | date:'medium') } }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-card-content>
+      <div id="canvasView">
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+<div class="mat-elevation-z8 overflow-hidden selectedElt" [style.display]="!isLoading ? 'block' : 'none'">
+  <mat-card>
+    <h2>{{ 'workflow.instance.selectedElt' | translate }}</h2>
+    <mat-card-content>
+      <div class="alert alert-warning" [style.display]="!execPointer.id ? 'block' : 'none'">
+        {{ 'workflow.instance.noElementSelected' | translate }}
+      </div>
+      <div [style.display]="execPointer.id ? 'block' : 'none'">
+        <div class="token">
+          <h3>{{ 'workflow.instance.inputTokens' | translate }}</h3>
+          <mat-table class="full-width" [dataSource]="execPointer.incomingTokens">
+            <!-- name -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef>
+                {{ 'workflow.instance.name' | translate}}
+              </mat-header-cell>
+              <mat-cell *matCellDef="let token">
+                {{ token.name }}
+              </mat-cell>
+            </ng-container>
+            <!-- content -->
+            <ng-container matColumnDef="content">
+              <mat-header-cell *matHeaderCellDef>{{ 'workflow.instance.content' | translate }}</mat-header-cell>
+              <mat-cell *matCellDef="let workflow">
+                {{ workflow.content | json }}
+              </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="token">
+          <h3>{{ 'workflow.instance.outgoingTokens' | translate }}</h3>
+          <mat-table class="full-width" [dataSource]="execPointer.outgoingTokens">
+            <!-- name -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef>
+                {{ 'workflow.instance.name' | translate}}
+              </mat-header-cell>
+              <mat-cell *matCellDef="let token">
+                {{ token.name }}
+              </mat-cell>
+            </ng-container>
+            <!-- content -->
+            <ng-container matColumnDef="content">
+              <mat-header-cell *matHeaderCellDef>{{ 'workflow.instance.content' | translate }}</mat-header-cell>
+              <mat-cell *matCellDef="let workflow">
+                {{ workflow.content | json }}
+              </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          </mat-table>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

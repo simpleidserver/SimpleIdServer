@@ -27,9 +27,17 @@
     <None Remove="src\app\stores\users\models\userphonenumber.model.ts" />
     <None Remove="src\app\stores\users\models\userphoto.model.ts" />
     <None Remove="src\app\stores\users\models\userrole.model.ts" />
+    <None Remove="src\app\stores\workflows\models\activitystatehistory.model.ts" />
+    <None Remove="src\app\stores\workflows\models\messagetoken.model.ts" />
+    <None Remove="src\app\stores\workflows\models\nodeinstance.model.ts" />
     <None Remove="src\app\stores\workflows\models\searchworkflowfile.model.ts" />
+    <None Remove="src\app\stores\workflows\models\searchworkflowinstance.model.ts" />
     <None Remove="src\app\stores\workflows\models\workflowfile.model.ts" />
+    <None Remove="src\app\stores\workflows\models\workflowinstance-executionpath.model.ts" />
+    <None Remove="src\app\stores\workflows\models\workflowinstance-executionpointer.model.ts" />
+    <None Remove="src\app\stores\workflows\models\workflowinstance.model.ts" />
     <None Remove="src\app\stores\workflows\services\workflowfile.service.ts" />
+    <None Remove="src\app\stores\workflows\services\workflowinstance.service.ts" />
     <None Remove="src\app\users\view\edit-address.component.ts" />
     <None Remove="src\app\users\view\edit-email.component.ts" />
     <None Remove="src\app\users\view\edit-phonenumber.component.ts" />
@@ -67,10 +75,20 @@
     <TypeScriptCompile Include="src\app\stores\users\models\userphonenumber.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userphoto.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\userrole.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\activitystatehistory.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\messagetoken.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\nodeinstance.model.ts" />
     <TypeScriptCompile Include="src\app\stores\workflows\models\searchworkflowfile.model.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\app\stores\workflows\models\searchworkflowinstance.model.ts" />
     <TypeScriptCompile Include="src\app\stores\workflows\models\workflowfile.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\workflowinstance-executionpath.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\workflowinstance-executionpointer.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\models\workflowinstance.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\workflows\services\workflowinstance.service.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\app\stores\workflows\services\workflowfile.service.ts" />
     <TypeScriptCompile Include="src\app\users\view\details\edit-address.component.ts">
       <SubType>Code</SubType>
@@ -90,7 +108,6 @@
     <TypeScriptCompile Include="src\environments\environments.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\app\workflows\view\instances\" />
     <Folder Include="src\assets\images\" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>

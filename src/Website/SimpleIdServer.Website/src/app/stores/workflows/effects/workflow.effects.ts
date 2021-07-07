@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { completeCreateInstance, completeGetFile, completePublishFile, completeSearchFiles, completeSearchInstances, completeStartInstance, completeUpdateFile, completeUpdateFilePayload, errorCreateInstance, errorGetFile, errorPublishFile, errorSearchFiles, errorSearchInstances, errorStartInstance, errorUpdateFile, errorUpdateFilePayload, startCreateInstance, startGetFile, startInstance, startPublishFile, startSearchFiles, startSearchInstances, startUpdateFile, startUpdateFilePayload } from '../actions/workflow.actions';
+import { completeCreateInstance, completeGetFile, completeGetInstance, completePublishFile, completeSearchFiles, completeSearchInstances, completeStartInstance, completeUpdateFile, completeUpdateFilePayload, errorCreateInstance, errorGetFile, errorGetInstance, errorPublishFile, errorSearchFiles, errorSearchInstances, errorStartInstance, errorUpdateFile, errorUpdateFilePayload, getInstance, startCreateInstance, startGetFile, startInstance, startPublishFile, startSearchFiles, startSearchInstances, startUpdateFile, startUpdateFilePayload } from '../actions/workflow.actions';
 import { WorkflowFileService } from '../services/workflowfile.service';
 import { WorkflowInstanceService } from '../services/workflowinstance.service';
 
@@ -121,6 +121,20 @@ export class WorkflowEffects {
           .pipe(
             map(() => completeStartInstance()),
             catchError(() => of(errorStartInstance()))
+          );
+      }
+      )
+  );
+
+  @Effect()
+  getInstance$ = this.actions$
+    .pipe(
+      ofType(getInstance),
+      mergeMap((evt) => {
+        return this.workflowInstanceService.get(evt.id)
+          .pipe(
+            map((content) => completeGetInstance({ content: content })),
+            catchError(() => of(errorGetInstance()))
           );
       }
       )

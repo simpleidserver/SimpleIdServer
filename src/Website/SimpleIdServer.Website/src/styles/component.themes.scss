@@ -41,6 +41,14 @@
     background-color: mat-color($primary, 600) !important;
     color: white !important;
   }
+
+  .error-overlay {
+    background-color: red;
+  }
+
+  .complete-overlay {
+    background-color: green;
+  }
 }
 
 @mixin component-themes($theme) {

@@ -123,7 +123,7 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
       this.isLoadingHumanTaskDefs = false;
       this.humanTaskDefs = humanTaskDefs;
     });
-    this.fourthSubscription = this.activatedRoute.params.subscribe((e) => {
+    this.fourthSubscription = this.activatedRoute.parent?.params.subscribe((e) => {
       this.refresh();
     });
   }

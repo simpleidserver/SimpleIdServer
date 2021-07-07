@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { SearchWorkflowFileResult } from '../models/searchworkflowfile.model';
 import { SearchWorkflowInstanceResult } from '../models/searchworkflowinstance.model';
 import { WorkflowFile } from '../models/workflowfile.model';
+import { WorkflowInstance } from '../models/workflowinstance.model';
 
 export const startSearchFiles = createAction('[Workflows] START_SEARCH_FILES', props<{ startIndex: number, count: number, order: string, direction: string, takeLatest: boolean, fileId: string }>());
 export const completeSearchFiles = createAction('[Workflows] COMPLETE_SEARCH_FILES', props<{ content: SearchWorkflowFileResult }>());
@@ -27,3 +28,6 @@ export const errorCreateInstance = createAction('[Workflows] ERROR_CREATE_INSTAN
 export const startInstance = createAction('[Workflows] START_INSTANCE', props<{ id: string }>());
 export const completeStartInstance = createAction('[Workflows] COMPLETE_START_INSTANCE');
 export const errorStartInstance = createAction('[Workflows] ERROR_START_INSTANCE');
+export const getInstance = createAction('[Workflows] GET_INSTANCE', props<{ id: string }>());
+export const completeGetInstance = createAction('[Workflows] COMPLETE_GET_INSTANCE', props<{ content: WorkflowInstance }>());
+export const errorGetInstance = createAction('[Workflows] ERROR_GET_INSTANCE');

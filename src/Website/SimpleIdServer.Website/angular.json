@@ -40,7 +40,9 @@
               "./node_modules/bpmn-js/dist/assets/bpmn-font/css/bpmn.css",
               "./node_modules/bpmn-js/dist/assets/diagram-js.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/jquery/dist/jquery.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -13,48 +13,48 @@
     </ul>
   </div>
 </div>
-<loader *ngIf="isLoading"></loader>
-<div [style.display]="!isLoading ? 'block' : 'none'">
-  <nav mat-tab-nav-bar>
-    <a mat-tab-link
-       [routerLink]="['/workflows/'+ workflow$?.id + '/details']"
-       routerLinkActive
-       #rla1="routerLinkActive"
-       [active]="rla1.isActive">
-      {{ 'workflow.navs.details' | translate }}
-    </a>
-    <a mat-tab-link
-       [routerLink]="['/workflows/'+ workflow$?.id +'/editor']"
-       routerLinkActive
-       #rla2="routerLinkActive"
-       [active]="rla2.isActive">
-      {{ 'workflow.navs.editor' | translate }}
-    </a>
-    <a mat-tab-link
-       [routerLink]="['/workflows/'+ workflow$?.id +'/instances']"
-       routerLinkActive
-       #rla3="routerLinkActive"
-       [active]="rla3.isActive">
-      {{ 'workflow.navs.instances' | translate }}
-    </a>
-  </nav>
-  <div class="alert alert-primary" id="selectVersion">
-    <form [formGroup]="publishFormGroup">
-      <div fxLayout="row">
-        <div fxFlex="90%">
-          {{ 'workflow.selectVersion' | translate }}
-          <mat-form-field appearance="outline" class="no-bottom-padding">
-            <mat-label>{{ 'workflow.version' | translate }}</mat-label>
-            <mat-select formControlName="version">
-              <mat-option *ngFor="let history of workflowHistory$" [value]="history.version">{{ history.version }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-        <div fxFlex>
-          <button mat-raised-button color="primary" (click)="publish()" [style.display]="workflow$?.status === 'Edited' ? 'block' : 'none'">{{ 'workflow.publish' | translate }}</button>
-        </div>
+<nav mat-tab-nav-bar>
+  <a mat-tab-link
+     [routerLink]="['/workflows/'+ workflow$?.id + '/details']"
+     routerLinkActive
+     #rla1="routerLinkActive"
+     [active]="rla1.isActive"
+     [disabled]="isLoading">
+    {{ 'workflow.navs.details' | translate }}
+  </a>
+  <a mat-tab-link
+     [routerLink]="['/workflows/'+ workflow$?.id +'/editor']"
+     routerLinkActive
+     #rla2="routerLinkActive"
+     [active]="rla2.isActive"
+     [disabled]="isLoading">
+    {{ 'workflow.navs.editor' | translate }}
+  </a>
+  <a mat-tab-link
+     [routerLink]="['/workflows/'+ workflow$?.id +'/instances']"
+     routerLinkActive
+     #rla3="routerLinkActive"
+     [active]="rla3.isActive"
+     [disabled]="isLoading">
+    {{ 'workflow.navs.instances' | translate }}
+  </a>
+</nav>
+<div class="alert alert-primary" id="selectVersion">
+  <form [formGroup]="publishFormGroup">
+    <div fxLayout="row">
+      <div fxFlex="90%">
+        {{ 'workflow.selectVersion' | translate }}
+        <mat-form-field appearance="outline" class="no-bottom-padding">
+          <mat-label>{{ 'workflow.version' | translate }}</mat-label>
+          <mat-select formControlName="version">
+            <mat-option *ngFor="let history of workflowHistory$" [value]="history.version">{{ history.version }}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-    </form>
-  </div>
-  <router-outlet></router-outlet>
+      <div fxFlex>
+        <button mat-raised-button color="primary" (click)="publish()" [style.display]="workflow$?.status === 'Edited' ? 'block' : 'none'">{{ 'workflow.publish' | translate }}</button>
+      </div>
+    </div>
+  </form>
 </div>
+<router-outlet></router-outlet>

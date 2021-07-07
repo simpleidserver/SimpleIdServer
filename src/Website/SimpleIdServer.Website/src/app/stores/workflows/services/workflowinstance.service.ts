@@ -52,4 +52,13 @@ export class WorkflowInstanceService {
     const targetUrl = environment.apiUrl + "/workflowinstances/" + id + "/start";
     return this.http.get<any>(targetUrl, { headers: headers });
   }
+
+  get(id: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json');
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', 'Bearer ' + this.oauthService.getIdToken());
+    const targetUrl = environment.apiUrl + "/workflowinstances/" + id;
+    return this.http.get<any>(targetUrl, { headers: headers });
+  }
 }

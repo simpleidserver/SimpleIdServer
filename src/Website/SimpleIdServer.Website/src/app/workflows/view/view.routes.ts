@@ -1,6 +1,7 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ViewDetailsComponent } from './details/details.component';
 import { ViewEditorComponent } from './editor/editor.component';
+import { ViewInstanceComponent } from './instance/instance.component';
 import { ViewInstancesComponent } from './instances/instances.component';
 import { ViewWorkflowComponent } from './view.component';
 
@@ -26,6 +27,10 @@ const routes: Routes = [
         component: ViewInstancesComponent
       }
     ]
+  },
+  {
+    path: 'instances/:instanceid',
+    component: ViewInstanceComponent
   }
 ];
 

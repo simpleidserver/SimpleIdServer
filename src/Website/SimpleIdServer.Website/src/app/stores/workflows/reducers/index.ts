@@ -3,6 +3,7 @@ import * as fromActions from '../actions/workflow.actions';
 import { SearchWorkflowFileResult } from '../models/searchworkflowfile.model';
 import { SearchWorkflowInstanceResult } from '../models/searchworkflowinstance.model';
 import { WorkflowFile } from '../models/workflowfile.model';
+import { WorkflowInstance } from '../models/workflowinstance.model';
 
 export interface SearchWorkflowFilesState {
   WorkflowFiles: SearchWorkflowFileResult | null;
@@ -10,6 +11,10 @@ export interface SearchWorkflowFilesState {
 
 export interface SearchWorkflowInstancesState {
   WorkflowInstances: SearchWorkflowInstanceResult | null;
+}
+
+export interface WorkflowInstanceState {
+  WorkflowInstance: WorkflowInstance | null;
 }
 
 export interface WorkflowFileState {
@@ -26,6 +31,10 @@ export const initialWorkflowFileState: WorkflowFileState = {
 
 export const initialSearchWorkflowInstancesState: SearchWorkflowInstancesState = {
   WorkflowInstances: null
+};
+
+export const initialWorkflowInstanceState: WorkflowInstanceState = {
+  WorkflowInstance: null
 };
 
 const searchWorkflowFilesReducer = createReducer(
@@ -109,6 +118,16 @@ const searchWorkflowInstancesReducer = createReducer(
   })
 );
 
+const workflowInstanceReducer = createReducer(
+  initialWorkflowInstanceState,
+  on(fromActions.completeGetInstance, (state, { content }) => {
+    return {
+      ...state,
+      WorkflowInstance: { ...content }
+    };
+  })
+);
+
 export function getSearchWorkflowFilesReducer(state: SearchWorkflowFilesState | undefined, action: Action) {
   return searchWorkflowFilesReducer(state, action);
 }
@@ -120,4 +139,8 @@ export function getWorkflowFileReducer(state: WorkflowFileState | undefined, act
 
 export function getWorkflowInstancesReducer(state: SearchWorkflowInstancesState | undefined, action: Action) {
   return searchWorkflowInstancesReducer(state, action);
+}
+
+export function getWorkflowInstanceReducer(state: WorkflowInstanceState | undefined, action: Action) {
+  return workflowInstanceReducer(state, action);
 }

@@ -65,10 +65,20 @@
       "sequenceFlowInfo": "Informations Sequence"
     },
     "instance": {
+      "title": "Instance",
       "status": "Statut",
       "createDateTime": "Date de création",
       "updateDateTime": "Date de mise à jour",
-      "nbExecutionPath": "Nombre de chemins d'execution"
+      "nbExecutionPath": "Nombre de chemins d'exécution",
+      "selectExecutionPath": "Sélectionner un chemin d'exécution",
+      "executionPath": "Chemin d'exécution",
+      "executionPathInfo": "Chemin d'execution {{index}}, {{receptionDate}}",
+      "selectedElt": "Elément sélectionné",
+      "inputTokens": "Input Tokens",
+      "outgoingTokens": "Outgoing Tokens",
+      "name": "Nom",
+      "content": "Contenu",
+      "noElementSelected": "Aucun élément est sélectionné"
     },
     "navs": {
       "details": "Détails",

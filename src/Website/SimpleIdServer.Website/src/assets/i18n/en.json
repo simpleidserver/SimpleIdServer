@@ -72,10 +72,20 @@
       "sequenceFlowInfo": "Sequence Flow"
     },
     "instance": {
+      "title": "Instance",
       "status": "Status",
       "createDateTime": "Create DateTime",
       "updateDateTime": "Update DateTime",
-      "nbExecutionPath": "Nb execution path"
+      "nbExecutionPath": "Nb execution path",
+      "selectExecutionPath": "Select execution path",
+      "executionPath": "Execution path",
+      "executionPathInfo": "Execution path {{index}}, {{receptionDate}}",
+      "selectedElt": "Selected Element",
+      "inputTokens": "Input Tokens",
+      "outgoingTokens": "Outgoing Tokens",
+      "name": "Name",
+      "content": "Content",
+      "noElementSelected": "There is no selected element"
     },
     "navs": {
       "details": "Details",
