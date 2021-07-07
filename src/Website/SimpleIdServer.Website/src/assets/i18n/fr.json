@@ -37,7 +37,10 @@
     "nbInstances": "Nombre d'instances",
     "createDateTime": "Date de création",
     "updateDateTime": "Date de mise à jour",
+    "selectVersion": "Sélectionner la version",
+    "version": "Version",
     "details": "Détails",
+    "publish": "Publier",
     "editor": {
       "title": "Editeur",
       "generalInfo": "Détails",
@@ -61,13 +64,26 @@
       "default": "Défaut",
       "sequenceFlowInfo": "Informations Sequence"
     },
+    "instance": {
+      "status": "Statut",
+      "createDateTime": "Date de création",
+      "updateDateTime": "Date de mise à jour",
+      "nbExecutionPath": "Nombre de chemins d'execution"
+    },
     "navs": {
       "details": "Détails",
-      "editor": "Editeur"
+      "editor": "Editeur",
+      "instances": "Instances"
     },
     "messages": {
       "update": "Le workflow a été mis à jour",
-      "errorUpdate": "Une erreur est survenue durant la mise à jour du workflow"
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du workflow",
+      "publish": "Le workflow a été publié",
+      "errorPublish": "Une erreur est survenue durant la publication du workflow",
+      "createInstance": "Une instance de workflow a été créée",
+      "errorCreateInstance": "Une erreur est survenue durant la création de l'instance",
+      "startInstance": "L'instance est lancée",
+      "errorStartInstance": "Une erreur est survenue durant le lancement de l'instance"
     }
   },
   "menu": {

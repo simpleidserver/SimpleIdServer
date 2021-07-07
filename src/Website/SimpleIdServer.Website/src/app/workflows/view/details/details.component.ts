@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
 import * as fromReducers from '@app/stores/appstate';
 import * as fromWorkflowActions from '@app/stores/workflows/actions/workflow.actions';
 import { WorkflowFile } from '@app/stores/workflows/models/workflowfile.model';
@@ -25,7 +24,6 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<fromReducers.AppState>,
-    private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private snackbar: MatSnackBar,
     private actions$: ScannedActionsSubject) { }
@@ -62,19 +60,11 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
   }
 
   save(form: any) {
+    if (this.workflow$.status !== 'Edited') {
+      return;
+    }
+
     const action = fromWorkflowActions.startUpdateFile({ id: this.workflow$.id, name: form.name, description: form.description });
-    this.store.dispatch(action);
-
-  }
-
-  ngAfterViewInit() {
-    this.refresh();
-  }
-
-  private refresh() {
-    this.isLoading = true;
-    const id = this.activatedRoute.parent?.snapshot.params['id'];
-    const action = fromWorkflowActions.startGetFile({ id: id });
     this.store.dispatch(action);
   }
 }

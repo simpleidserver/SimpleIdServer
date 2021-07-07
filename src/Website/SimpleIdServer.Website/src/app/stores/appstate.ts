@@ -26,7 +26,8 @@ export interface AppState {
   delegateConfigurations: fromDelegateConfigurations.DelegateConfigurationLstState,
   delegateConfiguration: fromDelegateConfigurations.DelegateConfigurationState,
   humanTaskDefs: fromHumanTask.HumanTaskDefLstState,
-  humanTaskDef: fromHumanTask.HumanTaskState
+  humanTaskDef: fromHumanTask.HumanTaskState,
+  workflowInstances: fromWorkflows.SearchWorkflowInstancesState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -47,6 +48,7 @@ export const selectDelegateConfigurations = (state: AppState) => state.delegateC
 export const selectDelegateConfiguration = (state: AppState) => state.delegateConfiguration;
 export const selectHumanTaskDefs = (state: AppState) => state.humanTaskDefs;
 export const selectHumanTaskDef = (state: AppState) => state.humanTaskDef;
+export const selectWorkflowInstances = (state: AppState) => state.workflowInstances;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -268,6 +270,17 @@ export const selectHumanTaskDefResult = createSelector(
   }
 );
 
+export const selectWorkflowInstancesResult = createSelector(
+  selectWorkflowInstances,
+  (state: fromWorkflows.SearchWorkflowInstancesState) => {
+    if (!state || !state.WorkflowInstances) {
+      return null;
+    }
+
+    return state.WorkflowInstances;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -286,5 +299,6 @@ export const appReducer = {
   delegateConfigurations: fromDelegateConfigurations.getDelegateConfigurationLstReducer,
   delegateConfiguration: fromDelegateConfigurations.getDelegateConfigurationReducer,
   humanTaskDefs: fromHumanTask.getHumanTaskLstReducer,
-  humanTaskDef: fromHumanTask.getHumanTaskReducer
+  humanTaskDef: fromHumanTask.getHumanTaskReducer,
+  workflowInstances: fromWorkflows.getWorkflowInstancesReducer
 };

@@ -6,9 +6,12 @@ import * as fromWorkflowActions from '@app/stores/workflows/actions/workflow.act
 import * as fromDelegateConfigurationActions from '@app/stores/delegateconfigurations/actions/delegateconfigurations.actions';
 import * as fromHumanTaskDefActions from '@app/stores/humantasks/actions/humantasks.actions';
 import { WorkflowFile } from '@app/stores/workflows/models/workflowfile.model';
-import { select, Store } from '@ngrx/store';
+import { ScannedActionsSubject, select, Store } from '@ngrx/store';
 import { HumanTaskDef } from '@app/stores/humantasks/models/humantaskdef.model';
 import { Parameter } from '@app/stores/humantasks/models/parameter.model';
+import { TranslateService } from '@ngx-translate/core';
+import { filter } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 declare var require: any
 let BpmnViewer = require('bpmn-js/lib/Modeler'),
   propertiesPanelModule = require('bpmn-js-properties-panel'),
@@ -21,14 +24,17 @@ let caseMgtBpmnModdle = require('@app/moddlextensions/casemanagement-bpmn.json')
   styleUrls: ['./editor.component.scss']
 })
 export class ViewEditorComponent implements OnInit, OnDestroy {
-  isLoading: boolean;
+  isLoadingDelegateConfigurations: boolean;
+  isLoadingHumanTaskDefs: boolean;
   viewer: any;
   subscription: any;
   secondSubscription: any;
   thirdSubscription: any;
+  fourthSubscription: any;
   selectedElt: any;
   buildingForm: boolean = true;
   isEltSelected: boolean = false;
+  workflow: WorkflowFile;
   inputParameters: Parameter[] = [];
   humanTaskDefs: HumanTaskDef[] = [];
   outgoingElts: string[] = [];
@@ -51,7 +57,14 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
   
   constructor(
     private store: Store<fromReducers.AppState>,
-    private activatedRoute: ActivatedRoute) { }
+    private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService,
+    private snackbar: MatSnackBar,
+    private actions$: ScannedActionsSubject) { }
+
+  get isLoading() {
+    return this.isLoadingDelegateConfigurations || this.isLoadingHumanTaskDefs;
+  }
 
   ngOnInit() {
     const self = this;
@@ -72,12 +85,26 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
     evtBus.on('element.click', function (evt: any) {
       self.updateProperties(evt.element);
     });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Workflows] COMPLETE_UPDATE_FILE_PAYLOAD'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('workflow.messages.update'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
+    this.actions$.pipe(
+      filter((action: any) => action.type === '[Workflows] ERROR_UPDATE_FILE_PAYLOAD'))
+      .subscribe(() => {
+        this.snackbar.open(this.translateService.instant('workflow.messages.errorUpdate'), this.translateService.instant('undo'), {
+          duration: 2000
+        });
+      });
     this.subscription = this.store.pipe(select(fromReducers.selectWorkflowFileResult)).subscribe((workflow: WorkflowFile | null) => {
       if (!workflow) {
         return;
       }
 
-      this.isLoading = false;
+      this.workflow = workflow;
       this.viewer.importXML(workflow.payload);
     });
     this.secondSubscription = this.store.pipe(select(fromReducers.selectDelegateConfigurationsResult)).subscribe((delegateIds: string[] | null) => {
@@ -85,6 +112,7 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
         return;
       }
 
+      this.isLoadingDelegateConfigurations = false;
       this.delegateIds = delegateIds;
     });
     this.thirdSubscription = this.store.pipe(select(fromReducers.selectHumanTaskDefsResult)).subscribe((humanTaskDefs : HumanTaskDef[] | null) => {
@@ -92,7 +120,11 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
         return;
       }
 
+      this.isLoadingHumanTaskDefs = false;
       this.humanTaskDefs = humanTaskDefs;
+    });
+    this.fourthSubscription = this.activatedRoute.params.subscribe((e) => {
+      this.refresh();
     });
   }
 
@@ -100,9 +132,23 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
     this.secondSubscription.unsubscribe();
     this.thirdSubscription.unsubscribe();
+    this.fourthSubscription.unsubscribe();
   }
 
   save() {
+    if (this.workflow.status !== 'Edited') {
+      return;
+    }
+
+    const self = this;
+    this.viewer.saveXML({}, function (e: any, x: any) {
+      if (e) {
+        return;
+      }
+
+      const act = fromWorkflowActions.startUpdateFilePayload({id: self.workflow.id, payload: x});
+      self.store.dispatch(act);
+    });
   }
 
   ngAfterViewInit() {
@@ -141,12 +187,10 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
   }
 
   private refresh() {
-    this.isLoading = true;
-    const id = this.activatedRoute.parent?.snapshot.params['id'];
-    const startGetFile = fromWorkflowActions.startGetFile({ id: id });
+    this.isLoadingDelegateConfigurations = true;
+    this.isLoadingHumanTaskDefs = true;
     const startGetDelegateConfigurations = fromDelegateConfigurationActions.startGetAll();
     const startGetAllHumanTaskDefs = fromHumanTaskDefActions.startGetAll();
-    this.store.dispatch(startGetFile);
     this.store.dispatch(startGetDelegateConfigurations);
     this.store.dispatch(startGetAllHumanTaskDefs);
   }

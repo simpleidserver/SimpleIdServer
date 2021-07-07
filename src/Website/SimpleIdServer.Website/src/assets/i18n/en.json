@@ -45,6 +45,9 @@
     "createDateTime": "Creation DateTime",
     "updateDateTime": "Update DateTime",
     "details": "Details",
+    "selectVersion": "Select Version",
+    "version": "Version",
+    "publish": "Publish",
     "editor": {
       "title": "Editor",
       "generalInfo": "Details",
@@ -68,13 +71,26 @@
       "default": "Default",
       "sequenceFlowInfo": "Sequence Flow"
     },
+    "instance": {
+      "status": "Status",
+      "createDateTime": "Create DateTime",
+      "updateDateTime": "Update DateTime",
+      "nbExecutionPath": "Nb execution path"
+    },
     "navs": {
       "details": "Details",
-      "editor": "Editor"
+      "editor": "Editor",
+      "instances": "Instances"
     },
     "messages": {
       "update": "Workflow is updated",
-      "errorUpdate": "An error occured while trying to update the workflow"
+      "errorUpdate": "An error occured while trying to update the workflow",
+      "publish": "Workflow is published",
+      "errorPublish": "An error occured while trying to publish the workflow",
+      "createInstance": "Workflow instance is created",
+      "errorCreateInstance": "An error occured while trying to create the instance",
+      "startInstance": "Workflow instance is started",
+      "errorStartInstance": "An error occured while trying to start the instance"
     }
   },
   "applications": {

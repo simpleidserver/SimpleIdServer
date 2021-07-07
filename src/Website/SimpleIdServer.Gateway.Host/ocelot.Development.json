@@ -215,6 +215,30 @@
       "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
     },
     {
+      "DownstreamPathTemplate": "/processinstances",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60007
+        }
+      ],
+      "UpstreamPathTemplate": "/workflowinstances",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/processinstances/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60007
+        }
+      ],
+      "UpstreamPathTemplate": "/workflowinstances/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
       "DownstreamPathTemplate": "/delegateconfigurations",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

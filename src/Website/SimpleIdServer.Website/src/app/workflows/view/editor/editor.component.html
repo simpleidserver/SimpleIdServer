@@ -140,7 +140,7 @@
       </div>
     </mat-card-content>
     <mat-card-actions>
-      <button type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+      <button type="submit" mat-raised-button color="primary" [style.display]="workflow?.status === 'Edited' ? 'block' : 'none'" (click)="save()">{{ 'save' | translate }}</button>
     </mat-card-actions>
   </mat-card>
 </div>

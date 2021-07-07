@@ -33,6 +33,7 @@ import { UserEffects } from './stores/users/effects/user.effects';
 import { UserService } from './stores/users/services/user.service';
 import { WorkflowEffects } from './stores/workflows/effects/workflow.effects';
 import { WorkflowFileService } from './stores/workflows/services/workflowfile.service';
+import { WorkflowInstanceService } from './stores/workflows/services/workflowinstance.service';
 import { translationFactory } from './translation.util';
 
 export function createTranslateLoader(http: HttpClient) {
@@ -74,6 +75,7 @@ export function createTranslateLoader(http: HttpClient) {
     WorkflowFileService,
     GroupService,
     HumanTaskDefService,
+    WorkflowInstanceService,
     DelegateConfigurationService,
     MetadataService,
     {

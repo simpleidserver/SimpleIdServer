@@ -68,7 +68,7 @@ export class ListWorkflowsComponent implements OnInit, OnDestroy {
       direction = this.sort.direction;
     }
 
-    const request = fromWorkflowActions.startSearchFiles({ startIndex: startIndex, count: count, direction: direction, order: active });
+    const request = fromWorkflowActions.startSearchFiles({ startIndex: startIndex, count: count, direction: direction, order: active, takeLatest: true, fileId: "" });
     this.store.dispatch(request);
   }
 }

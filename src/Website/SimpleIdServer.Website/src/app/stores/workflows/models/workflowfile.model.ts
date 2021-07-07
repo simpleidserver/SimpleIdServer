@@ -6,4 +6,7 @@ export class WorkflowFile {
   createDateTime: Date;
   updateDateTime: Date;
   payload: string;
+  fileId: string;
+  version: number;
+  status: string;
 }
