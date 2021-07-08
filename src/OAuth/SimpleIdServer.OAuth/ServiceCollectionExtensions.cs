@@ -235,6 +235,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateUserBySCIMIdHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetUserBySCIMIdHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateUserPasswordHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateUserPasswordHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.AddOAuthUserBySCIMIdHandler>();
             return services;
         }
     }

@@ -265,6 +265,33 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                             }
                                         }
                                     }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "bpmnHost",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "http://localhost:60007"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name ="bpmnFileId",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "c1aa1cd88cb94150c61f04b70795cb03646d43a8a65b4de005c2e6294b3aa1ff"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "messageToken",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "{    'name': 'user',    'messageContent': {        'userId': '{{id}}',        'email': '{{emails[0].value}}'    }}"
+                                    }
                                 }
                             }
                         });

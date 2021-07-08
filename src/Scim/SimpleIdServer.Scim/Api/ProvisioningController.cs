@@ -43,7 +43,7 @@ namespace SimpleIdServer.Scim.Api
             }
 
             var content = representation.ToResponse(string.Empty, false);
-            await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.VersionNumber, representation.ResourceType, content));
+            await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.VersionNumber, representation.ResourceType, content));
             return new NoContentResult();
         }
     }

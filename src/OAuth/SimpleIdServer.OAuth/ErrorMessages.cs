@@ -82,5 +82,6 @@ namespace SimpleIdServer.OAuth
         public const string REDIRECT_URI_CONTAINS_FRAGMENT = "the redirect_uri cannot contains fragment";
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
         public const string SCOPE_ALREADY_EXISTS = "scope '{0}' already exists";
+        public const string USER_ALREADY_EXISTS = "user '{0}' already exists";
     }
 }

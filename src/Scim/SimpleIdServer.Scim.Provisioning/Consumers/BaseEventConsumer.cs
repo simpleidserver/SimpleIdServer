@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Provisioning.Provisioner;
@@ -48,6 +49,7 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
                 try
                 {
                     transaction = await _provisioningConfigurationRepository.StartTransaction(token);
+                    await LaunchWorkflow(configuration, context);
                     await provisioner.Seed(Type,
                         context.Message.Id,
                         context.Message.Representation,
@@ -59,7 +61,6 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
                 {
                     _logger.LogError(ex.ToString());
                     configuration.Error(context.Message.Id, context.Message.Version, ex.ToString());
-                    throw;
                 }
                 finally
                 {
@@ -68,5 +69,7 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
                 }
             }
         }
+
+        protected abstract Task LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<TMessage> context);
     }
 }

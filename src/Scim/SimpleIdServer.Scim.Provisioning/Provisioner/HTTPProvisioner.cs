@@ -26,11 +26,14 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
                 case ProvisioningOperations.ADD:
                     {
                         var httpRequest = BuildHTTPRequest(representation, configuration);
+                        var content = new JObject();
+                        content.Add("scim_id", representationId);
+                        content.Add("content", httpRequest);
                         request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Post,
                             RequestUri = new Uri(configuration.GetTargetUrl()),
-                            Content = new StringContent(httpRequest.ToString(), Encoding.UTF8, "application/json")
+                            Content = new StringContent(content.ToString(), Encoding.UTF8, "application/json")
                         };
                     }
                     break;

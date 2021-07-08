@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Management.Handlers;
+using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
@@ -35,6 +36,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IUpdateUserBySCIMIdHandler _updateUserBySCIMIdHandler;
         private readonly IGetUserBySCIMIdHandler _getUserBySCIMIdHandler;
         private readonly IUpdateUserPasswordHandler _updateUserPasswordHandler;
+        private readonly IAddOAuthUserBySCIMIdHandler _addOAuthUserBySCIMIdHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -51,6 +53,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IUpdateUserBySCIMIdHandler updateUserBySCIMIdHandler,
             IGetUserBySCIMIdHandler getUserBySCIMIdHandler,
             IUpdateUserPasswordHandler updateUserPasswordHandler,
+            IAddOAuthUserBySCIMIdHandler addOAuthUserBySCIMIdHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -66,6 +69,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _updateUserBySCIMIdHandler = updateUserBySCIMIdHandler;
             _getUserBySCIMIdHandler = getUserBySCIMIdHandler;
             _updateUserPasswordHandler = updateUserPasswordHandler;
+            _addOAuthUserBySCIMIdHandler = addOAuthUserBySCIMIdHandler;
             _options = options.Value;
         }
 
@@ -251,9 +255,9 @@ namespace SimpleIdServer.OAuth.Api.Management
                 await _updateUserPasswordHandler.Handle(id, jObj, cancellationToken);
                 return new NoContentResult();
             }
-            catch
+            catch(OAuthUserNotFoundException ex)
             {
-                return new NotFoundResult();
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
             }
         }
 
@@ -266,9 +270,24 @@ namespace SimpleIdServer.OAuth.Api.Management
                 var result = await _getUserBySCIMIdHandler.Handle(id, cancellationToken);
                 return new OkObjectResult(result);
             }
-            catch(OAuthUserNotFoundException)
+            catch(OAuthUserNotFoundException ex)
             {
-                return new NotFoundResult();
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
+            }
+        }
+
+        [HttpPost("users/scim")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> AddUserByScimId([FromBody] JObject jObj, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _addOAuthUserBySCIMIdHandler.Handle(jObj, cancellationToken);
+                return new NoContentResult();
+            }
+            catch(OAuthException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
         }
 
@@ -276,8 +295,15 @@ namespace SimpleIdServer.OAuth.Api.Management
         [Authorize("ManageUsers")]
         public virtual async Task<IActionResult> UpdateUserByScimId(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
         {
-            await _updateUserBySCIMIdHandler.Handle(id, jObj, cancellationToken);
-            return new NoContentResult();
+            try
+            {
+                await _updateUserBySCIMIdHandler.Handle(id, jObj, cancellationToken);
+                return new NoContentResult();
+            }
+            catch(OAuthUserNotFoundException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
+            }
         }
 
         #endregion

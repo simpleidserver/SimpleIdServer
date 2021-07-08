@@ -33,6 +33,21 @@ namespace SimpleIdServer.Scim.Provisioning.Extensions
             return provisioningConfiguration.Records.First(r => r.Name == "tokenEdp").ValuesString.First();
         }
 
+        public static string GetBpmnEndpoint(this ProvisioningConfiguration provisioningConfiguration)
+        {
+            return provisioningConfiguration.Records.First(r => r.Name == "bpmnHost").ValuesString.First();
+        }
+
+        public static string GetBpmnFileId(this ProvisioningConfiguration provisioningConfiguration)
+        {
+            return provisioningConfiguration.Records.First(r => r.Name == "bpmnFileId").ValuesString.First();
+        }
+
+        public static string GetMessageToken(this ProvisioningConfiguration provisioningConfiguration)
+        {
+            return provisioningConfiguration.Records.First(r => r.Name == "messageToken").ValuesString.First();
+        }
+
         public static Dictionary<string, string> GetMappingRules(this ProvisioningConfiguration provisioningConfiguration)
         {
             return new Dictionary<string, string>(provisioningConfiguration.Records.First(r => r.Name == "mapping").Values.Select(v => new KeyValuePair<string, string>(v.Name, v.ValuesString.First())));

@@ -41,6 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
             user.UpdatePassword(parameter.Password);
             await _oauthUserRepository.Update(user, cancellationToken);
             await _oauthUserRepository.SaveChanges(cancellationToken);
+            _logger.LogInformation($"password has been updated for the user '{id}'");
         }
 
         private class UpdatePasswordParameter

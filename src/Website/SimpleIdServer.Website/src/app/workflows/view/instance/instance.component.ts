@@ -28,7 +28,7 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
   workflowInstance$: WorkflowInstance;
   execPointer: WorkflowInstanceExecutionPointer = new WorkflowInstanceExecutionPointer();
   viewer: any;
-  execPathId: string;
+  execPathId: string | null;
   executionPathFormControl: FormControl = new FormControl();
 
   constructor(
@@ -39,8 +39,11 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
     private actions$: ScannedActionsSubject) { }
 
   ngOnInit() {
-    // TODO : DANS LE PROVISIONING DES UTILISATEURS IL FAUT SELECTIONNER LE BON WORKFLOW.
-    // TODO : UN UTILISATEUR PEUT ENSUITE SE CONNECTER SUR LE PO²RTAIL ET VALIDER LE FORMULAIRE.
+    const instanceId = this.activatedRoute.snapshot.params['instanceid'];
+    const id = this.activatedRoute.parent?.snapshot.params['id'];
+    this.execPathId = null
+    this.workflowInstance$ = new WorkflowInstance();
+    this.workflow = new WorkflowFile();
     this.viewer = new BpmnViewer.default({
       container: "#canvasView",
       keyboard: {
@@ -48,7 +51,7 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
       }
     });
     this.firstSubscription = this.store.pipe(select(fromReducers.selectWorkflowInstanceResult)).subscribe((workflowInstance: WorkflowInstance | null) => {
-      if (!workflowInstance) {
+      if (!workflowInstance || instanceId !== workflowInstance.id) {
         return;
       }
 
@@ -57,7 +60,7 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
       this.refreshCanvas();
     });
     this.secondSubscription = this.store.pipe(select(fromReducers.selectWorkflowFileResult)).subscribe((workflow: WorkflowFile | null) => {
-      if (!workflow) {
+      if (!workflow || id !== workflow.id) {
         return;
       }
 
@@ -81,6 +84,14 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
     this.refreshCanvas();
   }
 
+  getException() {
+    if (!this.execPointer || !this.execPointer.flowNodeInstance || this.execPointer.flowNodeInstance.activityState !== 'FAILING') {
+      return '';
+    }
+
+    return this.execPointer.flowNodeInstance.activityStates.filter(s => s.state === 'FAILING')[0].message;
+  }
+
   private refresh() {
     const instanceId = this.activatedRoute.snapshot.params['instanceid'];
     const id = this.activatedRoute.parent?.snapshot.params['id'];
@@ -91,7 +102,7 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
   }
 
   private refreshCanvas() {
-    if (!this.workflow || !this.workflowInstance$) {
+    if (!this.workflow.id || !this.workflowInstance$.id) {
       return;
     }
 
@@ -203,7 +214,7 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
         self.displayElt(eltid);
       });
       $(errorOverlayHtml).click(function (e : any) {
-        const eltid = $(evt.target).data('id');
+        const eltid = $(e.target).data('id');
         $(".selected-overlay").hide();
         selectedOverlayHtml.show();
         self.displayElt(eltid);
@@ -224,5 +235,6 @@ export class ViewInstanceComponent implements OnInit, OnDestroy {
       return p.id === eltId;
     })[0];
     this.execPointer = execPointer;
+    console.log(this.execPointer);
   }
 }

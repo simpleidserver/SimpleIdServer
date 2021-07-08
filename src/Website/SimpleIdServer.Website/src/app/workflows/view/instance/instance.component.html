@@ -6,7 +6,7 @@
     <mat-form-field appearance="outline" floatLabel="always">
       <mat-label>{{ 'workflow.instance.executionPath' | translate }}</mat-label>
       <mat-select [formControl]="executionPathFormControl" (selectionChange)="updateExecutionPath()">
-        <mat-option *ngFor="let execPath of workflowInstance$?.executionPaths; let i = index;" [value]="execPath.id">
+        <mat-option *ngFor="let execPath of workflowInstance$.executionPaths; let i = index;" [value]="execPath.id">
           {{ 'workflow.instance.executionPathInfo' | translate : { index : (workflowInstance$.executionPaths.length - i), receptionDate : (execPath.createDateTime | date:'medium') } }}
         </mat-option>
       </mat-select>
@@ -26,6 +26,13 @@
         {{ 'workflow.instance.noElementSelected' | translate }}
       </div>
       <div [style.display]="execPointer.id ? 'block' : 'none'">
+        <div class="token" [style.display]="execPointer.flowNodeInstance?.activityState === 'FAILING' ? 'block': 'none'">
+          <h3>{{ 'workflow.instance.exception' | translate }}</h3>
+          <div class="alert alert-danger">
+            {{getException()}}
+          </div>
+        </div>
+        <mat-divider></mat-divider>
         <div class="token">
           <h3>{{ 'workflow.instance.inputTokens' | translate }}</h3>
           <mat-table class="full-width" [dataSource]="execPointer.incomingTokens">

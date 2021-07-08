@@ -85,7 +85,8 @@
       "outgoingTokens": "Outgoing Tokens",
       "name": "Name",
       "content": "Content",
-      "noElementSelected": "There is no selected element"
+      "noElementSelected": "There is no selected element",
+      "exception": "Exception"
     },
     "navs": {
       "details": "Details",
