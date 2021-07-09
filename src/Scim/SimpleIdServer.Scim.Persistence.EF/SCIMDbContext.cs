@@ -22,6 +22,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public DbSet<SCIMRepresentationSchemaModel> SCIMRepresentationSchemaLst { get; set; }
         public DbSet<SCIMRepresentationAttributeValueModel> SCIMRepresentationAttributeValueLst { get; set; }
         public DbSet<ProvisioningConfiguration> ProvisioningConfigurations { get; set; }
+        public DbSet<ProvisioningConfigurationHistory> ProvisioningConfigurationHistory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -87,7 +88,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .HasKey(p => p.Id);
             modelBuilder.Entity<ProvisioningConfiguration>()
                 .HasMany(p => p.HistoryLst)
-                .WithOne()
+                .WithOne(p => p.ProvisioningConfiguration)
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<ProvisioningConfiguration>()
                 .HasMany(p => p.Records)

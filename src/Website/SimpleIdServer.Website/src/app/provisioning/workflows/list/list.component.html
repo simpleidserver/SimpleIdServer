@@ -14,7 +14,7 @@
         {{ 'workflow.name' | translate}}
       </mat-header-cell>
       <mat-cell *matCellDef="let workflow">
-        <a href="#" [routerLink]="['/workflows/' + workflow.id ]">
+        <a href="#" [routerLink]="['/provisioning/workflows/' + workflow.id ]">
           {{ workflow.name }}
         </a>
       </mat-cell>

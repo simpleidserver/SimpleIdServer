@@ -39,8 +39,8 @@ export class ListGroupsComponent implements OnInit {
         return;
       }
 
-      this.groups$ = state.Content;
-      this.length = state.TotalLength;
+      this.groups$ = state.content;
+      this.length = state.totalLength;
       this.isLoading = false;
     });
   }

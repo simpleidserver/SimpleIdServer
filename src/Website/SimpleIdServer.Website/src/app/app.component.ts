@@ -25,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isConnected: boolean = false;
   name: string;
   sessionCheckTimer: any = null;
+  showProvisioning: boolean = false;
 
   constructor(private translate: TranslateService, private oauthService: OAuthService, private route: Router, private router: Router) {
     translate.setDefaultLang('fr');
@@ -80,6 +81,10 @@ export class AppComponent implements OnInit, OnDestroy {
     if (!claims) {
       this.isConnected = false;;
       return;
+    }
+
+    if (this.router.routerState.snapshot.url.startsWith('/provisioning')) {
+      this.showProvisioning = true;
     }
 
     this.name = claims['given_name'];

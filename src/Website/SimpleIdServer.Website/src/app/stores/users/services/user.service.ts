@@ -35,9 +35,9 @@ export class UserService {
 
     return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
       var result = new SearchResult<User>();
-      result.StartIndex = res["startIndex"];
-      result.TotalLength = res["totalResults"];
-      result.Content = res['Resources'].map((c: any) => User.fromJson(c));
+      result.startIndex = res["startIndex"];
+      result.totalLength = res["totalResults"];
+      result.content = res['Resources'].map((c: any) => User.fromJson(c));
       return result;
     }));
   }

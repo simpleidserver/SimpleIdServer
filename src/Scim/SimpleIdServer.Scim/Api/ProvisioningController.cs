@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
+using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
@@ -19,15 +22,18 @@ namespace SimpleIdServer.Scim.Api
     {
         private readonly IBusControl _busControl;
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
+        private readonly IProvisioningConfigurationRepository _provisioningConfigurationRepository;
         private readonly ILogger<ProvisioningController> _logger;
 
         public ProvisioningController(
             IBusControl busControl,
             ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
+            IProvisioningConfigurationRepository provisioningConfigurationRepository,
             ILogger<ProvisioningController> logger)
         {
             _busControl = busControl;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
+            _provisioningConfigurationRepository = provisioningConfigurationRepository;
             _logger = logger;
         }
 
@@ -45,6 +51,50 @@ namespace SimpleIdServer.Scim.Api
             var content = representation.ToResponse(string.Empty, false);
             await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.VersionNumber, representation.ResourceType, content));
             return new NoContentResult();
+        }
+
+        [HttpPost("configurations/.search")]
+        public async Task<IActionResult> SearchConfigurations([FromBody] SearchProvisioningConfigurationParameter parameter, CancellationToken cancellationToken)
+        {
+            var configurations = await _provisioningConfigurationRepository.SearchConfigurations(parameter, cancellationToken);
+            return new OkObjectResult(configurations);
+        }
+
+        [HttpGet("configurations/{id}")]
+        public async Task<IActionResult> GetConfiguration(string id, CancellationToken cancellationToken)
+        {
+            var configuration = await _provisioningConfigurationRepository.GetQuery(id, cancellationToken);
+            if (configuration == null)
+            {
+                return new NotFoundResult();
+            }
+
+            return new OkObjectResult(configuration);
+        }
+
+        [HttpPut("configurations/{id}")]
+        public async Task<IActionResult> UpdateConfiguration(string id, [FromBody] UpdateProvisioningConfigurationParameter parameter, CancellationToken cancellationToken)
+        {
+            using (var transaction = await _provisioningConfigurationRepository.StartTransaction(cancellationToken))
+            {
+                var configuration = await _provisioningConfigurationRepository.Get(id, cancellationToken);
+                if (configuration == null)
+                {
+                    return new NotFoundResult();
+                }
+
+                configuration.Update(parameter.Records.Select(r => r.ToDomain()));
+                await _provisioningConfigurationRepository.Update(configuration, cancellationToken);
+                await transaction.Commit();
+                return new NoContentResult();
+            }
+        }
+
+        [HttpPost("histories/.search")]
+        public async Task<IActionResult> SearchHistories([FromBody] SearchProvisioningHistoryParameter parameter, CancellationToken cancellationToken)
+        {
+            var histories = await _provisioningConfigurationRepository.SearchHistory(parameter, cancellationToken);
+            return new OkObjectResult(histories);
         }
     }
 }

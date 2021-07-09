@@ -2,7 +2,7 @@
   <div fxFlex="80%">
     <ul>
       <li>
-        <div class="mat-h1"><a [routerLink]="['/workflows']">{{ "workflow.list" | translate }}</a></div>
+        <div class="mat-h1"><a [routerLink]="['/provisioning/workflows']">{{ "workflow.list" | translate }}</a></div>
       </li>
       <li class="separator">
         <div class="mat-h1">\</div>
@@ -15,7 +15,7 @@
 </div>
 <nav mat-tab-nav-bar>
   <a mat-tab-link
-     [routerLink]="['/workflows/'+ workflow$?.id + '/details']"
+     [routerLink]="['/provisioning/workflows/'+ workflow$?.id + '/details']"
      routerLinkActive
      #rla1="routerLinkActive"
      [active]="rla1.isActive"
@@ -23,7 +23,7 @@
     {{ 'workflow.navs.details' | translate }}
   </a>
   <a mat-tab-link
-     [routerLink]="['/workflows/'+ workflow$?.id +'/editor']"
+     [routerLink]="['/provisioning/workflows/'+ workflow$?.id +'/editor']"
      routerLinkActive
      #rla2="routerLinkActive"
      [active]="rla2.isActive"
@@ -31,7 +31,7 @@
     {{ 'workflow.navs.editor' | translate }}
   </a>
   <a mat-tab-link
-     [routerLink]="['/workflows/'+ workflow$?.id +'/instances']"
+     [routerLink]="['/provisioning/workflows/'+ workflow$?.id +'/instances']"
      routerLinkActive
      #rla3="routerLinkActive"
      [active]="rla3.isActive"

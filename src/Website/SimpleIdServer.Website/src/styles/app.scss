@@ -50,7 +50,8 @@ body, h1 {
     padding-bottom: 0px !important;
 }
 
-.mat-table .mat-cell > a {
+.mat-table .mat-cell > a,
+.mat-table .mat-cell .ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -58,6 +59,10 @@ body, h1 {
 
 .mat-chip-list.inline {
     display: inline-block !important;
+}
+
+.mat-icon.small {
+    font-size: 20px;
 }
 
 /* Breadcrumb */

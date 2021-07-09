@@ -26,6 +26,23 @@
       "example": "Examples : REST.API"
     }
   },
+  "provisioning": {
+    "list": "Provisioning",
+    "history": {
+      "list": "History",
+      "configurationId": "Configuration Id",
+      "representationId": "Id",
+      "representationVersion": "Version",
+      "status": "Status",
+      "exception": "Exception",
+      "executionDateTime": "Execution DateTime",
+      "copy": "Copy",
+      "statusTypes": {
+        "0": "Success",
+        "1": "Failed"
+      }
+    }
+  },
   "languages": {
     "fr": "French",
     "en": "English"

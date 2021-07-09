@@ -57,8 +57,8 @@ export class ListScopesComponent implements OnInit {
         return;
       }
 
-      this.scopes$ = state.Content;
-      this.length = state.TotalLength;
+      this.scopes$ = state.content;
+      this.length = state.totalLength;
       this.isLoading = false;
     });
   }

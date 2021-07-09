@@ -133,6 +133,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
   addresses$: AddressDataSource;
   roles$: RoleDataSource;
   currentPhotoIndex: number = 1;
+  firstSubscription: any;
   editUserFormGroup: FormGroup = new FormGroup({
     externalId: new FormControl({ value: '' }),
     userName: new FormControl({ value: '' }),
@@ -180,7 +181,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
         this.isLoadingUserOpenId = false;
         this.isAlertVisible = true;
       });
-    this.actions$.pipe(
+    this.firstSubscription = this.actions$.pipe(
       filter((action: any) => action.type === '[Users] COMPLETE_PROVISION'))
       .subscribe(() => {
         this.isLoadingUserOpenId = false;
@@ -242,6 +243,8 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
     if (this.interval) {
       clearInterval(this.interval);
     }
+
+    this.firstSubscription.unsubscribe();
   }
 
   refresh() {

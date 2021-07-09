@@ -21,6 +21,17 @@ namespace SimpleIdServer.Scim.Domain
         public virtual ICollection<ProvisioningConfigurationRecord> Records { get; set; }
         public virtual ICollection<ProvisioningConfigurationHistory> HistoryLst { get; set; } 
 
+        public void Update(IEnumerable<ProvisioningConfigurationRecord> records)
+        {
+            Records.Clear();
+            foreach(var record in records)
+            {
+                Records.Add(record);
+            }
+
+            UpdateDateTime = DateTime.UtcNow;
+        }
+
         public void Complete(string representationId, int version)
         {
             UpdateDateTime = DateTime.UtcNow;

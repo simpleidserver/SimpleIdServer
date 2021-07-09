@@ -1,11 +1,39 @@
 .drawer-container {
-    position: absolute !important;
-    left: 0;
-    right: 0;
-    top: 60px;
-    bottom: 0;
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  top: 60px;
+  bottom: 0;
 }
 
 .mat-drawer {
-    width: 250px;
+  width: 250px;
+}
+
+.baseMenu > .mat-list-item-content {
+  margin-left: 10px;
+}
+
+.menu-button {
+  transition: 300ms ease-in-out;
+  transform: rotate(0deg);
+}
+
+.menu-button.rotated {
+  transform: rotate(180deg);
+}
+
+.submenu {
+  overflow-y: hidden;
+  transition: transform 300ms ease;
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+.submenuItem > .mat-list-item-content {
+  margin-left: 20px;
+}
+
+.submenu.expanded {
+  transform: scaleY(1);
 }

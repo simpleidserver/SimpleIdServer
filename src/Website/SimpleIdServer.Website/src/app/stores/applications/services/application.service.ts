@@ -30,10 +30,10 @@ export class ApplicationService {
 
     return this.http.get(targetUrl, { headers: headers }).pipe(map((res: any) => {
       var result = new SearchResult<Application>();
-      result.StartIndex = res["start_index"];
-      result.Count = res["count"];
-      result.TotalLength = res["total_length"];
-      result.Content = res['content'].map((c: any) => Application.fromJson(c));
+      result.startIndex = res["start_index"];
+      result.count = res["count"];
+      result.totalLength = res["total_length"];
+      result.content = res['content'].map((c: any) => Application.fromJson(c));
       return result;
     }));
   }

@@ -36,12 +36,12 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.pipe(select(fromReducers.selectUsersResult)).subscribe((state: SearchResult<User> | null) => {
-      if (!state || !state.Content) {
+      if (!state || !state.content) {
         return;
       }
 
-      this.users$ = JSON.parse(JSON.stringify(state.Content)) as User[];
-      this.length = state.TotalLength;
+      this.users$ = JSON.parse(JSON.stringify(state.content)) as User[];
+      this.length = state.totalLength;
       this.isLoading = false;
     });
     if (!this.isSelectionDisabled) {

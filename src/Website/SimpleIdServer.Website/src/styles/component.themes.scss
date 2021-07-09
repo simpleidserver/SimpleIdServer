@@ -42,11 +42,16 @@
     color: white !important;
   }
 
-  .error-overlay {
+  .mat-chip.error,
+  .mat-chip.success {
+      color: white;
+  }
+
+  .error-overlay, .mat-chip.error {
     background-color: red;
   }
 
-  .complete-overlay {
+  .complete-overlay, .mat-chip.success {
     background-color: green;
   }
 }

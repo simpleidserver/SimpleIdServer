@@ -19,6 +19,7 @@ export class ViewConsentsComponent implements OnInit, OnDestroy {
   isLoadingUser: boolean;
   isOpenIdUserExits: boolean;
   isAlertVisible: boolean;
+  firstSubscription: any;
   userOpenId: UserOpenId | null = null;
   interval: any = null;
 
@@ -39,7 +40,7 @@ export class ViewConsentsComponent implements OnInit, OnDestroy {
         this.isLoadingUserOpenId = false;
         this.isAlertVisible = true;
       });
-    this.actions$.pipe(
+    this.firstSubscription = this.actions$.pipe(
       filter((action: any) => action.type === '[Users] COMPLETE_PROVISION'))
       .subscribe(() => {
         this.isLoadingUserOpenId = false;
@@ -85,6 +86,8 @@ export class ViewConsentsComponent implements OnInit, OnDestroy {
     if (this.interval) {
       clearInterval(this.interval);
     }
+
+    this.firstSubscription.unsubscribe();
   }
 
   create() {

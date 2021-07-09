@@ -24,11 +24,18 @@
   <mat-drawer-container class="drawer-container">
     <mat-drawer #drawer mode="side" opened>
       <mat-nav-list *ngIf="isConnected">
-        <a mat-list-item [routerLink]="['/applications']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "applications.list" | translate }}</a>
-        <a mat-list-item [routerLink]="['/scopes']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "scopes.list" | translate }}</a>
-        <a mat-list-item [routerLink]="['/users']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "users.list" | translate }}</a>
-        <a mat-list-item [routerLink]="['/groups']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ "groups.list" | translate }}</a>
-        <a mat-list-item [routerLink]="['/workflows']" [routerLinkActive]="['is-active']"><mat-icon></mat-icon>{{ 'workflow.list' | translate }}</a>
+        <a mat-list-item class="baseMenu" [routerLink]="['/applications']" [routerLinkActive]="['is-active']">{{ "applications.list" | translate }}</a>
+        <a mat-list-item class="baseMenu" [routerLink]="['/scopes']" [routerLinkActive]="['is-active']">{{ "scopes.list" | translate }}</a>
+        <a mat-list-item class="baseMenu" [routerLink]="['/users']" [routerLinkActive]="['is-active']">{{ "users.list" | translate }}</a>
+        <a mat-list-item class="baseMenu" [routerLink]="['/groups']" [routerLinkActive]="['is-active']">{{ "groups.list" | translate }}</a>
+        <mat-list-item class="baseMenu" (click)="showProvisioning = !showProvisioning">
+          <span class="full-width">{{ 'provisioning.list' | translate }}</span>
+          <mat-icon class="menu-button" [ngClass]="{'rotated' : showProvisioning}">expand_more</mat-icon>
+        </mat-list-item>
+        <div class="submenu" [class.expanded]="showProvisioning">
+          <a mat-list-item class="submenuItem" [routerLink]="['/provisioning/history']" [routerLinkActive]="['is-active']">{{ 'provisioning.history.list' | translate }}</a>
+          <a mat-list-item class="submenuItem" [routerLink]="['/provisioning/workflows']" [routerLinkActive]="['is-active']">{{ 'workflow.list' | translate }}</a>
+        </div>
       </mat-nav-list>
     </mat-drawer>
     <div class="container">

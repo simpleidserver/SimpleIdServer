@@ -11,6 +11,7 @@ namespace SimpleIdServer.Scim.Domain
         public DateTime ExecutionDateTime { get; set; }
         public string Exception { get; set; }
         public ProvisioningConfigurationHistoryStatus Status { get; set; }
+        public virtual ProvisioningConfiguration ProvisioningConfiguration { get; set; }
 
         public static ProvisioningConfigurationHistory Complete(string representationId, int version)
         {

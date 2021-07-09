@@ -25,8 +25,8 @@ export const routes: Routes = [
     loadChildren: async () => (await import('./groups/groups.module')).GroupsModule
   },
   {
-    path: 'workflows',
-    loadChildren: async () => (await import('./workflows/workflows.module')).WorkflowsModule
+    path: 'provisioning',
+    loadChildren: async () => (await import('./provisioning/provisioning.module')).ProvisioningModule
   },
   { path: '**', redirectTo: '/status/404' }
 ];
