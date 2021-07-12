@@ -44,6 +44,8 @@
       }
     },
     "history": {
+      "description": "Description",
+      "workflow": "Workflow",
       "list": "History",
       "configurationId": "Configuration Id",
       "representationId": "Id",

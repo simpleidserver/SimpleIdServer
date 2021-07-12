@@ -13,6 +13,9 @@ namespace SimpleIdServer.Scim.DTOs
         public string RepresentationId { get; set; }
         public int RepresentationVersion { get; set; }
         public DateTime ExecutionDateTime { get; set; }
+        public string Description { get; set; }
+        public string WorkflowInstanceId { get; set; }
+        public string WorkflowId { get; set; }
         public string Exception { get; set; }
         public ProvisioningConfigurationHistoryStatus Status { get; set; }
 
@@ -27,7 +30,10 @@ namespace SimpleIdServer.Scim.DTOs
                 ProvisioningConfigurationResourceType = history.ProvisioningConfiguration.ResourceType,
                 RepresentationId = history.RepresentationId,
                 RepresentationVersion = history.RepresentationVersion,
-                Status = history.Status
+                Status = history.Status,
+                Description = history.Description,
+                WorkflowInstanceId = history.WorkflowInstanceId,
+                WorkflowId = history.WorkflowId
             };
         }
     }

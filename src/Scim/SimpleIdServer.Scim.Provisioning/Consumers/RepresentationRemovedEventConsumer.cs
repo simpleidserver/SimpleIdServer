@@ -22,9 +22,9 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
 
         protected override ProvisioningOperations Type => ProvisioningOperations.DELETE;
 
-        protected override Task LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationRemovedEvent> context)
+        protected override Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationRemovedEvent> context)
         {
-            return Task.CompletedTask;
+            return Task.FromResult((WorkflowResult)null);
         }
     }
 }

@@ -7,4 +7,6 @@ export class ProvisioningConfigurationHistory {
   executionDateTime: Date;
   exception: string;
   status: number;
+  description: string;
+  workflowInstanceId: string
 }

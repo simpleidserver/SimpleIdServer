@@ -32,16 +32,16 @@ namespace SimpleIdServer.Scim.Domain
             UpdateDateTime = DateTime.UtcNow;
         }
 
-        public void Complete(string representationId, int version)
+        public void Complete(string representationId, string description, string workflowInstanceId, string workflowId, int version)
         {
             UpdateDateTime = DateTime.UtcNow;
-            HistoryLst.Add(ProvisioningConfigurationHistory.Complete(representationId, version));
+            HistoryLst.Add(ProvisioningConfigurationHistory.Complete(representationId, description, workflowInstanceId, workflowId, version));
         }
 
-        public void Error(string representationId, int version, string exception)
+        public void Error(string representationId, string description, int version, string exception)
         {
             UpdateDateTime = DateTime.UtcNow;
-            HistoryLst.Add(ProvisioningConfigurationHistory.Error(representationId, version, exception));
+            HistoryLst.Add(ProvisioningConfigurationHistory.Error(representationId, description, version, exception));
         }
 
         public bool IsRepresentationProvisioned(string representationId, int version)

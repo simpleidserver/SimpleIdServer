@@ -10,16 +10,16 @@
   <mat-table class="full-width" [dataSource]="provisioningConfigurations$" matSortActive="executionDateTime" matSortDirection="desc" matSort>
     <!-- representationId -->
     <ng-container matColumnDef="representationId">
-      <mat-header-cell *matHeaderCellDef mat-sort-header>{{ "provisioning.history.representationId" | translate }}</mat-header-cell>
+      <mat-header-cell *matHeaderCellDef>{{ "provisioning.history.description" | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let history">
-        <a [routerLink]="['/users', history.representationId]">{{history.representationId}}</a>
+        <a [routerLink]="['/users', history.representationId]">{{history.description}}</a>
       </mat-cell>
     </ng-container>
-    <!-- representationVersion -->
-    <ng-container matColumnDef="representationVersion">
-      <mat-header-cell *matHeaderCellDef  mat-sort-header>{{ "provisioning.history.representationVersion" | translate }}</mat-header-cell>
+    <!-- workflow -->
+    <ng-container matColumnDef="workflow">
+      <mat-header-cell *matHeaderCellDef>{{ "provisioning.history.workflow" | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let history">
-        {{ history.representationVersion }}
+        <a [routerLink]="['/provisioning/workflows/' + history.workflowId + '/instances/' + history.workflowInstanceId ]">{{ "provisioning.history.workflow" | translate }}</a>
       </mat-cell>
     </ng-container>
     <!-- status -->

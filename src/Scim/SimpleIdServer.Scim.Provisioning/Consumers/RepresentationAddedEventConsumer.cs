@@ -28,13 +28,14 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
 
         protected override ProvisioningOperations Type => ProvisioningOperations.ADD;
 
-        protected override async Task LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationAddedEvent> context)
+        protected override async Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationAddedEvent> context)
         {
             using (var httpClient = new HttpClient())
             {
                 var processInstanceId = await CreateProcessInstance(configuration, httpClient);
                 await LaunchProcessInstance(processInstanceId, configuration, httpClient);
                 await RaiseEvent(processInstanceId, configuration, context, httpClient);
+                return new WorkflowResult(processInstanceId, configuration.GetBpmnFileId());
             }
         }
 

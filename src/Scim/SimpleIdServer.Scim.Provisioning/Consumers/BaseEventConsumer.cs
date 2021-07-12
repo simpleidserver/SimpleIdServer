@@ -46,21 +46,22 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
 
                 var provisioner = _provisioners.First(p => p.Type == configuration.Type);
                 ITransaction transaction = null;
+                var description = $"{Enum.GetName(typeof(ProvisioningOperations), Type)} the resource {configuration.ResourceType}";
                 try
                 {
                     transaction = await _provisioningConfigurationRepository.StartTransaction(token);
-                    await LaunchWorkflow(configuration, context);
+                    var workflowResult = await LaunchWorkflow(configuration, context);
                     await provisioner.Seed(Type,
                         context.Message.Id,
                         context.Message.Representation,
                         configuration,
                         token);
-                    configuration.Complete(context.Message.Id, context.Message.Version);
+                    configuration.Complete(context.Message.Id, description, workflowResult.InstanceId, workflowResult.FileId, context.Message.Version);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString());
-                    configuration.Error(context.Message.Id, context.Message.Version, ex.ToString());
+                    configuration.Error(context.Message.Id, description, context.Message.Version, ex.ToString());
                 }
                 finally
                 {
@@ -70,6 +71,6 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
             }
         }
 
-        protected abstract Task LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<TMessage> context);
+        protected abstract Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<TMessage> context);
     }
 }

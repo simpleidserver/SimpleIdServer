@@ -99,18 +99,19 @@ export class ProvisioningConfigurationComponent implements OnInit, OnDestroy {
   private populateParameters(records: ProvisioningConfigurationRecord[], parent: string | null) {
     const parameters = this.updateProvisioningConfigurationForm.get('parameters') as FormGroup;
     records.forEach((v: ProvisioningConfigurationRecord) => {
+      var newParent = parent;
       if (v.type === 1) {
         if (!parent) {
-          parent = v.name;
+          newParent = v.name;
         } else {
-          parent = parent + ' \\ ' + v.name;
+          newParent = newParent + ' \\ ' + v.name;
         }
 
-        this.populateParameters(v.values, parent);
+        this.populateParameters(v.values, newParent);
       } else {
         let name = v.name;
-        if (parent) {
-          name = parent + ' \\ ' + name;
+        if (newParent) {
+          name = newParent + ' \\ ' + name;
         }
 
         const newFormControl = new FormControl({ value: v.valuesString[0] });
@@ -127,7 +128,7 @@ export class ProvisioningConfigurationComponent implements OnInit, OnDestroy {
       const splitted = k.split(' \\ ');
       var record: ProvisioningConfigurationRecord;
       splitted.forEach((str: string, index: number) => {
-        var records = result;
+        records = result;
         if (index > 0) {
           records = record.values;
         }
@@ -149,9 +150,5 @@ export class ProvisioningConfigurationComponent implements OnInit, OnDestroy {
     });
 
     return result;
-  }
-
-  private getConfigurationRecord(records: ProvisioningConfigurationRecord[]) {
-
   }
 }

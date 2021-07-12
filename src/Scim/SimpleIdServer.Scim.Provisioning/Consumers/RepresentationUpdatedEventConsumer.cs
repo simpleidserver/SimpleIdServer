@@ -22,9 +22,9 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
 
         protected override ProvisioningOperations Type => ProvisioningOperations.UPDATE;
 
-        protected override Task LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationUpdatedEvent> context)
+        protected override Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationUpdatedEvent> context)
         {
-            return Task.CompletedTask;
+            return Task.FromResult((WorkflowResult)null);
         }
     }
 }

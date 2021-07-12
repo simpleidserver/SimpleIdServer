@@ -14,7 +14,7 @@ import { merge } from 'rxjs';
   styleUrls: ['./history.component.scss']
 })
 export class ProvisioningConfigurationHistoryComponent implements OnInit {
-  displayedColumns: string[] = ['representationId', 'representationVersion', 'status', 'exception', 'executionDateTime'];
+  displayedColumns: string[] = ['representationId', 'workflow', 'status', 'exception', 'executionDateTime'];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   length: number;
@@ -64,7 +64,7 @@ export class ProvisioningConfigurationHistoryComponent implements OnInit {
       direction = this.sort.direction;
     }
 
-    let request = startSearchHistory({ order: active, direction, count, startIndex });
+    const request = startSearchHistory({ order: active, direction, count, startIndex });
     this.store.dispatch(request);
   }
 }
