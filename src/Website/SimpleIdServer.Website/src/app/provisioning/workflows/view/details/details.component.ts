@@ -18,6 +18,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
   isLoading: boolean;
   workflow$: WorkflowFile;
   saveFormGroup: FormGroup = new FormGroup({
+    id: new FormControl({ value: '', disabled: true }),
     name: new FormControl(),
     description: new FormControl()
   });
@@ -29,6 +30,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
     private actions$: ScannedActionsSubject) { }
 
   ngOnInit() {
+    this.isLoading = true;
     this.actions$.pipe(
       filter((action: any) => action.type === '[Workflows] COMPLETE_UPDATE_FILE'))
       .subscribe(() => {
@@ -50,6 +52,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
 
       this.saveFormGroup.get('name')?.setValue(workflow.name);
       this.saveFormGroup.get('description')?.setValue(workflow.description);
+      this.saveFormGroup.get('id')?.setValue(workflow.id);
       this.workflow$ = workflow;
       this.isLoading = false;
     });

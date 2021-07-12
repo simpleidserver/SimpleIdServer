@@ -20,6 +20,9 @@
     <None Remove="src\app\stores\humantasks\models\searchhumantaskdef.model.ts" />
     <None Remove="src\app\stores\humantasks\models\topart.model.ts" />
     <None Remove="src\app\stores\humantasks\services\humantaskdef.service.ts" />
+    <None Remove="src\app\stores\provisioning\models\provisioningconfiguration.model.ts" />
+    <None Remove="src\app\stores\provisioning\models\provisioningconfigurationhistory.model.ts" />
+    <None Remove="src\app\stores\provisioning\models\provisioningconfigurationrecord.model.ts" />
     <None Remove="src\app\stores\users\models\consent.model.ts" />
     <None Remove="src\app\stores\users\models\user-openid.model.ts" />
     <None Remove="src\app\stores\users\models\useraddress.model.ts" />
@@ -68,6 +71,9 @@
     <TypeScriptCompile Include="src\app\stores\humantasks\models\searchhumantaskdef.model.ts" />
     <TypeScriptCompile Include="src\app\stores\humantasks\models\topart.model.ts" />
     <TypeScriptCompile Include="src\app\stores\humantasks\services\humantaskdef.service.ts" />
+    <TypeScriptCompile Include="src\app\stores\provisioning\models\provisioningconfiguration.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\provisioning\models\provisioningconfigurationhistory.model.ts" />
+    <TypeScriptCompile Include="src\app\stores\provisioning\models\provisioningconfigurationrecord.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\consent.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\user-openid.model.ts" />
     <TypeScriptCompile Include="src\app\stores\users\models\useraddress.model.ts" />

@@ -88,12 +88,10 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .HasKey(p => p.Id);
             modelBuilder.Entity<ProvisioningConfiguration>()
                 .HasMany(p => p.HistoryLst)
-                .WithOne(p => p.ProvisioningConfiguration)
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(p => p.ProvisioningConfiguration);
             modelBuilder.Entity<ProvisioningConfiguration>()
                 .HasMany(p => p.Records)
-                .WithOne()
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithOne();
             modelBuilder.Entity<ProvisioningConfigurationRecord>()
                 .Property<int>("Id").ValueGeneratedOnAdd();
             modelBuilder.Entity<ProvisioningConfigurationRecord>()

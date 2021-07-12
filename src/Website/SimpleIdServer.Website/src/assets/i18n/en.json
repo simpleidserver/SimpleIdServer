@@ -28,6 +28,21 @@
   },
   "provisioning": {
     "list": "Provisioning",
+    "configuration": {
+      "parameters": "Parameters",
+      "basicInfo": "Basic information",
+      "list": "Configurations",
+      "types": {
+        "0": "API"
+      },
+      "resourceType": "Resource Type",
+      "updateDateTime": "Update DateTime",
+      "type": "Type",
+      "messages": {
+        "update": "Provisioning configuration has been updated",
+        "errorUpdate": "An error occured while trying to update the provisioning configuration"
+      }
+    },
     "history": {
       "list": "History",
       "configurationId": "Configuration Id",
@@ -55,6 +70,7 @@
     "languages": "Languages"
   },
   "workflow": {
+    "id": "Identifier",
     "list": "Workflows",
     "name": "Name",
     "description": "Description",
@@ -65,6 +81,9 @@
     "selectVersion": "Select Version",
     "version": "Version",
     "publish": "Publish",
+    "actions": {
+      "copy": "Copy"
+    },
     "editor": {
       "title": "Editor",
       "generalInfo": "Details",

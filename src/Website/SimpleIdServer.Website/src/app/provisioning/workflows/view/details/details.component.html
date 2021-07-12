@@ -4,6 +4,14 @@
     <form [formGroup]="saveFormGroup" (ngSubmit)="save(saveFormGroup.value)">
       <h2>{{ 'workflow.details' | translate }}</h2>
       <mat-card-content>
+        <!--id -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'workflow.id' | translate }}</mat-label>
+          <input matInput type="text" formControlName="id" />
+          <div class="actions">
+            <mat-icon class="copy" [matTooltip]="'workflow.actions.copy' | translate" [cdkCopyToClipboard]="saveFormGroup.get('id')?.value">content_copy</mat-icon>
+          </div>
+        </mat-form-field>
         <!--name -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'workflow.name' | translate }}</mat-label>

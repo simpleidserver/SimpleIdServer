@@ -3,30 +3,30 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SearchResult } from '@app/stores/applications/models/search.model';
 import * as fromReducers from '@app/stores/appstate';
-import { startSearchHistory } from '@app/stores/provisioning/actions/provisioning.actions';
-import { ProvisioningConfigurationHistory } from '@app/stores/provisioning/models/provisioningconfigurationhistory.model';
+import { startSearch } from '@app/stores/provisioning/actions/provisioning.actions';
+import { ProvisioningConfiguration } from '@app/stores/provisioning/models/provisioningconfiguration.model';
 import { select, Store } from '@ngrx/store';
 import { merge } from 'rxjs';
 
 @Component({
-  selector: 'history-provisioning-configuration',
-  templateUrl: './history.component.html',
-  styleUrls: ['./history.component.scss']
+  selector: 'provisioning-configurations',
+  templateUrl: './configurations.component.html',
+  styleUrls: ['./configurations.component.scss']
 })
-export class ProvisioningConfigurationHistoryComponent implements OnInit {
-  displayedColumns: string[] = ['representationId', 'representationVersion', 'status', 'exception', 'executionDateTime'];
+export class ProvisioningConfigurationsComponent implements OnInit {
+  displayedColumns: string[] = ['type', 'resourceType', 'updateDateTime'];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   length: number;
   isLoading: boolean;
-  provisioningConfigurations$: Array<ProvisioningConfigurationHistory> = [];
+  provisioningConfigurations$: Array<ProvisioningConfiguration> = [];
 
   constructor(
     private store: Store<fromReducers.AppState>) { }
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.store.pipe(select(fromReducers.selectProvisioningHistoriesResult)).subscribe((state: SearchResult<ProvisioningConfigurationHistory> | null) => {
+    this.store.pipe(select(fromReducers.selectProvisioningConfigurationsResult)).subscribe((state: SearchResult<ProvisioningConfiguration> | null) => {
       if (!state || !state.content) {
         return;
       }
@@ -64,7 +64,7 @@ export class ProvisioningConfigurationHistoryComponent implements OnInit {
       direction = this.sort.direction;
     }
 
-    let request = startSearchHistory({ order: active, direction, count, startIndex });
+    let request = startSearch({ order: active, direction, count, startIndex });
     this.store.dispatch(request);
   }
 }

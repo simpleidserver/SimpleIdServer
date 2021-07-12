@@ -28,6 +28,21 @@
   },
   "provisioning": {
     "list": "Provisioning",
+    "configuration": {
+      "parameters": "Paramètres",
+      "basicInfo": "Informations de base",
+      "list": "Configurations",
+      "types": {
+        "0": "API"
+      },
+      "resourceType": "Type de ressource",
+      "updateDateTime": "Date de mise à jour",
+      "type": "Type",
+      "messages": {
+        "update": "La configuration a été mise à jour",
+        "errorUpdate": "Une erreur est survenue durant la mise à jour de la configuration"
+      }
+    },
     "history": {
       "list": "Historique",
       "configurationId": "Id. de la configuration",
@@ -48,8 +63,12 @@
     "en": "Anglais"
   },
   "workflow": {
+    "id": "Identifiant",
     "list": "Les workflows",
     "name": "Nom",
+    "actions": {
+      "copy": "Copier"
+    },
     "description": "Description",
     "nbInstances": "Nombre d'instances",
     "createDateTime": "Date de création",

@@ -28,7 +28,7 @@ import { HumanTaskDefService } from './stores/humantasks/services/humantaskdef.s
 import { MetadataEffects } from './stores/metadata/effects/metadata.effects';
 import { MetadataService } from './stores/metadata/services/metadata.service';
 import { ProvisioningEffects } from './stores/provisioning/effects/provisioning.effects';
-import { ProvisioningConfigurationHistoryService } from './stores/provisioning/services/provisioningconfigurationhistory.service';
+import { ProvisioningConfigurationService } from './stores/provisioning/services/provisioningconfiguration.service';
 import { OAuthScopeEffects } from './stores/scopes/effects/scope.effects';
 import { OAuthScopeService } from './stores/scopes/services/scope.service';
 import { UserEffects } from './stores/users/effects/user.effects';
@@ -79,7 +79,7 @@ export function createTranslateLoader(http: HttpClient) {
     HumanTaskDefService,
     WorkflowInstanceService,
     DelegateConfigurationService,
-    ProvisioningConfigurationHistoryService,
+    ProvisioningConfigurationService,
     MetadataService,
     {
       provide: OAuthStorage,

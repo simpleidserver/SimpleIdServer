@@ -116,6 +116,7 @@ export class ViewInstancesComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isLoading = true;
     const id = this.activatedRoute.parent?.snapshot.params['id'];
     let startIndex: number = 0;
     let count: number = 5;

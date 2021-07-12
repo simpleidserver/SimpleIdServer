@@ -30,7 +30,9 @@ export interface AppState {
   humanTaskDef: fromHumanTask.HumanTaskState,
   workflowInstances: fromWorkflows.SearchWorkflowInstancesState,
   workflowInstance: fromWorkflows.WorkflowInstanceState,
-  provisioningHistories: fromProvisioning.ProvisioningHistoriesState
+  provisioningHistories: fromProvisioning.ProvisioningHistoriesState,
+  provisioningConfigurations: fromProvisioning.ProvisioningConfigurationsState,
+  provisioningConfiguration: fromProvisioning.ProvisioningConfigurationState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -54,6 +56,8 @@ export const selectHumanTaskDef = (state: AppState) => state.humanTaskDef;
 export const selectWorkflowInstances = (state: AppState) => state.workflowInstances;
 export const selectWorkflowInstance = (state: AppState) => state.workflowInstance;
 export const selectProvisioningHistories = (state: AppState) => state.provisioningHistories;
+export const selectProvisioningConfigurations = (state: AppState) => state.provisioningConfigurations;
+export const selectProvisioningConfiguration = (state: AppState) => state.provisioningConfiguration;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -308,6 +312,28 @@ export const selectProvisioningHistoriesResult = createSelector(
   }
 );
 
+export const selectProvisioningConfigurationsResult = createSelector(
+  selectProvisioningConfigurations,
+  (state: fromProvisioning.ProvisioningConfigurationsState) => {
+    if (!state || !state.ProvisioningConfigurations) {
+      return null;
+    }
+
+    return state.ProvisioningConfigurations;
+  }
+);
+
+export const selectProvisioningConfigurationResult = createSelector(
+  selectProvisioningConfiguration,
+  (state: fromProvisioning.ProvisioningConfigurationState) => {
+    if (!state || !state.ProvisioningConfiguration) {
+      return null;
+    }
+
+    return state.ProvisioningConfiguration;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -329,5 +355,7 @@ export const appReducer = {
   humanTaskDef: fromHumanTask.getHumanTaskReducer,
   workflowInstances: fromWorkflows.getWorkflowInstancesReducer,
   workflowInstance: fromWorkflows.getWorkflowInstanceReducer,
-  provisioningHistories: fromProvisioning.getProvisioningHistoriesReducer
+  provisioningHistories: fromProvisioning.getProvisioningHistoriesReducer,
+  provisioningConfigurations: fromProvisioning.getProvisioningConfigurationsReducer,
+  provisioningConfiguration: fromProvisioning.getProvisioningConfigurationReducer
 };

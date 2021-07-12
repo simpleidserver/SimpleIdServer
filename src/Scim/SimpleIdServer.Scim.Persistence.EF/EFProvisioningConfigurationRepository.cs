@@ -15,7 +15,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
     {
         private static Dictionary<string, string> MAPPING_PROVISIONING_TO_PROPERTYNAME = new Dictionary<string, string>
         {
-            { "update_datetime", "UpdateDateTime" }
+            { "updateDateTime", "UpdateDateTime" },
+            { "resourceType", "ResourceType" }
         };
         private static Dictionary<string, string> MAPPING_PROVISIONINGHISTORY_TO_PROPERTYNAME = new Dictionary<string, string>
         {
