@@ -18,11 +18,11 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
     public class UpdateUserPasswordHandler : IUpdateUserPasswordHandler
     {
         private readonly IOAuthUserRepository _oauthUserRepository;
-        private readonly ILogger<UpdateUserPasswordHandler> _logger;
+        private readonly ILogger<GetOTPCodeHandler> _logger;
 
         public UpdateUserPasswordHandler(
             IOAuthUserRepository oauthUserRepository,
-            ILogger<UpdateUserPasswordHandler> logger)
+            ILogger<GetOTPCodeHandler> logger)
         {
             _oauthUserRepository = oauthUserRepository;
             _logger = logger;

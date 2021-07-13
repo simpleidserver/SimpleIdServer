@@ -79,6 +79,15 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email authentication.
+        /// </summary>
+        public static string authenticate_email {
+            get {
+                return ResourceManager.GetString("authenticate_email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login password authentication.
         /// </summary>
         public static string authenticate_pwd {
@@ -120,6 +129,15 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Resources {
         public static string claims {
             get {
                 return ResourceManager.GetString("claims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Code has a validity of {0} seconds.
+        /// </summary>
+        public static string code_validity {
+            get {
+                return ResourceManager.GetString("code_validity", resourceCulture);
             }
         }
         
@@ -174,6 +192,15 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Resources {
         public static string disconnect {
             get {
                 return ResourceManager.GetString("disconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email.
+        /// </summary>
+        public static string email {
+            get {
+                return ResourceManager.GetString("email", resourceCulture);
             }
         }
         
@@ -480,6 +507,15 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Resources {
         public static string tos {
             get {
                 return ResourceManager.GetString("tos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Email is unknown.
+        /// </summary>
+        public static string unknown_email {
+            get {
+                return ResourceManager.GetString("unknown_email", resourceCulture);
             }
         }
         

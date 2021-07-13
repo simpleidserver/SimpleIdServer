@@ -141,6 +141,15 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     "pwd",
                     "sms"
                 }
+            },
+            new AuthenticationContextClassReference
+            {
+                DisplayName = "Second level of assurance (email)",
+                Name = "sid-load-021",
+                AuthenticationMethodReferences = new List<string>
+                {
+                    "email"
+                }
             }
         };
 
@@ -159,6 +168,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
+                OTPKey = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTA=",
                 DeviceRegistrationToken = "ciyortoPQHGluxo-vIZLu7:APA91bHRrB-mdgHl6IQFu4XNWR5VBXxOjaq-gAAuxCzswQAGeryvFaBqoJqJN_oSEtPZMTknRe2rixJj5cjnaWkCin8NSXm7Gug6peZd9EpJgJ98CNHqOudcFv_h3jp4dpgWn6imb7sR",
                 OAuthUserClaims = new List<OAuthUserClaim>
                 {

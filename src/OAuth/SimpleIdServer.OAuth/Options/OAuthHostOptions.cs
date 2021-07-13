@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
+using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OAuth.Options
@@ -27,6 +28,9 @@ namespace SimpleIdServer.OAuth.Options
             JWKExpirationTimeInSeconds = 60 * 5;
             DefaultTokenExpirationTimeInSeconds= 60 * 30;
             DefaultRefreshTokenExpirationTimeInSeconds = 60 * 30;
+            HOTPWindow = 5;
+            TOTPStep = 30;
+            OTPAlg = OTPAlgs.TOTP;
         }
 
         /// <summary>
@@ -81,5 +85,17 @@ namespace SimpleIdServer.OAuth.Options
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>
         public int DefaultRefreshTokenExpirationTimeInSeconds { get; set; }
+        /// <summary>
+        /// HOTP Window.
+        /// </summary>
+        public int HOTPWindow { get; set; }
+        /// <summary>
+        /// Calculate time windows.
+        /// </summary>
+        public int TOTPStep { get; set; }
+        /// <summary>
+        /// Default OTP algorithm.
+        /// </summary>
+        public OTPAlgs OTPAlg { get; set; }
     }
 }

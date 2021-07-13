@@ -10,7 +10,6 @@ using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
-using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.Sms.Services;
 using SimpleIdServer.UI.Authenticate.Sms.ViewModels;
@@ -83,10 +82,18 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
                     {
                         return View(viewModel);
                     }
-
-                    await _smsAuthService.SendConfirmationCode(viewModel.PhoneNumber);
-                    SetSuccessMessage("confirmationcode_sent");
-                    return View(viewModel);
+                    
+                    try
+                    {
+                        await _smsAuthService.SendCode(viewModel.PhoneNumber, token);
+                        SetSuccessMessage("confirmationcode_sent");
+                        return View(viewModel);
+                    }
+                    catch(BaseUIException ex)
+                    {
+                        ModelState.AddModelError(ex.Code, ex.Code);
+                        return View(viewModel);
+                    }
                 default:
                     viewModel.CheckRequiredFields(ModelState);
                     viewModel.CheckConfirmationCode(ModelState);
@@ -97,7 +104,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Controllers
 
                     try
                     {
-                        var user = await _smsAuthService.Authenticate(viewModel.PhoneNumber, viewModel.ConfirmationCode, token);
+                        var user = await _smsAuthService.Authenticate(viewModel.PhoneNumber, viewModel.OTPCode.Value, token);
                         return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
                     }
                     catch (CryptographicException)

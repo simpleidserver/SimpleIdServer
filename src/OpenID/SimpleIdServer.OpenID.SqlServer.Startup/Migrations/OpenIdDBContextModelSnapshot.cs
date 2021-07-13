@@ -213,6 +213,12 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.Property<string>("DeviceRegistrationToken")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OTPCounter")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OTPKey")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 

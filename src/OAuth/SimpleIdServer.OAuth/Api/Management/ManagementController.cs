@@ -37,6 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IGetUserBySCIMIdHandler _getUserBySCIMIdHandler;
         private readonly IUpdateUserPasswordHandler _updateUserPasswordHandler;
         private readonly IAddOAuthUserBySCIMIdHandler _addOAuthUserBySCIMIdHandler;
+        private readonly IGetOTPCodeHandler _getOTPCodeHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -54,6 +55,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IGetUserBySCIMIdHandler getUserBySCIMIdHandler,
             IUpdateUserPasswordHandler updateUserPasswordHandler,
             IAddOAuthUserBySCIMIdHandler addOAuthUserBySCIMIdHandler,
+            IGetOTPCodeHandler getOTPCodeHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -70,6 +72,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _getUserBySCIMIdHandler = getUserBySCIMIdHandler;
             _updateUserPasswordHandler = updateUserPasswordHandler;
             _addOAuthUserBySCIMIdHandler = addOAuthUserBySCIMIdHandler;
+            _getOTPCodeHandler = getOTPCodeHandler;
             _options = options.Value;
         }
 
@@ -244,7 +247,7 @@ namespace SimpleIdServer.OAuth.Api.Management
 
         #endregion
 
-        #region Update user
+        #region Manager users
 
         [HttpPut("users/{id}/password")]
         [Authorize("ManageUsers")]
@@ -256,6 +259,36 @@ namespace SimpleIdServer.OAuth.Api.Management
                 return new NoContentResult();
             }
             catch(OAuthUserNotFoundException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
+            }
+        }
+
+        [HttpGet("users/{id}/otp")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> GetOTPCode(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _getOTPCodeHandler.Handle(id, null, cancellationToken);
+                return new OkObjectResult(result);
+            }
+            catch (OAuthUserNotFoundException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
+            }
+        }
+
+        [HttpGet("users/{id}/emails/otp")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> GetOTPCodeByEmail(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _getOTPCodeHandler.Handle(id, SimpleIdServer.Jwt.Constants.UserClaims.Email, cancellationToken);
+                return new OkObjectResult(result);
+            }
+            catch (OAuthUserNotFoundException ex)
             {
                 return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
             }

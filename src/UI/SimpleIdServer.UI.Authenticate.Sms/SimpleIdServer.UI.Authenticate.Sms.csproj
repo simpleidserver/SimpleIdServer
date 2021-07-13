@@ -3,6 +3,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Twilio" Version="5.63.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj" />
   </ItemGroup>
 </Project>

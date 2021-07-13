@@ -25,7 +25,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.ViewModels
         public string TosUri { get; set; }
         public string PolicyUri { get; set; }
         public string Action { get; set; }
-        public string ConfirmationCode { get; set; }
+        public long? OTPCode { get; set; }
         public bool RememberLogin { get; set; }
 
         public void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
@@ -43,7 +43,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.ViewModels
 
         public void CheckConfirmationCode(ModelStateDictionary modelStateDictionary)
         {
-            if (string.IsNullOrWhiteSpace(ConfirmationCode))
+            if (OTPCode == null)
             {
                 modelStateDictionary.AddModelError("missing_confirmationcode", "missing_confirmationcode");
             }

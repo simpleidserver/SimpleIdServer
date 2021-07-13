@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.OAuth.Domains
 {
@@ -23,6 +24,8 @@ namespace SimpleIdServer.OAuth.Domains
         public OAuthUserStatus Status { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        public string OTPKey { get; set; }
+        public int OTPCounter { get; set; }
         public ICollection<Claim> Claims
         {
             get
@@ -50,6 +53,38 @@ namespace SimpleIdServer.OAuth.Domains
 
             Sessions.Add(new OAuthUserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = OAuthUserSessionStates.Active });
             return true;
+        }
+
+        public byte[] GetOTPKey()
+        {
+            return Convert.FromBase64String(OTPKey);
+        }
+
+        public void ResetOtp()
+        {
+            byte[] key = new byte[20];
+            using (var rnd = RandomNumberGenerator.Create())
+            {
+                rnd.GetBytes(key);
+                OTPKey = Convert.ToBase64String(key);
+                OTPCounter = 0;
+            }
+        }
+
+        public void ResetOtp(byte[] secret)
+        {
+            ResetOtp(secret, 0);
+        }
+
+        public void ResetOtp(byte[] secret, int counter)
+        {
+            OTPKey = Convert.ToBase64String(secret);
+            OTPCounter = counter;
+        }
+
+        public void IncrementCounter()
+        {
+            OTPCounter++;
         }
 
         public OAuthUserSession GetActiveSession()
@@ -116,7 +151,9 @@ namespace SimpleIdServer.OAuth.Domains
                 Consents = Consents == null ? new List<OAuthConsent>() : Consents.Select(c => (OAuthConsent)c.Clone()).ToList(),
                 CreateDateTime = CreateDateTime,
                 UpdateDateTime = UpdateDateTime,
-                Sessions = Sessions.Select(s => (OAuthUserSession)s.Clone()).ToList()
+                Sessions = Sessions.Select(s => (OAuthUserSession)s.Clone()).ToList(),
+                OTPCounter = OTPCounter,
+                OTPKey = OTPKey
             };
         }
 

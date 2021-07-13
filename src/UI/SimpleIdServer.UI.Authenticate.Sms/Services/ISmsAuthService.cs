@@ -8,7 +8,7 @@ namespace SimpleIdServer.UI.Authenticate.Sms.Services
 {
     public interface ISmsAuthService
     {
-        Task<OAuthUser> Authenticate(string phoneNumber, string confirmationCode, CancellationToken cancellationToken);
-        Task<string> SendConfirmationCode(string phoneNumber);
+        Task<OAuthUser> Authenticate(string phoneNumber, long code, CancellationToken cancellationToken);
+        Task<long> SendCode(string phoneNumber, CancellationToken cancellationToken);
     }
 }

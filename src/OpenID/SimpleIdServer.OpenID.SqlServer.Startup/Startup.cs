@@ -18,6 +18,8 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace SimpleIdServer.OpenID.SqlServer.Startup
 {
@@ -32,6 +34,13 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "credentials.json");
+            var credentials = new CredentialsParameter();
+            if (File.Exists(path))
+            {
+                credentials = JsonConvert.DeserializeObject<CredentialsParameter>(File.ReadAllText(path));
+            }
+
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             var issuerSigningKey = ExtractIssuerSigningKey("openid_key.txt");
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
@@ -83,7 +92,13 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     opt.UseSqlServer("Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=OpenID;Integrated Security=True", o => o.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddLoginPasswordAuthentication()
-                .AddSMSAuthentication();
+                .AddSMSAuthentication()
+                .AddEmailAuthentication(opts =>
+                {
+                    opts.SmtpUserName = credentials.Login;
+                    opts.SmtpPassword = credentials.Password;
+                    opts.FromEmail = credentials.Login;
+                });
             // ConfigureFireBase();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -130,19 +145,29 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 using (var context = scope.ServiceProvider.GetService<OpenIdDBContext>())
                 {
                     context.Database.Migrate();
-                    if (context.Users.Any())
-                    {
-                        return;
-                    }
-
                     var sigJsonWebKey = ExtractJsonWebKeyFromRSA("openid_key.txt", "RS256", "1");
                     var firstMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("first_mtlsClient_key.txt", "PS256", "2");
                     var secondMtlsClientJsonWebKey = ExtractJsonWebKeyFromRSA("second_mtlsClient_key.txt", "PS256", "3");
-                    context.OAuthScopes.AddRange(DefaultConfiguration.Scopes);
-                    context.Users.AddRange(DefaultConfiguration.Users);
-                    context.Acrs.AddRange(DefaultConfiguration.AcrLst);
-                    context.OpenIdClients.AddRange(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey, sigJsonWebKey));
-                    // context.JsonWebKeys.Add(sigJsonWebKey);
+                    if (!context.OAuthScopes.Any())
+                    {
+                        context.OAuthScopes.AddRange(DefaultConfiguration.Scopes);
+                    }
+
+                    if (!context.Users.Any())
+                    {
+                        context.Users.AddRange(DefaultConfiguration.Users);
+                    }
+
+                    if (!context.Acrs.Any())
+                    {
+                        context.Acrs.AddRange(DefaultConfiguration.AcrLst);
+                    }
+
+                    if (!context.OpenIdClients.Any())
+                    {
+                        context.OpenIdClients.AddRange(DefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey, sigJsonWebKey));
+                    }
+
                     context.SaveChanges();
                 }
             }
@@ -173,6 +198,12 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 Exponent = dic.TryGet(RSAFields.Exponent)
             };
             return new Microsoft.IdentityModel.Tokens.RsaSecurityKey(rsaParameter);
+        }
+
+        private class CredentialsParameter
+        {
+            public string Login { get; set; }
+            public string Password { get; set; }
         }
     }
 }

@@ -31,6 +31,7 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
   secondSubscription: any;
   thirdSubscription: any;
   fourthSubscription: any;
+  fifthSubscription: any;
   selectedElt: any;
   buildingForm: boolean = true;
   isEltSelected: boolean = false;
@@ -126,6 +127,13 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
     this.fourthSubscription = this.activatedRoute.parent?.params.subscribe((e) => {
       this.refresh();
     });
+    this.fifthSubscription = this.updatePropertiesForm.valueChanges.subscribe(() => {
+      if (self.buildingForm) {
+        return;
+      }
+
+      self.saveProperties(this.updatePropertiesForm.value);
+    });
   }
 
   ngOnDestroy() {
@@ -133,6 +141,7 @@ export class ViewEditorComponent implements OnInit, OnDestroy {
     this.secondSubscription.unsubscribe();
     this.thirdSubscription.unsubscribe();
     this.fourthSubscription.unsubscribe();
+    this.fifthSubscription.unsubscribe();
   }
 
   save() {

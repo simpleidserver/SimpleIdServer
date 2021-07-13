@@ -29,6 +29,7 @@ using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.InMemory;
+using SimpleIdServer.OAuth.UI;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -58,7 +59,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddJwt()
                 .AddRegisterApi()
                 .AddManagementApi()
-                .AddConfigurationApi();
+                .AddConfigurationApi()
+                .AddUI();
             return new SimpleIdServerOAuthBuilder(services);
         }
 
@@ -236,6 +238,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetUserBySCIMIdHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateUserPasswordHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateUserPasswordHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.AddOAuthUserBySCIMIdHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOTPCodeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOTPCodeHandler>();
+            return services;
+        }
+
+        private static IServiceCollection AddUI(this IServiceCollection services)
+        {
+            services.AddTransient<IOTPAuthenticator, HOTPAuthenticator>();
+            services.AddTransient<IOTPAuthenticator, TOTPAuthenticator>();
             return services;
         }
     }
