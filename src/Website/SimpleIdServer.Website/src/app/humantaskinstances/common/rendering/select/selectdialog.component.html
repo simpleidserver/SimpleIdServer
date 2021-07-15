@@ -1,0 +1,9 @@
+﻿<h1 mat-dialog-title>{{ 'HUMANTASK.EDITOR.CONFIGURESELECT' | translate }}</h1>
+<div mat-dialog-content>
+    <form [formGroup]="configureSelectForm" (ngSubmit)="onSave(configureSelectForm.value)">
+        <button mat-raised-button color="primary">{{ 'SHARED.SAVE' | translate }}</button>
+    </form>
+</div>
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close>{{ 'SHARED.CANCEL' | translate }}</button>
+</mat-dialog-actions>

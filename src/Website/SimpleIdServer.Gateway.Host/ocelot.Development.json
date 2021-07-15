@@ -285,6 +285,18 @@
       ],
       "UpstreamPathTemplate": "/humantasksdefs/{everything}",
       "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/humantaskinstances/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60006
+        }
+      ],
+      "UpstreamPathTemplate": "/humantaskinstances/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT" ]
     }
   ],
   "ClientId": "gatewayClient",

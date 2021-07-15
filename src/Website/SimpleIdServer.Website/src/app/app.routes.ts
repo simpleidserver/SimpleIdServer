@@ -29,8 +29,8 @@ export const routes: Routes = [
     loadChildren: async () => (await import('./provisioning/provisioning.module')).ProvisioningModule
   },
   {
-    path: 'humantasks',
-    loadChildren: async () => (await import('./humantasks/humantasks.module')).HumanTasksModule
+    path: 'humantaskinstances',
+    loadChildren: async () => (await import('./humantaskinstances/humantaskinstances.module')).HumanTaskInstancesModule
   },
   { path: '**', redirectTo: '/status/404' }
 ];

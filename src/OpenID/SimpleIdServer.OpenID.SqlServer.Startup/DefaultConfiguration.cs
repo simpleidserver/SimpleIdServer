@@ -91,9 +91,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
-        private static OAuthScope CreateHumanTaskInstance = new OAuthScope
+        private static OAuthScope ManageHumanTaskInstance = new OAuthScope
         {
-            Name = "create_humantaskinstance",
+            Name = "manage_humantaskinstance",
             IsExposedInConfigurationEdp = true,
             IsStandardScope = false,
             CreateDateTime = DateTime.UtcNow,
@@ -192,7 +192,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     new OAuthUserClaim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
                     new OAuthUserClaim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", Jwt.ClaimValueTypes.JSONOBJECT),
                     new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Role, "visitor")
                 }
             },
             new OAuthUser
@@ -870,7 +871,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     TokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        CreateHumanTaskInstance
+                        ManageHumanTaskInstance
                     },
                     GrantTypes = new List<string>
                     {
@@ -901,7 +902,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     TokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        ManageUsers
+                        ManageUsers,
+                        ManageHumanTaskInstance
                     },
                     GrantTypes = new List<string>
                     {

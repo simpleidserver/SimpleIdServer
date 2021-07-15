@@ -4,6 +4,31 @@
   "create": "Create",
   "seconds": "Secondes",
   "confirm": "Confirm",
+  "HUMANTASK": {
+    "EDITOR": {
+      "ERRORS": {
+        "required": "Is required",
+        "badPassword": "Password doesn't match"
+      }
+    }
+  },
+  "humantaskinstance": {
+    "list": "Tasks",
+    "status": "Status",
+    "priority": "Priority",
+    "name": "Name",
+    "subject": "Subject",
+    "createdDateTime": "Create DateTime",
+    "statusLst": {
+      "RESERVED": "Reserved",
+      "INPROGRESS": "In Progress",
+      "COMPLETED": "Completed"
+    },
+    "messages": {
+      "errorCompleteTask": "An error occured while trying to complete the task",
+      "taskCompleted": "Task is completed"
+    }
+  },
   "applicationKinds": {
     "0": {
       "description": "Traditional web application using redirects",

@@ -32,7 +32,9 @@ export interface AppState {
   workflowInstance: fromWorkflows.WorkflowInstanceState,
   provisioningHistories: fromProvisioning.ProvisioningHistoriesState,
   provisioningConfigurations: fromProvisioning.ProvisioningConfigurationsState,
-  provisioningConfiguration: fromProvisioning.ProvisioningConfigurationState
+  provisioningConfiguration: fromProvisioning.ProvisioningConfigurationState,
+  humanTaskInstance: fromHumanTask.HumanTaskInstanceState,
+  humanTaskInstances: fromHumanTask.HumanTaskInstancesState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -58,6 +60,8 @@ export const selectWorkflowInstance = (state: AppState) => state.workflowInstanc
 export const selectProvisioningHistories = (state: AppState) => state.provisioningHistories;
 export const selectProvisioningConfigurations = (state: AppState) => state.provisioningConfigurations;
 export const selectProvisioningConfiguration = (state: AppState) => state.provisioningConfiguration;
+export const selectHumanTaskInstance = (state: AppState) => state.humanTaskInstance;
+export const selectHumanTaskInstances = (state: AppState) => state.humanTaskInstances;
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -334,6 +338,28 @@ export const selectProvisioningConfigurationResult = createSelector(
   }
 );
 
+export const selectHumanTaskInstanceResult = createSelector(
+  selectHumanTaskInstance,
+  (state: fromHumanTask.HumanTaskInstanceState) => {
+    if (!state) {
+      return null;
+    }
+
+    return state;
+  }
+);
+
+export const selectHumanTaskInstancesResult = createSelector(
+  selectHumanTaskInstances,
+  (state: fromHumanTask.HumanTaskInstancesState) => {
+    if (!state || !state.content) {
+      return null;
+    }
+
+    return state.content;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -357,5 +383,7 @@ export const appReducer = {
   workflowInstance: fromWorkflows.getWorkflowInstanceReducer,
   provisioningHistories: fromProvisioning.getProvisioningHistoriesReducer,
   provisioningConfigurations: fromProvisioning.getProvisioningConfigurationsReducer,
-  provisioningConfiguration: fromProvisioning.getProvisioningConfigurationReducer
+  provisioningConfiguration: fromProvisioning.getProvisioningConfigurationReducer,
+  humanTaskInstance: fromHumanTask.getHumanTaskInstanceReducer,
+  humanTaskInstances: fromHumanTask.getHumanTaskInstancesReducer
 };

@@ -4,7 +4,10 @@ import { SIDCommonModule } from '@app/common/sidcommon.module';
 import { MaterialModule } from '@app/shared/material.module';
 import { SharedModule } from '@app/shared/shared.module';
 import { AvatarModule } from 'ngx-avatar';
+import { RenderingModule } from './common/rendering/rendering.module';
 import { HumanTaskInstancesRoutes } from './humantaskinstances.routes';
+import { ListHumanTaskInstanceComponent } from './list/list.component';
+import { ViewHumanTaskInstanceComponent } from './view/view.component';
 
 @NgModule({
   imports: [
@@ -13,9 +16,12 @@ import { HumanTaskInstancesRoutes } from './humantaskinstances.routes';
     SharedModule,
     MaterialModule,
     SIDCommonModule,
-    HumanTaskInstancesRoutes
+    HumanTaskInstancesRoutes,
+    RenderingModule
   ],
   declarations: [
+    ViewHumanTaskInstanceComponent,
+    ListHumanTaskInstanceComponent
   ]
 })
 

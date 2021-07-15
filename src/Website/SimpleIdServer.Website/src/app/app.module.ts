@@ -25,6 +25,7 @@ import { GroupEffects } from './stores/groups/effects/group.effects';
 import { GroupService } from './stores/groups/services/group.service';
 import { HumanTaskEffects } from './stores/humantasks/effects/humantask.effects';
 import { HumanTaskDefService } from './stores/humantasks/services/humantaskdef.service';
+import { HumanTaskInstanceService } from './stores/humantasks/services/humantaskinstance.service';
 import { MetadataEffects } from './stores/metadata/effects/metadata.effects';
 import { MetadataService } from './stores/metadata/services/metadata.service';
 import { ProvisioningEffects } from './stores/provisioning/effects/provisioning.effects';
@@ -80,6 +81,7 @@ export function createTranslateLoader(http: HttpClient) {
     WorkflowInstanceService,
     DelegateConfigurationService,
     ProvisioningConfigurationService,
+    HumanTaskInstanceService,
     MetadataService,
     {
       provide: OAuthStorage,

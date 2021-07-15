@@ -1,0 +1,49 @@
+<div class="breadcrumb">
+  <ul>
+    <li>
+      <div class="mat-h1">{{ "humantaskinstance.list" | translate }}</div>
+    </li>
+  </ul>
+</div>
+<loader *ngIf="isLoading"></loader>
+<div class="mat-elevation-z8 overflow-hidden" [style.display]="!isLoading ? 'block' : 'none'">
+  <table mat-table class="full-width" matSortActive="createdTime" matSortDirection="desc" [dataSource]="instances$" matSort>
+    <!-- Presentation name -->
+    <ng-container matColumnDef="presentationName">
+      <th mat-header-cell *matHeaderCellDef>{{ "humantaskinstance.name" | translate }}</th>
+      <td mat-cell *matCellDef="let instance">
+        <a *ngIf="instance.status === 'INPROGRESS'" [routerLink]="['/humantaskinstances/' + instance.id]">{{instance.presentationName}}</a>
+        <span *ngIf="instance.status !== 'INPROGRESS'">{{ instance.presentationName }}</span>
+      </td>
+    </ng-container>
+    <!-- Presentation subject -->
+    <ng-container matColumnDef="presentationSubject">
+      <th mat-header-cell *matHeaderCellDef>{{ "humantaskinstance.subject" | translate }}</th>
+      <td mat-cell *matCellDef="let instance">{{instance.presentationSubject}}</td>
+    </ng-container>
+    <!-- Priority -->
+    <ng-container matColumnDef="priority">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "humantaskinstance.priority" | translate }}</th>
+      <td mat-cell *matCellDef="let instance">{{instance.priority}}</td>
+    </ng-container>
+    <!-- Status -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>{{ "humantaskinstance.status" | translate }}</th>
+      <td mat-cell *matCellDef="let instance">
+        <mat-chip-list>
+          <mat-chip>
+            {{ 'humantaskinstance.statusLst.' + instance.status | translate }}
+          </mat-chip>
+        </mat-chip-list>
+      </td>
+    </ng-container>
+    <!-- Created datetime -->
+    <ng-container matColumnDef="createdTime">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "humantaskinstance.createdDateTime" | translate }}</th>
+      <td mat-cell *matCellDef="let instance">{{instance.createdTime | date:'medium'}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <mat-paginator [length]="length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>

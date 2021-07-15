@@ -1,0 +1,24 @@
+<div class="breadcrumb">
+  <ul>
+    <li>
+      <div class="mat-h1"><a [routerLink]="['/humantaskinstances']">{{ "humantaskinstance.list" | translate }}</a></div>
+    </li>
+    <li class="separator">
+      <div class="mat-h1">\</div>
+    </li>
+    <li>
+      <div class="mat-h1">{{ humanTaskInstance?.name }}</div>
+    </li>
+  </ul>
+</div>
+<loader *ngIf="isLoading"></loader>
+<div *ngIf="!isLoading">
+  <mat-card>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()">
+        <dynamic-component [option]="option" [uiOption]="uiOption" [form]="formGroup"></dynamic-component>
+        <button mat-raised-button color="primary">{{ 'confirm' | translate }}</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

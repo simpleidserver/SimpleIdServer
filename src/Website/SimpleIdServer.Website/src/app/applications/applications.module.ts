@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { SIDCommonModule } from '@app/common/sidcommon.module';
-import { TranslateEnumPipe } from '@app/pipes/translateenum.pipe';
 import { MaterialModule } from '@app/shared/material.module';
 import { SharedModule } from '@app/shared/shared.module';
 import { AvatarModule } from 'ngx-avatar';
-import { TranslateMetadataPipe } from '../pipes/translatemetadata';
+import { PipesModule } from '../pipes/pipes.module';
 import { ApplicationsRoutes } from './applications.routes';
 import { AddApplicationComponent } from './list/add-application.component';
 import { ListApplicationsComponent } from './list/list.component';
@@ -20,6 +19,7 @@ import { ViewApplicationsComponent } from './view/view.component';
     SharedModule,
     MaterialModule,
     SIDCommonModule,
+    PipesModule,
     ApplicationsRoutes
   ],
   declarations: [
@@ -27,9 +27,7 @@ import { ViewApplicationsComponent } from './view/view.component';
     ViewApplicationsComponent,
     EditTranslationComponent,
     DisplayJwkComponent,
-    AddApplicationComponent,
-    TranslateEnumPipe,
-    TranslateMetadataPipe
+    AddApplicationComponent
   ]
 })
 

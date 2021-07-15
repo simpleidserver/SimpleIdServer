@@ -28,6 +28,7 @@
         <a mat-list-item class="baseMenu" [routerLink]="['/scopes']" [routerLinkActive]="['is-active']">{{ "scopes.list" | translate }}</a>
         <a mat-list-item class="baseMenu" [routerLink]="['/users']" [routerLinkActive]="['is-active']">{{ "users.list" | translate }}</a>
         <a mat-list-item class="baseMenu" [routerLink]="['/groups']" [routerLinkActive]="['is-active']">{{ "groups.list" | translate }}</a>
+        <a mat-list-item class="baseMenu" [routerLink]="['/humantaskinstances']" [routerLinkActive]="['is-active']">{{ "humantaskinstance.list" | translate }}</a>
         <mat-list-item class="baseMenu" (click)="showProvisioning = !showProvisioning">
           <span class="full-width">{{ 'provisioning.list' | translate }}</span>
           <mat-icon class="menu-button" [ngClass]="{'rotated' : showProvisioning}">expand_more</mat-icon>
