@@ -25,8 +25,7 @@ namespace SimpleIdServer.OpenID.Tests.UI
             var options = new OAuth.Options.OAuthHostOptions();
             var opts = Microsoft.Extensions.Options.Options.Create(options);
             var authenticator = new TOTPAuthenticator(opts);
-            double d = 1626120476;
-            var date = d.ConvertFromUnixTimestamp();
+            var date = DateTime.Parse("12-07-21 20:07:56");
 
             // ARRANGE
             var otp = authenticator.GenerateOtp(user, date);
