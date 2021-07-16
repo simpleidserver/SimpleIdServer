@@ -239,6 +239,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateUserPasswordHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateUserPasswordHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.AddOAuthUserBySCIMIdHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOTPCodeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOTPCodeHandler>();
+            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOTPQRCodeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOTPQRCodeHandler>();
             return services;
         }
 

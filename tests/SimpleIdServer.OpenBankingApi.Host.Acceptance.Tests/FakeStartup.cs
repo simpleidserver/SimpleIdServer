@@ -67,6 +67,7 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
                 opts.AddPolicy("IsConnected", p => p.RequireAuthenticatedUser());
                 opts.AddPolicy("ManageClients", p => p.RequireAssertion(b => true));
                 opts.AddPolicy("ManageScopes", p => p.RequireAssertion(b => true));
+                opts.AddPolicy("ManageUsers", p => p.RequireAssertion(b => true));
                 opts.AddOpenBankingAuthorization(CertificateAuthenticationDefaults.AuthenticationScheme);
             });
 

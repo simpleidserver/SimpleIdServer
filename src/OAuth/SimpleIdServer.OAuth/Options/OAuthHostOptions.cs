@@ -31,6 +31,7 @@ namespace SimpleIdServer.OAuth.Options
             HOTPWindow = 5;
             TOTPStep = 30;
             OTPAlg = OTPAlgs.TOTP;
+            OTPIssuer = "SimpleIdServer";
         }
 
         /// <summary>
@@ -97,5 +98,9 @@ namespace SimpleIdServer.OAuth.Options
         /// Default OTP algorithm.
         /// </summary>
         public OTPAlgs OTPAlg { get; set; }
+        /// <summary>
+        /// Default OTP issuer.
+        /// </summary>
+        public string OTPIssuer { get; set; }
     }
 }

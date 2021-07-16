@@ -13,9 +13,14 @@ namespace SimpleIdServer.OpenID.Extensions
     {
         #region Openid client request
 
-        public static ApplicationKinds GetApplicationKind(this JObject jObj)
+        public static ApplicationKinds? GetApplicationKind(this JObject jObj)
         {
             var kind = jObj.GetInt(OpenIdClientParameters.ApplicationKind);
+            if (kind == null)
+            {
+                return null;
+            }
+
             return (ApplicationKinds)kind.Value;
         }
 

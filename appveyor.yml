@@ -32,7 +32,7 @@ deploy:
   name: production
   artifact: /.*\.nupkg/
   api_key:
-    secure: uvqCTXIhqkg276NWxxcSCJ6bo32fJTY+jalwlNjZQ6EKVyADinxmJ8qpcDorWSS/
+    secure: ppwdCVQ3Ue4Msodk0VafBwlpujkDBddjGg7okIRojYiVFhVD6fhd7ERijm3RzSGD
   on:
     branch: master
     appveyor_repo_tag: true

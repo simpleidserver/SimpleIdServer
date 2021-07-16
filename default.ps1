@@ -22,9 +22,6 @@ task publish {
 	exec { dotnet publish $source_dir\OAuth\SimpleIdServer.OAuth.Startup\SimpleIdServer.OAuth.Startup.csproj -c $config -o $result_dir\services\OAuth }
 	exec { dotnet publish $source_dir\Website\SimpleIdServer.Gateway.Host\SimpleIdServer.Gateway.Host.csproj -c $config -o $result_dir\services\SimpleIdServerApi }
 	exec { dotnet publish $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Startup\SimpleIdServer.OpenBankingApi.Startup.csproj -c $config -o $result_dir\services\OpenBankingApi }
-	exec { npm install $source_dir\Website\SimpleIdServer.Website --prefix $source_dir\Website\SimpleIdServer.Website }
-	exec { npm run build-azure --prefix $source_dir\Website\SimpleIdServer.Website }
-	exec { dotnet publish $source_dir\Website\SimpleIdServer.Website\SimpleIdServer.Website.csproj -c $config -o $result_dir\services\SimpleIdServerWebsite }
 }
 
 task clean {
@@ -53,6 +50,7 @@ task compile -depends clean {
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Uma.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.OpenBanking.Host.sln -c $config --version-suffix=$buildSuffix }
+    exec { dotnet build .\CaseManagement.sln -c $config --version-suffix=$buildSuffix }
 }
  
 task pack -depends compile {

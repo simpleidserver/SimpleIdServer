@@ -91,6 +91,14 @@ namespace SimpleIdServer.OpenID.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope ManageHumanTaskInstance = new OAuthScope
+        {
+            Name = "manage_humantaskinstance",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -133,6 +141,15 @@ namespace SimpleIdServer.OpenID.Startup
                     "pwd",
                     "sms"
                 }
+            },
+            new AuthenticationContextClassReference
+            {
+                DisplayName = "Second level of assurance (email)",
+                Name = "sid-load-021",
+                AuthenticationMethodReferences = new List<string>
+                {
+                    "email"
+                }
             }
         };
 
@@ -151,6 +168,7 @@ namespace SimpleIdServer.OpenID.Startup
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
+                OTPKey = "HQI6X6V2MEP44J4NLZJ65VKAHCSSCNFL",
                 DeviceRegistrationToken = "ciyortoPQHGluxo-vIZLu7:APA91bHRrB-mdgHl6IQFu4XNWR5VBXxOjaq-gAAuxCzswQAGeryvFaBqoJqJN_oSEtPZMTknRe2rixJj5cjnaWkCin8NSXm7Gug6peZd9EpJgJ98CNHqOudcFv_h3jp4dpgWn6imb7sR",
                 OAuthUserClaims = new List<OAuthUserClaim>
                 {
@@ -174,7 +192,8 @@ namespace SimpleIdServer.OpenID.Startup
                     new OAuthUserClaim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
                     new OAuthUserClaim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", Jwt.ClaimValueTypes.JSONOBJECT),
                     new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN)
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
+                    new OAuthUserClaim(Jwt.Constants.UserClaims.Role, "visitor")
                 }
             },
             new OAuthUser
@@ -210,7 +229,8 @@ namespace SimpleIdServer.OpenID.Startup
                 {
                     new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
                     new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst"),
+                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "visitor")
                 }
             },
             new OAuthUser
@@ -821,6 +841,69 @@ namespace SimpleIdServer.OpenID.Startup
                     AllowedScopes = new List<OAuthScope>
                     {
                         ManageUsers
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "bpmnClient",
+                    ClientSecret = "bpmnClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    Translations = new List<OAuthClientTranslation>
+                    {
+                        new OAuthClientTranslation
+                        {
+                            Translation = new OAuthTranslation("bpmnClient_client_name", "BpmnClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
+                        }
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        ManageHumanTaskInstance
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "client_credentials"
+                    },
+                    PreferredTokenProfile = "Bearer"
+                },
+                new OpenIdClient
+                {
+                    ClientId = "humanTaskClient",
+                    ClientSecret = "humanTaskClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    Translations = new List<OAuthClientTranslation>
+                    {
+                        new OAuthClientTranslation
+                        {
+                            Translation = new OAuthTranslation("humanTaskClient_client_name", "HumanTaskClient", "fr")
+                            {
+                                Type = "client_name"
+                            }
+                        }
+                    },
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        ManageUsers,
+                        ManageHumanTaskInstance
                     },
                     GrantTypes = new List<string>
                     {

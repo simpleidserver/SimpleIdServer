@@ -261,4 +261,16 @@
   <data name="manage_consents" xml:space="preserve">
     <value>Gérer les consentements</value>
   </data>
+  <data name="authenticate_email" xml:space="preserve">
+    <value>Authentification par email</value>
+  </data>
+  <data name="email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="unknown_email" xml:space="preserve">
+    <value>L'email est inconnu</value>
+  </data>
+  <data name="code_validity" xml:space="preserve">
+    <value>Le code a une validité de {0} secondes</value>
+  </data>
 </root>

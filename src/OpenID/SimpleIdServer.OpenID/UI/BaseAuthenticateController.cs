@@ -68,6 +68,7 @@ namespace SimpleIdServer.OpenID.UI
             {
                 var currentDateTime = DateTime.UtcNow;
                 var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+                var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
                 var claims = user.ToClaims();
                 var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -80,11 +81,22 @@ namespace SimpleIdServer.OpenID.UI
                     HttpOnly = false,
                     SameSite = SameSiteMode.None
                 });
-                await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
+                if (rememberLogin)
                 {
-                    IsPersistent = rememberLogin,
-                    ExpiresUtc = expirationDateTime
-                });
+                    await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
+                    {
+                        IsPersistent = true
+                    });
+                }
+                else
+                {
+                    await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = offset
+                    });
+                }
+
                 return Redirect(unprotectedUrl);
             }
 

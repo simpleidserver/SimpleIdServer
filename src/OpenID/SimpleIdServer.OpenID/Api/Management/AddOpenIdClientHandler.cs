@@ -34,7 +34,7 @@ namespace SimpleIdServer.OpenID.Api.Management
             }
 
             var parameter = jObj.ToCreateOpenIdClientParameter();
-            var openidClient = OpenIdClient.Create(parameter.ApplicationKind, 
+            var openidClient = OpenIdClient.Create(parameter.ApplicationKind.Value, 
                 parameter.ClientName, 
                 language, 
                 expirationDateTime, 

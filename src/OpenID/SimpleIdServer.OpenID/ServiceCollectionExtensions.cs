@@ -111,23 +111,33 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {
-                        var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                        var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
-                        var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
-                        ctx.Options.CookieManager.AppendResponseCookie(
-                            ctx.HttpContext,
-                            $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
-                            cookieValue,
-                            ctx.CookieOptions);
+                        if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
+                        {
+                            var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
+                            var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
+                            ctx.Options.CookieManager.AppendResponseCookie(
+                                ctx.HttpContext,
+                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                cookieValue,
+                                ctx.CookieOptions);
+                            return Task.CompletedTask;
+                        }
+
                         return Task.CompletedTask;
                     };
                     opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
                     {
-                        var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                        ctx.Options.CookieManager.DeleteCookie(
-                            ctx.HttpContext,
-                            $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
-                            ctx.CookieOptions);
+                        if (ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
+                        {
+                            var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            ctx.Options.CookieManager.DeleteCookie(
+                                ctx.HttpContext,
+                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                ctx.CookieOptions);
+                            return Task.CompletedTask;
+                        }
+
                         return Task.CompletedTask;
                     };
                 });

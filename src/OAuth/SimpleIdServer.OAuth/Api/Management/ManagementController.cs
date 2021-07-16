@@ -13,6 +13,9 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.Parameters;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -38,6 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IUpdateUserPasswordHandler _updateUserPasswordHandler;
         private readonly IAddOAuthUserBySCIMIdHandler _addOAuthUserBySCIMIdHandler;
         private readonly IGetOTPCodeHandler _getOTPCodeHandler;
+        private readonly IGetOTPQRCodeHandler _getOTPQRCodeHandler;
         private readonly OAuthHostOptions _options;
 
         public ManagementController(
@@ -56,6 +60,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IUpdateUserPasswordHandler updateUserPasswordHandler,
             IAddOAuthUserBySCIMIdHandler addOAuthUserBySCIMIdHandler,
             IGetOTPCodeHandler getOTPCodeHandler,
+            IGetOTPQRCodeHandler getOTPQRCodeHandler,
             IOptions<OAuthHostOptions> options)
         {
             _oauthScopeRepository = oauthScopeRepository;
@@ -73,6 +78,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _updateUserPasswordHandler = updateUserPasswordHandler;
             _addOAuthUserBySCIMIdHandler = addOAuthUserBySCIMIdHandler;
             _getOTPCodeHandler = getOTPCodeHandler;
+            _getOTPQRCodeHandler = getOTPQRCodeHandler;
             _options = options.Value;
         }
 
@@ -279,6 +285,21 @@ namespace SimpleIdServer.OAuth.Api.Management
             }
         }
 
+        [HttpGet("users/{id}/otp/qr")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> GetOTPQRCode(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _getOTPQRCodeHandler.Handle(id, null, cancellationToken);
+                return GetImage(result);
+            }
+            catch (OAuthUserNotFoundException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
+            }
+        }
+
         [HttpGet("users/{id}/emails/otp")]
         [Authorize("ManageUsers")]
         public virtual async Task<IActionResult> GetOTPCodeByEmail(string id, CancellationToken cancellationToken)
@@ -287,6 +308,21 @@ namespace SimpleIdServer.OAuth.Api.Management
             {
                 var result = await _getOTPCodeHandler.Handle(id, SimpleIdServer.Jwt.Constants.UserClaims.Email, cancellationToken);
                 return new OkObjectResult(result);
+            }
+            catch (OAuthUserNotFoundException ex)
+            {
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
+            }
+        }
+
+        [HttpGet("users/{id}/emails/otp/qr")]
+        [Authorize("ManageUsers")]
+        public virtual async Task<IActionResult> GetOTPQRByEmailCode(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _getOTPQRCodeHandler.Handle(id, SimpleIdServer.Jwt.Constants.UserClaims.Email, cancellationToken);
+                return GetImage(result);
             }
             catch (OAuthUserNotFoundException ex)
             {
@@ -359,6 +395,18 @@ namespace SimpleIdServer.OAuth.Api.Management
             var result = new SearchScopeParameter();
             result.ExtractSearchParameter(queries);
             return result;
+        }
+
+        private IActionResult GetImage(Bitmap result)
+        {
+            byte[] payload = null;
+            using (var stream = new MemoryStream())
+            {
+                result.Save(stream, ImageFormat.Png);
+                payload = stream.ToArray();
+            }
+
+            return File(payload, "image/png");
         }
     }
 }

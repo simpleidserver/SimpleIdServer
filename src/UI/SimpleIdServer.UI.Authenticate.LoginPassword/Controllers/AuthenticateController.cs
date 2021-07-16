@@ -10,7 +10,6 @@ using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
-using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.UI;
 using SimpleIdServer.UI.Authenticate.LoginPassword.Services;
 using SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels;

@@ -1,5 +1,8 @@
-﻿@using SimpleIdServer.OpenID.Startup.Resources
-@model  SimpleIdServer.UI.Authenticate.Sms.ViewModels.AuthenticateViewModel
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.OAuth.Options;
+@using SimpleIdServer.OpenID.Startup.Resources;
+@model SimpleIdServer.UI.Authenticate.Sms.ViewModels.AuthenticateViewModel
+@inject IOptions<OAuthHostOptions> configuration
 
 @{
     ViewBag.Title = Global.authenticate_sms;
@@ -14,6 +17,23 @@
                 <img class="card-img-top rounded mx-auto d-block" src="@Model.LogoUri" style="max-width: 300px" />
             }
             <h5 class="card-title">@Model.ClientName</h5>
+            <div class="alert alert-info">
+                @string.Format(Global.code_validity, configuration.Value.TOTPStep)
+            </div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <ul class="list-group">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
+                            {
+                                <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
             <div class="row">
                 <div class="col-md-6">
                     @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
@@ -33,20 +53,6 @@
                     }
                 </div>
                 <div class="col-md-6">
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div class="alert alert-danger">
-                            <ul class="list-group">
-                                @foreach (var modelState in ViewData.ModelState.Values)
-                                {
-                                    foreach (var error in modelState.Errors)
-                                    {
-                                        <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
-                                    }
-                                }
-                            </ul>
-                        </div>
-                    }
                     @using (Html.BeginForm("Index", "Authenticate", new { area = "sms", returnUrl = Model.ReturnUrl }, FormMethod.Post))
                     {
                         @Html.AntiForgeryToken()
@@ -57,8 +63,8 @@
                             <input asp-for="PhoneNumber" type="text" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <label asp-for="ConfirmationCode">@Global.confirmationcode</label>
-                            <input asp-for="ConfirmationCode" type="password" class="form-control" />
+                            <label asp-for="OTPCode">@Global.confirmationcode</label>
+                            <input asp-for="OTPCode" type="password" class="form-control" />
                         </div>
                         <div>
                             <input type="checkbox" asp-for="RememberLogin " />

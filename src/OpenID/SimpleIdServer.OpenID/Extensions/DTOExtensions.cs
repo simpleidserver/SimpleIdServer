@@ -35,7 +35,11 @@ namespace SimpleIdServer.OpenID.Extensions
             }
 
             result.Add(OpenIdClientParameters.RequireAuthTime, openidClient.RequireAuthTime);
-            result.Add(OpenIdClientParameters.ApplicationKind, (int)openidClient.ApplicationKind);
+            if (openidClient.ApplicationKind != null)
+            {
+                result.Add(OpenIdClientParameters.ApplicationKind, (int)openidClient.ApplicationKind);
+            }
+
             return result;
         }
 

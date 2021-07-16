@@ -27,7 +27,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultBCAuthorizeWaitIntervalInSeconds = 2;
             DefaultRequestObjectEncyptionEnc = A128CBCHS256EncHandler.ENC_NAME;
             MaxRequestLifetime = 60 * 5;
-            CookieAuthExpirationTimeInSeconds = 60 * 5;
+            CookieAuthExpirationTimeInSeconds = 5 * 60;
         }
 
         /// <summary>

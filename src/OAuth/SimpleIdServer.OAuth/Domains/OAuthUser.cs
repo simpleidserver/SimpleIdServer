@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace SimpleIdServer.OAuth.Domains
 
         public byte[] GetOTPKey()
         {
-            return Convert.FromBase64String(OTPKey);
+            return OTPKey.ConvertToBase32();
         }
 
         public void ResetOtp()
@@ -66,7 +67,7 @@ namespace SimpleIdServer.OAuth.Domains
             using (var rnd = RandomNumberGenerator.Create())
             {
                 rnd.GetBytes(key);
-                OTPKey = Convert.ToBase64String(key);
+                OTPKey = key.ConvertFromBase32();
                 OTPCounter = 0;
             }
         }
@@ -78,7 +79,7 @@ namespace SimpleIdServer.OAuth.Domains
 
         public void ResetOtp(byte[] secret, int counter)
         {
-            OTPKey = Convert.ToBase64String(secret);
+            OTPKey = secret.ConvertFromBase32();
             OTPCounter = counter;
         }
 

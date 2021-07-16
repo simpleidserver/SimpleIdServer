@@ -20,17 +20,15 @@
                 <h5 class="card-title">@Model.ClientName</h5>
                 @if (!ViewData.ModelState.IsValid)
                 {
-                    <div class="alert alert-danger">
-                        <ul class="list-group">
-                            @foreach (var modelState in ViewData.ModelState.Values)
+                    <ul class="list-group">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
                             {
-                                foreach (var error in modelState.Errors)
-                                {
-                                    <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
-                                }
+                                <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
                             }
-                        </ul>
-                    </div>
+                        }
+                    </ul>
                 }
                 <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
                 <div class="form-group">

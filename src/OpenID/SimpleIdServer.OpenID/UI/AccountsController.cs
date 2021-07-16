@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OpenID.UI.Infrastructures;
 using SimpleIdServer.OpenID.UI.ViewModels;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -27,6 +28,7 @@ namespace SimpleIdServer.OpenID.UI
         {
             var sessions = _sessionManager.FetchTickets(HttpContext);
             var accounts = sessions.Select(sess => new AccountViewModel(sess.Principal.Claims.First(cl => cl.Type == ClaimTypes.NameIdentifier).Value, sess.Properties.ExpiresUtc, sess.Properties.IssuedUtc));
+            accounts = accounts.Where(a => a.ExpiresUct >= DateTime.UtcNow);
             return View(new AccountsIndexViewModel(returnUrl, accounts));
         }
 

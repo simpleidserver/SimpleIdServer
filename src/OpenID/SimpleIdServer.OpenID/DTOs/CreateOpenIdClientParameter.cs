@@ -6,7 +6,7 @@ namespace SimpleIdServer.OpenID.DTOs
 {
     public class CreateOpenIdClientParameter
     {
-        public ApplicationKinds ApplicationKind { get; set; }
+        public ApplicationKinds? ApplicationKind { get; set; }
         public string ClientName { get; set; }
     }
 }
