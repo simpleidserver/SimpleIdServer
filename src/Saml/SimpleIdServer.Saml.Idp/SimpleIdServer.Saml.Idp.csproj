@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj" />
   </ItemGroup>
   <ItemGroup>

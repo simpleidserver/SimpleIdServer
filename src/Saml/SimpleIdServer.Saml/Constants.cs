@@ -8,6 +8,8 @@ namespace SimpleIdServer.Saml
 {
     public static class Constants
     {
+        public const string SamlVersion = "2.0";
+
         public static class ConfirmationMethodIdentifiers
         {
             public const string HolderOfKey = "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key";
@@ -59,6 +61,7 @@ namespace SimpleIdServer.Saml
             public const string Requester = "urn:oasis:names:tc:SAML:2.0:status:Requester";
             public const string VersionMismatch = "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch";
             public const string RequestUnsupported = "urn:oasis:names:tc:SAML:2.0:status:RequestUnsupported";
+            public const string InvalidNameIDPolicy = "urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy";
         }
 
         public static Dictionary<Saml.SignatureAlgorithms, string> MappingDigestMethodToStr = new Dictionary<Saml.SignatureAlgorithms, string>

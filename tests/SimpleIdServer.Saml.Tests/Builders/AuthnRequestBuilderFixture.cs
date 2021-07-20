@@ -22,6 +22,7 @@ namespace SimpleIdServer.Saml.Tests.Builders
             // https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf
             // http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml2-holder-of-key-cs-02.html
             // https://developers.onelogin.com/saml/examples/authnrequest : explains how to sign AuthnRequest
+            // https://dtservices.bosa.be/sites/default/files/content/download/files/fas_saml_integration_guide_v0.51_1.pdf
             // ARRANGE
             var builder = AuthnRequestBuilder.New("SP")
                 .SetIssuer(Constants.NameIdentifierFormats.EntityIdentifier, "urn:rp")

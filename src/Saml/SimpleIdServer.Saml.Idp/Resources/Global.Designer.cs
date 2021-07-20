@@ -88,6 +88,15 @@ namespace SimpleIdServer.Saml.Idp.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à At least one AuthnContextClassRef must be specified.
+        /// </summary>
+        internal static string MissingAuthnContextClassRef {
+            get {
+                return ResourceManager.GetString("MissingAuthnContextClassRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Parameter {0} is missing.
         /// </summary>
         internal static string MissingParameter {
@@ -97,11 +106,29 @@ namespace SimpleIdServer.Saml.Idp.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à AuthContextClassRef {0} don&apos;t exist.
+        /// </summary>
+        internal static string UnknownAuthContextClassRef {
+            get {
+                return ResourceManager.GetString("UnknownAuthContextClassRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Issuer {0} is unknown.
         /// </summary>
         internal static string UnknownIssuer {
             get {
                 return ResourceManager.GetString("UnknownIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à NameID {0} doesn&apos;t exist.
+        /// </summary>
+        internal static string UnknownNameId {
+            get {
+                return ResourceManager.GetString("UnknownNameId", resourceCulture);
             }
         }
         

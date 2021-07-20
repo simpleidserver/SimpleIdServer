@@ -126,11 +126,20 @@
   <data name="BadAuthnRequestXml" xml:space="preserve">
     <value>AuthnRequest is not a correct XML request</value>
   </data>
+  <data name="MissingAuthnContextClassRef" xml:space="preserve">
+    <value>At least one AuthnContextClassRef must be specified</value>
+  </data>
   <data name="MissingParameter" xml:space="preserve">
     <value>Parameter {0} is missing</value>
   </data>
+  <data name="UnknownAuthContextClassRef" xml:space="preserve">
+    <value>AuthContextClassRef {0} don't exist</value>
+  </data>
   <data name="UnknownIssuer" xml:space="preserve">
     <value>Issuer {0} is unknown</value>
+  </data>
+  <data name="UnknownNameId" xml:space="preserve">
+    <value>NameID {0} doesn't exist</value>
   </data>
   <data name="UnsupportNameIdFormat" xml:space="preserve">
     <value>NameID format {0} is not supported</value>

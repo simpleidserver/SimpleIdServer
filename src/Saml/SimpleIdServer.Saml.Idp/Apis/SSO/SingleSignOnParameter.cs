@@ -6,5 +6,6 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
     {
         public string SAMLRequest { get; set; }
         public string RelayState { get; set; }
+        public string UserId { get; set; }
     }
 }

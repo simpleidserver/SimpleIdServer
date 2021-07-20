@@ -17,7 +17,7 @@ namespace SimpleIdServer.Saml.Builders
             _authRequest = new AuthnRequestType
             {
                 ID = $"pfx{Guid.NewGuid().ToString()}",
-                Version = "2.0",
+                Version = Constants.SamlVersion,
                 IssueInstant = DateTime.UtcNow,
                 ProviderName = providerName
             };
@@ -133,11 +133,11 @@ namespace SimpleIdServer.Saml.Builders
             return _authRequest;
         }
 
-        #endregion
-
         public AuthnRequestType Build()
         {
             return _authRequest;
         }
+
+        #endregion
     }
 }

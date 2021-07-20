@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core Layer", "01. Core Layer", "{D90BBDDE-8BBA-4E2F-9C5E-0EE27FF4205D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Testing Layer", "02. Testing Layer", "{DE019BAE-0BF0-4AEC-9D62-233E3F10D602}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. Testing Layer", "04. Testing Layer", "{DE019BAE-0BF0-4AEC-9D62-233E3F10D602}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Saml.Idp", "src\Saml\SimpleIdServer.Saml.Idp\SimpleIdServer.Saml.Idp.csproj", "{0E3BFC0F-2389-41D8-B985-D42C66D65C25}"
 EndProject
@@ -14,6 +14,18 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Saml", "src\Saml\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj", "{85C7378C-4C73-4420-A3E1-D159CC0C3072}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Saml.Tests", "tests\SimpleIdServer.Saml.Tests\SimpleIdServer.Saml.Tests.csproj", "{9A0FD560-AD1C-4C2D-9F5E-73C0535E005D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. UI Layer", "02. UI Layer", "{03BB2BE2-65FC-4276-8EB3-2E3D80BBB40E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Saml.UI.Authenticate.LoginPassword", "src\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.csproj", "{2CAE8A5B-3E66-4BB4-A5E7-45EDDF73A0C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Common", "src\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj", "{BDACCEE3-B3AB-479F-8FA2-FF5FFEEBFAED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Startup Layer", "03. Startup Layer", "{449F8F79-B227-470A-AB4D-E7878F617128}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Saml.Idp.Startup", "src\Saml\SimpleIdServer.Saml.Idp.Startup\SimpleIdServer.Saml.Idp.Startup.csproj", "{6813A89E-E37A-47B0-99E3-E863DFF24F6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Saml.Sp.Startup", "src\Saml\SimpleIdServer.Saml.Sp.Startup\SimpleIdServer.Saml.Sp.Startup.csproj", "{0BA83B10-AE62-485C-BD79-1B509424A6F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +49,22 @@ Global
 		{9A0FD560-AD1C-4C2D-9F5E-73C0535E005D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A0FD560-AD1C-4C2D-9F5E-73C0535E005D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A0FD560-AD1C-4C2D-9F5E-73C0535E005D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CAE8A5B-3E66-4BB4-A5E7-45EDDF73A0C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CAE8A5B-3E66-4BB4-A5E7-45EDDF73A0C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CAE8A5B-3E66-4BB4-A5E7-45EDDF73A0C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CAE8A5B-3E66-4BB4-A5E7-45EDDF73A0C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDACCEE3-B3AB-479F-8FA2-FF5FFEEBFAED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDACCEE3-B3AB-479F-8FA2-FF5FFEEBFAED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDACCEE3-B3AB-479F-8FA2-FF5FFEEBFAED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDACCEE3-B3AB-479F-8FA2-FF5FFEEBFAED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6813A89E-E37A-47B0-99E3-E863DFF24F6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6813A89E-E37A-47B0-99E3-E863DFF24F6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6813A89E-E37A-47B0-99E3-E863DFF24F6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6813A89E-E37A-47B0-99E3-E863DFF24F6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA83B10-AE62-485C-BD79-1B509424A6F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA83B10-AE62-485C-BD79-1B509424A6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA83B10-AE62-485C-BD79-1B509424A6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA83B10-AE62-485C-BD79-1B509424A6F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +74,10 @@ Global
 		{74FF7207-405B-4EC3-8BB8-98FC2471CA42} = {DE019BAE-0BF0-4AEC-9D62-233E3F10D602}
 		{85C7378C-4C73-4420-A3E1-D159CC0C3072} = {D90BBDDE-8BBA-4E2F-9C5E-0EE27FF4205D}
 		{9A0FD560-AD1C-4C2D-9F5E-73C0535E005D} = {DE019BAE-0BF0-4AEC-9D62-233E3F10D602}
+		{2CAE8A5B-3E66-4BB4-A5E7-45EDDF73A0C1} = {03BB2BE2-65FC-4276-8EB3-2E3D80BBB40E}
+		{BDACCEE3-B3AB-479F-8FA2-FF5FFEEBFAED} = {D90BBDDE-8BBA-4E2F-9C5E-0EE27FF4205D}
+		{6813A89E-E37A-47B0-99E3-E863DFF24F6F} = {449F8F79-B227-470A-AB4D-E7878F617128}
+		{0BA83B10-AE62-485C-BD79-1B509424A6F2} = {449F8F79-B227-470A-AB4D-E7878F617128}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {403A3C4E-E5B6-4B25-B4D8-E29AC0CEBAF5}

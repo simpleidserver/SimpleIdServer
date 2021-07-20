@@ -8,6 +8,6 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
 {
     public interface ISingleSignOnHandler
     {
-        Task Handle(SingleSignOnParameter parameter, CancellationToken cancellationToken);
+        Task<SingleSignOnResult> Handle(SingleSignOnParameter parameter, CancellationToken cancellationToken);
     }
 }

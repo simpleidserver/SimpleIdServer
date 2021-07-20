@@ -11,8 +11,2016 @@
 // 
 // Ce code source a été automatiquement généré par xsd, Version=4.8.3928.0.
 // 
+using System;
+
 namespace SimpleIdServer.Saml.Xsd
 {
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("EntitiesDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class EntitiesDescriptorType
+    {
+
+        private SignatureType signatureField;
+
+        private ExtensionsType extensionsField;
+
+        private object[] itemsField;
+
+        private System.DateTime validUntilField;
+
+        private bool validUntilFieldSpecified;
+
+        private string cacheDurationField;
+
+        private string idField;
+
+        private string nameField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
+        public SignatureType Signature
+        {
+            get
+            {
+                return this.signatureField;
+            }
+            set
+            {
+                this.signatureField = value;
+            }
+        }
+
+        /// <remarks/>
+        public ExtensionsType Extensions
+        {
+            get
+            {
+                return this.extensionsField;
+            }
+            set
+            {
+                this.extensionsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("EntitiesDescriptor", typeof(EntitiesDescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("EntityDescriptor", typeof(EntityDescriptorType))]
+        public object[] Items
+        {
+            get
+            {
+                return this.itemsField;
+            }
+            set
+            {
+                this.itemsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public System.DateTime validUntil
+        {
+            get
+            {
+                return this.validUntilField;
+            }
+            set
+            {
+                this.validUntilField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool validUntilSpecified
+        {
+            get
+            {
+                return this.validUntilFieldSpecified;
+            }
+            set
+            {
+                this.validUntilFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "duration")]
+        public string cacheDuration
+        {
+            get
+            {
+                return this.cacheDurationField;
+            }
+            set
+            {
+                this.cacheDurationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string ID
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Name
+        {
+            get
+            {
+                return this.nameField;
+            }
+            set
+            {
+                this.nameField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("EntityDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class EntityDescriptorType
+    {
+
+        private SignatureType signatureField;
+
+        private ExtensionsType extensionsField;
+
+        private object[] itemsField;
+
+        private OrganizationType organizationField;
+
+        private ContactType[] contactPersonField;
+
+        private AdditionalMetadataLocationType[] additionalMetadataLocationField;
+
+        private string entityIDField;
+
+        private System.DateTime validUntilField;
+
+        private bool validUntilFieldSpecified;
+
+        private string cacheDurationField;
+
+        private string idField;
+
+        private System.Xml.XmlAttribute[] anyAttrField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
+        public SignatureType Signature
+        {
+            get
+            {
+                return this.signatureField;
+            }
+            set
+            {
+                this.signatureField = value;
+            }
+        }
+
+        /// <remarks/>
+        public ExtensionsType Extensions
+        {
+            get
+            {
+                return this.extensionsField;
+            }
+            set
+            {
+                this.extensionsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AffiliationDescriptor", typeof(AffiliationDescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("AttributeAuthorityDescriptor", typeof(AttributeAuthorityDescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("AuthnAuthorityDescriptor", typeof(AuthnAuthorityDescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("IDPSSODescriptor", typeof(IDPSSODescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("PDPDescriptor", typeof(PDPDescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("RoleDescriptor", typeof(RoleDescriptorType))]
+        [System.Xml.Serialization.XmlElementAttribute("SPSSODescriptor", typeof(SPSSODescriptorType))]
+        public object[] Items
+        {
+            get
+            {
+                return this.itemsField;
+            }
+            set
+            {
+                this.itemsField = value;
+            }
+        }
+
+        /// <remarks/>
+        public OrganizationType Organization
+        {
+            get
+            {
+                return this.organizationField;
+            }
+            set
+            {
+                this.organizationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ContactPerson")]
+        public ContactType[] ContactPerson
+        {
+            get
+            {
+                return this.contactPersonField;
+            }
+            set
+            {
+                this.contactPersonField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AdditionalMetadataLocation")]
+        public AdditionalMetadataLocationType[] AdditionalMetadataLocation
+        {
+            get
+            {
+                return this.additionalMetadataLocationField;
+            }
+            set
+            {
+                this.additionalMetadataLocationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string entityID
+        {
+            get
+            {
+                return this.entityIDField;
+            }
+            set
+            {
+                this.entityIDField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public System.DateTime validUntil
+        {
+            get
+            {
+                return this.validUntilField;
+            }
+            set
+            {
+                this.validUntilField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool validUntilSpecified
+        {
+            get
+            {
+                return this.validUntilFieldSpecified;
+            }
+            set
+            {
+                this.validUntilFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "duration")]
+        public string cacheDuration
+        {
+            get
+            {
+                return this.cacheDurationField;
+            }
+            set
+            {
+                this.cacheDurationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string ID
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyAttributeAttribute()]
+        public System.Xml.XmlAttribute[] AnyAttr
+        {
+            get
+            {
+                return this.anyAttrField;
+            }
+            set
+            {
+                this.anyAttrField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("AffiliationDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class AffiliationDescriptorType
+    {
+
+        private SignatureType signatureField;
+
+        private ExtensionsType extensionsField;
+
+        private string[] affiliateMemberField;
+
+        private KeyDescriptorType[] keyDescriptorField;
+
+        private string affiliationOwnerIDField;
+
+        private System.DateTime validUntilField;
+
+        private bool validUntilFieldSpecified;
+
+        private string cacheDurationField;
+
+        private string idField;
+
+        private System.Xml.XmlAttribute[] anyAttrField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
+        public SignatureType Signature
+        {
+            get
+            {
+                return this.signatureField;
+            }
+            set
+            {
+                this.signatureField = value;
+            }
+        }
+
+        /// <remarks/>
+        public ExtensionsType Extensions
+        {
+            get
+            {
+                return this.extensionsField;
+            }
+            set
+            {
+                this.extensionsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AffiliateMember", DataType = "anyURI")]
+        public string[] AffiliateMember
+        {
+            get
+            {
+                return this.affiliateMemberField;
+            }
+            set
+            {
+                this.affiliateMemberField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("KeyDescriptor")]
+        public KeyDescriptorType[] KeyDescriptor
+        {
+            get
+            {
+                return this.keyDescriptorField;
+            }
+            set
+            {
+                this.keyDescriptorField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string affiliationOwnerID
+        {
+            get
+            {
+                return this.affiliationOwnerIDField;
+            }
+            set
+            {
+                this.affiliationOwnerIDField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public System.DateTime validUntil
+        {
+            get
+            {
+                return this.validUntilField;
+            }
+            set
+            {
+                this.validUntilField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool validUntilSpecified
+        {
+            get
+            {
+                return this.validUntilFieldSpecified;
+            }
+            set
+            {
+                this.validUntilFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "duration")]
+        public string cacheDuration
+        {
+            get
+            {
+                return this.cacheDurationField;
+            }
+            set
+            {
+                this.cacheDurationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string ID
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyAttributeAttribute()]
+        public System.Xml.XmlAttribute[] AnyAttr
+        {
+            get
+            {
+                return this.anyAttrField;
+            }
+            set
+            {
+                this.anyAttrField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("KeyDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class KeyDescriptorType
+    {
+
+        private KeyInfoType keyInfoField;
+
+        private EncryptionMethodType[] encryptionMethodField;
+
+        private KeyTypes useField;
+
+        private bool useFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
+        public KeyInfoType KeyInfo
+        {
+            get
+            {
+                return this.keyInfoField;
+            }
+            set
+            {
+                this.keyInfoField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("EncryptionMethod")]
+        public EncryptionMethodType[] EncryptionMethod
+        {
+            get
+            {
+                return this.encryptionMethodField;
+            }
+            set
+            {
+                this.encryptionMethodField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public KeyTypes use
+        {
+            get
+            {
+                return this.useField;
+            }
+            set
+            {
+                this.useField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool useSpecified
+        {
+            get
+            {
+                return this.useFieldSpecified;
+            }
+            set
+            {
+                this.useFieldSpecified = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    public enum KeyTypes
+    {
+
+        /// <remarks/>
+        encryption,
+
+        /// <remarks/>
+        signing,
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("AttributeAuthorityDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class AttributeAuthorityDescriptorType : RoleDescriptorType
+    {
+
+        private EndpointType[] attributeServiceField;
+
+        private EndpointType[] assertionIDRequestServiceField;
+
+        private string[] nameIDFormatField;
+
+        private string[] attributeProfileField;
+
+        private AttributeType[] attributeField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AttributeService")]
+        public EndpointType[] AttributeService
+        {
+            get
+            {
+                return this.attributeServiceField;
+            }
+            set
+            {
+                this.attributeServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AssertionIDRequestService")]
+        public EndpointType[] AssertionIDRequestService
+        {
+            get
+            {
+                return this.assertionIDRequestServiceField;
+            }
+            set
+            {
+                this.assertionIDRequestServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("NameIDFormat", DataType = "anyURI")]
+        public string[] NameIDFormat
+        {
+            get
+            {
+                return this.nameIDFormatField;
+            }
+            set
+            {
+                this.nameIDFormatField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AttributeProfile", DataType = "anyURI")]
+        public string[] AttributeProfile
+        {
+            get
+            {
+                return this.attributeProfileField;
+            }
+            set
+            {
+                this.attributeProfileField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Attribute", Namespace = "urn:oasis:names:tc:SAML:2.0:assertion")]
+        public AttributeType[] Attribute
+        {
+            get
+            {
+                return this.attributeField;
+            }
+            set
+            {
+                this.attributeField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(IndexedEndpointType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("SingleLogoutService", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class EndpointType
+    {
+
+        private System.Xml.XmlElement[] anyField;
+
+        private string bindingField;
+
+        private string locationField;
+
+        private string responseLocationField;
+
+        private System.Xml.XmlAttribute[] anyAttrField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyElementAttribute()]
+        public System.Xml.XmlElement[] Any
+        {
+            get
+            {
+                return this.anyField;
+            }
+            set
+            {
+                this.anyField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string Binding
+        {
+            get
+            {
+                return this.bindingField;
+            }
+            set
+            {
+                this.bindingField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string Location
+        {
+            get
+            {
+                return this.locationField;
+            }
+            set
+            {
+                this.locationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string ResponseLocation
+        {
+            get
+            {
+                return this.responseLocationField;
+            }
+            set
+            {
+                this.responseLocationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyAttributeAttribute()]
+        public System.Xml.XmlAttribute[] AnyAttr
+        {
+            get
+            {
+                return this.anyAttrField;
+            }
+            set
+            {
+                this.anyAttrField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AttributeAuthorityDescriptorType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PDPDescriptorType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AuthnAuthorityDescriptorType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SSODescriptorType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SPSSODescriptorType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(IDPSSODescriptorType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("RoleDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public abstract partial class RoleDescriptorType
+    {
+
+        private SignatureType signatureField;
+
+        private ExtensionsType extensionsField;
+
+        private KeyDescriptorType[] keyDescriptorField;
+
+        private OrganizationType organizationField;
+
+        private ContactType[] contactPersonField;
+
+        private string idField;
+
+        private System.DateTime validUntilField;
+
+        private bool validUntilFieldSpecified;
+
+        private string cacheDurationField;
+
+        private string[] protocolSupportEnumerationField;
+
+        private string errorURLField;
+
+        private System.Xml.XmlAttribute[] anyAttrField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.w3.org/2000/09/xmldsig#")]
+        public SignatureType Signature
+        {
+            get
+            {
+                return this.signatureField;
+            }
+            set
+            {
+                this.signatureField = value;
+            }
+        }
+
+        /// <remarks/>
+        public ExtensionsType Extensions
+        {
+            get
+            {
+                return this.extensionsField;
+            }
+            set
+            {
+                this.extensionsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("KeyDescriptor")]
+        public KeyDescriptorType[] KeyDescriptor
+        {
+            get
+            {
+                return this.keyDescriptorField;
+            }
+            set
+            {
+                this.keyDescriptorField = value;
+            }
+        }
+
+        /// <remarks/>
+        public OrganizationType Organization
+        {
+            get
+            {
+                return this.organizationField;
+            }
+            set
+            {
+                this.organizationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ContactPerson")]
+        public ContactType[] ContactPerson
+        {
+            get
+            {
+                return this.contactPersonField;
+            }
+            set
+            {
+                this.contactPersonField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "ID")]
+        public string ID
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public System.DateTime validUntil
+        {
+            get
+            {
+                return this.validUntilField;
+            }
+            set
+            {
+                this.validUntilField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool validUntilSpecified
+        {
+            get
+            {
+                return this.validUntilFieldSpecified;
+            }
+            set
+            {
+                this.validUntilFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "duration")]
+        public string cacheDuration
+        {
+            get
+            {
+                return this.cacheDurationField;
+            }
+            set
+            {
+                this.cacheDurationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string[] protocolSupportEnumeration
+        {
+            get
+            {
+                return this.protocolSupportEnumerationField;
+            }
+            set
+            {
+                this.protocolSupportEnumerationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string errorURL
+        {
+            get
+            {
+                return this.errorURLField;
+            }
+            set
+            {
+                this.errorURLField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyAttributeAttribute()]
+        public System.Xml.XmlAttribute[] AnyAttr
+        {
+            get
+            {
+                return this.anyAttrField;
+            }
+            set
+            {
+                this.anyAttrField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("Organization", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class OrganizationType
+    {
+
+        private ExtensionsType extensionsField;
+
+        private localizedNameType[] organizationNameField;
+
+        private localizedNameType[] organizationDisplayNameField;
+
+        private localizedURIType[] organizationURLField;
+
+        private System.Xml.XmlAttribute[] anyAttrField;
+
+        /// <remarks/>
+        public ExtensionsType Extensions
+        {
+            get
+            {
+                return this.extensionsField;
+            }
+            set
+            {
+                this.extensionsField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("OrganizationName")]
+        public localizedNameType[] OrganizationName
+        {
+            get
+            {
+                return this.organizationNameField;
+            }
+            set
+            {
+                this.organizationNameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("OrganizationDisplayName")]
+        public localizedNameType[] OrganizationDisplayName
+        {
+            get
+            {
+                return this.organizationDisplayNameField;
+            }
+            set
+            {
+                this.organizationDisplayNameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("OrganizationURL")]
+        public localizedURIType[] OrganizationURL
+        {
+            get
+            {
+                return this.organizationURLField;
+            }
+            set
+            {
+                this.organizationURLField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyAttributeAttribute()]
+        public System.Xml.XmlAttribute[] AnyAttr
+        {
+            get
+            {
+                return this.anyAttrField;
+            }
+            set
+            {
+                this.anyAttrField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("OrganizationName", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class localizedNameType
+    {
+
+        private string langField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/XML/1998/namespace")]
+        public string lang
+        {
+            get
+            {
+                return this.langField;
+            }
+            set
+            {
+                this.langField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return this.valueField;
+            }
+            set
+            {
+                this.valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("OrganizationURL", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class localizedURIType
+    {
+
+        private string langField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/XML/1998/namespace")]
+        public string lang
+        {
+            get
+            {
+                return this.langField;
+            }
+            set
+            {
+                this.langField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute(DataType = "anyURI")]
+        public string Value
+        {
+            get
+            {
+                return this.valueField;
+            }
+            set
+            {
+                this.valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("ContactPerson", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class ContactType
+    {
+
+        private ExtensionsType extensionsField;
+
+        private string companyField;
+
+        private string givenNameField;
+
+        private string surNameField;
+
+        private string[] emailAddressField;
+
+        private string[] telephoneNumberField;
+
+        private ContactTypeType contactTypeField;
+
+        private System.Xml.XmlAttribute[] anyAttrField;
+
+        /// <remarks/>
+        public ExtensionsType Extensions
+        {
+            get
+            {
+                return this.extensionsField;
+            }
+            set
+            {
+                this.extensionsField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string Company
+        {
+            get
+            {
+                return this.companyField;
+            }
+            set
+            {
+                this.companyField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string GivenName
+        {
+            get
+            {
+                return this.givenNameField;
+            }
+            set
+            {
+                this.givenNameField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string SurName
+        {
+            get
+            {
+                return this.surNameField;
+            }
+            set
+            {
+                this.surNameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("EmailAddress", DataType = "anyURI")]
+        public string[] EmailAddress
+        {
+            get
+            {
+                return this.emailAddressField;
+            }
+            set
+            {
+                this.emailAddressField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TelephoneNumber")]
+        public string[] TelephoneNumber
+        {
+            get
+            {
+                return this.telephoneNumberField;
+            }
+            set
+            {
+                this.telephoneNumberField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public ContactTypeType contactType
+        {
+            get
+            {
+                return this.contactTypeField;
+            }
+            set
+            {
+                this.contactTypeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAnyAttributeAttribute()]
+        public System.Xml.XmlAttribute[] AnyAttr
+        {
+            get
+            {
+                return this.anyAttrField;
+            }
+            set
+            {
+                this.anyAttrField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    public enum ContactTypeType
+    {
+
+        /// <remarks/>
+        technical,
+
+        /// <remarks/>
+        support,
+
+        /// <remarks/>
+        administrative,
+
+        /// <remarks/>
+        billing,
+
+        /// <remarks/>
+        other,
+    }
+
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SPSSODescriptorType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(IDPSSODescriptorType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    public abstract partial class SSODescriptorType : RoleDescriptorType
+    {
+
+        private IndexedEndpointType[] artifactResolutionServiceField;
+
+        private EndpointType[] singleLogoutServiceField;
+
+        private EndpointType[] manageNameIDServiceField;
+
+        private string[] nameIDFormatField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ArtifactResolutionService")]
+        public IndexedEndpointType[] ArtifactResolutionService
+        {
+            get
+            {
+                return this.artifactResolutionServiceField;
+            }
+            set
+            {
+                this.artifactResolutionServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("SingleLogoutService")]
+        public EndpointType[] SingleLogoutService
+        {
+            get
+            {
+                return this.singleLogoutServiceField;
+            }
+            set
+            {
+                this.singleLogoutServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ManageNameIDService")]
+        public EndpointType[] ManageNameIDService
+        {
+            get
+            {
+                return this.manageNameIDServiceField;
+            }
+            set
+            {
+                this.manageNameIDServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("NameIDFormat", DataType = "anyURI")]
+        public string[] NameIDFormat
+        {
+            get
+            {
+                return this.nameIDFormatField;
+            }
+            set
+            {
+                this.nameIDFormatField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("ArtifactResolutionService", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class IndexedEndpointType : EndpointType
+    {
+
+        private ushort indexField;
+
+        private bool isDefaultField;
+
+        private bool isDefaultFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public ushort index
+        {
+            get
+            {
+                return this.indexField;
+            }
+            set
+            {
+                this.indexField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool isDefault
+        {
+            get
+            {
+                return this.isDefaultField;
+            }
+            set
+            {
+                this.isDefaultField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool isDefaultSpecified
+        {
+            get
+            {
+                return this.isDefaultFieldSpecified;
+            }
+            set
+            {
+                this.isDefaultFieldSpecified = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("AuthnAuthorityDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class AuthnAuthorityDescriptorType : RoleDescriptorType
+    {
+
+        private EndpointType[] authnQueryServiceField;
+
+        private EndpointType[] assertionIDRequestServiceField;
+
+        private string[] nameIDFormatField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AuthnQueryService")]
+        public EndpointType[] AuthnQueryService
+        {
+            get
+            {
+                return this.authnQueryServiceField;
+            }
+            set
+            {
+                this.authnQueryServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AssertionIDRequestService")]
+        public EndpointType[] AssertionIDRequestService
+        {
+            get
+            {
+                return this.assertionIDRequestServiceField;
+            }
+            set
+            {
+                this.assertionIDRequestServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("NameIDFormat", DataType = "anyURI")]
+        public string[] NameIDFormat
+        {
+            get
+            {
+                return this.nameIDFormatField;
+            }
+            set
+            {
+                this.nameIDFormatField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("IDPSSODescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class IDPSSODescriptorType : SSODescriptorType
+    {
+
+        private EndpointType[] singleSignOnServiceField;
+
+        private EndpointType[] nameIDMappingServiceField;
+
+        private EndpointType[] assertionIDRequestServiceField;
+
+        private string[] attributeProfileField;
+
+        private AttributeType[] attributeField;
+
+        private bool wantAuthnRequestsSignedField;
+
+        private bool wantAuthnRequestsSignedFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("SingleSignOnService")]
+        public EndpointType[] SingleSignOnService
+        {
+            get
+            {
+                return this.singleSignOnServiceField;
+            }
+            set
+            {
+                this.singleSignOnServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("NameIDMappingService")]
+        public EndpointType[] NameIDMappingService
+        {
+            get
+            {
+                return this.nameIDMappingServiceField;
+            }
+            set
+            {
+                this.nameIDMappingServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AssertionIDRequestService")]
+        public EndpointType[] AssertionIDRequestService
+        {
+            get
+            {
+                return this.assertionIDRequestServiceField;
+            }
+            set
+            {
+                this.assertionIDRequestServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AttributeProfile", DataType = "anyURI")]
+        public string[] AttributeProfile
+        {
+            get
+            {
+                return this.attributeProfileField;
+            }
+            set
+            {
+                this.attributeProfileField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Attribute", Namespace = "urn:oasis:names:tc:SAML:2.0:assertion")]
+        public AttributeType[] Attribute
+        {
+            get
+            {
+                return this.attributeField;
+            }
+            set
+            {
+                this.attributeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool WantAuthnRequestsSigned
+        {
+            get
+            {
+                return this.wantAuthnRequestsSignedField;
+            }
+            set
+            {
+                this.wantAuthnRequestsSignedField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool WantAuthnRequestsSignedSpecified
+        {
+            get
+            {
+                return this.wantAuthnRequestsSignedFieldSpecified;
+            }
+            set
+            {
+                this.wantAuthnRequestsSignedFieldSpecified = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("PDPDescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class PDPDescriptorType : RoleDescriptorType
+    {
+
+        private EndpointType[] authzServiceField;
+
+        private EndpointType[] assertionIDRequestServiceField;
+
+        private string[] nameIDFormatField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AuthzService")]
+        public EndpointType[] AuthzService
+        {
+            get
+            {
+                return this.authzServiceField;
+            }
+            set
+            {
+                this.authzServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AssertionIDRequestService")]
+        public EndpointType[] AssertionIDRequestService
+        {
+            get
+            {
+                return this.assertionIDRequestServiceField;
+            }
+            set
+            {
+                this.assertionIDRequestServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("NameIDFormat", DataType = "anyURI")]
+        public string[] NameIDFormat
+        {
+            get
+            {
+                return this.nameIDFormatField;
+            }
+            set
+            {
+                this.nameIDFormatField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("SPSSODescriptor", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class SPSSODescriptorType : SSODescriptorType
+    {
+
+        private IndexedEndpointType[] assertionConsumerServiceField;
+
+        private AttributeConsumingServiceType[] attributeConsumingServiceField;
+
+        private bool authnRequestsSignedField;
+
+        private bool authnRequestsSignedFieldSpecified;
+
+        private bool wantAssertionsSignedField;
+
+        private bool wantAssertionsSignedFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AssertionConsumerService")]
+        public IndexedEndpointType[] AssertionConsumerService
+        {
+            get
+            {
+                return this.assertionConsumerServiceField;
+            }
+            set
+            {
+                this.assertionConsumerServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("AttributeConsumingService")]
+        public AttributeConsumingServiceType[] AttributeConsumingService
+        {
+            get
+            {
+                return this.attributeConsumingServiceField;
+            }
+            set
+            {
+                this.attributeConsumingServiceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool AuthnRequestsSigned
+        {
+            get
+            {
+                return this.authnRequestsSignedField;
+            }
+            set
+            {
+                this.authnRequestsSignedField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool AuthnRequestsSignedSpecified
+        {
+            get
+            {
+                return this.authnRequestsSignedFieldSpecified;
+            }
+            set
+            {
+                this.authnRequestsSignedFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool WantAssertionsSigned
+        {
+            get
+            {
+                return this.wantAssertionsSignedField;
+            }
+            set
+            {
+                this.wantAssertionsSignedField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool WantAssertionsSignedSpecified
+        {
+            get
+            {
+                return this.wantAssertionsSignedFieldSpecified;
+            }
+            set
+            {
+                this.wantAssertionsSignedFieldSpecified = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("AttributeConsumingService", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class AttributeConsumingServiceType
+    {
+
+        private localizedNameType[] serviceNameField;
+
+        private localizedNameType[] serviceDescriptionField;
+
+        private RequestedAttributeType[] requestedAttributeField;
+
+        private ushort indexField;
+
+        private bool isDefaultField;
+
+        private bool isDefaultFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ServiceName")]
+        public localizedNameType[] ServiceName
+        {
+            get
+            {
+                return this.serviceNameField;
+            }
+            set
+            {
+                this.serviceNameField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("ServiceDescription")]
+        public localizedNameType[] ServiceDescription
+        {
+            get
+            {
+                return this.serviceDescriptionField;
+            }
+            set
+            {
+                this.serviceDescriptionField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("RequestedAttribute")]
+        public RequestedAttributeType[] RequestedAttribute
+        {
+            get
+            {
+                return this.requestedAttributeField;
+            }
+            set
+            {
+                this.requestedAttributeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public ushort index
+        {
+            get
+            {
+                return this.indexField;
+            }
+            set
+            {
+                this.indexField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool isDefault
+        {
+            get
+            {
+                return this.isDefaultField;
+            }
+            set
+            {
+                this.isDefaultField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool isDefaultSpecified
+        {
+            get
+            {
+                return this.isDefaultFieldSpecified;
+            }
+            set
+            {
+                this.isDefaultFieldSpecified = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("RequestedAttribute", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class RequestedAttributeType : AttributeType
+    {
+
+        private bool isRequiredField;
+
+        private bool isRequiredFieldSpecified;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public bool isRequired
+        {
+            get
+            {
+                return this.isRequiredField;
+            }
+            set
+            {
+                this.isRequiredField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool isRequiredSpecified
+        {
+            get
+            {
+                return this.isRequiredFieldSpecified;
+            }
+            set
+            {
+                this.isRequiredFieldSpecified = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:metadata")]
+    [System.Xml.Serialization.XmlRootAttribute("AdditionalMetadataLocation", Namespace = "urn:oasis:names:tc:SAML:2.0:metadata", IsNullable = false)]
+    public partial class AdditionalMetadataLocationType
+    {
+
+        private string namespaceField;
+
+        private string valueField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute(DataType = "anyURI")]
+        public string @namespace
+        {
+            get
+            {
+                return this.namespaceField;
+            }
+            set
+            {
+                this.namespaceField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute(DataType = "anyURI")]
+        public string Value
+        {
+            get
+            {
+                return this.valueField;
+            }
+            set
+            {
+                this.valueField = value;
+            }
+        }
+    }
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
     [System.SerializableAttribute()]
@@ -1062,7 +3070,45 @@ namespace SimpleIdServer.Saml.Xsd
             }
         }
     }
-    
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:assertion")]
+    [System.Xml.Serialization.XmlRootAttribute("AttributeValue", Namespace = "urn:oasis:names:tc:SAML:2.0:assertion", IsNullable = false)]
+    public partial class AttributeValueType
+    {
+        private string _type;
+        private string _value;
+
+        [System.Xml.Serialization.XmlAttributeAttribute(Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+        public string Type
+        {
+            get
+            {
+                return _type;
+            }
+            set
+            {
+                _type = value;
+            }
+        }
+
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                _value = value;
+            }
+        }
+    }
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
     [System.SerializableAttribute()]
