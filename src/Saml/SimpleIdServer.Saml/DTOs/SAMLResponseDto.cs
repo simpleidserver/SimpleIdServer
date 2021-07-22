@@ -1,11 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-namespace SimpleIdServer.Saml.Idp.Apis.SSO
+namespace SimpleIdServer.Saml.DTOs
 {
-    public class SingleSignOnParameter
+    public class SAMLResponseDto
     {
-        public string SAMLRequest { get; set; }
+        public string SAMLResponse { get; set; }
         public string RelayState { get; set; }
-        public string UserId { get; set; }
+        public string SigAlg { get; set; }
+        public string Signature { get; set; }
     }
 }

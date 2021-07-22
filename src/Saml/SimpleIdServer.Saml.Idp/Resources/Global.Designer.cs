@@ -88,6 +88,24 @@ namespace SimpleIdServer.Saml.Idp.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à RelyingParty is not recognized as a ServiceProvider (SP).
+        /// </summary>
+        internal static string BadRelyingPartySpMetadata {
+            get {
+                return ResourceManager.GetString("BadRelyingPartySpMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Service Provider (SP) doesn&apos;t have valid Assertion Location.
+        /// </summary>
+        internal static string BadSPAssertionLocation {
+            get {
+                return ResourceManager.GetString("BadSPAssertionLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à At least one AuthnContextClassRef must be specified.
         /// </summary>
         internal static string MissingAuthnContextClassRef {
@@ -129,6 +147,15 @@ namespace SimpleIdServer.Saml.Idp.Resources {
         internal static string UnknownNameId {
             get {
                 return ResourceManager.GetString("UnknownNameId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Binding {0} is not supported.
+        /// </summary>
+        internal static string UnsupportBinding {
+            get {
+                return ResourceManager.GetString("UnsupportBinding", resourceCulture);
             }
         }
         

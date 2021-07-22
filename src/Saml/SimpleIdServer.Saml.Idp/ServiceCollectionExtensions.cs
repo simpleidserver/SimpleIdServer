@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Common.Domains;
 using SimpleIdServer.Saml.Idp;
 using SimpleIdServer.Saml.Idp.Apis.Metadata;
 using SimpleIdServer.Saml.Idp.Apis.SSO;
@@ -45,8 +46,9 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddSamlInMemoryEF(this IServiceCollection serviceCollection)
         {
             var relyingParties = new List<RelyingPartyAggregate>();
+            var users = new List<User>();
             serviceCollection.AddSingleton<IRelyingPartyRepository>(new InMemoryRelyingPartyRepository(relyingParties));
-            serviceCollection.AddSingleton<IUserRepository>(new InMemoryUserRepository());
+            serviceCollection.AddSingleton<IUserRepository>(new InMemoryUserRepository(users));
             return serviceCollection;
         }
     }

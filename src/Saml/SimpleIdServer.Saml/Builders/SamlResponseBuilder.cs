@@ -18,7 +18,16 @@ namespace SimpleIdServer.Saml.Builders
         {
             _response = new ResponseType
             {
-                ID = $"pfx_{Guid.NewGuid()}"
+                ID = $"pfx_{Guid.NewGuid()}",
+                Version = Saml.Constants.SamlVersion,
+                IssueInstant = DateTime.UtcNow,
+                Status = new StatusType
+                {
+                    StatusCode = new StatusCodeType
+                    {
+                        Value = Constants.StatusCodes.Success
+                    }
+                }
             };
         }
 
@@ -35,6 +44,17 @@ namespace SimpleIdServer.Saml.Builders
         #region Actions
 
         /// <summary>
+        /// Reference to the identifier of the request to which the response corresponds.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public SamlResponseBuilder SetInResponseTo(string id)
+        {
+            _response.InResponseTo = id;
+            return this;
+        }
+
+        /// <summary>
         /// Add an assertion.
         /// </summary>
         /// <param name="callback"></param>
@@ -49,7 +69,7 @@ namespace SimpleIdServer.Saml.Builders
             };
             var builder = new AssertionBuilder(assertion);
             callback(builder);
-            AddAssertion(assertion);
+            _response.Items = _response.Items.Add(assertion);
             return this;
         }
 
@@ -83,17 +103,5 @@ namespace SimpleIdServer.Saml.Builders
         }
 
         #endregion
-
-        private void AddAssertion(AssertionType o)
-        {
-            var items = new List<object>();
-            if (_response.Items != null)
-            {
-                items = _response.Items.ToList();
-            }
-
-            items.Add(o);
-            _response.Items = items.ToArray();
-        }
     }
 }

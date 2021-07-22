@@ -3,6 +3,7 @@
 
 using SimpleIdServer.Saml.Idp;
 using SimpleIdServer.Saml.UI.Authenticate.LoginPassword;
+using SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Services;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -11,6 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddSamlLoginPawdAuth(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IAuthenticator, LoginPwdAuthenticator>();
+            serviceCollection.AddTransient<IPasswordSamlAuthService, PasswordSamlAuthService>();
             return serviceCollection;
         }
     }

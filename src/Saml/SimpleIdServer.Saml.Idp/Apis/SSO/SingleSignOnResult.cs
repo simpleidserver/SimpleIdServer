@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Saml.Idp.Domains;
 using SimpleIdServer.Saml.Xsd;
 
 namespace SimpleIdServer.Saml.Idp.Apis.SSO
@@ -8,14 +9,16 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
     {
         public bool IsValid { get; private set; }
         public ResponseType Response { get; private set; }
+        public RelyingPartyAggregate RelyingParty { get; private set; }
         public string Amr { get; private set; }
 
-        public static SingleSignOnResult Ok(ResponseType response)
+        public static SingleSignOnResult Ok(ResponseType response, RelyingPartyAggregate relyingParty)
         {
             return new SingleSignOnResult
             {
                 IsValid = true,
-                Response = response
+                Response = response,
+                RelyingParty = relyingParty
             };
         }
 

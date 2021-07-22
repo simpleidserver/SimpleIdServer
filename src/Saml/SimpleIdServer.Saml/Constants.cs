@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Saml.Builders;
 using System.Collections.Generic;
 using System.Security.Cryptography.Xml;
 
@@ -10,9 +9,15 @@ namespace SimpleIdServer.Saml
     {
         public const string SamlVersion = "2.0";
 
+        public static class RouteNames
+        {
+            public const string Metadata = "metadata";
+        }
+
         public static class ConfirmationMethodIdentifiers
         {
             public const string HolderOfKey = "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key";
+            public const string Bearer = "urn:oasis:names:tc:SAML:2.0:cm:bearer";
         }
 
         public static class NameIdentifierFormats
@@ -35,6 +40,12 @@ namespace SimpleIdServer.Saml
             public const string X509Certificate = "urn:oasis:names:tc:SAML:2.0:ac:classes:X509";
             public const string AuthenticationWindows = "urn:federation:authentication:windows";
             public const string Kerberos = "urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos";
+        }
+
+        public static class Bindings
+        {
+            public const string HttpRedirect = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect";
+            public const string HttpPost = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
         }
 
         public static class SignatureAlgorithms
@@ -62,6 +73,8 @@ namespace SimpleIdServer.Saml
             public const string VersionMismatch = "urn:oasis:names:tc:SAML:2.0:status:VersionMismatch";
             public const string RequestUnsupported = "urn:oasis:names:tc:SAML:2.0:status:RequestUnsupported";
             public const string InvalidNameIDPolicy = "urn:oasis:names:tc:SAML:2.0:status:InvalidNameIDPolicy";
+            public const string UnsupportedBinding = "urn:oasis:names:tc:SAML:2.0:status:UnsupportedBinding";
+            public const string NoAuthnContext = "urn:oasis:names:tc:SAML:2.0:status:NoAuthnContext";
         }
 
         public static Dictionary<Saml.SignatureAlgorithms, string> MappingDigestMethodToStr = new Dictionary<Saml.SignatureAlgorithms, string>

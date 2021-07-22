@@ -2,11 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.Saml.Extensions;
+using SimpleIdServer.Saml.Idp.Extensions;
 using System.Net;
 
 namespace SimpleIdServer.Saml.Idp.Apis.Metadata
 {
-    [Route(Constants.RouteNames.Metadata)]
+    [Route(Saml.Constants.RouteNames.Metadata)]
     public class MetadataController : Controller
     {
         private readonly IMetadataHandler _metadataHandler;
@@ -19,7 +20,8 @@ namespace SimpleIdServer.Saml.Idp.Apis.Metadata
         [HttpGet]
         public IActionResult Index()
         {
-            var result = _metadataHandler.Get();
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var result = _metadataHandler.Get(issuer);
             return new ContentResult
             {
                 Content = result.SerializeToXmlElement().OuterXml,

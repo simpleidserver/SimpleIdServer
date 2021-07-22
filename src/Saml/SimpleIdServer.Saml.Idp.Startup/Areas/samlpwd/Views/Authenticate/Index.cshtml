@@ -1,15 +1,13 @@
-﻿<div>
+﻿@model SimpleIdServer.Saml.UI.Authenticate.LoginPassword.ViewModels.LoginViewModel
+@using SimpleIdServer.Saml.Idp.Startup.Resources
+
+<div>
     <div class="card" id="loginpwd-card">
-        <div class="card-header"></div>
-        @using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+        <div class="card-header">@Global.LoginPwdAuthenticateTitle</div>
+        @using (Html.BeginForm("Index", "Authenticate", new { area = "samlpwd" }, FormMethod.Post))
         {
             @Html.AntiForgeryToken()
             <div class="card-body">
-                @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
-                {
-                    <img class="card-img-top rounded mx-auto d-block" src="@Model.LogoUri" style="max-width: 300px" />
-                }
-                <h5 class="card-title">@Model.ClientName</h5>
                 @if (!ViewData.ModelState.IsValid)
                 {
                     <ul class="list-group">
@@ -17,27 +15,28 @@
                         {
                             foreach (var error in modelState.Errors)
                             {
-                                <li class="list-group-item list-group-item-danger"></li>
+                                <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
                             }
                         }
                     </ul>
                 }
-                <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+                <input type="hidden" name="Parameter.SAMLRequest" value="@Model.Parameter.SAMLRequest" />
+                <input type="hidden" name="Parameter.RelayState" value="@Model.Parameter.RelayState" />
                 <div class="form-group">
-                    <label></label>
+                    <label>@Global.Login</label>
                     <input type="text" value="@Model.Login" name="Login" class="form-control" />
                 </div>
                 <div class="form-group">
-                    <label></label>
+                    <label>@Global.Password</label>
                     <input type="password" value="@Model.Password" name="Password" class="form-control" />
                 </div>
                 <div>
                     <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-                    <label></label>
+                    <label>@Global.RememberMe</label>
                 </div>
             </div>
             <div class="card-footer">
-                <button type="submit" class="btn btn-primary card-link"></button>
+                <button type="submit" class="btn btn-primary card-link">@Global.Authenticate</button>
             </div>
         }
     </div>

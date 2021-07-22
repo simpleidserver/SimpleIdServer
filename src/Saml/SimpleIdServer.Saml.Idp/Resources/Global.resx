@@ -126,6 +126,12 @@
   <data name="BadAuthnRequestXml" xml:space="preserve">
     <value>AuthnRequest is not a correct XML request</value>
   </data>
+  <data name="BadRelyingPartySpMetadata" xml:space="preserve">
+    <value>RelyingParty is not recognized as a ServiceProvider (SP)</value>
+  </data>
+  <data name="BadSPAssertionLocation" xml:space="preserve">
+    <value>Service Provider (SP) doesn't have valid Assertion Location</value>
+  </data>
   <data name="MissingAuthnContextClassRef" xml:space="preserve">
     <value>At least one AuthnContextClassRef must be specified</value>
   </data>
@@ -140,6 +146,9 @@
   </data>
   <data name="UnknownNameId" xml:space="preserve">
     <value>NameID {0} doesn't exist</value>
+  </data>
+  <data name="UnsupportBinding" xml:space="preserve">
+    <value>Binding {0} is not supported</value>
   </data>
   <data name="UnsupportNameIdFormat" xml:space="preserve">
     <value>NameID format {0} is not supported</value>

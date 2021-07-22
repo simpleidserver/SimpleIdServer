@@ -8,6 +8,7 @@ namespace SimpleIdServer.Saml.Idp.Domains
     {
         public string UserAttribute { get; set; }
         public string ClaimName { get; set; }
+        public string ClaimFormat { get; set; }
 
         public object Clone()
         {

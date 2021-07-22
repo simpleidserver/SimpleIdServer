@@ -2055,7 +2055,13 @@ namespace SimpleIdServer.Saml.Xsd
     public partial class SubjectConfirmationDataType {
         
         private string[] textField;
-        
+        private DateTime notBeforeField;
+        private bool notBeforeFieldSpecified;
+        private DateTime notOnOrAfterField;
+        private bool notOnOrAfterFieldSpecified;
+        private string recipient;
+        private string inResponseTo;
+
         /// <remarks/>
         [System.Xml.Serialization.XmlTextAttribute()]
         public string[] Text {
@@ -2064,6 +2070,86 @@ namespace SimpleIdServer.Saml.Xsd
             }
             set {
                 this.textField = value;
+            }
+        }
+
+        [System.Xml.Serialization.XmlAttribute()]
+        public DateTime NotBefore
+        {
+            get
+            {
+                return this.notBeforeField;
+            }
+            set
+            {
+                this.notBeforeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool NotBeforeSpecified
+        {
+            get
+            {
+                return this.notBeforeFieldSpecified;
+            }
+            set
+            {
+                this.notBeforeFieldSpecified = value;
+            }
+        }
+
+        [System.Xml.Serialization.XmlAttribute()]
+        public DateTime NotOnOrAfter
+        {
+            get
+            {
+                return this.notOnOrAfterField;
+            }
+            set
+            {
+                this.notOnOrAfterField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool NotOnOrAfterSpecified
+        {
+            get
+            {
+                return this.notOnOrAfterFieldSpecified;
+            }
+            set
+            {
+                this.notOnOrAfterFieldSpecified = value;
+            }
+        }
+
+        [System.Xml.Serialization.XmlAttribute()]
+        public string Recipient
+        {
+            get
+            {
+                return this.recipient;
+            }
+            set
+            {
+                this.recipient = value;
+            }
+        }
+
+        [System.Xml.Serialization.XmlAttribute()]
+        public string InResponseTo
+        {
+            get
+            {
+                return this.inResponseTo;
+            }
+            set
+            {
+                this.inResponseTo = value;
             }
         }
     }

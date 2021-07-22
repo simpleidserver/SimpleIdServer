@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using System.Web;
 
 namespace SimpleIdServer.Saml.Helpers
 {
@@ -12,7 +11,6 @@ namespace SimpleIdServer.Saml.Helpers
     {
         public static string Decompress(string parameter)
         {
-            parameter = HttpUtility.UrlDecode(parameter);
             using (var originalStream = new MemoryStream(Convert.FromBase64String(parameter)))
             using (var decompressedStream = new MemoryStream())
             {
@@ -35,7 +33,7 @@ namespace SimpleIdServer.Saml.Helpers
                     originalStream.Write(parameter);
                 }
 
-                return HttpUtility.UrlEncode(Convert.ToBase64String(compressedStream.GetBuffer()));
+                return Convert.ToBase64String(compressedStream.GetBuffer());
             }
         }
     }

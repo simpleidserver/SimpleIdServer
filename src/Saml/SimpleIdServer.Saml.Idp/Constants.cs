@@ -8,7 +8,6 @@ namespace SimpleIdServer.Saml.Idp
         public static class RouteNames
         {
             public const string SingleSignOn = "SSO";
-            public const string Metadata = "metadata";
         }
     }
 }

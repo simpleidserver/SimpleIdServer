@@ -1,8 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Xsd;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SimpleIdServer.Saml.Builders
 {
@@ -28,22 +27,10 @@ namespace SimpleIdServer.Saml.Builders
             {
                 Audience = audiences
             };
-            AddItem(audienceRestriction);
+            _conditions.Items = _conditions.Items.Add(audienceRestriction);
             return this;
         }
 
         #endregion
-
-        private void AddItem(ConditionAbstractType o)
-        {
-            var items = new List<ConditionAbstractType>();
-            if(_conditions.Items != null)
-            {
-                items = _conditions.Items.ToList();
-            }
-
-            items.Add(o);
-            _conditions.Items = items.ToArray();
-        }
     }
 }

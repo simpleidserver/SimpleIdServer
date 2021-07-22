@@ -33,7 +33,7 @@ namespace SimpleIdServer.Saml.Sp.Startup.Controllers
         [Route("AssertionConsumerService")]
         public async Task<IActionResult> AssertionConsumerService()
         {
-            var binding = new Saml2PostBinding();
+            var binding = new Saml2RedirectBinding();
             var saml2AuthnResponse = new Saml2AuthnResponse(config);
 
             binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);

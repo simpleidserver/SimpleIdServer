@@ -3,4 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Common library used by SimpleIdServer.</Description>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
+  </ItemGroup>
 </Project>

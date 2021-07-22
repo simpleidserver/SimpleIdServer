@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Xsd;
 using System;
 using System.Collections.Generic;
@@ -40,11 +41,11 @@ namespace SimpleIdServer.Saml.Builders
             };
             return this;
         }
-        
+
         /// <summary>
-        /// Specifies the requested subject of the resulting assertion(s).
+        /// Set the subject.
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="subject"></param>
         /// <returns></returns>
         public AssertionBuilder SetSubject(Action<SubjectBuilder> callback)
         {
@@ -98,7 +99,7 @@ namespace SimpleIdServer.Saml.Builders
             if (attributeStatement == null)
             {
                 attributeStatement = new AttributeStatementType();
-                AddItem(attributeStatement);
+                _assertion.Items = _assertion.Items.Add(attributeStatement);
             }
 
             var attributes = new List<object>();
@@ -126,17 +127,5 @@ namespace SimpleIdServer.Saml.Builders
         }
 
         #endregion
-
-        private void AddItem(StatementAbstractType elt)
-        {
-            var items = new List<StatementAbstractType>();
-            if (_assertion.Items != null)
-            {
-                items = _assertion.Items.ToList();
-            }
-
-            items.Add(elt);
-            _assertion.Items = items.ToArray();
-        }
     }
 }

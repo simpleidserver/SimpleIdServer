@@ -60,36 +60,44 @@ namespace SimpleIdServer.Saml.Builders
                 Method = Constants.ConfirmationMethodIdentifiers.HolderOfKey,
                 SubjectConfirmationData = new KeyInfoConfirmationDataType
                 {
-                    KeyInfo = new KeyInfoType
-                    {
-                        Items = new object[]
-                        {
-                            new X509DataType
-                            {
-                                Items = new object[]
-                                {
-                                    certificate.RawData,
-                                    certificate.SubjectName.Name,
-                                    new X509IssuerSerialType
-                                    {
-                                        X509IssuerName = certificate.IssuerName.Name,
-                                        X509SerialNumber = certificate.SerialNumber
-                                    }
-                                },
-                                ItemsElementName = new ItemsChoiceType[]
-                                {
-                                    ItemsChoiceType.X509Certificate,
-                                    ItemsChoiceType.X509SubjectName,
-                                    ItemsChoiceType.X509IssuerSerial
-                                }
-                            },
-                        },
-                        ItemsElementName = new ItemsChoiceType2[]
-                        {
-                            ItemsChoiceType2.X509Data
-                        }
-                    }
+                    KeyInfo = KeyInfoBuilder.Build(certificate)
                 }
+            };
+            AddSubjectConfirmation(subjectConfirmation);
+            return this;
+        }
+
+        /// <summary>
+        /// Subject of the assertion is the bearer of the assertion
+        /// </summary>
+        /// <param name="notBefore">A time instant before which the subject cannot be confirmed.</param>
+        /// <param name="notOnAfter">A time instant at which the subject can no longer be confirmed.</param>
+        /// <param name="recipient">URI specifying the entity or location to which an attesting entity can present the assertion.</param>
+        /// <param name="inResponseTo">The ID of a SAML protocol message in response to which an attesting entity can present the assertion.</param>
+        /// <returns></returns>
+        public SubjectBuilder AddSubjectConfirmationBearer(DateTime? notBefore, DateTime? notOnAfter, string recipient = null, string inResponseTo = null)
+        {
+            var data = new SubjectConfirmationDataType
+            {
+                InResponseTo = inResponseTo,
+                Recipient = recipient
+            };
+            if (notBefore != null)
+            {
+                data.NotBefore = notBefore.Value;
+                data.NotBeforeSpecified = true;
+            }
+
+            if (notOnAfter != null)
+            {
+                data.NotOnOrAfter = notOnAfter.Value;
+                data.NotOnOrAfterSpecified = true;
+            }
+
+            var subjectConfirmation = new SubjectConfirmationType
+            {
+                Method = Constants.ConfirmationMethodIdentifiers.Bearer,
+                SubjectConfirmationData = data
             };
             AddSubjectConfirmation(subjectConfirmation);
             return this;

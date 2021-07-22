@@ -8,6 +8,9 @@ namespace SimpleIdServer.Saml.Idp.Persistence
 {
     public interface IUserRepository
     {
+        Task<User> FindOAuthUserByLogin(string login, CancellationToken cancellationToken);
         Task<User> Get(string id, CancellationToken cancellationToken);
+        Task<bool> Update(User user, CancellationToken cancellationToken);
+        Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 }

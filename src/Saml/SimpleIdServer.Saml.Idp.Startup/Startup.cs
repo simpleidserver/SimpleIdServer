@@ -1,10 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.Saml.Idp.Startup
 {
@@ -19,11 +23,17 @@ namespace SimpleIdServer.Saml.Idp.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var certificate = new X509Certificate2(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "localhost.pfx"), "password");
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
-            services.AddSamlIdp().AddRelyingParties(DefaultConfiguration.RelyingParties);
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
+            services.AddSamlIdp(opt =>
+            {
+                opt.SigningCertificate = certificate;
+            }).AddRelyingParties(DefaultConfiguration.RelyingParties).AddUsers(DefaultConfiguration.Users);
             services.AddSamlLoginPawdAuth();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -40,6 +50,8 @@ namespace SimpleIdServer.Saml.Idp.Startup
 
             app.UseForwardedHeaders();
             app.UseCors("AllowAll");
+            app.UseAuthentication();
+            app.UseStaticFiles();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

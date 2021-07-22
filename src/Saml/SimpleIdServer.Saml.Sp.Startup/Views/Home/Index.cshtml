@@ -1,3 +1,13 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+
+<div>
+    @foreach (var claim in User.Claims)
+    {
+        <strong>@claim.Type</strong>
+        <br />
+        <span style="padding-left: 10px">Value: @claim.Value</span>
+        <br />
+    }
+</div>
