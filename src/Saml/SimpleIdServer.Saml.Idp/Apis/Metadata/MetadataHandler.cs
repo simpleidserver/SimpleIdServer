@@ -17,7 +17,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.Metadata
 
         public EntityDescriptorType Get(string issuer)
         {
-            return EntityDescriptorBuilder.Instance(_options.Issuer)
+            return EntityDescriptorBuilder.Instance(_options.IDPId)
                 .AddIdpSSODescriptor(cb =>
                 {
                     cb.AddSingleSignOnService($"{issuer}/{Constants.RouteNames.SingleSignOn}/Login", Saml.Constants.Bindings.HttpRedirect);

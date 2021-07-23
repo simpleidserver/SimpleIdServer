@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseSamlIdp(this IApplicationBuilder applicationBuilder) 
+        public static IApplicationBuilder UseSamlSp(this IApplicationBuilder applicationBuilder) 
         {
             applicationBuilder.UseMiddleware<SamlExceptionMiddleware>();
             return applicationBuilder;

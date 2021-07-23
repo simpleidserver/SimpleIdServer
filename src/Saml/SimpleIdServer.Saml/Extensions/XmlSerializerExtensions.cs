@@ -18,6 +18,16 @@ namespace SimpleIdServer.Saml.Extensions
 
             return doc.DocumentElement;
         }
+        public static XmlDocument SerializeToXmlDocument(this object obj)
+        {
+            var doc = new XmlDocument();
+            using (var writer = doc.CreateNavigator().AppendChild())
+            {
+                new XmlSerializer(obj.GetType()).Serialize(writer, obj);
+            }
+
+            return doc;
+        }
 
         public static T DeserializeXml<T>(this string xml) where T : class
         {

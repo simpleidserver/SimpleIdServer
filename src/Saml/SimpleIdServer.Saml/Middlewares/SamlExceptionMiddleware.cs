@@ -6,7 +6,7 @@ using SimpleIdServer.Saml.Exceptions;
 using SimpleIdServer.Saml.Extensions;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Saml.Idp.Middlewares
+namespace SimpleIdServer.Saml.Middlewares
 {
     public class SamlExceptionMiddleware
     {

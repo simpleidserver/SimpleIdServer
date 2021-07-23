@@ -48,7 +48,7 @@ namespace SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Controllers
             {
                 var user = await _passwordSamlAuthService.Authenticate(viewModel.Login, viewModel.Password, cancellationToken);
                 await Authenticate(Constants.AMR, user, cancellationToken, viewModel.RememberLogin);
-                return RedirectToAction("Login", Idp.Constants.RouteNames.SingleSignOn, new
+                return RedirectToAction("Login", Saml.Constants.RouteNames.SingleSignOn, new
                 {
                     SAMLRequest = viewModel.Parameter.SAMLRequest,
                     RelayState = viewModel.Parameter.RelayState,

@@ -95,6 +95,11 @@ namespace SimpleIdServer.Saml.Builders
         /// <returns></returns>
         public AssertionBuilder AddAttributeStatementAttribute(string name, string nameFormat, string valueType, string value)
         {
+            if (_assertion.Items == null)
+            {
+                _assertion.Items = new StatementAbstractType[0];
+            }
+
             var attributeStatement = _assertion.Items.FirstOrDefault(i => i is AttributeStatementType) as AttributeStatementType;
             if (attributeStatement == null)
             {
@@ -123,6 +128,7 @@ namespace SimpleIdServer.Saml.Builders
 
             values.Add(new AttributeValueType { Type = valueType, Value = value });
             attribute.AttributeValue = values.ToArray();
+            attributeStatement.Items = attributes.ToArray();
             return this;
         }
 

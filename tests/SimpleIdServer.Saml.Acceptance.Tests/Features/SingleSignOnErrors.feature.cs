@@ -121,7 +121,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 10
- testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'Parameter SAMLRequest is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'Parameter saml is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 11
  testRunner.Then("XML attribute \'saml:Status/saml:StatusCode/@Value\'=\'urn:oasis:names:tc:SAML:2.0:s" +
@@ -172,7 +172,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 19
- testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'Parameter RelayState is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'Parameter relayState is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 20
  testRunner.Then("XML attribute \'saml:Status/saml:StatusCode/@Value\'=\'urn:oasis:names:tc:SAML:2.0:s" +
@@ -224,8 +224,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 28
- testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'AuthnRequest is not correctly compr" +
-                        "essed\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'Saml cannot be decompressed\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 29
  testRunner.Then("XML attribute \'saml:Status/saml:StatusCode/@Value\'=\'urn:oasis:names:tc:SAML:2.0:s" +
@@ -276,8 +275,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 37
- testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'AuthnRequest is not a correct XML r" +
-                        "equest\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("XML element \'saml:Status/saml:StatusMessage\'=\'Saml cannot be deserialized\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 38
  testRunner.Then("XML attribute \'saml:Status/saml:StatusCode/@Value\'=\'urn:oasis:names:tc:SAML:2.0:s" +

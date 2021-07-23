@@ -8,13 +8,19 @@ namespace SimpleIdServer.Saml.Sp
     {
         public SamlSpOptions()
         {
-            Issuer = "http://simpleidserver-saml-sp.com";
+            SPName = "SP Saml2";
+            SPId = "urn:sp";
+            CanonicalizationMethod = CanonicalizationMethods.C14;
         }
 
         /// <summary>
-        /// Issuer.
+        /// Unique identifier of the Service Provider (SP).
         /// </summary>
-        public string Issuer { get; set; }
+        public string SPId { get; set; }
+        /// <summary>
+        /// Name of the Service Provider.
+        /// </summary>
+        public string SPName { get; set; }
         /// <summary>
         /// Certificate used to sign request.
         /// </summary>
@@ -23,5 +29,21 @@ namespace SimpleIdServer.Saml.Sp
         /// Indicates whether the AuthnRequest messages sent by this service provider will be signed.
         /// </summary>
         public bool AuthnRequestSigned { get; set; }
+        /// <summary>
+        /// Want assertion signed.
+        /// </summary>
+        public bool WantAssertionSigned { get; set; }
+        /// <summary>
+        /// Default Signature Algorithm.
+        /// </summary>
+        public SignatureAlgorithms? SignatureAlg { get; set; }
+        /// <summary>
+        /// Default Canonicalization Method.
+        /// </summary>
+        public CanonicalizationMethods CanonicalizationMethod { get; set; }
+        /// <summary>
+        /// Metadata URL of the IdentityProvider.
+        /// </summary>
+        public string IdpMetadataUrl { get; set; }
     }
 }

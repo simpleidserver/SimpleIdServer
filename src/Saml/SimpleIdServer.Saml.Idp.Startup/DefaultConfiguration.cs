@@ -23,14 +23,14 @@ namespace SimpleIdServer.Saml.Idp.Startup
                 {
                     new RelyingPartyClaimMapping
                     {
-                        ClaimName = Jwt.Constants.UserClaims.GivenName,
-                        UserAttribute = "urn:oid:2.5.4.42",
+                        UserAttribute = Jwt.Constants.UserClaims.GivenName,
+                        ClaimName = "urn:oid:2.5.4.42",
                         ClaimFormat = ""
                     },
                     new RelyingPartyClaimMapping
                     {
-                        ClaimName = Jwt.Constants.UserClaims.FamilyName,
-                        UserAttribute = "LastName",
+                        UserAttribute= Jwt.Constants.UserClaims.FamilyName,
+                        ClaimName = "LastName",
                         ClaimFormat = ""
                     }
                 }

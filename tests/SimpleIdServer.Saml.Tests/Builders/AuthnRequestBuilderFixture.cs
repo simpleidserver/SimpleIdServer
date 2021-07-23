@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Saml.Builders;
-using SimpleIdServer.Saml.Extensions;
-using SimpleIdServer.Saml.Xsd;
+using SimpleIdServer.Saml.Helpers;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Web;
 using Xunit;
 
 namespace SimpleIdServer.Saml.Tests.Builders
@@ -26,15 +26,14 @@ namespace SimpleIdServer.Saml.Tests.Builders
             // https://dtservices.bosa.be/sites/default/files/content/download/files/fas_saml_integration_guide_v0.51_1.pdf
             // ARRANGE
             var builder = AuthnRequestBuilder.New("SP")
-                .SetIssuer(Constants.NameIdentifierFormats.EntityIdentifier, "urn:rp")
-                .SetNameIDPolicy(Constants.NameIdentifierFormats.EmailAddress, null, true)
-                .AddAuthnContextClassPassword(AuthnContextComparisonType.exact);
+                .SetIssuer(Constants.NameIdentifierFormats.EntityIdentifier, "urn:sp");
 
             // ACT 
-            var authnRequest = builder.SignAndBuild(certificate, SignatureAlgorithms.RSASHA1, CanonicalizationMethods.C14);
+            // var authnRequest = builder.Build();
+            var authnRequest = builder.SignAndBuild(certificate, SignatureAlgorithms.RSASHA256, CanonicalizationMethods.C14);
 
             // ASSERT
-            authnRequest.SerializeXml();
+            Assert.True(SignatureHelper.CheckSignature(authnRequest, certificate));
         }
     }
 }

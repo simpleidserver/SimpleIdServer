@@ -33,6 +33,8 @@ namespace SimpleIdServer.Saml.Idp.Startup
             services.AddSamlIdp(opt =>
             {
                 opt.SigningCertificate = certificate;
+                opt.SignatureAlg = SignatureAlgorithms.RSASHA256;
+                opt.CanonicalizationMethod = CanonicalizationMethods.C14;
             }).AddRelyingParties(DefaultConfiguration.RelyingParties).AddUsers(DefaultConfiguration.Users);
             services.AddSamlLoginPawdAuth();
             services.Configure<ForwardedHeadersOptions>(options =>

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Saml.Exceptions;
-using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Idp.Resources;
+using SimpleIdServer.Saml.Stores;
 using SimpleIdServer.Saml.Xsd;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,27 +45,9 @@ namespace SimpleIdServer.Saml.Idp.Domains
             return claimMapping;
         }
 
-        public async Task<EntityDescriptorType> GetMetadata(CancellationToken cancellationToken)
+        public async Task<IEnumerable<X509Certificate2>> GetSigningCertificates(IEntityDescriptorStore entityDescriptorStore, CancellationToken cancellationToken)
         {
-            // TODO : Implement caching.
-            if (EntityDescriptor != null)
-            {
-                return EntityDescriptor;
-            }
-
-            using (var httpClient = new HttpClient())
-            {
-                var httpResponse = await httpClient.GetAsync(MetadataUrl, cancellationToken);
-                httpResponse.EnsureSuccessStatusCode();
-                var str = await httpResponse.Content.ReadAsStringAsync();
-                EntityDescriptor = str.DeserializeXml<EntityDescriptorType>();
-                return EntityDescriptor;
-            }
-        }
-
-        public async Task<IEnumerable<X509Certificate2>> GetSigningCertificates(CancellationToken cancellationToken)
-        {
-            var ssp = await GetSpSSODescriptor(cancellationToken);
+            var ssp = await GetSpSSODescriptor(entityDescriptorStore, cancellationToken);
             var result = new List<X509Certificate2>();
             foreach (var keyDescriptor in ssp.KeyDescriptor.Where(k => k.use == KeyTypes.signing))
             {
@@ -84,15 +65,15 @@ namespace SimpleIdServer.Saml.Idp.Domains
             return result;
         }
 
-        public async Task<bool> GetAuthnRequestsSigned(CancellationToken cancellationToken)
+        public async Task<bool> GetAuthnRequestsSigned(IEntityDescriptorStore entityDescriptorStore, CancellationToken cancellationToken)
         {
-            var ssp = await GetSpSSODescriptor(cancellationToken);
+            var ssp = await GetSpSSODescriptor(entityDescriptorStore, cancellationToken);
             return ssp.AuthnRequestsSignedSpecified && ssp.AuthnRequestsSigned;
         }
 
-        public async Task<string> GetAssertionLocation(string binding, CancellationToken cancellationToken)
+        public async Task<string> GetAssertionLocation(IEntityDescriptorStore entityDescriptorStore, string binding, CancellationToken cancellationToken)
         {
-            var ssp = await GetSpSSODescriptor(cancellationToken);
+            var ssp = await GetSpSSODescriptor(entityDescriptorStore, cancellationToken);
             var assertionConsumerService = ssp.AssertionConsumerService.FirstOrDefault(a => a.Binding == binding);
             if (assertionConsumerService == null)
             {
@@ -102,9 +83,9 @@ namespace SimpleIdServer.Saml.Idp.Domains
             return assertionConsumerService.Location;
         }
 
-        public async Task<bool> GetAssertionSigned(CancellationToken cancellationToken)
+        public async Task<bool> GetAssertionSigned(IEntityDescriptorStore entityDescriptorStore, CancellationToken cancellationToken)
         {
-            var ssp = await GetSpSSODescriptor(cancellationToken);
+            var ssp = await GetSpSSODescriptor(entityDescriptorStore, cancellationToken);
             return ssp.WantAssertionsSignedSpecified && ssp.WantAssertionsSigned;
         }
 
@@ -115,9 +96,9 @@ namespace SimpleIdServer.Saml.Idp.Domains
             throw new NotImplementedException();
         }
 
-        protected async Task<SPSSODescriptorType> GetSpSSODescriptor(CancellationToken cancellationToken)
+        protected async Task<SPSSODescriptorType> GetSpSSODescriptor(IEntityDescriptorStore entityDescriptorStore, CancellationToken cancellationToken)
         {
-            var entityDescriptor = await GetMetadata(cancellationToken);
+            var entityDescriptor = await entityDescriptorStore.Get(MetadataUrl, cancellationToken);
             var ssp = entityDescriptor.Items.FirstOrDefault(i => i is SPSSODescriptorType) as SPSSODescriptorType;
             if (ssp == null)
             {

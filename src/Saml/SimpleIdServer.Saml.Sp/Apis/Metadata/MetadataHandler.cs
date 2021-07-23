@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.Saml.Builders;
 using SimpleIdServer.Saml.Xsd;
 
-namespace SimpleIdServer.Saml.Sp.Apis
+namespace SimpleIdServer.Saml.Sp.Apis.Metadata
 {
     public class MetadataHandler : IMetadataHandler
     {
@@ -17,13 +17,16 @@ namespace SimpleIdServer.Saml.Sp.Apis
 
         public EntityDescriptorType Get(string issuer)
         {
-            return EntityDescriptorBuilder.Instance(_options.Issuer)
+            return EntityDescriptorBuilder.Instance(_options.SPId)
                 .AddSpSSODescriptor(cb =>
                 {
-                    cb.SetAuthnRequestsSigned(false);
-                    cb.SetWantAssertionsSigned(true);
-                    cb.AddAssertionConsumerService(Saml.Constants.Bindings.HttpRedirect, $"{issuer}/Auth/AssertionConsumerService");
-                    cb.AddSigningKey(_options.SigningCertificate);
+                    cb.SetAuthnRequestsSigned(_options.AuthnRequestSigned);
+                    cb.SetWantAssertionsSigned(_options.WantAssertionSigned);
+                    cb.AddAssertionConsumerService(Constants.Bindings.HttpRedirect, $"{issuer}/{Constants.RouteNames.SingleSignOn}/AssertionConsumer");
+                    if (_options.SigningCertificate != null)
+                    {
+                        cb.AddSigningKey(_options.SigningCertificate);
+                    }
                 }).Build();
         }
     }

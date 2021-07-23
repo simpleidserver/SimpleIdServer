@@ -10,9 +10,10 @@ namespace SimpleIdServer.Saml.Idp
         public SamlIdpOptions()
         {
             DefaultAuthnContextClassRef = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password";
-            Issuer = "http://simpleidserver-saml-idp.com";
+            IDPId = "urn:idp";
             CookieAuthExpirationTimeInSeconds = 5 * 60;
             SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
+            CanonicalizationMethod = CanonicalizationMethods.C14;
         }
 
         /// <summary>
@@ -20,13 +21,17 @@ namespace SimpleIdServer.Saml.Idp
         /// </summary>
         public string DefaultAuthnContextClassRef { get; set; }
         /// <summary>
-        /// Issuer.
+        /// Identifier of the Identity Provider.
         /// </summary>
-        public string Issuer { get; set; }
+        public string IDPId { get; set; }
         /// <summary>
         /// Certificate used to sign response.
         /// </summary>
         public X509Certificate2 SigningCertificate { get; set; }
+        /// <summary>
+        /// Default Signature Algorithm.
+        /// </summary>
+        public SignatureAlgorithms? SignatureAlg { get; set; }
         /// <summary>
         /// Cookie auth expiration time in seconds.
         /// </summary>
@@ -35,5 +40,9 @@ namespace SimpleIdServer.Saml.Idp
         /// Name of the cookie used to store the session id.
         /// </summary>
         public string SessionCookieName { get; set; }
+        /// <summary>
+        /// Default Canonicalization Method.
+        /// </summary>
+        public CanonicalizationMethods CanonicalizationMethod { get; set; }
     }
 }

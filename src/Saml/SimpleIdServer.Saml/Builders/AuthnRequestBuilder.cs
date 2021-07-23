@@ -4,6 +4,7 @@ using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Xsd;
 using System;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml;
 
 namespace SimpleIdServer.Saml.Builders
 {
@@ -34,6 +35,17 @@ namespace SimpleIdServer.Saml.Builders
         }
 
         #region Actions
+
+        /// <summary>
+        /// Identifies a SAML protocol binding to be used when returning the Response.
+        /// </summary>
+        /// <param name="binding"></param>
+        /// <returns></returns>
+        public AuthnRequestBuilder SetBinding(string binding)
+        {
+            _authRequest.ProtocolBinding = binding;
+            return this;
+        }
 
         /// <summary>
         /// Set the issuer.
@@ -124,18 +136,19 @@ namespace SimpleIdServer.Saml.Builders
         /// <param name="digestMethod"></param>
         /// <param name="canonicalizationMethod"></param>
         /// <returns></returns>
-        public AuthnRequestType SignAndBuild(X509Certificate2 certificate, SignatureAlgorithms signatureAlgorithm, CanonicalizationMethods canonicalizationMethod)
+        public XmlElement SignAndBuild(X509Certificate2 certificate, SignatureAlgorithms signatureAlgorithm, CanonicalizationMethods canonicalizationMethod)
         {
-            var signedRequest = new SamlSignedRequest(_authRequest.SerializeToXmlElement(), certificate, signatureAlgorithm, canonicalizationMethod);
+            var xmlDocument = _authRequest.SerializeToXmlDocument();
+            var signedRequest = new SamlSignedRequest(xmlDocument.DocumentElement, certificate, signatureAlgorithm, canonicalizationMethod);
             signedRequest.ComputeSignature(_authRequest.ID);
-            var signature = signedRequest.GetXml().OuterXml.DeserializeXml<SignatureType>();
-            _authRequest.Signature = signature;
-            return _authRequest;
+            var issuer = xmlDocument.DocumentElement.GetElementsByTagName("//Issuer", "urn:oasis:names:tc:SAML:2.0:assertion")[0] as XmlElement;
+            xmlDocument.DocumentElement.InsertAfter(xmlDocument.ImportNode(signedRequest.GetXml(), true), issuer);
+            return xmlDocument.DocumentElement;
         }
 
-        public AuthnRequestType Build()
+        public XmlElement Build()
         {
-            return _authRequest;
+            return _authRequest.SerializeToXmlElement();
         }
 
         #endregion

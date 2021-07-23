@@ -11,6 +11,8 @@ using SimpleIdServer.Saml.Helpers;
 using SimpleIdServer.Saml.Idp.Domains;
 using SimpleIdServer.Saml.Idp.Persistence;
 using SimpleIdServer.Saml.Idp.Resources;
+using SimpleIdServer.Saml.Stores;
+using SimpleIdServer.Saml.Validators;
 using SimpleIdServer.Saml.Xsd;
 using System;
 using System.Collections.Generic;
@@ -21,26 +23,27 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Saml.Idp.Apis.SSO
 {
-    public class SingleSignOnHandler : ISingleSignOnHandler
+    public class SingleSignOnHandler : SAMLValidator, ISingleSignOnHandler
     {
+        private readonly IEntityDescriptorStore _entityDescriptorStore;
         private readonly IRelyingPartyRepository _relyingPartyRepository;
         private readonly IEnumerable<IAuthenticator> _authenticators;
         private readonly IUserRepository _userRepository;
         private readonly SamlIdpOptions _options;
-        private readonly ILogger<SingleSignOnHandler> _logger;
 
         public SingleSignOnHandler(
+            IEntityDescriptorStore entityDescriptorStore,
             IRelyingPartyRepository relyingPartyRepository,
             IEnumerable<IAuthenticator> authenticators,
             IUserRepository userRepository,
             IOptions<SamlIdpOptions> options,
-            ILogger<SingleSignOnHandler> logger)
+            ILogger<SAMLValidator> loggerSamlValidator) : base(loggerSamlValidator)
         {
+            _entityDescriptorStore = entityDescriptorStore;
             _relyingPartyRepository = relyingPartyRepository;
             _authenticators = authenticators;
             _userRepository = userRepository;
             _options = options.Value;
-            _logger = logger;
         }
 
         public async Task<SingleSignOnResult> Handle(SAMLRequestDto parameter, string userId, CancellationToken cancellationToken)
@@ -61,44 +64,13 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
 
         protected virtual AuthnRequestType CheckParameter(SAMLRequestDto parameter)
         {
-            if (string.IsNullOrWhiteSpace(parameter.SAMLRequest))
-            {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(parameter.SAMLRequest)));
-            }
-
-            if (string.IsNullOrWhiteSpace(parameter.RelayState))
-            {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(parameter.RelayState)));
-            }
-
-            string decompressed;
-            try
-            {
-                decompressed = Compression.Decompress(parameter.SAMLRequest);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, Global.BadAuthnRequestCompression);
-            }
-
-            AuthnRequestType authnRequest = null;
-            try
-            {
-                authnRequest = decompressed.DeserializeAuthnRequestFromXml();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, Global.BadAuthnRequestXml);
-            }
-
+            var authnRequest = CheckSaml<AuthnRequestType>(parameter.SAMLRequest, parameter.RelayState);
             if (authnRequest.Issuer == null || string.IsNullOrWhiteSpace(authnRequest.Issuer.Value))
             {
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(authnRequest.Issuer)));
             }
 
-                if (!string.IsNullOrWhiteSpace(authnRequest.Issuer.Format) && authnRequest.Issuer.Format != Saml.Constants.NameIdentifierFormats.EntityIdentifier)
+            if (!string.IsNullOrWhiteSpace(authnRequest.Issuer.Format) && authnRequest.Issuer.Format != Saml.Constants.NameIdentifierFormats.EntityIdentifier)
             {
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnsupportNameIdFormat, nameof(authnRequest.Issuer.Format)));
             }
@@ -119,12 +91,12 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                 throw new SamlException(HttpStatusCode.NotFound, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnknownIssuer, nameof(authnRequest.Issuer.Value)));
             }
 
-            if (await relyingParty.GetAuthnRequestsSigned(cancellationToken))
+            if (await relyingParty.GetAuthnRequestsSigned(_entityDescriptorStore, cancellationToken))
             {
-                var certificates = await relyingParty.GetSigningCertificates(cancellationToken);
+                var certificates = await relyingParty.GetSigningCertificates(_entityDescriptorStore, cancellationToken);
                 foreach (var certificate in certificates)
                 {
-                    if (SignatureHelper.CheckSignature(authnRequest, certificate))
+                    if (SignatureHelper.CheckSignature(authnRequest.SerializeToXmlElement(), certificate))
                     {
                         return relyingParty;
                     }
@@ -133,7 +105,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, Global.BadAuthnRequestSignature);
             }
 
-            if((await relyingParty.GetAssertionLocation(Saml.Constants.Bindings.HttpRedirect, cancellationToken)) == null)
+            if((await relyingParty.GetAssertionLocation(_entityDescriptorStore, Saml.Constants.Bindings.HttpRedirect, cancellationToken)) == null)
             {
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.UnsupportedBinding, Global.BadSPAssertionLocation);
             }
@@ -205,7 +177,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             var builder = SamlResponseBuilder.New()
                 .AddAssertion(cb =>
                 {
-                    cb.SetIssuer(null, _options.Issuer);
+                    cb.SetIssuer(Constants.NameIdentifierFormats.PersistentIdentifier, _options.IDPId);
                     cb.SetSubject(s =>
                     {
                         s.SetNameId(validationResult.NameIdFormat, validationResult.NameIdValue);
@@ -220,9 +192,9 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                         cb.AddAttributeStatementAttribute(attr.AttributeName, null, attr.Type, attr.Value);
                     }
                 });
-            if (await relyingParty.GetAssertionSigned(cancellationToken))
+            if (await relyingParty.GetAssertionSigned(_entityDescriptorStore, cancellationToken))
             {
-                return builder.SignAndBuild(_options.SigningCertificate, SignatureAlgorithms.RSASHA1, CanonicalizationMethods.C14);
+                return builder.SignAndBuild(_options.SigningCertificate, _options.SignatureAlg.Value, _options.CanonicalizationMethod);
             }
 
             return builder.Build();

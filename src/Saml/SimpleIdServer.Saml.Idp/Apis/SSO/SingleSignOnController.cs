@@ -6,12 +6,10 @@ using SimpleIdServer.Saml.DTOs;
 using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Helpers;
 using SimpleIdServer.Saml.Idp.Apis.SSO;
+using SimpleIdServer.Saml.Stores;
 using System;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,13 +19,16 @@ namespace SimpleIdServer.Saml.Idp.SSO.Apis
     public class SingleSignOnController : Controller
     {
         private readonly ISingleSignOnHandler _singleSignOnHandler;
+        private readonly IEntityDescriptorStore _entityDescriptorStore;
         private readonly SamlIdpOptions _options;
 
         public SingleSignOnController(
             ISingleSignOnHandler singleSignOnHandler,
+            IEntityDescriptorStore entityDescriptorStore,
             IOptions<SamlIdpOptions> options)
         {
             _singleSignOnHandler = singleSignOnHandler;
+            _entityDescriptorStore = entityDescriptorStore;
             _options = options.Value;
         }
 
@@ -54,23 +55,10 @@ namespace SimpleIdServer.Saml.Idp.SSO.Apis
             var result = await _singleSignOnHandler.Handle(parameter, nameId, cancellationToken);
             if (result.IsValid)
             {
-                var location = await result.RelyingParty.GetAssertionLocation(Saml.Constants.Bindings.HttpRedirect, cancellationToken);
+                var location = await result.RelyingParty.GetAssertionLocation(_entityDescriptorStore, Saml.Constants.Bindings.HttpRedirect, cancellationToken);
                 var uri = new Uri(location);
-                var xml = result.Response.SerializeToXmlElement().OuterXml;
-                // https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf chapter 3.4.4.1 : HTTP Redirect Binding
-                uri = uri.AddParameter("SAMLResponse", Compression.Compress(xml));
-                uri = uri.AddParameter("RelayState", parameter.RelayState);
-                uri = uri.AddParameter("SigAlg", Saml.Constants.SignatureAlgorithms.RSASHA1);
-                var rsa = _options.SigningCertificate.PrivateKey as RSACng;
-                var hashed = new byte[0];
-                using (var sha1 = SHA1.Create())
-                {
-                    hashed = sha1.ComputeHash(Encoding.UTF8.GetBytes(uri.Query.TrimStart('?')));
-                }
-
-                var signed = rsa.SignHash(hashed, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
-                uri = uri.AddParameter("Signature", Convert.ToBase64String(signed));
-                return Redirect(uri.ToString());
+                var redirectionUrl = MessageEncodingBuilder.EncodeHTTPBindingResponse(uri, result.Response.SerializeToXmlElement(), parameter.RelayState, _options.SigningCertificate, _options.SignatureAlg);
+                return Redirect(redirectionUrl);
             }
 
             return RedirectToAction("Index", "Authenticate", new

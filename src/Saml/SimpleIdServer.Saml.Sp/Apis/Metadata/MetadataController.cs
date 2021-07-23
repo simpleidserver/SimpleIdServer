@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.Saml.Extensions;
-using SimpleIdServer.Saml.Sp.Extensions;
 using System.Net;
 
-namespace SimpleIdServer.Saml.Sp.Apis
+namespace SimpleIdServer.Saml.Sp.Apis.Metadata
 {
     [Route(Saml.Constants.RouteNames.Metadata)]
     public class MetadataController : Controller

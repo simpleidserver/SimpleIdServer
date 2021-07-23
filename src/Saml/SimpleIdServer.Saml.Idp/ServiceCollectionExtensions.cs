@@ -7,6 +7,7 @@ using SimpleIdServer.Saml.Idp.Apis.SSO;
 using SimpleIdServer.Saml.Idp.Domains;
 using SimpleIdServer.Saml.Idp.Persistence;
 using SimpleIdServer.Saml.Idp.Persistence.InMemory;
+using SimpleIdServer.Saml.Stores;
 using System;
 using System.Collections.Generic;
 
@@ -49,6 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var users = new List<User>();
             serviceCollection.AddSingleton<IRelyingPartyRepository>(new InMemoryRelyingPartyRepository(relyingParties));
             serviceCollection.AddSingleton<IUserRepository>(new InMemoryUserRepository(users));
+            serviceCollection.AddSingleton<IEntityDescriptorStore, InMemoryEntityDescriptorStore>();
             return serviceCollection;
         }
     }

@@ -14,7 +14,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
-    <PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.6.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SimpleIdServer.Saml.Sp\SimpleIdServer.Saml.Sp.csproj" />

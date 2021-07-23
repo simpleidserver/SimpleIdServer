@@ -3102,7 +3102,7 @@ namespace SimpleIdServer.Saml.Xsd
         private System.Xml.XmlAttribute[] anyAttrField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("AttributeValue", IsNullable=true)]
+        [System.Xml.Serialization.XmlElementAttribute("AttributeValue", typeof(AttributeValueType))]
         public object[] AttributeValue {
             get {
                 return this.attributeValueField;
