@@ -5,12 +5,12 @@
 @inject IOptions<OAuthHostOptions> configuration
 
 @{
-    ViewBag.Title = Global.authenticate_email;
+    ViewBag.Title = OpenIdGlobal.authenticate_email;
 }
 
 <div>
     <div class="card">
-        <div class="card-header">@Global.authenticate_email</div>
+        <div class="card-header">@OpenIdGlobal.authenticate_email</div>
         <div class="card-body">
             @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
             {
@@ -18,7 +18,7 @@
             }
             <h5 class="card-title">@Model.ClientName</h5>
             <div class="alert alert-info">
-                @string.Format(Global.code_validity, configuration.Value.TOTPStep)
+                @string.Format(OpenIdGlobal.code_validity, configuration.Value.TOTPStep)
             </div>
             @if (!ViewData.ModelState.IsValid)
             {
@@ -27,7 +27,7 @@
                     {
                         foreach (var error in modelState.Errors)
                         {
-                            <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                            <li class="list-group-item list-group-item-danger">@OpenIdGlobal.ResourceManager.GetString(error.ErrorMessage)</li>
                         }
                     }
                 </ul>
@@ -36,7 +36,7 @@
                 <div class="col-md-6">
                     @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
                     {
-                        <div class="alert alert-success">@Global.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
+                        <div class="alert alert-success">@OpenIdGlobal.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
                     }
                     @using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
                     {
@@ -44,10 +44,10 @@
                         <input type="hidden" asp-for="ReturnUrl" />
                         <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
                         <div class="form-group">
-                            <label asp-for="Email">@Global.email</label>
+                            <label asp-for="Email">@OpenIdGlobal.email</label>
                             <input asp-for="Email" type="text" class="form-control" />
                         </div>
-                        <button type="submit" class="btn btn-primary card-link">@Global.sendconfirmationcode</button>
+                        <button type="submit" class="btn btn-primary card-link">@OpenIdGlobal.sendconfirmationcode</button>
                     }
                 </div>
                 <div class="col-md-6">
@@ -57,18 +57,18 @@
                         <input type="hidden" asp-for="ReturnUrl" />
                         <input type="hidden" name="Action" value="AUTHENTICATE" />
                         <div class="form-group">
-                            <label asp-for="Email">@Global.email</label>
+                            <label asp-for="Email">@OpenIdGlobal.email</label>
                             <input asp-for="Email" type="text" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <label asp-for="OTPCode">@Global.confirmationcode</label>
+                            <label asp-for="OTPCode">@OpenIdGlobal.confirmationcode</label>
                             <input asp-for="OTPCode" type="password" class="form-control" />
                         </div>
                         <div>
                             <input type="checkbox" asp-for="RememberLogin " />
-                            <label>@Global.remember_login</label>
+                            <label>@OpenIdGlobal.remember_login</label>
                         </div>
-                        <button type="submit" class="btn btn-primary card-link">@Global.authenticate</button>
+                        <button type="submit" class="btn btn-primary card-link">@OpenIdGlobal.authenticate</button>
                     }
 
                 </div>
@@ -78,12 +78,12 @@
             <div style="float: right">
                 @if (!string.IsNullOrWhiteSpace(Model.TosUri))
                 {
-                    <a href="@Model.TosUri" target="_blank">@Global.tos</a>
+                    <a href="@Model.TosUri" target="_blank">@OpenIdGlobal.tos</a>
                 }
 
                 @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
                 {
-                    <a href="@Model.PolicyUri" target="_blank">@Global.policy</a>
+                    <a href="@Model.PolicyUri" target="_blank">@OpenIdGlobal.policy</a>
                 }
             </div>
         </div>

@@ -68,6 +68,8 @@ task pack -depends compile {
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Bootstrap4\SimpleIdServer.UI.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Bootstrap4\SimpleIdServer.Saml.UI.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --no-build $versionSuffix --output $result_dir }

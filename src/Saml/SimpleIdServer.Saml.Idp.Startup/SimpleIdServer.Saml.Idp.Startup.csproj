@@ -22,20 +22,32 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Resources\Global.Designer.cs">
+    <Compile Update="Resources\LayoutResource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Global.resx</DependentUpon>
+      <DependentUpon>LayoutResource.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\SamlGlobal.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SamlGlobal.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Global.fr.resx">
+    <EmbeddedResource Update="Resources\LayoutResource.fr.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\LayoutResource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\SamlGlobal.fr.resx">
       <LastGenOutput>Global.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Global.resx">
+    <EmbeddedResource Update="Resources\SamlGlobal.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Global.Designer.cs</LastGenOutput>
+      <LastGenOutput>SamlGlobal.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

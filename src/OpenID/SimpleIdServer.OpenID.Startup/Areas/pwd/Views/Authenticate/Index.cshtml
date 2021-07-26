@@ -2,12 +2,12 @@
 @using SimpleIdServer.OpenID.Startup.Resources
 
 @{
-    ViewBag.Title = Global.authenticate_pwd;
+    ViewBag.Title = OpenIdGlobal.authenticate_pwd;
 }
 
 <div>
     <div class="card" id="loginpwd-card">
-        <div class="card-header">@Global.authenticate_pwd</div>
+        <div class="card-header">@OpenIdGlobal.authenticate_pwd</div>
         @using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
         {
             @Html.AntiForgeryToken()
@@ -24,36 +24,36 @@
                         {
                             foreach (var error in modelState.Errors)
                             {
-                                <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                                <li class="list-group-item list-group-item-danger">@OpenIdGlobal.ResourceManager.GetString(error.ErrorMessage)</li>
                             }
                         }
                     </ul>
                 }
                 <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
                 <div class="form-group">
-                    <label>@Global.login</label>
+                    <label>@OpenIdGlobal.login</label>
                     <input type="text" value="@Model.Login" name="Login" class="form-control" />
                 </div>
                 <div class="form-group">
-                    <label>@Global.password</label>
+                    <label>@OpenIdGlobal.password</label>
                     <input type="password" value="@Model.Password" name="Password" class="form-control" />
                 </div>
                 <div>
                     <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-                    <label>@Global.remember_login</label>
+                    <label>@OpenIdGlobal.remember_login</label>
                 </div>
             </div>
             <div class="card-footer">
-                <button type="submit" class="btn btn-primary card-link">@Global.submit</button>
+                <button type="submit" class="btn btn-primary card-link">@OpenIdGlobal.submit</button>
                 <div style="float: right">
                     @if (!string.IsNullOrWhiteSpace(Model.TosUri))
                     {
-                        <a href="@Model.TosUri" target="_blank">@Global.tos</a>
+                        <a href="@Model.TosUri" target="_blank">@OpenIdGlobal.tos</a>
                     }
 
                     @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
                     {
-                        <a href="@Model.PolicyUri" target="_blank">@Global.policy</a>
+                        <a href="@Model.PolicyUri" target="_blank">@OpenIdGlobal.policy</a>
                     }
                 </div>
             </div>

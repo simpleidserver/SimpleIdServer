@@ -17,7 +17,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults((cfg) =>
                 {
-                    cfg.UseStartup<Startup>();
+                    cfg.UseStartup<OpenIdStartup>();
                     cfg.ConfigureKestrel(options =>
                     {
                         options.ConfigureHttpsDefaults(configureOptions =>

@@ -16,7 +16,7 @@ namespace SimpleIdServer.Saml.Idp.Startup
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults((cfg) =>
                 {
-                    cfg.UseStartup<Startup>();
+                    cfg.UseStartup<SamlStartup>();
                 });
     }
 }

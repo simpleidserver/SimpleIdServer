@@ -7,16 +7,16 @@
 
 @{
     var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
- var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
- string languagesLabel = Global.ResourceManager.GetString("languages");
- if (currentCultureInfo != null && !string.IsNullOrWhiteSpace(currentCultureInfo.Name))
- {
-     var str = Global.ResourceManager.GetString(currentCultureInfo.Name);
-     if (!string.IsNullOrWhiteSpace(str))
-     {
-         languagesLabel = string.Format(Global.ResourceManager.GetString("selected_language"), str);
-     }
- }
+    var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
+    string languagesLabel = LayoutResource.ResourceManager.GetString("languages");
+    if (currentCultureInfo != null && !string.IsNullOrWhiteSpace(currentCultureInfo.Name))
+    {
+        var str = LayoutResource.ResourceManager.GetString(currentCultureInfo.Name);
+        if (!string.IsNullOrWhiteSpace(str))
+        {
+            languagesLabel = string.Format(LayoutResource.ResourceManager.GetString("selected_language"), str);
+        }
+    }
 }
 
 <!DOCTYPE html>
@@ -56,7 +56,7 @@
                             <form asp-controller="Home" asp-action="SwitchLanguage" asp-area="" method="post">
                                 <input type="hidden" name="culture" value="@uiCulture.Name" />
                                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                <button type="submit" class="dropdown-item" href="#">@Global.ResourceManager.GetString(uiCulture.Name)</button>
+                                <button type="submit" class="dropdown-item" href="#">@LayoutResource.ResourceManager.GetString(uiCulture.Name)</button>
                             </form>
                         }
                     </div>

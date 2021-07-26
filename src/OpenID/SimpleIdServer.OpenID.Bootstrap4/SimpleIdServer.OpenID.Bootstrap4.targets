@@ -6,10 +6,10 @@
   </PropertyGroup>
   <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(CustomTaskAssembly)" />  
   <ItemGroup>
-    <EmbeddedResource Update="$(ProjectDir)Resources\Global.fr.resx">
+    <EmbeddedResource Update="$(ProjectDir)Resources\OpenIdGlobal.fr.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="$(ProjectDir)Resources\Global.resx">
+    <EmbeddedResource Update="$(ProjectDir)Resources\OpenIdGlobal.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <None Include="$(ProjectDir)openid_key.txt">

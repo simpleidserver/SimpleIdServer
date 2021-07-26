@@ -19,6 +19,7 @@
     <file src="**\*.cshtml.pp" target="contentFiles" />
     <file src="libman.json" target="contentFiles\libman.json" />
     <file src="SimpleIdServer.UI.Bootstrap4.targets" target="build"/>
+    <file src="**\*.resx" target="contentFiles" />
     <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\netcoreapp2.2\publish\**\*.dll" target="build\netcoreapp2.2"/>
     <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\net472\publish\**\*.dll" target="build\net472"/>
   </files>

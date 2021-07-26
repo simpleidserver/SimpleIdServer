@@ -3,8 +3,9 @@
 
 @{
     ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_OpenIdLayout.cshtml";
 }
 
 <div class="alert alert-danger" role="alert">
-    @SimpleIdServer.OpenID.SqlServer.Startup.Resources.Global.ResourceManager.GetString(Model.Code)
+    @SimpleIdServer.OpenID.SqlServer.Startup.Resources.OpenIdGlobal.ResourceManager.GetString(Model.Code)
 </div>

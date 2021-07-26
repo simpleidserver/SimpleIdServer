@@ -41,19 +41,28 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Resources\Global.Designer.cs">
-      <DependentUpon>Global.resx</DependentUpon>
+    <Compile Update="Resources\OpenIdGlobal.Designer.cs">
+      <DependentUpon>OpenIdGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Update="Resources\LayoutResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LayoutResource.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Global.fr.resx">
+    <EmbeddedResource Update="Resources\OpenIdGlobal.fr.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Global.resx">
-      <LastGenOutput>Global.Designer.cs</LastGenOutput>
+    <EmbeddedResource Update="Resources\OpenIdGlobal.resx">
+      <LastGenOutput>OpenIdGlobal.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\LayoutResource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ProjectExtensions>

@@ -25,4 +25,17 @@
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\LayoutResource.Designer.cs">
+      <DependentUpon>LayoutResource.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\LayoutResource.resx">
+      <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

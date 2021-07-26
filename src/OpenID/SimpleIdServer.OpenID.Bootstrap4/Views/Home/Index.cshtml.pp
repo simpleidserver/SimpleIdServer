@@ -1,7 +1,8 @@
 ﻿@using $rootnamespace$.Resources
 
 @{
-    ViewBag.Title = Global.home;
+    ViewBag.Title = OpenIdGlobal.home;
+    Layout = "~/Views/Shared/_OpenIdLayout.cshtml";
 }
 
 <h1>Welcome to SimpleIdServer</h1>

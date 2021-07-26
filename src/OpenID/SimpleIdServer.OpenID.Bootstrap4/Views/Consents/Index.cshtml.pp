@@ -2,7 +2,8 @@
 @model SimpleIdServer.OpenID.UI.ViewModels.ConsentsIndexViewModel
 
 @{
-    ViewBag.Title = Global.consents;
+    ViewBag.Title = OpenIdGlobal.consents;
+    Layout = "~/Views/Shared/_OpenIdLayout.cshtml";
 }
 
 <form method="post" action="@Url.Action("Reject", "Consents")" id="rejectForm">
@@ -21,7 +22,7 @@
                 {
                     foreach (var error in modelState.Errors)
                     {
-                        <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                        <li class="list-group-item list-group-item-danger">@OpenIdGlobal.ResourceManager.GetString(error.ErrorMessage)</li>
                     }
                 }
             </ul>
@@ -30,17 +31,17 @@
     <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
     <div class="card">
         <div class="card-header">
-            @string.Format(Global.consent_client_access, Model.ClientName)
+            @string.Format(OpenIdGlobal.consent_client_access, Model.ClientName)
         </div>
         <div class="card-body">
-            <h5 class="card-title">@Global.scopes</h5>
+            <h5 class="card-title">@OpenIdGlobal.scopes</h5>
             <ul class="list-group">
                 @foreach (var scopeName in Model.ScopeNames)
                 {
-                    <li class="list-group-item">@Global.ResourceManager.GetString($"scope_{scopeName}")</li>
+                    <li class="list-group-item">@OpenIdGlobal.ResourceManager.GetString($"scope_{scopeName}")</li>
                 }
             </ul>
-            <h5 class="card-title">@Global.claims</h5>
+            <h5 class="card-title">@OpenIdGlobal.claims</h5>
             <ul class="list-group">
                 @foreach (var claim in Model.ClaimNames)
                 {
@@ -49,8 +50,8 @@
             </ul>
         </div>
         <div class="card-footer">
-            <button type="submit" class="btn btn-success card-link">@Global.confirm</button>
-            <button type="submit" form="rejectForm" class="btn btn-danger">@Global.reject</button>
+            <button type="submit" class="btn btn-success card-link">@OpenIdGlobal.confirm</button>
+            <button type="submit" form="rejectForm" class="btn btn-danger">@OpenIdGlobal.reject</button>
         </div>
     </div>
 }

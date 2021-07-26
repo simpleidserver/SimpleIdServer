@@ -24,30 +24,26 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Update="Resources\Global.Designer.cs">
+    <None Update="openid_key.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Resources\OpenIdGlobal.Designer.cs">
+      <DependentUpon>OpenIdGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Global.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Global.fr.resx">
+    <EmbeddedResource Update="Resources\OpenIdGlobal.fr.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Global.resx">
+    <EmbeddedResource Update="Resources\OpenIdGlobal.resx">
+      <LastGenOutput>OpenIdGlobal.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Global.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="openid_key.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\_ViewStart.cshtml.pp">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </None>
   </ItemGroup>
 </Project>

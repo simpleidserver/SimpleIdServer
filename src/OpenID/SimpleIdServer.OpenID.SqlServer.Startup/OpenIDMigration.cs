@@ -11,7 +11,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
     {
         public OpenIdDBContext CreateDbContext(string[] args)
         {
-            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            var migrationsAssembly = typeof(OpenIdStartup).GetTypeInfo().Assembly.GetName().Name;
             var builder = new DbContextOptionsBuilder<OpenIdDBContext>();
             builder.UseSqlServer("Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=OpenID;Integrated Security=True",
                 optionsBuilder => optionsBuilder.MigrationsAssembly(migrationsAssembly));

@@ -28,10 +28,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\Global.Designer.cs">
+    <Compile Update="Resources\LayoutResource.Designer.cs">
+      <DependentUpon>LayoutResource.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Global.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\OpenIdGlobal.Designer.cs">
+      <DependentUpon>OpenIdGlobal.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
   </ItemGroup>
 
@@ -43,12 +48,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Global.fr.resx">
+    <EmbeddedResource Update="Resources\LayoutResource.resx">
+      <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Global.resx">
+    <EmbeddedResource Update="Resources\OpenIdGlobal.fr.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Global.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\OpenIdGlobal.resx">
+      <LastGenOutput>OpenIdGlobal.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
 
