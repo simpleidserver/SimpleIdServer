@@ -1,6 +1,10 @@
 ﻿@model SimpleIdServer.Saml.UI.Authenticate.LoginPassword.ViewModels.LoginViewModel
 @using SimpleIdServer.Saml.Idp.Startup.Resources
 
+@{ 
+    ViewBag.Title = Global.LoginPwdAuthenticateTitle;
+}
+
 <div>
     <div class="card" id="loginpwd-card">
         <div class="card-header">@Global.LoginPwdAuthenticateTitle</div>

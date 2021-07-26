@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Common;
 using SimpleIdServer.OAuth.Api.Management.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.Parameters;
 using System.Collections.Generic;
@@ -42,7 +42,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         private readonly IAddOAuthUserBySCIMIdHandler _addOAuthUserBySCIMIdHandler;
         private readonly IGetOTPCodeHandler _getOTPCodeHandler;
         private readonly IGetOTPQRCodeHandler _getOTPQRCodeHandler;
-        private readonly OAuthHostOptions _options;
+        private readonly SimpleIdServerCommonOptions _commonOptions;
 
         public ManagementController(
             IOAuthScopeRepository oauthScopeRepository,
@@ -61,7 +61,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             IAddOAuthUserBySCIMIdHandler addOAuthUserBySCIMIdHandler,
             IGetOTPCodeHandler getOTPCodeHandler,
             IGetOTPQRCodeHandler getOTPQRCodeHandler,
-            IOptions<OAuthHostOptions> options)
+            IOptions<SimpleIdServerCommonOptions> commonOptions)
         {
             _oauthScopeRepository = oauthScopeRepository;
             _getOAuthClientHandler = getOAuthClientHandler;
@@ -79,7 +79,7 @@ namespace SimpleIdServer.OAuth.Api.Management
             _addOAuthUserBySCIMIdHandler = addOAuthUserBySCIMIdHandler;
             _getOTPCodeHandler = getOTPCodeHandler;
             _getOTPQRCodeHandler = getOTPQRCodeHandler;
-            _options = options.Value;
+            _commonOptions = commonOptions.Value;
         }
 
         #region Manage clients
@@ -132,7 +132,7 @@ namespace SimpleIdServer.OAuth.Api.Management
         [Authorize("ManageClients")]
         public virtual async Task<IActionResult> AddClient([FromBody] JObject jObj, CancellationToken cancellationToken)
         {
-            var language = this.GetLanguage(_options);
+            var language = this.GetLanguage(_commonOptions);
             var clientId = await _addOAuthClientHandler.Handle(language, jObj, cancellationToken);
             return new ContentResult
             {

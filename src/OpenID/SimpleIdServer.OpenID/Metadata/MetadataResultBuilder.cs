@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Common;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
@@ -15,11 +15,11 @@ namespace SimpleIdServer.OpenID.Metadata
     public class MetadataResultBuilder : IMetadataResultBuilder
     {
         private readonly ITranslationRepository _translationRepository;
-        private readonly OAuthHostOptions _options;
+        private readonly SimpleIdServerCommonOptions _options;
         private Dictionary<string, Type> _dic;
 
         public MetadataResultBuilder(
-            IOptions<OAuthHostOptions> options, 
+            IOptions<SimpleIdServerCommonOptions> options, 
             ITranslationRepository translationRepository)
         {
             _options = options.Value;

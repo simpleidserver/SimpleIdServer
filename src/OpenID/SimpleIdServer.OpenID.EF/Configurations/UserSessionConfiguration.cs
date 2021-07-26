@@ -2,13 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.Common.Domains;
 
-namespace SimpleIdServer.OAuth.EF.Configurations
+namespace SimpleIdServer.OpenID.EF.Configurations
 {
-    public class OAuthUserSessionConfiguration : IEntityTypeConfiguration<OAuthUserSession>
+    public class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
     {
-        public void Configure(EntityTypeBuilder<OAuthUserSession> builder)
+        public void Configure(EntityTypeBuilder<UserSession> builder)
         {
             builder.HasKey(s => s.SessionId);
         }

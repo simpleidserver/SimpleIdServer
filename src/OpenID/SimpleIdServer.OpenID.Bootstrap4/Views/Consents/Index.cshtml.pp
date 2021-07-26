@@ -2,8 +2,7 @@
 @model SimpleIdServer.OpenID.UI.ViewModels.ConsentsIndexViewModel
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-	ViewBag.Title = Global.consents;
+    ViewBag.Title = Global.consents;
 }
 
 <form method="post" action="@Url.Action("Reject", "Consents")" id="rejectForm">

@@ -9,6 +9,7 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Extensions;
 using System.Linq;
 using System.Threading.Tasks;
+using SimpleIdServer.Common;
 
 namespace SimpleIdServer.OpenID.Middlewares
 {
@@ -23,7 +24,7 @@ namespace SimpleIdServer.OpenID.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var opts = (IOptions<OAuthHostOptions>)context.RequestServices.GetService(typeof(IOptions<OAuthHostOptions>));
+            var opts = (IOptions<SimpleIdServerCommonOptions>)context.RequestServices.GetService(typeof(IOptions<SimpleIdServerCommonOptions>));
             if (context.Request.Query.ContainsKey(AuthorizationRequestParameters.UILocales) && context.Request.Query[AuthorizationRequestParameters.UILocales].Count == 1)
             {
                 var uiLocales = context.Request.Query[AuthorizationRequestParameters.UILocales][0];
@@ -57,7 +58,7 @@ namespace SimpleIdServer.OpenID.Middlewares
             await _next(context);
         }
 
-        private async Task<bool> UpdateLanguage(string languages, OAuthHostOptions opts, HttpContext context)
+        private async Task<bool> UpdateLanguage(string languages, SimpleIdServerCommonOptions opts, HttpContext context)
         {
             if (string.IsNullOrWhiteSpace(languages))
             {

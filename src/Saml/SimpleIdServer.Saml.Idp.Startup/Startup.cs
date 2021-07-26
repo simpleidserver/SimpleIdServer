@@ -30,6 +30,7 @@ namespace SimpleIdServer.Saml.Idp.Startup
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
+            services.AddCommonSID();
             services.AddSamlIdp(opt =>
             {
                 opt.SigningCertificate = certificate;

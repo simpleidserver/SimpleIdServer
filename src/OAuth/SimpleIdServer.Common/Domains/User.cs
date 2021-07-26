@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 
 namespace SimpleIdServer.Common.Domains
 {
-    public class User : ICloneable
+    public class User : ICloneable, IEquatable<User>
     {
         public User()
         {
@@ -132,7 +132,7 @@ namespace SimpleIdServer.Common.Domains
             return user;
         }
 
-        public object Clone()
+        public virtual object Clone()
         {
             return new User
             {

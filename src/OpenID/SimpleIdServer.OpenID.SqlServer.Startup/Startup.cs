@@ -19,8 +19,6 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
 
 namespace SimpleIdServer.OpenID.SqlServer.Startup
 {
@@ -71,6 +69,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     o.RevocationFlag = X509RevocationFlag.EntireChain;
                     o.RevocationMode = X509RevocationMode.NoCheck;
                 });
+            services.AddCommonSID();
             services.AddSIDOpenID(opt =>
                 {
                     opt.IsLocalhostAllowed = true;

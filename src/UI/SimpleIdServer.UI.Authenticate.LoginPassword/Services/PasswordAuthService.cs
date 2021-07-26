@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Common.Exceptions;
+using SimpleIdServer.Common.Helpers;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.Exceptions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;

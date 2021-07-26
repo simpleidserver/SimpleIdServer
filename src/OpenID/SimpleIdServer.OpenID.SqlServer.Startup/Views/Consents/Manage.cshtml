@@ -2,7 +2,6 @@
 @model IEnumerable<SimpleIdServer.OpenID.UI.ViewModels.ConsentViewModel>
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = Global.consents;
 }
 

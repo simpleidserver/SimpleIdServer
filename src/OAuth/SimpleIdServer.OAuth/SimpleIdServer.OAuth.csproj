@@ -9,6 +9,7 @@
     <PackageReference Include="QRCoder" Version="1.4.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
   </ItemGroup>
 </Project>

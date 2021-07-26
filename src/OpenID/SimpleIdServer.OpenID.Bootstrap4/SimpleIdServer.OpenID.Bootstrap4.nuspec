@@ -10,8 +10,7 @@
     <dependencies>
       <group targetFramework=".NETCoreApp5.0">
         <dependency id="SimpleIdServer.OpenID" version="$version$" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Web.LibraryManager.Build" version="2.1.113" />
-        <dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="5.0.3" />
+        <dependency id="SimpleIdServer.UI.Bootstrap4" version="$version$" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
@@ -22,7 +21,6 @@
     <file src="**\*.cshtml.pp" target="contentFiles" />
     <file src="openid_key.txt" target="content" />
     <file src="openid_key.txt" target="contentFiles" />
-    <file src="libman.json" target="contentFiles\libman.json" />
     <file src="SimpleIdServer.OpenID.Bootstrap4.targets" target="build"/>
     <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\netcoreapp2.2\publish\**\*.dll" target="build\netcoreapp2.2"/>
     <file src="..\..\MSBuild\Nuget.Transform.MSBuild.Task\bin\Release\net472\publish\**\*.dll" target="build\net472"/>

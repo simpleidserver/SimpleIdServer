@@ -19,6 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Bootstrap4\SimpleIdServer.UI.Bootstrap4.csproj" />
     <ProjectReference Include="..\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj" />
   </ItemGroup>
   
@@ -43,6 +44,10 @@
   <ItemGroup>
     <None Update="openid_key.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Views\_ViewStart.cshtml.pp">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
 </Project>

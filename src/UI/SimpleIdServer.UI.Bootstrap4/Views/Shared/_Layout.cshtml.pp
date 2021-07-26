@@ -1,23 +1,22 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using $rootnamespace$.Resources
 @using Microsoft.Extensions.Options
-@using SimpleIdServer.OAuth.Options 
 @using System.Globalization
 
-@inject IOptions<OAuthHostOptions> Options
+@inject IOptions<SimpleIdServer.Common.SimpleIdServerCommonOptions> Options
 
 @{
     var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
-    var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
-    string languagesLabel = Global.ResourceManager.GetString("languages");
-    if (currentCultureInfo != null && !string.IsNullOrWhiteSpace(currentCultureInfo.Name))
-    {
-        var str = Global.ResourceManager.GetString(currentCultureInfo.Name);
-        if (!string.IsNullOrWhiteSpace(str))
-        {
-            languagesLabel = string.Format(Global.ResourceManager.GetString("selected_language"), str);
-        }
-    }
+ var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
+ string languagesLabel = Global.ResourceManager.GetString("languages");
+ if (currentCultureInfo != null && !string.IsNullOrWhiteSpace(currentCultureInfo.Name))
+ {
+     var str = Global.ResourceManager.GetString(currentCultureInfo.Name);
+     if (!string.IsNullOrWhiteSpace(str))
+     {
+         languagesLabel = string.Format(Global.ResourceManager.GetString("selected_language"), str);
+     }
+ }
 }
 
 <!DOCTYPE html>
@@ -43,15 +42,8 @@
                             Welcome @User.Identity.Name
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Manage", "Consents", new { area = "" })">
-                            @Global.consents
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Disconnect", "Home", new { area = "" })">@Global.disconnect</a>
-                    </li>
                 }
+                @RenderSection("SubMenu", required: false)
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">

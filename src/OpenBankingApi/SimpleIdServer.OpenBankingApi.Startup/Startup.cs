@@ -73,6 +73,7 @@ namespace SimpleIdServer.OpenBankingApi.Startup
 
             services.AddMediatR(typeof(IAccountRepository));
             services.AddSwaggerGen();
+            services.AddCommonSID();
             services.AddSIDOpenID(opt =>
             {
                 opt.IsLocalhostAllowed = true;

@@ -61,6 +61,7 @@ namespace SimpleIdServer.OpenID.Startup
                     o.RevocationFlag = X509RevocationFlag.EntireChain;
                     o.RevocationMode = X509RevocationMode.NoCheck;
                 });
+            services.AddCommonSID();
             services.AddSIDOpenID(opt =>
                 {
                     opt.IsLocalhostAllowed = true;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Execution;
+﻿using Medallion.Threading.FileSystem;
+using Microsoft.Build.Execution;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,36 +24,45 @@ namespace Nuget.Transform.MSBuild.Task
                 throw new Exception("Rootnamespace cannot be found");
             }
 
-            var lockFilePath = Path.Combine(projectInstance.Directory, LOCK_FILE_NAME);
-            var lockFiles = DeserializeLockFile(projectInstance.Directory);
-            foreach (var filePath in Directory.GetFiles(projectInstance.Directory, "*.pp", SearchOption.AllDirectories))
+            var lck = new FileDistributedLock(new DirectoryInfo(projectInstance.Directory), "MyLockName");
+            using (var handle = lck.TryAcquire())
             {
-                var text = File.ReadAllText(filePath);
-                using (var sha256 = SHA256.Create())
+                if (handle == null)
                 {
-                    var hashPayload = sha256.ComputeHash(Encoding.UTF8.GetBytes((text)));
-                    var hashContent = Convert.ToBase64String(hashPayload.Take(100).ToArray());
-                    var kvp = lockFiles.FirstOrDefault(k => k.Key.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
-                    if (!kvp.Equals(default(KeyValuePair<string, string>)) && kvp.Value.Equals(hashContent, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    if (!kvp.Equals(default(KeyValuePair<string, string>)))
-                    {
-                        lockFiles.Remove(kvp.Key);
-                    }
-
-                    lockFiles.Add(filePath, hashContent);
-                    text = text.Replace("$rootnamespace$", rootNamespace.EvaluatedValue);
-                    var extension = Path.GetExtension(filePath).Replace(".pp", "");
-                    var newFilePath = Path.ChangeExtension(filePath, extension);
-                    File.WriteAllText(newFilePath, text);
+                    return Execute();
                 }
-            }
 
-            SerializeLockFile(projectInstance.Directory, lockFiles);
-            return true;
+                var lockFilePath = Path.Combine(projectInstance.Directory, LOCK_FILE_NAME);
+                var lockFiles = DeserializeLockFile(projectInstance.Directory);
+                foreach (var filePath in Directory.GetFiles(projectInstance.Directory, "*.pp", SearchOption.AllDirectories))
+                {
+                    var text = File.ReadAllText(filePath);
+                    using (var sha256 = SHA256.Create())
+                    {
+                        var hashPayload = sha256.ComputeHash(Encoding.UTF8.GetBytes((text)));
+                        var hashContent = Convert.ToBase64String(hashPayload.Take(100).ToArray());
+                        var kvp = lockFiles.FirstOrDefault(k => k.Key.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
+                        if (!kvp.Equals(default(KeyValuePair<string, string>)) && kvp.Value.Equals(hashContent, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        if (!kvp.Equals(default(KeyValuePair<string, string>)))
+                        {
+                            lockFiles.Remove(kvp.Key);
+                        }
+
+                        lockFiles.Add(filePath, hashContent);
+                        text = text.Replace("$rootnamespace$", rootNamespace.EvaluatedValue);
+                        var extension = Path.GetExtension(filePath).Replace(".pp", "");
+                        var newFilePath = Path.ChangeExtension(filePath, extension);
+                        File.WriteAllText(newFilePath, text);
+                    }
+                }
+
+                SerializeLockFile(projectInstance.Directory, lockFiles);
+                return true;
+            }
         }
 
         private ProjectInstance GetProjectInstance()

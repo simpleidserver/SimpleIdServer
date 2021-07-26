@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>    
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>SimpleIdServer.UI.Bootstrap4.nuspec</NuspecFile>
+    <NuspecProperties Condition="'$(VersionSuffix)' == ''">$(NuspecProperties);version=$(VersionPrefix)</NuspecProperties>
+    <NuspecProperties Condition="'$(VersionSuffix)' != ''">$(NuspecProperties);version=$(VersionPrefix)-$(VersionSuffix)</NuspecProperties>
+    <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
+    <NuspecProperties>$(NuspecProperties);owners=$(Owners)</NuspecProperties>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Views\_Layout.cshtml.pp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_Layout.cshtml.pp">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.113" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
+  </ItemGroup>
+</Project>

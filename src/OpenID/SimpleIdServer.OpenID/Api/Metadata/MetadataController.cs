@@ -3,9 +3,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Common;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Metadata;
 using System.Threading;
@@ -16,21 +16,21 @@ namespace SimpleIdServer.OpenID.Api.Metadata
     [Route(SIDOpenIdConstants.EndPoints.Metadata)]
     public class MetadataController: Controller
     {
-        private readonly OAuthHostOptions _options;
+        private readonly SimpleIdServerCommonOptions commonOptions;
         private readonly IMetadataResultBuilder _metadataResultBuilder;
 
         public MetadataController(
-            IOptions<OAuthHostOptions> options,
+            IOptions<SimpleIdServerCommonOptions> commonOptions,
             IMetadataResultBuilder metadataResultBuilder)
         {
-            _options = options.Value;
+            this.commonOptions = commonOptions.Value;
             _metadataResultBuilder = metadataResultBuilder;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetMetadata(CancellationToken cancellationToken)
         {
-            var name = this.GetLanguage(_options);
+            var name = this.GetLanguage(commonOptions);
             var result = await _metadataResultBuilder
                 .AddTranslatedEnum<ApplicationKinds>("applicationKind")
                 .Build(name, cancellationToken);
@@ -41,7 +41,7 @@ namespace SimpleIdServer.OpenID.Api.Metadata
         public IActionResult GetLanguages()
         {
             var result = new JArray();
-            foreach(var supportedUICulture in _options.SupportedUICultures)
+            foreach(var supportedUICulture in commonOptions.SupportedUICultures)
             {
                 result.Add(new JObject
                 {

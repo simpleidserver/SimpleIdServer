@@ -1,14 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.Common;
 using System.Linq;
 
 namespace SimpleIdServer.OAuth.Extensions
 {
     public static class ControllerExtensions
     {
-        public static string GetLanguage(this Controller controller, OAuthHostOptions options)
+        public static string GetLanguage(this Controller controller, SimpleIdServerCommonOptions options)
         {
             if (controller.Request.Headers.ContainsKey(TranslationHelper.AcceptLanguage))
             {

@@ -1,4 +1,23 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using SimpleIdServer.Saml.Idp.Startup.Resources
+@using Microsoft.Extensions.Options
+@using System.Globalization
+
+@inject IOptions<SimpleIdServer.Common.SimpleIdServerCommonOptions> Options
+
+@{
+    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
+    var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
+    string languagesLabel = Global.ResourceManager.GetString("languages");
+    if (currentCultureInfo != null && !string.IsNullOrWhiteSpace(currentCultureInfo.Name))
+    {
+        var str = Global.ResourceManager.GetString(currentCultureInfo.Name);
+        if (!string.IsNullOrWhiteSpace(str))
+        {
+            languagesLabel = string.Format(Global.ResourceManager.GetString("selected_language"), str);
+        }
+    }
+}
 
 <!DOCTYPE html>
 <html>
@@ -23,7 +42,25 @@
                             Welcome @User.Identity.Name
                         </a>
                     </li>
+                    @RenderSection("Menu", false)
                 }
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-toggle="dropdown">
+                        @languagesLabel
+                    </a>
+                    <div class="dropdown-menu">
+                        @foreach (var uiCulture in Options.Value.SupportedUICultures)
+                        {
+                            <form asp-controller="Home" asp-action="SwitchLanguage" asp-area="" method="post">
+                                <input type="hidden" name="culture" value="@uiCulture.Name" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="dropdown-item" href="#">@Global.ResourceManager.GetString(uiCulture.Name)</button>
+                            </form>
+                        }
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>

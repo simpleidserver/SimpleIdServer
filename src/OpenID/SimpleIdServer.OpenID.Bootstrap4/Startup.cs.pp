@@ -26,6 +26,7 @@ namespace $rootnamespace$
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
+            services.AddCommonSID();
             services.AddSIDOpenID()
                 .AddClients(DefaultConfiguration.GetClients(), DefaultConfiguration.Scopes)
                 .AddAcrs(DefaultConfiguration.AcrLst)

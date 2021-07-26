@@ -3,8 +3,9 @@
 @using Microsoft.Extensions.Options
 @using SimpleIdServer.OAuth.Options
 @using System.Globalization
+@using SimpleIdServer.Common
 
-@inject IOptions<OAuthHostOptions> Options
+@inject IOptions<SimpleIdServerCommonOptions> Options
 
 @{
     var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";

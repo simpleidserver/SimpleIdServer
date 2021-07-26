@@ -120,8 +120,17 @@
   <data name="Authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="en" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="fr" xml:space="preserve">
+    <value>French</value>
+  </data>
   <data name="InvalidCredentials" xml:space="preserve">
     <value>Password is invalid</value>
+  </data>
+  <data name="languages" xml:space="preserve">
+    <value>Languages</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Login</value>
@@ -140,6 +149,9 @@
   </data>
   <data name="RememberMe" xml:space="preserve">
     <value>Remember me</value>
+  </data>
+  <data name="selected_language" xml:space="preserve">
+    <value>Selected Language</value>
   </data>
   <data name="UnknownUser" xml:space="preserve">
     <value>User is unknown</value>

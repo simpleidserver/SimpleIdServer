@@ -1,9 +1,9 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@using SimpleIdServer.OpenID.SqlServer.Startup.Resources;
+@model SimpleIdServer.OpenID.UI.ViewModels.ErrorViewModel
+
+@{
     ViewBag.Title = "Error";
 }
-
-@model SimpleIdServer.OpenID.UI.ViewModels.ErrorViewModel
 
 <div class="alert alert-danger" role="alert">
     @SimpleIdServer.OpenID.SqlServer.Startup.Resources.Global.ResourceManager.GetString(Model.Code)

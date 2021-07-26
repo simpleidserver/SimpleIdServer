@@ -1,9 +1,8 @@
 ﻿@model SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels.AuthenticateViewModel
-@using $rootnamespace$.Resources
+@using $rootnamespace$.Resources;
 
 @{
     ViewBag.Title = Global.authenticate_pwd;
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div>
@@ -20,15 +19,17 @@
                 <h5 class="card-title">@Model.ClientName</h5>
                 @if (!ViewData.ModelState.IsValid)
                 {
-                    <ul class="list-group">
-                        @foreach (var modelState in ViewData.ModelState.Values)
-                        {
-                            foreach (var error in modelState.Errors)
+                    <div class="alert alert-danger">
+                        <ul class="list-group">
+                            @foreach (var modelState in ViewData.ModelState.Values)
                             {
-                                <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                                foreach (var error in modelState.Errors)
+                                {
+                                    <li class="list-group-item list-group-item-danger">@Global.ResourceManager.GetString(error.ErrorMessage)</li>
+                                }
                             }
-                        }
-                    </ul>
+                        </ul>
+                    </div>
                 }
                 <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
                 <div class="form-group">

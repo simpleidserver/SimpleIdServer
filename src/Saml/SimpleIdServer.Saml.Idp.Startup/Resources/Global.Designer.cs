@@ -70,11 +70,38 @@ namespace SimpleIdServer.Saml.Idp.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à English.
+        /// </summary>
+        public static string en {
+            get {
+                return ResourceManager.GetString("en", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à French.
+        /// </summary>
+        public static string fr {
+            get {
+                return ResourceManager.GetString("fr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Password is invalid.
         /// </summary>
         public static string InvalidCredentials {
             get {
                 return ResourceManager.GetString("InvalidCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Languages.
+        /// </summary>
+        public static string languages {
+            get {
+                return ResourceManager.GetString("languages", resourceCulture);
             }
         }
         
@@ -129,6 +156,15 @@ namespace SimpleIdServer.Saml.Idp.Startup.Resources {
         public static string RememberMe {
             get {
                 return ResourceManager.GetString("RememberMe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected Language.
+        /// </summary>
+        public static string selected_language {
+            get {
+                return ResourceManager.GetString("selected_language", resourceCulture);
             }
         }
         

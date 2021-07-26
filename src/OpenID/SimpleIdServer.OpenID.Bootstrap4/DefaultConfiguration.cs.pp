@@ -1,18 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Common.Domains;
+using SimpleIdServer.Common.Helpers;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace $rootnamespace$
 {
     public class DefaultConfiguration
     {
-        public static List<OpenIdScope> Scopes = new List<OpenIdScope>
+        public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
             SIDOpenIdConstants.StandardScopes.Phone,
@@ -20,15 +20,8 @@ namespace $rootnamespace$
             SIDOpenIdConstants.StandardScopes.Role,
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
-            SIDOpenIdConstants.StandardScopes.Address,
-            new OpenIdScope
-            {
-                Name = "scim",
-                Claims = new List<OpenIdScopeClaim>
-                {
-                    new OpenIdScopeClaim("scim_id", true)
-                }
-            }
+            SIDOpenIdConstants.StandardScopes.Address,            
+            SIDOpenIdConstants.StandardScopes.ScimScope
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -59,9 +52,9 @@ namespace $rootnamespace$
             new OAuthUser
             {
                 Id = "sub",
-                Credentials = new List<OAuthUserCredential>
+                Credentials = new List<UserCredential>
                 {
-                    new OAuthUserCredential
+                    new UserCredential
                     {
                         CredentialType = "pwd",
                         Value = PasswordHelper.ComputeHash("password")
@@ -69,137 +62,29 @@ namespace $rootnamespace$
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
-                OAuthUserClaims = new List<OAuthUserClaim>
+                OAuthUserClaims = new List<UserClaim>
                 {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "sub"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "name"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, "familyName"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "uniquename"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "givenName"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.MiddleName, "middleName"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.NickName, "nickName"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Locale, "locale"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Picture, "picture"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.WebSite, "website"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Profile, "profile"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Gender, "gender"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UpdatedAt, "1612355959", SimpleIdServer.Jwt.ClaimValueTypes.INTEGER),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.EmailVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", SimpleIdServer.Jwt.ClaimValueTypes.JSONOBJECT),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumberVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN)
-                }
-            },
-            new OAuthUser
-            {
-                Id = "administrator",
-                Credentials = new List<OAuthUserCredential>
-                {
-                    new OAuthUserCredential
-                    {
-                        CredentialType = "pwd",
-                        Value = PasswordHelper.ComputeHash("password")
-                    }
-                },
-                OAuthUserClaims = new List<OAuthUserClaim>
-                {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "administrator"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin")
-                }
-            },
-            new OAuthUser
-            {
-                Id = "businessanalyst",
-                Credentials = new List<OAuthUserCredential>
-                {
-                    new OAuthUserCredential
-                    {
-                        CredentialType = "pwd",
-                        Value = PasswordHelper.ComputeHash("password")
-                    }
-                },
-                OAuthUserClaims = new List<OAuthUserClaim>
-                {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "businessanalyst"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "businessanalyst"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "businessanalyst")
-                }
-            },
-            new OAuthUser
-            {
-                Id = "caseworker",
-                Credentials = new List<OAuthUserCredential>
-                {
-                    new OAuthUserCredential
-                    {
-                        CredentialType = "pwd",
-                        Value = PasswordHelper.ComputeHash("password")
-                    }
-                },
-                OAuthUserClaims = new List<OAuthUserClaim>
-                {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "caseworker"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "caseworker"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "caseworker")
-                }
-            },
-            new OAuthUser
-            {
-                Id = "scimUser",
-                Credentials = new List<OAuthUserCredential>
-                {
-                    new OAuthUserCredential
-                    {
-                        CredentialType = "pwd",
-                        Value = PasswordHelper.ComputeHash("password")
-                    }
-                },
-                OAuthUserClaims = new List<OAuthUserClaim>
-                {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "scimUser"),
-                    new OAuthUserClaim("scim_id", "1")
-                }
-            },
-            new OAuthUser
-            {
-                Id = "umaUser",
-                Credentials = new List<OAuthUserCredential>
-                {
-                    new OAuthUserCredential
-                    {
-                        CredentialType = "pwd",
-                        Value = PasswordHelper.ComputeHash("password")
-                    }
-                },
-                OAuthUserClaims = new List<OAuthUserClaim>
-                {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "umaUser"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "User"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "User")
-                }
-            },
-            new OAuthUser
-            {
-                Id = "doctor",
-                Credentials = new List<OAuthUserCredential>
-                {
-                    new OAuthUserCredential
-                    {
-                        CredentialType = "pwd",
-                        Value = PasswordHelper.ComputeHash("password")
-                    }
-                },
-                OAuthUserClaims = new List<OAuthUserClaim>
-                {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "doctor"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Doctor"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "Doctor"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "Doctor")
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "sub"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "name"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, "familyName"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UniqueName, "uniquename"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.GivenName, "givenName"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.MiddleName, "middleName"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.NickName, "nickName"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.BirthDate, "07-10-1989"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PreferredUserName, "preferredUserName"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.ZoneInfo, "zoneInfo"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Locale, "locale"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Picture, "picture"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.WebSite, "website"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Profile, "profile"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Gender, "gender"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UpdatedAt, "1612355959", SimpleIdServer.Jwt.ClaimValueTypes.INTEGER),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.EmailVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'locality': 'Los Angeles', 'region': 'CA', 'postal_code': '90210', 'country': 'US' }", SimpleIdServer.Jwt.ClaimValueTypes.JSONOBJECT),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumberVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN)
                 }
             }
         };
@@ -211,10 +96,8 @@ namespace $rootnamespace$
                 new OpenIdClient
                 {
                     ClientId = "scimClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "scimClientSecret", null)
-                    },
+                    ClientSecret = "scimClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -223,16 +106,9 @@ namespace $rootnamespace$
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
-                        new OpenIdScope
-                        {
-                            Name = "scim",
-                            Claims = new List<OpenIdScopeClaim>
-                            {
-                                new OpenIdScopeClaim("scim_id", true)
-                            }
-                        }
+                        SIDOpenIdConstants.StandardScopes.ScimScope
                     },
                     GrantTypes = new List<string>
                     {
@@ -253,10 +129,8 @@ namespace $rootnamespace$
                 new OpenIdClient
                 {
                     ClientId = "umaClient",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "umaClientSecret", null)
-                    },
+                    ClientSecret = "umaClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -265,7 +139,7 @@ namespace $rootnamespace$
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
@@ -291,11 +165,9 @@ namespace $rootnamespace$
                 new OpenIdClient
                 {
                     ClientId = "simpleIdServerWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "simpleIdServerWebsiteSecret", null)
-                    },
-                    TokenEndPointAuthMethod = "client_secret_post",
+                    ClientSecret = "simpleIdServerWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.SPA,
+                    TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
                     CreateDateTime = DateTime.UtcNow,
@@ -303,7 +175,7 @@ namespace $rootnamespace$
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
@@ -312,27 +184,32 @@ namespace $rootnamespace$
                     },
                     GrantTypes = new List<string>
                     {
+                        "authorization_code",
                         "implicit"
                     },
                     RedirectionUrls = new List<string>
                     {
                         "http://localhost:4200",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver"
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver/"
+                    },
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        "http://localhost:4200",
+                        "https://simpleidserver.northeurope.cloudapp.azure.com/simpleidserver/"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "token",
-                        "id_token"
+                        "id_token",
+                        "code"
                     }
                 },
                 new OpenIdClient
                 {
                     ClientId = "tradWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "tradWebsiteSecret", null)
-                    },
+                    ClientSecret = "tradWebsiteSecret",
+                    ApplicationKind = ApplicationKinds.Web,
                     TokenEndPointAuthMethod = "client_secret_post",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -341,7 +218,7 @@ namespace $rootnamespace$
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile
@@ -366,10 +243,8 @@ namespace $rootnamespace$
                 new OpenIdClient
                 {
                     ClientId = "native",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "nativeSecret", null)
-                    },
+                    ClientSecret = "nativeSecret",
+                    ApplicationKind = ApplicationKinds.Native,
                     TokenEndPointAuthMethod = "pkce",
                     ApplicationType = "web",
                     UpdateDateTime = DateTime.UtcNow,
@@ -378,8 +253,9 @@ namespace $rootnamespace$
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
                     IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
+                    AllowedScopes = new List<OAuthScope>
                     {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
                         SIDOpenIdConstants.StandardScopes.Email
                     },
@@ -389,163 +265,12 @@ namespace $rootnamespace$
                     },
                     RedirectionUrls = new List<string>
                     {
-                        "sid:/oauth2redirect"
+                        "com.companyname.simpleidserver.mobileapp:/oauth2redirect"
                     },
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
                         "code"
-                    }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "caseManagementWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
-                    },
-                    TokenEndPointAuthMethod = "client_secret_post",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email,
-                        SIDOpenIdConstants.StandardScopes.Role
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "implicit"
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "http://localhost:51724",
-                        "http://localhost:8080",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagement"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "token",
-                        "id_token"
-                    }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "caseManagementTasklistWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "b98113b5-f45f-4a4a-9db5-610b7183e148", null)
-                    },
-                    TokenEndPointAuthMethod = "client_secret_post",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email,
-                        SIDOpenIdConstants.StandardScopes.Role
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "implicit"
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "http://localhost:51724",
-                        "http://localhost:8081",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/tasklist"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "token",
-                        "id_token"
-                    }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "caseManagementPerformanceWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "91894b86-c57e-489a-838d-fb82621a67ee", null)
-                    },
-                    TokenEndPointAuthMethod = "client_secret_post",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email,
-                        SIDOpenIdConstants.StandardScopes.Role
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "implicit"
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "http://localhost:51725",
-                        "http://localhost:8081",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/casemanagementperformance"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "token",
-                        "id_token"
-                    }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "medikitWebsite",
-                    Secrets = new List<ClientSecret>
-                    {
-                        new ClientSecret(ClientSecretTypes.SharedSecret, "f200eeb0-a6a3-465e-be91-97806e5dd3bc", null)
-                    },
-                    TokenEndPointAuthMethod = "client_secret_post",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OpenIdScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email,
-                        SIDOpenIdConstants.StandardScopes.Role
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "implicit"
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "http://localhost:8080",
-                        "http://simpleidserver.northeurope.cloudapp.azure.com/medikit"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "token",
-                        "id_token"
                     }
                 }
             };

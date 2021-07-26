@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenID.EF", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenBankingApi.EF.Startup", "src\OpenBankingApi\SimpleIdServer.OpenBankingApi.EF.Startup\SimpleIdServer.OpenBankingApi.EF.Startup.csproj", "{73FF6B1A-8ABF-419A-B8F8-CC3EE2C3F301}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Common", "src\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj", "{521AF209-06AF-450C-A2F8-45D6000FFE6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{73FF6B1A-8ABF-419A-B8F8-CC3EE2C3F301}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73FF6B1A-8ABF-419A-B8F8-CC3EE2C3F301}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73FF6B1A-8ABF-419A-B8F8-CC3EE2C3F301}.Release|Any CPU.Build.0 = Release|Any CPU
+		{521AF209-06AF-450C-A2F8-45D6000FFE6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{521AF209-06AF-450C-A2F8-45D6000FFE6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{521AF209-06AF-450C-A2F8-45D6000FFE6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{521AF209-06AF-450C-A2F8-45D6000FFE6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{79CF82F4-D08F-4F9F-B446-6FFA147AB0DA} = {66D571DA-9F35-4818-97E9-D89B56AFCC8C}
 		{54D7D25D-BEF3-4232-B57D-A0B31735FC60} = {EF7D00E5-A5AA-4337-AEC9-B3731F66BB6E}
 		{73FF6B1A-8ABF-419A-B8F8-CC3EE2C3F301} = {305D4806-CC80-41DD-B994-D9C0C29F9DEC}
+		{521AF209-06AF-450C-A2F8-45D6000FFE6E} = {068E0DFD-A185-43F3-8F74-94137789AAFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {570C87DE-80F1-44E8-8869-A35488B6C71A}

@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Common;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenBankingApi.AccountAccessContents.Commands;
 using SimpleIdServer.OpenBankingApi.Persistences;
@@ -43,7 +43,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
         private readonly IMediator _mediator;
         private readonly IResponseModeHandler _responseModeHandler;
         private readonly IExtractRequestHelper _extractRequestHelper;
-        private readonly OAuthHostOptions _oauthHostOptions;
+        private readonly SimpleIdServerCommonOptions _commonOptions;
         private readonly OpenBankingApiOptions _openbankingApiOptions;
         private readonly ILogger<OpenBankingApiAccountConsentController> _logger;
 
@@ -58,7 +58,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
             IResponseModeHandler responseModeHandler,
             IMediator mediator,
             ILogger<OpenBankingApiAccountConsentController> logger,
-            IOptions<OAuthHostOptions> oauthHostOptions,
+            IOptions<SimpleIdServerCommonOptions> commonOptions,
             IOptions<OpenBankingApiOptions> openbankingApiOptions)
         {
             _oauthUserRepository = oauthUserRepository;
@@ -71,7 +71,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
             _extractRequestHelper = extractRequestHelper;
             _mediator = mediator;
             _logger = logger;
-            _oauthHostOptions = oauthHostOptions.Value;
+            _commonOptions = commonOptions.Value;
             _openbankingApiOptions = openbankingApiOptions.Value;
         }
 
@@ -92,7 +92,7 @@ namespace SimpleIdServer.OpenBankingApi.UI
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 var consentId = claims.Single(c => c.Name == _openbankingApiOptions.OpenBankingApiConsentClaimName).Values.First();
-                var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _oauthHostOptions.DefaultCulture;
+                var defaultLanguage = CultureInfo.DefaultThreadCurrentUICulture != null ? CultureInfo.DefaultThreadCurrentUICulture.Name : _commonOptions.DefaultCulture;
                 var claimDescriptions = new List<string>();
                 if (claims != null && claims.Any())
                 {

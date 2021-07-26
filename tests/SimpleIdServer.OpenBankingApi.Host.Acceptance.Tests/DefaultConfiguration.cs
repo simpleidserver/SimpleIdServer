@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Common.Domains;
+using SimpleIdServer.Common.Helpers;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OpenBankingApi.Domains.Account;
@@ -54,33 +56,33 @@ namespace SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
             new OAuthUser
             {
                 Id = "administrator",
-                Credentials = new List<OAuthUserCredential>
+                Credentials = new List<UserCredential>
                 {
-                    new OAuthUserCredential
+                    new UserCredential
                     {
                         CredentialType = "pwd",
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                Sessions = new List<OAuthUserSession>
+                Sessions = new List<UserSession>
                 {
-                    new OAuthUserSession
+                    new UserSession
                     {
                         AuthenticationDateTime = DateTime.UtcNow,
                         ExpirationDateTime = DateTime.UtcNow.AddSeconds(5 * 60),
                         SessionId = Guid.NewGuid().ToString()
                     }
                 },
-                OAuthUserClaims = new List<OAuthUserClaim>
+                OAuthUserClaims = new List<UserClaim>
                 {
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.Name, "Thierry Habart"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.Role, "role1"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.Role, "role2"),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.UpdatedAt, "1612361922", Jwt.ClaimValueTypes.INTEGER),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
-                    new OAuthUserClaim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'region': 'CA' }", Jwt.ClaimValueTypes.JSONOBJECT)
+                    new UserClaim(Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new UserClaim(Jwt.Constants.UserClaims.Name, "Thierry Habart"),
+                    new UserClaim(Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr"),
+                    new UserClaim(Jwt.Constants.UserClaims.Role, "role1"),
+                    new UserClaim(Jwt.Constants.UserClaims.Role, "role2"),
+                    new UserClaim(Jwt.Constants.UserClaims.UpdatedAt, "1612361922", Jwt.ClaimValueTypes.INTEGER),
+                    new UserClaim(Jwt.Constants.UserClaims.EmailVerified, "true", Jwt.ClaimValueTypes.BOOLEAN),
+                    new UserClaim(Jwt.Constants.UserClaims.Address, "{ 'street_address': '1234 Hollywood Blvd.', 'region': 'CA' }", Jwt.ClaimValueTypes.JSONOBJECT)
                 }
             }
         };

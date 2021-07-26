@@ -15,13 +15,7 @@ namespace SimpleIdServer.OAuth.Options
             DefaultTokenProfile = BearerTokenProfile.DEFAULT_NAME;
             ClientSecretExpirationInSeconds = null;
             SoftwareStatementTrustedParties = new List<SoftwareStatementTrustedParty>();
-            DefaultCulture = "en";
             AuthorizationCodeExpirationInSeconds = 10 * 60;
-            SupportedUICultures = new List<UICultureOption>
-            {
-                new UICultureOption("fr", "French"),
-                new UICultureOption("en", "English")
-            };
             MtlsEnabled = false;
             CertificateAuthenticationScheme = "Certificate";
             DefaultTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
@@ -54,14 +48,6 @@ namespace SimpleIdServer.OAuth.Options
         /// Trusted parties used to validate the software statement.
         /// </summary>
         public ICollection<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; }
-        /// <summary>
-        /// Set the default UI culture.
-        /// </summary>
-        public string DefaultCulture { get; set; }
-        /// <summary>
-        /// Supported cultures.
-        /// </summary>
-        public IEnumerable<UICultureOption> SupportedUICultures { get; set; }
         /// <summary>
         /// Mututal TLS is enabled.
         /// </summary>

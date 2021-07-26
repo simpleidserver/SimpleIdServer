@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Common.Domains;
+using SimpleIdServer.Common.Helpers;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 {
@@ -15,19 +15,19 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             new OAuthUser
             {
                 Id = "administrator",
-                Credentials = new List<OAuthUserCredential>
+                Credentials = new List<UserCredential>
                 {
-                    new OAuthUserCredential
+                    new UserCredential
                     {
                         CredentialType = "pwd",
                         Value = PasswordHelper.ComputeHash("password")
                     }
                 },
-                OAuthUserClaims = new List<OAuthUserClaim>
+                OAuthUserClaims = new List<UserClaim>
                 {
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
-                    new OAuthUserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "administrator"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "Thierry Habart"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "habarthierry@hotmail.fr")
                 }
             }
         };

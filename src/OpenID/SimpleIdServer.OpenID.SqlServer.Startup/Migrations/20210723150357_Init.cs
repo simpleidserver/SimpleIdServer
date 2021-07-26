@@ -159,18 +159,21 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DeviceRegistrationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OTPKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OTPCounter = table.Column<int>(type: "int", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -307,15 +310,15 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 {
                     table.PrimaryKey("PK_OAuthConsent", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OAuthConsent_Users_OAuthUserId",
+                        name: "FK_OAuthConsent_User_OAuthUserId",
                         column: x => x.OAuthUserId,
-                        principalTable: "Users",
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OAuthUserClaim",
+                name: "UserClaim",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -323,57 +326,57 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OAuthUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OAuthUserClaim", x => x.Id);
+                    table.PrimaryKey("PK_UserClaim", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OAuthUserClaim_Users_OAuthUserId",
-                        column: x => x.OAuthUserId,
-                        principalTable: "Users",
+                        name: "FK_UserClaim_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OAuthUserCredential",
+                name: "UserCredential",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CredentialType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OAuthUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OAuthUserCredential", x => x.Id);
+                    table.PrimaryKey("PK_UserCredential", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OAuthUserCredential_Users_OAuthUserId",
-                        column: x => x.OAuthUserId,
-                        principalTable: "Users",
+                        name: "FK_UserCredential_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OAuthUserSession",
+                name: "UserSession",
                 columns: table => new
                 {
                     SessionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     AuthenticationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpirationDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
-                    OAuthUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OAuthUserSession", x => x.SessionId);
+                    table.PrimaryKey("PK_UserSession", x => x.SessionId);
                     table.ForeignKey(
-                        name: "FK_OAuthUserSession_Users_OAuthUserId",
-                        column: x => x.OAuthUserId,
-                        principalTable: "Users",
+                        name: "FK_UserSession_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -469,21 +472,6 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_OAuthUserClaim_OAuthUserId",
-                table: "OAuthUserClaim",
-                column: "OAuthUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OAuthUserCredential_OAuthUserId",
-                table: "OAuthUserCredential",
-                column: "OAuthUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OAuthUserSession_OAuthUserId",
-                table: "OAuthUserSession",
-                column: "OAuthUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OpenIdClientScope_OpenIdClientClientId",
                 table: "OpenIdClientScope",
                 column: "OpenIdClientClientId");
@@ -492,6 +480,21 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 name: "IX_OpenIdClientScope_ScopeName",
                 table: "OpenIdClientScope",
                 column: "ScopeName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserClaim_UserId",
+                table: "UserClaim",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCredential_UserId",
+                table: "UserCredential",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSession_UserId",
+                table: "UserSession",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -515,19 +518,19 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 name: "OAuthScopeClaim");
 
             migrationBuilder.DropTable(
-                name: "OAuthUserClaim");
-
-            migrationBuilder.DropTable(
-                name: "OAuthUserCredential");
-
-            migrationBuilder.DropTable(
-                name: "OAuthUserSession");
-
-            migrationBuilder.DropTable(
                 name: "OpenIdClientScope");
 
             migrationBuilder.DropTable(
                 name: "Tokens");
+
+            migrationBuilder.DropTable(
+                name: "UserClaim");
+
+            migrationBuilder.DropTable(
+                name: "UserCredential");
+
+            migrationBuilder.DropTable(
+                name: "UserSession");
 
             migrationBuilder.DropTable(
                 name: "BCAuthorizeLst");
@@ -548,7 +551,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 name: "OpenIdClients");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
         }
     }
 }
