@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -98,7 +100,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     opts.SmtpUserName = credentials.Login;
                     opts.SmtpPassword = credentials.Password;
                     opts.FromEmail = credentials.Login;
-                });
+                })
+                .AddDynamicAuthenticationProviders()
+                .AddAuthenticationProviderSchemes(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
             // ConfigureFireBase();
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()));

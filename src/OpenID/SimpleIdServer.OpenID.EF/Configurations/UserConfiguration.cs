@@ -14,6 +14,7 @@ namespace SimpleIdServer.OpenID.EF.Configurations
             builder.Ignore(u => u.Claims);
             builder.HasMany(u => u.Sessions).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.OAuthUserClaims).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.ExternalAuthProviders).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

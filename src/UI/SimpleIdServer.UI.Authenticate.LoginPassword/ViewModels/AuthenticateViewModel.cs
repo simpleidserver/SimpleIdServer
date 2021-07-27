@@ -1,14 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.OpenID.UI.ViewModels;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels
 {
     public class AuthenticateViewModel
     {
-        public AuthenticateViewModel() { }
+        public AuthenticateViewModel() 
+        {
+            ExternalIdsProviders = new List<ExternalIdProvider>();
+        }
 
-        public AuthenticateViewModel(string login, string returnUrl, string clientName, string logoUri, string tosUri, string policyUri)
+        public AuthenticateViewModel(string login, string returnUrl, string clientName, string logoUri, string tosUri, string policyUri, ICollection<ExternalIdProvider> externalIdProviders) : this()
         {
             Login = login;
             ReturnUrl = returnUrl;
@@ -16,6 +21,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels
             LogoUri = logoUri;
             TosUri = tosUri;
             PolicyUri = policyUri;
+            ExternalIdsProviders = externalIdProviders;
         }
 
         public string Login { get; set; }
@@ -26,6 +32,7 @@ namespace SimpleIdServer.UI.Authenticate.LoginPassword.ViewModels
         public string PolicyUri { get; set; }
         public string Password { get; set; }
         public bool RememberLogin { get; set; }
+        public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; }
 
         public void Check(ModelStateDictionary modelStateDictionary)
         {

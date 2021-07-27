@@ -177,10 +177,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 SIDOpenIdConstants.StandardScopes.Profile
             };
             var bcAuthorizeLst = new ConcurrentBag<BCAuthorize>();
+            var authenticationSchemes = new List<SimpleIdServer.OpenID.Domains.AuthenticationSchemeProvider>();
             services.AddSingleton<IAuthenticationContextClassReferenceRepository>(new DefaultAuthenticationContextClassReferenceRepository(acrs));
             services.AddSingleton<IOAuthClientRepository>(new DefaultOpenIdClientRepository(clients));
             services.AddSingleton<IOAuthScopeRepository>(new DefaultOpenIdScopeRepository(scopes));
             services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository(bcAuthorizeLst));
+            services.AddSingleton<IAuthenticationSchemeProviderRepository>(new InMemoryAuthenticationSchemeProviderRepository(authenticationSchemes));
             return services;
         }
 

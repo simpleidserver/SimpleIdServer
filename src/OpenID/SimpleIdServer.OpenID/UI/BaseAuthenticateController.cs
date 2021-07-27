@@ -43,6 +43,8 @@ namespace SimpleIdServer.OpenID.UI
         }
 
         protected IOAuthClientRepository OAuthClientQueryRepository => _oauthClientRepository;
+        protected IOAuthUserRepository OauthUserRepository => _oauthUserCommandRepository;
+        protected OpenIDHostOptions Options => _options;
 
         protected string Unprotect(string returnUrl)
         {
@@ -67,41 +69,46 @@ namespace SimpleIdServer.OpenID.UI
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {
-                var currentDateTime = DateTime.UtcNow;
-                var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-                var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-                var claims = user.ToClaims();
-                var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                user.AddSession(expirationDateTime);
-                await _oauthUserCommandRepository.Update(user, token);
-                await _oauthUserCommandRepository.SaveChanges(token);
-                Response.Cookies.Append(_options.SessionCookieName, user.GetActiveSession().SessionId,  new CookieOptions
-                {
-                    Secure = true,
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.None
-                });
-                if (rememberLogin)
-                {
-                    await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
-                    {
-                        IsPersistent = true
-                    });
-                }
-                else
-                {
-                    await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
-                    {
-                        IsPersistent = true,
-                        ExpiresUtc = offset
-                    });
-                }
-
-                return Redirect(unprotectedUrl);
+                return await Sign(unprotectedUrl, currentAmr, user, token, rememberLogin);
             }
 
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
+        }
+
+        protected async Task<IActionResult> Sign(string returnUrl, string currentAmr, OAuthUser user, CancellationToken token, bool rememberLogin = false)
+        {
+            var currentDateTime = DateTime.UtcNow;
+            var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+            var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+            var claims = user.ToClaims();
+            var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            user.AddSession(expirationDateTime);
+            await _oauthUserCommandRepository.Update(user, token);
+            await _oauthUserCommandRepository.SaveChanges(token);
+            Response.Cookies.Append(_options.SessionCookieName, user.GetActiveSession().SessionId, new CookieOptions
+            {
+                Secure = true,
+                HttpOnly = false,
+                SameSite = SameSiteMode.None
+            });
+            if (rememberLogin)
+            {
+                await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
+                {
+                    IsPersistent = true
+                });
+            }
+            else
+            {
+                await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = offset
+                });
+            }
+
+            return Redirect(returnUrl);
         }
     }
 }

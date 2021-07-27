@@ -28,5 +28,10 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
         {
             return Task.FromResult(LstData.FirstOrDefault(u => u.Id == login && u.Credentials.Any(c => c.CredentialType == credentialType && c.Value == credentialValue)));
         }
+
+        public Task<OAuthUser> FindOAuthUserByExternalAuthProvider(string scheme, string subject, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(LstData.FirstOrDefault(u => u.ExternalAuthProviders.Any(p => p.Scheme == scheme && p.Subject == subject)));
+        }
     }
 }

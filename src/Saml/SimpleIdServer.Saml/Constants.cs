@@ -12,8 +12,9 @@ namespace SimpleIdServer.Saml
 
         public static class RouteNames
         {
-            public const string Metadata = "metadata";
-            public const string SingleSignOn = "SSO";
+            public const string Prefix = "saml";
+            public const string Metadata = Prefix + "/metadata";
+            public const string SingleSignOn = Prefix + "/SSO";
         }
 
         public static class ConfirmationMethodIdentifiers

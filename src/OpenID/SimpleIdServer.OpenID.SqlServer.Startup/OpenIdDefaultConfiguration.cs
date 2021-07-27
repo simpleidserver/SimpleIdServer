@@ -1,10 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Newtonsoft.Json;
 using SimpleIdServer.Common.Domains;
 using SimpleIdServer.Common.Helpers;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.SqlServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
 
@@ -120,6 +123,26 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             BulkScimResource,
             ScimProvision,
             ManageUsers
+        };
+
+        public static List<AuthenticationSchemeProvider> AuthenticationProviderSchemes => new List<AuthenticationSchemeProvider>
+        {
+            new AuthenticationSchemeProvider
+            {
+                CreateDateTime = DateTime.UtcNow,
+                DisplayName = "Facebook",
+                HandlerFullQualifiedName = typeof(FacebookHandler).AssemblyQualifiedName,
+                Id = Guid.NewGuid().ToString(),
+                Name = "Facebook",
+                Options = JsonConvert.SerializeObject(new FacebookOptionsLite
+                {
+                    AppId = "2130151727301440",
+                    AppSecret = "fbd2fe5e37602f333908eff93eae295d"
+                }),
+                JsonConverter = typeof(FacebookOptionsJsonConverter).AssemblyQualifiedName,
+                UpdateDateTime = DateTime.UtcNow,
+                IsEnabled = true
+            }
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>

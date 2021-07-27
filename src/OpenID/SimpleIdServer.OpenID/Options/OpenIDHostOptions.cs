@@ -14,6 +14,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultMaxAge = null;
             DefaultAcrValue = "sid-load-01";
             AuthenticationScheme = "MultiAccount";
+            ExternalAuthenticationScheme = "ExternalAuthentication";
             SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
             IsRedirectionUrlHTTPSRequired = true;
@@ -28,6 +29,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultRequestObjectEncyptionEnc = A128CBCHS256EncHandler.ENC_NAME;
             MaxRequestLifetime = 60 * 5;
             CookieAuthExpirationTimeInSeconds = 5 * 60;
+            CacheExternalAuthProvidersInSeconds = null;
         }
 
         /// <summary>
@@ -50,6 +52,10 @@ namespace SimpleIdServer.OpenID.Options
         /// Authentication scheme.
         /// </summary>
         public string AuthenticationScheme { get; set; }
+        /// <summary>
+        /// External Authentication scheme.
+        /// </summary>
+        public string ExternalAuthenticationScheme { get; set; }
         /// <summary>
         /// Check if the redirection url must be HTTPS.
         /// </summary>
@@ -108,5 +114,9 @@ namespace SimpleIdServer.OpenID.Options
         /// Name of the cookie used to store the session id.
         /// </summary>
         public string SessionCookieName { get; set; }
+        /// <summary>
+        /// Number of seconds the external authentication providers will be stored.
+        /// </summary>
+        public int? CacheExternalAuthProvidersInSeconds { get; set; }
     }
 }

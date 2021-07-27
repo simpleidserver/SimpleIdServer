@@ -21,6 +21,24 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuthenticationSchemeProviders",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    HandlerFullQualifiedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Options = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationSchemeProviders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BCAuthorizeLst",
                 columns: table => new
                 {
@@ -361,6 +379,28 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserExternalAuthProvider",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Scheme = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserExternalAuthProvider", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserExternalAuthProvider_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserSession",
                 columns: table => new
                 {
@@ -492,6 +532,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserExternalAuthProvider_UserId",
+                table: "UserExternalAuthProvider",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserSession_UserId",
                 table: "UserSession",
                 column: "UserId");
@@ -501,6 +546,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Acrs");
+
+            migrationBuilder.DropTable(
+                name: "AuthenticationSchemeProviders");
 
             migrationBuilder.DropTable(
                 name: "BCAuthorizePermission");
@@ -528,6 +576,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserCredential");
+
+            migrationBuilder.DropTable(
+                name: "UserExternalAuthProvider");
 
             migrationBuilder.DropTable(
                 name: "UserSession");

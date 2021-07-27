@@ -117,6 +117,32 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.ToTable("UserCredential");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserExternalAuthProvider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Scheme")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserExternalAuthProvider");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Common.Domains.UserSession", b =>
                 {
                     b.Property<string>("SessionId")
@@ -359,6 +385,37 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.HasKey("Name");
 
                     b.ToTable("Acrs");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.AuthenticationSchemeProvider", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HandlerFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Options")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuthenticationSchemeProviders");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorize", b =>
@@ -667,6 +724,14 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserExternalAuthProvider", b =>
+                {
+                    b.HasOne("SimpleIdServer.Common.Domains.User", null)
+                        .WithMany("ExternalAuthProviders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.Common.Domains.UserSession", b =>
                 {
                     b.HasOne("SimpleIdServer.Common.Domains.User", null)
@@ -743,6 +808,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.Common.Domains.User", b =>
                 {
                     b.Navigation("Credentials");
+
+                    b.Navigation("ExternalAuthProviders");
 
                     b.Navigation("OAuthUserClaims");
 

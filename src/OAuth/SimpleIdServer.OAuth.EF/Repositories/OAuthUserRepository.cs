@@ -33,6 +33,11 @@ namespace SimpleIdServer.OAuth.EF.Repositories
             return GetUsers().Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Id == login && u.Credentials.Any(c => c.CredentialType == credentialType && c.Value == credentialValue), cancellationToken);
         }
 
+        public Task<OAuthUser> FindOAuthUserByExternalAuthProvider(string scheme, string subject, CancellationToken cancellationToken)
+        {
+            return GetUsers().FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == subject));
+        }
+
         private IQueryable<OAuthUser> GetUsers()
         {
             return _dbContext.Users

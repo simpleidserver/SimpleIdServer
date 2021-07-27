@@ -17,6 +17,7 @@ namespace SimpleIdServer.Common.Domains
             Sessions = new List<UserSession>();
             OAuthUserClaims = new List<UserClaim>();
             Credentials = new List<UserCredential>();
+            ExternalAuthProviders = new List<UserExternalAuthProvider>();
         }
 
         public string Id { get; set; }
@@ -36,6 +37,7 @@ namespace SimpleIdServer.Common.Domains
         public ICollection<UserSession> Sessions { get; set; }
         public ICollection<UserClaim> OAuthUserClaims { get; set; }
         public ICollection<UserCredential> Credentials { get; set; }
+        public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; }
 
         public bool AddSession(DateTime expirationDateTime)
         {
@@ -103,6 +105,25 @@ namespace SimpleIdServer.Common.Domains
             }
         }
 
+        public void UpdateClaims(ICollection<UserClaim> claims)
+        {
+            OAuthUserClaims.Clear();
+            foreach(var claim in claims)
+            {
+                OAuthUserClaims.Add(claim);
+            }
+        }
+
+        public void AddExternalAuthProvider(string scheme, string subject)
+        {
+            ExternalAuthProviders.Add(new UserExternalAuthProvider
+            {
+                CreateDateTime = DateTime.UtcNow,
+                Scheme = scheme,
+                Subject = subject
+            });
+        }
+
         public void UpdatePassword(string newPassword)
         {
             var credential = Credentials.First(c => c.CredentialType == "pwd");
@@ -145,7 +166,8 @@ namespace SimpleIdServer.Common.Domains
                 UpdateDateTime = UpdateDateTime,
                 Sessions = Sessions.Select(s => (UserSession)s.Clone()).ToList(),
                 OTPCounter = OTPCounter,
-                OTPKey = OTPKey
+                OTPKey = OTPKey,
+                ExternalAuthProviders = ExternalAuthProviders.Select(e => (UserExternalAuthProvider)e.Clone()).ToList()
             };
         }
 
