@@ -16,7 +16,6 @@ namespace SimpleIdServer.Common.Extensions
             { Jwt.Constants.UserClaims.Email, ClaimTypes.Email },
             { Jwt.Constants.UserClaims.BirthDate, ClaimTypes.DateOfBirth },
             { Jwt.Constants.UserClaims.Gender, ClaimTypes.Gender },
-            { Jwt.Constants.UserClaims.Email, ClaimTypes.Email },
             { Jwt.Constants.UserClaims.GivenName, ClaimTypes.GivenName }
         };
 

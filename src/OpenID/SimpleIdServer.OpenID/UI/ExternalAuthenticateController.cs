@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.OpenID.ExternalEvents;
 using SimpleIdServer.OpenID.Helpers;
 using SimpleIdServer.OpenID.Options;
 using System;
@@ -28,6 +30,7 @@ namespace SimpleIdServer.OpenID.UI
         private readonly ILogger<ExternalAuthenticateController> _logger;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IBusControl _busControl;
 
         public ExternalAuthenticateController(
             IOptions<OpenIDHostOptions> options,
@@ -37,11 +40,13 @@ namespace SimpleIdServer.OpenID.UI
             IOAuthUserRepository oauthUserRepository,
             ILogger<ExternalAuthenticateController> logger,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IServiceProvider serviceProvider) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserRepository)
+            IServiceProvider serviceProvider,
+            IBusControl busControl) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserRepository)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _serviceProvider = serviceProvider;
+            _busControl = busControl;
         }
 
         [HttpGet]
@@ -52,17 +57,18 @@ namespace SimpleIdServer.OpenID.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(scheme)));
             }
 
-            var props = new AuthenticationProperties
+            var items = new Dictionary<string, string>
             {
-                RedirectUri = Url.Action(nameof(Callback))
+                { SCHEME_NAME, scheme }
             };
-            props.SetParameter(SCHEME_NAME, scheme);
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {
-                props.SetParameter(RETURN_URL_NAME, returnUrl);
+                items.Add(RETURN_URL_NAME, returnUrl);
             }
-
-            
+            var props = new AuthenticationProperties(items)
+            {
+                RedirectUri = Url.Action(nameof(Callback)),
+            };
             var scopeParameter = props.GetParameter<ICollection<string>>("scope");
             return Challenge(props, scheme);
         }
@@ -70,7 +76,6 @@ namespace SimpleIdServer.OpenID.UI
         [HttpGet]
         public async Task<IActionResult> Callback(CancellationToken cancellationToken)
         {
-            // TODO : CORRIGER ICI POUR EXTERNALAUTHSCHEME.
             var result = await HttpContext.AuthenticateAsync(Options.ExternalAuthenticationScheme);
             if (result == null || !result.Succeeded)
             {
@@ -112,6 +117,7 @@ namespace SimpleIdServer.OpenID.UI
                 user = principal.BuildOAuthUser(scheme);
                 await OauthUserRepository.Add(user, cancellationToken);
                 await OauthUserRepository.SaveChanges(cancellationToken);
+                await _busControl.Publish(new UserAddedEvent(user.Id, user.OAuthUserClaims.ToDictionary(c => c.Name, c => c.Value)));
                 _logger.LogInformation($"Finish to provision the user '{sub}'");
             }
 

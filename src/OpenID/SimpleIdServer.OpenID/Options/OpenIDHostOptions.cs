@@ -14,7 +14,7 @@ namespace SimpleIdServer.OpenID.Options
             DefaultMaxAge = null;
             DefaultAcrValue = "sid-load-01";
             AuthenticationScheme = "MultiAccount";
-            ExternalAuthenticationScheme = "ExternalAuthentication";
+            ExternalAuthenticationScheme = SIDOpenIdConstants.ExternalAuthenticationScheme;
             SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
             CookieName = CookieAuthenticationDefaults.CookiePrefix + AuthenticationScheme;
             IsRedirectionUrlHTTPSRequired = true;

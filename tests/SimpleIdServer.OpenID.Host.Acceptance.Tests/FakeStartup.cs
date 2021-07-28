@@ -27,7 +27,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
         {
             services.AddMvc(o => o.EnableEndpointRouting = false)
                 .AddNewtonsoftJson();
-            services.AddSIDOpenID()
+            services.AddSIDOpenID(null)
                 .AddClients(new List<OpenIdClient>(), DefaultConfiguration.Scopes)
                 .AddUsers(DefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<Jwt.JsonWebKey>());

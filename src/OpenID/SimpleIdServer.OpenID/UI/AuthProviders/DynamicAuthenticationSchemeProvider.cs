@@ -117,6 +117,7 @@ namespace SimpleIdServer.OpenID.UI.AuthProviders
             {
                 oauthOptions.StateDataFormat = new PropertiesDataFormat(_dataProtectionProvider.CreateProtector(provider.Name));
                 oauthOptions.Backchannel = new System.Net.Http.HttpClient();
+                oauthOptions.SignInScheme = _openidOptions.ExternalAuthenticationScheme;
             }
 
             var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);

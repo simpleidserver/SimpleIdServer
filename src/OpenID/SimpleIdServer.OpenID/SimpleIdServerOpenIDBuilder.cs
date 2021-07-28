@@ -69,7 +69,6 @@ namespace SimpleIdServer.OpenID
             _serviceCollection.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
             _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
             _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
-            // _serviceCollection.AddTransient<IAuthenticationService, DynamicAuthenticationService>();
             return this;
         }
 

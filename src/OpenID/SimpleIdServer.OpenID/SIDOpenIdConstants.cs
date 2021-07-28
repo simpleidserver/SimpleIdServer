@@ -8,6 +8,7 @@ namespace SimpleIdServer.OpenID
 {
     public static class SIDOpenIdConstants
     {
+        public const string ExternalAuthenticationScheme = "ExternalAuthentication";
         public static List<string> AllStandardNotificationModes = new List<string>
         {
             StandardNotificationModes.Ping,
