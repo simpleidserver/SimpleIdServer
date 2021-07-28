@@ -5,7 +5,7 @@ BEGIN
 	DECLARE @targetAttributeId NVARCHAR(MAX);
 	DECLARE @sourceAttributeId NVARCHAR(MAX);
 	DECLARE @valueAttrId NVARCHAR(450);
-	DECLARE attr_mapping_cursor CURSOR FOR SELECT [Id], [SourceResourceType], [TargetResourceType], [TargetAttributeId], [SourceAttributeId] from [SCIM].[dbo].[SCIMAttributeMappingLst];
+	DECLARE attr_mapping_cursor CURSOR FOR SELECT [Id], [SourceResourceType], [TargetResourceType], [TargetAttributeId], [SourceAttributeId] from [SCIM].[dbo].[SCIMAttributeMappingLst] where [SourceResourceType] = 'Groups';
 	
 	OPEN attr_mapping_cursor 
 	FETCH NEXT FROM attr_mapping_cursor INTO @Id, @sourceResourceType, @targetResourceType, @targetAttributeId, @sourceAttributeId
