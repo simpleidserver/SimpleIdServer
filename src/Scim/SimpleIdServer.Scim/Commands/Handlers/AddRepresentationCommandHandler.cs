@@ -18,17 +18,20 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        private readonly IRepresentationReferenceSync _representationReferenceSync;
 
         public AddRepresentationCommandHandler(
             ISCIMSchemaQueryRepository scimSchemaQueryRepository, 
             ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, 
             ISCIMRepresentationHelper scimRepresentationHelper, 
-            ISCIMRepresentationCommandRepository scimRepresentationCommandRepository)
+            ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
+            IRepresentationReferenceSync representationReferenceSync)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+            _representationReferenceSync = representationReferenceSync;
         }
 
         public async Task<SCIMRepresentation> Handle(AddRepresentationCommand addRepresentationCommand)
@@ -68,9 +71,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var uniqueGlobalAttributes = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
+            var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, scimRepresentation, scimRepresentation);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 await _scimRepresentationCommandRepository.Add(scimRepresentation);
+                foreach(var reference in references)
+                {
+                    await _scimRepresentationCommandRepository.Update(reference);
+                }
+
                 await transaction.Commit();
             }
 

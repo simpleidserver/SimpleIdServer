@@ -346,7 +346,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id));
             try
             {
-                var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, patchRepresentation));
+                var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation));
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false);
                 await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.VersionNumber, _resourceType, content));

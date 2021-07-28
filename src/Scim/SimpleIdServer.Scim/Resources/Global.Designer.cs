@@ -349,6 +349,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à references {0} don&apos;t exist.
+        /// </summary>
+        public static string ReferencesDontExist {
+            get {
+                return ResourceManager.GetString("ReferencesDontExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; request is not well-formatted.
         /// </summary>
         public static string RequestIsNotWellFormatted {

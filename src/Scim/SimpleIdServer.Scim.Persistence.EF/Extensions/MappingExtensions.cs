@@ -97,8 +97,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 SourceResourceType = attributeMapping.SourceResourceType,
                 TargetAttributeId = attributeMapping.TargetAttributeId,
                 TargetResourceType = attributeMapping.TargetResourceType,
-                SourceAttributeId = attributeMapping.SourceAttributeId,
-                SourceValueAttributeId = attributeMapping.SourceValueAttributeId
+                SourceAttributeId = attributeMapping.SourceAttributeId
             };
         }
 
@@ -144,8 +143,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 SourceAttributeSelector = attribute.SourceAttributeSelector,
                 SourceResourceType = attribute.SourceResourceType,
                 TargetAttributeId = attribute.TargetAttributeId,
-                TargetResourceType = attribute.TargetResourceType,
-                SourceValueAttributeId = attribute.SourceValueAttributeId
+                TargetResourceType = attribute.TargetResourceType
             };
         }
 

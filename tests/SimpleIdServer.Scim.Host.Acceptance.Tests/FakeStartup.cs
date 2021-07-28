@@ -40,6 +40,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddComplexAttribute("groups", opt =>
                {
                    opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                   opt.AddStringAttribute("display", mutability: SCIMSchemaAttributeMutabilities.READONLY);
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                .AddComplexAttribute("phones", opt =>
                {
@@ -86,6 +87,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     opt.AddStringAttribute("value");
                     opt.AddStringAttribute("$ref");
                     opt.AddStringAttribute("type");
+                    opt.AddStringAttribute("display");
                 }, multiValued: true)
                 .Build();
             var schemas = new List<SCIMSchema>
@@ -105,27 +107,34 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     SourceResourceType = userSchema.ResourceType,
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                    TargetAttributeId = SCIMConstants.StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = SCIMConstants.StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id
+                },
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = SCIMConstants.StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id,
+                    SourceResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    SourceAttributeSelector = "members",
+                    TargetResourceType = userSchema.ResourceType,
+                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id,
-                    SourceValueAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").SubAttributes.First(g => g.Name == "value").Id,
                     SourceResourceType = "CustomUsers",
                     SourceAttributeSelector = "entitlements",
                     TargetResourceType = "Entitlements",
-                    TargetAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").Id,
-                    SourceValueAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(g => g.Name == "value").Id,
                     SourceResourceType = "Entitlements",
                     SourceAttributeSelector = "members",
                     TargetResourceType = "CustomUsers",
-                    TargetAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id
                 }
             };
             services.AddMvc(o =>

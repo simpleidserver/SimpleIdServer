@@ -105,7 +105,7 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                     SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                 }
             });
         }

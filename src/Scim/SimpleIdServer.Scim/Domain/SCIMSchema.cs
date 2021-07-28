@@ -55,6 +55,11 @@ namespace SimpleIdServer.Scim.Domain
             return Attributes.Any(attr => attr.Id == attribute.Id || attr.HasAttribute(attribute));
         }
 
+        public SCIMSchemaAttribute GetAttributeById(string attributeId)
+        {
+            return Attributes.GetAttributeById(attributeId);
+        }
+
         public object Clone()
         {
             return new SCIMSchema

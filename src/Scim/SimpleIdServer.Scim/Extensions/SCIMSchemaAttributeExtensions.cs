@@ -29,5 +29,30 @@ namespace SimpleIdServer.Scim.Extensions
 
             return attr.SubAttributes.GetAttribute(lst);
         }
+
+        public static SCIMSchemaAttribute GetAttributeById(this ICollection<SCIMSchemaAttribute> attributes, string id)
+        {
+            var attr = attributes.FirstOrDefault(a => a.Id == id);
+            if (attr != null)
+            {
+                return attr;
+            }
+
+            foreach(var att in attributes)
+            {
+                if (att.SubAttributes == null || !att.SubAttributes.Any())
+                {
+                    continue;
+                }
+
+                var result = att.SubAttributes.GetAttributeById(id);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
     }
 }

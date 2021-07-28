@@ -141,31 +141,28 @@ namespace SimpleIdServer.Scim.Startup
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
-                    SourceValueAttributeId = userSchema.Attributes.First(a => a.Name == "groups").SubAttributes.First(g => g.Name == "value").Id,
                     SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id,
-                    SourceValueAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").SubAttributes.First(g => g.Name == "value").Id,
                     SourceResourceType = "CustomUsers",
                     SourceAttributeSelector = "entitlements",
                     TargetResourceType = "Entitlements",
-                    TargetAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").Id,
-                    SourceValueAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(g => g.Name == "value").Id,
                     SourceResourceType = "Entitlements",
                     SourceAttributeSelector = "members",
                     TargetResourceType = "CustomUsers",
-                    TargetAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id
                 }
             });
         }

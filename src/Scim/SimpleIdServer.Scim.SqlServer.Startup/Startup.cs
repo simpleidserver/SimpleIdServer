@@ -121,21 +121,19 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         {
                             Id = Guid.NewGuid().ToString(),
                             SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
-                            SourceValueAttributeId = userSchema.Attributes.First(a => a.Name == "groups").SubAttributes.First(g => g.Name == "value").Id,
                             SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                             SourceAttributeSelector = "groups",
                             TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                            TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                            TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                         };
                         var secondAttributeMapping = new SCIMAttributeMapping
                         {
                             Id = Guid.NewGuid().ToString(),
                             SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
-                            SourceValueAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(g => g.Name == "value").Id,
                             SourceResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
                             SourceAttributeSelector = "members",
                             TargetResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
-                            TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").SubAttributes.First(a => a.Name == "value").Id
+                            TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
                         };
                         context.SCIMAttributeMappingLst.Add(firstAttributeMapping.ToModel());
                         context.SCIMAttributeMappingLst.Add(secondAttributeMapping.ToModel());

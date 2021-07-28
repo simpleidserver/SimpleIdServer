@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -20,17 +21,20 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IDistributedLock _distributedLock;
+        private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly SCIMHostOptions _options;
 
         public PatchRepresentationCommandHandler(
             ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, 
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, 
             IDistributedLock distributedLock,
+            IRepresentationReferenceSync representationReferenceSync,
             IOptions<SCIMHostOptions> options)
         {
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _distributedLock = distributedLock;
+            _representationReferenceSync = representationReferenceSync;
             _options = options.Value;
         }
 
@@ -47,11 +51,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
                 }
 
+                var oldRepresentation = existingRepresentation.Clone() as SCIMRepresentation;
                 existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
+                var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                    foreach (var reference in references)
+                    {
+                        await _scimRepresentationCommandRepository.Update(reference);
+                    }
+
                     await transaction.Commit();
                 }
 

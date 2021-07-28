@@ -81,6 +81,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddHelpers(this IServiceCollection services)
         {
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
+            services.AddTransient<IRepresentationReferenceSync, RepresentationReferenceSync>();
             return services;
         }
 

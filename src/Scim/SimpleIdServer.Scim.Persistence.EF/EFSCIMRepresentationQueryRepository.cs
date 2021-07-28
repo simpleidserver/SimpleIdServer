@@ -26,7 +26,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
             var record = await _scimDbContext.SCIMRepresentationAttributeLst
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => v.ValueString != null && v.ValueString == value))
                 .Select(a => a.Representation)
-                .AsNoTracking()
                 .FirstOrDefaultAsync();
             if (record == null)
             {
@@ -43,7 +42,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
             var record = await _scimDbContext.SCIMRepresentationAttributeLst
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.Values.Any(v => v.ValueInteger != null && v.ValueInteger.Value == value))
                 .Select(a => a.Representation)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(); 
             if (record == null)
             {
@@ -66,7 +64,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
                     SchemaAttributeId = _.RepresentationAttribute.SchemaAttributeId,
                     ValueString = _.ValueString
                 })
-                .AsNoTracking()
                 .ToListAsync();
             var result = records.Select(r => r.RepresentationId).Distinct().Count();
 

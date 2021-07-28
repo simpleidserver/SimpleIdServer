@@ -20,14 +20,22 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IDistributedLock _distributedLock;
 
-        public ReplaceRepresentationCommandHandler(ISCIMSchemaQueryRepository scimSchemaQueryRepository, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMRepresentationHelper scimRepresentationHelper, ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IDistributedLock distributedLock)
+        public ReplaceRepresentationCommandHandler(
+            ISCIMSchemaQueryRepository scimSchemaQueryRepository,
+            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
+            ISCIMRepresentationHelper scimRepresentationHelper,
+            ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
+            IRepresentationReferenceSync representationReferenceSync,
+            IDistributedLock distributedLock)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+            _representationReferenceSync = representationReferenceSync;
             _distributedLock = distributedLock;
         }
 
@@ -59,6 +67,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
                 }
 
+                var oldRepresentation = (SCIMRepresentation)existingRepresentation.Clone();
                 var mainSchema = schemas.First(s => s.Id == schema.Id);
                 var extensionSchemas = schemas.Where(s => s.Id != schema.Id).ToList();
                 var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(
@@ -83,9 +92,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
                 existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
+                var references = await _representationReferenceSync.Sync(replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                    foreach (var reference in references)
+                    {
+                        await _scimRepresentationCommandRepository.Update(reference);
+                    }
+
                     await transaction.Commit();
                 }
 

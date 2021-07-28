@@ -80,8 +80,8 @@ export class User {
       });
     }
 
-    if (json["phoneNumbers"]) {
-      result.roles = json["roles"].map((r: any) => {
+    if (json["groups"]) {
+      result.roles = json["groups"].map((r: any) => {
         let record: UserRole = { display: r["display"], type: r["type"], value: r["value"] };
         return record;
       });

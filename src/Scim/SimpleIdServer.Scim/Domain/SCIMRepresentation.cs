@@ -57,6 +57,11 @@ namespace SimpleIdServer.Scim.Domain
             Attributes.Add(attribute);
         }
 
+        public void RemoveAttribute(SCIMRepresentationAttribute attribute)
+        {
+            Attributes.Remove(attribute);
+        }
+
         public void RemoveAttributes(IEnumerable<string> schemaAttrIds)
         {
             Attributes = Attributes.Where(_ => !schemaAttrIds.Contains(_.SchemaAttribute.Id)).ToList();
