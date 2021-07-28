@@ -10,7 +10,7 @@ export class User {
     this.emails = [];
     this.phoneNumbers = [];
     this.addresses = [];
-    this.roles = [];
+    this.groups = [];
   }
 
   externalId: string;
@@ -30,7 +30,7 @@ export class User {
   emails: UserEmail[];
   phoneNumbers: UserPhoneNumber[];
   addresses: UserAddress[];
-  roles: UserRole[];
+  groups: UserRole[];
 
   public static fromJson(json: any): User {
     var result = new User();
@@ -81,7 +81,7 @@ export class User {
     }
 
     if (json["groups"]) {
-      result.roles = json["groups"].map((r: any) => {
+      result.groups = json["groups"].map((r: any) => {
         let record: UserRole = { display: r["display"], type: r["type"], value: r["value"] };
         return record;
       });

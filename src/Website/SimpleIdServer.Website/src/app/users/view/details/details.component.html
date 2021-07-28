@@ -239,7 +239,7 @@
               </button>
             </div>
           </div>
-          <mat-table class="full-width" [dataSource]="roles$">
+          <mat-table class="full-width" [dataSource]="groups$">
             <ng-container matColumnDef="value">
               <mat-header-cell *matHeaderCellDef>{{ 'users.roleValue' | translate }}</mat-header-cell>
               <mat-cell *matCellDef="let role">

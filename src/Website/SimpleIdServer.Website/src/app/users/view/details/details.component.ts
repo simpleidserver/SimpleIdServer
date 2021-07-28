@@ -131,7 +131,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
   emails$: EmailDataSource;
   phoneNumbers$: PhoneNumberDataSource;
   addresses$: AddressDataSource;
-  roles$: RoleDataSource;
+  groups$: RoleDataSource;
   currentPhotoIndex: number = 1;
   firstSubscription: any;
   editUserFormGroup: FormGroup = new FormGroup({
@@ -170,7 +170,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
       this.emails$ = new EmailDataSource(JSON.parse(JSON.stringify(user.emails)) as UserEmail[]);
       this.phoneNumbers$ = new PhoneNumberDataSource(JSON.parse(JSON.stringify(user.phoneNumbers)) as UserPhoneNumber[]);
       this.addresses$ = new AddressDataSource(JSON.parse(JSON.stringify(user.addresses)) as UserAddress[]);
-      this.roles$ = new RoleDataSource(JSON.parse(JSON.stringify(user.roles)) as UserRole[]);
+      this.groups$ = new RoleDataSource(JSON.parse(JSON.stringify(user.groups)) as UserRole[]);
       this.isLoading = false;
       this.refreshEditForm();
     });
@@ -471,19 +471,19 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
       }
 
       const roles = [
-        ...this.roles$.data,
+        ...this.groups$.data,
         r as UserRole
       ];
-      this.roles$.setData(roles);
+      this.groups$.setData(roles);
     });
   }
 
   removeRole(evt: any, address: UserRole) {
     evt.preventDefault();
-    const roles = this.roles$.data;
+    const roles = this.groups$.data;
     const index = roles.indexOf(address);
     roles.splice(index, 1);
-    this.roles$.setData(roles);
+    this.groups$.setData(roles);
   }
 
   editRole(evt: any, role: UserRole, index: number) {
@@ -497,12 +497,12 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
       }
 
       const updatedRole = r as UserRole;
-      const roles = this.roles$.data;
+      const roles = this.groups$.data;
       const role = roles[index];
       role.type = updatedRole.type;
       role.display = updatedRole.display;
       role.value = updatedRole.value;
-      this.roles$.setData(roles);
+      this.groups$.setData(roles);
     });
   }
 
@@ -530,7 +530,7 @@ export class ViewDetailsComponent implements OnInit, OnDestroy {
       emails: this.emails$.data,
       phoneNumbers: this.phoneNumbers$.data,
       addresses: this.addresses$.data,
-      roles: this.roles$.data
+      groups: this.groups$.data
     };
     this.isLoading = true;
     const updateUser = startUpdate({ userId: this.user$.id, request: request });
