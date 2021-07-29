@@ -6,6 +6,12 @@ namespace SimpleIdServer.Scim.Persistence.EF.Models
 {
     public class SCIMSchemaModel
     {
+        public SCIMSchemaModel()
+        {
+            SchemaExtensions = new List<SCIMSchemaExtensionModel>();
+            Attributes = new List<SCIMSchemaAttributeModel>();
+        }
+
         /// <summary>
         /// The unique URI of the schema. When applicable, service providers MUST specify the URI, e.g., "urn:ietf:params:scim:schemas:core:2.0:User".
         /// </summary>

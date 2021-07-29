@@ -7,6 +7,12 @@ namespace SimpleIdServer.Scim.Persistence.EF.Models
 {
     public class SCIMRepresentationModel : IEquatable<SCIMRepresentationModel>
     {
+        public SCIMRepresentationModel()
+        {
+            Attributes = new List<SCIMRepresentationAttributeModel>();
+            Schemas = new List<SCIMRepresentationSchemaModel>();
+        }
+
         public string Id { get; set; }
         public string ExternalId { get; set; }
         public string ResourceType { get; set; }

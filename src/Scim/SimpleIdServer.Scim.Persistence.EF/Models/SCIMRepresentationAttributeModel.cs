@@ -7,6 +7,12 @@ namespace SimpleIdServer.Scim.Persistence.EF.Models
 {
     public class SCIMRepresentationAttributeModel
     {
+        public SCIMRepresentationAttributeModel()
+        {
+            Values = new List<SCIMRepresentationAttributeValueModel>();
+            Children = new List<SCIMRepresentationAttributeModel>();
+        }
+
         public string Id { get; set; }
         public string ParentId { get; set; }
         public string SchemaAttributeId { get; set; }

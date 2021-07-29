@@ -76,7 +76,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             });
             services.AddScimStoreEF(options =>
             {
-                options.UseLazyLoadingProxies();
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
             });
             services.AddDistributedLockSQLServer(opts =>

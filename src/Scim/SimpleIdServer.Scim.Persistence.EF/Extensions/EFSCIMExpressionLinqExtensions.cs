@@ -116,7 +116,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                      orderby rep.orderedValue descending
                      select rep.representationId;
             var orderedIds = await query.Skip(startIndex).Take(count).ToListAsync(cancellationToken);
-            var result = await dbContext.SCIMRepresentationLst.Where(s => orderedIds.Contains(s.Id)).ToListAsync(cancellationToken);
+            var result = await EFSCIMRepresentationQueryRepository.IncludeRepresentationNavigationProperties(dbContext.SCIMRepresentationLst).Where(s => orderedIds.Contains(s.Id)).ToListAsync(cancellationToken);
             var comparer = new RepresentationComparer(orderedIds);
             List<SCIMRepresentationModel> content= null;
             switch(order)
