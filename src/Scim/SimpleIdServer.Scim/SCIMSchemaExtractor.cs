@@ -52,6 +52,7 @@ namespace SimpleIdServer.Scim
                         foreach(JObject subAttr in subAttributes)
                         {
                             c.AddAttribute(
+                                builder.Build(),
                                 ExtractString(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Name),
                                 ExtractEnum<SCIMSchemaAttributeTypes>(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Type),
                                 multiValued: ExtractBoolean(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.MultiValued),

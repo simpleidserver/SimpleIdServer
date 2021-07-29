@@ -13,7 +13,6 @@ namespace SimpleIdServer.Scim.Domain
         public SCIMSchemaAttribute(string id)
         {
             Id = id;
-            SubAttributes = new List<SCIMSchemaAttribute>();
             CanonicalValues = new List<string>();
             ReferenceTypes = new List<string>();
             Uniqueness = SCIMSchemaAttributeUniqueness.NONE;
@@ -26,6 +25,9 @@ namespace SimpleIdServer.Scim.Domain
         }
 
         public string Id { get; set; }
+        public string FullPath { get; set; }
+        public string ParentId { get; set; }
+        public string SchemaId { get; set; }
         /// <summary>
         /// The attribute's name.
         /// </summary>
@@ -38,10 +40,6 @@ namespace SimpleIdServer.Scim.Domain
         /// A Boolean value indicating the attribute's plurality.
         /// </summary>
         public bool MultiValued { get; set; }
-        /// <summary>
-        /// When an attribute is of type "complex", "subAttributes" defines a set of sub-attributes. "subAttributes" has the same schema sub-attributes as "attributes".
-        /// </summary>
-        public ICollection<SCIMSchemaAttribute> SubAttributes { get; private set; }
         /// <summary>
         /// The attribute's human-readable description.  When applicable, service providers MUST specify the description.
         /// </summary>
@@ -83,16 +81,6 @@ namespace SimpleIdServer.Scim.Domain
         /// </summary>
         public ICollection<int> DefaultValueInt { get; set; }
 
-        public void AddSubAttribute(SCIMSchemaAttribute subAttribute)
-        {
-            SubAttributes.Add(subAttribute);
-        }
-
-        public bool HasAttribute(SCIMSchemaAttribute attribute)
-        {
-            return SubAttributes.Any(attr => attr.Id == attribute.Id || attr.HasAttribute(attribute));
-        }
-
         public object Clone()
         {
             return new SCIMSchemaAttribute(Id)
@@ -106,12 +94,13 @@ namespace SimpleIdServer.Scim.Domain
                 ReferenceTypes = ReferenceTypes.ToList(),
                 Required = Required,
                 Returned = Returned,
-                SubAttributes = SubAttributes.Select(s => (SCIMSchemaAttribute)s.Clone()).ToList(),
                 Type = Type,
                 Uniqueness = Uniqueness,
                 DefaultValueInt = DefaultValueInt == null ? new List<int>() : DefaultValueInt.ToList(),
                 DefaultValueString = DefaultValueString == null ? new List<string>() : DefaultValueString.ToList(),
-                Id = Id
+                Id = Id,
+                FullPath = FullPath,
+                ParentId = ParentId
             };
         }
     }

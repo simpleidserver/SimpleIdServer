@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.Extensions
             };
 
             var attributes = new JArray();
-            foreach(var attribute in schema.Attributes)
+            foreach(var attribute in schema.HierarchicalAttributes)
             {
                 attributes.Add(SerializeSCIMSchemaAttribute(attribute));
             }
@@ -27,22 +27,22 @@ namespace SimpleIdServer.Scim.Extensions
             return jObj;
         }
 
-        private static JObject SerializeSCIMSchemaAttribute(SCIMSchemaAttribute scimSchemaAttribute)
+        private static JObject SerializeSCIMSchemaAttribute(TreeNode<SCIMSchemaAttribute> scimSchemaAttribute)
         {
             var result = new JObject();
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Name, scimSchemaAttribute.Name);
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Type, scimSchemaAttribute.Type.ToString().ToLowerInvariant());
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.MultiValued, scimSchemaAttribute.MultiValued);
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Description, scimSchemaAttribute.Description);
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Required, scimSchemaAttribute.Required);
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.CaseExact, scimSchemaAttribute.CaseExact);
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Mutability, scimSchemaAttribute.Mutability.ToString().ToLowerInvariant());
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Returned, scimSchemaAttribute.Returned.ToString().ToLowerInvariant());
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Uniqueness, scimSchemaAttribute.Uniqueness.ToString().ToLowerInvariant());
-            if (scimSchemaAttribute.SubAttributes != null && scimSchemaAttribute.SubAttributes.Any())
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Name, scimSchemaAttribute.Leaf.Name);
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Type, scimSchemaAttribute.Leaf.Type.ToString().ToLowerInvariant());
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.MultiValued, scimSchemaAttribute.Leaf.MultiValued);
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Description, scimSchemaAttribute.Leaf.Description);
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Required, scimSchemaAttribute.Leaf.Required);
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.CaseExact, scimSchemaAttribute.Leaf.CaseExact);
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Mutability, scimSchemaAttribute.Leaf.Mutability.ToString().ToLowerInvariant());
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Returned, scimSchemaAttribute.Leaf.Returned.ToString().ToLowerInvariant());
+            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Uniqueness, scimSchemaAttribute.Leaf.Uniqueness.ToString().ToLowerInvariant());
+            if (scimSchemaAttribute.Children != null && scimSchemaAttribute.Children.Any())
             {
                 var subAttributes = new JArray();
-                foreach(var subAttribute in scimSchemaAttribute.SubAttributes)
+                foreach(var subAttribute in scimSchemaAttribute.Children)
                 {
                     subAttributes.Add(SerializeSCIMSchemaAttribute(subAttribute));
                 }
@@ -50,9 +50,9 @@ namespace SimpleIdServer.Scim.Extensions
                 result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.SubAttributes, subAttributes);
             }
 
-            if (scimSchemaAttribute.CanonicalValues != null && scimSchemaAttribute.CanonicalValues.Any())
+            if (scimSchemaAttribute.Leaf.CanonicalValues != null && scimSchemaAttribute.Leaf.CanonicalValues.Any())
             {
-                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.CanonicalValues, new JArray(scimSchemaAttribute.CanonicalValues));
+                result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.CanonicalValues, new JArray(scimSchemaAttribute.Leaf.CanonicalValues));
             }
 
             return result;

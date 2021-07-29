@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Scim.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +30,13 @@ namespace SimpleIdServer.Scim.Domain
         public DateTime LastModified { get; set; }
         public ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
         public ICollection<SCIMSchema> Schemas { get; set; }
+        public List<TreeNode<SCIMRepresentationAttribute>> HierarchicalAttributes
+        {
+            get
+            {
+                return BuildHierarchicalAttributes(null);
+            }
+        }
 
         public SCIMSchema GetRootSchema()
         {
@@ -52,9 +58,20 @@ namespace SimpleIdServer.Scim.Domain
             return Schemas.FirstOrDefault(s => s.HasAttribute(attribute));
         }
 
+        public SCIMSchema GetSchema(string id)
+        {
+            return Schemas.FirstOrDefault(s => s.Id == id);
+        }
+
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {
             Attributes.Add(attribute);
+        }
+        
+        public void AddAttribute(SCIMRepresentationAttribute parentAttribute, SCIMRepresentationAttribute childAttribute)
+        {
+            childAttribute.ParentAttributeId = parentAttribute.Id;
+            Attributes.Add(childAttribute);
         }
 
         public void RemoveAttribute(SCIMRepresentationAttribute attribute)
@@ -69,15 +86,17 @@ namespace SimpleIdServer.Scim.Domain
 
         public SCIMRepresentationAttribute GetAttribute(string fullPath)
         {
-            var splitted = fullPath.Split('.').ToList();
-            return Attributes.GetAttribute(splitted);
+            return Attributes.FirstOrDefault(a => a.FullPath == fullPath);
         }
 
-        public ICollection<SCIMRepresentationAttribute> GetAttributesByAttrSchemaId(string attrSchemaId)
+        public IEnumerable<SCIMRepresentationAttribute> GetAttributesByAttrSchemaId(string attrSchemaId)
         {
-            var result = new List<SCIMRepresentationAttribute>();
-            Attributes.GetAttributesByAttrSchemaId(attrSchemaId, result);
-            return result;
+            return Attributes.Where(a => a.SchemaAttributeId == attrSchemaId);
+        }
+
+        public SCIMRepresentationAttribute GetParentAttribute(SCIMRepresentationAttribute attr)
+        {
+            return GetParentAttribute(attr.FullPath);
         }
 
         public SCIMRepresentationAttribute GetParentAttribute(string fullPath)
@@ -89,7 +108,13 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             splitted.Remove(splitted.Last());
-            return Attributes.GetAttribute(splitted);
+            fullPath = string.Join(".", splitted);
+            return GetAttribute(fullPath);
+        }
+
+        public IEnumerable<SCIMRepresentationAttribute> GetChildren(SCIMRepresentationAttribute attr)
+        {
+            return Attributes.Where(a => a.ParentAttributeId == attr.Id);
         }
 
         public void SetCreated(DateTime created)
@@ -120,7 +145,8 @@ namespace SimpleIdServer.Scim.Domain
 
         public bool ContainsAttribute(SCIMRepresentationAttribute attr)
         {
-            return Attributes.Any(a => a.IsSimilar(attr));
+            return false;
+            // return Attributes.Any(a => a.IsSimilar(attr));
         }
 
         public void SetDisplayName(string displayName)
@@ -169,6 +195,20 @@ namespace SimpleIdServer.Scim.Domain
         public override int GetHashCode()
         {
             return Id.GetHashCode();
+        }
+
+        private List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes(string parentId)
+        {
+            var nodes = Attributes.Where(p => (string.IsNullOrWhiteSpace(parentId) && string.IsNullOrWhiteSpace(p.ParentAttributeId)) || p.ParentAttributeId == parentId).Select(s =>
+            {
+                return new TreeNode<SCIMRepresentationAttribute>(s);
+            }).ToList();
+            foreach (var node in nodes)
+            {
+                node.AddChildren(BuildHierarchicalAttributes(node.Leaf.Id));
+            }
+
+            return nodes;
         }
     }
 }

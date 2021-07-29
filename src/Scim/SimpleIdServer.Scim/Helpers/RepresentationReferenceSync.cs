@@ -35,14 +35,14 @@ namespace SimpleIdServer.Scim.Helpers
 
 			foreach (var attributeMapping in attributeMappingLst)
 			{
-				var newIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => a.Values.Where(v => v.SchemaAttribute.Name == "value").SelectMany(v => v.ValuesString));
+				var newIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => oldScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
 				if (isScimRepresentationRemoved)
 				{
 					await RemoveReferenceAttributes(newIds, attributeMapping, newSourceScimRepresentation);
 				}
 				else
 				{
-					var oldIds = oldScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => a.Values.Where(v => v.SchemaAttribute.Name == "value").SelectMany(v => v.ValuesString));
+					var oldIds = oldScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => oldScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
 					var idsToBeRemoved = oldIds.Where(i => !newIds.Contains(i));
 					result.AddRange(await RemoveReferenceAttributes(idsToBeRemoved, attributeMapping, newSourceScimRepresentation));
 					result.AddRange(await UpdateReferenceAttributes(newIds, attributeMapping, newSourceScimRepresentation));
@@ -62,7 +62,7 @@ namespace SimpleIdServer.Scim.Helpers
 				var targetSchemaAttribute = firstTargetRepresentation.GetRootSchema().GetAttributeById(attributeMapping.TargetAttributeId);
 				foreach(var targetRepresentation in targetRepresentations)
 				{
-					var attr = targetRepresentation.Attributes.FirstOrDefault(s => s.SchemaAttribute.Id == targetSchemaAttribute.Id && s.Values != null && s.Values.Any(v => v.ValuesString != null && v.ValuesString.Contains(sourceScimRepresentation.Id)));
+					var attr = targetRepresentation.GetAttributesByAttrSchemaId(targetSchemaAttribute.Id).FirstOrDefault(v => targetRepresentation.GetChildren(v).Any(c => c.ValueString == sourceScimRepresentation.Id));
 					if (attr != null)
 					{
 						targetRepresentation.RemoveAttribute(attr);
@@ -100,38 +100,38 @@ namespace SimpleIdServer.Scim.Helpers
 
 		protected virtual void UpdateScimRepresentation(SCIMRepresentation scimRepresentation, SCIMRepresentation sourceRepresentation, string attributeId, string resourceType)
 		{
-			var attr = scimRepresentation.Attributes.FirstOrDefault(s => s.SchemaAttribute.Id == attributeId && s.Values != null && s.Values.Any(v => v.ValuesString != null && v.ValuesString.Contains(sourceRepresentation.Id)));
+			var attr = scimRepresentation.GetAttributesByAttrSchemaId(attributeId).FirstOrDefault(v => scimRepresentation.GetChildren(v).Any(c => c.ValueString == sourceRepresentation.Id));
 			if (attr != null)
 			{
 				scimRepresentation.RemoveAttribute(attr);
 			}
 
-			scimRepresentation.AddAttribute(BuildScimRepresentationAttribute(attributeId, scimRepresentation, sourceRepresentation, resourceType));
+			BuildScimRepresentationAttribute(attributeId, scimRepresentation, sourceRepresentation, resourceType);
 
 		}
 
-		protected virtual SCIMRepresentationAttribute BuildScimRepresentationAttribute(string attributeId, SCIMRepresentation targetRepresentation, SCIMRepresentation sourceRepresentation, string sourceResourceType)
+		protected virtual void BuildScimRepresentationAttribute(string attributeId, SCIMRepresentation targetRepresentation, SCIMRepresentation sourceRepresentation, string sourceResourceType)
 		{
+			var rootSchema = targetRepresentation.GetRootSchema();
 			var attributes = new List<SCIMRepresentationAttribute>();
-			var targetSchemaAttribute = targetRepresentation.GetRootSchema().GetAttributeById(attributeId);
-			var value = targetSchemaAttribute.SubAttributes.FirstOrDefault(s => s.Name == "value");
-			var display = targetSchemaAttribute.SubAttributes.FirstOrDefault(s => s.Name == "display");
-			var type = targetSchemaAttribute.SubAttributes.FirstOrDefault(s => s.Name == "type");
+			var targetSchemaAttribute = rootSchema.GetAttributeById(attributeId);
+			var values = rootSchema.GetChildren(targetSchemaAttribute);
+			var value = values.FirstOrDefault(s => s.Name == "value");
+			var display = values.FirstOrDefault(s => s.Name == "display");
+			var type = values.FirstOrDefault(s => s.Name == "type");
 			if (value != null)
             {
 				attributes.Add(new SCIMRepresentationAttribute
 				{
 					Id = Guid.NewGuid().ToString(),
+					AttributeId = Guid.NewGuid().ToString(),
 					SchemaAttribute = new SCIMSchemaAttribute(value.Id)
 					{
 						Name = "value",
 						MultiValued = false,
 						Type = SCIMSchemaAttributeTypes.STRING
 					},
-					ValuesString = new List<string>
-					{
-						sourceRepresentation.Id
-					}
+					ValueString = sourceRepresentation.Id
 				});
 			}
 
@@ -140,16 +140,14 @@ namespace SimpleIdServer.Scim.Helpers
 				attributes.Add(new SCIMRepresentationAttribute
 				{
 					Id = Guid.NewGuid().ToString(),
+					AttributeId = Guid.NewGuid().ToString(),
 					SchemaAttribute = new SCIMSchemaAttribute(display.Id)
 					{
 						Name = "display",
 						MultiValued = false,
 						Type = SCIMSchemaAttributeTypes.STRING
 					},
-					ValuesString = new List<string>
-					{
-						sourceRepresentation.DisplayName
-					}
+					ValueString = sourceRepresentation.DisplayName
 				});
 			}
 
@@ -158,25 +156,27 @@ namespace SimpleIdServer.Scim.Helpers
 				attributes.Add(new SCIMRepresentationAttribute
 				{
 					Id = Guid.NewGuid().ToString(),
+					AttributeId = Guid.NewGuid().ToString(),
 					SchemaAttribute = new SCIMSchemaAttribute(type.Id)
 					{
 						Name = "type",
 						MultiValued = false,
 						Type = SCIMSchemaAttributeTypes.STRING
 					},
-					ValuesString = new List<string>
-					{
-						sourceResourceType
-					}
+					ValueString = sourceResourceType
 				});
 			}
 
-			return new SCIMRepresentationAttribute
+			var parentAttr = new SCIMRepresentationAttribute
 			{
 				Id = Guid.NewGuid().ToString(),
-				SchemaAttribute = targetSchemaAttribute,
-				Values = attributes
+				SchemaAttribute = targetSchemaAttribute
 			};
+			targetRepresentation.AddAttribute(parentAttr);
+			foreach(var attr in attributes)
+			{
+				targetRepresentation.AddAttribute(parentAttr, attr);
+			}
         }
 	}
 }

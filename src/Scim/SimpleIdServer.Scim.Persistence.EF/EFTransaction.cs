@@ -20,6 +20,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task Commit(CancellationToken token)
         {
+            var entries = _dbContext.ChangeTracker.Entries();
+
             await _dbContext.SaveChangesAsync(token);
             _dbContextTransaction.Commit();
         }

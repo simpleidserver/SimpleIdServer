@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,70 +17,41 @@ namespace SimpleIdServer.Scim.Persistence.EF
             _context = context;
         }
 
-        public async Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
+        public Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
         {
-            var result = await _context.SCIMSchemaLst
-                .Include(s => s.SchemaExtensions)
-                .Include(s => s.Attributes).ThenInclude(s => s.SubAttributes).ThenInclude(s => s.SubAttributes)
-                .AsNoTracking()
+            return _context.SCIMSchemaLst.Include(s => s.SchemaExtensions).Include(s => s.Attributes)
                 .FirstOrDefaultAsync(s => s.Id == schemaId);
-            if (result == null)
-            {
-                return null;
-            }
-
-            return result.ToDomain();
         }
 
         public async Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers)
         {
-            var result = await _context.SCIMSchemaLst
-                .Include(s => s.SchemaExtensions)
-                .Include(s => s.Attributes).ThenInclude(s => s.SubAttributes).ThenInclude(s => s.SubAttributes)
-                .AsNoTracking()
-                .Where(s => schemaIdentifiers.Contains(s.Id)).ToListAsync();
-            if (result == null)
-            {
-                return null;
-            }
-
-            return result.Select(r => r.ToDomain());
+            var result = await _context.SCIMSchemaLst.Include(s => s.SchemaExtensions).Include(s => s.Attributes)
+                .Where(s => schemaIdentifiers.Contains(s.Id))
+                .ToListAsync();
+            return result;
 
         }
 
         public async Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
         {
-            var result = await _context.SCIMSchemaLst
-                .Include(s => s.SchemaExtensions)
-                .Include(s => s.Attributes).ThenInclude(s => s.SubAttributes).ThenInclude(s => s.SubAttributes)
-                .AsNoTracking()
+            return await _context.SCIMSchemaLst.Include(s => s.SchemaExtensions).Include(s => s.Attributes)
                 .FirstOrDefaultAsync(s => s.ResourceType == resourceType && s.IsRootSchema == true);
-            if (result == null)
-            {
-                return null;
-            }
-
-            return result.ToDomain();
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAll()
         {
-            var result = await _context.SCIMSchemaLst
-                .Include(s => s.SchemaExtensions)
-                .Include(s => s.Attributes).ThenInclude(s => s.SubAttributes).ThenInclude(s => s.SubAttributes)
-                .AsNoTracking()
+            var result = await _context.SCIMSchemaLst.Include(s => s.SchemaExtensions).Include(s => s.Attributes)
                 .ToListAsync();
-            return result.Select(r => r.ToDomain());
+            return result;
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAllRoot()
         {
             var result = await _context.SCIMSchemaLst
                 .Include(s => s.SchemaExtensions)
-                .Include(s => s.Attributes).ThenInclude(s => s.SubAttributes).ThenInclude(s => s.SubAttributes)
-                .AsNoTracking()
+                .Include(s => s.Attributes)
                 .Where(s => s.IsRootSchema == true).ToListAsync();
-            return result.Select(r => r.ToDomain());
+            return result;
         }
     }
 }

@@ -58,7 +58,7 @@ namespace SimpleIdServer.Scim.Helpers
                 }
 
                 attrExpression.SchemaAttribute = schemaAttr;
-                Parse(attrExpression.Child, schemaAttr.SubAttributes);
+                // Parse(attrExpression.Child, schemaAttr.SubAttributes);
             }
         }
 

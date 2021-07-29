@@ -5,7 +5,7 @@ using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
-using SimpleIdServer.Scim.Persistence.EF.Models;
+// using SimpleIdServer.Scim.Persistence.EF.Models;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
@@ -19,6 +19,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 {
     public static class EFSCIMExpressionLinqExtensions
     {
+        /*
         private static Dictionary<SCIMSchemaAttributeTypes, Type> MAPPING_SCHEMATTR_TO_TYPES = new Dictionary<SCIMSchemaAttributeTypes, Type>
         {
             { SCIMSchemaAttributeTypes.BOOLEAN, typeof(bool) },
@@ -43,7 +44,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         #region Order By
 
         public static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderBy(this SCIMExpression expression,
-            SCIMDbContext dbContext, 
+            SCIMDbContext dbContext,
             IQueryable<SCIMRepresentationModel> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
@@ -95,7 +96,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         }
 
         private static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderByProperty(
-            SCIMDbContext dbContext, 
+            SCIMDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentationModel> representations, 
             SearchSCIMRepresentationOrders order,
@@ -104,50 +105,36 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             CancellationToken cancellationToken)
         {
             var lastChild = attrExpression.GetLastChild();
-            var query = from rep in (from s in representations
-                                join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
-                                join attrv in dbContext.SCIMRepresentationAttributeValueLst on attr.Id equals attrv.SCIMRepresentationAttributeId
-                                select new
-                                {
-                                    representation = s,
-                                    representationId = s.Id,
-                                    orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attrv.ValueString : ""
-                                })
-                     orderby rep.orderedValue descending
-                     select rep.representationId;
-            var orderedIds = await query.Skip(startIndex).Take(count).ToListAsync(cancellationToken);
-            var result = await EFSCIMRepresentationQueryRepository.IncludeRepresentationNavigationProperties(dbContext.SCIMRepresentationLst).Where(s => orderedIds.Contains(s.Id)).ToListAsync(cancellationToken);
-            var comparer = new RepresentationComparer(orderedIds);
+            var reps = await representations.ToListAsync(cancellationToken);
+            var query = reps.Select(r =>  
+            {
+                var orderValue = string.Empty;
+                var attr = r.Attributes.FirstOrDefault(a => a.SchemaAttributeId == lastChild.SchemaAttribute.Id);
+                if (attr != null && attr.Values.Any())
+                {
+                    orderValue = attr.Values.First().ValueString;
+                }
+
+                return new
+                {
+                    result = r,
+                    orderValue = orderValue
+                };
+            });
             List<SCIMRepresentationModel> content= null;
             switch(order)
             {
                 case SearchSCIMRepresentationOrders.Ascending:
-                    content = result.OrderBy(r => r, comparer).ToList();
+                    content = query.OrderBy(r => r.orderValue).Select(r => r.result).ToList();
                     break;
                 case SearchSCIMRepresentationOrders.Descending:
-                    content = result.OrderByDescending(r => r, comparer).ToList();
+                    content = query.OrderByDescending(r => r.orderValue).Select(r => r.result).ToList();
                     break;
             }
 
-            var total = await representations.CountAsync(cancellationToken);
+            content = content.Skip(startIndex).Take(count).ToList();
+            var total = reps.Count();
             return new SearchSCIMRepresentationsResponse(total, content.Select(r => r.ToDomain()));
-        }
-
-        private class RepresentationComparer : IComparer<SCIMRepresentationModel>
-        {
-            private List<string> _orderedIds;
-
-            public RepresentationComparer(List<string> orderedIds)
-            {
-                _orderedIds = orderedIds;
-            }
-
-            public int Compare(SCIMRepresentationModel x, SCIMRepresentationModel y)
-            {
-                var xIndex = _orderedIds.IndexOf(x.Id);
-                var yIndex = _orderedIds.IndexOf(y.Id);
-                return xIndex.CompareTo(yIndex);
-            }
         }
 
         public class GroupedResult
@@ -846,5 +833,6 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         }
 
         #endregion
+        */
     }
 }

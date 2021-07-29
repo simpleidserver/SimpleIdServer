@@ -32,14 +32,15 @@ namespace SimpleIdServer.Scim.Helpers
 					var attrs = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId);
 					foreach(var attr in attrs)
                     {
-						var value = attr.Values.FirstOrDefault(v => v.SchemaAttribute.Name == "value");
-						var reference = attr.SchemaAttribute.SubAttributes.FirstOrDefault(v => v.Name == "$ref");
-						if (value == null || value.ValuesString == null || !value.ValuesString.Any() || reference == null)
+						var values = representation.GetChildren(attr);
+						var value = values.FirstOrDefault(v => v.SchemaAttribute.Name == "value");
+						var reference = values.FirstOrDefault(v => v.SchemaAttribute.Name == "$ref");
+						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference == null)
                         {
 							continue;
                         }
 
-						attr.Values.Add(new SCIMRepresentationAttribute
+						representation.AddAttribute(attr, new SCIMRepresentationAttribute
 						{
 							SchemaAttribute = new SCIMSchemaAttribute(reference.Id)
 							{
@@ -47,10 +48,7 @@ namespace SimpleIdServer.Scim.Helpers
 								MultiValued = false,
 								Type = SCIMSchemaAttributeTypes.STRING
 							},
-							ValuesString = new List<string>
-							{
-								$"{baseUrl}/{attributeMapping.TargetResourceType}/{value.ValuesString.FirstOrDefault()}"
-							}
+							ValueString = $"{baseUrl}/{attributeMapping.TargetResourceType}/{value.ValueString}"
 						});
                     }
                 }

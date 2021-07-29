@@ -126,7 +126,7 @@ namespace SimpleIdServer.Scim
                 SourceResourceType = StandardSchemas.UserSchema.ResourceType,
                 SourceAttributeSelector = "groups",
                 TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
-                TargetAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                TargetAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id
             }
         };
 

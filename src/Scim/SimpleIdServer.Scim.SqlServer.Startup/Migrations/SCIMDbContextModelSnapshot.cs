@@ -19,6 +19,21 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
+                {
+                    b.Property<string>("RepresentationsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SchemasId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("RepresentationsId", "SchemasId");
+
+                    b.HasIndex("SchemasId");
+
+                    b.ToTable("SCIMRepresentationSCIMSchema");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", b =>
                 {
                     b.Property<string>("Id")
@@ -57,6 +72,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("ProvisioningConfigurationId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ProvisioningConfigurationId1")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("RepresentationId")
                         .HasColumnType("nvarchar(max)");
 
@@ -75,6 +93,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProvisioningConfigurationId");
+
+                    b.HasIndex("ProvisioningConfigurationId1");
 
                     b.ToTable("ProvisioningConfigurationHistory");
                 });
@@ -113,7 +133,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.ToTable("ProvisioningConfigurationRecord");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMAttributeMappingModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMAttributeMapping", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -127,9 +147,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("SourceResourceType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SourceValueAttributeId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("TargetAttributeId")
                         .HasColumnType("nvarchar(max)");
 
@@ -141,68 +158,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.ToTable("SCIMAttributeMappingLst");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ParentId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RepresentationId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SchemaAttributeId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("RepresentationId");
-
-                    b.HasIndex("SchemaAttributeId");
-
-                    b.ToTable("SCIMRepresentationAttributeLst");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeValueModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SCIMRepresentationAttributeId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool?>("ValueBoolean")
-                        .HasColumnType("bit");
-
-                    b.Property<byte[]>("ValueByte")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<DateTime?>("ValueDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("ValueDecimal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ValueInteger")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ValueReference")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ValueString")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SCIMRepresentationAttributeId");
-
-                    b.ToTable("SCIMRepresentationAttributeValueLst");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMRepresentation", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -225,107 +181,65 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("Version")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("VersionNumber")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("SCIMRepresentationLst");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationSchemaModel", b =>
-                {
-                    b.Property<string>("SCIMSchemaId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SCIMRepresentationId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("SCIMSchemaId", "SCIMRepresentationId");
-
-                    b.HasIndex("SCIMRepresentationId");
-
-                    b.ToTable("SCIMRepresentationSchemaLst");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaAttributeModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CanonicalValues")
+                    b.Property<string>("AttributeId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("CaseExact")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("DefaultValueInt")
+                    b.Property<string>("FullPath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DefaultValueString")
+                    b.Property<string>("ParentAttributeId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("MultiValued")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Mutability")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ParentId")
+                    b.Property<string>("RepresentationId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ReferenceTypes")
+                    b.Property<string>("SchemaAttributeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("ValueBinary")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<bool?>("ValueBoolean")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ValueDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("ValueDecimal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("ValueInteger")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ValueReference")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Required")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Returned")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SchemaId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Uniqueness")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("SchemaId");
-
-                    b.ToTable("SCIMSchemaAttributeModel");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaExtensionModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("Required")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SCIMSchemaModelId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Schema")
+                    b.Property<string>("ValueString")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SCIMSchemaModelId");
+                    b.HasIndex("RepresentationId");
 
-                    b.ToTable("SCIMSchemaExtensionModel");
+                    b.HasIndex("SchemaAttributeId");
+
+                    b.ToTable("SCIMRepresentationAttributeLst");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchema", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -347,11 +261,112 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.ToTable("SCIMSchemaLst");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchemaAttribute", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CanonicalValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("CaseExact")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DefaultValueInt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DefaultValueString")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullPath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("MultiValued")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Mutability")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceTypes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Returned")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SchemaId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Uniqueness")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchemaId");
+
+                    b.ToTable("SCIMSchemaAttribute");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchemaExtension", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SCIMSchemaId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Schema")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SCIMSchemaId");
+
+                    b.ToTable("SCIMSchemaExtension");
+                });
+
+            modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
+                {
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMRepresentation", null)
+                        .WithMany()
+                        .HasForeignKey("RepresentationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMSchema", null)
+                        .WithMany()
+                        .HasForeignKey("SchemasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfigurationHistory", b =>
                 {
-                    b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", "ProvisioningConfiguration")
+                    b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", null)
                         .WithMany("HistoryLst")
-                        .HasForeignKey("ProvisioningConfigurationId");
+                        .HasForeignKey("ProvisioningConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", "ProvisioningConfiguration")
+                        .WithMany()
+                        .HasForeignKey("ProvisioningConfigurationId1");
 
                     b.Navigation("ProvisioningConfiguration");
                 });
@@ -360,82 +375,44 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 {
                     b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", null)
                         .WithMany("Records")
-                        .HasForeignKey("ProvisioningConfigurationId");
+                        .HasForeignKey("ProvisioningConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SimpleIdServer.Scim.Domain.ProvisioningConfigurationRecord", null)
                         .WithMany("Values")
                         .HasForeignKey("ProvisioningConfigurationRecordId");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMRepresentationAttribute", b =>
                 {
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId");
-
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationModel", "Representation")
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMRepresentation", "Representation")
                         .WithMany("Attributes")
-                        .HasForeignKey("RepresentationId");
+                        .HasForeignKey("RepresentationId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaAttributeModel", "SchemaAttribute")
-                        .WithMany("RepresentationAttributes")
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMSchemaAttribute", "SchemaAttribute")
+                        .WithMany()
                         .HasForeignKey("SchemaAttributeId");
-
-                    b.Navigation("Parent");
 
                     b.Navigation("Representation");
 
                     b.Navigation("SchemaAttribute");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeValueModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchemaAttribute", b =>
                 {
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", "RepresentationAttribute")
-                        .WithMany("Values")
-                        .HasForeignKey("SCIMRepresentationAttributeId");
-
-                    b.Navigation("RepresentationAttribute");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationSchemaModel", b =>
-                {
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationModel", "Representation")
-                        .WithMany("Schemas")
-                        .HasForeignKey("SCIMRepresentationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaModel", "Schema")
-                        .WithMany("Representations")
-                        .HasForeignKey("SCIMSchemaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Representation");
-
-                    b.Navigation("Schema");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaAttributeModel", b =>
-                {
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaAttributeModel", "ParentAttribute")
-                        .WithMany("SubAttributes")
-                        .HasForeignKey("ParentId");
-
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaModel", "Schema")
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMSchema", null)
                         .WithMany("Attributes")
-                        .HasForeignKey("SchemaId");
-
-                    b.Navigation("ParentAttribute");
-
-                    b.Navigation("Schema");
+                        .HasForeignKey("SchemaId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaExtensionModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchemaExtension", b =>
                 {
-                    b.HasOne("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaModel", null)
+                    b.HasOne("SimpleIdServer.Scim.Domain.SCIMSchema", null)
                         .WithMany("SchemaExtensions")
-                        .HasForeignKey("SCIMSchemaModelId");
+                        .HasForeignKey("SCIMSchemaId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domain.ProvisioningConfiguration", b =>
@@ -450,32 +427,14 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Navigation("Values");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationAttributeModel", b =>
-                {
-                    b.Navigation("Children");
-
-                    b.Navigation("Values");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMRepresentationModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMRepresentation", b =>
                 {
                     b.Navigation("Attributes");
-
-                    b.Navigation("Schemas");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaAttributeModel", b =>
-                {
-                    b.Navigation("RepresentationAttributes");
-
-                    b.Navigation("SubAttributes");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Scim.Persistence.EF.Models.SCIMSchemaModel", b =>
+            modelBuilder.Entity("SimpleIdServer.Scim.Domain.SCIMSchema", b =>
                 {
                     b.Navigation("Attributes");
-
-                    b.Navigation("Representations");
 
                     b.Navigation("SchemaExtensions");
                 });

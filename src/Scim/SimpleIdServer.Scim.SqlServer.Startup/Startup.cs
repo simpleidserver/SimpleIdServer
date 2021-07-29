@@ -13,7 +13,6 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.EF;
-using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -109,9 +108,9 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                     });
                     if (!context.SCIMSchemaLst.Any())
                     {
-                        context.SCIMSchemaLst.Add(userSchema.ToModel());
-                        context.SCIMSchemaLst.Add(groupSchema.ToModel());
-                        context.SCIMSchemaLst.Add(eidUserSchema.ToModel());
+                        context.SCIMSchemaLst.Add(userSchema);
+                        context.SCIMSchemaLst.Add(groupSchema);
+                        context.SCIMSchemaLst.Add(eidUserSchema);
                     }
 
                     if (!context.SCIMAttributeMappingLst.Any())
@@ -134,8 +133,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                             TargetResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                             TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
                         };
-                        context.SCIMAttributeMappingLst.Add(firstAttributeMapping.ToModel());
-                        context.SCIMAttributeMappingLst.Add(secondAttributeMapping.ToModel());
+                        context.SCIMAttributeMappingLst.Add(firstAttributeMapping);
+                        context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
                     }
 
                     if (!context.ProvisioningConfigurations.Any())

@@ -170,7 +170,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
                 var scimSchema = _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(controller.ResourceType).Result;
                 if (scimSchema != null)
                 {
-                    Enrich(scimSchema.Attributes, schema.Properties);
+                    Enrich(scimSchema, scimSchema.Attributes, schema.Properties);
                 }
                 else
                 {
@@ -191,7 +191,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
             };
         }
 
-        private static void Enrich(ICollection<SCIMSchemaAttribute> attributes, IDictionary<string, OpenApiSchema> properties)
+        private static void Enrich(SCIMSchema schema, ICollection<SCIMSchemaAttribute> attributes, IDictionary<string, OpenApiSchema> properties)
         {
             foreach (var attr in attributes)
             {
@@ -221,6 +221,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
                     continue;
                 }
 
+                var values = schema.GetChildren(attr).ToList();
                 if (attr.MultiValued && attr.Type == SCIMSchemaAttributeTypes.COMPLEX)
                 {
                     sc.Items = new OpenApiSchema
@@ -228,13 +229,13 @@ namespace SimpleIdServer.Scim.Swashbuckle
                         Type = "object",
                         Properties = new Dictionary<string, OpenApiSchema>()
                     };
-                    Enrich(attr.SubAttributes, sc.Items.Properties);
+                    Enrich(schema, values, sc.Items.Properties);
                     continue;
                 }
 
                 if (attr.Type == SCIMSchemaAttributeTypes.COMPLEX && !attr.MultiValued)
                 {
-                    Enrich(attr.SubAttributes, sc.Properties);
+                    Enrich(schema, values, sc.Properties);
                 }
             }
         }

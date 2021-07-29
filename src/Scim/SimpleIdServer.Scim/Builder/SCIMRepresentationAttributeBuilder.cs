@@ -9,11 +9,13 @@ namespace SimpleIdServer.Scim.Builder
 {
     public class SCIMRepresentationAttributeBuilder
     {
+        private readonly SCIMSchema _schema;
         private readonly SCIMSchemaAttribute _scimSchemaAttribute;
         private readonly ICollection<SCIMRepresentationAttribute> _attributes;
 
-        public SCIMRepresentationAttributeBuilder(SCIMSchemaAttribute scimSchemaAttribute)
+        public SCIMRepresentationAttributeBuilder(SCIMSchema schema, SCIMSchemaAttribute scimSchemaAttribute)
         {
+            _schema = schema;
             _scimSchemaAttribute = scimSchemaAttribute;
             _attributes = new List<SCIMRepresentationAttribute>();
         }
@@ -22,12 +24,56 @@ namespace SimpleIdServer.Scim.Builder
         {
             var id = Guid.NewGuid().ToString();
             SCIMSchemaAttribute schemaAttribute = null;
-            if (_scimSchemaAttribute != null && _scimSchemaAttribute.SubAttributes != null)
+            var subAttributes = _schema.GetChildren(_scimSchemaAttribute);
+            if (subAttributes != null)
             {
-                schemaAttribute = _scimSchemaAttribute.SubAttributes.FirstOrDefault(a => a.Name == name);
+                schemaAttribute = subAttributes.FirstOrDefault(a => a.Name == name);
             }
 
-            _attributes.Add(new SCIMRepresentationAttribute(id, schemaAttribute, valuesInt, valuesBool, valuesString, valuesDateTime, valuesDecimal, valuesBinary));
+            var attributeId = Guid.NewGuid().ToString();
+            if (valuesInt != null)
+            {
+                foreach(var attr in valuesInt)
+                {
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueInteger: attr));
+                }
+            }
+            else if (valuesBool != null)
+            {
+                foreach (var attr in valuesBool)
+                {
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBoolean: attr));
+                }
+            }
+            else if (valuesString != null)
+            {
+                foreach (var attr in valuesString)
+                {
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueString: attr));
+                }
+            }
+            else if (valuesDateTime != null)
+            {
+                foreach (var attr in valuesDateTime)
+                {
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDateTime: attr));
+                }
+            }
+            else if (valuesDecimal != null)
+            {
+                foreach (var attr in valuesDecimal)
+                {
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDecimal: attr));
+                }
+            }
+            else if (valuesBinary != null)
+            {
+                foreach (var attr in valuesBinary)
+                {
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBinary: attr));
+                }
+            }
+
             return this;
         }
 
@@ -63,8 +109,8 @@ namespace SimpleIdServer.Scim.Builder
 
         public SCIMRepresentationAttributeBuilder AddComplexAttribute(string name, string schemaId, Action<SCIMRepresentationAttributeBuilder> callback)
         {
-            var schemaAttribute = _scimSchemaAttribute.SubAttributes.FirstOrDefault(a => a.Name == name);
-            var builder = new SCIMRepresentationAttributeBuilder(schemaAttribute);
+            var schemaAttribute = _schema.GetChildren(_scimSchemaAttribute).FirstOrDefault(a => a.Name == name);
+            var builder = new SCIMRepresentationAttributeBuilder(_schema, schemaAttribute);
             callback(builder);
             return this;
         }

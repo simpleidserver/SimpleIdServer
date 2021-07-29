@@ -46,7 +46,7 @@ namespace SimpleIdServer.Scim.Helpers
             var attr = result.Attributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
             if (attr != null)
             {
-                result.DisplayName = attr.ValuesString.First();
+                result.DisplayName = attr.ValueString;
             }
 
             return result;
@@ -90,7 +90,7 @@ namespace SimpleIdServer.Scim.Helpers
             var defaultAttributes = allSchemaAttributes.Where(a => !attributes.Any(at => at.SchemaAttribute.Name == a.Name) && a.Mutability == SCIMSchemaAttributeMutabilities.READWRITE);
             foreach (var defaultAttr in defaultAttributes)
             {
-                var attr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), defaultAttr);
+                var attributeId = Guid.NewGuid().ToString();
                 switch (defaultAttr.Type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
@@ -104,10 +104,8 @@ namespace SimpleIdServer.Scim.Helpers
 
                             foreach (var str in defaultValueStr)
                             {
-                                attr.Add(str);
+                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, valueString: str));
                             }
-
-                            attributes.Add(attr);
                         }
 
                         break;
@@ -122,10 +120,8 @@ namespace SimpleIdServer.Scim.Helpers
 
                             foreach (var i in defaultValueInt)
                             {
-                                attr.Add(i);
+                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, valueInteger: i));
                             }
-
-                            attributes.Add(attr);
                         }
 
                         break;
@@ -138,11 +134,12 @@ namespace SimpleIdServer.Scim.Helpers
         public static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, SCIMSchema schema, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMRepresentationAttribute>();
+            var attributeId = Guid.NewGuid().ToString();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
                 if (!jArr.Any())
                 {
-                    result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute));
+                    result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute));
                 }
                 else
                 {
@@ -154,25 +151,23 @@ namespace SimpleIdServer.Scim.Helpers
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidJSON, jsonProperty.ToString()));
                         }
 
-                        CheckRequiredAttributes(schema, schemaAttribute.SubAttributes, rec);
-                        var resolutionResult = Resolve(rec, schema, schemaAttribute.SubAttributes);
-                        var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute)
+                        var subAttributes = schema.GetChildren(schemaAttribute).ToList();
+                        CheckRequiredAttributes(schema, subAttributes, rec);
+                        var resolutionResult = Resolve(rec, schema, subAttributes);
+                        var parent = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute);
+                        var children = BuildRepresentationAttributes(resolutionResult, subAttributes, ignoreUnsupportedCanonicalValues);
+                        foreach(var child in children)
                         {
-                            Values = BuildRepresentationAttributes(resolutionResult, schemaAttribute.SubAttributes, ignoreUnsupportedCanonicalValues)
-                        };
-
-                        foreach (var subAttribute in record.Values)
-                        {
-                            subAttribute.Parent = record;
+                            child.ParentAttributeId = parent.Id;
+                            result.Add(child);
                         }
 
-                        result.Add(record);
+                        result.Add(parent);
                     }
                 }
             }
             else
             {
-                var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), schemaAttribute);
                 switch(schemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.BOOLEAN:
@@ -182,7 +177,11 @@ namespace SimpleIdServer.Scim.Helpers
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidBoolean, string.Join(",", valuesBooleanResult.InvalidValues)));
                         }
 
-                        record.ValuesBoolean = valuesBooleanResult.Values;
+                        foreach(var b in valuesBooleanResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueBoolean: b);
+                            result.Add(record);
+                        }
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
                         var valuesIntegerResult = Extract<int>(jArr);
@@ -191,7 +190,11 @@ namespace SimpleIdServer.Scim.Helpers
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidInteger, string.Join(",", valuesIntegerResult.InvalidValues)));
                         }
 
-                        record.ValuesInteger = valuesIntegerResult.Values;
+                        foreach (var i in valuesIntegerResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueInteger: i);
+                            result.Add(record);
+                        }
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
                         var valuesDateTimeResult = Extract<DateTime>(jArr);
@@ -200,18 +203,32 @@ namespace SimpleIdServer.Scim.Helpers
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidDateTime, string.Join(",", valuesDateTimeResult.InvalidValues)));
                         }
 
-                        record.ValuesDateTime = valuesDateTimeResult.Values;
+                        foreach (var d in valuesDateTimeResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueDateTime: d);
+                            result.Add(record);
+                        }
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
-                        record.ValuesString = jArr.Select(j => j.ToString()).ToList();
-                        if (schemaAttribute.CanonicalValues != null && schemaAttribute.CanonicalValues.Any() && !ignoreUnsupportedCanonicalValues && !record.ValuesString.All(_ => schemaAttribute.CanonicalValues.Contains(_)))
+                        var strs = jArr.Select(j => j.ToString()).ToList();
+                        if (schemaAttribute.CanonicalValues != null && schemaAttribute.CanonicalValues.Any() && !ignoreUnsupportedCanonicalValues && !strs.All(_ => schemaAttribute.CanonicalValues.Contains(_)))
                         {
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidCanonicalValue, schemaAttribute.Name));
                         }
 
+                        foreach (var s in strs)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueString: s);
+                            result.Add(record);
+                        }
                         break;
                     case SCIMSchemaAttributeTypes.REFERENCE:
-                        record.ValuesReference = jArr.Select(j => j.ToString()).ToList();
+                        var refs = jArr.Select(j => j.ToString()).ToList();
+                        foreach (var reference in refs)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueReference: reference);
+                            result.Add(record);
+                        }
                         break;
                     case SCIMSchemaAttributeTypes.DECIMAL:
                         var valuesDecimalResult = Extract<decimal>(jArr);
@@ -220,7 +237,11 @@ namespace SimpleIdServer.Scim.Helpers
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidDecimal, string.Join(",", valuesDecimalResult.InvalidValues)));
                         }
 
-                        record.ValuesDecimal = valuesDecimalResult.Values;
+                        foreach (var d in valuesDecimalResult.Values)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueDecimal: d);
+                            result.Add(record);
+                        }
                         break;
                     case SCIMSchemaAttributeTypes.BINARY:
                         var invalidValues = new List<string>();
@@ -242,11 +263,13 @@ namespace SimpleIdServer.Scim.Helpers
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidBase64, string.Join(",", invalidValues)));
                         }
 
-                        record.ValuesBinary = valuesBinary;
+                        foreach (var b in valuesBinary)
+                        {
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueBinary: b);
+                            result.Add(record);
+                        }
                         break;
                 }
-
-                result.Add(record);
             }
 
             return result;
@@ -353,7 +376,8 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static void CheckRequiredAttributes(SCIMSchema schema, JObject json)
         {
-            CheckRequiredAttributes(schema, schema.Attributes, json);
+            var attributes = schema.HierarchicalAttributes.Select(h => h.Leaf);
+            CheckRequiredAttributes(schema, attributes, json);
         }
 
         private static void CheckRequiredAttributes(SCIMSchema schema, IEnumerable<SCIMSchemaAttribute> schemaAttributes, JObject json)
@@ -404,7 +428,7 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 get
                 {
-                    return Schemas.SelectMany(s => s.Attributes).ToList();
+                    return Schemas.SelectMany(s => s.HierarchicalAttributes).Select(h => h.Leaf).ToList();
                 }
             }
         }

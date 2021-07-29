@@ -67,8 +67,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.SetUpdated(DateTime.UtcNow);
             scimRepresentation.SetVersion(version);
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
-            var uniqueServerAttributeIds = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
-            var uniqueGlobalAttributes = scimRepresentation.Attributes.Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
+            var uniqueServerAttributeIds = scimRepresentation.HierarchicalAttributes.Select(s => s.Leaf).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
+            var uniqueGlobalAttributes = scimRepresentation.HierarchicalAttributes.Select(s => s.Leaf).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
             var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, scimRepresentation, scimRepresentation);
@@ -95,10 +95,14 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 switch (attribute.SchemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
-                        record = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValuesString.First(), endpoint);
+                        record = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueString, endpoint);
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
-                        record = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValuesInteger.First(), endpoint);
+                        if (attribute.ValueInteger != null)
+                        {
+                            record = await _scimRepresentationQueryRepository.FindSCIMRepresentationByAttribute(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value, endpoint);
+                        }
+
                         break;
                 }
 

@@ -8,10 +8,12 @@ namespace SimpleIdServer.Scim.Builder
 {
     public class SCIMSchemaAttributeBuilder
     {
+        private readonly SCIMSchema _schema;
         private readonly SCIMSchemaAttribute _scimSchemaAttribute;
 
-        public SCIMSchemaAttributeBuilder(SCIMSchemaAttribute scimSchemaAttribute)
+        public SCIMSchemaAttributeBuilder(SCIMSchema schema, SCIMSchemaAttribute scimSchemaAttribute)
         {
+            _schema = schema;
             _scimSchemaAttribute = scimSchemaAttribute;
         }
 
@@ -59,18 +61,18 @@ namespace SimpleIdServer.Scim.Builder
 
         public SCIMSchemaAttributeBuilder AddAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback)
         {
-            var builder = new SCIMSchemaAttributeBuilder(new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
+            var builder = new SCIMSchemaAttributeBuilder(_schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
             callback(builder);
-            _scimSchemaAttribute.AddSubAttribute(builder.Build());
+            _schema.AddAttribute(_scimSchemaAttribute, builder.Build());
             return this;
         }
 
-        public SCIMSchemaAttributeBuilder AddAttribute(string name, SCIMSchemaAttributeTypes type, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
+        public SCIMSchemaAttributeBuilder AddAttribute(SCIMSchema schema, string name, SCIMSchemaAttributeTypes type, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false, List<string> canonicalValues = null)
         {
-            var builder = new SCIMSchemaAttributeBuilder(new SCIMSchemaAttribute(Guid.NewGuid().ToString())
+            var builder = new SCIMSchemaAttributeBuilder(schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString())
             {
                 Name = name,
                 MultiValued = multiValued,
@@ -88,7 +90,7 @@ namespace SimpleIdServer.Scim.Builder
                 callback(builder);
             }
 
-            _scimSchemaAttribute.AddSubAttribute(builder.Build());
+            _schema.AddAttribute(_scimSchemaAttribute, builder.Build());
             return this;
         }
 
@@ -97,7 +99,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.STRING, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.STRING, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         public SCIMSchemaAttributeBuilder AddDecimalAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
@@ -105,7 +107,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.DECIMAL, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.DECIMAL, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         public SCIMSchemaAttributeBuilder AddBinaryAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
@@ -113,7 +115,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.BINARY, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.BINARY, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         public SCIMSchemaAttributeBuilder AddBooleanAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
@@ -121,7 +123,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.BOOLEAN, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.BOOLEAN, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         public SCIMSchemaAttributeBuilder AddDateTimeAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
@@ -129,7 +131,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.DATETIME, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.DATETIME, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         public SCIMSchemaAttributeBuilder AddIntAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
@@ -137,7 +139,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.INTEGER, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.INTEGER, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         public SCIMSchemaAttributeBuilder AddComplexAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
@@ -145,7 +147,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
         {
-            return AddAttribute(name, SCIMSchemaAttributeTypes.COMPLEX, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.COMPLEX, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
         }
 
         internal SCIMSchemaAttribute Build()

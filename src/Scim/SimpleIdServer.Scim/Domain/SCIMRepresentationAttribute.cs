@@ -1,112 +1,57 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
-    [DebuggerDisplay("Attribute = {SchemaAttribute.Name}")]
+    [DebuggerDisplay("FullPath = {FullPath}, Id = {Id}, ParentAttributeId = {ParentAttributeId}, AttributeId = {AttributeId}")]
     public class SCIMRepresentationAttribute : ICloneable
     {
         public SCIMRepresentationAttribute()
         {
-            ValuesInteger = new List<int>();
-            ValuesBoolean = new List<bool>();
-            ValuesString = new List<string>();
-            ValuesDateTime = new List<DateTime>();
-            ValuesReference = new List<string>();
-            ValuesDecimal = new List<decimal>();
-            ValuesBinary = new List<byte[]>();
-            Values = new List<SCIMRepresentationAttribute>();
         }
 
-        public SCIMRepresentationAttribute(string id) : this()
+        public SCIMRepresentationAttribute(string id, string attributeId) : this()
         {
             Id = id;
+            AttributeId = attributeId;
         }
 
-        public SCIMRepresentationAttribute(string id, SCIMSchemaAttribute schemaAttribute, List<int> valuesInteger = null, 
-            List<bool> valuesBoolean = null, 
-            List<string> valuesString = null, 
-            List<DateTime> valuesDateTime = null,
-            List<decimal> valuesDecimal = null,
-            List<byte[]> valuesBinary = null) : this(id)
+        public SCIMRepresentationAttribute(string id, string attributeId, SCIMSchemaAttribute schemaAttribute, int? valueInteger = null, 
+            bool? valueBoolean = null, 
+            string valueString = null, 
+            DateTime? valueDateTime = null,
+            decimal? valueDecimal = null,
+            byte[] valueBinary = null,
+            string valueReference = null) : this(id, attributeId)
         {
             SchemaAttribute = schemaAttribute;
-            ValuesInteger = valuesInteger == null ? new List<int>() : valuesInteger;
-            ValuesBoolean = valuesBoolean == null ? new List<bool>() : valuesBoolean;
-            ValuesString = valuesString == null ? new List<string>() : valuesString;
-            ValuesDateTime = valuesDateTime == null ? new List<DateTime>() : valuesDateTime;
-            ValuesDecimal = valuesDecimal == null ? new List<decimal>() : valuesDecimal;
-            ValuesBinary = valuesBinary == null ? new List<byte[]>() : valuesBinary;
+            FullPath = schemaAttribute.FullPath;
+            ValueInteger = valueInteger;
+            ValueBoolean = valueBoolean;
+            ValueString = valueString;
+            ValueDateTime = valueDateTime;
+            ValueDecimal = valueDecimal;
+            ValueBinary = valueBinary;
+            ValueReference = valueReference;
         }
 
         public string Id { get; set; }
-        public ICollection<string> ValuesString { get; set; }
-        public ICollection<bool> ValuesBoolean { get; set; }
-        public ICollection<int> ValuesInteger { get; set; }
-        public ICollection<DateTime> ValuesDateTime { get; set; }
-        public ICollection<string> ValuesReference { get; set; }
-        public ICollection<decimal> ValuesDecimal { get; set; }
-        public ICollection<byte[]> ValuesBinary { get; set; }
-        public ICollection<SCIMRepresentationAttribute> Values { get; set; }
-        public SCIMRepresentationAttribute Parent { get; set; }
+        public string AttributeId { get; set; }
+        public string ParentAttributeId { get; set; }
+        public string SchemaAttributeId { get; set; }
+        public string RepresentationId { get; set; }
+        public string FullPath { get; set; }
+        public string ValueString { get; set; }
+        public bool? ValueBoolean { get; set; }
+        public int? ValueInteger { get; set; }
+        public DateTime? ValueDateTime { get; set; }
+        public string ValueReference { get; set; }
+        public decimal? ValueDecimal { get; set; }
+        public byte[] ValueBinary { get; set; }
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
-
-        public string GetFullPath()
-        {
-            var lst = new List<string>();
-            GetFullPath(lst);
-            lst.Reverse();
-            return string.Join(".", lst);
-        }
-
-        public void GetFullPath(List<string> lst)
-        {
-            lst.Add(SchemaAttribute.Name);
-            if (Parent != null)
-            {
-                Parent.GetFullPath(lst);
-            }
-        }
-
-        public void Add(int value)
-        {
-            ValuesInteger.Add(value);
-        }
-
-        public void Add(string value)
-        {
-            ValuesString.Add(value);
-        }
-
-        public void Add(DateTime value)
-        {
-            ValuesDateTime.Add(value);
-        }
-
-        public void Add(bool value)
-        {
-            ValuesBoolean.Add(value);
-        }
-
-        public void Add(decimal value)
-        {
-            ValuesDecimal.Add(value);
-        }
-
-        public void Add(byte[] value)
-        {
-            ValuesBinary.Add(value);
-        }
-
-        public void Add(SCIMRepresentationAttribute value)
-        {
-            Values.Add(value);
-            value.Parent = this;
-        }
+        public SCIMRepresentation Representation { get; set; }
 
         public bool IsReadable(bool isGetRequest = false)
         {
@@ -119,27 +64,8 @@ namespace SimpleIdServer.Scim.Domain
             
             return true;
         }
-        
-        public bool HasValue
-        {
-            get
-            {
-                if (Values.Any()
-                    || ValuesBinary.Any()
-                    || ValuesBoolean.Any()
-                    || ValuesDateTime.Any()
-                    || ValuesDecimal.Any()
-                    || ValuesInteger.Any()
-                    || ValuesReference.Any()
-                    || ValuesString.Any())
-                {
-                    return true;
-                }
 
-                return false;
-            }
-        }
-
+        /*
         public bool IsSimilar(SCIMRepresentationAttribute attr)
         {
             if (attr.SchemaAttribute.Name != SchemaAttribute.Name)
@@ -147,9 +73,10 @@ namespace SimpleIdServer.Scim.Domain
                 return false;
             }
 
-            switch(attr.SchemaAttribute.Type)
+            switch (attr.SchemaAttribute.Type)
             {
                 case SCIMSchemaAttributeTypes.STRING:
+                    return attr.ValueString == 
                     if (attr.ValuesString.All(s => ValuesString.Contains(s)))
                     {
                         return true;
@@ -201,26 +128,26 @@ namespace SimpleIdServer.Scim.Domain
 
             return false;
         }
+        */
 
         public object Clone()
         {
-            var result = new SCIMRepresentationAttribute(Id)
+            var result = new SCIMRepresentationAttribute(Id, AttributeId)
             {
                 Id = Id,
-                ValuesString = ValuesString.ToList(),
-                ValuesBoolean = ValuesBoolean.ToList(),
-                ValuesDateTime = ValuesDateTime.ToList(),
-                ValuesInteger = ValuesInteger.ToList(),
-                ValuesReference = ValuesReference.ToList(),
-                ValuesDecimal = ValuesDecimal.ToList(),
-                ValuesBinary = ValuesBinary.ToList(),
-                SchemaAttribute = (SCIMSchemaAttribute)SchemaAttribute.Clone()
+                AttributeId = AttributeId,
+                ValueBinary = ValueBinary,
+                ValueBoolean = ValueBoolean,
+                ValueDateTime = ValueDateTime,
+                ValueDecimal = ValueDecimal,
+                ValueInteger = ValueInteger,
+                ValueReference = ValueReference,
+                ValueString = ValueString,
+                SchemaAttribute = (SCIMSchemaAttribute)SchemaAttribute.Clone(),
+                FullPath = FullPath,
+                ParentAttributeId = ParentAttributeId,
+                SchemaAttributeId = SchemaAttributeId
             };
-            foreach(var cloneAttribute in Values.Select(v => (SCIMRepresentationAttribute)v.Clone()).ToList())
-            {
-                result.Add(cloneAttribute);
-            }
-
             return result;
         }
     }
