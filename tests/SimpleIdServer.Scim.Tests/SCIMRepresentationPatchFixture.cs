@@ -58,10 +58,10 @@ namespace SimpleIdServer.Scim.Tests
                 }
             }, false);
 
-            Assert.Equal("cassandra", userRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "userName").ValuesString.First());
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phones" && a.Values.Any(b => b.SchemaAttribute.Name == "phoneNumber" && b.ValuesString.Contains("03"))) == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phones" && a.Values.Any(b => b.SchemaAttribute.Name == "phoneNumber" && b.ValuesString.Contains("05"))) == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phones" && a.Values.Any(b => b.SchemaAttribute.Name == "phoneNumber" && b.ValuesString.Contains("01"))) == false);
+            Assert.Equal("cassandra", userRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString.Contains("03")) == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString.Contains("05")) == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString.Contains("01")) == false);
         }
     }
 }

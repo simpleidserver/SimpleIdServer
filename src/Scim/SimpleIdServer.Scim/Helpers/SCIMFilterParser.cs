@@ -23,11 +23,11 @@ namespace SimpleIdServer.Scim.Helpers
         public static SCIMExpression Parse(string filterString, ICollection<SCIMSchema> scimSchemas)
         {
             var scimExpression = Parse(filterString);
-            Parse(scimExpression, scimSchemas.SelectMany(s => s.Attributes).ToList());
+            Parse(scimExpression, scimSchemas.SelectMany(s => s.HierarchicalAttributes.Select(h => h.Leaf)).ToList(), scimSchemas);
             return scimExpression;
         }
 
-        private static void Parse(SCIMExpression expression, ICollection<SCIMSchemaAttribute> scimSchemaAttributes)
+        private static void Parse(SCIMExpression expression, ICollection<SCIMSchemaAttribute> scimSchemaAttributes, ICollection<SCIMSchema> schemas)
         {
             var compAttrExpression = expression as SCIMComparisonExpression;
             var attrExpression = expression as SCIMAttributeExpression;
@@ -37,17 +37,22 @@ namespace SimpleIdServer.Scim.Helpers
             if (compAttrExpression != null)
             {
                 var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == compAttrExpression.LeftExpression.Name);
-                if (schemaAttr != null && compAttrExpression.LeftExpression.Child != null && schemaAttr.MultiValued && schemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && compAttrExpression.LeftExpression.Child == null)
+                if (schemaAttr != null && schemaAttr.MultiValued && schemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && compAttrExpression.LeftExpression.Child == null)
                 {
-                    compAttrExpression.LeftExpression.Child = new SCIMAttributeExpression("value");
+                    var schema = schemas.FirstOrDefault(s => s.HasAttribute(schemaAttr));
+                    var children = schema.GetChildren(schemaAttr);
+                    compAttrExpression.LeftExpression.Child = new SCIMAttributeExpression("value")
+                    {
+                        SchemaAttribute = children.First(c => c.Name == "value")
+                    };
                 }
 
-                Parse(compAttrExpression.LeftExpression, scimSchemaAttributes);
+                Parse(compAttrExpression.LeftExpression, scimSchemaAttributes, schemas);
             }
             else if (logicalExpression != null)
             {
-                Parse(logicalExpression.LeftExpression, scimSchemaAttributes);
-                Parse(logicalExpression.RightExpression, scimSchemaAttributes);
+                Parse(logicalExpression.LeftExpression, scimSchemaAttributes, schemas);
+                Parse(logicalExpression.RightExpression, scimSchemaAttributes, schemas);
             }
             else if (attrExpression != null)
             {
@@ -58,7 +63,34 @@ namespace SimpleIdServer.Scim.Helpers
                 }
 
                 attrExpression.SchemaAttribute = schemaAttr;
-                // Parse(attrExpression.Child, schemaAttr.SubAttributes);
+                var complex = attrExpression as SCIMComplexAttributeExpression;
+                if (attrExpression.Child != null || complex != null)
+                {
+                    var schema = schemas.FirstOrDefault(s => s.HasAttribute(attrExpression.SchemaAttribute));
+                    var subAttributes = schema.GetChildren(attrExpression.SchemaAttribute).ToList();
+                    if (attrExpression.Child != null)
+                    {
+                        Parse(attrExpression.Child, subAttributes, schemas);
+                    }
+                    else
+                    {
+                        Parse(complex.GroupingFilter, subAttributes, schemas);
+                    }
+                }
+            }
+            else if (presentExpression != null)
+            {
+                var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == presentExpression.Content.Name);
+                if (schemaAttr == null)
+                {
+                    return;
+                }
+
+                presentExpression.Content.SchemaAttribute = schemaAttr;
+            }
+            else if (notExpression != null)
+            {
+                Parse(notExpression.Content, scimSchemaAttributes, schemas);
             }
         }
 

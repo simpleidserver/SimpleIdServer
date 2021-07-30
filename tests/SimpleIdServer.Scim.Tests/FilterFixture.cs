@@ -21,81 +21,133 @@ namespace SimpleIdServer.Scim.Tests
                     .AddBinaryAttribute("eidCertificate")
                     .AddStringAttribute("filePath")
                     .Build();
-            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, customSchema })
-                .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "bjensen" })
-                .AddBooleanAttribute("active", "urn:ietf:params:scim:schemas:core:2.0:User", new List<bool> { true })
-                .AddDecimalAttribute("age", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<decimal> { 22 })
-                .AddBinaryAttribute("eidCertificate", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<string> { "aGVsbG8=" })
-                .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
-                .AddStringAttribute("userType", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Employee" })
-                .AddStringAttribute("filePath", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<string> { @"C:\Program Files (x86)\Internet Explorer" })
-                .AddComplexAttribute("emails", "urn:ietf:params:scim:schemas:core:2.0:User", (c) =>
-                {
-                    c.AddStringAttribute("value", new List<string> { "example.com" });
-                    c.AddStringAttribute("type", new List<string> { "work" });
-                })
-                .AddComplexAttribute("emails", "urn:ietf:params:scim:schemas:core:2.0:User", (c) =>
-                {
-                    c.AddStringAttribute("value", new List<string> { "example.org" });
-                })
-                .AddComplexAttribute("name", "urn:ietf:params:scim:schemas:core:2.0:User", (r) =>
-                {
-                    r.AddStringAttribute("familyName", new List<string> { "O'Malley" });
-                })
-                .Build();
-            firstRepresentation.LastModified = DateTime.Parse("2012-05-13T04:42:34Z");
-            firstRepresentation.Version = "2";
-            var secondRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema })
-                .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Justine" })
-                .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
-                .AddStringAttribute("userType", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Intern" })
-                .AddComplexAttribute("ims", "urn:ietf:params:scim:schemas:core:2.0:User", (c) =>
-                {
-                    c.AddStringAttribute("type", new List<string> { "xmpp" });
-                    c.AddStringAttribute("value", new List<string> { "foo.com" });
-                })
-                .AddComplexAttribute("emails", "urn:ietf:params:scim:schemas:core:2.0:User", (c) =>
-                {
-                    c.AddStringAttribute("value", new List<string> { "example.be" });
-                })
-                .Build();
-            secondRepresentation.LastModified = DateTime.Parse("2010-05-13T04:42:34Z");
+            var schema = SCIMConstants.StandardSchemas.UserSchema;
+            var representation = new SCIMRepresentation
+            {
+                Id = Guid.NewGuid().ToString(),
+                LastModified = DateTime.Parse("2010-05-13T04:42:34Z")
+            };
+            var secondRepresentation = new SCIMRepresentation
+            {
+                Id = Guid.NewGuid().ToString(),
+                LastModified = DateTime.Parse("2012-05-13T04:42:34Z"),
+                Version = 2
+            };
+            var thirdRepresentation = new SCIMRepresentation
+            {
+                Id = Guid.NewGuid().ToString()
+            };
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("title"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "title"
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("age"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueDecimal = 20
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("eidCertificate"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueBinary = "aGVsbG8="
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("filePath"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = @"C:\Program Files (x86)\Internet Explorer"
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "Employee"
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails")));
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails.value"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "example.org"
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails.type"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "work"
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("phoneNumbers")));
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("phoneNumbers.primary"))
+            {
+                ValueBoolean = true
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "bjensen"
+            });
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("name.familyName"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "O'Malley"
+            });
+            secondRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "Justine"
+            });
+            secondRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "Intern"
+            });
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"))
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "Jule"
+            });
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims")));
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims.type"))
+            {
+                ValueString = "xmpp"
+            });
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims.value"))
+            {
+                ValueString = "foo.com"
+            });
             var representations = new List<SCIMRepresentation>
             {
-                firstRepresentation,
-                secondRepresentation
+                representation,
+                secondRepresentation,
+                thirdRepresentation
             };
 
-            var otherResult = ParseAndExecuteFilter(representations.AsQueryable(), "emails co \"example.com\"");
-            var firstResult = ParseAndExecuteFilter(representations.AsQueryable(), "userName eq \"bjensen\"");
-            var secondResult = ParseAndExecuteFilter(representations.AsQueryable(), "name.familyName co \"O'Malley\"");
-            var thirdResult = ParseAndExecuteFilter(representations.AsQueryable(), "userName sw \"J\"");
-            var fourthResult = ParseAndExecuteFilter(representations.AsQueryable(), "title pr");
-            var fifthResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\"");
-            var sixResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified ge \"2011-05-13T04:42:34Z\"");
-            var sevenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified lt \"2011-05-13T04:42:34Z\"");
-            var eightResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified le \"2011-05-13T04:42:34Z\"");
-            var nineResult = ParseAndExecuteFilter(representations.AsQueryable(), "title pr and userType eq \"Employee\"");
-            var tenResult = ParseAndExecuteFilter(representations.AsQueryable(), "title pr or userType eq \"Intern\"");
-            var elevenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and (emails.value co \"example.org\" or emails.value co \"example.org\")");
-            var twelveResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\")");
-            var thirteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and (emails.type eq \"work\")");
-            var fourteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and emails[type eq \"work\" and value co \"example.com\"]");
-            var fifteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "emails[type eq \"work\" and value co \"example.com\"] or ims[type eq \"xmpp\" and value co \"foo.com\"]");
-            var sixteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\" and meta.version eq \"2\"");
-            var seventeenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified pr");
-            var eighteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "age gt 15");
-            var nineteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "eidCertificate eq \"aGVsbG8=\"");
-            var twentyResult = ParseAndExecuteFilter(representations.AsQueryable(), "filePath eq \"C:\\Program Files (x86)\\Internet Explorer\"");
+            var firstResult = ParseAndExecuteFilter(representations.AsQueryable(), "userName eq \"bjensen\"", customSchema);
+            var secondResult = ParseAndExecuteFilter(representations.AsQueryable(), "name.familyName co \"O'Malley\"", customSchema);
+            var thirdResult = ParseAndExecuteFilter(representations.AsQueryable(), "userName sw \"J\"", customSchema);
+            var fourthResult = ParseAndExecuteFilter(representations.AsQueryable(), "title pr", customSchema);
+            var fifthResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\"", customSchema);
+            var sixResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified ge \"2011-05-13T04:42:34Z\"", customSchema);
+            var sevenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified lt \"2011-05-13T04:42:34Z\"", customSchema);
+            var eightResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified le \"2011-05-13T04:42:34Z\"", customSchema);
+            var nineResult = ParseAndExecuteFilter(representations.AsQueryable(), "title pr and userType eq \"Employee\"", customSchema);
+            var tenResult = ParseAndExecuteFilter(representations.AsQueryable(), "title pr or userType eq \"Intern\"", customSchema);
+            var elevenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and (emails.value co \"example.org\" or emails.value co \"example.org\")", customSchema);
+            var twelveResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\")", customSchema);
+            var thirteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and (emails.type eq \"work\")", customSchema);
+            var fourteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "userType eq \"Employee\" and emails[type eq \"work\" and value co \"example.org\"]", customSchema);
+            var fifteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "emails[type eq \"work\" and value co \"example.org\"] or ims[type eq \"xmpp\" and value co \"foo.com\"]", customSchema);
+            var sixteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "meta.lastModified gt \"2011-05-13T04:42:34Z\" and meta.version eq \"2\"", customSchema);
+            var seventeenResult = ParseAndExecuteFilter(representations.AsQueryable(), "phoneNumbers[primary eq \"true\"]", customSchema);
+            var eighteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "age gt 15", customSchema);
+            var nineteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "eidCertificate eq \"aGVsbG8=\"", customSchema);
+            var twentyResult = ParseAndExecuteFilter(representations.AsQueryable(), "filePath eq \"C:\\Program Files (x86)\\Internet Explorer\"", customSchema);
 
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
-            Assert.Equal(1, thirdResult.Count());
-            Assert.Equal(2, fourthResult.Count());
+            Assert.Equal(2, thirdResult.Count());
+            Assert.Equal(1, fourthResult.Count());
             Assert.Equal(1, fifthResult.Count());
             Assert.Equal(1, sixResult.Count());
-            Assert.Equal(1, sevenResult.Count());
-            Assert.Equal(1, eightResult.Count());
+            Assert.Equal(2, sevenResult.Count());
+            Assert.Equal(2, eightResult.Count());
             Assert.Equal(1, nineResult.Count());
             Assert.Equal(2, tenResult.Count());
             Assert.Equal(1, elevenResult.Count());
@@ -104,15 +156,15 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(1, fourteenResult.Count());
             Assert.Equal(2, fifteenResult.Count());
             Assert.Equal(1, sixteenResult.Count());
-            Assert.Equal(2, seventeenResult.Count());
+            Assert.Equal(1, seventeenResult.Count());
             Assert.Equal(1, eighteenResult.Count());
             Assert.Equal(1, nineteenResult.Count());
             Assert.Equal(1, twentyResult.Count());
         }
 
-        private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter)
+        private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter, SCIMSchema customSchema)
         {
-            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema });
+            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, customSchema });
             var evaluatedExpression = parsed.Evaluate(representations);
             return (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(representations);
         }

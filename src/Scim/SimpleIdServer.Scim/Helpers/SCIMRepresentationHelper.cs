@@ -245,12 +245,13 @@ namespace SimpleIdServer.Scim.Helpers
                         break;
                     case SCIMSchemaAttributeTypes.BINARY:
                         var invalidValues = new List<string>();
-                        var valuesBinary = new List<byte[]>();
+                        var valuesBinary = new List<string>();
                         foreach(var rec in jArr)
                         {
                             try
                             {
-                                valuesBinary.Add(Convert.FromBase64String(rec.ToString()));
+                                Convert.FromBase64String(rec.ToString());
+                                valuesBinary.Add(rec.ToString());
                             }
                             catch(FormatException)
                             {

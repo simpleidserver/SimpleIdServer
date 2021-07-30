@@ -35,10 +35,10 @@ namespace SimpleIdServer.Scim.Helpers
 
 			foreach (var attributeMapping in attributeMappingLst)
 			{
-				var newIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => oldScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
+				var newIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => newSourceScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
 				if (isScimRepresentationRemoved)
 				{
-					await RemoveReferenceAttributes(newIds, attributeMapping, newSourceScimRepresentation);
+					result.AddRange(await RemoveReferenceAttributes(newIds, attributeMapping, newSourceScimRepresentation));
 				}
 				else
 				{
@@ -121,55 +121,37 @@ namespace SimpleIdServer.Scim.Helpers
 			var type = values.FirstOrDefault(s => s.Name == "type");
 			if (value != null)
             {
-				attributes.Add(new SCIMRepresentationAttribute
+				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), value)
 				{
-					Id = Guid.NewGuid().ToString(),
-					AttributeId = Guid.NewGuid().ToString(),
-					SchemaAttribute = new SCIMSchemaAttribute(value.Id)
-					{
-						Name = "value",
-						MultiValued = false,
-						Type = SCIMSchemaAttributeTypes.STRING
-					},
 					ValueString = sourceRepresentation.Id
 				});
 			}
 
 			if (display != null)
 			{
-				attributes.Add(new SCIMRepresentationAttribute
+				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), display)
 				{
-					Id = Guid.NewGuid().ToString(),
-					AttributeId = Guid.NewGuid().ToString(),
-					SchemaAttribute = new SCIMSchemaAttribute(display.Id)
-					{
-						Name = "display",
-						MultiValued = false,
-						Type = SCIMSchemaAttributeTypes.STRING
-					},
 					ValueString = sourceRepresentation.DisplayName
 				});
 			}
 
 			if (type != null)
 			{
-				attributes.Add(new SCIMRepresentationAttribute
+				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), type)
 				{
-					Id = Guid.NewGuid().ToString(),
-					AttributeId = Guid.NewGuid().ToString(),
-					SchemaAttribute = new SCIMSchemaAttribute(type.Id)
-					{
-						Name = "type",
-						MultiValued = false,
-						Type = SCIMSchemaAttributeTypes.STRING
-					},
 					ValueString = sourceResourceType
 				});
 			}
 
-			var parentAttr = new SCIMRepresentationAttribute
+			var attrId = Guid.NewGuid().ToString();
+			var attrs = targetRepresentation.GetAttributesByAttrSchemaId(targetSchemaAttribute.Id);
+			if (attrs.Any())
+            {
+				attrId = attrs.First().AttributeId;
+            }
+
+			var parentAttr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attrId, targetSchemaAttribute)
 			{
-				Id = Guid.NewGuid().ToString(),
 				SchemaAttribute = targetSchemaAttribute
 			};
 			targetRepresentation.AddAttribute(parentAttr);

@@ -33,7 +33,7 @@ namespace SimpleIdServer.Scim.Builder
             _representation = scimRepresentation;
         }
 
-        public SCIMRepresentationBuilder AddAttribute(string name, string schemaId, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null, List<decimal> valuesDecimal = null, List<byte[]> valuesBinary = null)
+        public SCIMRepresentationBuilder AddAttribute(string name, string schemaId, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null, List<decimal> valuesDecimal = null, List<string> valuesBinary = null)
         {
             var schema = _schemas.First(s => s.Id == schemaId);
             var schemaAttribute = schema.Attributes.FirstOrDefault(a => a.Name == name);
@@ -97,7 +97,7 @@ namespace SimpleIdServer.Scim.Builder
 
         public SCIMRepresentationBuilder AddBinaryAttribute(string name, string schemaId, List<string> valuesBinary)
         {
-            return AddAttribute(name, schemaId, valuesBinary: valuesBinary.Select(_ => Convert.FromBase64String(_)).ToList());
+            return AddAttribute(name, schemaId, valuesBinary: valuesBinary);
         }
 
         public SCIMRepresentationBuilder AddBooleanAttribute(string name, string schemaId, List<bool> valuesBoolean)

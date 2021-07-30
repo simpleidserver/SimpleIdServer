@@ -23,8 +23,7 @@ namespace SimpleIdServer.Scim.Domain
         public string Id { get; set; }
         public string ExternalId { get; set; }
         public string ResourceType { get; set; }
-        public int VersionNumber { get; set; }
-        public string Version { get; set; }
+        public int Version { get; set; }
         public string DisplayName { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
@@ -129,11 +128,11 @@ namespace SimpleIdServer.Scim.Domain
 
         public void SetUpdated(DateTime lastModified)
         {
-            VersionNumber++;
+            Version++;
             LastModified = lastModified;
         }
 
-        public void SetVersion(string version)
+        public void SetVersion(int version)
         {
             Version = version;
         }
@@ -162,7 +161,6 @@ namespace SimpleIdServer.Scim.Domain
                 ExternalId = ExternalId,
                 ResourceType = ResourceType,
                 Version = Version,
-                VersionNumber = VersionNumber,
                 Created = Created,
                 LastModified = LastModified,
                 DisplayName = DisplayName,

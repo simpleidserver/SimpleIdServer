@@ -23,11 +23,12 @@ namespace SimpleIdServer.Scim.Domain
             string valueString = null, 
             DateTime? valueDateTime = null,
             decimal? valueDecimal = null,
-            byte[] valueBinary = null,
+            string valueBinary = null,
             string valueReference = null) : this(id, attributeId)
         {
             SchemaAttribute = schemaAttribute;
             FullPath = schemaAttribute.FullPath;
+            SchemaAttributeId = schemaAttribute.Id;
             ValueInteger = valueInteger;
             ValueBoolean = valueBoolean;
             ValueString = valueString;
@@ -49,7 +50,7 @@ namespace SimpleIdServer.Scim.Domain
         public DateTime? ValueDateTime { get; set; }
         public string ValueReference { get; set; }
         public decimal? ValueDecimal { get; set; }
-        public byte[] ValueBinary { get; set; }
+        public string ValueBinary { get; set; }
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
         public SCIMRepresentation Representation { get; set; }
 

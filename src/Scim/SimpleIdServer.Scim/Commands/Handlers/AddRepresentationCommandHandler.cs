@@ -60,12 +60,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            var version = Guid.NewGuid().ToString();
             var scimRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
             scimRepresentation.Id = Guid.NewGuid().ToString();
             scimRepresentation.SetCreated(DateTime.UtcNow);
             scimRepresentation.SetUpdated(DateTime.UtcNow);
-            scimRepresentation.SetVersion(version);
+            scimRepresentation.SetVersion(0);
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             var uniqueServerAttributeIds = scimRepresentation.HierarchicalAttributes.Select(s => s.Leaf).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
             var uniqueGlobalAttributes = scimRepresentation.HierarchicalAttributes.Select(s => s.Leaf).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);

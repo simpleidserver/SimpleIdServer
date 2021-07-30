@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.Builder
             _attributes = new List<SCIMRepresentationAttribute>();
         }
 
-        public SCIMRepresentationAttributeBuilder AddAttribute(string name, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null, List<decimal> valuesDecimal = null, List<byte[]> valuesBinary = null)
+        public SCIMRepresentationAttributeBuilder AddAttribute(string name, List<int> valuesInt = null, List<bool> valuesBool = null, List<string> valuesString = null, List<DateTime> valuesDateTime = null, List<decimal> valuesDecimal = null, List<string> valuesBinary = null)
         {
             var id = Guid.NewGuid().ToString();
             SCIMSchemaAttribute schemaAttribute = null;
@@ -97,7 +97,7 @@ namespace SimpleIdServer.Scim.Builder
             return AddAttribute(name, valuesDecimal: valuesDecimal);
         }
 
-        public SCIMRepresentationAttributeBuilder AddBinaryAttribute(string name, List<byte[]> valuesBinary)
+        public SCIMRepresentationAttributeBuilder AddBinaryAttribute(string name, List<string> valuesBinary)
         {
             return AddAttribute(name, valuesBinary: valuesBinary);
         }

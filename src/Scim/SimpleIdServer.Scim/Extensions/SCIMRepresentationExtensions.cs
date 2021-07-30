@@ -280,14 +280,19 @@ namespace SimpleIdServer.Scim.Domain
 
         public static JObject ToResponseWithIncludedAttributes(this SCIMRepresentation representation, ICollection<SCIMExpression> includedAttributes)
         {
-            var result = new JObject();
+            // var result = new JObject();
+            var filteredAttributes = new List<SCIMRepresentationAttribute>();
+            var attributes = representation.Attributes.AsQueryable();
             foreach (var includedAttribute in includedAttributes)
             {
-                representation.IncludeAttribute(includedAttribute, result);
+                filteredAttributes.AddRange(GetAttributes(includedAttribute as SCIMAttributeExpression, attributes).ToList());
+                // representation.IncludeAttribute(includedAttribute, result);
             }
 
-            result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id);
-            return result;
+            // result.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id);
+            representation.Attributes = filteredAttributes;
+            return representation.ToResponse("");
+            // return result;
         }
 
         public static JObject ToResponseWithExcludedAttributes(this SCIMRepresentation representation, ICollection<SCIMExpression> excludedAttributes, string location)
@@ -508,13 +513,13 @@ namespace SimpleIdServer.Scim.Domain
 
         private static IQueryable<SCIMRepresentationAttribute> GetAttributes(SCIMAttributeExpression scimExpression, IQueryable<SCIMRepresentationAttribute> attributes)
         {
+            var evaluatedExpression = scimExpression.Evaluate(attributes);
+            return (IQueryable<SCIMRepresentationAttribute>)evaluatedExpression.Compile().DynamicInvoke(attributes);
+            /*
             var filteredAttributes = attributes.Where(a => a.SchemaAttribute.Name == scimExpression.Name).AsQueryable();
             var scimComplexAttribute = scimExpression as SCIMComplexAttributeExpression;
             if (scimComplexAttribute != null)
             {
-                var representationAttributeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "rp");
-                var attributesProperty = Expression.Property(representationAttributeParameter, "Values");
-                var subRepresentationAttributeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString("N"));
                 var logicalExpr = scimComplexAttribute.GroupingFilter as SCIMLogicalExpression;
                 Expression result;
                 if (logicalExpr != null)
@@ -524,15 +529,13 @@ namespace SimpleIdServer.Scim.Domain
                     var rightExpr = logicalExpr.RightExpression.Evaluate(subParameter);
                     var anyLeftLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(leftExpr, subParameter);
                     var anyRightLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(rightExpr, subParameter);
-                    var anyLeftCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLeftLambda);
-                    var anyRightCall = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyRightLambda);
                     if (logicalExpr.LogicalOperator == SCIMLogicalOperators.AND)
                     {
-                        result = Expression.AndAlso(anyLeftCall, anyRightCall);
+                        result = Expression.AndAlso(anyLeftLambda, anyRightLambda);
                     }
                     else
                     {
-                        result = Expression.Or(anyLeftCall, anyRightCall);
+                        result = Expression.Or(anyLeftLambda, anyRightLambda);
                     }
                 }
                 else
@@ -540,9 +543,10 @@ namespace SimpleIdServer.Scim.Domain
                     var subParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString("N"));
                     var lambdaExpression = scimComplexAttribute.GroupingFilter.Evaluate(subParameter);
                     var anyLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(lambdaExpression, subParameter);
-                    result = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLambda);
+                    // result = Expression.Call(typeof(Enumerable), "Any", new[] { typeof(SCIMRepresentationAttribute) }, attributesProperty, anyLambda);
                 }
 
+                /*
                 var whereLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(result, representationAttributeParameter);
                 var enumarableType = typeof(Queryable);
                 var whereMethod = enumarableType.GetMethods()
@@ -555,6 +559,7 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             return filteredAttributes;
+             */
         }
 
         public static void EnrichResponse(SCIMRepresentation representation, IEnumerable<EnrichParameter> attributes, JObject jObj, bool isGetRequest = false)
@@ -639,7 +644,7 @@ namespace SimpleIdServer.Scim.Domain
                     case SCIMSchemaAttributeTypes.BINARY:
                         var valuesBinary = records.Select(r => r.Attr.ValueBinary).Where(r => r != null);
                         if (valuesBinary.Any())
-                            jObj.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBinary.Select(_ => Convert.ToBase64String(_))) : Convert.ToBase64String(valuesBinary.First()));
+                            jObj.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBinary) : valuesBinary.First());
                         break;
                 }
             }

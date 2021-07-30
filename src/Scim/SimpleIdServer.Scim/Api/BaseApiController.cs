@@ -252,7 +252,7 @@ namespace SimpleIdServer.Scim.Api
                 var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
                 var location = GetLocation(scimRepresentation);
                 var content = scimRepresentation.ToResponse(location, false);
-                await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.VersionNumber, _resourceType, content));
+                await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, _resourceType, content));
                 return BuildHTTPResult(HttpStatusCode.Created, location, scimRepresentation.Version, content);
             }
             catch(SCIMSchemaViolatedException ex)
@@ -283,7 +283,7 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType));
-                await _busControl.Publish(new RepresentationRemovedEvent(id, representation.VersionNumber, _resourceType));
+                await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, _resourceType));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMNotFoundException ex)
@@ -311,7 +311,7 @@ namespace SimpleIdServer.Scim.Api
                 var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter));
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false);
-                await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.VersionNumber, _resourceType, content));
+                await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, _resourceType, content));
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
             catch (SCIMSchemaViolatedException ex)
@@ -349,7 +349,7 @@ namespace SimpleIdServer.Scim.Api
                 var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation));
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false);
-                await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.VersionNumber, _resourceType, content));
+                await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, _resourceType, content));
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
             catch (SCIMFilterException ex)
@@ -395,10 +395,10 @@ namespace SimpleIdServer.Scim.Api
             return BuildHTTPResult(status, location, representation.Version, content);
         }
 
-        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, string version, JObject content)
+        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, int version, JObject content)
         {
             HttpContext.Response.Headers.Add("Location", location);
-            HttpContext.Response.Headers.Add("ETag", version);
+            HttpContext.Response.Headers.Add("ETag", version.ToString());
             return new ContentResult
             {
                 StatusCode = (int)status,

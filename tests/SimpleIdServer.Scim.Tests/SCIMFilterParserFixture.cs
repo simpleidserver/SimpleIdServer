@@ -1,5 +1,4 @@
 ﻿using SimpleIdServer.Scim.Helpers;
-using System.Linq;
 using Xunit;
 
 namespace SimpleIdServer.Scim.Tests

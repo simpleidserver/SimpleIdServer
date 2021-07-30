@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,8 +47,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            /*
-            IQueryable<SCIMRepresentationModel> queryableRepresentations = IncludeRepresentationNavigationProperties(_scimDbContext.SCIMRepresentationLst)
+            IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst.Include(r => r.Attributes)
                 .Where(s => s.ResourceType == parameter.ResourceType);
             if (parameter.SortBy == null)
             {
@@ -56,9 +57,10 @@ namespace SimpleIdServer.Scim.Persistence.EF
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
-                queryableRepresentations = (IQueryable<SCIMRepresentationModel>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
+                queryableRepresentations = (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
             }
 
+            /*
             if(parameter.SortBy != null)
             {
                 return await parameter.SortBy.EvaluateOrderBy(
@@ -69,11 +71,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
                     parameter.Count,
                     CancellationToken.None);
             }
+            */
 
             int totalResults = queryableRepresentations.Count();
-            IEnumerable<SCIMRepresentation> result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList().Select(s => s.ToDomain());
-            */
-            return new SearchSCIMRepresentationsResponse(0, new List<SCIMRepresentation> { });
+            IEnumerable<SCIMRepresentation> result = await queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync();
+            return new SearchSCIMRepresentationsResponse(totalResults, result);
         }
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
