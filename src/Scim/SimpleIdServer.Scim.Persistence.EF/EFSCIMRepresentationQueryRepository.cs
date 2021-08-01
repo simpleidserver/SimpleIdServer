@@ -6,6 +6,7 @@ using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.EF
@@ -21,7 +22,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {
-            return _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.Representation).ThenInclude(a => a.Attributes)
+            return _scimDbContext.SCIMRepresentationAttributeLst
+                .Include(a => a.Representation).ThenInclude(a => a.Attributes)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
                 .Select(a => a.Representation)
                 .FirstOrDefaultAsync();
@@ -29,7 +31,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
-            return _scimDbContext.SCIMRepresentationAttributeLst.Include(a => a.Representation).ThenInclude(a => a.Attributes)
+            return _scimDbContext.SCIMRepresentationAttributeLst
+                .Include(a => a.Representation).ThenInclude(a => a.Attributes)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueInteger != null && a.ValueInteger == value)
                 .Select(a => a.Representation)
                 .FirstOrDefaultAsync(); 
@@ -37,17 +40,23 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
         {
-            return _scimDbContext.SCIMRepresentationLst.Include(r => r.Attributes).Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
+            return _scimDbContext.SCIMRepresentationLst.
+                Include(r => r.Attributes)
+                .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
         {
-            return _scimDbContext.SCIMRepresentationLst.Include(r => r.Attributes).Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType);
+            return _scimDbContext.SCIMRepresentationLst
+                .Include(r => r.Attributes)
+                .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
+                .FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType);
         }
 
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst.Include(r => r.Attributes)
+            IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst
+                .Include(r => r.Attributes)
                 .Where(s => s.ResourceType == parameter.ResourceType);
             if (parameter.SortBy == null)
             {
@@ -60,7 +69,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 queryableRepresentations = (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
             }
 
-            /*
             if(parameter.SortBy != null)
             {
                 return await parameter.SortBy.EvaluateOrderBy(
@@ -71,7 +79,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
                     parameter.Count,
                     CancellationToken.None);
             }
-            */
 
             int totalResults = queryableRepresentations.Count();
             IEnumerable<SCIMRepresentation> result = await queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync();

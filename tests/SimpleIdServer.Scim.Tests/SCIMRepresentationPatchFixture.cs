@@ -17,6 +17,28 @@ namespace SimpleIdServer.Scim.Tests
         {
             var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", "User Account")
                .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
+               .AddStringAttribute("firstName")
+               .AddStringAttribute("lastName")
+               .AddStringAttribute("roles", multiValued: true)
+               .AddStringAttribute("familyName")
+               .AddComplexAttribute("adRoles", opt =>
+               {
+                   opt.AddStringAttribute("display");
+                   opt.AddStringAttribute("value");
+               }, multiValued: true)
+               .AddComplexAttribute("attributes", opt =>
+               {
+                   opt.AddStringAttribute("title");
+                   opt.AddComplexAttribute("subattributes", sopt =>
+                   {
+                       sopt.AddStringAttribute("str");
+                       sopt.AddStringAttribute("sstr");
+                   }, multiValued: true);
+                   opt.AddComplexAttribute("subtitle", sopt =>
+                   {
+                       sopt.AddStringAttribute("str");
+                   });
+               }, multiValued: true)
                .AddComplexAttribute("phones", opt =>
                {
                    opt.AddStringAttribute("phoneNumber", description: "Phone number");
@@ -25,6 +47,7 @@ namespace SimpleIdServer.Scim.Tests
                .Build();
             var userRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { userSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "john" })
+                .AddStringAttribute("lastName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "lastName" })
                 .AddComplexAttribute("phones", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
                 {
                     b.AddStringAttribute("phoneNumber", new List<string> { "01" });
@@ -35,10 +58,49 @@ namespace SimpleIdServer.Scim.Tests
                     b.AddStringAttribute("phoneNumber", new List<string> { "02" });
                     b.AddStringAttribute("type", new List<string> { "home" });
                 })
+                .AddComplexAttribute("attributes", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("title", new List<string> { "title" });
+                    b.AddComplexAttribute("subattributes", (sb) =>
+                    {
+                        sb.AddStringAttribute("str", new List<string> { "1" });
+                    });
+                    b.AddComplexAttribute("subtitle", (sb) =>
+                    {
+                        sb.AddStringAttribute("str", new List<string> { "1" });
+                    });
+                })
+                .AddComplexAttribute("attributes", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("title", new List<string> { "secondTitle" });
+                    b.AddComplexAttribute("subattributes", (sb) =>
+                    {
+                        sb.AddStringAttribute("str", new List<string> { "1" });
+                    });
+                })
+                .AddComplexAttribute("adRoles", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("display", new List<string> { "display" });
+                    b.AddStringAttribute("value", new List<string> { "user1" });
+                })
+                .AddComplexAttribute("adRoles", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("value", new List<string> { "user2" });
+                })
+                .AddComplexAttribute("adRoles", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("value", new List<string> { "user3" });
+                })
                 .Build();
 
             userRepresentation.ApplyPatches(new List<PatchOperationParameter>
             {
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Path = "phones.phoneNumber",
+                    Value = "NEWPHONE"
+                },
                 new PatchOperationParameter
                 {
                     Operation = SCIMPatchOperations.REPLACE,
@@ -53,15 +115,110 @@ namespace SimpleIdServer.Scim.Tests
                 },
                 new PatchOperationParameter
                 {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Path = "phones[phoneNumber eq 03].type",
+                    Value = "newType"
+                },
+                new PatchOperationParameter
+                {
                     Operation = SCIMPatchOperations.REMOVE,
                     Path = "phones[phoneNumber eq 01]"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REMOVE,
+                    Path = "phones[phoneNumber eq 03].phoneNumber"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "familyName",
+                    Value = "familyName"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "familyName",
+                    Value = "updatedFamilyName"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "roles",
+                    Value = "firstRole"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "roles",
+                    Value = "secondRole"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Value = JObject.Parse("{ 'firstName' : 'firstName' }")
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Value = JObject.Parse("{ 'lastName' : 'updatedLastName' }")
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Value = JObject.Parse("{ 'phoneNumber': '06', 'type': 'mobile' }"),
+                    Path = "phones"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "attributes[title eq title].subattributes",
+                    Value = JObject.Parse("{ 'str' : '2' }")
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "attributes[title eq title].subtitle",
+                    Value = JObject.Parse("{ 'str' : '2' }")
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Path = "attributes[title eq secondTitle].subattributes",
+                    Value = JObject.Parse("{ 'str' : '3' }")
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Path = "adRoles.display",
+                    Value = "NEWUSER"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.ADD,
+                    Path = "adRoles[value eq user3].display",
+                    Value = "NEWUSER3"
                 }
             }, false);
 
+            Assert.True(userRepresentation.Attributes.Count(a => a.SchemaAttribute.FullPath == "adRoles.display" && a.ValueString == "NEWUSER") == 2);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user1") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user2") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user3") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.display" && a.ValueString == "NEWUSER3") == true);
             Assert.Equal("cassandra", userRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString.Contains("03")) == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString.Contains("05")) == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString.Contains("01")) == false);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "03") == false);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "05") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "01") == false);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "06") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "familyName" && a.ValueString == "updatedFamilyName") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "roles" && a.ValueString == "firstRole") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "roles" && a.ValueString == "secondRole") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "userName" && a.ValueString == "cassandra") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "lastName" && a.ValueString == "updatedLastName") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "2") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subtitle.str" && a.ValueString == "2") == true);
+            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "3") == true);
         }
     }
 }

@@ -117,15 +117,15 @@ namespace SimpleIdServer.Scim.Builder
 
         public SCIMRepresentationBuilder AddComplexAttribute(string name, string schemaId, Action<SCIMRepresentationAttributeBuilder> callback)
         {
+            var id = Guid.NewGuid().ToString();
             var schema = _schemas.First(s => s.Id == schemaId);
             var schemaAttribute = schema.Attributes.FirstOrDefault(a => a.Name == name);
-            var builder = new SCIMRepresentationAttributeBuilder(schema, schemaAttribute);
+            var builder = new SCIMRepresentationAttributeBuilder(id, schema, schemaAttribute);
             callback(builder);
-            var id = Guid.NewGuid().ToString();
             var newAttribute = new SCIMRepresentationAttribute(id, Guid.NewGuid().ToString(), schemaAttribute);
             foreach(var subAttribute in builder.Build())
             {
-                _representation.AddAttribute(newAttribute, subAttribute);
+                _representation.AddAttribute(subAttribute);
             }
 
             _attributes.Add(newAttribute);

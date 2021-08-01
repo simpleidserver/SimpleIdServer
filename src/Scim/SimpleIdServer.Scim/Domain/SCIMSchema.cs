@@ -72,6 +72,11 @@ namespace SimpleIdServer.Scim.Domain
             return Attributes.Where(a => a.ParentId == id);
         }
 
+        public void AddAttribute(SCIMSchemaAttribute attr)
+        {
+            Attributes.Add(attr);
+        }
+
         public void AddAttribute(SCIMSchemaAttribute parentAttr, SCIMSchemaAttribute childAttr)
         {
             childAttr.ParentId = parentAttr.Id;

@@ -158,7 +158,11 @@ namespace SimpleIdServer.Scim.Helpers
                         var children = BuildRepresentationAttributes(resolutionResult, subAttributes, ignoreUnsupportedCanonicalValues);
                         foreach(var child in children)
                         {
-                            child.ParentAttributeId = parent.Id;
+                            if (SCIMRepresentation.GetParentPath(child.FullPath) == parent.FullPath)
+                            {
+                                child.ParentAttributeId = parent.Id;
+                            }
+
                             result.Add(child);
                         }
 
@@ -318,13 +322,13 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> allSchemas)
         {
-            var schema = allSchemas.FirstOrDefault(s => s.Attributes.Any(at => at.Name == kvp.Key));
+            var schema = allSchemas.FirstOrDefault(s => s.Attributes.Any(at => at.FullPath == kvp.Key));
             if (schema == null)
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotRecognirzed, kvp.Key));
             }
 
-            return new ResolutionRowResult(schema, schema.Attributes.First(at => at.Name == kvp.Key), kvp.Value);
+            return new ResolutionRowResult(schema, schema.Attributes.First(at => at.FullPath == kvp.Key), kvp.Value);
         }
 
         private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> extensionSchemas)

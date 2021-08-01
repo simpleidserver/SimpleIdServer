@@ -169,6 +169,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à duplicate reference {0}.
+        /// </summary>
+        public static string DuplicateReference {
+            get {
+                return ResourceManager.GetString("DuplicateReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à greater than cannot be applied on &apos;{0}&apos; type.
         /// </summary>
         public static string GreaterThanNotSupported {

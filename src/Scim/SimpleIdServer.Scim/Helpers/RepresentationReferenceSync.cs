@@ -65,7 +65,7 @@ namespace SimpleIdServer.Scim.Helpers
 					var attr = targetRepresentation.GetAttributesByAttrSchemaId(targetSchemaAttribute.Id).FirstOrDefault(v => targetRepresentation.GetChildren(v).Any(c => c.ValueString == sourceScimRepresentation.Id));
 					if (attr != null)
 					{
-						targetRepresentation.RemoveAttribute(attr);
+						targetRepresentation.RemoveAttributeById(attr);
 					}
 
 					result.Add(targetRepresentation);
@@ -83,6 +83,12 @@ namespace SimpleIdServer.Scim.Helpers
 			if (missingIds.Any())
             {
 				throw new SCIMNotFoundException(string.Format(Global.ReferencesDontExist, string.Join(",", missingIds)));
+            }
+
+			var duplicateIds = ids.Where(id => ids.Where(i => i == id).Count() > 1);
+			if (duplicateIds.Any())
+            {
+				throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Distinct())));
             }
 
 			if (targetRepresentations.Any())
@@ -103,7 +109,7 @@ namespace SimpleIdServer.Scim.Helpers
 			var attr = scimRepresentation.GetAttributesByAttrSchemaId(attributeId).FirstOrDefault(v => scimRepresentation.GetChildren(v).Any(c => c.ValueString == sourceRepresentation.Id));
 			if (attr != null)
 			{
-				scimRepresentation.RemoveAttribute(attr);
+				scimRepresentation.RemoveAttributeById(attr);
 			}
 
 			BuildScimRepresentationAttribute(attributeId, scimRepresentation, sourceRepresentation, resourceType);

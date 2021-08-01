@@ -181,6 +181,11 @@ namespace SimpleIdServer.Scim.Api
                 var resources = new JArray();
                 var baseUrl = Request.GetAbsoluteUriWithVirtualPath();
                 var representations = result.Content.ToList();
+                foreach(var representation in representations)
+                {
+                    representation.Schemas = schemas;
+                }
+
                 await _attributeReferenceEnricher.Enrich(_resourceType, representations, baseUrl);
                 foreach (var record in representations)
                 {
@@ -189,7 +194,7 @@ namespace SimpleIdServer.Scim.Api
                     var location = $"{baseUrl}/{_resourceType}/{record.Id}";
                     if (searchRequest.Attributes.Any())
                     {
-                        newJObj = record.ToResponseWithIncludedAttributes(searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, schemas)).ToList());
+                        newJObj = record.ToResponseWithIncludedAttributes(searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, schemas)).ToList(), location);
                     }
                     else if (searchRequest.ExcludedAttributes.Any())
                     {
@@ -314,6 +319,11 @@ namespace SimpleIdServer.Scim.Api
                 await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, _resourceType, content));
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
+            catch (SCIMUniquenessAttributeException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
+            }
             catch (SCIMSchemaViolatedException ex)
             {
                 _logger.LogError(ex, ex.Message);
@@ -351,6 +361,11 @@ namespace SimpleIdServer.Scim.Api
                 var content = newRepresentation.ToResponse(location, false);
                 await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, _resourceType, content));
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
+            }
+            catch (SCIMUniquenessAttributeException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
             }
             catch (SCIMFilterException ex)
             {

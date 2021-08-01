@@ -130,6 +130,35 @@ namespace SimpleIdServer.Scim
             }
         };
 
+        public static Dictionary<string, string> MappingStandardAttributePathToProperty = new Dictionary<string, string>
+        {
+            { StandardSCIMRepresentationAttributes.Id, "Id" },
+            { StandardSCIMRepresentationAttributes.ExternalId, "ExternalId" },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.ResourceType}", "ResourceType" },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Created}", "Created" },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.LastModified}", "LastModified" },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}", "Version" },
+        };
+
+        public static Dictionary<string, SCIMSchemaAttributeTypes> MappingStandardAttributeTypeToType = new Dictionary<string, SCIMSchemaAttributeTypes>
+        {
+            { StandardSCIMRepresentationAttributes.Id, SCIMSchemaAttributeTypes.STRING},
+            { StandardSCIMRepresentationAttributes.ExternalId, SCIMSchemaAttributeTypes.STRING},
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.ResourceType}", SCIMSchemaAttributeTypes.STRING },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Created}", SCIMSchemaAttributeTypes.DATETIME },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.LastModified}", SCIMSchemaAttributeTypes.DATETIME },
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}", SCIMSchemaAttributeTypes.INTEGER }
+        };
+
+        public static Dictionary<SCIMSchemaAttributeTypes, Type> MappingSchemaAttrTypeToType = new Dictionary<SCIMSchemaAttributeTypes, Type>
+        {
+            { SCIMSchemaAttributeTypes.BOOLEAN, typeof(bool) },
+            { SCIMSchemaAttributeTypes.STRING, typeof(string) },
+            { SCIMSchemaAttributeTypes.INTEGER, typeof(int) },
+            { SCIMSchemaAttributeTypes.DATETIME, typeof(DateTime) },
+            { SCIMSchemaAttributeTypes.DECIMAL, typeof(decimal) }
+        };
+
         public static class StandardSchemas
         {
             public static SCIMSchema ResourceTypeSchema =
@@ -312,6 +341,18 @@ namespace SimpleIdServer.Scim
                     c.AddStringAttribute(StandardSCIMRepresentationAttributes.BulkId);
                     c.AddStringAttribute(StandardSCIMRepresentationAttributes.Version);
                 }, multiValued: true)
+                .Build();
+            public static SCIMSchema StandardResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:StandardResponse", "StandardResponse", null, "StandardResponse", true)
+                .AddStringAttribute(StandardSCIMRepresentationAttributes.ExternalId)
+                .AddStringAttribute(StandardSCIMRepresentationAttributes.Schemas, multiValued: true)
+                .AddComplexAttribute(StandardSCIMRepresentationAttributes.Meta, callback: c =>
+                {
+                    c.AddStringAttribute(StandardSCIMMetaAttributes.ResourceType);
+                    c.AddDateTimeAttribute(StandardSCIMMetaAttributes.Created);
+                    c.AddDateTimeAttribute(StandardSCIMMetaAttributes.LastModified);
+                    c.AddIntAttribute(StandardSCIMMetaAttributes.Version);
+                    c.AddStringAttribute(StandardSCIMMetaAttributes.Location);
+                }, multiValued: false)
                 .Build();
         }
     }

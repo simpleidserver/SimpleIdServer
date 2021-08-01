@@ -10,12 +10,14 @@ namespace SimpleIdServer.Scim.Builder
     public class SCIMRepresentationAttributeBuilder
     {
         private readonly SCIMSchema _schema;
+        private readonly string _parentId;
         private readonly SCIMSchemaAttribute _scimSchemaAttribute;
         private readonly ICollection<SCIMRepresentationAttribute> _attributes;
 
-        public SCIMRepresentationAttributeBuilder(SCIMSchema schema, SCIMSchemaAttribute scimSchemaAttribute)
+        public SCIMRepresentationAttributeBuilder(string parentId, SCIMSchema schema, SCIMSchemaAttribute scimSchemaAttribute)
         {
             _schema = schema;
+            _parentId = parentId;
             _scimSchemaAttribute = scimSchemaAttribute;
             _attributes = new List<SCIMRepresentationAttribute>();
         }
@@ -35,42 +37,60 @@ namespace SimpleIdServer.Scim.Builder
             {
                 foreach(var attr in valuesInt)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueInteger: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueInteger: attr)
+                    {
+                        ParentAttributeId = _parentId
+                    });
                 }
             }
             else if (valuesBool != null)
             {
                 foreach (var attr in valuesBool)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBoolean: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBoolean: attr)
+                    {
+                        ParentAttributeId = _parentId
+                    });
                 }
             }
             else if (valuesString != null)
             {
                 foreach (var attr in valuesString)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueString: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueString: attr)
+                    {
+                        ParentAttributeId = _parentId
+                    });
                 }
             }
             else if (valuesDateTime != null)
             {
                 foreach (var attr in valuesDateTime)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDateTime: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDateTime: attr)
+                    {
+                        ParentAttributeId = _parentId
+                    });
                 }
             }
             else if (valuesDecimal != null)
             {
                 foreach (var attr in valuesDecimal)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDecimal: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDecimal: attr)
+                    {
+                        ParentAttributeId = _parentId
+                    });
                 }
             }
             else if (valuesBinary != null)
             {
                 foreach (var attr in valuesBinary)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBinary: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBinary: attr)
+                    {
+                        ParentAttributeId = _parentId
+                    });
                 }
             }
 
@@ -107,11 +127,22 @@ namespace SimpleIdServer.Scim.Builder
             return AddAttribute(name, valuesDateTime: valuesDateTime);
         }
 
-        public SCIMRepresentationAttributeBuilder AddComplexAttribute(string name, string schemaId, Action<SCIMRepresentationAttributeBuilder> callback)
+        public SCIMRepresentationAttributeBuilder AddComplexAttribute(string name, Action<SCIMRepresentationAttributeBuilder> callback)
         {
             var schemaAttribute = _schema.GetChildren(_scimSchemaAttribute).FirstOrDefault(a => a.Name == name);
-            var builder = new SCIMRepresentationAttributeBuilder(_schema, schemaAttribute);
+            var id = Guid.NewGuid().ToString();
+            var attributeId = Guid.NewGuid().ToString();
+            _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueInteger: 0)
+            {
+                ParentAttributeId = _parentId
+            });
+            var builder = new SCIMRepresentationAttributeBuilder(id, _schema, schemaAttribute);
             callback(builder);
+            foreach(var newAttr in builder.Build())
+            {
+                _attributes.Add(newAttr);
+            }
+
             return this;
         }
 

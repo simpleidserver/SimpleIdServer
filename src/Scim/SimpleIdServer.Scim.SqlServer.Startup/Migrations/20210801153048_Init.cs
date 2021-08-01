@@ -44,8 +44,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VersionNumber = table.Column<int>(type: "int", nullable: false),
-                    Version = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Version = table.Column<int>(type: "int", nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -227,7 +226,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     ValueDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ValueReference = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ValueDecimal = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ValueBinary = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
+                    ValueBinary = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -178,10 +178,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("ResourceType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Version")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VersionNumber")
+                    b.Property<int>("Version")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -209,8 +206,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("SchemaAttributeId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<byte[]>("ValueBinary")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("ValueBinary")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("ValueBoolean")
                         .HasColumnType("bit");

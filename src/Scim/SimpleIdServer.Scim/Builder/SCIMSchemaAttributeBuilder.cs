@@ -10,11 +10,15 @@ namespace SimpleIdServer.Scim.Builder
     {
         private readonly SCIMSchema _schema;
         private readonly SCIMSchemaAttribute _scimSchemaAttribute;
+        private readonly string _fullPath;
+        private readonly string _parentId;
 
-        public SCIMSchemaAttributeBuilder(SCIMSchema schema, SCIMSchemaAttribute scimSchemaAttribute)
+        public SCIMSchemaAttributeBuilder(string parentId, string fullPath, SCIMSchema schema, SCIMSchemaAttribute scimSchemaAttribute)
         {
             _schema = schema;
             _scimSchemaAttribute = scimSchemaAttribute;
+            _fullPath = fullPath;
+            _parentId = parentId;
         }
 
         public SCIMSchemaAttributeBuilder SetType(SCIMSchemaAttributeTypes type)
@@ -61,7 +65,8 @@ namespace SimpleIdServer.Scim.Builder
 
         public SCIMSchemaAttributeBuilder AddAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback)
         {
-            var builder = new SCIMSchemaAttributeBuilder(_schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
+            var fullPath = $"{_fullPath}.{name}";
+            var builder = new SCIMSchemaAttributeBuilder(_scimSchemaAttribute.Id, fullPath, _schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
             callback(builder);
             _schema.AddAttribute(_scimSchemaAttribute, builder.Build());
             return this;
@@ -72,7 +77,8 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false, List<string> canonicalValues = null)
         {
-            var builder = new SCIMSchemaAttributeBuilder(schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString())
+            var fullPath = $"{_fullPath}.{name}";
+            var builder = new SCIMSchemaAttributeBuilder(_scimSchemaAttribute.Id, fullPath, schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString())
             {
                 Name = name,
                 MultiValued = multiValued,
@@ -83,14 +89,14 @@ namespace SimpleIdServer.Scim.Builder
                 Uniqueness = uniqueness,
                 Type = type,
                 Description = description,
-                CanonicalValues = canonicalValues
+                CanonicalValues = canonicalValues,
             });
             if (callback != null)
             {
                 callback(builder);
             }
 
-            _schema.AddAttribute(_scimSchemaAttribute, builder.Build());
+            _schema.AddAttribute(builder.Build());
             return this;
         }
 
@@ -152,7 +158,10 @@ namespace SimpleIdServer.Scim.Builder
 
         internal SCIMSchemaAttribute Build()
         {
-            return _scimSchemaAttribute;
+            var result = _scimSchemaAttribute;
+            result.FullPath = _fullPath;
+            result.ParentId = _parentId;
+            return result;
         }
     }
 }

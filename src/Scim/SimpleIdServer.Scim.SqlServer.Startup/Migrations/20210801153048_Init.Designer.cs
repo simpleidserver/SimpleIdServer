@@ -10,7 +10,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20210729203209_Init")]
+    [Migration("20210801153048_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -180,10 +180,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("ResourceType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Version")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VersionNumber")
+                    b.Property<int>("Version")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -211,8 +208,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     b.Property<string>("SchemaAttributeId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<byte[]>("ValueBinary")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("ValueBinary")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("ValueBoolean")
                         .HasColumnType("bit");

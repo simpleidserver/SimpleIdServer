@@ -19,5 +19,17 @@ namespace SimpleIdServer.Scim
         {
             Children.AddRange(children);
         }
+
+        public List<T> ToFlat()
+        {
+            var result = new List<T>();
+            result.Add(Leaf);
+            foreach(var child in Children)
+            {
+                result.AddRange(child.ToFlat());
+            }
+
+            return result;
+        }
     }
 }

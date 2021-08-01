@@ -75,7 +75,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     replaceRepresentationCommand.Representation.ExternalId,
                     mainSchema,
                     extensionSchemas);
-                existingRepresentation.RemoveAttributes(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
+                existingRepresentation.RemoveAttributesBySchemaAttrId(updatedRepresentation.Attributes.Select(_ => _.SchemaAttribute.Id));
                 foreach (var updatedAttribute in updatedRepresentation.Attributes)
                 {
                     if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)

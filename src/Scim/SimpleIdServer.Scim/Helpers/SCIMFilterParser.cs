@@ -72,7 +72,8 @@ namespace SimpleIdServer.Scim.Helpers
                     {
                         Parse(attrExpression.Child, subAttributes, schemas);
                     }
-                    else
+
+                    if (complex != null && complex.GroupingFilter != null)
                     {
                         Parse(complex.GroupingFilter, subAttributes, schemas);
                     }

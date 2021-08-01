@@ -104,7 +104,7 @@ namespace SimpleIdServer.Scim.Builder
             SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null,
             bool multiValued = false, ICollection<string> defaulValueStr = null, ICollection<int> defaultValueInt = null, List<string> canonicalValues = null)
         {
-            var builder = new SCIMSchemaAttributeBuilder(_schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString())
+            var builder = new SCIMSchemaAttributeBuilder(null, name, _schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString())
             {
                 Name = name,
                 MultiValued = multiValued,
@@ -188,7 +188,7 @@ namespace SimpleIdServer.Scim.Builder
 
         public SCIMSchemaBuilder AddAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback)
         {
-            var builder = new SCIMSchemaAttributeBuilder(_schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
+            var builder = new SCIMSchemaAttributeBuilder(null, name, _schema, new SCIMSchemaAttribute(Guid.NewGuid().ToString()) { Name = name });
             callback(builder);
             _attributes.Add(builder.Build());
             return this;

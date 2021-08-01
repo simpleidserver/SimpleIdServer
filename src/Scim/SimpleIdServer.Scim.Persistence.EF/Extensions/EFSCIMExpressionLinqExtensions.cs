@@ -1,38 +1,26 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Persistence.Filters;
+using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 {
     public static class EFSCIMExpressionLinqExtensions
     {
-        private static Dictionary<string, string> MAPPING_PATH_TO_PROPERTYNAMES = new Dictionary<string, string>
-        {
-            { SCIMConstants.StandardSCIMRepresentationAttributes.Id, "Id" },
-            { SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, "ExternalId" },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}", "ResourceType" },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}", "Created" },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}", "LastModified" },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}", "Version" },
-        };
-
-        private static Dictionary<string, SCIMSchemaAttributeTypes> MAPPING_PROPERTY_TO_TYPES = new Dictionary<string, SCIMSchemaAttributeTypes>
-        {
-            { SCIMConstants.StandardSCIMRepresentationAttributes.Id, SCIMSchemaAttributeTypes.STRING},
-            { SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId, SCIMSchemaAttributeTypes.STRING},
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}", SCIMSchemaAttributeTypes.STRING },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}", SCIMSchemaAttributeTypes.DATETIME },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}", SCIMSchemaAttributeTypes.DATETIME },
-            { $"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}", SCIMSchemaAttributeTypes.INTEGER }
-        };
-
-        /*
         #region Order By
 
         public static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderBy(this SCIMExpression expression,
             SCIMDbContext dbContext,
-            IQueryable<SCIMRepresentationModel> representations, 
+            IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
             int count,
@@ -55,97 +43,132 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 
         private static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderByMetadata(
             SCIMAttributeExpression attrExpression, 
-            IQueryable<SCIMRepresentationModel> representations, 
+            IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
             int count,
             CancellationToken cancellationToken)
         {
             var fullPath = attrExpression.GetFullPath();
-            if (!MAPPING_PATH_TO_PROPERTYNAMES.ContainsKey(fullPath))
+            if (!SCIMConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
             {
                 return null;
             }
 
-            var representationParameter = Expression.Parameter(typeof(SCIMRepresentationModel), "rp");
-            var propertyName = MAPPING_PATH_TO_PROPERTYNAMES[fullPath];
-            var property = Expression.Property(representationParameter, MAPPING_PATH_TO_PROPERTYNAMES[fullPath]);
-            var propertyType = typeof(SCIMRepresentationModel).GetProperty(propertyName).PropertyType;
+            var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
+            var propertyName = SCIMConstants.MappingStandardAttributePathToProperty[fullPath];
+            var property = Expression.Property(representationParameter, SCIMConstants.MappingStandardAttributePathToProperty[fullPath]);
+            var propertyType = typeof(SCIMRepresentation).GetProperty(propertyName).PropertyType;
             var orderBy = GetOrderByType(order, propertyType);
             var innerLambda = Expression.Lambda(property, new ParameterExpression[] { representationParameter });
             var orderExpr = Expression.Call(orderBy, Expression.Constant(representations), innerLambda);
-            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentationModel>), "f");
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentation>), "f");
             var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
-            var result = (IOrderedEnumerable<SCIMRepresentationModel>)finalOrderRequestBody.Compile().DynamicInvoke(representations);
+            var result = (IOrderedEnumerable<SCIMRepresentation>)finalOrderRequestBody.Compile().DynamicInvoke(representations);
             var content = result.Skip(startIndex).Take(count).ToList();
             var total = await representations.CountAsync(cancellationToken);
-            return new SearchSCIMRepresentationsResponse(total, content.Select(r => r.ToDomain()));
+            return new SearchSCIMRepresentationsResponse(total, content);
         }
 
         private static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderByProperty(
             SCIMDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
-            IQueryable<SCIMRepresentationModel> representations, 
+            IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
             int count,
             CancellationToken cancellationToken)
         {
             var lastChild = attrExpression.GetLastChild();
-            var reps = await representations.ToListAsync(cancellationToken);
-            var query = reps.Select(r =>  
-            {
-                var orderValue = string.Empty;
-                var attr = r.Attributes.FirstOrDefault(a => a.SchemaAttributeId == lastChild.SchemaAttribute.Id);
-                if (attr != null && attr.Values.Any())
-                {
-                    orderValue = attr.Values.First().ValueString;
-                }
-
-                return new
-                {
-                    result = r,
-                    orderValue = orderValue
-                };
-            });
-            List<SCIMRepresentationModel> content= null;
+            IQueryable<string> query = null;
             switch(order)
             {
                 case SearchSCIMRepresentationOrders.Ascending:
-                    content = query.OrderBy(r => r.orderValue).Select(r => r.result).ToList();
+                    query = from rep in (from s in representations
+                                         join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
+                                         select new
+                                         {
+                                             representation = s,
+                                             representationId = s.Id,
+                                             orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : ""
+                                         })
+                            orderby rep.orderedValue ascending
+                            select rep.representationId;
                     break;
                 case SearchSCIMRepresentationOrders.Descending:
-                    content = query.OrderByDescending(r => r.orderValue).Select(r => r.result).ToList();
+                    query = from rep in (from s in representations
+                                         join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
+                                         select new
+                                         {
+                                             representation = s,
+                                             representationId = s.Id,
+                                             orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : ""
+                                         })
+                            orderby rep.orderedValue descending
+                            select rep.representationId;
+                    break;
+            }
+            
+            var orderedIds = await query.Skip(startIndex).Take(count).ToListAsync(cancellationToken);
+            var result = await dbContext.SCIMRepresentationLst.Include(a => a.Attributes).Where(s => orderedIds.Contains(s.Id)).ToListAsync(cancellationToken);
+            var comparer = new RepresentationComparer(orderedIds);
+            List<SCIMRepresentation> content = null;
+            switch (order)
+            {
+                case SearchSCIMRepresentationOrders.Ascending:
+                    content = result.OrderBy(r => r, comparer).ToList();
+                    break;
+                case SearchSCIMRepresentationOrders.Descending:
+                    content = result.OrderByDescending(r => r, comparer).ToList();
                     break;
             }
 
-            content = content.Skip(startIndex).Take(count).ToList();
-            var total = reps.Count();
-            return new SearchSCIMRepresentationsResponse(total, content.Select(r => r.ToDomain()));
-        }
-
-        public class GroupedResult
-        {
-            public string RepresentationId { get; set; }
-            public string OrderedValue { get; set; }
+            var total = await representations.CountAsync(cancellationToken);
+            return new SearchSCIMRepresentationsResponse(total, content);
         }
 
         private static MethodInfo GetOrderByType(SearchSCIMRepresentationOrders order, Type lastChildType)
         {
             var orderBy = typeof(Enumerable).GetMethods()
                 .Where(m => m.Name == "OrderBy" && m.IsGenericMethod)
-                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationModel), lastChildType);
+                .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation), lastChildType);
             if (order == SearchSCIMRepresentationOrders.Descending)
             {
                 orderBy = typeof(Enumerable).GetMethods()
                     .Where(m => m.Name == "OrderByDescending" && m.IsGenericMethod)
-                    .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationModel), lastChildType);
+                    .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation), lastChildType);
             }
 
             return orderBy;
         }
 
+        private class RepresentationComparer : IComparer<SCIMRepresentation>
+        {
+            private readonly List<string> _orderedIds;
+
+            public RepresentationComparer(List<string> orderedIds)
+            {
+                _orderedIds = orderedIds;
+            }
+
+            public int Compare(SCIMRepresentation x, SCIMRepresentation y)
+            {
+                var xIndex = _orderedIds.IndexOf(x.Id);
+                var yIndex = _orderedIds.IndexOf(y.Id);
+                if (xIndex < yIndex)
+                {
+                    return 1;
+                }
+
+                if (xIndex > yIndex)
+                {
+                    return -1;
+                }
+
+                return 0;
+            }
+        }
+
         #endregion
-        */
     }
 }

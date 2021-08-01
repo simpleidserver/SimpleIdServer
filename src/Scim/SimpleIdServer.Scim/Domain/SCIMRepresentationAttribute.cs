@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace SimpleIdServer.Scim.Domain
 {
     [DebuggerDisplay("FullPath = {FullPath}, Id = {Id}, ParentAttributeId = {ParentAttributeId}, AttributeId = {AttributeId}")]
-    public class SCIMRepresentationAttribute : ICloneable
+    public class SCIMRepresentationAttribute : ICloneable, IComparable<SCIMRepresentationAttribute>
     {
         public SCIMRepresentationAttribute()
         {
@@ -27,8 +27,6 @@ namespace SimpleIdServer.Scim.Domain
             string valueReference = null) : this(id, attributeId)
         {
             SchemaAttribute = schemaAttribute;
-            FullPath = schemaAttribute.FullPath;
-            SchemaAttributeId = schemaAttribute.Id;
             ValueInteger = valueInteger;
             ValueBoolean = valueBoolean;
             ValueString = valueString;
@@ -36,6 +34,11 @@ namespace SimpleIdServer.Scim.Domain
             ValueDecimal = valueDecimal;
             ValueBinary = valueBinary;
             ValueReference = valueReference;
+            if (schemaAttribute != null)
+            {
+                FullPath = schemaAttribute.FullPath;
+                SchemaAttributeId = schemaAttribute.Id;
+            }
         }
 
         public string Id { get; set; }
@@ -66,10 +69,9 @@ namespace SimpleIdServer.Scim.Domain
             return true;
         }
 
-        /*
         public bool IsSimilar(SCIMRepresentationAttribute attr)
         {
-            if (attr.SchemaAttribute.Name != SchemaAttribute.Name)
+            if (attr.AttributeId != AttributeId)
             {
                 return false;
             }
@@ -77,59 +79,28 @@ namespace SimpleIdServer.Scim.Domain
             switch (attr.SchemaAttribute.Type)
             {
                 case SCIMSchemaAttributeTypes.STRING:
-                    return attr.ValueString == 
-                    if (attr.ValuesString.All(s => ValuesString.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueString == ValueString;
                 case SCIMSchemaAttributeTypes.BINARY:
-                    if (attr.ValuesBinary.All(s => ValuesBinary.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueBinary == ValueBinary;
                 case SCIMSchemaAttributeTypes.BOOLEAN:
-                    if (attr.ValuesBoolean.All(s => ValuesBoolean.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueBoolean == ValueBoolean;
                 case SCIMSchemaAttributeTypes.DATETIME:
-                    if (attr.ValuesDateTime.All(s => ValuesDateTime.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueDateTime == ValueDateTime;
                 case SCIMSchemaAttributeTypes.DECIMAL:
-                    if (attr.ValuesDecimal.All(s => ValuesDecimal.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueDecimal == ValueDecimal;
                 case SCIMSchemaAttributeTypes.INTEGER:
-                    if (attr.ValuesInteger.All(s => ValuesInteger.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueInteger == ValueInteger;
                 case SCIMSchemaAttributeTypes.REFERENCE:
-                    if (attr.ValuesReference.All(s => ValuesReference.Contains(s)))
-                    {
-                        return true;
-                    }
-                    break;
-                case SCIMSchemaAttributeTypes.COMPLEX:
-                    if (attr.Values.All(s => Values.Any(v => v.IsSimilar(s))))
-                    {
-                        return true;
-                    }
-                    break;
+                    return attr.ValueReference == ValueReference;
             }
 
             return false;
         }
-        */
+
+        public int GetLevel()
+        {
+            return FullPath.Split('.').Length;
+        }
 
         public object Clone()
         {
@@ -150,6 +121,56 @@ namespace SimpleIdServer.Scim.Domain
                 SchemaAttributeId = SchemaAttributeId
             };
             return result;
+        }
+
+        public int CompareTo(SCIMRepresentationAttribute other)
+        {
+            switch(SchemaAttribute.Type)
+            {
+                case SCIMSchemaAttributeTypes.BINARY:
+                    return ValueBinary.CompareTo(other.ValueBinary);
+                case SCIMSchemaAttributeTypes.DATETIME:
+                    if (ValueDateTime == null) {
+                        return -1;
+                    }
+
+                    if (other.ValueDateTime == null)
+                    {
+                        return 1;
+                    }
+
+                    return ValueDateTime.Value.CompareTo(other.ValueDateTime.Value);
+                case SCIMSchemaAttributeTypes.DECIMAL:
+                    if (ValueDecimal == null)
+                    {
+                        return -1;
+                    }
+
+                    if (other.ValueDecimal == null)
+                    {
+                        return 1;
+                    }
+
+                    return ValueDecimal.Value.CompareTo(other.ValueDecimal.Value);
+                case SCIMSchemaAttributeTypes.INTEGER:
+                    if (ValueInteger == null)
+                    {
+                        return -1;
+                    }
+
+                    if (other.ValueInteger == null)
+                    {
+                        return 1;
+                    }
+
+                    return ValueInteger.Value.CompareTo(other.ValueInteger.Value);
+                case SCIMSchemaAttributeTypes.REFERENCE:
+                    return ValueReference.CompareTo(other.ValueReference);
+                case SCIMSchemaAttributeTypes.STRING:
+                    return ValueString.CompareTo(other.ValueString);
+            }
+
+            return 0;
         }
     }
 }

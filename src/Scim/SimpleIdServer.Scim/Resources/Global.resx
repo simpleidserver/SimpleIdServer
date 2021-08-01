@@ -153,6 +153,9 @@
   <data name="DeleteResource" xml:space="preserve">
     <value>delete resource {0}</value>
   </data>
+  <data name="DuplicateReference" xml:space="preserve">
+    <value>duplicate reference {0}</value>
+  </data>
   <data name="GreaterThanNotSupported" xml:space="preserve">
     <value>greater than cannot be applied on '{0}' type</value>
   </data>

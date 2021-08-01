@@ -6,6 +6,7 @@ using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace SimpleIdServer.Scim.Tests
@@ -50,8 +51,8 @@ namespace SimpleIdServer.Scim.Tests
             var thirdFilter = SCIMFilterParser.Parse("userName", new List<SCIMSchema> { userSchema });
             var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
             var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema });
-            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema });
-            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema });
+            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas });
+            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas });
             var eightFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
             var nineFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
             var tenFilter = SCIMFilterParser.Parse("info.age", new List<SCIMSchema> { userSchema });

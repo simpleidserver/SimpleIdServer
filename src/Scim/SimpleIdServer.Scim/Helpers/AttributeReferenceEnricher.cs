@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,25 +30,21 @@ namespace SimpleIdServer.Scim.Helpers
 			{
 				foreach(var representation in representationLst)
                 {
-					var attrs = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId);
+					var attrs = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).ToList();
 					foreach(var attr in attrs)
                     {
 						var values = representation.GetChildren(attr);
 						var value = values.FirstOrDefault(v => v.SchemaAttribute.Name == "value");
 						var reference = values.FirstOrDefault(v => v.SchemaAttribute.Name == "$ref");
-						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference == null)
+						var schema = representation.GetSchema(attr);
+						var referenceAttribute = representation.GetSchema(attr).GetChildren(attr.SchemaAttribute).FirstOrDefault(v => v.Name == "$ref");
+						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference != null || referenceAttribute == null)
                         {
 							continue;
                         }
 
-						representation.AddAttribute(attr, new SCIMRepresentationAttribute
+						representation.AddAttribute(attr, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), referenceAttribute)
 						{
-							SchemaAttribute = new SCIMSchemaAttribute(reference.Id)
-							{
-								Name = "$ref",
-								MultiValued = false,
-								Type = SCIMSchemaAttributeTypes.STRING
-							},
 							ValueString = $"{baseUrl}/{attributeMapping.TargetResourceType}/{value.ValueString}"
 						});
                     }
