@@ -14,11 +14,11 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
         {
             builder.HasKey(s => s.Id);
             builder.Property(p => p.CanonicalValues)
-                .HasConversion(p => string.Join(",", p), p => p.Split(',', System.StringSplitOptions.None).ToList());
+                .HasConversion(p => string.Join(",", p), p => p.Split(',', System.StringSplitOptions.None).Where(s => !string.IsNullOrWhiteSpace(s)).ToList());
             builder.Property(p => p.ReferenceTypes)
-                .HasConversion(p => string.Join(",", p), p => p.Split(',', System.StringSplitOptions.None).ToList());
+                .HasConversion(p => string.Join(",", p), p => p.Split(',', System.StringSplitOptions.None).Where(s => !string.IsNullOrWhiteSpace(s)).ToList());
             builder.Property(p => p.DefaultValueString)
-                .HasConversion(p => string.Join(",", p), p => p.Split(',', System.StringSplitOptions.None).ToList());
+                .HasConversion(p => string.Join(",", p), p => p.Split(',', System.StringSplitOptions.None).Where(s => !string.IsNullOrWhiteSpace(s)).ToList());
             builder.Property(p => p.DefaultValueInt)
                 .HasConversion(p => string.Join(",", p), p => string.IsNullOrWhiteSpace(p) ? new List<int>() : p.Split(',', System.StringSplitOptions.None).Select(s => int.Parse(s)).ToList());
         }
