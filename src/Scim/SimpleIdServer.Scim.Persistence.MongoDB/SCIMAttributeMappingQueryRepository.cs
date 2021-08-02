@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
     public class SCIMAttributeMappingQueryRepository : ISCIMAttributeMappingQueryRepository
-    {
-        
+    {   
         private readonly SCIMDbContext _scimDbContext;
 
         public SCIMAttributeMappingQueryRepository(SCIMDbContext scimDbContext)
@@ -22,8 +21,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
         {
             var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
-            var result = await attributeMappings.AsQueryable().Where(a => a.SourceResourceType == sourceResourceType).ToMongoListAsync();
-            return result.Select(_ => _.ToDomain());
+            return await attributeMappings.AsQueryable().Where(a => a.SourceResourceType == sourceResourceType).ToMongoListAsync();
         }
     }
 }

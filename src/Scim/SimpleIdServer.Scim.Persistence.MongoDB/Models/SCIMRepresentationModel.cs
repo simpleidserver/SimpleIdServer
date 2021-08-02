@@ -1,48 +1,37 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using System;
+using SimpleIdServer.Scim.Domain;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
 {
-    public class SCIMRepresentationModel
+    public class SCIMRepresentationModel : SCIMRepresentation
     {
-        public SCIMRepresentationModel()
+        public SCIMRepresentationModel() : base()
         {
             SchemaRefs = new List<MongoDBRef>();
-            Attributes = new List<SCIMRepresentationAttributeModel>();
         }
 
-        public string Id { get; set; }
-        public string ExternalId { get; set; }
-        public string ResourceType { get; set; }
-        public string Version { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime LastModified { get; set; }
-        public ICollection<SCIMRepresentationAttributeModel> Attributes { get; set; }
-        
-        public void SetSchemas(List<SCIMSchemaModel> schemas, string collectionName)
+        public SCIMRepresentationModel(SCIMRepresentation representation, string schemaCollectionName) : this()
         {
-            SchemaRefs = schemas.Select(_ => new MongoDBRef(collectionName, _.Id)).ToList();
+            Id = representation.Id;
+            ExternalId = representation.ExternalId;
+            ResourceType = representation.ResourceType;
+            Version = representation.Version;
+            Created = representation.Created;
+            LastModified = representation.LastModified;
+            DisplayName = representation.DisplayName;
+            Attributes = representation.Attributes;
+            SchemaRefs = representation.Schemas.Select(s => new MongoDBRef(schemaCollectionName, s.Id)).ToList();
         }
 
-        public ICollection<SCIMSchemaModel> GetSchemas(IMongoDatabase db)
+        public ICollection<MongoDBRef> SchemaRefs { get; set; }
+
+        public void Init(IMongoDatabase database)
         {
-            var result = new List<SCIMSchemaModel>();
-            if (!SchemaRefs.Any())
-            {
-                return result;
-            }
-
-            var collectionName = SchemaRefs.First().CollectionName;
-            var schemaIds = SchemaRefs.Select(_ => _.Id).ToList();
-            var filter = Builders<SCIMSchemaModel>.Filter.In(x => x.Id, schemaIds);
-            return db.GetCollection<SCIMSchemaModel>(collectionName).Find(filter).ToList();
+            Schemas = MongoDBEntity.GetReferences<SCIMSchema>(SchemaRefs, database);
         }
-
-        public ICollection<MongoDBRef> SchemaRefs { get; set; } 
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
-    public class SCIMSchema : ICloneable
+    public class SCIMSchema : BaseDomain, ICloneable
     {
         public SCIMSchema()
         {
@@ -14,10 +14,6 @@ namespace SimpleIdServer.Scim.Domain
             SchemaExtensions = new List<SCIMSchemaExtension>();
         }
 
-        /// <summary>
-        /// The unique URI of the schema. When applicable, service providers MUST specify the URI, e.g., "urn:ietf:params:scim:schemas:core:2.0:User".
-        /// </summary>
-        public string Id { get; set; }
         /// <summary>
         /// The schema's human-readable name. 
         /// </summary>

@@ -19,22 +19,24 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 		{
 			var mongoClient = new MongoClient(options.ConnectionString);
 			var db = mongoClient.GetDatabase(options.Database);
-			var schemasCollection = EnsureCollectionIsCreated<SCIMSchemaModel>(db, options.CollectionSchemas);
-			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMappingModel>(db, options.CollectionMappings);
 			EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
+			EnsureCollectionIsCreated<SCIMRepresentationAttributeModel>(db, options.CollectionRepresentationAttributes);
+			EnsureCollectionIsCreated<ProvisioningConfiguration>(db, options.CollectionProvisioningLst);
+			var schemasCollection = EnsureCollectionIsCreated<SCIMSchema>(db, options.CollectionSchemas);
+			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);
 			var query = schemasCollection.AsQueryable();
 			if (query.Count() == 0)
 			{
 				if (initialSchemas != null)
 				{
-					schemasCollection.InsertMany(initialSchemas.Select(_ => _.ToModel()));
+					schemasCollection.InsertMany(initialSchemas);
 				}
 				else
 				{
-					var schemas = new List<SCIMSchemaModel>
+					var schemas = new List<SCIMSchema>
 					{
-						SCIMConstants.StandardSchemas.GroupSchema.ToModel(),
-						SCIMConstants.StandardSchemas.UserSchema.ToModel()
+						SCIMConstants.StandardSchemas.GroupSchema,
+						SCIMConstants.StandardSchemas.UserSchema
                     };
 					schemasCollection.InsertMany(schemas);
 				}
@@ -43,9 +45,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 			if (mappingsCollection.AsQueryable().Count() == 0)
 			{
 				if (initialAttributeMapping != null)
-					mappingsCollection.InsertMany(initialAttributeMapping.Select(_ => _.ToModel()));
+				{
+					mappingsCollection.InsertMany(initialAttributeMapping);
+				}
 				else
-					mappingsCollection.InsertMany(SCIMConstants.StandardAttributeMapping.Select(_ => _.ToModel()));
+                {
+					mappingsCollection.InsertMany(SCIMConstants.StandardAttributeMapping);
+				}
             }
 		}
 

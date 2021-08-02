@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
-    public class SCIMRepresentation : ICloneable, IEquatable<SCIMRepresentation>
+    public class SCIMRepresentation : BaseDomain, ICloneable, IEquatable<SCIMRepresentation>
     {
         public SCIMRepresentation()
         {
@@ -20,7 +20,6 @@ namespace SimpleIdServer.Scim.Domain
             Attributes = attributes;
         }
 
-        public string Id { get; set; }
         public string ExternalId { get; set; }
         public string ResourceType { get; set; }
         public int Version { get; set; }

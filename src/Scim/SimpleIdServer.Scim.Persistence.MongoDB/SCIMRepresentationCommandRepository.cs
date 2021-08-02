@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Linq;
 using System.Threading;
@@ -36,29 +35,21 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return new MongoDbTransaction();
         }
 
-        public async Task<bool> Add(SCIMRepresentation data, CancellationToken token)
+        public async Task<bool> Add(SCIMRepresentation representation, CancellationToken token)
         {
-            var representations = _scimDbContext.SCIMRepresentationLst;
-            var record = new SCIMRepresentationModel
-            {
-                Created = data.Created,
-                ExternalId = data.ExternalId,
-                Id = data.Id,
-                LastModified = data.LastModified,
-                ResourceType = data.ResourceType,
-                Version = data.Version,
-                Attributes = data.Attributes.Select(_ => _.ToModel()).ToList()
-            };
-            record.SetSchemas(data.Schemas.Select(_ => _.ToModel()).ToList(), _options.CollectionSchemas);
-            await representations.InsertOneAsync(record, null, token);
+            var record = new SCIMRepresentationModel(representation, _options.CollectionSchemas);
+            await _scimDbContext.SCIMRepresentationLst.InsertOneAsync(record, null, token);
+            var newAttributes = representation.Attributes.Select(a => new SCIMRepresentationAttributeModel(a, representation.Id, representation.ResourceType));
+            await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(newAttributes, null, token);
             return true;
         }
 
         public async Task<bool> Delete(SCIMRepresentation data, CancellationToken token)
         {
-            var representations = _scimDbContext.SCIMRepresentationLst;
-            var deleteFilter = Builders<SCIMRepresentationModel>.Filter.Eq("_id", data.Id);
-            await representations.DeleteOneAsync(deleteFilter, null, token);
+            await _scimDbContext.SCIMRepresentationLst.DeleteOneAsync(d => d.Id == data.Id, null, token);
+            var ids = data.Attributes.Select(a => a.Id);
+            var filter = Builders<SCIMRepresentationAttributeModel>.Filter.In(s => s.Id, ids.ToArray());
+            await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(filter, token);
             return true;
         }
 

@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace SimpleIdServer.Scim.Domain
 {
     [DebuggerDisplay("FullPath = {FullPath}, Id = {Id}, ParentAttributeId = {ParentAttributeId}, AttributeId = {AttributeId}")]
-    public class SCIMRepresentationAttribute : ICloneable, IComparable<SCIMRepresentationAttribute>
+    public class SCIMRepresentationAttribute : BaseDomain, ICloneable, IComparable<SCIMRepresentationAttribute>
     {
         public SCIMRepresentationAttribute()
         {
@@ -41,7 +41,6 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        public string Id { get; set; }
         public string AttributeId { get; set; }
         public string ParentAttributeId { get; set; }
         public string SchemaAttributeId { get; set; }

@@ -106,6 +106,15 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
                     TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
+                },
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                    SourceResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    SourceAttributeSelector = "members",
+                    TargetResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
                 }
             });
         }

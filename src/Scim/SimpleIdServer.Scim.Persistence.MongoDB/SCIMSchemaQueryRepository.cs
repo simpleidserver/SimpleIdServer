@@ -28,14 +28,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            return result.ToDomain();
+            return result;
         }
 
         public async Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers)
         {
             var collection = _scimDbContext.SCIMSchemaLst;
-            var result = await collection.AsQueryable().Where(s => schemaIdentifiers.Contains(s.Id)).ToMongoListAsync();
-            return result.Select(_ => _.ToDomain());
+            return await collection.AsQueryable().Where(s => schemaIdentifiers.Contains(s.Id)).ToMongoListAsync();
         }
 
         public async Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
@@ -47,21 +46,20 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            return result.ToDomain();
+            return result;
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAll()
         {
             var collection = _scimDbContext.SCIMSchemaLst;
-            var result = await collection.AsQueryable().ToMongoListAsync();
-            return result.Select(_ => _.ToDomain());
+            return await collection.AsQueryable().ToMongoListAsync();
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAllRoot()
         {
             var collection = _scimDbContext.SCIMSchemaLst;
             var result = await collection.AsQueryable().Where(s => s.IsRootSchema).ToMongoListAsync();
-            return result.Select(_ => _.ToDomain());
+            return result;
         }
     }
 }

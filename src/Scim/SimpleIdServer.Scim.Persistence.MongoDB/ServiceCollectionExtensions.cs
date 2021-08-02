@@ -18,6 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
 			List<SCIMSchema> initialSchemas = null,
 			List<SCIMAttributeMapping> initialAttributeMapping = null)
 		{
+			SCIMDbContext.RegisterMappings();
 			if (mongoDbSetup != null)
 			{
 				services.Configure(mongoDbSetup);

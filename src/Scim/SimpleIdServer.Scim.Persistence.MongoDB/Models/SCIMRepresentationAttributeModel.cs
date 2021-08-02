@@ -1,28 +1,33 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
+using SimpleIdServer.Scim.Domain;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
 {
-    public class SCIMRepresentationAttributeModel
+    public class SCIMRepresentationAttributeModel : SCIMRepresentationAttribute
     {
         public SCIMRepresentationAttributeModel()
         {
-            Children = new List<SCIMRepresentationAttributeModel>();
+
         }
 
-        public string Id { get; set; }
-        public ICollection<string> ValuesString { get; set; }
-        public ICollection<bool> ValuesBoolean { get; set; }
-        public ICollection<int> ValuesInteger { get; set; }
-        public ICollection<DateTime> ValuesDateTime { get; set; }
-        public ICollection<string> ValuesReference { get; set; }
-        public ICollection<decimal> ValuesDecimal { get; set; }
-        public ICollection<byte[]> ValuesByte { get; set; }
-        public ICollection<SCIMRepresentationAttributeModel> Children { get; set; }
-        public MongoDBRef Parent { get; set; }
-        public SCIMSchemaAttributeModel SchemaAttribute { get; set; }
+        public SCIMRepresentationAttributeModel(SCIMRepresentationAttribute attr, string representationId, string representationResourceType)
+        {
+            Id = attr.Id;
+            AttributeId = attr.AttributeId;
+            ParentAttributeId = attr.ParentAttributeId;
+            SchemaAttributeId = attr.SchemaAttributeId;
+            FullPath = attr.FullPath;
+            ValueString = attr.ValueString;
+            ValueBoolean = attr.ValueBoolean;
+            ValueInteger = attr.ValueInteger;
+            ValueDateTime = attr.ValueDateTime;
+            ValueReference = attr.ValueReference;
+            ValueDecimal = attr.ValueDecimal;
+            RepresentationId = representationId;
+            RepresentationResourceType = representationResourceType;
+        }
+
+        public string RepresentationResourceType { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
@@ -22,53 +23,32 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {            
-            var collection = _scimDbContext.SCIMRepresentationLst;
-            var record = await collection.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType)
-                    && r.Attributes.Any(a => (a.SchemaAttribute.Id == schemaAttributeId && a.ValuesString.Contains(value))
-                        || (a.Children.Any(sa => sa.SchemaAttribute.Id == schemaAttributeId && sa.ValuesString.Contains(value) ||
-                            (sa.Children.Any(ssa => ssa.SchemaAttribute.Id == schemaAttributeId && ssa.ValuesString.Contains(value))))
-                    )
-                 ))
+            var attr = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => (endpoint == null || endpoint == a.RepresentationResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
                 .ToMongoFirstAsync();
-            if (record == null)
+            if (attr == null)
             {
                 return null;
             }
 
-            return record.ToDomain(_scimDbContext.Database);
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(a => a.Id == attr.RepresentationId).ToMongoFirstAsync();
+            result.Init(_scimDbContext.Database);
+            return result;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
-            var collection = _scimDbContext.SCIMRepresentationLst;
-            var record = await collection.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType) 
-                    && r.Attributes.Any(a => (a.SchemaAttribute.Id == schemaAttributeId && a.ValuesInteger.Contains(value))
-                        || (a.Children.Any(sa => sa.SchemaAttribute.Id == schemaAttributeId && sa.ValuesInteger.Contains(value) ||
-                            (sa.Children.Any(ssa => ssa.SchemaAttribute.Id == schemaAttributeId && ssa.ValuesInteger.Contains(value))))
-                    )
-                 ))
+            var attr = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => (endpoint == null || endpoint == a.RepresentationResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueInteger == value)
                 .ToMongoFirstAsync();
-            if (record == null)
+            if (attr == null)
             {
                 return null;
             }
 
-            return record.ToDomain(_scimDbContext.Database);
-        }
-
-        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string schemaAttributeId, IEnumerable<string> values, string endpoint = null)
-        {
-            var collection = _scimDbContext.SCIMRepresentationLst;
-            var records = await collection.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType)
-                    && r.Attributes.Any(a => (a.SchemaAttribute.Id == schemaAttributeId && a.ValuesString.Any(v => values.Contains(v)))
-                        || (a.Children.Any(sa => sa.SchemaAttribute.Id == schemaAttributeId && sa.ValuesString.Any(v => values.Contains(v)) ||
-                            (sa.Children.Any(ssa => ssa.SchemaAttribute.Id == schemaAttributeId && ssa.ValuesString.Any(v => values.Contains(v)))))
-                    )
-                 )).ToMongoListAsync();
-            return records.Select(_ => _.ToDomain(_scimDbContext.Database));
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(a => a.Id == attr.RepresentationId).ToMongoFirstAsync();
+            result.Init(_scimDbContext.Database);
+            return result;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
@@ -80,7 +60,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            return result.ToDomain(_scimDbContext.Database);
+            result.Init(_scimDbContext.Database);
+            return result;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
@@ -92,35 +73,50 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            return result.ToDomain(_scimDbContext.Database);
+            result.Init(_scimDbContext.Database);
+            return result;
         }
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
-            IEnumerable<SCIMRepresentationModel> result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToMongoListAsync<SCIMRepresentationModel>();
-            return result.Select(r => r.ToDomain(_scimDbContext.Database));
+            foreach(var representation in result)
+            {
+                representation.Init(_scimDbContext.Database);
+            }
+
+            return result;
         }
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
+            IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
             var collection = _scimDbContext.SCIMRepresentationLst;
             var queryableRepresentations = collection.AsQueryable().Where(s => s.ResourceType == parameter.ResourceType);
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
-                queryableRepresentations = (IQueryable<SCIMRepresentationModel>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
-            }
+                var filtered = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IMongoQueryable<SCIMRepresentation>;
+                int totalResults = filtered.Count();
+                if (parameter.Count > 0)
+                {
+                    result = filtered.Skip(parameter.StartIndex).Take(parameter.Count).ToList();
+                }
 
-            int totalResults = queryableRepresentations.Count();
-            IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
-            if (parameter.Count > 0)
+                return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+            }
+            else
             {
-                result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList().Select(s => s.ToDomain(_scimDbContext.Database));
-            }
+                int totalResults = queryableRepresentations.Count();
+                if (parameter.Count > 0)
+                {
+                    result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList();
+                }
 
-            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+                return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+            }
         }
     }
 }
