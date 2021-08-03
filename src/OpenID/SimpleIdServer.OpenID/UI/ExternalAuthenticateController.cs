@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Common;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
@@ -115,9 +116,10 @@ namespace SimpleIdServer.OpenID.UI
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");
                 user = principal.BuildOAuthUser(scheme);
+                user.UpdateClaim(Jwt.Constants.UserClaims.Role, "visitor");
                 await OauthUserRepository.Add(user, cancellationToken);
                 await OauthUserRepository.SaveChanges(cancellationToken);
-                await _busControl.Publish(new UserAddedEvent(user.Id, user.OAuthUserClaims.ToDictionary(c => c.Name, c => c.Value)));
+                await _busControl.Publish(new UserAddedEvent(user.Id, 0, CommonConstants.ResourceTypes.OpenIdUser, user.OAuthUserClaims.ToDictionary(c => c.Name, c => c.Value)));
                 _logger.LogInformation($"Finish to provision the user '{sub}'");
             }
 
@@ -127,7 +129,7 @@ namespace SimpleIdServer.OpenID.UI
         private static string GetClaim(ClaimsPrincipal principal, string claimType)
         {
             var claim = principal.Claims.FirstOrDefault(c => c.Type == claimType);
-            if (claim == null)
+            if (claim == null || string.IsNullOrWhiteSpace(claim.Value))
             {
                 return null;
             }

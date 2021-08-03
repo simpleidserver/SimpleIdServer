@@ -40,6 +40,7 @@ namespace SimpleIdServer.Scim.Provisioning
                 x.AddConsumer<RepresentationAddedEventConsumer>();
                 x.AddConsumer<RepresentationUpdatedEventConsumer>();
                 x.AddConsumer<RepresentationRemovedEventConsumer>();
+                x.AddConsumer<OpenIdUserAddedEventConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.ReceiveEndpoint("representation-added", e =>
@@ -56,6 +57,11 @@ namespace SimpleIdServer.Scim.Provisioning
                     {
                         e.UseMessageRetry(r => r.Immediate(5));
                         e.ConfigureConsumer<RepresentationRemovedEventConsumer>(context);
+                    });
+                    cfg.ReceiveEndpoint("user-added", e =>
+                    {
+                        e.UseMessageRetry(r => r.Immediate(5));
+                        e.ConfigureConsumer<OpenIdUserAddedEventConsumer>(context);
                     });
                 });
             });

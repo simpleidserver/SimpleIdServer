@@ -12,14 +12,15 @@
     <ng-container matColumnDef="representationId">
       <mat-header-cell *matHeaderCellDef>{{ "provisioning.history.description" | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let history">
-        <a [routerLink]="['/users', history.representationId]">{{history.description}}</a>
+        <a [routerLink]="['/users', history.representationId]" *ngIf="history.provisioningConfigurationResourceType === 'ScimUser'">{{history.description}}</a>
+        <div *ngIf="history.provisioningConfigurationResourceType === 'OpenIdUser'">{{history.description}}</div>
       </mat-cell>
     </ng-container>
     <!-- workflow -->
     <ng-container matColumnDef="workflow">
       <mat-header-cell *matHeaderCellDef>{{ "provisioning.history.workflow" | translate }}</mat-header-cell>
       <mat-cell *matCellDef="let history">
-        <a [routerLink]="['/provisioning/workflows/' + history.workflowId + '/instances/' + history.workflowInstanceId ]">{{ "provisioning.history.workflow" | translate }}</a>
+        <a [routerLink]="['/provisioning/workflows/' + history.workflowId + '/instances/' + history.workflowInstanceId ]" *ngIf="history.workflowInstanceId">{{ "provisioning.history.workflow" | translate }}</a>
       </mat-cell>
     </ng-container>
     <!-- status -->

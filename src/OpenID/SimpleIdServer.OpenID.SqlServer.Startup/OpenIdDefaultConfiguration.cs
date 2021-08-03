@@ -864,7 +864,12 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     TokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        ManageUsers
+                        ManageUsers,
+                        AddScimResource,
+                        DeleteScimResource,
+                        UpdateScimResource,
+                        BulkScimResource,
+                        QueryScimResource
                     },
                     GrantTypes = new List<string>
                     {

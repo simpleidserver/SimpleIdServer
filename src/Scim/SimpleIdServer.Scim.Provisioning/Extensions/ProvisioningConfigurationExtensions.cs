@@ -48,9 +48,9 @@ namespace SimpleIdServer.Scim.Provisioning.Extensions
             return provisioningConfiguration.Records.First(r => r.Name == "messageToken").ValuesString.First();
         }
 
-        public static Dictionary<string, string> GetMappingRules(this ProvisioningConfiguration provisioningConfiguration)
+        public static string GetHttpRequestTemplate(this ProvisioningConfiguration provisioningConfiguration)
         {
-            return new Dictionary<string, string>(provisioningConfiguration.Records.First(r => r.Name == "mapping").Values.Select(v => new KeyValuePair<string, string>(v.Name, v.ValuesString.First())));
+            return provisioningConfiguration.Records.First(r => r.Name == "httpRequestTemplate").ValuesString.First();
         }
     }
 }

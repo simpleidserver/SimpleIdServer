@@ -7,12 +7,12 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Provisioning.Extensions;
+using SimpleIdServer.Scim.Provisioning.Helpers;
 using SimpleIdServer.Scim.Provisioning.Provisioner;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Provisioning.Consumers
@@ -77,25 +77,7 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
         private static string ParseMessageToken(ProvisioningConfiguration configuration, ConsumeContext<RepresentationAddedEvent> context)
         {
             var representation = context.Message.Representation;
-            var regularExpression = new Regex(@"\{{([a-zA-Z]|_|[0-9]|\[|\]|\.)*\}}");
-            var result = regularExpression.Replace(configuration.GetMessageToken(), (m) =>
-            {
-                if (string.IsNullOrWhiteSpace(m.Value))
-                {
-                    return string.Empty;
-                }
-
-                var value = m.Value.Replace("{{", "");
-                value = value.Replace("}}", "");
-                var token = representation.SelectToken(value);
-                if (token == null)
-                {
-                    return string.Empty;
-                }
-
-                return token.ToString();
-            });
-            return result;
+            return TemplateParser.ParseMessage(configuration.GetMessageToken(), representation);
         }
     }
 }

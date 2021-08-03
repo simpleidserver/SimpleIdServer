@@ -126,7 +126,16 @@ namespace SimpleIdServer.Common.Domains
 
         public void UpdatePassword(string newPassword)
         {
-            var credential = Credentials.First(c => c.CredentialType == "pwd");
+            var credential = Credentials.FirstOrDefault(c => c.CredentialType == "pwd");
+            if (credential == null)
+            {
+                credential = new UserCredential
+                {
+                    CredentialType = "pwd"
+                };
+                Credentials.Add(credential);
+            }
+
             credential.Value = PasswordHelper.ComputeHash(newPassword);
             UpdateDateTime = DateTime.UtcNow;
         }

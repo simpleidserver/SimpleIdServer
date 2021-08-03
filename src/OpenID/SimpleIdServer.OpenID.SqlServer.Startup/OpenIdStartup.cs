@@ -2,9 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Authentication;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -89,6 +88,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         SIDOpenIdConstants.StandardScopes.Phone.Name,
                         SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name
                     };
+                }, massTransitOptions: opt =>
+                {
+                    opt.UsingRabbitMq();
                 })
                 .AddOpenIDEF(opt =>
                 {

@@ -48,8 +48,12 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
             }
 
-            var content = representation.ToResponse(string.Empty, false);
-            await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.VersionNumber, representation.ResourceType, content));
+            if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(representation.ResourceType))
+            {
+                var content = representation.ToResponse(string.Empty, false);
+                await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.VersionNumber, SCIMConstants.MappingScimResourceTypeToCommonType[representation.ResourceType], content));
+            }
+
             return new NoContentResult();
         }
 

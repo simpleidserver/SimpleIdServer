@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using SimpleIdServer.OpenID.ExternalEvents;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Provisioning.Provisioner;
 using System.Collections.Generic;
@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Provisioning.Consumers
 {
-    public class RepresentationRemovedEventConsumer : BaseEventConsumer<RepresentationRemovedEvent>, IConsumer<RepresentationRemovedEvent>
+    public class OpenIdUserAddedEventConsumer : BaseEventConsumer<UserAddedEvent>, IConsumer<UserAddedEvent>
     {
-        public RepresentationRemovedEventConsumer(
+        public OpenIdUserAddedEventConsumer(
             IEnumerable<IProvisioner> provisioners,
             IProvisioningConfigurationRepository provisioningConfigurationRepository,
-            ILogger<BaseEventConsumer<RepresentationRemovedEvent>> logger) : base(provisioners, provisioningConfigurationRepository, logger)
+            ILogger<BaseEventConsumer<UserAddedEvent>> logger) : base(provisioners, provisioningConfigurationRepository, logger)
         {
         }
 
-        protected override ProvisioningOperations Type => ProvisioningOperations.DELETE;
+        protected override ProvisioningOperations Type => ProvisioningOperations.ADD;
 
-        protected override Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationRemovedEvent> context)
+        protected override Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<UserAddedEvent> context)
         {
             return Task.FromResult((WorkflowResult)new WorkflowResult(string.Empty, string.Empty));
         }

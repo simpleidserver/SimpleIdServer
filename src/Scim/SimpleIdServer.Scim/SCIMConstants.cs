@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Common;
 using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
 using System;
@@ -11,8 +12,13 @@ namespace SimpleIdServer.Scim
     public static class SCIMConstants
     {
         public const string AuthenticationScheme = "SimpleIdServerSCIM";
-
         public const string STANDARD_SCIM_CONTENT_TYPE = "application/scim+json";
+
+        public static Dictionary<string, string> MappingScimResourceTypeToCommonType = new Dictionary<string, string>
+        {
+            { SCIMEndpoints.User, CommonConstants.ResourceTypes.ScimUser },
+            { SCIMEndpoints.Group, CommonConstants.ResourceTypes.ScimGroup },
+        };
 
         public static class ErrorSCIMTypes
         {
