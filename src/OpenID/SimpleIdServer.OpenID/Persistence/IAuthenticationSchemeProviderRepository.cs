@@ -10,5 +10,8 @@ namespace SimpleIdServer.OpenID.Persistence
     public interface IAuthenticationSchemeProviderRepository
     {
         Task<IEnumerable<AuthenticationSchemeProvider>> GetAll(CancellationToken cancellationToken);
+        Task<AuthenticationSchemeProvider> Get(string id, CancellationToken cancellationToken);
+        Task<bool> Update(AuthenticationSchemeProvider authenticationSchemeProvider, CancellationToken cancellationToken);
+        Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 }

@@ -26,8 +26,15 @@
       <mat-nav-list *ngIf="isConnected">
         <a mat-list-item class="baseMenu" [routerLink]="['/applications']" [routerLinkActive]="['is-active']">{{ "applications.list" | translate }}</a>
         <a mat-list-item class="baseMenu" [routerLink]="['/scopes']" [routerLinkActive]="['is-active']">{{ "scopes.list" | translate }}</a>
-        <a mat-list-item class="baseMenu" [routerLink]="['/users']" [routerLinkActive]="['is-active']">{{ "users.list" | translate }}</a>
-        <a mat-list-item class="baseMenu" [routerLink]="['/groups']" [routerLinkActive]="['is-active']">{{ "groups.list" | translate }}</a>
+        <mat-list-item class="baseMenu" (click)="showUserManagement = !showUserManagement">
+          <span class="full-width">{{ 'userManagement' | translate }}</span>
+          <mat-icon class="menu-button" [ngClass]="{'rotated' : showUserManagement}">expand_more</mat-icon>
+        </mat-list-item>
+        <div class="submenu" [class.expanded]="showUserManagement">
+          <a mat-list-item class="submenuItem" [routerLink]="['/users']" [routerLinkActive]="['is-active']">{{ "users.list" | translate }}</a>
+          <a mat-list-item class="submenuItem" [routerLink]="['/groups']" [routerLinkActive]="['is-active']">{{ "groups.list" | translate }}</a>
+        </div>
+        <a mat-list-item class="baseMenu" [routerLink]="['/authentications']" [routerLinkActive]="['is-active']">{{ "authentications.list" | translate }}</a>
         <a mat-list-item class="baseMenu" [routerLink]="['/humantaskinstances']" [routerLinkActive]="['is-active']">{{ "humantaskinstance.list" | translate }}</a>
         <mat-list-item class="baseMenu" (click)="showProvisioning = !showProvisioning">
           <span class="full-width">{{ 'provisioning.list' | translate }}</span>

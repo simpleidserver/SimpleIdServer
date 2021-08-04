@@ -104,8 +104,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     opts.SmtpPassword = credentials.Password;
                     opts.FromEmail = credentials.Login;
                 })
-                .AddDynamicAuthenticationProviders()
-                .AddAuthenticationProviderSchemes(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
+                .AddDynamicAuthenticationProviders();
             // ConfigureFireBase();
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()));
@@ -175,6 +174,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     if (!context.OpenIdClients.Any())
                     {
                         context.OpenIdClients.AddRange(OpenIdDefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey, sigJsonWebKey));
+                    }
+
+                    if(!context.AuthenticationSchemeProviders.Any())
+                    {
+                        context.AuthenticationSchemeProviders.AddRange(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
                     }
 
                     context.SaveChanges();

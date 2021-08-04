@@ -157,7 +157,7 @@ task test {
         Pop-Location
     }
 
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Saml
+    Push-Location -Path $base_dir\tests\SimpleIdServer.Saml.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }

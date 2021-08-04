@@ -22,6 +22,7 @@ using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Api.Authorization;
 using SimpleIdServer.OpenID.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OpenID.Api.Authorization.Validators;
+using SimpleIdServer.OpenID.Api.AuthSchemeProvider.Handlers;
 using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Api.BCDeviceRegistration;
 using SimpleIdServer.OpenID.Api.Configuration;
@@ -74,7 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOpenIDAuthentication()
                 .AddManagementApi()
                 .AddBCAuthorizeJob()
-                .AddInMemoryLock();
+                .AddInMemoryLock()
+                .AddAuthSchemeProviderApi();
             if (openidOptions != null)
             {
                 services.Configure(openidOptions);
@@ -180,7 +182,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IOAuthClientRepository>(new DefaultOpenIdClientRepository(clients));
             services.AddSingleton<IOAuthScopeRepository>(new DefaultOpenIdScopeRepository(scopes));
             services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository(bcAuthorizeLst));
-            services.AddSingleton<IAuthenticationSchemeProviderRepository>(new InMemoryAuthenticationSchemeProviderRepository(authenticationSchemes));
+            services.AddSingleton<IAuthenticationSchemeProviderRepository>(new DefaultAuthenticationSchemeProviderRepository(authenticationSchemes));
             return services;
         }
 
@@ -265,6 +267,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler, SimpleIdServer.OpenID.Api.Management.SearchOpenIdClientsHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.UpdateOpenIdClientHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.AddOpenIdClientHandler>();
+            return services;
+        }
+
+        private static IServiceCollection AddAuthSchemeProviderApi(this IServiceCollection services)
+        {
+            services.AddTransient<IDisableAuthSchemeProviderHandler, DisableAuthSchemeProviderHandler>();
+            services.AddTransient<IEnableAuthSchemeProviderHandler, EnableAuthSchemeProviderHandler>();
+            services.AddTransient<IGetAllAuthSchemeProvidersHandler, GetAllAuthSchemeProvidersHandler>();
+            services.AddTransient<IUpdateAuthSchemeProviderOptionsHandler, UpdateAuthSchemeProviderOptionsHandler>();
+            services.AddTransient<IGetAuthSchemeProviderHandler, GetAuthSchemeProviderHandler>();
             return services;
         }
 

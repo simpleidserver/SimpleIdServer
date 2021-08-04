@@ -103,6 +103,14 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope ManageAuthSchemeProviders = new OAuthScope
+        {
+            Name = "manage_authschemeproviders",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -122,7 +130,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             UpdateScimResource,
             BulkScimResource,
             ScimProvision,
-            ManageUsers
+            ManageUsers,
+            ManageAuthSchemeProviders
         };
 
         public static List<AuthenticationSchemeProvider> AuthenticationProviderSchemes => new List<AuthenticationSchemeProvider>
@@ -140,6 +149,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     AppSecret = "fbd2fe5e37602f333908eff93eae295d"
                 }),
                 JsonConverter = typeof(FacebookOptionsJsonConverter).AssemblyQualifiedName,
+                OptionsFullQualifiedName = typeof(FacebookOptionsLite).AssemblyQualifiedName,
                 UpdateDateTime = DateTime.UtcNow,
                 IsEnabled = true
             }
@@ -833,7 +843,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         BulkScimResource,
                         UpdateScimResource,
                         DeleteScimResource,
-                        ScimProvision
+                        ScimProvision,
+                        ManageAuthSchemeProviders
                     },
                     GrantTypes = new List<string>
                     {
@@ -869,7 +880,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         DeleteScimResource,
                         UpdateScimResource,
                         BulkScimResource,
-                        QueryScimResource
+                        QueryScimResource,
+                        ManageAuthSchemeProviders
                     },
                     GrantTypes = new List<string>
                     {

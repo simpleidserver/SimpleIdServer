@@ -84,7 +84,9 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddUsers(OpenIdDefaultConfiguration.Users)
                 .AddJsonWebKeys(new List<JsonWebKey> { sigJsonWebKey })
                 .AddLoginPasswordAuthentication()
-                .AddSMSAuthentication();
+                .AddSMSAuthentication()
+                .AddDynamicAuthenticationProviders()
+                .AddAuthenticationProviderSchemes(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
             // ConfigureFireBase();
             var d = Directory.GetCurrentDirectory();
             services.AddDataProtection()

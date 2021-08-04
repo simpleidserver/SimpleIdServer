@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SimpleIdServer.OpenID.Options;
@@ -18,19 +19,19 @@ namespace SimpleIdServer.OpenID.UI.AuthProviders
     public class DynamicAuthenticationSchemeProvider: AuthenticationSchemeProvider, ISIDAuthenticationSchemeProvider
     {
         private readonly IDataProtectionProvider _dataProtectionProvider;
-        private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
+        private readonly IServiceProvider _serviceProvider;
         private readonly OpenIDHostOptions _openidOptions;
         private IEnumerable<Domains.AuthenticationSchemeProvider> _cachedAuthenticationProviders;
         private DateTime? _nextExpirationTime;
 
         public DynamicAuthenticationSchemeProvider(
             IDataProtectionProvider dataProtectionProvider,
-            IOptions<AuthenticationOptions> options,
+            IServiceProvider serviceProvider,
             IOptions<OpenIDHostOptions> openidOptions,
-            IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository) : base(options)
+            IOptions<AuthenticationOptions> options) : base(options)
         {
             _dataProtectionProvider = dataProtectionProvider;
-            _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
+            _serviceProvider = serviceProvider;
             _openidOptions = openidOptions.Value;
         }
 
@@ -77,22 +78,26 @@ namespace SimpleIdServer.OpenID.UI.AuthProviders
 
         private async Task<IEnumerable<Domains.AuthenticationSchemeProvider>> GetAuthenticationSchemeProviders()
         {
-            var currentDateTime = DateTime.UtcNow;
-            var authenticationSchemeProviders = _cachedAuthenticationProviders;
-            if (_nextExpirationTime == null ||
-                _nextExpirationTime.Value <= currentDateTime ||
-                _openidOptions.CacheExternalAuthProvidersInSeconds == null)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                authenticationSchemeProviders = await _authenticationSchemeProviderRepository.GetAll(CancellationToken.None);
-                authenticationSchemeProviders = authenticationSchemeProviders.Where(a => a.IsEnabled);
-                if (_openidOptions.CacheExternalAuthProvidersInSeconds != null)
+                var authenticationSchemeProviderRepository = scope.ServiceProvider.GetRequiredService<IAuthenticationSchemeProviderRepository>();
+                var currentDateTime = DateTime.UtcNow;
+                var authenticationSchemeProviders = _cachedAuthenticationProviders;
+                if (_nextExpirationTime == null ||
+                    _nextExpirationTime.Value <= currentDateTime ||
+                    _openidOptions.CacheExternalAuthProvidersInSeconds == null)
                 {
-                    _nextExpirationTime = currentDateTime.AddSeconds(_openidOptions.CacheExternalAuthProvidersInSeconds.Value);
-                    _cachedAuthenticationProviders = authenticationSchemeProviders;
+                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.GetAll(CancellationToken.None);
+                    authenticationSchemeProviders = authenticationSchemeProviders.Where(a => a.IsEnabled);
+                    if (_openidOptions.CacheExternalAuthProvidersInSeconds != null)
+                    {
+                        _nextExpirationTime = currentDateTime.AddSeconds(_openidOptions.CacheExternalAuthProvidersInSeconds.Value);
+                        _cachedAuthenticationProviders = authenticationSchemeProviders;
+                    }
                 }
-            }
 
-            return authenticationSchemeProviders;
+                return authenticationSchemeProviders;
+            }
         }
 
         private SIDAuthenticationScheme Convert(Domains.AuthenticationSchemeProvider provider)

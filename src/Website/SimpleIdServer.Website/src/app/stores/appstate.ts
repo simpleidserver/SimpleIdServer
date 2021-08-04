@@ -8,6 +8,7 @@ import * as fromProvisioning from './provisioning/reducers';
 import * as fromScopes from './scopes/reducers';
 import * as fromUsers from './users/reducers';
 import * as fromWorkflows from './workflows/reducers';
+import * as fromAuthSchemeProviders from './authschemeproviders/reducers';
 
 export interface AppState {
   application: fromApplications.ApplicationState;
@@ -34,7 +35,9 @@ export interface AppState {
   provisioningConfigurations: fromProvisioning.ProvisioningConfigurationsState,
   provisioningConfiguration: fromProvisioning.ProvisioningConfigurationState,
   humanTaskInstance: fromHumanTask.HumanTaskInstanceState,
-  humanTaskInstances: fromHumanTask.HumanTaskInstancesState
+  humanTaskInstances: fromHumanTask.HumanTaskInstancesState,
+  authSchemeProvider: fromAuthSchemeProviders.AuthSchemeProviderState,
+  authSchemeProviders: fromAuthSchemeProviders.AuthSchemeProvidersState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -62,6 +65,30 @@ export const selectProvisioningConfigurations = (state: AppState) => state.provi
 export const selectProvisioningConfiguration = (state: AppState) => state.provisioningConfiguration;
 export const selectHumanTaskInstance = (state: AppState) => state.humanTaskInstance;
 export const selectHumanTaskInstances = (state: AppState) => state.humanTaskInstances;
+export const selectAuthSchemeProvider = (state: AppState) => state.authSchemeProvider;
+export const selectAuthSchemeProviders = (state: AppState) => state.authSchemeProviders;
+
+export const selectAuthSchemeProviderResult = createSelector(
+  selectAuthSchemeProvider,
+  (state: fromAuthSchemeProviders.AuthSchemeProviderState) => {
+    if (!state || state.AuthSchemeProvider === null) {
+      return null;
+    }
+
+    return state.AuthSchemeProvider;
+  }
+);
+
+export const selectAuthSchemeProvidersResult = createSelector(
+  selectAuthSchemeProviders,
+  (state: fromAuthSchemeProviders.AuthSchemeProvidersState) => {
+    if (!state || !state.AuthSchemeProviders) {
+      return null;
+    }
+
+    return state.AuthSchemeProviders;
+  }
+);
 
 export const selectApplicationResult = createSelector(
   selectApplication,
@@ -385,5 +412,7 @@ export const appReducer = {
   provisioningConfigurations: fromProvisioning.getProvisioningConfigurationsReducer,
   provisioningConfiguration: fromProvisioning.getProvisioningConfigurationReducer,
   humanTaskInstance: fromHumanTask.getHumanTaskInstanceReducer,
-  humanTaskInstances: fromHumanTask.getHumanTaskInstancesReducer
+  humanTaskInstances: fromHumanTask.getHumanTaskInstancesReducer,
+  authSchemeProvider: fromAuthSchemeProviders.getAuthSchemeProviderReducer,
+  authSchemeProviders: fromAuthSchemeProviders.getAuthSchemeProvidersReducer
 };

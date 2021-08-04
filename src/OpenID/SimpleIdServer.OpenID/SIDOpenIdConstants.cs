@@ -34,6 +34,7 @@ namespace SimpleIdServer.OpenID
             public const string BCAuthorize = "bc-authorize";
             public const string BCDeviceRegistration = "bc-device-registration";
             public const string Metadata = "metadata";
+            public const string AuthSchemeProviders = "authschemeproviders";
         }
 
         public static class StandardClaims

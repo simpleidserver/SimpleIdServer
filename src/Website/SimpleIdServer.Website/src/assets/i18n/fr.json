@@ -1,4 +1,5 @@
 {
+  "userManagement": "Gérer les utilisateurs",
   "close": "Fermer",
   "save": "Sauvegarder",
   "create": "Créer",
@@ -10,6 +11,21 @@
         "required": "Est requis",
         "badPassword": "Mot de passe ne correspond pas"
       }
+    }
+  },
+  "authentications": {
+    "list": "Authentifications",
+    "name": "Nom",
+    "displayName": "Nom d'affichage",
+    "isEnabled": "Est actif",
+    "updateDateTime": "Date de mise à jour",
+    "messages": {
+      "enable": "Le schéma d'authentification est activé",
+      "errorEnable": "Une erreur est survenue durant l'activation du schéma d'authentification",
+      "disable": "Le schéma d'authentification est désactivé",
+      "errorDisable": "Une erreur est survenue durant la désactivation du schéma d'authentification",
+      "update": "Le schéma d'authentification est mis à jour",
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du schéma d'authentification"
     }
   },
   "humantaskinstance": {

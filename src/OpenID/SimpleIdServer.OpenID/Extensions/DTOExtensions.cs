@@ -11,6 +11,21 @@ namespace SimpleIdServer.OpenID.Extensions
 {
     public static class DTOExtensions
     {
+        public static JObject ToDto(this AuthenticationSchemeProvider authenticationSchemeProvider)
+        {
+            var result = new JObject();
+            result.Add(AuthenticationSchemeProviderParameters.CreateDateTime, authenticationSchemeProvider.CreateDateTime);
+            result.Add(AuthenticationSchemeProviderParameters.DisplayName, authenticationSchemeProvider.DisplayName);
+            result.Add(AuthenticationSchemeProviderParameters.HandlerFullQualifiedName, authenticationSchemeProvider.HandlerFullQualifiedName);
+            result.Add(AuthenticationSchemeProviderParameters.Id, authenticationSchemeProvider.Id);
+            result.Add(AuthenticationSchemeProviderParameters.IsEnabled, authenticationSchemeProvider.IsEnabled);
+            result.Add(AuthenticationSchemeProviderParameters.JsonConverter, authenticationSchemeProvider.JsonConverter);
+            result.Add(AuthenticationSchemeProviderParameters.Name, authenticationSchemeProvider.Name);
+            result.Add(AuthenticationSchemeProviderParameters.Options, authenticationSchemeProvider.JsonOptions);
+            result.Add(AuthenticationSchemeProviderParameters.UpdateDateTime, authenticationSchemeProvider.UpdateDateTime);
+            return result;
+        }
+
         public static JObject ToDto(this OpenIdClient openidClient, string issuer)
         {
             var result = (openidClient as BaseClient).ToDto(issuer);

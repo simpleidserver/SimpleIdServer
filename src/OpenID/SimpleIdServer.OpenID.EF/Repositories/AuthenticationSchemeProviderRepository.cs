@@ -18,10 +18,26 @@ namespace SimpleIdServer.OpenID.EF.Repositories
             _dbContext = dbContext;
         }
 
+        public Task<AuthenticationSchemeProvider> Get(string id, CancellationToken cancellationToken)
+        {
+            return _dbContext.AuthenticationSchemeProviders.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+        }
+
         public async Task<IEnumerable<AuthenticationSchemeProvider>> GetAll(CancellationToken cancellationToken)
         {
             var result = await _dbContext.AuthenticationSchemeProviders.ToListAsync(cancellationToken);
             return result;
+        }
+
+        public Task<bool> Update(AuthenticationSchemeProvider authenticationSchemeProvider, CancellationToken cancellationToken)
+        {
+            _dbContext.AuthenticationSchemeProviders.Update(authenticationSchemeProvider);
+            return Task.FromResult(true);
+        }
+
+        public Task<int> SaveChanges(CancellationToken cancellationToken)
+        {
+            return _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -19,6 +19,8 @@ import { SharedModule } from './shared/shared.module';
 import { ApplicationEffects } from './stores/applications/effects/application.effects';
 import { ApplicationService } from './stores/applications/services/application.service';
 import { appReducer } from './stores/appstate';
+import { AuthSchemeProviderEffects } from './stores/authschemeproviders/effects/authschemeprovider.effects';
+import { AuthSchemeProviderService } from './stores/authschemeproviders/services/authschemeprovider.service';
 import { DelegateConfigurationEffects } from './stores/delegateconfigurations/effects/delegateconfiguration.effects';
 import { DelegateConfigurationService } from './stores/delegateconfigurations/services/delegateconfiguration.service';
 import { GroupEffects } from './stores/groups/effects/group.effects';
@@ -55,7 +57,7 @@ export function createTranslateLoader(http: HttpClient) {
     BrowserAnimationsModule,
     HttpClientModule,
     OAuthModule.forRoot(),
-    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects, UserEffects, GroupEffects, WorkflowEffects, DelegateConfigurationEffects, HumanTaskEffects, ProvisioningEffects]),
+    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects, UserEffects, GroupEffects, WorkflowEffects, DelegateConfigurationEffects, HumanTaskEffects, ProvisioningEffects, AuthSchemeProviderEffects]),
     StoreModule.forRoot(appReducer),
     StoreDevtoolsModule.instrument({
       maxAge: 10
@@ -82,6 +84,7 @@ export function createTranslateLoader(http: HttpClient) {
     DelegateConfigurationService,
     ProvisioningConfigurationService,
     HumanTaskInstanceService,
+    AuthSchemeProviderService,
     MetadataService,
     {
       provide: OAuthStorage,

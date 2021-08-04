@@ -1,0 +1,12 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.authSchemeProviders {
+    flex-flow: row wrap;
+}
+
+.authSchemeProviders > mat-card {
+    margin-bottom: 20px;
+}

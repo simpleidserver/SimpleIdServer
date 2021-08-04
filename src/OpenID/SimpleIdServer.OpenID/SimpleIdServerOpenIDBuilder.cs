@@ -74,7 +74,7 @@ namespace SimpleIdServer.OpenID
 
         public SimpleIdServerOpenIDBuilder AddAuthenticationProviderSchemes(ICollection<Domains.AuthenticationSchemeProvider> authenticationSchemes)
         {
-            _serviceCollection.AddSingleton<IAuthenticationSchemeProviderRepository>(new InMemoryAuthenticationSchemeProviderRepository(authenticationSchemes));
+            _serviceCollection.AddSingleton<IAuthenticationSchemeProviderRepository>(new DefaultAuthenticationSchemeProviderRepository(authenticationSchemes));
             return this;
         }
     }
