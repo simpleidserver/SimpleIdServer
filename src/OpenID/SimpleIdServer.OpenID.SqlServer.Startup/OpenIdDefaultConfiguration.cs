@@ -1,10 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Newtonsoft.Json;
 using SimpleIdServer.Common.Domains;
 using SimpleIdServer.Common.Helpers;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.SqlServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
 
@@ -100,6 +103,14 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope ManageAuthSchemeProviders = new OAuthScope
+        {
+            Name = "manage_authschemeproviders",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -119,7 +130,29 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             UpdateScimResource,
             BulkScimResource,
             ScimProvision,
-            ManageUsers
+            ManageUsers,
+            ManageAuthSchemeProviders
+        };
+
+        public static List<AuthenticationSchemeProvider> AuthenticationProviderSchemes => new List<AuthenticationSchemeProvider>
+        {
+            new AuthenticationSchemeProvider
+            {
+                CreateDateTime = DateTime.UtcNow,
+                DisplayName = "Facebook",
+                HandlerFullQualifiedName = typeof(FacebookHandler).AssemblyQualifiedName,
+                Id = Guid.NewGuid().ToString(),
+                Name = "Facebook",
+                Options = JsonConvert.SerializeObject(new FacebookOptionsLite
+                {
+                    AppId = "2130151727301440",
+                    AppSecret = "fbd2fe5e37602f333908eff93eae295d"
+                }),
+                JsonConverter = typeof(FacebookOptionsJsonConverter).AssemblyQualifiedName,
+                OptionsFullQualifiedName = typeof(FacebookOptionsLite).AssemblyQualifiedName,
+                UpdateDateTime = DateTime.UtcNow,
+                IsEnabled = true
+            }
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -810,7 +843,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         BulkScimResource,
                         UpdateScimResource,
                         DeleteScimResource,
-                        ScimProvision
+                        ScimProvision,
+                        ManageAuthSchemeProviders
                     },
                     GrantTypes = new List<string>
                     {
@@ -841,7 +875,13 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     TokenSignedResponseAlg = "RS256",
                     AllowedScopes = new List<OAuthScope>
                     {
-                        ManageUsers
+                        ManageUsers,
+                        AddScimResource,
+                        DeleteScimResource,
+                        UpdateScimResource,
+                        BulkScimResource,
+                        QueryScimResource,
+                        ManageAuthSchemeProviders
                     },
                     GrantTypes = new List<string>
                     {

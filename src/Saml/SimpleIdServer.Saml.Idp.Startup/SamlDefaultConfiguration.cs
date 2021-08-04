@@ -17,7 +17,7 @@ namespace SimpleIdServer.Saml.Idp.Startup
                 Id = "urn:sp",
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                MetadataUrl = "http://localhost:7001/metadata",
+                MetadataUrl = "http://localhost:7001/saml/metadata",
                 AssertionExpirationTimeInSeconds = 60,
                 ClaimMappings = new List<RelyingPartyClaimMapping>
                 {

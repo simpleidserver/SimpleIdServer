@@ -7,5 +7,6 @@ namespace SimpleIdServer.OAuth.DTOs
     {
         public const string SCIM_ID = "scim_id";
         public const string CONTENT = "content";
+        public const string GENERATE_OTP = "generate_otp";
     }
 }

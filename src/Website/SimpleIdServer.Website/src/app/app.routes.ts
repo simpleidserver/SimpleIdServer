@@ -32,5 +32,9 @@ export const routes: Routes = [
     path: 'humantaskinstances',
     loadChildren: async () => (await import('./humantaskinstances/humantaskinstances.module')).HumanTaskInstancesModule
   },
+  {
+    path: 'authentications',
+    loadChildren: async () => (await import('./authentications/authentications.module')).AuthenticationsModule
+  },
   { path: '**', redirectTo: '/status/404' }
 ];

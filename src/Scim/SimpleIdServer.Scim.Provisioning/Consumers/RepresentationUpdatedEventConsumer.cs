@@ -24,7 +24,7 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
 
         protected override Task<WorkflowResult> LaunchWorkflow(ProvisioningConfiguration configuration, ConsumeContext<RepresentationUpdatedEvent> context)
         {
-            return Task.FromResult((WorkflowResult)null);
+            return Task.FromResult((WorkflowResult)new WorkflowResult(string.Empty, string.Empty));
         }
     }
 }

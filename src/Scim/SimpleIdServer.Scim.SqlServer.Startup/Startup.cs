@@ -60,7 +60,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         ValidIssuer = "https://localhost:60000",
                         ValidAudiences = new List<string>
                         {
-                            "scimClient", "gatewayClient"
+                            "scimClient", "gatewayClient", "provisioningClient"
                         },
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = oauthRsaSecurityKey
@@ -143,7 +143,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         {
                             Id = Guid.NewGuid().ToString(),
                             Type = ProvisioningConfigurationTypes.API,
-                            ResourceType = SCIMConstants.SCIMEndpoints.User,
+                            ResourceType = "ScimUser",
                             UpdateDateTime = DateTime.UtcNow,
                             Records = new List<ProvisioningConfigurationRecord>
                             {
@@ -195,71 +195,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                 },
                                 new ProvisioningConfigurationRecord
                                 {
-                                    Name = "mapping",
-                                    IsArray = true,
-                                    Type = ProvisioningConfigurationRecordTypes.COMPLEX,
-                                    Values = new List<ProvisioningConfigurationRecord>
+                                    Name = "httpRequestTemplate",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
                                     {
-                                        // subject
-                                        new ProvisioningConfigurationRecord
-                                        {
-                                            Name = "externalId",
-                                            Type = ProvisioningConfigurationRecordTypes.STRING,
-                                            ValuesString = new List<string>
-                                            {
-                                                "sub"
-                                            }
-                                        },
-                                        // scim_id
-                                        new ProvisioningConfigurationRecord
-                                        {
-                                            Name = "id",
-                                            Type = ProvisioningConfigurationRecordTypes.STRING,
-                                            ValuesString = new List<string>
-                                            {
-                                                "claims.scim_id"
-                                            }
-                                        },
-                                        // name
-                                        new ProvisioningConfigurationRecord
-                                        {
-                                            Name = "userName",
-                                            Type = ProvisioningConfigurationRecordTypes.STRING,
-                                            ValuesString = new List<string>
-                                            {
-                                                "claims.name"
-                                            }
-                                        },
-                                        // givenName
-                                        new ProvisioningConfigurationRecord
-                                        {
-                                            Name = "name.givenName",
-                                            Type = ProvisioningConfigurationRecordTypes.STRING,
-                                            ValuesString = new List<string>
-                                            {
-                                                "claims.given_name"
-                                            }
-                                        },
-                                        // familyName
-                                        new ProvisioningConfigurationRecord
-                                        {
-                                            Name = "name.familyName",
-                                            Type = ProvisioningConfigurationRecordTypes.STRING,
-                                            ValuesString = new List<string>
-                                            {
-                                                "claims.family_name"
-                                            }
-                                        },
-                                        // middleName
-                                        new ProvisioningConfigurationRecord
-                                        {
-                                            Name = "name.middleName",
-                                            Type = ProvisioningConfigurationRecordTypes.STRING,
-                                            ValuesString = new List<string>
-                                            {
-                                                "claims.middle_name"
-                                            }
-                                        }
+                                        "{ 'generate_otp': true, 'scim_id' : '{{id}}', 'content' : { 'sub' : '{{externalId}}', 'claims': { 'scim_id': '{{id}}', 'name': '{{userName}}', 'given_name' : '{{name.givenName}}', 'family_name': '{{name.familyName}}', 'middle_name': '{{claims.middleName}}' }  } }"
                                     }
                                 },
                                 new ProvisioningConfigurationRecord
@@ -286,7 +226,72 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                     Type = ProvisioningConfigurationRecordTypes.STRING,
                                     ValuesString = new List<string>
                                     {
-                                        "{    'name': 'user',    'messageContent': {        'userId': '{{id}}',        'email': '{{emails[0].value}}'    }}"
+                                        "{ 'name': 'user',    'messageContent': {        'userId': '{{externalId}}',        'email': '{{emails[0].value}}'    }}"
+                                    }
+                                }
+                            }
+                        });
+                        context.ProvisioningConfigurations.Add(new ProvisioningConfiguration
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Type = ProvisioningConfigurationTypes.API,
+                            ResourceType = "OpenIdUser",
+                            UpdateDateTime = DateTime.UtcNow,
+                            Records = new List<ProvisioningConfigurationRecord>
+                            {
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "tokenEdp",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "https://localhost:60000/token"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "targetUrl",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "http://localhost:60002/Users"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "clientId",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "provisioningClient"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "clientSecret",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "provisioningClientSecret"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "scopes",
+                                    IsArray = true,
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "add_scim_resource"
+                                    }
+                                },
+                                new ProvisioningConfigurationRecord
+                                {
+                                    Name = "httpRequestTemplate",
+                                    Type = ProvisioningConfigurationRecordTypes.STRING,
+                                    ValuesString = new List<string>
+                                    {
+                                        "{ 'schemas' : ['urn:ietf:params:scim:schemas:core:2.0:User'], 'externalId': '{{sub}}', 'userName': '{{name??sub}}', 'name': { 'givenName': '{{given_name??sub}}', 'middleName' : '{{middle_name??sub}}', 'familyName': '{{family_name??sub}}' }, 'emails': [ { 'value' : '{{email}}' } ] }"
                                     }
                                 }
                             }

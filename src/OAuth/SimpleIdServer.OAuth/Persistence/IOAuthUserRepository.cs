@@ -11,5 +11,6 @@ namespace SimpleIdServer.OAuth.Persistence
         Task<OAuthUser> FindOAuthUserByLogin(string login, CancellationToken cancellationToken);
         Task<OAuthUser> FindOAuthUserByLoginAndCredential(string login, string credentialType, string credentialValue, CancellationToken token);
         Task<OAuthUser> FindOAuthUserByClaim(string claimType, string claimValue, CancellationToken cancellationToken);
+        Task<OAuthUser> FindOAuthUserByExternalAuthProvider(string scheme, string subject, CancellationToken cancellationToken);
     }
 }

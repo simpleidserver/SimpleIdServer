@@ -1,11 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Provisioning.Extensions;
+using SimpleIdServer.Scim.Provisioning.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -15,25 +16,29 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
 {
     public class HTTPProvisioner : IProvisioner
     {
+        private readonly ILogger<HTTPProvisioner> _logger;
+
+        public HTTPProvisioner(ILogger<HTTPProvisioner> logger)
+        {
+            _logger = logger;
+        }
+
         public ProvisioningConfigurationTypes Type => ProvisioningConfigurationTypes.API;
 
         public async Task Seed(ProvisioningOperations operation, string representationId, JObject representation, ProvisioningConfiguration configuration, CancellationToken cancellationToken)
         {
             var accessToken = await GetAccessToken(configuration, cancellationToken);
             HttpRequestMessage request = null;
-            switch(operation)
+            switch (operation)
             {
                 case ProvisioningOperations.ADD:
                     {
-                        var httpRequest = BuildHTTPRequest(representation, configuration);
-                        var content = new JObject();
-                        content.Add("scim_id", representationId);
-                        content.Add("content", httpRequest);
+                        var content = BuildHTTPRequest(representation, configuration);
                         request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Post,
                             RequestUri = new Uri(configuration.GetTargetUrl()),
-                            Content = new StringContent(content.ToString(), Encoding.UTF8, "application/json")
+                            Content = new StringContent(content, Encoding.UTF8, "application/json")
                         };
                     }
                     break;
@@ -88,62 +93,10 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
             }
         }
 
-        protected JObject BuildHTTPRequest(JObject representation, ProvisioningConfiguration configuration)
+        protected string BuildHTTPRequest(JObject representation, ProvisioningConfiguration configuration)
         {
-            var result = new JObject();
-            var mappingRules = configuration.GetMappingRules();
-            foreach (var mappingRule in mappingRules)
-            {
-                var token = representation.SelectToken(mappingRule.Key);
-                if (token == null)
-                {
-                    continue;
-                }
-
-                var splitted = mappingRule.Value.Split('.');
-                JObject childRecord = null;
-                if (splitted.Length == 1)
-                {
-                    result.Add(splitted.First(), token);
-                }
-                else
-                {
-                    for (int i = splitted.Length - 1; i >= 0; i--)
-                    {
-                        var name = splitted[i];
-                        if (childRecord == null)
-                        {
-                            childRecord = new JObject();
-                            childRecord.Add(name, token);
-                            continue;
-                        }
-
-                        if (i == 0)
-                        {
-                            var cl = result.SelectToken(name) as JObject;
-                            if (cl != null)
-                            {
-                                foreach(var kvp in childRecord)
-                                {
-                                    cl.Add(kvp.Key, kvp.Value);
-                                }
-                            }
-                            else
-                            {
-                                result.Add(name, childRecord);
-                            }
-                        }
-                        else
-                        {
-                            var rec = new JObject();
-                            rec.Add(name, childRecord);
-                            childRecord = rec;
-                        }
-                    }
-                }
-            }
-
-            return result;
+            var template = configuration.GetHttpRequestTemplate();
+            return TemplateParser.ParseMessage(template, representation);
         }
     }
 }

@@ -32,6 +32,7 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
 
         public virtual async Task<bool> Handle(JObject jObj, CancellationToken cancellationToken)
         {
+            bool isAdded = true;
             var parameter = ExtractParameter(jObj);
             var user = await _oauthUserRepository.FindOAuthUserByClaim(SimpleIdServer.Jwt.Constants.UserClaims.ScimId, parameter.ScimId, cancellationToken);
             if (user != null)
@@ -40,11 +41,35 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.USER_ALREADY_EXISTS, parameter.ScimId));
             }
 
-            var newUser = OAuthUser.Create(parameter.Content.GetStr(SimpleIdServer.Jwt.Constants.UserClaims.Subject));
-            UpdateUser(parameter.Content, newUser);
-            await _oauthUserRepository.Add(newUser, cancellationToken);
+            var sub = parameter.Content.GetStr(SimpleIdServer.Jwt.Constants.UserClaims.Subject);
+            if (!string.IsNullOrWhiteSpace(sub))
+            {
+                user = await _oauthUserRepository.FindOAuthUserByLogin(sub.ToString(), cancellationToken);
+                isAdded = user == null;
+            }
+            
+            if (isAdded)
+            {
+                user = OAuthUser.Create(sub);
+            }
+
+            UpdateUser(parameter.Content, user);
+            if (parameter.GenerateOTP)
+            {
+                user.ResetOtp();
+            }
+
+            if (isAdded)
+            {
+                await _oauthUserRepository.Add(user, cancellationToken);
+            }
+            else
+            {
+                await _oauthUserRepository.Update(user, cancellationToken);
+            }
+
             await _oauthUserRepository.SaveChanges(cancellationToken);
-            _logger.LogInformation($"the user {parameter.ScimId} has been added");
+            _logger.LogInformation($"the user {parameter.ScimId} has been added/updated");
             return true;
         }
         protected virtual AddUser ExtractParameter(JObject jObj)
@@ -63,7 +88,8 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AddUserParameters.CONTENT));
             }
 
-            return new AddUser(scimId.ToString(), content as JObject);
+            var generateOTP = jObj.GetBoolean(AddUserParameters.GENERATE_OTP);
+            return new AddUser(scimId.ToString(), content as JObject, generateOTP);
         }
 
         protected virtual void UpdateUser(JObject jObj, OAuthUser user)
@@ -81,12 +107,14 @@ namespace SimpleIdServer.OAuth.Api.Management.Handlers
 
         protected class AddUser
         {
-            public AddUser(string scimId, JObject content)
+            public AddUser(string scimId, JObject content, bool generateOTP)
             {
                 ScimId = scimId;
                 Content = content;
+                GenerateOTP = generateOTP;
             }
 
+            public bool GenerateOTP { get; set; }
             public string ScimId { get; set; }
             public JObject Content { get; set; }
         }

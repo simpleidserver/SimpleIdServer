@@ -50,6 +50,7 @@ namespace SimpleIdServer.OpenID
         public const string MISSING_AUD_CLAIM = "the audience claim is missing";
         public const string MISSING_RESPONSE_TYPE_CLAIM = "the response type claim is missing";
         public const string MISSING_CLIENT_ID_CLAIM = "the client identifier claim is missing";
+        public const string MISSING_PARAMETER = "the parameter {0} is missing";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
         public const string ACCESS_REVOKED_BY_RESOURCE_OWNER = "access has been revoked by the resource owner";
@@ -60,6 +61,8 @@ namespace SimpleIdServer.OpenID
         public const string LOGIN_HINT_TOKEN_IS_EXPIRED = "login_hint_token has expired";
         public const string UNKNOWN_USER = "unknown user '{0}'";
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
+        public const string UNKNOWN_AUTH_SCHEME_PROVIDER = "the authentication scheme {0} doesn't exist";
+        public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
         public const string AUTH_REQUEST_NOTIFIED = "the authentication request '{0}' has already been notified to the client";
@@ -83,5 +86,7 @@ namespace SimpleIdServer.OpenID
         public const string AUTH_REQUEST_CLIENT_NOT_AUTHORIZED = "the client is not authorized to use the auth_req_id";
         public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
         public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
+        public const string BAD_EXTERNAL_AUTHENTICATION = "an error occured while trying to authenticate the user";
+        public const string BAD_EXTERNAL_AUTHENTICATION_USER = "the user doesn't contain a valid subject";
     }
 }

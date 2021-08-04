@@ -5,7 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.1.0" />
     <PackageReference Include="FirebaseAdmin" Version="2.0.0" />
+    <PackageReference Include="MassTransit" Version="7.1.8" />
+    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.1.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj" />

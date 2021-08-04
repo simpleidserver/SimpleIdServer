@@ -25,6 +25,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 p.AddAuthenticationSchemes(Constants.AuthenticationScheme);
                 p.RequireClaim(SimpleIdServer.Jwt.Constants.OAuthClaims.Scopes, "manage_users");
             });
+            options.AddPolicy("ManageAuthSchemeProviders", p =>
+            {
+                p.AddAuthenticationSchemes(Constants.AuthenticationScheme);
+                p.RequireClaim(SimpleIdServer.Jwt.Constants.OAuthClaims.Scopes, "manage_authschemeproviders");
+            });
         }
     }
 }

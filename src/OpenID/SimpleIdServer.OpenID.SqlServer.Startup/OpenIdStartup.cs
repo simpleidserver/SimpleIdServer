@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -49,6 +50,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
+                .AddCookie(SIDOpenIdConstants.ExternalAuthenticationScheme)
                 .AddJwtBearer(OAuth.Constants.AuthenticationScheme, cfg =>
                 {
                     cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -86,6 +88,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                         SIDOpenIdConstants.StandardScopes.Phone.Name,
                         SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name
                     };
+                }, massTransitOptions: opt =>
+                {
+                    opt.UsingRabbitMq();
                 })
                 .AddOpenIDEF(opt =>
                 {
@@ -98,7 +103,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     opts.SmtpUserName = credentials.Login;
                     opts.SmtpPassword = credentials.Password;
                     opts.FromEmail = credentials.Login;
-                });
+                })
+                .AddDynamicAuthenticationProviders();
             // ConfigureFireBase();
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory()));
@@ -168,6 +174,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     if (!context.OpenIdClients.Any())
                     {
                         context.OpenIdClients.AddRange(OpenIdDefaultConfiguration.GetClients(firstMtlsClientJsonWebKey, secondMtlsClientJsonWebKey, sigJsonWebKey));
+                    }
+
+                    if(!context.AuthenticationSchemeProviders.Any())
+                    {
+                        context.AuthenticationSchemeProviders.AddRange(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
                     }
 
                     context.SaveChanges();

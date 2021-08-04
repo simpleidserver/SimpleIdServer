@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
@@ -10,6 +11,7 @@ using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.Persistence.InMemory;
+using SimpleIdServer.OpenID.UI.AuthProviders;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OpenID
@@ -59,6 +61,20 @@ namespace SimpleIdServer.OpenID
         public SimpleIdServerOpenIDBuilder AddDistributeHttpClaimsSource(DistributeHttpClaimsSourceOptions distributeHttpClaimsSourceOptions)
         {
             _serviceCollection.AddTransient<IClaimsSource, DistributeHttpClaimsSource>(o => new DistributeHttpClaimsSource(distributeHttpClaimsSourceOptions));
+            return this;
+        }
+
+        public SimpleIdServerOpenIDBuilder AddDynamicAuthenticationProviders()
+        {
+            _serviceCollection.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
+            return this;
+        }
+
+        public SimpleIdServerOpenIDBuilder AddAuthenticationProviderSchemes(ICollection<Domains.AuthenticationSchemeProvider> authenticationSchemes)
+        {
+            _serviceCollection.AddSingleton<IAuthenticationSchemeProviderRepository>(new DefaultAuthenticationSchemeProviderRepository(authenticationSchemes));
             return this;
         }
     }

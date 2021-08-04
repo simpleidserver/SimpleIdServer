@@ -261,4 +261,7 @@
   <data name="code_validity" xml:space="preserve">
     <value>Le code a une validité de {0} secondes</value>
   </data>
+  <data name="external_authenticate" xml:space="preserve">
+    <value>Authentification externe</value>
+  </data>
 </root>

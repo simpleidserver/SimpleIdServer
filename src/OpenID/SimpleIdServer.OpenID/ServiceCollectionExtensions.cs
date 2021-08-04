@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
@@ -20,6 +22,7 @@ using SimpleIdServer.OpenID;
 using SimpleIdServer.OpenID.Api.Authorization;
 using SimpleIdServer.OpenID.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OpenID.Api.Authorization.Validators;
+using SimpleIdServer.OpenID.Api.AuthSchemeProvider.Handlers;
 using SimpleIdServer.OpenID.Api.BCAuthorize;
 using SimpleIdServer.OpenID.Api.BCDeviceRegistration;
 using SimpleIdServer.OpenID.Api.Configuration;
@@ -53,7 +56,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services)
+        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services,
+            Action<OpenIDHostOptions> openidOptions = null,
+            Action<OAuthHostOptions> oauthOptions = null,
+            Action<IServiceCollectionBusConfigurator> massTransitOptions = null)
         {
             var builder = new SimpleIdServerOpenIDBuilder(services);
             services.AddSIDOAuth();
@@ -69,18 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOpenIDAuthentication()
                 .AddManagementApi()
                 .AddBCAuthorizeJob()
-                .AddInMemoryLock();
-            return builder;
-        }
-
-        /// <summary>
-        /// Register OPENID dependencies.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static SimpleIdServerOpenIDBuilder AddSIDOpenID(this IServiceCollection services, Action<OpenIDHostOptions> openidOptions = null, Action<OAuthHostOptions> oauthOptions = null)
-        {
+                .AddInMemoryLock()
+                .AddAuthSchemeProviderApi();
             if (openidOptions != null)
             {
                 services.Configure(openidOptions);
@@ -99,7 +95,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Configure<OAuthHostOptions>((opt) => { });
             }
 
-            return services.AddSIDOpenID();
+            services.AddMassTransit(massTransitOptions != null ? massTransitOptions : (o) =>
+            {
+                o.UsingInMemory();
+            });
+            return builder;
         }
 
         private static IServiceCollection AddOpenIDAuthentication(this IServiceCollection services)
@@ -107,7 +107,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var serviceProvider = services.BuildServiceProvider();
             var openidHostOptions = serviceProvider.GetService<IOptionsMonitor<OpenIDHostOptions>>();
             services.AddAuthentication(openidHostOptions.CurrentValue.AuthenticationScheme)
-                .AddCookie(openidHostOptions.CurrentValue.AuthenticationScheme, openidHostOptions.CurrentValue.AuthenticationScheme, opts =>
+                .AddCookie(openidHostOptions.CurrentValue.AuthenticationScheme, null, opts =>
                 {
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {
@@ -177,10 +177,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 SIDOpenIdConstants.StandardScopes.Profile
             };
             var bcAuthorizeLst = new ConcurrentBag<BCAuthorize>();
+            var authenticationSchemes = new List<SimpleIdServer.OpenID.Domains.AuthenticationSchemeProvider>();
             services.AddSingleton<IAuthenticationContextClassReferenceRepository>(new DefaultAuthenticationContextClassReferenceRepository(acrs));
             services.AddSingleton<IOAuthClientRepository>(new DefaultOpenIdClientRepository(clients));
             services.AddSingleton<IOAuthScopeRepository>(new DefaultOpenIdScopeRepository(scopes));
             services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository(bcAuthorizeLst));
+            services.AddSingleton<IAuthenticationSchemeProviderRepository>(new DefaultAuthenticationSchemeProviderRepository(authenticationSchemes));
             return services;
         }
 
@@ -265,6 +267,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler, SimpleIdServer.OpenID.Api.Management.SearchOpenIdClientsHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.UpdateOpenIdClientHandler>();
             services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthClientHandler, SimpleIdServer.OpenID.Api.Management.AddOpenIdClientHandler>();
+            return services;
+        }
+
+        private static IServiceCollection AddAuthSchemeProviderApi(this IServiceCollection services)
+        {
+            services.AddTransient<IDisableAuthSchemeProviderHandler, DisableAuthSchemeProviderHandler>();
+            services.AddTransient<IEnableAuthSchemeProviderHandler, EnableAuthSchemeProviderHandler>();
+            services.AddTransient<IGetAllAuthSchemeProvidersHandler, GetAllAuthSchemeProvidersHandler>();
+            services.AddTransient<IUpdateAuthSchemeProviderOptionsHandler, UpdateAuthSchemeProviderOptionsHandler>();
+            services.AddTransient<IGetAuthSchemeProviderHandler, GetAuthSchemeProviderHandler>();
             return services;
         }
 

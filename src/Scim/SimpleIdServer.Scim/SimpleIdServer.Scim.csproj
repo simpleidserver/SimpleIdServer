@@ -11,6 +11,9 @@
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.1.8" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Resources\Global.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

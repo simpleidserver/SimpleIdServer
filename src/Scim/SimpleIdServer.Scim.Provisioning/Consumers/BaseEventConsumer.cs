@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using SimpleIdServer.Common.ExternalEvents;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Provisioning.Provisioner;
 using System;
@@ -50,12 +50,12 @@ namespace SimpleIdServer.Scim.Provisioning.Consumers
                 try
                 {
                     transaction = await _provisioningConfigurationRepository.StartTransaction(token);
-                    var workflowResult = await LaunchWorkflow(configuration, context);
                     await provisioner.Seed(Type,
                         context.Message.Id,
                         context.Message.Representation,
                         configuration,
                         token);
+                    var workflowResult = await LaunchWorkflow(configuration, context);
                     configuration.Complete(context.Message.Id, description, workflowResult.InstanceId, workflowResult.FileId, context.Message.Version);
                 }
                 catch (Exception ex)

@@ -191,6 +191,44 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/authschemeproviders/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/authschemeproviders/{everything}",
+      "UpstreamHttpMethod": [ "GET", "PUT" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/authschemeproviders",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 60000
+        }
+      ],
+      "UpstreamPathTemplate": "/authschemeproviders",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DelegatingHandlers": [
+        "ManageClientClientCredentialsHandler"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Authenticated",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/metadata/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

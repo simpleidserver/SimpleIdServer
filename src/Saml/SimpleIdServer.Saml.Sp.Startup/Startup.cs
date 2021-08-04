@@ -36,7 +36,7 @@ namespace SimpleIdServer.Saml.Sp.Startup
                 o.WantAssertionSigned = true;
                 o.SignatureAlg = SignatureAlgorithms.RSASHA256;
                 o.CanonicalizationMethod = CanonicalizationMethods.C14;
-                o.IdpMetadataUrl = "http://localhost:7000/metadata";
+                o.IdpMetadataUrl = "http://localhost:7000/saml/metadata";
             });
         }
 

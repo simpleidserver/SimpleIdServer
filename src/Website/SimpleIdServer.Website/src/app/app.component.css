@@ -28,6 +28,7 @@
   transition: transform 300ms ease;
   transform: scaleY(0);
   transform-origin: top;
+  display: none;
 }
 
 .submenuItem > .mat-list-item-content {
@@ -36,4 +37,5 @@
 
 .submenu.expanded {
   transform: scaleY(1);
+  display: block;
 }

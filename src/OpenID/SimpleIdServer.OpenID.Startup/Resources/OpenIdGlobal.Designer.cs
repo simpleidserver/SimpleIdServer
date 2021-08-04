@@ -214,6 +214,15 @@ namespace SimpleIdServer.OpenID.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à External Authentication.
+        /// </summary>
+        public static string external_authenticate {
+            get {
+                return ResourceManager.GetString("external_authenticate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Home.
         /// </summary>
         public static string home {
