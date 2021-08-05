@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Saml\SimpleIdServer.Saml.Sp\SimpleIdServer.Saml.Sp.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj" />
@@ -23,6 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\..\certificates\localhost.pfx" Link="localhost.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\..\..\certificates\simpleIdServerClient.crt" Link="simpleIdServerClient.crt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

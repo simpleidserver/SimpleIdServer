@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Logging;
 using SimpleIdServer.Saml.Exceptions;
 using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Helpers;
@@ -10,16 +9,9 @@ using System.Net;
 
 namespace SimpleIdServer.Saml.Validators
 {
-    public class SAMLValidator
+    public static class SAMLValidator
     {
-        private readonly ILogger<SAMLValidator> _logger;
-
-        public SAMLValidator(ILogger<SAMLValidator> logger)
-        {
-            _logger = logger;
-        }
-
-        protected virtual T CheckSaml<T>(string saml, string relayState, bool isRequester = true) where T : class
+        public static T CheckSaml<T>(string saml, string relayState, bool isRequester = true) where T : class
         {
             string errorCode = isRequester ? Saml.Constants.StatusCodes.Requester : Saml.Constants.StatusCodes.Responder;
             if (string.IsNullOrWhiteSpace(saml))
@@ -39,7 +31,6 @@ namespace SimpleIdServer.Saml.Validators
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
                 throw new SamlException(HttpStatusCode.BadRequest, errorCode, Global.BadSamlDecompression);
             }
 
@@ -50,7 +41,6 @@ namespace SimpleIdServer.Saml.Validators
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
                 throw new SamlException(HttpStatusCode.BadRequest, errorCode, Global.BadSamlDeserialization);
             }
 

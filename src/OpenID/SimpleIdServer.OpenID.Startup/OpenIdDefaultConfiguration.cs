@@ -8,6 +8,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.Startup.Converters;
+using SimpleIdServer.Saml.Sp;
 using System;
 using System.Collections.Generic;
 
@@ -150,6 +151,26 @@ namespace SimpleIdServer.OpenID.Startup
                 }),
                 JsonConverter = typeof(FacebookOptionsJsonConverter).AssemblyQualifiedName,
                 OptionsFullQualifiedName = typeof(FacebookOptionsLite).AssemblyQualifiedName,
+                PostConfigureOptionsFullQualifiedName = typeof(FacebookPostConfigureOptions).AssemblyQualifiedName,
+                UpdateDateTime = DateTime.UtcNow,
+                IsEnabled = true
+            },
+            new AuthenticationSchemeProvider
+            {
+                CreateDateTime = DateTime.UtcNow,
+                DisplayName = "Saml",
+                HandlerFullQualifiedName = typeof(SamlSpHandler).AssemblyQualifiedName,
+                Id = Guid.NewGuid().ToString(),
+                Name = SamlSpDefaults.AuthenticationScheme,
+                Options = JsonConvert.SerializeObject(new SamlSpOptionsLite
+                {
+                    IdpMetadataUrl = "http://localhost:7000/saml/metadata",
+                    SPId = "urn:idp",
+                    SPName = "IdentityServer"
+                }),
+                JsonConverter = typeof(SamlSpOptionsJsonConverter).AssemblyQualifiedName,
+                OptionsFullQualifiedName = typeof(SamlSpOptionsLite).AssemblyQualifiedName,
+                PostConfigureOptionsFullQualifiedName = typeof(SamlSpPostConfigureOptions).AssemblyQualifiedName,
                 UpdateDateTime = DateTime.UtcNow,
                 IsEnabled = true
             }

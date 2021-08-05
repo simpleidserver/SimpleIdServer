@@ -16,6 +16,7 @@ namespace SimpleIdServer.OpenID.Domains
         public string HandlerFullQualifiedName { get; set; }
         public string JsonConverter { get; set; }
         public string OptionsFullQualifiedName { get; set; }
+        public string PostConfigureOptionsFullQualifiedName { get; set; }
         public string Options { get; set; }
 
         public JObject JsonOptions
@@ -57,7 +58,8 @@ namespace SimpleIdServer.OpenID.Domains
                 IsEnabled = IsEnabled,
                 Options = Options,
                 OptionsFullQualifiedName = OptionsFullQualifiedName,
-                JsonConverter = JsonConverter
+                JsonConverter = JsonConverter,
+                PostConfigureOptionsFullQualifiedName = PostConfigureOptionsFullQualifiedName
             };
         }
     }

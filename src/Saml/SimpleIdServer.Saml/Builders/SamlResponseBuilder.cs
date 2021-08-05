@@ -33,11 +33,7 @@ namespace SimpleIdServer.Saml.Builders
 
         public static SamlResponseBuilder New()
         {
-            if (_instance == null)
-            {
-                _instance = new SamlResponseBuilder();
-            }
-
+            _instance = new SamlResponseBuilder();
             return _instance;
         }
 

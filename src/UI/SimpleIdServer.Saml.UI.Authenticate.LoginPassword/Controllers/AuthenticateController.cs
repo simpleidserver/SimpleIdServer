@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Common.Exceptions;
 using SimpleIdServer.Saml.DTOs;
+using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Idp;
 using SimpleIdServer.Saml.Idp.Persistence;
 using SimpleIdServer.Saml.Idp.UI;
 using SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Services;
 using SimpleIdServer.Saml.UI.Authenticate.LoginPassword.ViewModels;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Controllers
 {
@@ -48,12 +51,8 @@ namespace SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Controllers
             {
                 var user = await _passwordSamlAuthService.Authenticate(viewModel.Login, viewModel.Password, cancellationToken);
                 await Authenticate(Constants.AMR, user, cancellationToken, viewModel.RememberLogin);
-                return RedirectToAction("Login", Saml.Constants.RouteNames.SingleSignOn, new
-                {
-                    SAMLRequest = viewModel.Parameter.SAMLRequest,
-                    RelayState = viewModel.Parameter.RelayState,
-                    area = ""
-                });
+                var url = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SimpleIdServer.Saml.Constants.RouteNames.SingleSignOn}/Login?SAMLRequest={HttpUtility.UrlEncode(viewModel.Parameter.SAMLRequest)}&RelayState={HttpUtility.UrlEncode(viewModel.Parameter.RelayState)}";
+                return Redirect(url);
             }
             catch(BaseUIException ex)
             {

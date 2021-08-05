@@ -70,7 +70,6 @@ namespace SimpleIdServer.OpenID.UI
             {
                 RedirectUri = Url.Action(nameof(Callback)),
             };
-            var scopeParameter = props.GetParameter<ICollection<string>>("scope");
             return Challenge(props, scheme);
         }
 

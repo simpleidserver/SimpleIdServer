@@ -1,16 +1,21 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using SimpleIdServer.Saml.Sp.Events;
 using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.Saml.Sp
 {
-    public class SamlSpOptions
+    public class SamlSpOptions : RemoteAuthenticationOptions
     {
         public SamlSpOptions()
         {
-            SPName = "SP Saml2";
+            CallbackPath = new PathString("/saml2-signin");
+            SPName = SamlSpDefaults.DisplayName;
             SPId = "urn:sp";
             CanonicalizationMethod = CanonicalizationMethods.C14;
+            Events = new SamlSpEvents();
         }
 
         /// <summary>
@@ -45,5 +50,18 @@ namespace SimpleIdServer.Saml.Sp
         /// Metadata URL of the IdentityProvider.
         /// </summary>
         public string IdpMetadataUrl { get; set; }
+        /// <summary>
+        /// Gets or sets the SamlSpEvents used to handle authentication events.
+        /// </summary>
+        public new SamlSpEvents Events
+        {
+            get { return (SamlSpEvents)base.Events; }
+            set { base.Events = value; }
+        }
+        public string SignOutScheme { get; set; }
+        /// <summary>
+        /// Gets or sets the type used to secure data handled by the middleware.
+        /// </summary>
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
     }
 }

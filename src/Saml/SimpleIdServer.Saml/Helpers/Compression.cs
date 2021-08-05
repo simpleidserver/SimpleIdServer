@@ -33,7 +33,10 @@ namespace SimpleIdServer.Saml.Helpers
                     originalStream.Write(parameter);
                 }
 
-                return Convert.ToBase64String(compressedStream.GetBuffer());
+                var buffer = compressedStream.GetBuffer();
+                var lastIndex = Array.FindLastIndex(buffer, b => b != 0);
+                Array.Resize(ref buffer, lastIndex + 1);
+                return Convert.ToBase64String(buffer);
             }
         }
     }

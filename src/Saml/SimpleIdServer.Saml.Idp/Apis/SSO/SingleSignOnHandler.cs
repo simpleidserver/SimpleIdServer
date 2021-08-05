@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Saml.Idp.Apis.SSO
 {
-    public class SingleSignOnHandler : SAMLValidator, ISingleSignOnHandler
+    public class SingleSignOnHandler : ISingleSignOnHandler
     {
         private readonly IEntityDescriptorStore _entityDescriptorStore;
         private readonly IRelyingPartyRepository _relyingPartyRepository;
@@ -36,8 +36,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             IRelyingPartyRepository relyingPartyRepository,
             IEnumerable<IAuthenticator> authenticators,
             IUserRepository userRepository,
-            IOptions<SamlIdpOptions> options,
-            ILogger<SAMLValidator> loggerSamlValidator) : base(loggerSamlValidator)
+            IOptions<SamlIdpOptions> options)
         {
             _entityDescriptorStore = entityDescriptorStore;
             _relyingPartyRepository = relyingPartyRepository;
@@ -64,7 +63,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
 
         protected virtual AuthnRequestType CheckParameter(SAMLRequestDto parameter)
         {
-            var authnRequest = CheckSaml<AuthnRequestType>(parameter.SAMLRequest, parameter.RelayState);
+            var authnRequest = SAMLValidator.CheckSaml<AuthnRequestType>(parameter.SAMLRequest, parameter.RelayState);
             if (authnRequest.Issuer == null || string.IsNullOrWhiteSpace(authnRequest.Issuer.Value))
             {
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(authnRequest.Issuer)));

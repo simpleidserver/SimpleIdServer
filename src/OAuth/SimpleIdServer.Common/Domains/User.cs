@@ -190,6 +190,22 @@ namespace SimpleIdServer.Common.Domains
             return other.GetHashCode() == GetHashCode();
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var u = obj as User;
+            if (u == null)
+            {
+                return false;
+            }
+
+            return GetHashCode() == u.GetHashCode();
+        }
+
         public override int GetHashCode()
         {
             return Id.GetHashCode();

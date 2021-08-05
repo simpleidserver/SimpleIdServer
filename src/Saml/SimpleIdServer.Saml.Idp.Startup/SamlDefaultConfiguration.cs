@@ -34,6 +34,29 @@ namespace SimpleIdServer.Saml.Idp.Startup
                         ClaimFormat = ""
                     }
                 }
+            },
+            new RelyingPartyAggregate
+            {
+                Id = "urn:idp",
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                MetadataUrl = "https://localhost:60000/saml/metadata",
+                AssertionExpirationTimeInSeconds = 60,
+                ClaimMappings = new List<RelyingPartyClaimMapping>
+                {
+                    new RelyingPartyClaimMapping
+                    {
+                        UserAttribute = Jwt.Constants.UserClaims.GivenName,
+                        ClaimName = "urn:oid:2.5.4.42",
+                        ClaimFormat = ""
+                    },
+                    new RelyingPartyClaimMapping
+                    {
+                        UserAttribute= Jwt.Constants.UserClaims.FamilyName,
+                        ClaimName = "LastName",
+                        ClaimFormat = ""
+                    }
+                }
             }
         };
 

@@ -25,26 +25,28 @@ namespace SimpleIdServer.Saml.Sp.Startup
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie()
+                .AddCookie("ExternalAuthentication")
+                .AddSamlSp(opts =>
+                {
+                    opts.SignInScheme = "ExternalAuthentication";
+                    opts.SPId = "urn:sp";
+                    opts.SigningCertificate = certificate;
+                    opts.AuthnRequestSigned = true;
+                    opts.WantAssertionSigned = true;
+                    opts.SignatureAlg = SignatureAlgorithms.RSASHA256;
+                    opts.CanonicalizationMethod = CanonicalizationMethods.C14;
+                    opts.IdpMetadataUrl = "http://localhost:7000/saml/metadata";
+                });
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
-            services.AddSamlSp(o =>
-            {
-                o.SPId = "urn:sp";
-                o.SPName = "SP Saml2";
-                o.SigningCertificate = certificate;
-                o.AuthnRequestSigned = true;
-                o.WantAssertionSigned = true;
-                o.SignatureAlg = SignatureAlgorithms.RSASHA256;
-                o.CanonicalizationMethod = CanonicalizationMethods.C14;
-                o.IdpMetadataUrl = "http://localhost:7000/saml/metadata";
-            });
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseSamlSp();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

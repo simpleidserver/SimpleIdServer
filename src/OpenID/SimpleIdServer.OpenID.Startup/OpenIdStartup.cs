@@ -43,6 +43,7 @@ namespace SimpleIdServer.OpenID.Startup
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
+                .AddCookie(SIDOpenIdConstants.ExternalAuthenticationScheme)
                 .AddJwtBearer(OAuth.Constants.AuthenticationScheme, cfg =>
                 {
                     cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters

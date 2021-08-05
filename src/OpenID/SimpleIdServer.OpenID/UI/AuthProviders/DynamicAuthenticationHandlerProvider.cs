@@ -15,7 +15,8 @@ namespace SimpleIdServer.OpenID.UI.AuthProviders
         private readonly Dictionary<string, IAuthenticationHandler> _handlerMap = new Dictionary<string, IAuthenticationHandler>(StringComparer.Ordinal);
         private readonly ISIDAuthenticationSchemeProvider _authenticationSchemeProvider;
 
-        public DynamicAuthenticationHandlerProvider(ISIDAuthenticationSchemeProvider authenticationSchemeProvider)
+        public DynamicAuthenticationHandlerProvider(
+            ISIDAuthenticationSchemeProvider authenticationSchemeProvider)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
         }

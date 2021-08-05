@@ -117,12 +117,20 @@ namespace SimpleIdServer.OpenID.UI.AuthProviders
             var optionType = authenticationHandlerType.GetGenericArguments().First();
             var converter = Activator.CreateInstance(Type.GetType(provider.JsonConverter)) as JsonConverter;
             var option = JsonConvert.DeserializeObject(provider.Options, optionType, converter);
-            var oauthOptions = option as OAuthOptions;
-            if (oauthOptions != null)
+            if (!string.IsNullOrWhiteSpace(provider.PostConfigureOptionsFullQualifiedName))
             {
-                oauthOptions.StateDataFormat = new PropertiesDataFormat(_dataProtectionProvider.CreateProtector(provider.Name));
-                oauthOptions.Backchannel = new System.Net.Http.HttpClient();
-                oauthOptions.SignInScheme = _openidOptions.ExternalAuthenticationScheme;
+                var postConfigureOptionsType = Type.GetType(provider.PostConfigureOptionsFullQualifiedName);
+                var constructor = postConfigureOptionsType.GetConstructors().First();
+                var args = new List<object>();
+                foreach(var parameter in constructor.GetParameters())
+                {
+                    args.Add(_serviceProvider.GetRequiredService(parameter.ParameterType));
+                }
+
+                var postConfigure = postConfigureOptionsType.GetMethod("PostConfigure", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                var instance = Activator.CreateInstance(postConfigureOptionsType, args.ToArray());
+                postConfigure.Invoke(instance, new object[] { provider.Name, option });
+                
             }
 
             var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);

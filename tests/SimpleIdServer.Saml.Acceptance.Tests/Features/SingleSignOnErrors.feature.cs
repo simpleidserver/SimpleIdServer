@@ -112,7 +112,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost/SSO/Login\'", ((string)(null)), table1, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost/saml/SSO/Login\'", ((string)(null)), table1, "When ");
 #line hidden
 #line 7
  testRunner.And("extract XML from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -163,7 +163,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
 #line 14
- testRunner.When("execute HTTP GET request \'https://localhost/SSO/Login?SAMLRequest=samlRequest\'", ((string)(null)), table2, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost/saml/SSO/Login?SAMLRequest=samlReques" +
+                        "t\'", ((string)(null)), table2, "When ");
 #line hidden
 #line 16
  testRunner.And("extract XML from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -214,8 +215,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
 #line 23
- testRunner.When("execute HTTP GET request \'https://localhost/SSO/Login?SAMLRequest=samlRequest&Rel" +
-                        "ayState=token\'", ((string)(null)), table3, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost/saml/SSO/Login?SAMLRequest=samlReques" +
+                        "t&RelayState=token\'", ((string)(null)), table3, "When ");
 #line hidden
 #line 25
  testRunner.And("extract XML from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -266,7 +267,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
 #line 32
- testRunner.When(@"execute HTTP GET request 'https://localhost/SSO/Login?SAMLRequest=Ki4pAgAAAP%2f%2fAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%3d%3d&RelayState=token'", ((string)(null)), table4, "When ");
+ testRunner.When(@"execute HTTP GET request 'https://localhost/saml/SSO/Login?SAMLRequest=Ki4pAgAAAP%2f%2fAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%3d%3d&RelayState=token'", ((string)(null)), table4, "When ");
 #line hidden
 #line 34
  testRunner.And("extract XML from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

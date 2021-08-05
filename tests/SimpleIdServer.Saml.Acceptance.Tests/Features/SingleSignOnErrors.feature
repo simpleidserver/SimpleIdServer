@@ -2,7 +2,7 @@
 	Check Errors returned by SingleSignOn
 
 Scenario: Check error is returned when SAMLRequest is missing
-	When execute HTTP GET request 'https://localhost/SSO/Login'
+	When execute HTTP GET request 'https://localhost/saml/SSO/Login'
 	| Key | Value |
 	And extract XML from body
 
@@ -11,7 +11,7 @@ Scenario: Check error is returned when SAMLRequest is missing
 	Then XML attribute 'saml:Status/saml:StatusCode/@Value'='urn:oasis:names:tc:SAML:2.0:status:Requester'
 
 Scenario: Check error is returned when RelayState is missing
-	When execute HTTP GET request 'https://localhost/SSO/Login?SAMLRequest=samlRequest'
+	When execute HTTP GET request 'https://localhost/saml/SSO/Login?SAMLRequest=samlRequest'
 	| Key | Value |
 	And extract XML from body
 
@@ -20,7 +20,7 @@ Scenario: Check error is returned when RelayState is missing
 	Then XML attribute 'saml:Status/saml:StatusCode/@Value'='urn:oasis:names:tc:SAML:2.0:status:Requester'
 
 Scenario: Check error is returned when SAMLRequest cannot be decompressed
-	When execute HTTP GET request 'https://localhost/SSO/Login?SAMLRequest=samlRequest&RelayState=token'
+	When execute HTTP GET request 'https://localhost/saml/SSO/Login?SAMLRequest=samlRequest&RelayState=token'
 	| Key | Value |
 	And extract XML from body
 
@@ -29,7 +29,7 @@ Scenario: Check error is returned when SAMLRequest cannot be decompressed
 	Then XML attribute 'saml:Status/saml:StatusCode/@Value'='urn:oasis:names:tc:SAML:2.0:status:Requester'
 
 Scenario: Check error is returned when SAMLRequest is not an xml file
-	When execute HTTP GET request 'https://localhost/SSO/Login?SAMLRequest=Ki4pAgAAAP%2f%2fAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%3d%3d&RelayState=token'
+	When execute HTTP GET request 'https://localhost/saml/SSO/Login?SAMLRequest=Ki4pAgAAAP%2f%2fAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%3d%3d&RelayState=token'
 	| Key | Value |
 	And extract XML from body
 
