@@ -9,5 +9,8 @@ namespace SimpleIdServer.Saml.Idp.Persistence
     public interface IRelyingPartyRepository
     {
         Task<RelyingPartyAggregate> Get(string id, CancellationToken cancellationToken);
+        Task<bool> Add(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken);
+        Task<bool> Update(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken);
+        Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 }

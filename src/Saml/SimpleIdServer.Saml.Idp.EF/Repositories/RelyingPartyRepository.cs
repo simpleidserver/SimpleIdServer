@@ -1,20 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Saml.Idp.Domains;
-using System.Collections.Generic;
-using System.Linq;
+using SimpleIdServer.Saml.Idp.Persistence;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Saml.Idp.Persistence.InMemory
+namespace SimpleIdServer.Saml.Idp.EF.Repositories
 {
-    public class InMemoryRelyingPartyRepository : IRelyingPartyRepository
+    public class RelyingPartyRepository : IRelyingPartyRepository
     {
-        private readonly ICollection<RelyingPartyAggregate> _relyingParties;
+        private readonly SamlIdpDBContext _dbContext;
 
-        public InMemoryRelyingPartyRepository(ICollection<RelyingPartyAggregate> relyingParties)
+        public RelyingPartyRepository(SamlIdpDBContext samlIdpDBContext)
         {
-            _relyingParties = relyingParties;
+            _dbContext = samlIdpDBContext;
         }
 
         public Task<bool> Add(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken)
@@ -24,7 +23,7 @@ namespace SimpleIdServer.Saml.Idp.Persistence.InMemory
 
         public Task<RelyingPartyAggregate> Get(string id, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_relyingParties.FirstOrDefault(r => r.Id == id));
+            throw new System.NotImplementedException();
         }
 
         public Task<int> SaveChanges(CancellationToken cancellationToken)
