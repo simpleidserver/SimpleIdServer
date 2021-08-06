@@ -12,6 +12,8 @@
 // Ce code source a été automatiquement généré par xsd, Version=4.8.3928.0.
 // 
 using System;
+using System.Collections;
+using System.Xml.Serialization;
 
 namespace SimpleIdServer.Saml.Xsd
 {
@@ -3091,7 +3093,7 @@ namespace SimpleIdServer.Saml.Xsd
     [System.Xml.Serialization.XmlRootAttribute("Attribute", Namespace="urn:oasis:names:tc:SAML:2.0:assertion", IsNullable=false)]
     public partial class AttributeType {
         
-        private object[] attributeValueField;
+        private ArrayList attributeValueField;
         
         private string nameField;
         
@@ -3102,12 +3104,15 @@ namespace SimpleIdServer.Saml.Xsd
         private System.Xml.XmlAttribute[] anyAttrField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("AttributeValue", typeof(AttributeValueType))]
-        public object[] AttributeValue {
-            get {
+        [System.Xml.Serialization.XmlElementAttribute(DataType = "string", Type = typeof(string))]
+        public ArrayList AttributeValue 
+        {
+            get 
+            {
                 return this.attributeValueField;
             }
-            set {
+            set 
+            {
                 this.attributeValueField = value;
             }
         }
@@ -3161,14 +3166,36 @@ namespace SimpleIdServer.Saml.Xsd
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:assertion")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+    public partial class AttributeValueTypeType
+    {
+        private string _value;
+
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                _value = value;
+            }
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:oasis:names:tc:SAML:2.0:assertion", TypeName = "string")]
     [System.Xml.Serialization.XmlRootAttribute("AttributeValue", Namespace = "urn:oasis:names:tc:SAML:2.0:assertion", IsNullable = false)]
     public partial class AttributeValueType
     {
-        private string _type;
         private string _value;
-
-        [System.Xml.Serialization.XmlAttributeAttribute(Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
+        /*
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public string Type
         {
             get
@@ -3180,6 +3207,7 @@ namespace SimpleIdServer.Saml.Xsd
                 _type = value;
             }
         }
+        */
 
         [System.Xml.Serialization.XmlTextAttribute()]
         public string Value

@@ -3,6 +3,7 @@
 using SimpleIdServer.Saml.Extensions;
 using SimpleIdServer.Saml.Xsd;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -120,14 +121,14 @@ namespace SimpleIdServer.Saml.Builders
                 attributes.Add(attribute);
             }
 
-            var values = new List<object>();
+            var values = new ArrayList();
             if (attribute.AttributeValue != null)
             {
-                values = attribute.AttributeValue.ToList();
+                values = attribute.AttributeValue;
             }
 
-            values.Add(new AttributeValueType { Type = valueType, Value = value });
-            attribute.AttributeValue = values.ToArray();
+            values.Add(value);
+            attribute.AttributeValue = values;
             attributeStatement.Items = attributes.ToArray();
             return this;
         }

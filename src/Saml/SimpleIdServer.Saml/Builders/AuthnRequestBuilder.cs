@@ -48,6 +48,17 @@ namespace SimpleIdServer.Saml.Builders
         }
 
         /// <summary>
+        /// URL of the endpoint you are sending the message to.
+        /// </summary>
+        /// <param name="destination"></param>
+        /// <returns></returns>
+        public AuthnRequestBuilder SetDestination(string destination)
+        {
+            _authRequest.Destination = destination;
+            return this;
+        }
+
+        /// <summary>
         /// Set the issuer.
         /// </summary>
         /// <param name="format">A URI reference representing the classification of string-based identifier information. If no value is specified then the value "nameid-format-unspecified" is in effect.</param>

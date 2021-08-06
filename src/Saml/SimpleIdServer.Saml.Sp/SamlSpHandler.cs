@@ -72,7 +72,7 @@ namespace SimpleIdServer.Saml.Sp
                 throw new SamlException(System.Net.HttpStatusCode.BadRequest, Constants.StatusCodes.UnsupportedBinding, Global.BadIDPSingleSignOnLocation);
             }
 
-            var authnRequest = BuildHttpGetBinding();
+            var authnRequest = BuildHttpGetBinding(ssoService.Location);
             var uri = new Uri(ssoService.Location);
             var state = Options.StateDataFormat.Protect(properties);
             var redirectionUrl = MessageEncodingBuilder.EncodeHTTPBindingRequest(uri, authnRequest, state, Options.SigningCertificate, Options.SignatureAlg);
@@ -87,7 +87,16 @@ namespace SimpleIdServer.Saml.Sp
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
-            var samlResponse = SAMLResponseDto.Build(Request.Query.ToDictionary(k => k.Key, k => k.Value.First()));
+            SAMLResponseDto samlResponse = null;
+            if (Request.Method == "GET")
+            {
+                samlResponse = SAMLResponseDto.Build(Request.Query.ToDictionary(k => k.Key, k => k.Value.First()));
+            }
+            else
+            {
+                samlResponse = SAMLResponseDto.Build(Request.Form.ToDictionary(k => k.Key, k => k.Value.First()));
+            }
+
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             try
             {
@@ -132,9 +141,9 @@ namespace SimpleIdServer.Saml.Sp
                             name = MappingSamlAttributeToClaim[attribute.Name];
                         }
 
-                        foreach (var attributeValue in attribute.AttributeValue.Where(a => a is AttributeValueType).Cast<AttributeValueType>())
+                        foreach(var attributeValue in attribute.AttributeValue)
                         {
-                            claims.Add(new Claim(name, attributeValue.Value));
+                            claims.Add(new Claim(name, attributeValue.ToString()));
                         }
                     }
                 }
@@ -149,12 +158,8 @@ namespace SimpleIdServer.Saml.Sp
         {
             var certificates = await CheckEntityDescriptor(cancellationToken);
             var response = CheckSamlResponse(samlResponse);
-            if (certificates != null)
-            {
-                CheckSignature(samlResponse, response, certificates);
-            }
-
-            return response.Items.First(i => i is AssertionType) as AssertionType;
+            CheckSignature(samlResponse, response, certificates);
+            return response.Content.Items.First(i => i is AssertionType) as AssertionType;
         }
 
         protected virtual async Task<IEnumerable<X509Certificate2>> CheckEntityDescriptor(CancellationToken cancellationToken)
@@ -164,11 +169,6 @@ namespace SimpleIdServer.Saml.Sp
             if (idp == null)
             {
                 throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadIdpMetadata);
-            }
-
-            if (!Options.WantAssertionSigned)
-            {
-                return null;
             }
 
             var certificates = new List<X509Certificate2>();
@@ -200,51 +200,56 @@ namespace SimpleIdServer.Saml.Sp
             return certificates;
         }
 
-        protected virtual ResponseType CheckSamlResponse(SAMLResponseDto samlResponse)
+        protected virtual SAMLValidatorResult<ResponseType> CheckSamlResponse(SAMLResponseDto samlResponse)
         {
             var response = SAMLValidator.CheckSaml<ResponseType>(samlResponse.SAMLResponse, samlResponse.RelayState);
-            var assertion = response.Items.FirstOrDefault(i => i is AssertionType) as AssertionType;
+            var assertion = response.Content.Items.FirstOrDefault(i => i is AssertionType) as AssertionType;
             if (assertion == null)
             {
                 throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.MissingAssertion);
             }
 
+
             return response;
         }
 
-        protected virtual void CheckSignature(SAMLResponseDto samlResponse, ResponseType response, IEnumerable<X509Certificate2> certificates)
+        protected virtual void CheckSignature(SAMLResponseDto samlResponse, SAMLValidatorResult<ResponseType> response, IEnumerable<X509Certificate2> certificates)
         {
-            if (string.IsNullOrWhiteSpace(samlResponse.SigAlg))
-            {
-                throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, string.Format(Global.MissingParameter, "SigAlg"));
-            }
-
             if (string.IsNullOrWhiteSpace(samlResponse.SAMLResponse))
             {
                 throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, string.Format(Global.MissingParameter, "SAMLResponse"));
             }
 
-            if (!certificates.Any(certificate => SignatureHelper.CheckSignature(response.SerializeToXmlElement(), certificate)))
+            if (Options.WantsResponseSigned)
             {
-                throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadSamlResponseSignature);
+                if (!certificates.Any(certificate => SignatureHelper.CheckSignature(response.Document.DocumentElement, certificate)))
+                {
+                    throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadSamlResponseSignature);
+                }
             }
 
-            var assertion = response.Items.First(i => i is AssertionType) as AssertionType;
-            if (!certificates.Any(certificate => SignatureHelper.CheckSignature(assertion.SerializeToXmlElement(), certificate)))
+            if (Options.WantAssertionSigned)
             {
-                throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadAssertionSignature);
+                var assertion = response.Document.GetElementsByTagName("Assertion", "urn:oasis:names:tc:SAML:2.0:assertion");
+                if (!certificates.Any(certificate => SignatureHelper.CheckSignature(assertion[0] as XmlElement, certificate)))
+                {
+                    throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadAssertionSignature);
+                }
             }
 
-            var query = samlResponse.ToQuery(false);
-            var sig = Constants.MappingStrToSignature[samlResponse.SigAlg];
-            var hashed = Hash.Compute(query, sig);
-            if (!certificates.Any(certificate =>
+            if (!string.IsNullOrWhiteSpace(samlResponse.SigAlg))
             {
-                var rsa = certificate.GetRSAPublicKey();
-                return rsa.VerifyHash(hashed, Convert.FromBase64String(samlResponse.Signature), Constants.MappingSignatureAlgToHash[sig], RSASignaturePadding.Pkcs1);
-            }))
-            {
-                throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadSignature);
+                var query = samlResponse.ToQuery(false);
+                var sig = Constants.MappingStrToSignature[samlResponse.SigAlg];
+                var hashed = Hash.Compute(query, sig);
+                if (!certificates.Any(certificate =>
+                {
+                    var rsa = certificate.GetRSAPublicKey();
+                    return rsa.VerifyHash(hashed, Convert.FromBase64String(samlResponse.Signature), Constants.MappingSignatureAlgToHash[sig], RSASignaturePadding.Pkcs1);
+                }))
+                {
+                    throw new SamlException(System.Net.HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Responder, Global.BadSignature);
+                }
             }
         }
 
@@ -252,15 +257,16 @@ namespace SimpleIdServer.Saml.Sp
 
         #region AuthnRequestGenerator
 
-        protected virtual XmlElement BuildHttpGetBinding()
+        protected virtual XmlElement BuildHttpGetBinding(string destination)
         {
-            return Build(Constants.Bindings.HttpRedirect);
+            return Build(Constants.Bindings.HttpRedirect, destination);
         }
 
-        protected virtual XmlElement Build(string binding)
+        protected virtual XmlElement Build(string binding, string destination)
         {
             var request = AuthnRequestBuilder.New(Options.SPName)
                 .SetBinding(binding)
+                .SetDestination(destination)
                 .SetIssuer(Constants.NameIdentifierFormats.EntityIdentifier, Options.SPId);
             if (Options.AuthnRequestSigned && Options.SignatureAlg != null && Options.SigningCertificate != null)
             {
@@ -273,7 +279,6 @@ namespace SimpleIdServer.Saml.Sp
         #endregion
 
         #region EntityTypeDescriptor
-
 
         public async Task<EntityDescriptorType> GetEntityDescriptor(string metadataUrl, CancellationToken cancellationToken)
         {

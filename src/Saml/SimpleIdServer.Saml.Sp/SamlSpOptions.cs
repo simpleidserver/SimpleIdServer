@@ -35,6 +35,10 @@ namespace SimpleIdServer.Saml.Sp
         /// </summary>
         public bool AuthnRequestSigned { get; set; }
         /// <summary>
+        /// Wants response signed.
+        /// </summary>
+        public bool WantsResponseSigned { get; set; }
+        /// <summary>
         /// Want assertion signed.
         /// </summary>
         public bool WantAssertionSigned { get; set; }

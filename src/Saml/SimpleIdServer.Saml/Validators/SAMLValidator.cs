@@ -11,7 +11,7 @@ namespace SimpleIdServer.Saml.Validators
 {
     public static class SAMLValidator
     {
-        public static T CheckSaml<T>(string saml, string relayState, bool isRequester = true) where T : class
+        public static SAMLValidatorResult<T> CheckSaml<T>(string saml, string relayState, bool isRequester = true) where T : class
         {
             string errorCode = isRequester ? Saml.Constants.StatusCodes.Requester : Saml.Constants.StatusCodes.Responder;
             if (string.IsNullOrWhiteSpace(saml))
@@ -39,12 +39,16 @@ namespace SimpleIdServer.Saml.Validators
             {
                 request = decompressed.DeserializeXml<T>();
             }
-            catch (Exception ex)
+            catch
             {
                 throw new SamlException(HttpStatusCode.BadRequest, errorCode, Global.BadSamlDeserialization);
             }
 
-            return request;
+            return new SAMLValidatorResult<T>
+            {
+                Content = request,
+                Document = decompressed.DeserializeToXmlDocument()
+            };
         }
     }
 }

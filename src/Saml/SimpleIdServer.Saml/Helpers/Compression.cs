@@ -11,15 +11,34 @@ namespace SimpleIdServer.Saml.Helpers
     {
         public static string Decompress(string parameter)
         {
-            using (var originalStream = new MemoryStream(Convert.FromBase64String(parameter)))
-            using (var decompressedStream = new MemoryStream())
+            if (TryDecompress(parameter, out string result))
             {
-                using (var deflateStream = new DeflateStream(originalStream, CompressionMode.Decompress))
-                {
-                    deflateStream.CopyTo(decompressedStream);
-                }
+                return result;
+            }
 
-                return Encoding.UTF8.GetString(decompressedStream.ToArray());
+            return Encoding.UTF8.GetString(Convert.FromBase64String(parameter));
+        }
+
+        public static bool TryDecompress(string parameter, out string result)
+        {
+            result = null;
+            try
+            {
+                using (var originalStream = new MemoryStream(Convert.FromBase64String(parameter)))
+                using (var decompressedStream = new MemoryStream())
+                {
+                    using (var deflateStream = new DeflateStream(originalStream, CompressionMode.Decompress))
+                    {
+                        deflateStream.CopyTo(decompressedStream);
+                    }
+
+                    result = Encoding.UTF8.GetString(decompressedStream.ToArray());
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
             }
         }
 

@@ -4,7 +4,6 @@ using SimpleIdServer.Saml.Builders;
 using SimpleIdServer.Saml.Helpers;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using System.Web;
 using Xunit;
 
 namespace SimpleIdServer.Saml.Tests.Builders
@@ -29,7 +28,6 @@ namespace SimpleIdServer.Saml.Tests.Builders
                 .SetIssuer(Constants.NameIdentifierFormats.EntityIdentifier, "urn:sp");
 
             // ACT 
-            // var authnRequest = builder.Build();
             var authnRequest = builder.SignAndBuild(certificate, SignatureAlgorithms.RSASHA256, CanonicalizationMethods.C14);
 
             // ASSERT

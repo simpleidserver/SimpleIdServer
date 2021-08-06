@@ -18,6 +18,7 @@ namespace SimpleIdServer.Saml.Extensions
 
             return doc.DocumentElement;
         }
+
         public static XmlDocument SerializeToXmlDocument(this object obj)
         {
             var doc = new XmlDocument();
@@ -26,6 +27,13 @@ namespace SimpleIdServer.Saml.Extensions
                 new XmlSerializer(obj.GetType()).Serialize(writer, obj);
             }
 
+            return doc;
+        }
+
+        public static XmlDocument DeserializeToXmlDocument(this string xml)
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(xml);
             return doc;
         }
 

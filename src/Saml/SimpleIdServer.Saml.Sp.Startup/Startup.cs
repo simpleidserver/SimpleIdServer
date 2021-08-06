@@ -31,14 +31,7 @@ namespace SimpleIdServer.Saml.Sp.Startup
                 .AddCookie("ExternalAuthentication")
                 .AddSamlSp(opts =>
                 {
-                    opts.SignInScheme = "ExternalAuthentication";
-                    opts.SPId = "urn:sp";
-                    opts.SigningCertificate = certificate;
-                    opts.AuthnRequestSigned = true;
-                    opts.WantAssertionSigned = true;
-                    opts.SignatureAlg = SignatureAlgorithms.RSASHA256;
-                    opts.CanonicalizationMethod = CanonicalizationMethods.C14;
-                    opts.IdpMetadataUrl = "http://localhost:7000/saml/metadata";
+                    ConfigureLocalSamlIdp(opts, certificate);
                 });
             services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
         }
@@ -56,6 +49,32 @@ namespace SimpleIdServer.Saml.Sp.Startup
                     name: "DefaultRoute",
                     template: "{controller=Home}/{action=Index}/{id?}");
             }); 
+        }
+
+        private static void ConfigureLocalSamlIdp(SamlSpOptions opts, X509Certificate2 certificate)
+        {
+            opts.SignInScheme = "ExternalAuthentication";
+            opts.SPId = "urn:sp";
+            opts.SigningCertificate = certificate;
+            opts.AuthnRequestSigned = true;
+            opts.WantsResponseSigned = true;
+            opts.WantAssertionSigned = true;
+            opts.SignatureAlg = SignatureAlgorithms.RSASHA256;
+            opts.CanonicalizationMethod = CanonicalizationMethods.C14;
+            opts.IdpMetadataUrl = "http://localhost:7000/saml/metadata";
+        }
+
+        private static void ConfigureKeycloackSamlId(SamlSpOptions opts, X509Certificate2 certificate)
+        {
+            opts.SignInScheme = "ExternalAuthentication";
+            opts.SPId = "urn:keycloacksp";
+            opts.SigningCertificate = certificate;
+            opts.AuthnRequestSigned = true;
+            opts.WantsResponseSigned = true;
+            opts.WantAssertionSigned = true;
+            opts.SignatureAlg = SignatureAlgorithms.RSASHA256;
+            opts.CanonicalizationMethod = CanonicalizationMethods.C14;
+            opts.IdpMetadataUrl = "http://localhost:8080/auth/realms/master/protocol/saml/descriptor";
         }
     }
 }

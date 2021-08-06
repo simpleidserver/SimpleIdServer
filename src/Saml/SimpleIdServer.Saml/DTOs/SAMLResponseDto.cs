@@ -14,6 +14,11 @@ namespace SimpleIdServer.Saml.DTOs
         public string SigAlg { get; set; }
         public string Signature { get; set; }
 
+        public bool IsEmpty()
+        {
+            return string.IsNullOrWhiteSpace(SAMLResponse);
+        }
+
         public string ToQuery(bool withSignature = true)
         {
             var result = new Dictionary<string, string>

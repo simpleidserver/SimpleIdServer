@@ -64,22 +64,22 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
         protected virtual AuthnRequestType CheckParameter(SAMLRequestDto parameter)
         {
             var authnRequest = SAMLValidator.CheckSaml<AuthnRequestType>(parameter.SAMLRequest, parameter.RelayState);
-            if (authnRequest.Issuer == null || string.IsNullOrWhiteSpace(authnRequest.Issuer.Value))
+            if (authnRequest.Content.Issuer == null || string.IsNullOrWhiteSpace(authnRequest.Content.Issuer.Value))
             {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(authnRequest.Issuer)));
+                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(authnRequest.Content.Issuer)));
             }
 
-            if (!string.IsNullOrWhiteSpace(authnRequest.Issuer.Format) && authnRequest.Issuer.Format != Saml.Constants.NameIdentifierFormats.EntityIdentifier)
+            if (!string.IsNullOrWhiteSpace(authnRequest.Content.Issuer.Format) && authnRequest.Content.Issuer.Format != Saml.Constants.NameIdentifierFormats.EntityIdentifier)
             {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnsupportNameIdFormat, nameof(authnRequest.Issuer.Format)));
+                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnsupportNameIdFormat, nameof(authnRequest.Content.Issuer.Format)));
             }
 
-            if (!string.IsNullOrWhiteSpace(authnRequest.ProtocolBinding) && authnRequest.ProtocolBinding != Saml.Constants.Bindings.HttpRedirect)
+            if (!string.IsNullOrWhiteSpace(authnRequest.Content.ProtocolBinding) && authnRequest.Content.ProtocolBinding != Saml.Constants.Bindings.HttpRedirect)
             {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.UnsupportedBinding, string.Format(Global.UnsupportBinding, authnRequest.ProtocolBinding));
+                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.UnsupportedBinding, string.Format(Global.UnsupportBinding, authnRequest.Content.ProtocolBinding));
             }
 
-            return authnRequest;
+            return authnRequest.Content;
         }
 
         protected virtual async Task<RelyingPartyAggregate> CheckRelyingParty(AuthnRequestType authnRequest, CancellationToken cancellationToken)
