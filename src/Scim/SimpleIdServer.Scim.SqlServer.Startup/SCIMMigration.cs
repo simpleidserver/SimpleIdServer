@@ -13,7 +13,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
         {
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             var builder = new DbContextOptionsBuilder<SCIMDbContext>();
-            builder.UseSqlServer("Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=SCIM;Integrated Security=True",
+            builder.UseSqlServer("Data Source=DESKTOP-F641MIJ\\SQLEXPRESS;Initial Catalog=SCIM;Integrated Security=True",
                 optionsBuilder => optionsBuilder.MigrationsAssembly(migrationsAssembly));
             return new SCIMDbContext(builder.Options);
         }

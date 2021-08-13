@@ -1,5 +1,15 @@
 ﻿Feature: UsersErrors
 	Check the errors returned by the /Users endpoint
+	
+Scenario: Error is returned when startIndex <= 0
+	When execute HTTP GET request 'http://localhost/Users?startIndex=0'
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'status'='400'
+	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'response.detail'='startIndex must be >= 1'
 
 Scenario: Error is returned when pass invalid JSON object (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users' with body '{ "schemas": [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ], "userName": "externalId": "externalId" }'

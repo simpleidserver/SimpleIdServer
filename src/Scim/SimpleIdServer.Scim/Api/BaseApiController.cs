@@ -160,7 +160,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.StartGetResources);
             try
             {
-                if (searchRequest.Count > _options.MaxResults)
+                if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null)
                 {
                     searchRequest.Count = _options.MaxResults;
                 }
@@ -170,7 +170,13 @@ namespace SimpleIdServer.Scim.Api
                 schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
                 var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
                 var sortByFilter = SCIMFilterParser.Parse(searchRequest.SortBy, schemas);
-                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex - 1, searchRequest.Count, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), searchRequest.Attributes));
+                if (searchRequest.StartIndex <= 0)
+                {
+                    _logger.LogError(Global.StartIndexMustBeSuperiorOrEqualTo1);
+                    return this.BuildError(HttpStatusCode.BadRequest, Global.StartIndexMustBeSuperiorOrEqualTo1);
+                }
+
+                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), searchRequest.Attributes));
                 var jObj = new JObject
                 {
                     { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },

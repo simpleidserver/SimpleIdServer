@@ -258,6 +258,9 @@
   <data name="StartGetServiceProviderConfig" xml:space="preserve">
     <value>start to get service provider configuration</value>
   </data>
+  <data name="StartIndexMustBeSuperiorOrEqualTo1" xml:space="preserve">
+    <value>startIndex must be &gt;= 1</value>
+  </data>
   <data name="UnknownPath" xml:space="preserve">
     <value>path {0} doesn't exist</value>
   </data>

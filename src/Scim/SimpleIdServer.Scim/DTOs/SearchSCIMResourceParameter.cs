@@ -53,7 +53,7 @@ namespace SimpleIdServer.Scim.DTOs
         /// </summary>
         [JsonProperty(SCIMConstants.StandardSCIMSearchAttributes.Count)]
         [FromQuery(Name = SCIMConstants.StandardSCIMSearchAttributes.Count)]
-        public int Count { get; set; }
+        public int? Count { get; set; }
         /// <summary>
         /// The filter string used to request a subset of resources.
         /// </summary>

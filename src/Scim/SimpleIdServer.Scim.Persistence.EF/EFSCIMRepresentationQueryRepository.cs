@@ -81,7 +81,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             }
 
             int totalResults = queryableRepresentations.Count();
-            IEnumerable<SCIMRepresentation> result = await queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync();
+            IEnumerable<SCIMRepresentation> result = await queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).ToListAsync();
             return new SearchSCIMRepresentationsResponse(totalResults, result);
         }
 

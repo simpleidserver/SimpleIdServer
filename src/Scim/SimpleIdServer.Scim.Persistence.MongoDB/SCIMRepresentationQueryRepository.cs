@@ -100,21 +100,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
                 var filtered = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IMongoQueryable<SCIMRepresentation>;
                 int totalResults = filtered.Count();
-                if (parameter.Count > 0)
-                {
-                    result = filtered.Skip(parameter.StartIndex).Take(parameter.Count).ToList();
-                }
-
+                result = filtered.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).ToList();
                 return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
             }
             else
             {
                 int totalResults = queryableRepresentations.Count();
-                if (parameter.Count > 0)
-                {
-                    result = queryableRepresentations.Skip(parameter.StartIndex).Take(parameter.Count).ToList();
-                }
-
+                result = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).ToList();
                 return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
             }
         }
