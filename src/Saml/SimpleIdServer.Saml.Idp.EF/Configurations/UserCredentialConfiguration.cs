@@ -2,13 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SimpleIdServer.Saml.Idp.Domains;
+using SimpleIdServer.Common.Domains;
 
 namespace SimpleIdServer.Saml.Idp.EF.Configurations
 {
-    public class RelyingPartyClaimMappingConfiguration : IEntityTypeConfiguration<RelyingPartyClaimMapping>
+    public class UserCredentialConfiguration : IEntityTypeConfiguration<UserCredential>
     {
-        public void Configure(EntityTypeBuilder<RelyingPartyClaimMapping> builder)
+        public void Configure(EntityTypeBuilder<UserCredential> builder)
         {
             builder.Property<int>("Id").ValueGeneratedOnAdd();
             builder.HasKey("Id");

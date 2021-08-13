@@ -10,7 +10,11 @@ namespace SimpleIdServer.Saml.Idp.EF.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            throw new System.NotImplementedException();
+            builder.HasKey(u => u.Id);
+            builder.Ignore(u => u.Claims);
+            builder.HasMany(u => u.Sessions).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.OAuthUserClaims).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.ExternalAuthProviders).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
