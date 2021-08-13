@@ -18,6 +18,7 @@ namespace SimpleIdServer.Scim.Extensions
             };
 
             var attributes = new JArray();
+            schema.AddCommonAttributes();
             foreach(var attribute in schema.HierarchicalAttributes)
             {
                 attributes.Add(SerializeSCIMSchemaAttribute(attribute));

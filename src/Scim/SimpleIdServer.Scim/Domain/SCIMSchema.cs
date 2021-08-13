@@ -85,6 +85,15 @@ namespace SimpleIdServer.Scim.Domain
             return Attributes.Any(attr => attr.Id == attribute.Id);
         }
 
+        public void AddCommonAttributes()
+        {
+            var attributes = SCIMConstants.StandardSchemas.StandardResponseSchemas.Attributes;
+            foreach(var attr in attributes)
+            {
+                Attributes.Add(attr);
+            }
+        }
+
         public object Clone()
         {
             return new SCIMSchema

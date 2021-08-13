@@ -349,16 +349,17 @@ namespace SimpleIdServer.Scim
                 }, multiValued: true)
                 .Build();
             public static SCIMSchema StandardResponseSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:StandardResponse", "StandardResponse", null, "StandardResponse", true)
-                .AddStringAttribute(StandardSCIMRepresentationAttributes.ExternalId)
+                .AddStringAttribute(StandardSCIMRepresentationAttributes.Id, description: "A unique identifier for a SCIM resource as defined by the service provider", mutability: SCIMSchemaAttributeMutabilities.READONLY)
+                .AddStringAttribute(StandardSCIMRepresentationAttributes.ExternalId, description: " A String that is an identifier for the resource as defined by the provisioning client.")
                 .AddStringAttribute(StandardSCIMRepresentationAttributes.Schemas, multiValued: true)
                 .AddComplexAttribute(StandardSCIMRepresentationAttributes.Meta, callback: c =>
                 {
-                    c.AddStringAttribute(StandardSCIMMetaAttributes.ResourceType);
-                    c.AddDateTimeAttribute(StandardSCIMMetaAttributes.Created);
-                    c.AddDateTimeAttribute(StandardSCIMMetaAttributes.LastModified);
-                    c.AddIntAttribute(StandardSCIMMetaAttributes.Version);
-                    c.AddStringAttribute(StandardSCIMMetaAttributes.Location);
-                }, multiValued: false)
+                    c.AddStringAttribute(StandardSCIMMetaAttributes.ResourceType, description: "The name of the resource type of the resource.");
+                    c.AddDateTimeAttribute(StandardSCIMMetaAttributes.Created, description: "The DateTime that the resource was added to the service provider");
+                    c.AddDateTimeAttribute(StandardSCIMMetaAttributes.LastModified, description: "The most recent DateTime that the details of this resource were updated at the service provider");
+                    c.AddIntAttribute(StandardSCIMMetaAttributes.Version, description: "The version of the resource being returned");
+                    c.AddStringAttribute(StandardSCIMMetaAttributes.Location, description: "The URI of the resource being returned");
+                }, multiValued: false, description: "A complex attribute containing resource metadata")
                 .Build();
         }
     }

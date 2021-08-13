@@ -18,27 +18,40 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
 
         public Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
         {
-            return Task.FromResult(_schemas.FirstOrDefault(s => s.Id == schemaId));
+            var result = _schemas.FirstOrDefault(s => s.Id == schemaId);
+            if (result == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            return Task.FromResult((SCIMSchema)result.Clone());
         }
 
         public Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers)
         {
-            return Task.FromResult(_schemas.Where(s => schemaIdentifiers.Contains(s.Id)));
+            var result = _schemas.Where(s => schemaIdentifiers.Contains(s.Id));
+            return Task.FromResult(result.Select(r => (SCIMSchema)r.Clone()));
         }
 
         public Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
         {
-            return Task.FromResult(_schemas.FirstOrDefault(s => s.ResourceType == resourceType && s.IsRootSchema == true));
+            var result = _schemas.FirstOrDefault(s => s.ResourceType == resourceType && s.IsRootSchema == true);
+            if (result == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            return Task.FromResult((SCIMSchema)result.Clone());
         }
 
         public Task<IEnumerable<SCIMSchema>> GetAll()
         {
-            return Task.FromResult((IEnumerable<SCIMSchema>)_schemas);
+            return Task.FromResult((IEnumerable<SCIMSchema>)_schemas.Select(s => (SCIMSchema)s.Clone()));
         }
 
         public Task<IEnumerable<SCIMSchema>> GetAllRoot()
         {
-            return Task.FromResult((IEnumerable<SCIMSchema>)_schemas.Where(s => s.IsRootSchema == true));
+            return Task.FromResult((IEnumerable<SCIMSchema>)_schemas.Where(s => s.IsRootSchema == true).Select(s => (SCIMSchema)s.Clone()));
         }
     }
 }
