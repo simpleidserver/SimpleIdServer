@@ -21,4 +21,7 @@
       <LastGenOutput>Global.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Parameters\" />
+  </ItemGroup>
 </Project>

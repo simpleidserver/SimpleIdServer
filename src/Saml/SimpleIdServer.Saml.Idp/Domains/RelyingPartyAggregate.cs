@@ -90,6 +90,18 @@ namespace SimpleIdServer.Saml.Idp.Domains
 
         #endregion
 
+        public static RelyingPartyAggregate Create(string metadataUrl)
+        {
+            var result = new RelyingPartyAggregate
+            {
+                Id = Guid.NewGuid().ToString(),
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                MetadataUrl = metadataUrl
+            };
+            return result;
+        }
+
         public object Clone()
         {
             return new RelyingPartyAggregate

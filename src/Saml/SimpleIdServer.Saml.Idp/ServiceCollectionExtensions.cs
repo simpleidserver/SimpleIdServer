@@ -3,6 +3,7 @@
 using SimpleIdServer.Common.Domains;
 using SimpleIdServer.Saml.Idp;
 using SimpleIdServer.Saml.Idp.Apis.Metadata;
+using SimpleIdServer.Saml.Idp.Apis.RelyingParties.Handlers;
 using SimpleIdServer.Saml.Idp.Apis.SSO;
 using SimpleIdServer.Saml.Idp.Domains;
 using SimpleIdServer.Saml.Idp.Persistence;
@@ -19,6 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             serviceCollection.AddSSOApi();
             serviceCollection.AddMetadataApi();
+            serviceCollection.AddRelyingPartyApi();
             serviceCollection.AddSamlInMemoryEF();
             if (callback == null)
             {
@@ -41,6 +43,15 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddMetadataApi(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IMetadataHandler, MetadataHandler>();
+            return serviceCollection;
+        }
+
+        private static IServiceCollection AddRelyingPartyApi(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<ISearchRelyingPartiesHandler, SearchRelyingPartiesHandler>();
+            serviceCollection.AddTransient<IAddRelyingPartyHandler, AddRelyingPartyHandler>();
+            serviceCollection.AddTransient<IGetRelyingPartyHandler, GetRelyingPartyHandler>();
+            serviceCollection.AddTransient<IUpdateRelyingPartyHandler, UpdateRelyingPartyHandler>();
             return serviceCollection;
         }
 

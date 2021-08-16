@@ -15,6 +15,7 @@ namespace SimpleIdServer.Saml
             public const string Prefix = "saml";
             public const string Metadata = Prefix + "/metadata";
             public const string SingleSignOn = Prefix + "/SSO";
+            public const string RelyingParties = Prefix + "/relyingparties";
         }
 
         public static class ConfirmationMethodIdentifiers
