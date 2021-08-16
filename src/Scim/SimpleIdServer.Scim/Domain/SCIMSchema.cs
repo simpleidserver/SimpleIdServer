@@ -101,6 +101,7 @@ namespace SimpleIdServer.Scim.Domain
                 Id = Id,
                 Name = Name,
                 Description = Description,
+                ResourceType = ResourceType,
                 IsRootSchema = IsRootSchema,
                 Attributes = Attributes.Select(a => (SCIMSchemaAttribute)a.Clone()).ToList(),
                 SchemaExtensions = SchemaExtensions.Select(a => (SCIMSchemaExtension)a.Clone()).ToList()
