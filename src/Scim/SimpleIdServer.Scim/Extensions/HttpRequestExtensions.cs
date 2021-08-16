@@ -18,5 +18,10 @@ namespace SimpleIdServer.Scim.Extensions
             var relativePath = requestMessage.PathBase.Value;
             return http + host + relativePath;
         }
+
+        public static string GetRelativePath(this HttpRequest requestMessage)
+        {
+            return requestMessage.PathBase.Value;
+        }
     }
 }
