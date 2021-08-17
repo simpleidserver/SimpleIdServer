@@ -134,6 +134,11 @@ namespace SimpleIdServer.Scim.Helpers
         public static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, SCIMSchema schema, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMRepresentationAttribute>();
+            if (schemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READONLY)
+            {
+                return result;
+            }
+
             var attributeId = Guid.NewGuid().ToString();
             if (schemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
