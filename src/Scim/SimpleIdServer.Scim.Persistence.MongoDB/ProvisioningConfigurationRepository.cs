@@ -30,6 +30,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         private readonly SCIMDbContext _dbContext;
         private readonly IMongoClient _mongoClient;
         private readonly MongoDbOptions _options;
+        private IClientSessionHandle _session;
 
         public ProvisioningConfigurationRepository(
             SCIMDbContext dbContext,
@@ -45,11 +46,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         {
             if (_options.SupportTransaction)
             {
-                var session = await _mongoClient.StartSessionAsync(null, token);
-                session.StartTransaction();
-                return new MongoDbTransaction(session);
+                _session = await _mongoClient.StartSessionAsync(null, token);
+                _session.StartTransaction();
+                return new MongoDbTransaction(_session);
             }
 
+            _session = null;
             return new MongoDbTransaction();
         }
 
@@ -63,7 +65,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<bool> Update(ProvisioningConfiguration provisioningConfiguration, CancellationToken cancellationToken)
         {
             var update = Builders<ProvisioningConfiguration>.Update.Set(s => s, provisioningConfiguration);
-            await _dbContext.ProvisioningConfigurationLst.UpdateOneAsync(a => a.Id == provisioningConfiguration.Id, update);
+            if (_session != null)
+            {
+                await _dbContext.ProvisioningConfigurationLst.UpdateOneAsync(_session, a => a.Id == provisioningConfiguration.Id, update);
+            }
+            else
+            {
+                await _dbContext.ProvisioningConfigurationLst.UpdateOneAsync(a => a.Id == provisioningConfiguration.Id, update);
+            }
+
             return true;
         }
 
