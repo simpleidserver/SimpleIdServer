@@ -20,7 +20,6 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 			var mongoClient = new MongoClient(options.ConnectionString);
 			var db = mongoClient.GetDatabase(options.Database);
 			EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
-			EnsureCollectionIsCreated<SCIMRepresentationAttributeModel>(db, options.CollectionRepresentationAttributes);
 			EnsureCollectionIsCreated<ProvisioningConfiguration>(db, options.CollectionProvisioningLst);
 			var schemasCollection = EnsureCollectionIsCreated<SCIMSchema>(db, options.CollectionSchemas);
 			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);

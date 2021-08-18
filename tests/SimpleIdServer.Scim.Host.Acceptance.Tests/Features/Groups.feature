@@ -46,10 +46,6 @@ Scenario: Check user can be added to a group
 	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
 	| displayName | Tour Guides                                       |
 	| members     | [ { "value": "$id$" } ]                           |
-	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
-	| Key        | Value                                                                  |
-	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                    |
-	| Operations | [ { "op": "add", "path": "groups", "value": [ { "value" :  "1" } ] } ] |
 	And execute HTTP GET request 'http://localhost/Users/$id$'	
 	And extract JSON from body
 

@@ -23,30 +23,28 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {            
-            var attr = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => (endpoint == null || endpoint == a.RepresentationResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueString == value))
                 .ToMongoFirstAsync();
-            if (attr == null)
+            if (result == null)
             {
                 return null;
             }
 
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(a => a.Id == attr.RepresentationId).ToMongoFirstAsync();
             result.Init(_scimDbContext.Database);
             return result;
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
-            var attr = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => (endpoint == null || endpoint == a.RepresentationResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueInteger == value)
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueInteger == value))
                 .ToMongoFirstAsync();
-            if (attr == null)
+            if (result == null)
             {
                 return null;
             }
 
-            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(a => a.Id == attr.RepresentationId).ToMongoFirstAsync();
             result.Init(_scimDbContext.Database);
             return result;
         }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,15 +48,6 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 await _scimDbContext.SCIMRepresentationLst.InsertOneAsync(record, null, token);
             }
 
-            var newAttributes = representation.Attributes.Select(a => new SCIMRepresentationAttributeModel(a, representation.Id, representation.ResourceType));
-            if (_session != null)
-            {
-                await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(_session, newAttributes, null, token);
-            }
-            else
-            {
-                await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(newAttributes, null, token);
-            }
             return true;
         }
 
@@ -72,23 +62,21 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 await _scimDbContext.SCIMRepresentationLst.DeleteOneAsync(d => d.Id == data.Id, null, token);
             }
 
-            var filter = Builders<SCIMRepresentationAttributeModel>.Filter.Eq(s => s.RepresentationId, data.Id);
-            if (_session != null)
-            {
-                await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(_session, filter, null, token);
-            }
-            else
-            {
-                await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(filter, null, token);
-            }
-
             return true;
         }
 
         public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
-            await Delete(data, token);
-            await Add(data, token);
+            var record = new SCIMRepresentationModel(data, _options.CollectionSchemas);
+            if (_session != null)
+            {
+                await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == data.Id, record);
+            }
+            else
+            {
+                await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == data.Id, record);
+            }
+
             return true;
         }
     }

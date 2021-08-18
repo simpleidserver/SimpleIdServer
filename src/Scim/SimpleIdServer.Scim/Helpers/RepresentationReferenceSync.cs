@@ -95,25 +95,46 @@ namespace SimpleIdServer.Scim.Helpers
 			{
 				foreach (var targetRepresentation in targetRepresentations)
 				{
-					UpdateScimRepresentation(targetRepresentation, sourceScimRepresentation, attributeMapping.TargetAttributeId, attributeMapping.SourceResourceType);
+					bool isRepresentationUpdated = UpdateScimRepresentation(targetRepresentation, sourceScimRepresentation, attributeMapping.TargetAttributeId, attributeMapping.SourceResourceType);
 					UpdateScimRepresentation(sourceScimRepresentation, targetRepresentation, attributeMapping.SourceAttributeId, attributeMapping.TargetResourceType);
-					result.Add(targetRepresentation);
+					if(isRepresentationUpdated)
+                    {
+						result.Add(targetRepresentation);
+					}
 				}
 			}
 
 			return result;
 		}
 
-		protected virtual void UpdateScimRepresentation(SCIMRepresentation scimRepresentation, SCIMRepresentation sourceRepresentation, string attributeId, string resourceType)
+		protected virtual bool UpdateScimRepresentation(SCIMRepresentation scimRepresentation, SCIMRepresentation sourceRepresentation, string attributeId, string resourceType)
 		{
 			var attr = scimRepresentation.GetAttributesByAttrSchemaId(attributeId).FirstOrDefault(v => scimRepresentation.GetChildren(v).Any(c => c.ValueString == sourceRepresentation.Id));
 			if (attr != null)
 			{
+				var rootSchema = scimRepresentation.GetRootSchema();
+				var targetSchemaAttribute = rootSchema.GetAttributeById(attributeId);
+				var values = rootSchema.GetChildren(targetSchemaAttribute);
+				var children = scimRepresentation.GetFlatHierarchicalChildren(attr);
+				var valueDefinition = values.FirstOrDefault(s => s.Name == "value");
+				var displayDefinition = values.FirstOrDefault(s => s.Name == "display");
+				var typeDefinition = values.FirstOrDefault(s => s.Name == "type");
+				var value = children.FirstOrDefault(s => s.SchemaAttribute.Name == "value");
+				var display = children.FirstOrDefault(s => s.SchemaAttribute.Name == "display");
+				var type = children.FirstOrDefault(s => s.SchemaAttribute.Name == "type");
+				if (
+					(valueDefinition == null || (valueDefinition != null && value != null && value.ValueString == sourceRepresentation.Id)) &&
+					(typeDefinition == null || (typeDefinition != null && type != null && type.ValueString == resourceType)) &&
+					(displayDefinition == null || (displayDefinition != null && display != null && display.ValueString == sourceRepresentation.DisplayName)))
+                {
+					return false;
+                }
+
 				scimRepresentation.RemoveAttributeById(attr);
 			}
 
 			BuildScimRepresentationAttribute(attributeId, scimRepresentation, sourceRepresentation, resourceType);
-
+			return true;
 		}
 
 		protected virtual void BuildScimRepresentationAttribute(string attributeId, SCIMRepresentation targetRepresentation, SCIMRepresentation sourceRepresentation, string sourceResourceType)
