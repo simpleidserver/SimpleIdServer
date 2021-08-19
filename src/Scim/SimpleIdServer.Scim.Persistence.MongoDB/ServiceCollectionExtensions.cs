@@ -26,18 +26,18 @@ namespace Microsoft.Extensions.DependencyInjection
 				var options = new MongoDbOptions();
 				mongoDbSetup(options);
 
-				services.AddSingleton<IMongoClient>(_ => new MongoClient(options.ConnectionString));
-				services.AddSingleton(provider => provider.GetService<IMongoClient>().GetDatabase(options.Database));
-				services.AddSingleton<SCIMDbContext>();
+				services.AddTransient<IMongoClient>(_ => new MongoClient(options.ConnectionString));
+				services.AddTransient(provider => provider.GetService<IMongoClient>().GetDatabase(options.Database));
+				services.AddTransient<SCIMDbContext>();
 				MongoDbClientExtensions.EnsureMongoDbSCIMDatabaseIsCreated(options, initialSchemas, initialAttributeMapping);
 			}
 
-			services.AddSingleton<ISCIMRepresentationCommandRepository, SCIMRepresentationCommandRepository>();
-			services.AddSingleton<ISCIMRepresentationQueryRepository, SCIMRepresentationQueryRepository>();
-			services.AddSingleton<ISCIMSchemaQueryRepository, SCIMSchemaQueryRepository>();
-			services.AddSingleton<ISCIMSchemaCommandRepository, SCIMSchemaCommandRepository>();
-			services.AddSingleton<ISCIMAttributeMappingQueryRepository, SCIMAttributeMappingQueryRepository>();
-			services.AddSingleton<IProvisioningConfigurationRepository, ProvisioningConfigurationRepository>();
+			services.AddTransient<ISCIMRepresentationCommandRepository, SCIMRepresentationCommandRepository>();
+			services.AddTransient<ISCIMRepresentationQueryRepository, SCIMRepresentationQueryRepository>();
+			services.AddTransient<ISCIMSchemaQueryRepository, SCIMSchemaQueryRepository>();
+			services.AddTransient<ISCIMSchemaCommandRepository, SCIMSchemaCommandRepository>();
+			services.AddTransient<ISCIMAttributeMappingQueryRepository, SCIMAttributeMappingQueryRepository>();
+			services.AddTransient<IProvisioningConfigurationRepository, ProvisioningConfigurationRepository>();
 			return services;
 		}
 	}
