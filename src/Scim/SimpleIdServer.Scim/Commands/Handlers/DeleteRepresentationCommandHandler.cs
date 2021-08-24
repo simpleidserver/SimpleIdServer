@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             }
 
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, representation, true);
+            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, representation, true, true);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 await _scimRepresentationCommandRepository.Delete(representation);

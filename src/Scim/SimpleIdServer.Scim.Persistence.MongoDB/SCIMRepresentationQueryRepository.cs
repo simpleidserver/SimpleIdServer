@@ -80,9 +80,14 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToMongoListAsync<SCIMRepresentationModel>();
-            foreach(var representation in result)
+            if (result.Any())
             {
-                representation.Init(_scimDbContext.Database);
+                var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
+                var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
+                foreach (var representation in result)
+                {
+                    representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
+                }
             }
 
             return result;

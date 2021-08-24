@@ -9,6 +9,11 @@ namespace SimpleIdServer.Scim.Extensions
 {
     public static class JObjectExtensions
     {
+        public static ICollection<string> GetKeys(this JObject jObj)
+        {
+            return jObj.Properties().Select(p => p.Name).ToList();
+        }
+
         public static bool HasNotEmptyElement(this JObject jObj, string name, string schema)
         {
             if (jObj.ContainsKey(name) || jObj.ContainsKey($"{schema}:{name}"))

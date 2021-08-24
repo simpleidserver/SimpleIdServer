@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Exceptions;
+using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
@@ -92,7 +93,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
                 existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
-                var references = await _representationReferenceSync.Sync(replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation);
+                var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
+                var references = await _representationReferenceSync.Sync(replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, !isReferenceProperty);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);

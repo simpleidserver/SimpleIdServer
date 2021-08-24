@@ -8,6 +8,7 @@ namespace SimpleIdServer.Scim.Persistence
 {
     public interface ISCIMAttributeMappingQueryRepository
     {
+        Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes);
         Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType);
     }
 }

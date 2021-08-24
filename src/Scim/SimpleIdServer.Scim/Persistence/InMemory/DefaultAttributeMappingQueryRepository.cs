@@ -16,6 +16,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _attributeMappingLst = attributeMappingLst;
         }
 
+        public Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
+        {
+            return Task.FromResult(_attributeMappingLst.Where(a => sourceAttributes.Contains(a.SourceAttributeSelector)));
+        }
+
         public Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
         {
             return Task.FromResult(_attributeMappingLst.Where(a => a.SourceResourceType == sourceResourceType));

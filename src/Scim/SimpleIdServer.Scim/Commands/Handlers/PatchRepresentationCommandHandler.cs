@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -54,7 +55,19 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 var oldRepresentation = existingRepresentation.Clone() as SCIMRepresentation;
                 existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
-                var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation);
+                var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(
+                    patchRepresentationCommand.PatchRepresentation.Operations.Select(o =>
+                    {
+                        var scimFilter = SCIMFilterParser.Parse(o.Path, existingRepresentation.Schemas);
+                        var attr = scimFilter as SCIMAttributeExpression;
+                        if (attr != null)
+                        {
+                            return attr.Name;
+                        }
+
+                        return null;
+                    }).Where(a => a != null).ToList());
+                var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, !isReferenceProperty);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);

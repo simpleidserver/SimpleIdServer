@@ -209,6 +209,12 @@ namespace SimpleIdServer.Scim.Domain
                         break;
                 }
             }
+
+            var displayNameAttr = representation.Attributes.FirstOrDefault(a => a.FullPath == "displayName");
+            if (displayNameAttr != null)
+            {
+                representation.SetDisplayName(displayNameAttr.ValueString);
+            }
         }
 
         public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true)
