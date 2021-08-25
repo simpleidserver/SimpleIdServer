@@ -16,7 +16,8 @@ namespace SimpleIdServer.Gateway.Host.Handlers
             "update_scim_resource",
             "bulk_scim_resource",
             "scim_provision",
-            "manage_authschemeproviders"
+            "manage_authschemeproviders",
+            "manage_relying_parties"
         }) { }
     }
 }

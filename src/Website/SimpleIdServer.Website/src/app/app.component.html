@@ -24,8 +24,15 @@
   <mat-drawer-container class="drawer-container">
     <mat-drawer #drawer mode="side" opened>
       <mat-nav-list *ngIf="isConnected">
-        <a mat-list-item class="baseMenu" [routerLink]="['/applications']" [routerLinkActive]="['is-active']">{{ "applications.list" | translate }}</a>
-        <a mat-list-item class="baseMenu" [routerLink]="['/scopes']" [routerLinkActive]="['is-active']">{{ "scopes.list" | translate }}</a>
+        <mat-list-item class="baseMenu" (click)="showApplications = !showApplications">
+          <span class="full-width">{{ 'apps' | translate }}</span>
+          <mat-icon class="menu-button" [ngClass]="{'rotated' : showApplications}">expand_more</mat-icon>
+        </mat-list-item>
+        <div class="submenu" [class.expanded]="showApplications">
+          <a mat-list-item class="submenuItem" [routerLink]="['/applications']" [routerLinkActive]="['is-active']">{{ "applications.list" | translate }}</a>
+          <a mat-list-item class="submenuItem" [routerLink]="['/relyingparties']" [routerLinkActive]="['is-active']">{{ "relyingParties.list" | translate }}</a>
+          <a mat-list-item class="submenuItem" [routerLink]="['/scopes']" [routerLinkActive]="['is-active']">{{ "scopes.list" | translate }}</a>
+        </div>
         <mat-list-item class="baseMenu" (click)="showUserManagement = !showUserManagement">
           <span class="full-width">{{ 'userManagement' | translate }}</span>
           <mat-icon class="menu-button" [ngClass]="{'rotated' : showUserManagement}">expand_more</mat-icon>

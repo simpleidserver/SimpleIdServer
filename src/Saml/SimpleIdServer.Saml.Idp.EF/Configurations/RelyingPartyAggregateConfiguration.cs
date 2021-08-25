@@ -10,7 +10,8 @@ namespace SimpleIdServer.Saml.Idp.EF.Configurations
     {
         public void Configure(EntityTypeBuilder<RelyingPartyAggregate> builder)
         {
-            throw new System.NotImplementedException();
+            builder.HasKey(b => b.Id);
+            builder.HasMany(b => b.ClaimMappings).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

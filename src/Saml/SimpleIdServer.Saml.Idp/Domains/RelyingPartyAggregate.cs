@@ -28,7 +28,6 @@ namespace SimpleIdServer.Saml.Idp.Domains
         public string MetadataUrl { get; set; }
         public int AssertionExpirationTimeInSeconds { get; set; }
         public ICollection<RelyingPartyClaimMapping> ClaimMappings { get; set; }
-        public EntityDescriptorType EntityDescriptor { get; set; }
 
         #endregion
 
@@ -91,9 +90,29 @@ namespace SimpleIdServer.Saml.Idp.Domains
 
         #endregion
 
+        public static RelyingPartyAggregate Create(string metadataUrl)
+        {
+            var result = new RelyingPartyAggregate
+            {
+                Id = Guid.NewGuid().ToString(),
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                MetadataUrl = metadataUrl
+            };
+            return result;
+        }
+
         public object Clone()
         {
-            throw new NotImplementedException();
+            return new RelyingPartyAggregate
+            {
+                AssertionExpirationTimeInSeconds = AssertionExpirationTimeInSeconds,
+                ClaimMappings = ClaimMappings.Select(c => (RelyingPartyClaimMapping)c.Clone()).ToList(),
+                CreateDateTime = CreateDateTime,
+                Id = Id,
+                MetadataUrl = MetadataUrl,
+                UpdateDateTime = UpdateDateTime
+            };
         }
 
         protected async Task<SPSSODescriptorType> GetSpSSODescriptor(IEntityDescriptorStore entityDescriptorStore, CancellationToken cancellationToken)

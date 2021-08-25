@@ -14,6 +14,10 @@ namespace SimpleIdServer.Saml.Host.Acceptance.Tests
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthorization(policy =>
+            {
+                policy.AddPolicy("ManageRelyingParties", p => p.RequireAssertion(_ => true));
+            });
             services.
                 AddMvc(option => option.EnableEndpointRouting = false)
                 .AddApplicationPart(typeof(SingleSignOnController).Assembly)

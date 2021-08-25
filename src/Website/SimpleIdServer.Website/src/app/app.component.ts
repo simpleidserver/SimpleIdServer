@@ -27,6 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
   sessionCheckTimer: any = null;
   showProvisioning: boolean = false;
   showUserManagement: boolean = false;
+  showApplications: boolean = false;
 
   constructor(private translate: TranslateService, private oauthService: OAuthService, private route: Router, private router: Router) {
     translate.setDefaultLang('fr');
@@ -90,6 +91,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
     if (this.router.routerState.snapshot.url.startsWith('/users') || this.router.routerState.snapshot.url.startsWith('/groups')) {
       this.showUserManagement = true;
+    }
+
+
+    if (this.router.routerState.snapshot.url.startsWith('/applications')
+      || this.router.routerState.snapshot.url.startsWith('/scopes')
+      || this.router.routerState.snapshot.url.startsWith('/relyingparties')) {
+      this.showApplications = true;
     }
 
     this.name = claims['given_name'];

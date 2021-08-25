@@ -10,7 +10,8 @@ namespace SimpleIdServer.Saml.Idp.EF.Configurations
     {
         public void Configure(EntityTypeBuilder<RelyingPartyClaimMapping> builder)
         {
-            throw new System.NotImplementedException();
+            builder.Property<int>("Id").ValueGeneratedOnAdd();
+            builder.HasKey("Id");
         }
     }
 }

@@ -42,6 +42,7 @@ namespace SimpleIdServer.OpenID.Host.Acceptance.Tests
                 policy.AddPolicy("ManageClients", p => p.RequireAssertion(_ => true));
                 policy.AddPolicy("ManageScopes", p => p.RequireAssertion(_ => true));
                 policy.AddPolicy("ManageUsers", p => p.RequireAssertion(_ => true));
+                policy.AddPolicy("ManageAuthSchemeProviders", p => p.RequireAssertion(_ => true));
             });
             ConfigureClient(services);
             services.RemoveAll<IBCNotificationService>();

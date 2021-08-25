@@ -32,6 +32,8 @@ import { MetadataEffects } from './stores/metadata/effects/metadata.effects';
 import { MetadataService } from './stores/metadata/services/metadata.service';
 import { ProvisioningEffects } from './stores/provisioning/effects/provisioning.effects';
 import { ProvisioningConfigurationService } from './stores/provisioning/services/provisioningconfiguration.service';
+import { RelyingPartyEffects } from './stores/relyingparties/effects/relyingparty.effects';
+import { RelyingPartyService } from './stores/relyingparties/services/relyingparty.service';
 import { OAuthScopeEffects } from './stores/scopes/effects/scope.effects';
 import { OAuthScopeService } from './stores/scopes/services/scope.service';
 import { UserEffects } from './stores/users/effects/user.effects';
@@ -57,7 +59,7 @@ export function createTranslateLoader(http: HttpClient) {
     BrowserAnimationsModule,
     HttpClientModule,
     OAuthModule.forRoot(),
-    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects, UserEffects, GroupEffects, WorkflowEffects, DelegateConfigurationEffects, HumanTaskEffects, ProvisioningEffects, AuthSchemeProviderEffects]),
+    EffectsModule.forRoot([ApplicationEffects, OAuthScopeEffects, MetadataEffects, UserEffects, GroupEffects, WorkflowEffects, DelegateConfigurationEffects, HumanTaskEffects, ProvisioningEffects, AuthSchemeProviderEffects, RelyingPartyEffects]),
     StoreModule.forRoot(appReducer),
     StoreDevtoolsModule.instrument({
       maxAge: 10
@@ -85,6 +87,7 @@ export function createTranslateLoader(http: HttpClient) {
     ProvisioningConfigurationService,
     HumanTaskInstanceService,
     AuthSchemeProviderService,
+    RelyingPartyService,
     MetadataService,
     {
       provide: OAuthStorage,

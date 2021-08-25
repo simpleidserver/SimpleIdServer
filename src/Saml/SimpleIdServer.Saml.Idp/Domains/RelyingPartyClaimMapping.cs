@@ -12,7 +12,12 @@ namespace SimpleIdServer.Saml.Idp.Domains
 
         public object Clone()
         {
-            throw new NotImplementedException();
+            return new RelyingPartyClaimMapping
+            {
+                ClaimFormat = ClaimFormat,
+                ClaimName = ClaimName,
+                UserAttribute = UserAttribute
+            };
         }
     }
 }
