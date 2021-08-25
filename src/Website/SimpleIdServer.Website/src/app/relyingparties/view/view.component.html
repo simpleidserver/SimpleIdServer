@@ -1,0 +1,105 @@
+<div class="breadcrumb">
+  <ul>
+    <li>
+      <div class="mat-h1"><a [routerLink]="['/relyingparties']">{{ "relyingParties.list" | translate }}</a></div>
+    </li>
+    <li class="separator">
+      <div class="mat-h1">\</div>
+    </li>
+    <li>
+      <div class="mat-h1">{{relyingParty.id}}</div>
+    </li>
+  </ul>
+</div>
+<loader *ngIf="isLoading"></loader>
+<div *ngIf="!isLoading">
+  <mat-card>
+    <form [formGroup]="updateRelyingPartyFormGroup" (ngSubmit)="saveRelyingParty($event, updateRelyingPartyFormGroup.value)">
+      <mat-card-content>
+        <!-- Basic Information -->
+        <div fxLayout="row">
+          <div fxFlex="30%">
+            <h3>{{ 'relyingParties.basicinfo' | translate }}</h3>
+          </div>
+          <div fxFlex="70%">
+            <!-- Id -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ "relyingParties.id" | translate }}</mat-label>
+              <input matInput formControlName="id" />
+              <div class="actions">
+                <mat-icon class="copy" [matTooltip]="'relyingParties.actions.copy' | translate" [cdkCopyToClipboard]="getRelyingPartyId()">content_copy</mat-icon>
+              </div>
+            </mat-form-field>
+            <!-- AssertionExpirationTimeInSeconds -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ "relyingParties.assertionExpirationTimeInSeconds" | translate }}</mat-label>
+              <input matInput type="number" formControlName="assertionExpirationTimeInSeconds" />
+            </mat-form-field>
+            <!-- MetadataUrl -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ "relyingParties.metadataUrl" | translate }}</mat-label>
+              <input matInput type="text" formControlName="metadataUrl" />
+              <mat-error *ngIf="updateRelyingPartyFormGroup.get('metadataUrl')?.hasError('required')">
+                {{ 'relyingParties.metadataUrlRequired' | translate }}
+              </mat-error>
+            </mat-form-field>
+            <!-- ClaimMappings -->
+            <div fxLayout="row">
+              <div fxFlex="80%">
+                <p>{{ 'relyingParties.claims' | translate }}</p>
+              </div>
+              <div>
+                <button mat-raised-button color="primary" (click)="addClaimMapping($event)">
+                  <mat-icon>add</mat-icon>
+                  {{ 'relyingParties.addClaim' | translate }}
+                </button>
+              </div>
+            </div>
+            <mat-table class="full-width" [dataSource]="claims$">
+              <!-- UserAttribute -->
+              <ng-container matColumnDef="userAttribute">
+                <mat-header-cell *matHeaderCellDef>{{ "relyingParties.userAttribute" | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let claim">
+                  {{ claim.userAttribute }}
+                </mat-cell>
+              </ng-container>
+              <!-- ClaimName -->
+              <ng-container matColumnDef="claimName">
+                <mat-header-cell *matHeaderCellDef>{{ "relyingParties.claimName" | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let claim">
+                  {{ claim.claimName }}
+                </mat-cell>
+              </ng-container>
+              <!-- Action -->
+              <ng-container matColumnDef="action">
+                <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                <mat-cell *matCellDef="let claim; let i = index">
+                  <button mat-icon-button (click)="removeRelyingParty($event, claim)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="editRelyingParty($event, claim, i)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </mat-cell>
+              </ng-container>
+              <mat-header-row *matHeaderRowDef="displayedClaimColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedClaimColumns;"></mat-row>
+            </mat-table>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button type="submit" mat-raised-button color="primary">{{ 'save' | translate }}</button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+  <h2>{{ 'relyingParties.dangerZone' | translate }}</h2>
+  <div class="alert alert-danger" fxLayout="row">
+    <div fxFlex="90%">
+      <b>{{ 'relyingParties.deleteTitle' | translate }}</b>
+    </div>
+    <div>
+      <button mat-raised-button color="warn" (click)="delete()">{{ 'relyingParties.delete' | translate }}</button>
+    </div>
+  </div>
+</div>

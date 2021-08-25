@@ -1,5 +1,6 @@
 {
   "userManagement": "User management",
+  "apps": "Applications",
   "close": "Close",
   "save": "Save",
   "create": "Create",
@@ -11,6 +12,36 @@
         "required": "Is required",
         "badPassword": "Password doesn't match"
       }
+    }
+  },
+  "relyingParties": {
+    "list": "SAML2.0 Relying Parties",
+    "add": "Create Relying Party",
+    "metadataUrl": "Metadata Url",
+    "createDateTime": "Create Datetime",
+    "updateDateTime": "Update Datetime",
+    "metadataUrlRequired": "The Metadata Url is required",
+    "editClaim": "Edit / Add claim mapping",
+    "claimName": "Target",
+    "userAttribute": "Source",
+    "basicinfo": "Basic Information",
+    "id": "Identifier",
+    "claims": "Claim Mappings",
+    "addClaim": "Add claim mapping",
+    "deleteTitle": "Delete this relying party",
+    "delete": "Delete",
+    "dangerZone": "Danger zone",
+    "assertionExpirationTimeInSeconds": "Assertion expiration time in seconds",
+    "actions": {
+      "copy": "Copy"
+    },
+    "messages": {
+      "update": "The relying party has been updated",
+      "errorUpdate": "An error occured while trying to update the relying party",
+      "delete": "The relying party has been removed",
+      "errorDelete": "An error occured while trying to remove the relying party",
+      "add": "The relying party has been added",
+      "errorAdd": "An error occured while trying to add the relying party"
     }
   },
   "authentications": {
@@ -211,7 +242,7 @@
     "allowedScopes": "Allowed scopes",
     "grantTypes": "Grant Types",
     "advancedSettings": "Advanced Settings",
-    "list": "Applications",
+    "list": "OpenID clients",
     "kind": "Application Type",
     "badCallbackUri": "Callback URI must start with https",
     "callbackUrisDescription": "Callback URIS must start with https",

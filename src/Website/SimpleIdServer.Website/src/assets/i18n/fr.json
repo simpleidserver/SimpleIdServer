@@ -1,5 +1,6 @@
 {
   "userManagement": "Gérer les utilisateurs",
+  "apps": "Applications",
   "close": "Fermer",
   "save": "Sauvegarder",
   "create": "Créer",
@@ -11,6 +12,36 @@
         "required": "Est requis",
         "badPassword": "Mot de passe ne correspond pas"
       }
+    }
+  },
+  "relyingParties": {
+    "list": "SAML2.0 Relying Parties",
+    "add": "Créer une Relying Party",
+    "metadataUrl": "Metadata",
+    "createDateTime": "Date de création",
+    "updateDateTime": "Date de mise à jour",
+    "metadataUrlRequired": "L'URL de metadata est requise",
+    "editClaim": "Editer / Ajouter un règle de mapping",
+    "claimName": "Cible",
+    "userAttribute": "Source",
+    "basicinfo": "Informations basiques",
+    "id": "Identifiants",
+    "claims": "Règles de mapping",
+    "addClaim": "Ajouter une règle de mapping",
+    "deleteTitle": "Supprimer ce relying party",
+    "delete": "Supprimer",
+    "dangerZone": "Zone de danger",
+    "assertionExpirationTimeInSeconds": "Expiration de l'assertion en secondes",
+    "actions": {
+      "copy": "Copier"
+    },
+    "messages": {
+      "update": "Le relying party a été mis à jour",
+      "errorUpdate": "Une erreur est survenue durant la mise à jour du relying party",
+      "delete": " Le relying party a été supprimé",
+      "errorDelete": "Une erreur est survenue durant la suppression du relying party",
+      "add": "Le relying party a été ajouté",
+      "errorAdd": "Une erreur est survenue durant l'ajout du relying party"
     }
   },
   "authentications": {
@@ -211,7 +242,7 @@
     "allowedScopes": "Les scopes autorisés",
     "grantTypes": "Grant Types",
     "advancedSettings": "Paramètres avancées",
-    "list": "Applications",
+    "list": "Clients OPENID",
     "kind": "Type d'application",
     "badCallbackUri": "L'URL de callback doit commencer par https",
     "callbackUrisDescription": "Les URLS de callback doivent commencer par https",

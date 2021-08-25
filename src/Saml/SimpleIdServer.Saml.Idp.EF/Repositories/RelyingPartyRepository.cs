@@ -55,6 +55,12 @@ namespace SimpleIdServer.Saml.Idp.EF.Repositories
             return _dbContext.RelyingParties.Include(r => r.ClaimMappings);
         }
 
+        public Task<bool> Delete(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken)
+        {
+            _dbContext.RelyingParties.Remove(relyingPartyAggregate);
+            return Task.FromResult(true);
+        }
+
         public async Task<SearchResult<RelyingPartyAggregate>> Search(SearchRelyingPartiesParameter parameter, CancellationToken cancellationToken)
         {
             var result = _dbContext.RelyingParties.AsQueryable();

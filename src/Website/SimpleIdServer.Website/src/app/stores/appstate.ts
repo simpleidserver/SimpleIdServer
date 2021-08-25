@@ -9,6 +9,7 @@ import * as fromScopes from './scopes/reducers';
 import * as fromUsers from './users/reducers';
 import * as fromWorkflows from './workflows/reducers';
 import * as fromAuthSchemeProviders from './authschemeproviders/reducers';
+import * as fromRelyingParty from './relyingparties/reducers';
 
 export interface AppState {
   application: fromApplications.ApplicationState;
@@ -37,7 +38,9 @@ export interface AppState {
   humanTaskInstance: fromHumanTask.HumanTaskInstanceState,
   humanTaskInstances: fromHumanTask.HumanTaskInstancesState,
   authSchemeProvider: fromAuthSchemeProviders.AuthSchemeProviderState,
-  authSchemeProviders: fromAuthSchemeProviders.AuthSchemeProvidersState
+  authSchemeProviders: fromAuthSchemeProviders.AuthSchemeProvidersState,
+  relyingParty: fromRelyingParty.RelyingPartyState,
+  relyingParties: fromRelyingParty.SearchRelyingPartiesState
 }
 
 export const selectApplication = (state: AppState) => state.application;
@@ -67,6 +70,8 @@ export const selectHumanTaskInstance = (state: AppState) => state.humanTaskInsta
 export const selectHumanTaskInstances = (state: AppState) => state.humanTaskInstances;
 export const selectAuthSchemeProvider = (state: AppState) => state.authSchemeProvider;
 export const selectAuthSchemeProviders = (state: AppState) => state.authSchemeProviders;
+export const selectRelyingParty = (state: AppState) => state.relyingParty;
+export const selectRelyingParties = (state: AppState) => state.relyingParties;
 
 export const selectAuthSchemeProviderResult = createSelector(
   selectAuthSchemeProvider,
@@ -387,6 +392,28 @@ export const selectHumanTaskInstancesResult = createSelector(
   }
 );
 
+export const selectRelyingPartyResult = createSelector(
+  selectRelyingParty,
+  (state: fromRelyingParty.RelyingPartyState) => {
+    if (!state || !state.RelyingParty) {
+      return null;
+    }
+
+    return state.RelyingParty;
+  }
+);
+
+export const selectRelyingPartiesResult = createSelector(
+  selectRelyingParties,
+  (state: fromRelyingParty.SearchRelyingPartiesState) => {
+    if (!state || !state.RelyingParties) {
+      return null;
+    }
+
+    return state.RelyingParties;
+  }
+);
+
 export const appReducer = {
   application: fromApplications.getApplicationReducer,
   applications: fromApplications.getSearchApplicationsReducer,
@@ -414,5 +441,7 @@ export const appReducer = {
   humanTaskInstance: fromHumanTask.getHumanTaskInstanceReducer,
   humanTaskInstances: fromHumanTask.getHumanTaskInstancesReducer,
   authSchemeProvider: fromAuthSchemeProviders.getAuthSchemeProviderReducer,
-  authSchemeProviders: fromAuthSchemeProviders.getAuthSchemeProvidersReducer
+  authSchemeProviders: fromAuthSchemeProviders.getAuthSchemeProvidersReducer,
+  relyingParty: fromRelyingParty.getRelyingPartyReducer,
+  relyingParties: fromRelyingParty.getSearchRelyingPartiesReducer
 };

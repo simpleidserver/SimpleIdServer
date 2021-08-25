@@ -112,6 +112,14 @@ namespace SimpleIdServer.OpenID.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope ManageRelyingParties = new OAuthScope
+        {
+            Name = "manage_relying_parties",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -132,7 +140,8 @@ namespace SimpleIdServer.OpenID.Startup
             BulkScimResource,
             ScimProvision,
             ManageUsers,
-            ManageAuthSchemeProviders
+            ManageAuthSchemeProviders,
+            ManageRelyingParties
         };
 
         public static List<AuthenticationSchemeProvider> AuthenticationProviderSchemes => new List<AuthenticationSchemeProvider>
@@ -865,7 +874,8 @@ namespace SimpleIdServer.OpenID.Startup
                         UpdateScimResource,
                         DeleteScimResource,
                         ScimProvision,
-                        ManageAuthSchemeProviders
+                        ManageAuthSchemeProviders,
+                        ManageRelyingParties
                     },
                     GrantTypes = new List<string>
                     {

@@ -36,5 +36,9 @@ export const routes: Routes = [
     path: 'authentications',
     loadChildren: async () => (await import('./authentications/authentications.module')).AuthenticationsModule
   },
+  {
+    path: 'relyingparties',
+    loadChildren: async() => (await import('./relyingparties/relyingparties.module')).RelyingPartiesModule
+  },
   { path: '**', redirectTo: '/status/404' }
 ];

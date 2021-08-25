@@ -66,7 +66,13 @@ namespace SimpleIdServer.Saml.Idp.Persistence.InMemory
 
         public Task<int> SaveChanges(CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            return Task.FromResult(1);
+        }
+
+        public Task<bool> Delete(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken)
+        {
+            _relyingParties.Remove(relyingPartyAggregate);
+            return Task.FromResult(true);
         }
     }
 }

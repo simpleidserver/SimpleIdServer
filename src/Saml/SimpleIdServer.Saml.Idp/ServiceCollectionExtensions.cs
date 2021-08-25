@@ -52,6 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
             serviceCollection.AddTransient<IAddRelyingPartyHandler, AddRelyingPartyHandler>();
             serviceCollection.AddTransient<IGetRelyingPartyHandler, GetRelyingPartyHandler>();
             serviceCollection.AddTransient<IUpdateRelyingPartyHandler, UpdateRelyingPartyHandler>();
+            serviceCollection.AddTransient<IDeleteRelyingPartyHandler, DeleteRelyingPartyHandler>();
             return serviceCollection;
         }
 

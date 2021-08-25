@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>{{ 'relyingParties.add' | translate }}</h1>
+<form [formGroup]="addRelyingPartyFormGroup">
+  <div mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'relyingParties.metadataUrl' | translate }}</mat-label>
+      <input matInput formControlName="metadataUrl" />
+      <mat-error *ngIf="addRelyingPartyFormGroup.get('metadataUrl')?.hasError('required')">
+        {{ 'relyingParties.metadataUrlRequired' | translate }}
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="save()">{{ 'create' | translate }}</button>
+    <button mat-button color="warn" mat-dialog-close>{{ 'close' | translate }}</button>
+  </div>
+</form>

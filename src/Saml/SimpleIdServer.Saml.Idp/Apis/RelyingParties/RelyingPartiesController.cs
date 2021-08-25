@@ -22,17 +22,20 @@ namespace SimpleIdServer.Saml.Idp.Apis.RelyingParties
         private readonly IAddRelyingPartyHandler _addRelyingPartyHandler;
         private readonly IGetRelyingPartyHandler _getRelyingPartyHandler;
         private readonly IUpdateRelyingPartyHandler _updateRelyingPartyHandler;
+        private readonly IDeleteRelyingPartyHandler _deleteRelyingPartyHandler;
 
         public RelyingPartiesController(
             ISearchRelyingPartiesHandler searchRelyingPartiesHandler,
             IAddRelyingPartyHandler addRelyingPartyHandler,
             IGetRelyingPartyHandler getRelyingPartyHandler,
-            IUpdateRelyingPartyHandler updateRelyingPartyHandler)
+            IUpdateRelyingPartyHandler updateRelyingPartyHandler,
+            IDeleteRelyingPartyHandler deleteRelyingPartyHandler)
         {
             _searchRelyingPartiesHandler = searchRelyingPartiesHandler;
             _addRelyingPartyHandler = addRelyingPartyHandler;
             _getRelyingPartyHandler = getRelyingPartyHandler;
             _updateRelyingPartyHandler = updateRelyingPartyHandler;
+            _deleteRelyingPartyHandler = deleteRelyingPartyHandler;
         }
 
         #region Manage Relying Party
@@ -101,6 +104,31 @@ namespace SimpleIdServer.Saml.Idp.Apis.RelyingParties
             try
             {
                 await _updateRelyingPartyHandler.Handle(id, jObj, cancellationToken);
+                return new NoContentResult();
+            }
+            catch (RelyingPartyNotFoundException ex)
+            {
+                var content = new JObject
+                {
+                    { ErrorResponseParameters.Error, ex.Code },
+                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                };
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Content = content.ToString(),
+                    ContentType = "application/json"
+                };
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize("ManageRelyingParties")]
+        public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _deleteRelyingPartyHandler.Handle(id, cancellationToken);
                 return new NoContentResult();
             }
             catch (RelyingPartyNotFoundException ex)

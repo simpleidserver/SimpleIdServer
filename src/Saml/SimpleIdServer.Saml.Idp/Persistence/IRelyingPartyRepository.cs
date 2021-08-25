@@ -13,6 +13,7 @@ namespace SimpleIdServer.Saml.Idp.Persistence
         Task<RelyingPartyAggregate> Get(string id, CancellationToken cancellationToken);
         Task<bool> Add(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken);
         Task<bool> Update(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken);
+        Task<bool> Delete(RelyingPartyAggregate relyingPartyAggregate, CancellationToken cancellationToken);
         Task<SearchResult<RelyingPartyAggregate>> Search(SearchRelyingPartiesParameter parameter, CancellationToken cancellationToken);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
