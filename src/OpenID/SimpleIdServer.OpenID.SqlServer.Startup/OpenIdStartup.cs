@@ -94,7 +94,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                 })
                 .AddOpenIDEF(opt =>
                 {
-                    opt.UseSqlServer("Data Source=DESKTOP-F641MIJ\\SQLEXPRESS;Initial Catalog=OpenID;Integrated Security=True", o => o.MigrationsAssembly(migrationsAssembly));
+                    opt.UseSqlServer(_configuration.GetConnectionString("OpenId"), o => o.MigrationsAssembly(migrationsAssembly));
                 })
                 .AddLoginPasswordAuthentication()
                 .AddSMSAuthentication()

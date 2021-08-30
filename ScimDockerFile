@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
+
+COPY build/results/docker/Scim/ App/
+
+WORKDIR /App
+
+ENTRYPOINT ["dotnet", "SimpleIdServer.Scim.SqlServer.Startup.dll"]

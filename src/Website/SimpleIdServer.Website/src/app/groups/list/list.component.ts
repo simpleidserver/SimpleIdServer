@@ -52,7 +52,7 @@ export class ListGroupsComponent implements OnInit {
 
   refresh() {
     this.isLoading = true;
-    let startIndex: number = 0;
+    let startIndex: number = 1;
     let count: number = 5;
     if (this.paginator.pageIndex && this.paginator.pageSize) {
       startIndex = this.paginator.pageIndex * this.paginator.pageSize;

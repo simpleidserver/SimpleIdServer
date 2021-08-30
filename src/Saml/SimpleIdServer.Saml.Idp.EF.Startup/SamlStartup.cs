@@ -61,7 +61,7 @@ namespace SimpleIdServer.Saml.Idp.EF.Startup
             });
             services.AddSamlIdpEF(opt =>
             {
-                opt.UseSqlServer("Data Source=DESKTOP-F641MIJ\\SQLEXPRESS;Initial Catalog=SamlIdp;Integrated Security=True", o => o.MigrationsAssembly(migrationsAssembly));
+                opt.UseSqlServer(_configuration.GetConnectionString("SamlIdp"), o => o.MigrationsAssembly(migrationsAssembly));
             });
             services.AddSamlLoginPawdAuth();
             services.Configure<ForwardedHeadersOptions>(options =>

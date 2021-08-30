@@ -57,6 +57,7 @@ namespace CaseManagement.BPMN.Host
                 {
                     OnTokenValidated = async (ctx) =>
                     {
+                        // TODO : Get URL from configuration...
                         var issuer = ctx.Principal.Claims.First(c => c.Type == "iss").Value;
                         using (var httpClient = new HttpClient())
                         {

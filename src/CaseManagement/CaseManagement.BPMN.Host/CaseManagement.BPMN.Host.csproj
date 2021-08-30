@@ -4,6 +4,14 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="credentials.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="credentials.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0" />
@@ -13,6 +21,9 @@
     <PackageReference Include="CaseManagement.BPMN.AspNetCore" Version="1.0.4-ci-00081" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Bpmns\UpdatePassword.bpmn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="openid_puk.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

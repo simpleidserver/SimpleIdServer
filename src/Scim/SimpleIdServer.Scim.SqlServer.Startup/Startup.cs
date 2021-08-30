@@ -71,7 +71,14 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 _.IgnoreUnsupportedCanonicalValues = false;
             }, massTransitOptions: x =>
             {
-                x.UsingRabbitMq();
+                x.UsingRabbitMq((c, t) =>
+                {
+                    var connectionString = Configuration["RabbitMQ"];
+                    if (!string.IsNullOrWhiteSpace(connectionString))
+                    {
+                        t.Host(connectionString);
+                    }
+                });
             });
             services.AddScimStoreEF(options =>
             {

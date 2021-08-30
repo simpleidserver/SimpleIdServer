@@ -49,6 +49,7 @@
     <None Remove="src\app\users\view\edit-phonenumber.component.ts" />
     <None Remove="src\app\users\view\edit-photo.component.ts" />
     <None Remove="src\app\users\view\edit-role.component.ts" />
+    <None Remove="src\environments\environments.docker.ts" />
     <None Remove="src\environments\environments.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +120,7 @@
     <TypeScriptCompile Include="src\app\users\view\details\edit-photo.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\environments\environments.docker.ts" />
     <TypeScriptCompile Include="src\environments\environments.ts" />
   </ItemGroup>
   <ItemGroup>

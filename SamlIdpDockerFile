@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
+
+COPY build/results/docker/SamlIdp/ App/
+
+WORKDIR /App
+
+ENTRYPOINT ["dotnet", "SimpleIdServer.Saml.Idp.EF.Startup.dll"]

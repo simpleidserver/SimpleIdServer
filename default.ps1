@@ -24,6 +24,16 @@ task publish {
 	exec { dotnet publish $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Startup\SimpleIdServer.OpenBankingApi.Startup.csproj -c $config -o $result_dir\services\OpenBankingApi }
 }
 
+task publishDocker -depends clean {
+	exec { dotnet publish $source_dir\OpenID\SimpleIdServer.OpenID.SqlServer.Startup\SimpleIdServer.OpenID.SqlServer.Startup.csproj -c $config -o $result_dir\docker\OpenID }
+	exec { dotnet publish $source_dir\Website\SimpleIdServer.Gateway.Host\SimpleIdServer.Gateway.Host.csproj -c $config -o $result_dir\docker\Gateway }
+	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj -c $config -o $result_dir\docker\Scim }
+	exec { npm run docker --prefix $source_dir\Website\SimpleIdServer.Website }
+	exec { dotnet publish $source_dir\CaseManagement\CaseManagement.BPMN.Host\CaseManagement.BPMN.Host.csproj -c $config -o $result_dir\docker\Bpmn }
+	exec { dotnet publish $source_dir\CaseManagement\CaseManagement.HumanTask.Host\CaseManagement.HumanTask.Host.csproj -c $config -o $result_dir\docker\HumanTask }
+	exec { dotnet publish $source_dir\Saml\SimpleIdServer.Saml.Idp.EF.Startup\SimpleIdServer.Saml.Idp.EF.Startup.csproj -c $config -o $result_dir\docker\SamlIdp }
+}
+
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
 	rd "$base_dir\build" -recurse -force  -ErrorAction SilentlyContinue | out-null

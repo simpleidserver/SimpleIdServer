@@ -1,0 +1,98 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: "rabbitmq"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    expose:
+     - 15672
+     - 5672
+  db:
+    build:
+      context: .
+      dockerfile: ./DbDockerFile
+    image: sid/db
+    volumes:
+     - mssqldata:/var/opt/mssql
+  openid:
+    build:
+      context: .
+      dockerfile: ./OpenIdDockerFile
+    image: sid/openid
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_URLS : "https://*:60000"
+    ports:
+      - "60000:60000"
+    depends_on:
+      - db
+  scim:
+    build:
+      context: .
+      dockerfile: ./ScimDockerFile
+    image: sid/scim
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+    ports:
+      - "60002:60002"
+    depends_on:
+      - db
+  bpmn:
+    build:
+      context: .
+      dockerfile: ./BpmnDockerFile
+    image: sid/bpmn
+    environment:
+      ASPNETCORE_URLS : "http://*:60007"
+    ports:
+      - "60007:60007"
+  humantask:
+    build:
+      context: .
+      dockerfile: ./HumanTaskDockerFile
+    image: sid/humantask
+    environment:
+      ASPNETCORE_URLS : "http://*:60006"
+    ports:
+      - "60006:60006"
+  samlidp:
+    build:
+      context: .
+      dockerfile: ./SamlIdpDockerFile
+    image: sid/samlidp
+    environment:
+      ASPNETCORE_URLS : "http://*:7000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_URLS : "http://*:7000"
+    ports:
+      - "7000:7000"
+  gateway:
+    build:
+      context: .
+      dockerfile: ./GatewayDockerFile
+    image: sid/gateway
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_URLS : "http://*:5001"
+    ports:
+      - "5001:5001"
+    depends_on:
+      - openid
+      - scim
+      - bpmn
+      - humantask
+      - samlidp
+  website:
+    build:
+      context: .
+      dockerfile: ./WebsiteDockerFile
+    image: sid/website
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      ASPNETCORE_URLS : "http://*:4200"
+    ports:
+      - "4200:4200"
+volumes:
+  mssqldata:
