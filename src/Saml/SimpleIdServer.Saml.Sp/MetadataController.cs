@@ -35,14 +35,13 @@ namespace SimpleIdServer.Saml.Sp
             var handler = await _authenticationHandlerProvider.GetHandlerAsync(HttpContext, schemeName);
             var samlHandler = handler as SamlSpHandler;
             var options = samlHandler.SamlSpOptions;
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var callbackPath = options.CallbackPath.Value;
             var result = EntityDescriptorBuilder.Instance(options.SPId)
                 .AddSpSSODescriptor(cb =>
                 {
                     cb.SetAuthnRequestsSigned(options.AuthnRequestSigned);
                     cb.SetWantAssertionsSigned(options.WantAssertionSigned);
-                    cb.AddAssertionConsumerService(Constants.Bindings.HttpRedirect, $"{issuer}{callbackPath}");
+                    cb.AddAssertionConsumerService(Constants.Bindings.HttpRedirect, $"{options.BaseUrl}{callbackPath}");
                     if (options.SigningCertificate != null)
                     {
                         cb.AddSigningKey(options.SigningCertificate);

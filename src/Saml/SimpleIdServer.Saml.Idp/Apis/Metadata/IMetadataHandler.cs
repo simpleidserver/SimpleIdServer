@@ -6,6 +6,6 @@ namespace SimpleIdServer.Saml.Idp.Apis.Metadata
 {
     public interface IMetadataHandler
     {
-        EntityDescriptorType Get(string issuer);
+        EntityDescriptorType Get();
     }
 }

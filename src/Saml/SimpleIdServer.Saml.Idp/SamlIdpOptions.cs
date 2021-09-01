@@ -14,6 +14,7 @@ namespace SimpleIdServer.Saml.Idp
             CookieAuthExpirationTimeInSeconds = 5 * 60;
             SessionCookieName = CookieAuthenticationDefaults.CookiePrefix + "Session";
             CanonicalizationMethod = CanonicalizationMethods.C14;
+            BaseUrl = "http://localhost";
         }
 
         /// <summary>
@@ -44,5 +45,9 @@ namespace SimpleIdServer.Saml.Idp
         /// Default Canonicalization Method.
         /// </summary>
         public CanonicalizationMethods CanonicalizationMethod { get; set; }
+        /// <summary>
+        /// Base URL.
+        /// </summary>
+        public string BaseUrl { get; set; }
     }
 }

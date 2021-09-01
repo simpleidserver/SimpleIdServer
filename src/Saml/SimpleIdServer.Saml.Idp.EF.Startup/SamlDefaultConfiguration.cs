@@ -10,55 +10,58 @@ namespace SimpleIdServer.Saml.Idp.EF.Startup
 {
     public class SamlDefaultConfiguration
     {
-        public static ICollection<RelyingPartyAggregate> RelyingParties = new List<RelyingPartyAggregate>
+        public static ICollection<RelyingPartyAggregate> GetRelyingParties(string baseMetadataUrl)
         {
-            new RelyingPartyAggregate
+            return new List<RelyingPartyAggregate>
             {
-                Id = "urn:sp",
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                MetadataUrl = "http://localhost:7001/saml/metadata",
-                AssertionExpirationTimeInSeconds = 60,
-                ClaimMappings = new List<RelyingPartyClaimMapping>
+                new RelyingPartyAggregate
                 {
-                    new RelyingPartyClaimMapping
+                    Id = "urn:sp",
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    MetadataUrl = "http://localhost:7001/saml/metadata",
+                    AssertionExpirationTimeInSeconds = 60,
+                    ClaimMappings = new List<RelyingPartyClaimMapping>
                     {
-                        UserAttribute = Jwt.Constants.UserClaims.GivenName,
-                        ClaimName = "urn:oid:2.5.4.42",
-                        ClaimFormat = ""
-                    },
-                    new RelyingPartyClaimMapping
+                        new RelyingPartyClaimMapping
+                        {
+                            UserAttribute = Jwt.Constants.UserClaims.GivenName,
+                            ClaimName = "urn:oid:2.5.4.42",
+                            ClaimFormat = ""
+                        },
+                        new RelyingPartyClaimMapping
+                        {
+                            UserAttribute= Jwt.Constants.UserClaims.FamilyName,
+                            ClaimName = "LastName",
+                            ClaimFormat = ""
+                        }
+                    }
+                },
+                new RelyingPartyAggregate
+                {
+                    Id = "urn:idp",
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                    MetadataUrl = $"{baseMetadataUrl}/saml/metadata",
+                    AssertionExpirationTimeInSeconds = 60,
+                    ClaimMappings = new List<RelyingPartyClaimMapping>
                     {
-                        UserAttribute= Jwt.Constants.UserClaims.FamilyName,
-                        ClaimName = "LastName",
-                        ClaimFormat = ""
+                        new RelyingPartyClaimMapping
+                        {
+                            UserAttribute = Jwt.Constants.UserClaims.GivenName,
+                            ClaimName = "urn:oid:2.5.4.42",
+                            ClaimFormat = ""
+                        },
+                        new RelyingPartyClaimMapping
+                        {
+                            UserAttribute= Jwt.Constants.UserClaims.FamilyName,
+                            ClaimName = "LastName",
+                            ClaimFormat = ""
+                        }
                     }
                 }
-            },
-            new RelyingPartyAggregate
-            {
-                Id = "urn:idp",
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-                MetadataUrl = "https://localhost:60000/saml/metadata",
-                AssertionExpirationTimeInSeconds = 60,
-                ClaimMappings = new List<RelyingPartyClaimMapping>
-                {
-                    new RelyingPartyClaimMapping
-                    {
-                        UserAttribute = Jwt.Constants.UserClaims.GivenName,
-                        ClaimName = "urn:oid:2.5.4.42",
-                        ClaimFormat = ""
-                    },
-                    new RelyingPartyClaimMapping
-                    {
-                        UserAttribute= Jwt.Constants.UserClaims.FamilyName,
-                        ClaimName = "LastName",
-                        ClaimFormat = ""
-                    }
-                }
-            }
-        };
+            };
+        }
 
         public static ICollection<User> Users = new List<User>
         {

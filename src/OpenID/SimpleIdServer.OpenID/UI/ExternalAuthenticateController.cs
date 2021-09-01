@@ -79,7 +79,11 @@ namespace SimpleIdServer.OpenID.UI
             var result = await HttpContext.AuthenticateAsync(Options.ExternalAuthenticationScheme);
             if (result == null || !result.Succeeded)
             {
-                _logger.LogError(result.Failure.ToString());
+                if (result.Failure != null)
+                {
+                    _logger.LogError(result.Failure.ToString());
+                }
+
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION);
             }
 

@@ -65,7 +65,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentation>), "f");
             var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
             var result = (IOrderedEnumerable<SCIMRepresentation>)finalOrderRequestBody.Compile().DynamicInvoke(representations);
-            var content = result.Skip(startIndex).Take(count).ToList();
+            var content = result.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count).ToList();
             var total = await representations.CountAsync(cancellationToken);
             return new SearchSCIMRepresentationsResponse(total, content);
         }
@@ -109,7 +109,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                     break;
             }
             
-            var orderedIds = await query.Skip(startIndex).Take(count).ToListAsync(cancellationToken);
+            var orderedIds = await query.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count).ToListAsync(cancellationToken);
             var result = await dbContext.SCIMRepresentationLst.Include(a => a.Attributes).Where(s => orderedIds.Contains(s.Id)).ToListAsync(cancellationToken);
             var comparer = new RepresentationComparer(orderedIds);
             List<SCIMRepresentation> content = null;

@@ -38,7 +38,10 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<IEnumerable<ProvisioningConfiguration>> GetAll(CancellationToken cancellationToken)
         {
-            IEnumerable<ProvisioningConfiguration> result = await _dbContext.ProvisioningConfigurations.ToListAsync(cancellationToken);
+            IEnumerable<ProvisioningConfiguration> result = await _dbContext.ProvisioningConfigurations
+                .Include(p => p.Records).ThenInclude(p => p.Values)
+                .Include(p => p.HistoryLst)
+                .ToListAsync(cancellationToken);
             return result;
         }
 
@@ -50,18 +53,26 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<ProvisioningConfiguration> Get(string id, CancellationToken cancellationToken)
         {
-            return _dbContext.ProvisioningConfigurations.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            return _dbContext.ProvisioningConfigurations
+                .Include(p => p.Records).ThenInclude(p => p.Values)
+                .Include(p => p.HistoryLst)
+                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
 
         public async Task<ProvisioningConfigurationResult> GetQuery(string id, CancellationToken cancellationToken)
         {
-            var result = await _dbContext.ProvisioningConfigurations.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            var result = await _dbContext.ProvisioningConfigurations
+                .Include(p => p.Records).ThenInclude(p => p.Values)
+                .Include(p => p.HistoryLst)
+                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
             return result == null ? null : ProvisioningConfigurationResult.ToDto(result);
         }
 
         public async Task<SearchResult<ProvisioningConfigurationResult>> SearchConfigurations(SearchProvisioningConfigurationParameter parameter, CancellationToken cancellationToken)
         {
-            IQueryable<ProvisioningConfiguration> result = _dbContext.ProvisioningConfigurations;
+            IQueryable<ProvisioningConfiguration> result = _dbContext.ProvisioningConfigurations
+                .Include(p => p.Records).ThenInclude(p => p.Values)
+                .Include(p => p.HistoryLst);
             if (MAPPING_PROVISIONING_TO_PROPERTYNAME.ContainsKey(parameter.OrderBy))
             {
                 result = result.InvokeOrderBy(MAPPING_PROVISIONING_TO_PROPERTYNAME[parameter.OrderBy], parameter.Order);
@@ -81,7 +92,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<SearchResult<ProvisioningConfigurationHistoryResult>> SearchHistory(SearchProvisioningHistoryParameter parameter, CancellationToken cancellationToken)
         {
-            IQueryable<ProvisioningConfigurationHistory> result = _dbContext.ProvisioningConfigurationHistory;
+            IQueryable<ProvisioningConfigurationHistory> result = _dbContext.ProvisioningConfigurationHistory
+                .Include(p => p.ProvisioningConfiguration);
             if (MAPPING_PROVISIONINGHISTORY_TO_PROPERTYNAME.ContainsKey(parameter.OrderBy))
             {
                 result = result.InvokeOrderBy(MAPPING_PROVISIONINGHISTORY_TO_PROPERTYNAME[parameter.OrderBy], parameter.Order);

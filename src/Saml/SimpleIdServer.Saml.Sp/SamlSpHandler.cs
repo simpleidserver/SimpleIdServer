@@ -97,7 +97,6 @@ namespace SimpleIdServer.Saml.Sp
                 samlResponse = SAMLResponseDto.Build(Request.Form.ToDictionary(k => k.Key, k => k.Value.First()));
             }
 
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
             try
             {
                 var properties = Options.StateDataFormat.Unprotect(samlResponse.RelayState);

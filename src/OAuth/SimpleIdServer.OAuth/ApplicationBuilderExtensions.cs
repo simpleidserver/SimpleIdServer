@@ -10,6 +10,7 @@ namespace Microsoft.AspNetCore.Builder
         public static IApplicationBuilder UseSIDOauth(this IApplicationBuilder applicationBuilder)
         {
             applicationBuilder.UseMiddleware<MtlsAuthenticationMiddleware>();
+
             return applicationBuilder;
         }
     }

@@ -102,14 +102,13 @@ namespace CaseManagement.HumanTask.Host
                 {
                     OnTokenValidated = async (ctx) =>
                     {
-                        var issuer = ctx.Principal.Claims.First(c => c.Type == "iss").Value;
                         using (var httpClient = new HttpClient())
                         {
                             var authorization = ctx.Request.Headers["Authorization"][0];
                             var bearer = authorization.Split(" ").Last();
                             var requestMessage = new HttpRequestMessage
                             {
-                                RequestUri = new Uri($"{issuer}/userinfo"),
+                                RequestUri = new Uri($"{_configuration["OpenIdUrl"]}/userinfo"),
                                 Method = HttpMethod.Get
                             };
                             requestMessage.Headers.Add("Authorization", $"Bearer {bearer}");
@@ -165,6 +164,7 @@ namespace CaseManagement.HumanTask.Host
                     ValidIssuers = new List<string>
                     {
                         "https://localhost:60000",
+                        "https://openid:60000",
                         "https://simpleidserver.northeurope.cloudapp.azure.com/openid"
                     }
                 };

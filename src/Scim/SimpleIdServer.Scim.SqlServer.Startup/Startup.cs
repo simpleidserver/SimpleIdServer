@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 {
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = "https://localhost:60000",
+                        ValidIssuer = Configuration["OpenIdUrl"],
                         ValidAudiences = new List<string>
                         {
                             "scimClient", "gatewayClient", "provisioningClient"
@@ -160,7 +160,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                     Type = ProvisioningConfigurationRecordTypes.STRING,
                                     ValuesString = new List<string>
                                     {
-                                        "https://localhost:60000/token"
+                                        $"{Configuration["OpenIdUrl"]}/token"
                                     }
                                 },
                                 new ProvisioningConfigurationRecord
@@ -169,7 +169,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                     Type = ProvisioningConfigurationRecordTypes.STRING,
                                     ValuesString = new List<string>
                                     {
-                                        "https://localhost:60000/management/users/scim"
+                                        $"{Configuration["OpenIdUrl"]}/management/users/scim"
                                     }
                                 },
                                 new ProvisioningConfigurationRecord
@@ -215,7 +215,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                     Type = ProvisioningConfigurationRecordTypes.STRING,
                                     ValuesString = new List<string>
                                     {
-                                        "http://localhost:60007"
+                                        Configuration["BpmnUrl"]
                                     }
                                 },
                                 new ProvisioningConfigurationRecord
@@ -252,7 +252,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                     Type = ProvisioningConfigurationRecordTypes.STRING,
                                     ValuesString = new List<string>
                                     {
-                                        "https://localhost:60000/token"
+                                        $"{Configuration["OpenIdUrl"]}/token"
                                     }
                                 },
                                 new ProvisioningConfigurationRecord
@@ -261,7 +261,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                                     Type = ProvisioningConfigurationRecordTypes.STRING,
                                     ValuesString = new List<string>
                                     {
-                                        "http://localhost:60002/Users"
+                                        $"{Configuration["ScimUrl"]}/Users"
                                     }
                                 },
                                 new ProvisioningConfigurationRecord

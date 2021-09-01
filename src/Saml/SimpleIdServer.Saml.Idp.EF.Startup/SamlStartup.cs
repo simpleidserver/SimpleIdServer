@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
+using SimpleIdServer.Saml.Infastructures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +36,11 @@ namespace SimpleIdServer.Saml.Idp.EF.Startup
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
-            services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
+            services.AddMvc(option =>
+            {
+                option.EnableEndpointRouting = false;
+                option.Filters.Add(typeof(ExceptionFilter));
+            }).AddNewtonsoftJson();
             services.AddAuthorization(opts => opts.AddDefaultSamlIdpAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
@@ -55,6 +60,7 @@ namespace SimpleIdServer.Saml.Idp.EF.Startup
             services.AddCommonSID();
             services.AddSamlIdp(opt =>
             {
+                opt.BaseUrl = _configuration["BaseUrl"];
                 opt.SigningCertificate = certificate;
                 opt.SignatureAlg = SignatureAlgorithms.RSASHA256;
                 opt.CanonicalizationMethod = CanonicalizationMethods.C14;
@@ -107,7 +113,7 @@ namespace SimpleIdServer.Saml.Idp.EF.Startup
 
                     if (!context.RelyingParties.Any())
                     {
-                        context.RelyingParties.AddRange(SamlDefaultConfiguration.RelyingParties);
+                        context.RelyingParties.AddRange(SamlDefaultConfiguration.GetRelyingParties(_configuration["RpBaseUrl"]));
                     }
 
                     context.SaveChanges();

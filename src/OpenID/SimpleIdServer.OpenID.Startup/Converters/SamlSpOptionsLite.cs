@@ -47,7 +47,8 @@ namespace SimpleIdServer.OpenID.Startup.Converters
                 WantAssertionSigned = true,
                 SignatureAlg = SignatureAlgorithms.RSASHA256,
                 CanonicalizationMethod = CanonicalizationMethods.C14,
-                IdpMetadataUrl = IdpMetadataUrl
+                IdpMetadataUrl = IdpMetadataUrl,
+                BaseUrl = "https://localhost:60000"
             };
         }
     }

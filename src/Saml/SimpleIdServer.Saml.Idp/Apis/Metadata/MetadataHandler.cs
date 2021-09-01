@@ -15,12 +15,12 @@ namespace SimpleIdServer.Saml.Idp.Apis.Metadata
             _options = options.Value;
         }
 
-        public EntityDescriptorType Get(string issuer)
+        public EntityDescriptorType Get()
         {
             return EntityDescriptorBuilder.Instance(_options.IDPId)
                 .AddIdpSSODescriptor(cb =>
                 {
-                    cb.AddSingleSignOnService($"{issuer}/{Constants.RouteNames.SingleSignOn}/Login", Saml.Constants.Bindings.HttpRedirect);
+                    cb.AddSingleSignOnService($"{_options.BaseUrl}/{Constants.RouteNames.SingleSignOn}/Login", Saml.Constants.Bindings.HttpRedirect);
                     cb.AddSigningKey(_options.SigningCertificate);
                 }).Build();
         }

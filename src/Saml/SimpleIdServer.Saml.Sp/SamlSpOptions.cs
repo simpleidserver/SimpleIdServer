@@ -16,6 +16,7 @@ namespace SimpleIdServer.Saml.Sp
             SPId = "urn:sp";
             CanonicalizationMethod = CanonicalizationMethods.C14;
             Events = new SamlSpEvents();
+            BaseUrl = "http://localhost";
         }
 
         /// <summary>
@@ -67,5 +68,9 @@ namespace SimpleIdServer.Saml.Sp
         /// Gets or sets the type used to secure data handled by the middleware.
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+        /// <summary>
+        /// Gets or sets the base url.
+        /// </summary>
+        public string BaseUrl { get; set; }
     }
 }

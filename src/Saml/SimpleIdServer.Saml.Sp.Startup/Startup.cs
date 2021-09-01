@@ -62,6 +62,7 @@ namespace SimpleIdServer.Saml.Sp.Startup
             opts.SignatureAlg = SignatureAlgorithms.RSASHA256;
             opts.CanonicalizationMethod = CanonicalizationMethods.C14;
             opts.IdpMetadataUrl = "http://localhost:7000/saml/metadata";
+            opts.BaseUrl = "http://localhost:7001";
         }
 
         private static void ConfigureKeycloackSamlId(SamlSpOptions opts, X509Certificate2 certificate)

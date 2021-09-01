@@ -66,6 +66,10 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
             {
                 request.Headers.Add("Authorization", $"Bearer {accessToken}");
                 var httpResult = await httpClient.SendAsync(request, cancellationToken);
+                string json = await httpResult.Content.ReadAsStringAsync();
+                Console.WriteLine("URL : " + request.RequestUri);
+                Console.WriteLine("Access Token : " + accessToken);
+                Console.WriteLine("Content : " +  json);
                 httpResult.EnsureSuccessStatusCode();
             }
         }
@@ -96,6 +100,8 @@ namespace SimpleIdServer.Scim.Provisioning.Provisioner
         protected string BuildHTTPRequest(JObject representation, ProvisioningConfiguration configuration)
         {
             var template = configuration.GetHttpRequestTemplate();
+            Console.WriteLine("Template : " + template);
+            Console.WriteLine("Length : " + template.Length);
             return TemplateParser.ParseMessage(template, representation);
         }
     }

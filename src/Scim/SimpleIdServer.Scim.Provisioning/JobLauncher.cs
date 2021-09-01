@@ -17,7 +17,7 @@ namespace SimpleIdServer.Scim.Provisioning
         {
             var serviceCollection = new ServiceCollection();
             RegisterProvisioning(serviceCollection, configuration);
-            RegisterMassTransit(serviceCollection);
+            RegisterMassTransit(serviceCollection, configuration);
             var serviceProvider = serviceCollection.BuildServiceProvider();
             StartBus(serviceProvider);
         }
@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Provisioning
             services.AddTransient<IProvisioner, HTTPProvisioner>();
         }
 
-        private static void RegisterMassTransit(IServiceCollection services)
+        private static void RegisterMassTransit(IServiceCollection services, IConfiguration configuration)
         {
             services.AddMassTransit(x =>
             {
@@ -42,6 +42,12 @@ namespace SimpleIdServer.Scim.Provisioning
                 x.AddConsumer<OpenIdUserAddedEventConsumer>();
                 x.UsingRabbitMq((context, cfg) =>
                 {
+                    var rabbitMq = configuration["RabbitMQ"];
+                    if (!string.IsNullOrWhiteSpace(rabbitMq))
+                    {
+                        cfg.Host(rabbitMq);
+                    }
+
                     cfg.ReceiveEndpoint("representation-added", e =>
                     {
                         e.UseMessageRetry(r => r.Immediate(5));

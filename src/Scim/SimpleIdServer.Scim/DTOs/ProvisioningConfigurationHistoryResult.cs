@@ -21,13 +21,10 @@ namespace SimpleIdServer.Scim.DTOs
 
         public static ProvisioningConfigurationHistoryResult ToDto(ProvisioningConfigurationHistory history)
         {
-            return new ProvisioningConfigurationHistoryResult
+            var result = new ProvisioningConfigurationHistoryResult
             {
                 Exception = history.Exception,
                 ExecutionDateTime = history.ExecutionDateTime,
-                ProvisiongConfigurationType = history.ProvisioningConfiguration.Type,
-                ProvisioningConfigurationId = history.ProvisioningConfiguration.Id,
-                ProvisioningConfigurationResourceType = history.ProvisioningConfiguration.ResourceType,
                 RepresentationId = history.RepresentationId,
                 RepresentationVersion = history.RepresentationVersion,
                 Status = history.Status,
@@ -35,6 +32,14 @@ namespace SimpleIdServer.Scim.DTOs
                 WorkflowInstanceId = history.WorkflowInstanceId,
                 WorkflowId = history.WorkflowId
             };
+            if (history.ProvisioningConfiguration != null)
+            {
+                result.ProvisiongConfigurationType = history.ProvisioningConfiguration.Type;
+                result.ProvisioningConfigurationId = history.ProvisioningConfiguration.Id;
+                result.ProvisioningConfigurationResourceType = history.ProvisioningConfiguration.ResourceType;
+            }
+
+            return result;
         }
     }
 }

@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
-COPY build/results/docker/Bpmn/ App/
+COPY build/results/docker/Provisioning/ App/
 COPY certificates/localhost.crt /usr/local/share/ca-certificates/localhost.crt
 
 RUN update-ca-certificates
 
 WORKDIR /App
 
-ENTRYPOINT ["dotnet", "CaseManagement.BPMN.Host.dll"]
+ENTRYPOINT ["dotnet", "SimpleIdServer.Scim.Provisioning.dll"]

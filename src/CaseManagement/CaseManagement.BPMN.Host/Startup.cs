@@ -57,15 +57,13 @@ namespace CaseManagement.BPMN.Host
                 {
                     OnTokenValidated = async (ctx) =>
                     {
-                        // TODO : Get URL from configuration...
-                        var issuer = ctx.Principal.Claims.First(c => c.Type == "iss").Value;
                         using (var httpClient = new HttpClient())
                         {
                             var authorization = ctx.Request.Headers["Authorization"][0];
                             var bearer = authorization.Split(" ").Last();
                             var requestMessage = new HttpRequestMessage
                             {
-                                RequestUri = new Uri($"{issuer}/userinfo"),
+                                RequestUri = new Uri($"{_configuration["OpenIdUrl"]}/userinfo"),
                                 Method = HttpMethod.Get
                             };
                             requestMessage.Headers.Add("Authorization", $"Bearer {bearer}");
@@ -122,8 +120,9 @@ namespace CaseManagement.BPMN.Host
                 .AllowAnyHeader()));
             services.AddProcessJobServer(callbackServerOpts: opts =>
             {
-                opts.WSHumanTaskAPI = "http://localhost:60006";
-                opts.CallbackUrl = "http://localhost:60007/processinstances/{id}/complete/{eltId}";
+                opts.WSHumanTaskAPI = _configuration["WsHumanTaskUrl"];
+                opts.CallbackUrl = _configuration["BaseUrl"] + "/processinstances/{id}/complete/{eltId}";
+                opts.OAuthTokenEndpoint = $"{_configuration["OpenIdUrl"]}/token";
             }).AddProcessFiles(files).AddDelegateConfigurations(GetDelegateConfigurations());
             services.AddSwaggerGen();
             services.AddMassTransitHostedService();
@@ -187,7 +186,7 @@ namespace CaseManagement.BPMN.Host
             }
         }
 
-        private static ConcurrentBag<DelegateConfigurationAggregate> GetDelegateConfigurations()
+        private ConcurrentBag<DelegateConfigurationAggregate> GetDelegateConfigurations()
         {
             var credential = JsonConvert.DeserializeObject<CredentialsParameter>(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "credentials.json")));
             
@@ -209,8 +208,8 @@ namespace CaseManagement.BPMN.Host
             updateUserPasswordDelegate.AddDisplayName("en", "Update password");
             updateUserPasswordDelegate.AddRecord("clientId", "humanTaskClient");
             updateUserPasswordDelegate.AddRecord("clientSecret", "humanTaskClientSecret");
-            updateUserPasswordDelegate.AddRecord("tokenUrl", "https://localhost:60000/token");
-            updateUserPasswordDelegate.AddRecord("userUrl", "https://localhost:60000/management/users/{id}/password");
+            updateUserPasswordDelegate.AddRecord("tokenUrl", _configuration["OpenIdUrl"] + "/token");
+            updateUserPasswordDelegate.AddRecord("userUrl", _configuration["OpenIdUrl"] + "/management/users/{id}/password");
             updateUserPasswordDelegate.AddRecord("scope", "manage_users");
 
             var generateOTPDelegate = DelegateConfigurationAggregate.Create("GenerateOTPDelegate", typeof(GenerateOTPDelegate).FullName);
@@ -218,8 +217,8 @@ namespace CaseManagement.BPMN.Host
             generateOTPDelegate.AddDisplayName("en", "Generate OTP code");
             generateOTPDelegate.AddRecord("clientId", "humanTaskClient");
             generateOTPDelegate.AddRecord("clientSecret", "humanTaskClientSecret");
-            generateOTPDelegate.AddRecord("tokenUrl", "https://localhost:60000/token");
-            generateOTPDelegate.AddRecord("userUrl", "https://localhost:60000/management/users/{id}/otp");
+            generateOTPDelegate.AddRecord("tokenUrl", _configuration["OpenIdUrl"] + "/token");
+            generateOTPDelegate.AddRecord("userUrl", _configuration["OpenIdUrl"] + "/management/users/{id}/otp");
             generateOTPDelegate.AddRecord("scope", "manage_users");
 
             var assignHumanTaskInstanceDelegate = DelegateConfigurationAggregate.Create("assignHumanTask", typeof(AssignHumanTaskInstanceDelegate).FullName);
@@ -227,9 +226,9 @@ namespace CaseManagement.BPMN.Host
             assignHumanTaskInstanceDelegate.AddDisplayName("en", "Assign human task");
             assignHumanTaskInstanceDelegate.AddRecord("clientId", "humanTaskClient");
             assignHumanTaskInstanceDelegate.AddRecord("clientSecret", "humanTaskClientSecret");
-            assignHumanTaskInstanceDelegate.AddRecord("tokenUrl", "https://localhost:60000/token");
-            assignHumanTaskInstanceDelegate.AddRecord("humanTaskInstanceClaimUrl", "http://localhost:60006/humantaskinstances/{id}/force/claim");
-            assignHumanTaskInstanceDelegate.AddRecord("humanTaskInstanceStartUrl", "http://localhost:60006/humantaskinstances/{id}/force/start");
+            assignHumanTaskInstanceDelegate.AddRecord("tokenUrl", _configuration["OpenIdUrl"] + "/token");
+            assignHumanTaskInstanceDelegate.AddRecord("humanTaskInstanceClaimUrl", _configuration["WsHumanTaskUrl"] + "/humantaskinstances/{id}/force/claim");
+            assignHumanTaskInstanceDelegate.AddRecord("humanTaskInstanceStartUrl", _configuration["WsHumanTaskUrl"] + "/humantaskinstances/{id}/force/start");
 
             return new ConcurrentBag<DelegateConfigurationAggregate>
             {

@@ -53,6 +53,7 @@ namespace SimpleIdServer.Saml.Idp.Startup
             services.AddCommonSID();
             services.AddSamlIdp(opt =>
             {
+                opt.BaseUrl = "http://localhost:7000";
                 opt.SigningCertificate = certificate;
                 opt.SignatureAlg = SignatureAlgorithms.RSASHA256;
                 opt.CanonicalizationMethod = CanonicalizationMethods.C14;

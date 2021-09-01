@@ -12,7 +12,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
         {
             builder.HasKey(p => p.Id);
             builder.HasMany(p => p.Records).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(p => p.HistoryLst).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(p => p.HistoryLst).WithOne(v => v.ProvisioningConfiguration).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -19,8 +19,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.Metadata
         [HttpGet]
         public IActionResult Index()
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var result = _metadataHandler.Get(issuer);
+            var result = _metadataHandler.Get();
             return new ContentResult
             {
                 Content = result.SerializeToXmlElement().OuterXml,

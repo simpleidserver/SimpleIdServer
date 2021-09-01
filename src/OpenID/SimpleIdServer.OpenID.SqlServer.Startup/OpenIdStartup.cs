@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.OAuth.Infastructures;
 using SimpleIdServer.OpenID.EF;
 using System.Collections.Generic;
 using System.IO;
@@ -46,7 +47,11 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
-            services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
+            services.AddMvc(option =>
+            {
+                option.EnableEndpointRouting = false;
+                option.Filters.Add(typeof(ExceptionFilter));
+            }).AddNewtonsoftJson();
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
@@ -90,7 +95,14 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
                     };
                 }, massTransitOptions: opt =>
                 {
-                    opt.UsingRabbitMq();
+                    opt.UsingRabbitMq((c, t) =>
+                    {
+                        var connectionString = _configuration["RabbitMQ"];
+                        if (!string.IsNullOrWhiteSpace(connectionString))
+                        {
+                            t.Host(connectionString);
+                        }
+                    });
                 })
                 .AddOpenIDEF(opt =>
                 {
@@ -178,7 +190,7 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
 
                     if(!context.AuthenticationSchemeProviders.Any())
                     {
-                        context.AuthenticationSchemeProviders.AddRange(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
+                        context.AuthenticationSchemeProviders.AddRange(OpenIdDefaultConfiguration.GetAuthenticationProviderSchemes(_configuration["SamlIdpUrl"]));
                     }
 
                     context.SaveChanges();

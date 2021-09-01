@@ -1,6 +1,9 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 COPY build/results/docker/SamlIdp/ App/
+COPY certificates/localhost.crt /usr/local/share/ca-certificates/localhost.crt
+
+RUN update-ca-certificates
 
 WORKDIR /App
 

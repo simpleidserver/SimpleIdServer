@@ -13,7 +13,8 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Converters
             return new FacebookOptions
             {
                 AppId = AppId,
-                AppSecret = AppSecret
+                AppSecret = AppSecret,
+                SignInScheme = SIDOpenIdConstants.ExternalAuthenticationScheme
             };
         }
 

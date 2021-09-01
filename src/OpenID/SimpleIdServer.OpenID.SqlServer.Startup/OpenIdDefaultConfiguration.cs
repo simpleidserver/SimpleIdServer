@@ -144,46 +144,49 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup
             ManageRelyingParties
         };
 
-        public static List<AuthenticationSchemeProvider> AuthenticationProviderSchemes => new List<AuthenticationSchemeProvider>
+        public static List<AuthenticationSchemeProvider> GetAuthenticationProviderSchemes(string baseSamlIdpUrl)
         {
-            new AuthenticationSchemeProvider
+            return new List<AuthenticationSchemeProvider>
             {
-                CreateDateTime = DateTime.UtcNow,
-                DisplayName = "Facebook",
-                HandlerFullQualifiedName = typeof(FacebookHandler).AssemblyQualifiedName,
-                Id = Guid.NewGuid().ToString(),
-                Name = "Facebook",
-                Options = JsonConvert.SerializeObject(new FacebookOptionsLite
+                new AuthenticationSchemeProvider
                 {
-                    AppId = "2130151727301440",
-                    AppSecret = "fbd2fe5e37602f333908eff93eae295d"
-                }),
-                JsonConverter = typeof(FacebookOptionsJsonConverter).AssemblyQualifiedName,
-                OptionsFullQualifiedName = typeof(FacebookOptionsLite).AssemblyQualifiedName,
-                PostConfigureOptionsFullQualifiedName = typeof(FacebookPostConfigureOptions).AssemblyQualifiedName,
-                UpdateDateTime = DateTime.UtcNow,
-                IsEnabled = true
-            },
-            new AuthenticationSchemeProvider
-            {
-                CreateDateTime = DateTime.UtcNow,
-                DisplayName = "Saml",
-                HandlerFullQualifiedName = typeof(SamlSpHandler).AssemblyQualifiedName,
-                Id = Guid.NewGuid().ToString(),
-                Name = SamlSpDefaults.AuthenticationScheme,
-                Options = JsonConvert.SerializeObject(new SamlSpOptionsLite
+                    CreateDateTime = DateTime.UtcNow,
+                    DisplayName = "Facebook",
+                    HandlerFullQualifiedName = typeof(FacebookHandler).AssemblyQualifiedName,
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Facebook",
+                    Options = JsonConvert.SerializeObject(new FacebookOptionsLite
+                    {
+                        AppId = "2130151727301440",
+                        AppSecret = "fbd2fe5e37602f333908eff93eae295d"
+                    }),
+                    JsonConverter = typeof(FacebookOptionsJsonConverter).AssemblyQualifiedName,
+                    OptionsFullQualifiedName = typeof(FacebookOptionsLite).AssemblyQualifiedName,
+                    PostConfigureOptionsFullQualifiedName = typeof(FacebookPostConfigureOptions).AssemblyQualifiedName,
+                    UpdateDateTime = DateTime.UtcNow,
+                    IsEnabled = true
+                },
+                new AuthenticationSchemeProvider
                 {
-                    IdpMetadataUrl = "http://localhost:7000/saml/metadata",
-                    SPId = "urn:idp",
-                    SPName = "IdentityServer"
-                }),
-                JsonConverter = typeof(SamlSpOptionsJsonConverter).AssemblyQualifiedName,
-                OptionsFullQualifiedName = typeof(SamlSpOptionsLite).AssemblyQualifiedName,
-                PostConfigureOptionsFullQualifiedName = typeof(SamlSpPostConfigureOptions).AssemblyQualifiedName,
-                UpdateDateTime = DateTime.UtcNow,
-                IsEnabled = true
-            }
-        };
+                    CreateDateTime = DateTime.UtcNow,
+                    DisplayName = "Saml",
+                    HandlerFullQualifiedName = typeof(SamlSpHandler).AssemblyQualifiedName,
+                    Id = Guid.NewGuid().ToString(),
+                    Name = SamlSpDefaults.AuthenticationScheme,
+                    Options = JsonConvert.SerializeObject(new SamlSpOptionsLite
+                    {
+                        IdpMetadataUrl = $"{baseSamlIdpUrl}/saml/metadata",
+                        SPId = "urn:idp",
+                        SPName = "IdentityServer"
+                    }),
+                    JsonConverter = typeof(SamlSpOptionsJsonConverter).AssemblyQualifiedName,
+                    OptionsFullQualifiedName = typeof(SamlSpOptionsLite).AssemblyQualifiedName,
+                    PostConfigureOptionsFullQualifiedName = typeof(SamlSpPostConfigureOptions).AssemblyQualifiedName,
+                    UpdateDateTime = DateTime.UtcNow,
+                    IsEnabled = true
+                }
+            };
+        }
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
         {

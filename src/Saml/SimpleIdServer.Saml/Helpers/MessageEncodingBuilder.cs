@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Xml;
 
 namespace SimpleIdServer.Saml.Helpers
@@ -37,7 +36,7 @@ namespace SimpleIdServer.Saml.Helpers
 
             if (sigAlg != null)
             {
-                var prk = certificate.PrivateKey as RSACng;
+                var prk = certificate.PrivateKey as RSA;
                 var hashed = Hash.Compute(uri.Query.TrimStart('?'), sigAlg.Value);
                 var signed = prk.SignHash(hashed, Constants.MappingSignatureAlgToHash[sigAlg.Value], RSASignaturePadding.Pkcs1);
                 uri = uri.AddParameter("Signature", Convert.ToBase64String(signed));
