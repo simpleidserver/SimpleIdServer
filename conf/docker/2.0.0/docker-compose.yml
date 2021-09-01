@@ -45,9 +45,12 @@ services:
   humantask:
     image: simpleidserver/humantask:2.0.0
     environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
       ASPNETCORE_URLS : "http://*:60006"
     ports:
       - "60006:60006"
+    depends_on:
+      - openid
   samlidp:
     image: simpleidserver/samlidp:2.0.0
     environment:
