@@ -1,0 +1,682 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>OPENID - SimpleIdServer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#installation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SimpleIdServer" class="md-header__button md-logo" aria-label="SimpleIdServer" data-md-component="logo">
+      
+  <img src="../assets/SIDLogo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SimpleIdServer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              OPENID
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SimpleIdServer" class="md-nav__button md-logo" aria-label="SimpleIdServer" data-md-component="logo">
+      
+  <img src="../assets/SIDLogo.svg" alt="logo">
+
+    </a>
+    SimpleIdServer
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bigpicture/" class="md-nav__link">
+        Big Picture
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gettingstarted/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          OPENID
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        OPENID
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-methods" class="md-nav__link">
+    Authentication Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication-context-class-reference-acr" class="md-nav__link">
+    Authentication Context Class Reference (ACR)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#login-password-authentication" class="md-nav__link">
+    Login Password Authentication
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-authentication" class="md-nav__link">
+    Email Authentication
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sms-authentication" class="md-nav__link">
+    SMS Authentication
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#persistence" class="md-nav__link">
+    Persistence
+  </a>
+  
+    <nav class="md-nav" aria-label="Persistence">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sqlserver" class="md-nav__link">
+    SQLServer
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scim20/" class="md-nav__link">
+        SCIM2.0
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../saml20/" class="md-nav__link">
+        SAML2.0
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../uma20/" class="md-nav__link">
+        UMA2.0
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fapi/" class="md-nav__link">
+        FAPI
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../provisioning/" class="md-nav__link">
+        Provisioning
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-methods" class="md-nav__link">
+    Authentication Methods
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authentication-context-class-reference-acr" class="md-nav__link">
+    Authentication Context Class Reference (ACR)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#login-password-authentication" class="md-nav__link">
+    Login Password Authentication
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-authentication" class="md-nav__link">
+    Email Authentication
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sms-authentication" class="md-nav__link">
+    SMS Authentication
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#persistence" class="md-nav__link">
+    Persistence
+  </a>
+  
+    <nav class="md-nav" aria-label="Persistence">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sqlserver" class="md-nav__link">
+    SQLServer
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>OPENID</h1>
+                
+                <h2 id="installation">Installation</h2>
+<p>An OPENID server with bootstrap4 theme can be hosted in ASP.NET CORE project. There is one Nuget package per UI theme, at the moment only Bootstrap4 library is supported: </p>
+<ol>
+<li>Create an empty ASP.NET CORE project.</li>
+<li>Install the Nuget package <code>SimpleIdServer.OpenID.Bootstrap4</code>.</li>
+<li>Run the application and verify JSON is returned when you browse the following url : <code>https://localhost:&lt;sslPort&gt;/.well-known/openid-configuration</code>. </li>
+</ol>
+<p>By default there is no authentication method, they should be installed separately by the developer.  </p>
+<h2 id="authentication-methods">Authentication Methods</h2>
+<h3 id="authentication-context-class-reference-acr">Authentication Context Class Reference (ACR)</h3>
+<p>The Authentication Context Class Reference (ACR) specifies a set of business rules that the authentications are being requested to satisfy. These rules can often be satisfied by using a number of different authentication methods, either singly or in combination.</p>
+<p>In short, the Authentication Context Class Reference (ACR) ensures the correctness of the user identity. In SimpleIdServer, the ACR is similar to the Level Of Assurance. The higher your Level Of Assurance, the better the identity of a user can be trusted.  </p>
+<p>Examples of ACR configurations : </p>
+<p><strong>LOA equals to 1</strong> :</p>
+<pre><code>new AuthenticationContextClassReference 
+{ 
+
+ DisplayName = “First Level of Assurance”, 
+ Name = “sid-load-01”, 
+ AuthenticationMethodReferences = new List&lt;string&gt; 
+ { 
+  “pwd” 
+ }
+}
+</code></pre>
+<p><strong>LOA equals to 2</strong> :</p>
+<pre><code>new AuthenticationContextClassReference 
+{ 
+ DisplayName = “Second Level of Assurance”, 
+ Name = “sid-load-02”, 
+ AuthenticationMethodReferences = new List&lt;string&gt; 
+ { 
+  “pwd”; 
+  ‘sms”
+ }
+} 
+</code></pre>
+<p>It’s up to the Relying Party to specify the ACR value, the value is passed in the parameter “acr_values” inside the authorization query.</p>
+<h3 id="login-password-authentication">Login Password Authentication</h3>
+<p><strong>Authentication method</strong> : pwd</p>
+<p>Login password authentication with Bootstrap4 theme can be installed like this : </p>
+<ol>
+<li>Install the Nuget package <code>SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4</code>.</li>
+<li>In the Startup.cs file, insert the following line at the end of ConfigureServices method : <code>services.AddSIDOpenID().AddLoginPasswordAuthentication()</code>.</li>
+<li>Run the application and browse the URL : <code>https://localhost:&lt;sslPort&gt;/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid profile&amp;state=state</code>.</li>
+<li>Authenticate with the credentials :</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td>sub</td>
+</tr>
+<tr>
+<td>Password</td>
+<td>password</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Confirm the consent.</li>
+<li>User agent will be redirected to the callback url <code>https://localhost:60001</code>, the authorization code is passed in the query.</li>
+</ol>
+<h3 id="email-authentication">Email Authentication</h3>
+<p><strong>Authentication method</strong> : email</p>
+<p>The bootstrap4 theme will come in the next release. </p>
+<h3 id="sms-authentication">SMS Authentication</h3>
+<p><strong>Authentication method</strong> : sms</p>
+<p>The bootstrap4 theme will come in the next release. </p>
+<h2 id="persistence">Persistence</h2>
+<p>By default, all the assets like “Clients”, “Scopes”, “Users” and “JSON Web Keys” are stored in memory. The following data storage can be used. </p>
+<h3 id="sqlserver">SQLServer</h3>
+<p><strong>Pre-requisite</strong> : OPENID server must be installed in the Visual Studio Solution.</p>
+<p>SQL Server data storage can be configured like this : </p>
+<ol>
+<li>Install the Nuget package <code>SimpleIdServer.OpenID.EF</code>.</li>
+<li>Install the Nuget package <code>Microsoft.EntityFrameworkCore.SqlServer</code>.</li>
+<li>Install the Nuget package <code>Microsoft.EntityFrameworkCore.Design</code>. </li>
+<li>Create a class “OpenIDMigration” and replace the content with the following code. The namespace and connectionstring must be updated. </li>
+</ol>
+<pre><code>using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore.Design; 
+using SimpleIdServer.OpenID.EF; 
+using System.Reflection; 
+namespace &lt;&lt;NAMESPACE&gt;&gt;
+{ 
+    public class OpenIDMigration : IDesignTimeDbContextFactory&lt;OpenIdDBContext&gt; 
+    { 
+        public OpenIdDBContext CreateDbContext(string[] args) 
+        { 
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name; 
+            var builder = new DbContextOptionsBuilder&lt;OpenIdDBContext&gt;(); 
+            builder.UseSqlServer(&quot;&lt;&lt;CONNECTIONSTRING&gt;&gt;&quot;,  optionsBuilder =&gt; optionsBuilder.MigrationsAssembly(migrationsAssembly)); 
+            return new OpenIdDBContext(builder.Options); 
+        } 
+    } 
+
+}
+</code></pre>
+<ol>
+<li>Open a command prompt, navigate to the directory of your project and execute the command line : <code>dotnet ef add Init</code>. The migration scripts will be created. </li>
+<li>Execute the command line <code>dotnet ef database update</code>. The tables will be created in the database. </li>
+<li>Open the “Startup.cs” file, inside the “ConfigureServices” procedure add the following line : </li>
+</ol>
+<pre><code>services
+    .AddSIDOpenID()
+    .AddOpenIDEF(opt =&gt; opt.UseSqlServer(“&lt;&lt;CONNECTIONSTRING&gt;&gt;”, o =&gt; o.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name)); 
+</code></pre>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../gettingstarted/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Getting Started
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../scim20/" class="md-footer__link md-footer__link--next" aria-label="Next: SCIM2.0" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              SCIM2.0
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tracking"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      
+    
+  </body>
+</html>
