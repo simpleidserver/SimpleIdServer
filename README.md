@@ -8,7 +8,7 @@
 SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0, UMA2.0, FAPI and CIBA. It streamlines development, configuration and deployment of custom access control servers. 
 Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more.
 
-For project documentation, please visit [readthedocs](https://simpleidserver.readthedocs.io/en/latest/).
+For project documentation, please visit [docs](https://simpleidserver.github.io/SimpleIdServer/).
 
 ## Packages
 
@@ -26,6 +26,8 @@ For project documentation, please visit [readthedocs](https://simpleidserver.rea
 | `SimpleIdServer.Uma.Bootstrap4`   			 			| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Uma.Bootstrap4.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Uma.Bootstrap4) 								| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Uma.Bootstrap4.svg)](https://nuget.org/packages/SimpleIdServer.Uma.Bootstrap4) 						| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Uma.Bootstrap4.svg)](https://nuget.org/packages/SimpleIdServer.Uma.Bootstrap4)						|
 | `SimpleIdServer.OpenBankingApi`							| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenBankingApi.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenBankingApi) 								| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenBankingApi.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi) 						| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenBankingApi.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi)						|
 | `SimpleIdServer.OpenBankingApi.Domains`					| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenBankingApi.Domains.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenBankingApi.Domains) 				| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenBankingApi.Domains.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi.Domains)		| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenBankingApi.Domains.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi.Domains)		|
+| `SimpleIdServer.Saml.Idp`									| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Saml.Idp.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Saml.Idp) 											| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Saml.Idp.svg)](https://nuget.org/packages/SimpleIdServer.Saml.Idp)									| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.SimpleIdServer.Saml.Idp.svg)](https://nuget.org/packages/SimpleIdServer.Saml.Idp)					|
+| `SimpleIdServer.Saml.Sp`									| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Saml.Sp.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Saml.Sp) 												| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Saml.Sp.svg)](https://nuget.org/packages/SimpleIdServer.Sp.Idp)										| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.SimpleIdServer.Saml.Sp.svg)](https://nuget.org/packages/SimpleIdServer.Sp.Idp)						|
 
 ## Certifications
 

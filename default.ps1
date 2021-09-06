@@ -92,6 +92,7 @@ task pack -depends compile {
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Domains\SimpleIdServer.OpenBankingApi.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml.Idp\SimpleIdServer.Saml.Idp.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml.Sp\SimpleIdServer.Saml.Sp.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
 task test {

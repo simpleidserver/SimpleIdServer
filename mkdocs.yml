@@ -1,0 +1,18 @@
+site_name: SimpleIdServer
+markdown_extensions:
+    - toc:
+        baselevel: 2
+theme:
+  logo: assets/SIDLogo.svg
+  name: material
+  features:
+    - navigation.tracking
+nav:
+- Big Picture: 'bigpicture/index.md'
+- Getting Started: 'gettingstarted/index.md'
+- OPENID: 'openid/index.md'
+- SCIM2.0: 'scim20/index.md'
+- SAML2.0: 'saml20/index.md'
+- UMA2.0: 'uma20/index.md'
+- FAPI: 'fapi/index.md'
+- Provisioning: 'provisioning/index.md'
