@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <PropertyGroup>
+    <CustomTaskAssembly Condition=" '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)netcoreapp2.2\Nuget.Transform.MSBuild.Task.dll</CustomTaskAssembly>
+    <CustomTaskAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildThisFileDirectory)net472\Nuget.Transform.MSBuild.Task.dll</CustomTaskAssembly>
+  </PropertyGroup>
+  <UsingTask TaskName="Nuget.Transform.MSBuild.Task.TransformTask" AssemblyFile="$(CustomTaskAssembly)" />
+  <Target Name="CopyOpenIdEmailBootstrap4ContentFiles" AfterTargets="Compile">
+    <Message Text="Copying content files" />
+    <ItemGroup>
+      <_CopyItems Include="$(MSBuildThisFileDirectory)..\contentFiles\**\*.*" />
+    </ItemGroup>
+	<Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItems -> '$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" Condition="!Exists('$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="CopyAndTransformContentFiles" AfterTargets="CopyOpenIdEmailBootstrap4ContentFiles">
+    <Message Text="Transform content files" />
+    <TransformTask />
+  </Target>
+</Project>

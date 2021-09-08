@@ -78,6 +78,7 @@ task pack -depends release, compile {
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Email.Bootstrap4\SimpleIdServer.UI.Authenticate.Email.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms.Bootstrap4\SimpleIdServer.UI.Authenticate.Sms.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }

@@ -111,7 +111,69 @@ The Login Password authentication is included in the SimpleIdServer template. Th
 
 **Authentication method** : email
 
-The bootstrap4 theme will come in the next release. 
+Email authentication can be configured on the OPENID server like this :
+
+* Open a command prompt and navigate to the directory `src\OpenID`.
+* Install the Nuget package `SimpleIdServer.UI.Authenticate.Email.Bootstrap4`.
+
+```
+dotnet add package SimpleIdServer.UI.Authenticate.Email.Bootstrap4
+```
+
+* Open the `OpenIdStartup.cs` and add the following code after `AddLoginPasswordAuthentication` call. Replace the `SMTPUSERNAME`, `SMTPPASSWORD`, `FROMEMAIL`, `SMTPHOST`, `SMTPPORT` with the correct values.
+
+```
+AddEmailAuthentication(opts =>
+{
+    opts.SmtpUserName = "<<SMTPUSERNAME>>";
+    opts.SmtpPassword = "<<SMTPPASSWORD>>";
+    opts.FromEmail = "<<FROMEMAIL>>";
+	opts.SmtpHost = "<<SMTPHOST>>";
+	opts.SmtpPort = <<SMTPPORT>>
+})
+```
+
+| Property     | Description                                              | Default Value  |
+| ------------ | -------------------------------------------------------- | -------------- |
+| SmtpUserName | Email is used to authenticate against the SMTP server    |                |
+| SmtpPassword | Password is used to authenticate against the SMTP server |                |
+| FromEmail    | Sender of the email                                      |                |
+| SmtpHost     | SMTP Host                                                | smtp.gmail.com |
+| SmtpPort     | SMTP Port                                                | 587            |
+
+* Edit the `OpenIdDefaultConfiguration.cs` file and add a new ACR :
+
+```
+new AuthenticationContextClassReference
+{
+    DisplayName = "Second level of assurance",
+    Name = "sid-load-02-1",
+    AuthenticationMethodReferences = new List<string>
+    {
+        "pwd",
+        "email"
+    }
+}
+```
+
+* Always in the `OpenIdDefaultConfiguration.cs` file, update the EMAIL with yours :
+
+```
+new UserClaim(Jwt.Constants.UserClaims.Email, "<<EMAIL>>")
+```
+
+* Run the application
+
+```
+dotnet run
+```
+
+* Navigate to this URL [https://localhost:5001/authorization?client_id=umaClient&redirect_uri=https://localhost:60001/signin-oidc&response_type=code&scope=openid%20profile&state=state&acr_values=sid-load-02-1&prompt=login](https://localhost:5001/authorization?client_id=umaClient&redirect_uri=https://localhost:60001/signin-oidc&response_type=code&scope=openid%20profile&state=state&acr_values=sid-load-02-1&prompt=login)
+* Submit the credentials - Login : `sub`, Password : `password`.
+* Submit the confirmation code received on your email.
+
+![Confirmation code](images/openid-4.png)
+
 
 ## SMS Authentication
 
@@ -145,6 +207,12 @@ AddSMSAuthentication(opts =>
 
 ```
 new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "<<PHONENUMBER>>")
+```
+
+* Run the application.
+
+```
+dotnet run
 ```
 
 * Navigate to this URL [https://localhost:5001/authorization?client_id=umaClient&redirect_uri=https://localhost:60001/signin-oidc&response_type=code&scope=openid%20profile&state=state&acr_values=sid-load-02&prompt=login](https://localhost:5001/authorization?client_id=umaClient&redirect_uri=https://localhost:60001/signin-oidc&response_type=code&scope=openid%20profile&state=state&acr_values=sid-load-02&prompt=login)

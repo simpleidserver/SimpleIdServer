@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>SimpleIdServer.UI.Authenticate.Email.Bootstrap4.nuspec</NuspecFile>
+    <NuspecProperties Condition="'$(VersionSuffix)' == ''">$(NuspecProperties);version=$(VersionPrefix)</NuspecProperties>
+    <NuspecProperties Condition="'$(VersionSuffix)' != ''">$(NuspecProperties);version=$(VersionPrefix)-$(VersionSuffix)</NuspecProperties>
+    <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
+    <NuspecProperties>$(NuspecProperties);owners=$(Owners)</NuspecProperties>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Areas\email\Views\Authenticate\Index.cshtml.pp" />
+    <None Remove="Areas\email\Views\_ViewImports.cshtml.pp" />
+    <None Remove="Areas\email\Views\_ViewStart.cshtml.pp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Areas\email\Views\Authenticate\Index.cshtml.pp" />
+    <Content Include="Areas\email\Views\_ViewImports.cshtml.pp" />
+    <Content Include="Areas\email\Views\_ViewStart.cshtml.pp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj" />
+  </ItemGroup>
+</Project>
