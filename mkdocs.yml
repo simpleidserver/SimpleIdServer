@@ -1,5 +1,6 @@
 site_name: SimpleIdServer
 markdown_extensions:
+    - admonition
     - toc:
         baselevel: 2
 theme:

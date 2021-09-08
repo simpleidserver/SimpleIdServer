@@ -62,7 +62,6 @@ namespace $rootnamespace$
                 },
                 CreateDateTime = DateTime.Now,
                 UpdateDateTime = DateTime.Now,
-                OTPKey = "HQI6X6V2MEP44J4NLZJ65VKAHCSSCNFL",
                 OAuthUserClaims = new List<UserClaim>
                 {
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "sub"),
