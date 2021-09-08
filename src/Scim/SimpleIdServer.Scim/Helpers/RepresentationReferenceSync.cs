@@ -51,9 +51,9 @@ namespace SimpleIdServer.Scim.Helpers
 					}
 
 					if (!updateAllReferences)
-                    {
-						newIds = newIds.Where(i => !oldIds.Contains(i)).ToList();
-                    }
+					{
+						newIds = newIds.Except(oldIds).ToList();
+					}
 
 					result.AddRange(await RemoveReferenceAttributes(idsToBeRemoved, attributeMapping, newSourceScimRepresentation));
 					result.AddRange(await UpdateReferenceAttributes(newIds, attributeMapping, newSourceScimRepresentation));
