@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Persistence </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Persistence ">
+    <meta name="generator" content="docfx 2.58.3.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="persistence">Persistence</h1>
+
+<p>By default, all the assets like &quot;Clients&quot;, &quot;Scopes&quot;, &quot;Users&quot; and &quot;JSON Web Keys&quot; are stored in memory. The following data storage can be used.</p>
+<h2 id="sqlserver">SQLServer</h2>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>There is a SimpleIdServer template to create a new project with EF support, using <code>dotnet new openidefbs4</code>.</p>
+</div>
+<p><strong>Pre-requisite</strong> : OPENID server must be installed in the Visual Studio Solution.</p>
+<p>SQL Server data storage can be configured like this :</p>
+<ul>
+<li>In a command prompt, navigate to the directory <code>src\OpenId</code>.</li>
+<li>Install the Nuget package <code>SimpleIdServer.OpenID.EF</code>.</li>
+</ul>
+<pre><code>dotnet add package SimpleIdServer.OpenID.EF
+</code></pre>
+<ul>
+<li>Install the Nuget package <code>Microsoft.EntityFrameworkCore.SqlServer</code></li>
+</ul>
+<pre><code>dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+</code></pre>
+<ul>
+<li>Install the Nuget package <code>Microsoft.EntityFrameworkCore.Design</code>.</li>
+</ul>
+<pre><code>dotnet add package Microsoft.EntityFrameworkCore.Design
+</code></pre>
+<ul>
+<li>Create an <code>OpenIdMigration</code> class and replace the content with the following code. The CONNECTIONSTRING must be updated :</li>
+</ul>
+<pre><code>public class OpenIDMigration : IDesignTimeDbContextFactory&lt;OpenIdDBContext&gt;
+{
+    public OpenIdDBContext CreateDbContext(string[] args)
+    {
+        var migrationsAssembly = typeof(OpenIdStartup).GetTypeInfo().Assembly.GetName().Name;
+        var builder = new DbContextOptionsBuilder&lt;OpenIdDBContext&gt;();
+        builder.UseSqlServer(&quot;&lt;&lt;CONNECTIONSTRING&gt;&gt;&quot;, optionsBuilder =&gt; optionsBuilder.MigrationsAssembly(migrationsAssembly));
+        return new OpenIdDBContext(builder.Options);
+    }
+}
+</code></pre>
+<ul>
+<li>Execute the following command line, the migration scripts will be created</li>
+</ul>
+<pre><code>dotnet ef add migrations Init
+</code></pre>
+<ul>
+<li>Execute the following command line, the tables will be created in the database :</li>
+</ul>
+<pre><code>dotnet ef database update`
+</code></pre>
+<ul>
+<li>Open the <code>Startup.cs</code> file, replace any existing calls to <code>AddClients</code>, <code>AddAcrs</code>, <code>AddUsers</code>, <code>AddJsonWebKeys</code> with <code>AddOpenIDEF</code>. The CONNECTIONSTRING must be updated.</li>
+</ul>
+<pre><code>services
+    .AddSIDOpenID()
+    .AddOpenIDEF(opt =&gt; opt.UseSqlServer(&quot;&lt;&lt;CONNECTIONSTRING&gt;&gt;&quot;, o =&gt; o.MigrationsAssembly(typeof(OpenIdStartup).GetTypeInfo().Assembly.GetName().Name)))
+    .AddLoginPasswordAuthentication();
+</code></pre>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.1/docs/documentation/openid/persistence.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

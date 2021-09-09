@@ -1,0 +1,24 @@
+- name: Big Picture
+  href: bigpicture/index.md
+- name: Getting Started
+  href: gettingstarted/index.md
+- name: OpenId
+  items:
+   - name: Installation
+     href: openid/installation.md
+   - name: Authentication methods
+     href: openid/authentication.md
+   - name: Persistence
+     href: openid/persistence.md
+   - name: Scenarios
+     href: openid/scenarios.md
+- name: SCIM2.0
+  items:
+   - name: Installation
+     href: scim20/installation.md
+   - name: Persistence
+     href: scim20/persistence.md
+   - name: Swagger
+     href: scim20/swagger.md
+- name: Provisioning
+  href: provisioning/index.md

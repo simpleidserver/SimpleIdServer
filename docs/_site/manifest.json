@@ -1,0 +1,357 @@
+{
+  "homepages": [],
+  "source_base_path": "c:/Projects/SimpleIdServer/docs",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/bigpicture/images/big-picture-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/bigpicture/images/big-picture-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/bigpicture/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/bigpicture/index.html",
+          "hash": "D5Kj6PU4IQnpP+0h+n8aa75eotL6MQEjIlZeOm2eu2A="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/gettingstarted/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/gettingstarted/index.html",
+          "hash": "NJMS/ReZNagVvXs/HUPR7DFfs3rEJ4KsGCIEYslp4ZA="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/authentication.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/authentication.html",
+          "hash": "I/rb3tRT+thlJIoDEDn7eFX9PQZ9f6vHDiLpm+YN9WY="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-4.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-4.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-5.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-5.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-6.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-6.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-7.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-7.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/installation.html",
+          "hash": "AP4nh+wOFgBVUciZQ4VYVX/N695kl55sOnPXgtmrshI="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/persistence.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/persistence.html",
+          "hash": "B0v0QlKvLL0EYhUK7nLdEnCfiBtZBsdtly4/1i/VD8M="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/scenarios.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/scenarios.html",
+          "hash": "6flWUtiJLdfOhewqVLYZSIn0fiOIA3u6CjaXrDBuQBY="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-4.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-4.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "log_codes": [
+        "InvalidFileLink"
+      ],
+      "type": "Conceptual",
+      "source_relative_path": "documentation/provisioning/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/provisioning/index.html",
+          "hash": "Uek+YftB/JiOS5bY8oLFZGXmsjDAc9RYugcMqNuMcFs="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/scim20/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/scim20/installation.html",
+          "hash": "6XZCnCNPtgaeZ2hp3Tn28UXm0m87IeCpnNl/CCAhgoI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/scim20/persistence.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/scim20/persistence.html",
+          "hash": "GjVnWmvP2lNG4RConJ5xdQdwr57bIBA1w+sqv329MXI="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/scim20/swagger.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/scim20/swagger.html",
+          "hash": "PQ7gpsz1Sm5lFTIVLDrdvlX6aVZVGIenNFqiX88tjzQ="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "documentation/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/toc.html",
+          "hash": "tk8JZAxKdxECSJ0nf2LTAaXqEW7JP/pWOGwGNX2Hd5M="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "wacfe93hjbLuYknqPyKCz5snLzgRAJRNj5vikMv5k8g="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "logo.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "kNFNkN6mbUHcAoXK60MZhIVbCDoxtnGAWAwbzjRSy2E="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": true,
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {
+        "ConceptualDocumentProcessor": {
+          "can_incremental": true,
+          "incrementalPhase": "build",
+          "total_file_count": 11,
+          "skipped_file_count": 10
+        },
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": true,
+        "details": "Can support incremental post processing.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

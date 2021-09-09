@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Introduction </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Introduction ">
+    <meta name="generator" content="docfx 2.58.3.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="introduction">Introduction</h1>
+
+<p>The provisioning lets you:</p>
+<ul>
+<li><strong>Automate Provisioning</strong> : Automatically create new accounts in the right systems for new people when they join your team or organization.</li>
+<li><strong>Automate Deprovisioning</strong> : Automatically deactivate accounts in the right systems when people leave the team or organization.</li>
+<li><strong>Just In Time Provisioning</strong> : Automatically create new accounts in the right systems for new people when they authenticate to an external identity provider.</li>
+<li><strong>Credential Provisioning</strong> : Automatically ask to the users to submit their credentials.</li>
+</ul>
+<p>SCIM2.0 API is the entry point for users and groups management (for more details refer to this <a href="../scim20/index.md">part</a>).
+It is used by external clients for maintaining data consistency between multiple identity providers for example : between an active Directory and an OPENID Identity Provider.</p>
+<p><img src="images/provisioning-1.png" alt="Provisioning workflow"></p>
+<p>The workflow above describes the user provisioning / deprovisioning implementation made by SimpleIdServer. The credential provisioning is done by a BPMN workflow.</p>
+<ol>
+<li>A user arrives in the Active Directory.</li>
+<li>An HTTP REQUEST is sent to the SCIM2.0 API in order to create, update or delete users.</li>
+<li>An external event is published to the message broker.</li>
+<li>The message is fetched and processed by the Provisioning windows service.</li>
+<li>Based on the nature of the message, the windows service executes a sequence of actions : Launch the BPMN workflow and send an HTTP request. The windows service can be configured via the administration portal.</li>
+<li>If the message received is “new user” then a BPMN workflow is launched, it will create and assign a human task to the end user. It will be used by the end user to update their credentials.</li>
+<li>Execute an HTTP request in order to add, delete or update user from one identity provider.</li>
+</ol>
+<h1 id="getting-started-with-provisioning">Getting started with Provisioning</h1>
+<p>This chapter explains how to automatically provision a user who is authenticating with an external identity provider. This scenario is called &quot;Just In Time Provisioning&quot;.</p>
+<p>Before starting, ensure that SimpleIdServer is properly configured and installed on your machine:</p>
+<ol>
+<li>Open the <a href="http://localhost:4200">administration portal</a> and authenticate with an external identity provider (Facebook, SAMLIDP etc…).</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td>sub</td>
+</tr>
+<tr>
+<td>Password</td>
+<td>password</td>
+</tr>
+</tbody>
+</table>
+<ol start="2">
+<li>Navigate to the “Tasks” page and open the first task. Update your password and click on confirm.</li>
+<li>Close your session and connect with an administrator account.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td>administrator</td>
+</tr>
+<tr>
+<td>Password</td>
+<td>password</td>
+</tr>
+</tbody>
+</table>
+<ol start="4">
+<li>Navigate to the <a href="http://localhost:4200/users">Users</a> page. Only one user is displayed, it corresponds to the user who authenticate with an external identity provider. Thanks to &quot;Just In Time provisioning&quot; mechanism, users who successfully authenticate with external identity providers automatically have local account.</li>
+</ol>
+<p><img src="images/provisioning-2.png" alt="Users"></p>
+<ol start="5">
+<li>Navigate to the <a href="http://localhost:4200/provisioning/history">Provisioning &gt;&gt; History</a> page. The history of user provisioning is displayed.</li>
+</ol>
+<p><img src="images/provisioning-3.png" alt="History"></p>
+<ol start="6">
+<li>Click on the link &quot;Workflow&quot;.</li>
+<li>The BPMN workflow is used to get password from the end-user. It generates a link, sends and email, create and assign a human task to the end user. By default there is one error in the workflow instance because the SMTP configuration is incorrect.</li>
+</ol>
+<p><img src="images/provisioning-4.png" alt="Workflow"></p>
+<h1 id="configure-provisioning">Configure Provisioning</h1>
+<p>The configuration of the provisioning windows service can be updated in the page <a href="http://localhost:4200/provisioning/configurations">Provisioning &gt;&gt; Configuration</a>. The following properties can be updated :</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tokenEdp</td>
+<td>URL of the token endpoint. Used by the provisioning service in order to get an access token valid on the scope specified by the property “scopes”.</td>
+</tr>
+<tr>
+<td>clientId</td>
+<td>Client Identifier</td>
+</tr>
+<tr>
+<td>clientSecret</td>
+<td>Client Secret</td>
+</tr>
+<tr>
+<td>scopes</td>
+<td>List of scopes</td>
+</tr>
+<tr>
+<td>targetUrl</td>
+<td>URL where the JSON request will be sent</td>
+</tr>
+<tr>
+<td>httpRequestTemplate</td>
+<td>This template is used to generate the JSON request. It will be send to the &quot;targetUrl&quot;.</td>
+</tr>
+<tr>
+<td>bpmnHost</td>
+<td>URL of the BPMN REST.API</td>
+</tr>
+<tr>
+<td>bpmnFileId</td>
+<td>Identifier of the BPMN file</td>
+</tr>
+<tr>
+<td>messageToken</td>
+<td>This template is used to generate the JSON request. It will be sent to the &quot;bpmnHost&quot; in order to launch the BPMN workflow.</td>
+</tr>
+</tbody>
+</table>
+<h1 id="configure-bpmn-workflow">Configure BPMN workflow</h1>
+<p>The BPMN workflow is used to create and assign human tasks to the end-user in order to get the credential. Its definition is accessible in the page &quot;Provisioning &gt;&gt; Workflows&quot;.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.1/docs/documentation/provisioning/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

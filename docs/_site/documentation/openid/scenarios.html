@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Protect application from undesirable users </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Protect application from undesirable users ">
+    <meta name="generator" content="docfx 2.58.3.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="protect-application-from-undesirable-users">Protect application from undesirable users</h1>
+
+<h2 id="recommended-flow-by-application-type">Recommended flow by application type</h2>
+<p>There are different grant-types to get tokens, the choice depends on the type of application.</p>
+<p><img src="images/openid-5.png" alt="Choose grant-type"></p>
+<table>
+<thead>
+<tr>
+<th>Applications</th>
+<th>Recommended Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server-Side (Web application) - ASP.NET CORE</td>
+<td><strong>Grant-Type</strong> : authorization code</td>
+</tr>
+<tr>
+<td>Single Page Application (SPA) - Angular</td>
+<td><strong>Grant-Type</strong> : authorization code, <strong>Client Authentication Method</strong> : PKCE</td>
+</tr>
+<tr>
+<td>Native - Mobile, WPF application</td>
+<td><strong>Grant-Type</strong> : authorization code, <strong>Client Authentication Method</strong> : PKCE</td>
+</tr>
+<tr>
+<td>Trusted</td>
+<td><strong>Grant-Type</strong> : password</td>
+</tr>
+</tbody>
+</table>
+<h2 id="server-side-application">Server-Side application</h2>
+<p><strong>Example</strong> : ASP.NET CORE application.</p>
+<p>Server-Side application should use <em>authorization code</em> grant-type.</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.</p>
+</div>
+<h3 id="source-code">Source Code</h3>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/ProtectApplicationFromUndesirableUsers/AspNetCore">here</a>.</p>
+<h3 id="configure-openid-server">Configure OpenId Server</h3>
+<p>The first step consists to configure the OPENID client.</p>
+<ul>
+<li>Open the Visual Studio Solution and edit the <code>OpenIdDefaultConfiguration.cs</code> file.</li>
+<li>Add a new OpenId client :</li>
+</ul>
+<pre><code>new OpenIdClient
+{
+    ClientId = &quot;website&quot;,
+    ClientSecret = &quot;websiteSecret&quot;,
+    ApplicationKind = ApplicationKinds.Web,
+    TokenEndPointAuthMethod = &quot;client_secret_post&quot;,
+    ApplicationType = &quot;web&quot;,
+    UpdateDateTime = DateTime.UtcNow,
+    CreateDateTime = DateTime.UtcNow,
+    TokenExpirationTimeInSeconds = 60 * 30,
+    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+    TokenSignedResponseAlg = &quot;RS256&quot;,
+    IdTokenSignedResponseAlg = &quot;RS256&quot;,
+    AllowedScopes = new List&lt;OAuthScope&gt;
+    {
+        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+        SIDOpenIdConstants.StandardScopes.Profile,
+        SIDOpenIdConstants.StandardScopes.Email
+    },
+    GrantTypes = new List&lt;string&gt;
+    {
+        &quot;authorization_code&quot;,
+    },
+    RedirectionUrls = new List&lt;string&gt;
+    {
+        &quot;https://localhost:7000/signin-oidc&quot;
+    },
+    PreferredTokenProfile = &quot;Bearer&quot;,
+    ResponseTypes = new List&lt;string&gt;
+    {
+        &quot;token&quot;,
+        &quot;id_token&quot;
+    }
+}
+</code></pre>
+<ul>
+<li>Run the OPENID server.</li>
+</ul>
+<pre><code>cd src\OpenId
+dotnet run
+</code></pre>
+<h3 id="create-aspnet-core-application">Create ASP.NET CORE application</h3>
+<p>The last step consists to create and configure an ASP.NET CORE project.</p>
+<ul>
+<li>Open a command and navigate to the <code>src</code> subfolder of your project.</li>
+<li>Create a directory <code>AspNetCore</code> and create an ASP.NET CORE project in it :</li>
+</ul>
+<pre><code>mkdir AspNetCore
+
+dotnet new mvc -n AspNetCore
+</code></pre>
+<ul>
+<li>Navigate to the directory <code>AspNetCore</code> and install the Nuget package <code>Microsoft.AspNetCore.Authentication.OpenIdConnect</code>.</li>
+</ul>
+<pre><code>dotnet add package Microsoft.AspNetCore.Authentication.OpenIdConnect
+</code></pre>
+<ul>
+<li>Add the <code>AspNetCore</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..\..
+dotnet sln add ./src/AspNetCore/AspNetCore.csproj
+</code></pre>
+<ul>
+<li>Edit the <code>Startup.cs</code> file and configure the OpenId authentication. In the <code>ConfigureServices</code> procedure, add the following code :</li>
+</ul>
+<pre><code>services.AddAuthentication(options =&gt;
+{
+    options.DefaultScheme = &quot;Cookies&quot;;
+    options.DefaultChallengeScheme = &quot;sid&quot;;
+})
+    .AddCookie(&quot;Cookies&quot;)
+    .AddOpenIdConnect(&quot;sid&quot;, options =&gt;
+    {
+        options.SignInScheme = &quot;Cookies&quot;;
+
+        options.Authority = &quot;http://localhost:5000&quot;;
+        options.RequireHttpsMetadata = false;
+
+        options.ClientId = &quot;website&quot;;
+        options.SaveTokens = true;
+    });
+</code></pre>
+<ul>
+<li>To ensure the authentication services execute on each request, add <code>UseAuthentication</code> in the <code>Configure</code> procedure. The procedure should look like to something like this :</li>
+</ul>
+<pre><code>public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+	app.UseHttpsRedirection();
+	app.UseStaticFiles();
+	
+	app.UseRouting();
+	
+	app.UseAuthentication();
+	app.UseAuthorization();
+	
+	app.UseEndpoints(endpoints =&gt;
+	{
+		endpoints.MapControllerRoute(
+			name: &quot;default&quot;,
+			pattern: &quot;{controller=Home}/{action=Index}/{id?}&quot;);
+	});
+}
+</code></pre>
+<ul>
+<li>Add a <code>ClaimsController</code> with one protected operation :</li>
+</ul>
+<pre><code>public class ClaimsController : Controller
+{
+    [Authorize]
+    public IActionResult Index()
+    {
+        return View();
+    }
+}
+</code></pre>
+<ul>
+<li>Create a new view <code>Views\Claims\Index.cshtml</code>. It will display all the claims of the authenticated user.</li>
+</ul>
+<pre><code>&lt;ul&gt;
+    @foreach (var claim in User.Claims)
+    {
+        &lt;li&gt;@claim.Type : @claim.Value&lt;/li&gt;
+    }
+&lt;/ul&gt;
+</code></pre>
+<ul>
+<li>In a command prompt, navigate to the directory <code>src\AspNetCore</code> and run the application under the port <code>7000</code>.</li>
+</ul>
+<pre><code>dotnet run --urls=https://localhost:7000
+</code></pre>
+<ul>
+<li>Browse this URL <a href="https://localhost:7000/claims">https://localhost:7000/claims</a>, the User-Agent is automatically redirected to the OPENID server.
+Submit the credentials - login : <code>sub</code>, password : <code>password</code> and confirm the consent. You'll be redirected to the following screen where your claims will be displayed.</li>
+</ul>
+<p><img src="images/openid-6.png" alt="Claims"></p>
+<h2 id="single-page-application-spa">Single Page Application (SPA)</h2>
+<p><strong>Example</strong>: Angular application.</p>
+<p>SPA application use <em>authorization code</em> grant-type with <em>PKCE</em> client authentication method.</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.</p>
+</div>
+<h3 id="source-code-1">Source Code</h3>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/ProtectApplicationFromUndesirableUsers/Spa">here</a>.</p>
+<h3 id="configure-openid-server-1">Configure OpenId Server</h3>
+<p>The first step consists to configure the OPENID client.</p>
+<ul>
+<li>Open the Visual Studio solution and edit <code>OpenIdDefaultConfiguration.cs</code> file.</li>
+<li>Add a new OpenId client:</li>
+</ul>
+<pre><code>new OpenIdClient
+{
+    ClientId = &quot;website&quot;,
+    ClientSecret = &quot;websiteSecret&quot;,
+    ApplicationKind = ApplicationKinds.SPA,
+    TokenEndPointAuthMethod = &quot;pkce&quot;,
+    ApplicationType = &quot;web&quot;,
+    UpdateDateTime = DateTime.UtcNow,
+    CreateDateTime = DateTime.UtcNow,
+    TokenExpirationTimeInSeconds = 60 * 30,
+    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+    TokenSignedResponseAlg = &quot;RS256&quot;,
+    IdTokenSignedResponseAlg = &quot;RS256&quot;,
+    AllowedScopes = new List&lt;OAuthScope&gt;
+    {
+        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+        SIDOpenIdConstants.StandardScopes.Profile,
+        SIDOpenIdConstants.StandardScopes.Email,
+        SIDOpenIdConstants.StandardScopes.Role
+    },
+    GrantTypes = new List&lt;string&gt;
+    {
+        &quot;authorization_code&quot;
+    },
+    RedirectionUrls = new List&lt;string&gt;
+    {
+        &quot;http://localhost:4200&quot;
+    },
+    PreferredTokenProfile = &quot;Bearer&quot;,
+    ResponseTypes = new List&lt;string&gt;
+    {
+        &quot;token&quot;,
+        &quot;id_token&quot;,
+        &quot;code&quot;
+    }
+}
+</code></pre>
+<ul>
+<li>Run the OPENID server.</li>
+</ul>
+<pre><code>cd src\OpenId
+dotnet run
+</code></pre>
+<h3 id="create-angular-application">Create angular application</h3>
+<p>The last step consists to create and configure an Angular project.</p>
+<ul>
+<li>Open a command prompt and navigate to the <code>src</code> subfolder of your project.</li>
+<li>Create an ASP.NET CORE with angular project, its name must be <code>Spa</code>.</li>
+</ul>
+<pre><code>mkdir Spa
+
+dotnet new angular -n Spa
+</code></pre>
+<ul>
+<li>Navigate to the directory <code>Spa\ClientApp</code> and install the npm package <code>angular-oauth2-oidc</code>.</li>
+</ul>
+<pre><code>cd Spa\ClientApp
+
+npm i angular-oauth2-oidc --save
+</code></pre>
+<ul>
+<li>Add the <code>Spa</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..\..\..
+dotnet sln add ./src/Spa/Spa.csproj
+</code></pre>
+<ul>
+<li>Edit the file <code>ClientApp\src\app\app.module.ts</code> and import the <code>OAuthModule</code> module.</li>
+</ul>
+<pre><code>@NgModule({
+  declarations: [
+	// etc.
+  ],
+  imports: [
+	// etc.
+    OAuthModule.forRoot()
+  ],
+  providers: [],
+  bootstrap: []
+})
+export class AppModule { }
+</code></pre>
+<ul>
+<li>Create an <code>auth-config.ts</code> file in the directory <code>ClientApp\src\app</code>, replace its content with the following code. This file contains the authentication settings : Url of the identity provider or the Client Identifier.</li>
+</ul>
+<pre><code>import { AuthConfig } from 'angular-oauth2-oidc';
+
+export const authCodeFlowConfig: AuthConfig = {
+  issuer: 'http://localhost:5000',
+  redirectUri: window.location.origin,
+  clientId: 'website',
+  responseType: 'code',
+  scope: 'openid profile email role',
+  showDebugInformation: true,
+};
+</code></pre>
+<ul>
+<li>Edit the <code>ClientApp\src\app\nav-menu\nav-menu.component.ts</code> file, import the <code>authCodeFlowConfig</code> JSON object, inject the <code>OAuthService</code> into the constructor and add a <code>login</code> procedure. This procedure will be called to initiate the authentication workflow.</li>
+</ul>
+<pre><code>import { OAuthService } from 'angular-oauth2-oidc';
+import { authCodeFlowConfig } from '../auth-config';
+
+@Component({
+  selector: 'app-nav-menu',
+  templateUrl: './nav-menu.component.html',
+  styleUrls: ['./nav-menu.component.css']
+})
+export class NavMenuComponent {  
+  isConnected: boolean = false;
+  name: string;
+
+  constructor(private oauthService: OAuthService) {
+    this.oauthService.configure(authCodeFlowConfig);
+    this.oauthService.loadDiscoveryDocumentAndTryLogin();
+    var claims: any = this.oauthService.getIdentityClaims();
+    if (!claims) {
+      return;
+    }
+
+    this.isConnected = true;
+    this.name = claims[&quot;sub&quot;];
+  }
+
+  login(evt: any) {
+    evt.preventDefault();
+    this.oauthService.initImplicitFlow();
+  }
+}
+</code></pre>
+<ul>
+<li>Edit the <code>ClientApp\src\app\nav-menu\nav-menu.component.html</code> file and add a login button.</li>
+</ul>
+<pre><code>&lt;li class=&quot;nav-item&quot; *ngIf=&quot;!isConnected&quot;&gt;
+  &lt;a class=&quot;nav-link text-dark&quot; (click)=&quot;login($event)&quot;&gt;Authenticate&lt;/a&gt;
+&lt;/li&gt;
+&lt;li class=&quot;nav-item&quot; *ngIf=&quot;isConnected&quot;&gt;
+  &lt;a class=&quot;nav-link text-dark&quot;&gt;Welcome {{name}}&lt;/a&gt;
+&lt;/li&gt;
+</code></pre>
+<ul>
+<li>In a command prompt, navigate to the <code>src\Spa</code> directory and launch the project.</li>
+</ul>
+<pre><code>dotnet run --urls=http://localhost:4200
+</code></pre>
+<ul>
+<li>Navigate to the website <a href="http://localhost:4200">http://localhost:4200</a> and authenticate with the login : <code>sub</code> and password : <code>password</code>.</li>
+</ul>
+<p><img src="images/openid-7.png" alt="SPA website"></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.1/docs/documentation/openid/scenarios.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
