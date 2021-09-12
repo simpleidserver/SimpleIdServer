@@ -497,7 +497,7 @@ dotnet run --urls=http://*:5000;https://*:5001
 <pre><code>&lt;AndroidManifestPlaceholders&gt;appAuthRedirectScheme=''&lt;/AndroidManifestPlaceholders&gt;
 </code></pre>
 <ul>
-<li>Edit the Android Manifest, set the package name to <code>com.companyname.nativexamarin</code> and add the activity below inside the application element.</li>
+<li>Edit the Android Manifest, set the package name to <code>com.companyname.nativexamarin</code> and add the activity below inside the <code>application</code> element.</li>
 </ul>
 <pre><code>&lt;activity android:name=&quot;net.openid.appauth.RedirectUriReceiverActivity&quot;&gt;
   &lt;intent-filter&gt;
@@ -720,12 +720,12 @@ dotnet run --urls=http://*:5000;https://*:5001
 }
 </code></pre>
 <ul>
-<li>In the <code>Native.Android</code> project, edit the <code>MainActivity</code> class, reister the <code>AndroidLoginProvider</code> dependency and process the parameters received by the Intent <code>com.companyname.native:/oauth2redirect</code>.</li>
+<li>In the <code>Native.Android</code> project, edit the <code>MainActivity</code> class, register the <code>AndroidLoginProvider</code> dependency and process the parameters received by the Intent <code>com.companyname.native:/oauth2redirect</code>.</li>
 </ul>
 <pre><code>protected override void OnCreate(Bundle savedInstanceState)
 {
 	DependencyService.Register&lt;ILoginProvider, AndroidLoginProvider&gt;();
-    if (Intent != null &amp;&amp; AndroidLoginProvider.Instance != null)
+	if (Intent != null &amp;&amp; AndroidLoginProvider.Instance != null)
     {
         AndroidLoginProvider.Instance.NotifyOfCallback(Intent);
     }
@@ -829,17 +829,9 @@ dotnet new &lt;&lt;TODO&gt;&gt; -n Trusted
 <li>Add the <code>Trusted</code> project into your Visual Studio solution.</li>
 </ul>
 <pre><code>cd ..\..\..
+
 dotnet sln add ./src/Trusted/Trusted.csproj
 </code></pre>
-<ul>
-<li>TODO : CONTINUE THE EXPLANATION.</li>
-</ul>
-<h1 id="protect-restapi-from-undesirable-applications">Protect REST.API from undesirable applications</h1>
-<p>Use client_credentials in order to get an access token with scope.</p>
-<h1 id="protect-restapi-from-undeseriable-users">Protect REST.API from undeseriable users</h1>
-<p>An access token is passed, used by the REST.API to get role (explain why).
-Identity token can be passed but without role (explain why).
-Two different methods.</p>
 </article>
           </div>
           
@@ -848,7 +840,7 @@ Two different methods.</p>
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.1/docs/documentation/openid/scenarios.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.1/docs/documentation/openid/protectappsusers.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

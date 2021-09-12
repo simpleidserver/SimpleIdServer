@@ -11,7 +11,13 @@
    - name: Persistence
      href: openid/persistence.md
    - name: Scenarios
-     href: openid/scenarios.md
+     items:
+      - name: Protect application from undesirable users
+        href: openid/protectappsusers.md
+      - name: Protect REST.API from undesirable applications
+        href: openid/protectapiapps.md
+      - name: Protect application from undesirable users
+        href: openid/protectapiusers.md
 - name: SCIM2.0
   items:
    - name: Installation

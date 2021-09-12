@@ -1,0 +1,7 @@
+.navbar-brand > svg {
+	height: 48px !important;
+}	
+
+.navbar-brand {
+		height: 100px !important;
+}

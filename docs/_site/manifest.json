@@ -23,7 +23,7 @@
           "hash": "D5Kj6PU4IQnpP+0h+n8aa75eotL6MQEjIlZeOm2eu2A="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -35,7 +35,7 @@
           "hash": "NJMS/ReZNagVvXs/HUPR7DFfs3rEJ4KsGCIEYslp4ZA="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -47,7 +47,7 @@
           "hash": "I/rb3tRT+thlJIoDEDn7eFX9PQZ9f6vHDiLpm+YN9WY="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -128,6 +128,28 @@
       "version": ""
     },
     {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-8.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-8.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-9.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-9.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
       "type": "Conceptual",
       "source_relative_path": "documentation/openid/installation.md",
       "output": {
@@ -136,7 +158,7 @@
           "hash": "AP4nh+wOFgBVUciZQ4VYVX/N695kl55sOnPXgtmrshI="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -148,19 +170,43 @@
           "hash": "B0v0QlKvLL0EYhUK7nLdEnCfiBtZBsdtly4/1i/VD8M="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
       "type": "Conceptual",
-      "source_relative_path": "documentation/openid/scenarios.md",
+      "source_relative_path": "documentation/openid/protectapiapps.md",
       "output": {
         ".html": {
-          "relative_path": "documentation/openid/scenarios.html",
-          "hash": "6flWUtiJLdfOhewqVLYZSIn0fiOIA3u6CjaXrDBuQBY="
+          "relative_path": "documentation/openid/protectapiapps.html",
+          "hash": "E3nFB+9o8hSIIHJ8a+k9YCzCcP0iaBl/6Dp5j+bmVYo="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/protectapiusers.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/protectapiusers.html",
+          "hash": "H2hV7MjZoTiiR/4RE56AH1JDmnWntxQohDD1o2PWcyY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/protectappsusers.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/protectappsusers.html",
+          "hash": "2cc+UaaQM/wuBrgHcNVyCl6PJToPLTzJ/OUWyV/XVxY="
+        }
+      },
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -219,7 +265,7 @@
           "hash": "Uek+YftB/JiOS5bY8oLFZGXmsjDAc9RYugcMqNuMcFs="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -243,7 +289,7 @@
           "hash": "GjVnWmvP2lNG4RConJ5xdQdwr57bIBA1w+sqv329MXI="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -255,7 +301,7 @@
           "hash": "PQ7gpsz1Sm5lFTIVLDrdvlX6aVZVGIenNFqiX88tjzQ="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -264,7 +310,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/toc.html",
-          "hash": "tk8JZAxKdxECSJ0nf2LTAaXqEW7JP/pWOGwGNX2Hd5M="
+          "hash": "v+xK/j9AgTKD/BKXw1Kwq1+vl7l3Ym3PAn/Ba+QyrTg="
         }
       },
       "is_incremental": false,
@@ -279,7 +325,7 @@
           "hash": "wacfe93hjbLuYknqPyKCz5snLzgRAJRNj5vikMv5k8g="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -318,8 +364,8 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 11,
-          "skipped_file_count": 10
+          "total_file_count": 13,
+          "skipped_file_count": 13
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,

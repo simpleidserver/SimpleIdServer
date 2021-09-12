@@ -105,6 +105,10 @@ article h4 {
   color: var(--header-ft-color);
 }
 
+.navbar-brand > svg {
+	height: 48px !important;
+}
+
 .navbar {
   border: none;
   /* Both navbars use box-shadow */
