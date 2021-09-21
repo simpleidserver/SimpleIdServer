@@ -27,8 +27,9 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        public static void ApplyPatches(this SCIMRepresentation representation,  ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
+        public static List<SCIMPatchResult> ApplyPatches(this SCIMRepresentation representation,  ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
         {
+            var result = new List<SCIMPatchResult>();
             foreach (var patch in patches)
             {
                 var scimFilter = SCIMFilterParser.Parse(patch.Path, representation.Schemas);
@@ -60,6 +61,7 @@ namespace SimpleIdServer.Scim.Domain
                     foreach (var a in attrs)
                     {
                         representation.RemoveAttributeById(a);
+                        result.Add(new SCIMPatchResult { Attr = a, Operation = SCIMPatchOperations.REMOVE, Path = fullPath });
                     }
                 });
                 switch (patch.Operation)
@@ -120,6 +122,7 @@ namespace SimpleIdServer.Scim.Domain
                                 }
 
                                 attributes.Add(newAttribute);
+                                result.Add(new SCIMPatchResult { Attr = newAttribute, Operation = SCIMPatchOperations.ADD, Path = fullPath });
                             }
                         }
                         catch (SCIMSchemaViolatedException)
@@ -188,17 +191,19 @@ namespace SimpleIdServer.Scim.Domain
                                                 {
                                                     representation.AddAttribute(newAttribute);
                                                 }
+
+                                                result.Add(new SCIMPatchResult { Attr = newAttribute, Operation = SCIMPatchOperations.ADD, Path = fullPath });
                                             }
                                         }
 
-                                        Merge(flatHiearchy, newAttributes);
+                                        result.AddRange(Merge(flatHiearchy, newAttributes, fullPath));
                                     }
                                 }
                                 else
                                 {
                                     var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                                     var flatHiearchy = representation.Attributes.ToList();
-                                    Merge(flatHiearchy, newAttributes);
+                                    result.AddRange(Merge(flatHiearchy, newAttributes, fullPath));
                                 }
                             }
                             catch (SCIMSchemaViolatedException)
@@ -215,6 +220,8 @@ namespace SimpleIdServer.Scim.Domain
             {
                 representation.SetDisplayName(displayNameAttr.ValueString);
             }
+
+            return result;
         }
 
         public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true)
@@ -278,8 +285,9 @@ namespace SimpleIdServer.Scim.Domain
             return clone.ToResponse(location, true, false);
         }
 
-        private static void Merge(List<SCIMRepresentationAttribute> attributes, ICollection<SCIMRepresentationAttribute> newAttributes)
+        private static List<SCIMPatchResult> Merge(List<SCIMRepresentationAttribute> attributes, ICollection<SCIMRepresentationAttribute> newAttributes, string fullPath)
         {
+            var result = new List<SCIMPatchResult>();
             foreach(var attr in attributes)
             {
                 var newAttr = newAttributes.FirstOrDefault(na => na.FullPath == attr.FullPath);
@@ -295,7 +303,10 @@ namespace SimpleIdServer.Scim.Domain
                 attr.ValueInteger = newAttr.ValueInteger;
                 attr.ValueReference = newAttr.ValueReference;
                 attr.ValueBinary = newAttr.ValueBinary;
+                result.Add(new SCIMPatchResult { Attr = attr, Operation = SCIMPatchOperations.ADD, Path = fullPath });
             }
+
+            return result;
         }
 
         private static ICollection<SCIMRepresentationAttribute> ExtractRepresentationAttributesFromJSON(

@@ -31,8 +31,8 @@ namespace SimpleIdServer.Scim.Benchmark
                 }
 
                 var userId = await AddUser(httpClient);
-                // await PatchGroup(httpClient, _groupId, userId);
-                await PatchUser(httpClient, userId, _groupId);
+                await PatchGroup(httpClient, _groupId, userId);
+                // await PatchUser(httpClient, userId, _groupId);
             }
         }
 

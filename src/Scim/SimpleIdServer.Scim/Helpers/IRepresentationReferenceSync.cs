@@ -8,6 +8,7 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public interface IRepresentationReferenceSync
     {
+        Task<ICollection<SCIMRepresentation>> Sync(string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations);
         Task<ICollection<SCIMRepresentation>> Sync(string resourceType, SCIMRepresentation oldSourceScimRepresentation, SCIMRepresentation newSourceScimRepresentation, bool updateAllReferences = true, bool isScimRepresentationRemoved = false);
         Task<bool> IsReferenceProperty(ICollection<string> attributes);
     }
