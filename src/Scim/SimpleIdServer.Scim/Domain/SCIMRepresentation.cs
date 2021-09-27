@@ -36,6 +36,20 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
+        public SCIMSchemaAttribute GetSchemaAttributeById(string id)
+        {
+            foreach(var schema in Schemas)
+            {
+                var attr = schema.GetAttributeById(id);
+                if (attr != null)
+                {
+                    return attr;
+                }
+            }
+
+            return null;
+        }
+
         public SCIMSchema GetRootSchema()
         {
             return Schemas.FirstOrDefault(s => s.IsRootSchema);
@@ -84,9 +98,9 @@ namespace SimpleIdServer.Scim.Domain
             Attributes.Add(childAttribute);
         }
 
-        public void RemoveAttributeById(SCIMRepresentationAttribute attribute)
+        public ICollection<SCIMRepresentationAttribute> RemoveAttributeById(SCIMRepresentationAttribute attribute)
         {
-            RemoveAttributesById(new[] { attribute.Id });
+            return RemoveAttributesById(new[] { attribute.Id });
         }
 
         public void RemoveAttributesBySchemaAttrId(IEnumerable<string> schemaAttrIds)
@@ -99,9 +113,16 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        public void RemoveAttributesById(IEnumerable<string> attrIds)
+        public ICollection<SCIMRepresentationAttribute> RemoveAttributesById(IEnumerable<string> attrIds)
         {
-            for(int i = 0; i < attrIds.Count(); i++)
+            var result = new List<SCIMRepresentationAttribute>();
+            RemoveAttributesById(result, attrIds);
+            return result;
+        }
+
+        public void RemoveAttributesById(List<SCIMRepresentationAttribute> removedAttrs, IEnumerable<string> attrIds)
+        {
+            for (int i = 0; i < attrIds.Count(); i++)
             {
                 var schemaAttrId = attrIds.ElementAt(i);
                 var attr = GetAttributeById(schemaAttrId);
@@ -110,8 +131,10 @@ namespace SimpleIdServer.Scim.Domain
                     continue;
                 }
 
-                var children = GetChildren(attr).Select(a => a.Id).ToList();
-                RemoveAttributesById(children);
+                removedAttrs.Add(attr);
+                var children = GetChildren(attr);
+                var childrenIds = children.Select(a => a.Id).ToList();
+                RemoveAttributesById(removedAttrs, childrenIds);
                 Attributes.Remove(attr);
             }
         }

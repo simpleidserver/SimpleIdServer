@@ -60,8 +60,11 @@ namespace SimpleIdServer.Scim.Domain
                 {
                     foreach (var a in attrs)
                     {
-                        representation.RemoveAttributeById(a);
-                        result.Add(new SCIMPatchResult { Attr = a, Operation = SCIMPatchOperations.REMOVE, Path = fullPath });
+                        var removedAttrs = representation.RemoveAttributeById(a);
+                        foreach(var removedAttr in removedAttrs)
+                        {
+                            result.Add(new SCIMPatchResult { Attr = removedAttr, Operation = SCIMPatchOperations.REMOVE, Path = removedAttr.FullPath });
+                        }
                     }
                 });
                 switch (patch.Operation)

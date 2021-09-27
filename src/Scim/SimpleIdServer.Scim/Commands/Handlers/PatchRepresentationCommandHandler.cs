@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.DTOs;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
 {
-    public class PatchRepresentationCommandHandler : IPatchRepresentationCommandHandler
+    public class PatchRepresentationCommandHandler : BaseCommandHandler, IPatchRepresentationCommandHandler
     {
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
@@ -29,7 +30,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, 
             IDistributedLock distributedLock,
             IRepresentationReferenceSync representationReferenceSync,
-            IOptions<SCIMHostOptions> options)
+            IOptions<SCIMHostOptions> options,
+            IBusControl busControl) : base(busControl)
         {
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
@@ -58,7 +60,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                    foreach (var reference in references)
+                    foreach (var reference in references.Representations)
                     {
                         await _scimRepresentationCommandRepository.Update(reference);
                     }
@@ -66,6 +68,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     await transaction.Commit();
                 }
 
+                await Notify(references);
                 existingRepresentation.ApplyEmptyArray();
                 return existingRepresentation;
             }
