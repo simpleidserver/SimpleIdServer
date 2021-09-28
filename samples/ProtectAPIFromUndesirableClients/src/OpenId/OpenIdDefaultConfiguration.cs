@@ -21,7 +21,13 @@ namespace OpenId
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,            
-            SIDOpenIdConstants.StandardScopes.ScimScope
+            SIDOpenIdConstants.StandardScopes.ScimScope,
+            new OAuthScope
+            {
+                Name = "get_weather",
+                IsExposedInConfigurationEdp = false,
+                IsStandardScope = false
+            }
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -275,8 +281,8 @@ namespace OpenId
                 },
                 new OpenIdClient
                 {
-                    ClientId = "trusted",
-                    ClientSecret = "trustedSecret",
+                    ClientId = "console",
+                    ClientSecret = "consoleSecret",
                     ApplicationKind = ApplicationKinds.Service,
                     TokenEndPointAuthMethod = "client_secret_post",
                     UpdateDateTime = DateTime.UtcNow,
@@ -284,16 +290,21 @@ namespace OpenId
                     TokenExpirationTimeInSeconds = 60 * 30,
                     RefreshTokenExpirationTimeInSeconds = 60 * 30,
                     TokenSignedResponseAlg = "RS256",
-                    Token
                     AllowedScopes = new List<OAuthScope>
                     {
                         SIDOpenIdConstants.StandardScopes.OpenIdScope,
                         SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        new OAuthScope
+                        {
+                            Name = "get_weather",
+                            IsExposedInConfigurationEdp = false,
+                            IsStandardScope = false
+                        }
                     },
                     GrantTypes = new List<string>
                     {
-                        "password"
+                        "client_credentials"
                     },
                     PreferredTokenProfile = "Bearer"
                 }

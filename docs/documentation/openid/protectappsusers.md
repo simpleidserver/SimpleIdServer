@@ -1,5 +1,8 @@
 # Protect application from undesirable users
 
+An OPENID server can be used to protect any type of applications from undesirable users.
+Following chapters describe how to implement user authentication for each type of application.
+
 ## Recommended flow by application type
 
 There are different grant-types to get tokens, the choice depends on the type of application.
@@ -17,7 +20,7 @@ There are different grant-types to get tokens, the choice depends on the type of
 
 **Example** : ASP.NET CORE application.
 
-Server-Side application should use *authorization code* grant-type.
+Server-Side application should use **authorization code** grant-type.
 
 > [!WARNING]
 > Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
@@ -93,6 +96,8 @@ dotnet new mvc -n AspNetCore
 * Navigate to the directory `AspNetCore` and install the Nuget package `Microsoft.AspNetCore.Authentication.OpenIdConnect`.
 
 ```
+cd AspNetCore
+
 dotnet add package Microsoft.AspNetCore.Authentication.OpenIdConnect
 ```
 
@@ -124,7 +129,7 @@ services.AddAuthentication(options =>
     });
 ```
 
-* To ensure the authentication services execute on each request, add `UseAuthentication` in the `Configure` procedure. The procedure should look like to something like this :
+* To ensure the authentication service execute on each request, add `UseAuthentication` in the `Configure` procedure. The procedure should look like to something like this :
 
 ```
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -185,7 +190,7 @@ dotnet run --urls=https://localhost:7000
 
 **Example**: Angular application.
 
-SPA application use *authorization code* grant-type with *PKCE* client authentication method.
+SPA application use **authorization code** grant-type with **PKCE** client authentication method.
 
 > [!WARNING]
 > Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
@@ -366,7 +371,7 @@ dotnet run --urls=http://localhost:4200
 
 **Examples** : WPF, Xamarin application etc...
 
-Native application use *authorization code* grant-type with *PKCE* client authentication method.
+Native application use **authorization code** grant-type with **PKCE** client authentication method.
 
 > [!WARNING]
 > Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
@@ -747,7 +752,7 @@ public partial class MainPage : ContentPage
 
 **Example** : Console application.
 
-Server-Side application should use *password* grant-type.
+Server-Side application should use **password** grant-type.
 
 If you own both the client application and the resource that is accessing, then your application can be trusted.
 
@@ -814,7 +819,7 @@ dotnet new console -n Console
 * Add the `Console` project into your Visual Studio solution.
 
 ```
-cd ..\..
+cd ..
 
 dotnet sln add ./src/Console/Console.csproj
 ```
