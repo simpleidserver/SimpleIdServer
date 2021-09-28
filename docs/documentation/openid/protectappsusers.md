@@ -366,6 +366,8 @@ dotnet run --urls=http://localhost:4200
 
 **Examples** : WPF, Xamarin application etc...
 
+Native application use *authorization code* grant-type with *PKCE* client authentication method.
+
 > [!WARNING]
 > Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
 	
@@ -745,10 +747,16 @@ public partial class MainPage : ContentPage
 
 **Example** : Console application.
 
+Server-Side application should use *password* grant-type.
+
 If you own both the client application and the resource that is accessing, then your application can be trusted.
 
 > [!WARNING]
 > Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
+
+### Source Code
+
+The source code of this project can be found [here](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/ProtectApplicationFromUndesirableUsers/Trust).
  
 ### Configure OpenId Server
 
@@ -795,18 +803,47 @@ dotnet run
 The last step consists to create and configure a console application.
 
 * Open a command prompt and navigate to the `src` subfolder of your project.
-* Create a console application, its name must be `Trusted`.
+* Create a console application, its name must be `Console`.
 
 ```
-mkdir Trusted
+mkdir Console
 
-dotnet new <<TODO>> -n Trusted
+dotnet new console -n Console
 ```
 
-* Add the `Trusted` project into your Visual Studio solution.
+* Add the `Console` project into your Visual Studio solution.
 
 ```
-cd ..\..\..
+cd ..\..
 
-dotnet sln add ./src/Trusted/Trusted.csproj
+dotnet sln add ./src/Console/Console.csproj
 ```
+
+* Edit the `Program.cs` file and replace its content with the following code. The grant type `password` is used to authenticate the user and get his access token.
+
+```
+class Program
+{
+    static void Main(string[] args)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var form = new Dictionary<string, string>
+            {
+                { "grant_type", "password" },
+                { "username", "sub" },
+                { "password", "password" },
+                { "client_id", "trusted" },
+                { "client_secret", "trustedSecret" }
+            };
+            var tokenResponse = httpClient.PostAsync("http://localhost:5000/token", new FormUrlEncodedContent(form)).Result;
+            var json = tokenResponse.Content.ReadAsStringAsync().Result;
+            System.Console.WriteLine(json);
+        }
+    }
+}
+```
+
+* Run the console application, the access token should be displayed.
+
+![Trust application](images/openid-10.png)
