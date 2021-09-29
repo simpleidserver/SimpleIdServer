@@ -9,8 +9,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
-	  <PackageReference Include="SimpleIdServer.Scim" Version="2.0.0-ci-local" />
-	  <PackageReference Include="SimpleIdServer.Scim.Swashbuckle" Version="2.0.0-ci-local" />
+	<PackageReference Include="SimpleIdServer.Scim" Version="2.0.1" />
+	<PackageReference Include="SimpleIdServer.Scim.Swashbuckle" Version="2.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0 " />
   </ItemGroup>
   <ItemGroup>

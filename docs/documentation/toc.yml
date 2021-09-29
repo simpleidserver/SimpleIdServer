@@ -28,3 +28,5 @@
      href: scim20/swagger.md
 - name: Provisioning
   href: provisioning/index.md
+- name: Certifications
+  href: certifications/index.md

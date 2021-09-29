@@ -1,4 +1,4 @@
-# Protect REST.API from undeseriable users
+# Protect REST.API from undesirable users
 
 There are two different mechanisms to protect REST.API from undesirable users :
 

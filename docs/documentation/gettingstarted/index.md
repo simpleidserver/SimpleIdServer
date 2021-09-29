@@ -15,3 +15,12 @@ Install SimpleIdServer template :
 ```
 dotnet new --install SimpleIdServer.Templates
 ```
+
+| Command line              | Description                                                |
+| ------------------------- | ---------------------------------------------------------- |
+| dotnet new openidefbs4    | OPENID server with SQLServer store and Bootstrap4 theme    |
+| dotnet new openidinmembs4 | OPENID server with InMemory store and Bootstrap4 theme     |
+| dotnet new scimef         | SCIM2.0 server with EF store                               |
+| dotnet new sciminmem      | SCIM2.0 server with InMemory store                         |
+| dotnet new scimongodb     | SCIM2.0 server with MongoDB store                          |
+| dotnet new scimswagger    | SCIM2.0 server with Swagger support                        |
