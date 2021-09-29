@@ -16,7 +16,7 @@
         href: openid/protectappsusers.md
       - name: Protect REST.API from undesirable clients
         href: openid/protectapiclients.md
-      - name: Protect application from undesirable users
+      - name: Protect REST.API from undesirable users
         href: openid/protectapiusers.md
 - name: SCIM2.0
   items:

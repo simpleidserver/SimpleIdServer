@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
--->
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/launcher_background" />
-    <foreground android:drawable="@mipmap/launcher_foreground" />
-</adaptive-icon>
