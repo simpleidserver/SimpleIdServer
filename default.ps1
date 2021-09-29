@@ -33,6 +33,8 @@ task publishDocker -depends clean {
 	exec { dotnet publish $source_dir\CaseManagement\CaseManagement.HumanTask.Host\CaseManagement.HumanTask.Host.csproj -c $config -o $result_dir\docker\HumanTask }
 	exec { dotnet publish $source_dir\Saml\SimpleIdServer.Saml.Idp.EF.Startup\SimpleIdServer.Saml.Idp.EF.Startup.csproj -c $config -o $result_dir\docker\SamlIdp }
 	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Provisioning\SimpleIdServer.Scim.Provisioning.csproj -c $config -o $result_dir\docker\Provisioning }
+	exec { docker-compose build }
+	exec { docker-compose push }
 }
 
 task clean {
