@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{597470F9-94D2-49FD-8E5E-0FEB14C7E001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenId", "src\OpenId\OpenId.csproj", "{AEFEF00F-A1DD-455C-94DA-384EC6C414FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenId", "src\OpenId\OpenId.csproj", "{AEFEF00F-A1DD-455C-94DA-384EC6C414FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "src\WebApi\WebApi.csproj", "{460C98B9-CC7C-4B01-9E87-CBC7EB70E036}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi.csproj", "{460C98B9-CC7C-4B01-9E87-CBC7EB70E036}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCore", "src\AspNetCore\AspNetCore.csproj", "{20DE2B47-55BE-4A7B-9CD6-F957218D7111}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCore", "src\AspNetCore\AspNetCore.csproj", "{20DE2B47-55BE-4A7B-9CD6-F957218D7111}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.InMemory", "..\..\..\src\Templates\templates\SimpleIdServer.Scim.InMemory\SimpleIdServer.Scim.InMemory.csproj", "{25ACC63E-2455-4457-B11C-50BBB0E988A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,9 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AEFEF00F-A1DD-455C-94DA-384EC6C414FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -60,10 +59,28 @@ Global
 		{20DE2B47-55BE-4A7B-9CD6-F957218D7111}.Release|x64.Build.0 = Release|Any CPU
 		{20DE2B47-55BE-4A7B-9CD6-F957218D7111}.Release|x86.ActiveCfg = Release|Any CPU
 		{20DE2B47-55BE-4A7B-9CD6-F957218D7111}.Release|x86.Build.0 = Release|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Debug|x64.Build.0 = Debug|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Debug|x86.Build.0 = Debug|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Release|x64.ActiveCfg = Release|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Release|x64.Build.0 = Release|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Release|x86.ActiveCfg = Release|Any CPU
+		{25ACC63E-2455-4457-B11C-50BBB0E988A5}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AEFEF00F-A1DD-455C-94DA-384EC6C414FC} = {597470F9-94D2-49FD-8E5E-0FEB14C7E001}
 		{460C98B9-CC7C-4B01-9E87-CBC7EB70E036} = {597470F9-94D2-49FD-8E5E-0FEB14C7E001}
 		{20DE2B47-55BE-4A7B-9CD6-F957218D7111} = {597470F9-94D2-49FD-8E5E-0FEB14C7E001}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {062FE230-FA65-4C43-9AA1-C53488DC8FB8}
 	EndGlobalSection
 EndGlobal

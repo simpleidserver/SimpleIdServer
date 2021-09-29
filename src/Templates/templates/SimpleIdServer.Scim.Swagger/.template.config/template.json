@@ -1,0 +1,19 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SimpleIdServer",
+    "Scim",
+	"Swagger"
+  ],
+  "name": "SCIM2.0 with Swagger support",
+  "identity": "SimpleIdServer.Scim.Swagger",
+  "groupIdentity": "SimpleIdServer.Scim.Swagger",
+  "shortName": "scimswagger",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.Scim.Swagger",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.Scim.Swagger.csproj" } ]
+}

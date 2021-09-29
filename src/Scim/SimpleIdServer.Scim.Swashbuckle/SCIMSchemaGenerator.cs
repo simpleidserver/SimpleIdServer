@@ -170,7 +170,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
                 var scimSchema = _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(controller.ResourceType).Result;
                 if (scimSchema != null)
                 {
-                    Enrich(scimSchema, scimSchema.Attributes, schema.Properties);
+                    Enrich(scimSchema, scimSchema.HierarchicalAttributes.Select(a => a.Leaf).ToList(), schema.Properties);
                 }
                 else
                 {

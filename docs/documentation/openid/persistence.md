@@ -1,13 +1,13 @@
 # Persistence
 
-By default, all the assets like "Clients", "Scopes", "Users" and "JSON Web Keys" are stored in memory. The following data storage can be used. 
+By default, all the assets like `Clients`, `Scopes`, `Users` and `JSON Web Keys` are stored in memory. The following data storage can be used. 
 
 ## SQLServer
 
 > [!WARNING]
-> There is a SimpleIdServer template to create a new project with EF support, using `dotnet new openidefbs4`. 
+> A SimpleIdServer template exists to create OPENID server with EF support. Execute the command line `dotnet new openidefbs4` and don't forget to update the `CONNECTIONSTRING` parameter in the files `OpenIDMigration.cs` and `Startup.cs` before running the solution.
 
-**Pre-requisite** : OPENID server must be installed in the Visual Studio Solution.
+**Pre-requisite** : [OPENID server must be installed](/documentation/openid/installation.html) in the Visual Studio Solution.
 
 SQL Server data storage can be configured like this : 
 
@@ -47,7 +47,7 @@ public class OpenIDMigration : IDesignTimeDbContextFactory<OpenIdDBContext>
 * Execute the following command line, the migration scripts will be created
 
 ```
-dotnet ef add migrations Init
+dotnet ef migrations add Init
 ```
 
 * Execute the following command line, the tables will be created in the database :

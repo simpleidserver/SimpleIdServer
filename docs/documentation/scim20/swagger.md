@@ -1,24 +1,60 @@
 # Swagger
 
-There is a problem when swagger is installed in a SCIM2.0 project. All the properties of SCIM representations are documented in the SCIM Schema and by default Swagger is not able to fetch them  : 
+There is a problem when swagger is installed in a SCIM2.0 project. All the properties of SCIM representations are documented in the SCIM Schema and by default Swagger is not able to fetch them.
 
-1. Install the Nuget package `SimpleIdServer.Scim.Swashbuckle`.
-2. Open the “Startup.cs” file, copy and past the code below into `ConfigureService` :
+> [!WARNING]
+> A SimpleIdServer template exists to create SCIM server with Swagger support. Execute the command line `dotnet new scimswagger`.
+
+**Pre-requisite** : [SCIM server must be installed](/documentation/scim20/installation.html) in the Visual Studio Solution.
+
+Swagger can be configured like this : 
+
+* In a command prompt, navigate to the directory `src\ScimHost`.
+* Install the Nuget package `SimpleIdServer.Scim.Swashbuckle` version `5.5.0`. 
 
 ```
-services.AddSwaggerGen(c => 
-{ 
-	var currentAssembly = Assembly.GetExecutingAssembly(); 
-	var xmlDocs = currentAssembly.GetReferencedAssemblies() 
-		.Union(new AssemblyName[] { currentAssembly.GetName() }) 
-		.Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml")) 
-		.Where(f => File.Exists(f)).ToArray(); 
-	Array.ForEach(xmlDocs, (d) => 
-	{ 
-		c.IncludeXmlComments(d); 
-	}); 
+dotnet add package SimpleIdServer.Scim.Swashbuckle --version 5.5.0
+```
+
+* Install the Nuget package `Swashbuckle.AspNetCore`.
+
+```
+dotnet add package Swashbuckle.AspNetCore
+```
+
+* Edit the `Startup.cs` file and configure Swagger. Copy and paste the following code into `ConfigureService`.
+
+```
+services.AddSwaggerGen(c =>
+{
+    var currentAssembly = Assembly.GetExecutingAssembly();
+    var xmlDocs = currentAssembly.GetReferencedAssemblies()
+        .Union(new AssemblyName[] { currentAssembly.GetName() })
+        .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+        .Where(f => File.Exists(f)).ToArray();
+    Array.ForEach(xmlDocs, (d) =>
+    {
+        c.IncludeXmlComments(d);
+    });
 });
-services.AddSCIMSwagger();   
+services.AddSCIMSwagger();
 ```
 
-3. Browse the URL `https://localhost:<sslPort>/swagger`, the documentation is now fetched from the SCIM Schemas. 
+* Enable Swagger API and its UI. Copy and paste the following code into `Configure`.
+
+```
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SCIM API V1");
+});
+```
+
+* Run the SCIM server and check swagger portal is displayed when you browse the following url : [http://localhost:60002/swagger](http://localhost:60002/swagger).
+
+```
+cd src/ScimHost
+dotnet run --urls=http://localhost:60002
+```
+
+![SCIM2.0 swagger](images/scim20-1.png)
