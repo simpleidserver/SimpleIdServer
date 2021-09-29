@@ -1,0 +1,472 @@
+{
+  "homepages": [],
+  "source_base_path": "C:/Projects/SimpleIdServer/docs",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/bigpicture/images/big-picture-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/bigpicture/images/big-picture-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/bigpicture/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/bigpicture/index.html",
+          "hash": "UcrbEMGlCKUTarASVXQliB8/vNTlkPcwlG0/Zrca0JU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/certifications/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/certifications/index.html",
+          "hash": "Z7ASmmmoY0yPmbfbptdZIkoamsts0myJfK/ytYnrjTA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/gettingstarted/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/gettingstarted/index.html",
+          "hash": "ZyHVevfV3f9p20ooLarbodpaFKdaOKoctX2sK1S7zuk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/authentication.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/authentication.html",
+          "hash": "MEk2iHKHXQwWQaXcPlQN93X48snzTO1AF1+vndcc+Fo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-10.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-10.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-11.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-11.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-12.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-12.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-13.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-13.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-4.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-4.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-5.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-5.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-6.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-6.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-7.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-7.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-8.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-8.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/openid/images/openid-9.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/openid/images/openid-9.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/installation.html",
+          "hash": "V9rxvDpQJbfpwMY+XLln3zkaByNU37wXWzJrTGCHRfg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/persistence.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/persistence.html",
+          "hash": "Z1lOAVBbGtkcJfX2qrZTSPqv6uweGrSbbtFYgVcspGM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/protectapiclients.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/protectapiclients.html",
+          "hash": "ziPFYhdMaxjfBUGRSd4+xjUQBLfQo0VH0jjC4+Qnd1g="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/protectapiusers.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/protectapiusers.html",
+          "hash": "JZLFmlZyRl3tToCtiCgJrYueeQCSPVc+reNIjMAqhjM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/openid/protectappsusers.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/openid/protectappsusers.html",
+          "hash": "G1wXBFuVlWBou+1QtNzIYjLBYKQafP1ghYw5ptIgtL8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/provisioning/images/provisioning-4.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/provisioning/images/provisioning-4.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "log_codes": [
+        "InvalidFileLink"
+      ],
+      "type": "Conceptual",
+      "source_relative_path": "documentation/provisioning/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/provisioning/index.html",
+          "hash": "3sYdXqSpUHrC0/5SH1TZrNzVxW3fxwxmWiPDpR30TPc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/scim20/images/scim20-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/scim20/images/scim20-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/scim20/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/scim20/installation.html",
+          "hash": "iY3Mn+uQy0FWextz5A0u2Q1huJN6EGsEnF+L+K7wmFM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/scim20/persistence.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/scim20/persistence.html",
+          "hash": "HR0z8vQXSIWHJO80s8fmscn7p9HE9afDvjxJZDrF/gw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/scim20/swagger.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/scim20/swagger.html",
+          "hash": "+ZyTW6GNvSIaQDE+9PkQQPNwrivyI/MsZ+Zuv1sqSv0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "documentation/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/toc.html",
+          "hash": "immfpd0Uw0IGWtiaShjz5XA4Ln78urmHUmC4KaEa88M="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "o6n5+zENOsHH53Y5nQru+uElr62xd/mmDAhXwDP40J8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "logo.svg",
+      "output": {
+        "resource": {
+          "relative_path": "logo.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "kNFNkN6mbUHcAoXK60MZhIVbCDoxtnGAWAwbzjRSy2E="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot build incrementally because last build info is missing.",
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0,
+        "full_build_reason_code": "NoAvailableBuildCache"
+      },
+      "processors": {
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 14,
+          "skipped_file_count": 0
+        },
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: last post processor info is null.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

@@ -5,18 +5,18 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Welcome to SimpleIdServer </title>
+    <title>Before you start </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Welcome to SimpleIdServer ">
+    <meta name="title" content="Before you start ">
     <meta name="generator" content="docfx 2.58.3.0">
     
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="stylesheet" href="styles/docfx.vendor.css">
-    <link rel="stylesheet" href="styles/docfx.css">
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <meta property="docfx:navrel" content="toc.html">
-    <meta property="docfx:tocrel" content="toc.html">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
     
     
     
@@ -34,8 +34,8 @@
                 <span class="icon-bar"></span>
               </button>
               
-              <a class="navbar-brand" href="index.html">
-                <img id="logo" class="svg" src="logo.svg" alt="">
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
               </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar">
@@ -57,14 +57,60 @@
         </div>
       </header>
       <div role="main" class="container body-content hide-when-search">
-        <div class="article row grid">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="welcome-to-simpleidserver">Welcome to SimpleIdServer</h1>
+<h1 id="before-you-start">Before you start</h1>
 
-<p>SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0 and UMA2.0. It streamlines development, configuration and deployment of custom access control servers. Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more.</p>
-<p>Github: <a href="https://github.com/simpleidserver/SimpleIdServer">https://github.com/simpleidserver/SimpleIdServer</a></p>
-<p>Nuget feed: <a href="https://www.myget.org/F/advance-ict/api/v3/index.json">https://www.myget.org/F/advance-ict/api/v3/index.json</a></p>
+<p>Make sure you have Docker installed.</p>
+<h1 id="start-simpleidserver">Start SimpleIdServer</h1>
+<p>Download the <a href="https://raw.githubusercontent.com/simpleidserver/SimpleIdServer/release/2.0.0/conf/docker/2.0.0/docker-compose.yml">docker-compose.yml</a> file and execute the command line <code>docker-compose up</code>.</p>
+<p>This will start <a href="http://localhost:4200">SimpleIdServer</a> exposed on the port 4200. It will also create an initial admin user with username <code>administrator</code> and password <code>password</code>.</p>
+<h1 id="template">Template</h1>
+<p>Install SimpleIdServer template :</p>
+<pre><code>dotnet new --install SimpleIdServer.Templates
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Command line</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dotnet new openidefbs4</td>
+<td>OPENID server with SQLServer store and Bootstrap4 theme</td>
+</tr>
+<tr>
+<td>dotnet new openidinmembs4</td>
+<td>OPENID server with InMemory store and Bootstrap4 theme</td>
+</tr>
+<tr>
+<td>dotnet new scimef</td>
+<td>SCIM2.0 server with EF store</td>
+</tr>
+<tr>
+<td>dotnet new sciminmem</td>
+<td>SCIM2.0 server with InMemory store</td>
+</tr>
+<tr>
+<td>dotnet new scimongodb</td>
+<td>SCIM2.0 server with MongoDB store</td>
+</tr>
+<tr>
+<td>dotnet new scimswagger</td>
+<td>SCIM2.0 server with Swagger support</td>
+</tr>
+</tbody>
+</table>
 </article>
           </div>
           
@@ -73,7 +119,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/index.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/gettingstarted/index.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
@@ -100,8 +146,8 @@
       </footer>
     </div>
     
-    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
-    <script type="text/javascript" src="styles/docfx.js"></script>
-    <script type="text/javascript" src="styles/main.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
   </body>
 </html>
