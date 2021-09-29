@@ -181,3 +181,20 @@ task test {
         Pop-Location
     }
 }
+
+task publishWebsite {
+	exec { git checkout gh-pages }
+	exec { git rm -r . }
+	exec { git checkout HEAD -- .gitignore }
+	exec { git add . }
+	exec { git commit -m "Remove" }
+	exec { git checkout master }
+	exec { docfx ./docs/docfx.json }
+	exec { Copy-item -Force -Recurse -Verbose "./docs/_site/*" -Destination "." }
+	exec { git checkout gh-pages --merge }
+	exec { git add . }
+	exec { git commit -m "Update Documentation" }
+	exec { git rebase -i HEAD~2 }
+	exec { git push origin gh-pages }
+	exec { git checkout master }
+}
