@@ -3,7 +3,7 @@
 There is a problem when swagger is installed in a SCIM2.0 project. All the properties of SCIM representations are documented in the SCIM Schema and by default Swagger is not able to fetch them.
 
 > [!WARNING]
-> A SimpleIdServer template exists to create SCIM server with Swagger support. Execute the command line `dotnet new scimswagger`.
+> A SimpleIdServer template exists to create SCIM server with Swagger support. Execute the command line `dotnet new scimswagger -n ScimHost`.
 
 **Pre-requisite** : [SCIM server must be installed](/documentation/scim20/installation.html) in the Visual Studio Solution.
 

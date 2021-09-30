@@ -5,7 +5,10 @@ By default, all the assets like `Representation`, `Schemas` are stored in memory
 ## SQLServer
 
 > [!WARNING]
-> A SimpleIdServer template exists to create SCIM server with EF support. Execute the command line `dotnet new scimef` and don't forget to update the `CONNECTIONSTRING` parameter in the files `ScimMigration.cs` and `Startup.cs` before running the solution.
+> A SimpleIdServer template exists to create SCIM server with EF support.
+> * Execute the command line `dotnet new scimef -n ScimHost`.
+> * Create the migration scripts `dotnet ef migrations add Init`.
+> * Update the `CONNECTIONSTRING` parameter in the files `ScimMigration.cs` and `Startup.cs` before running the solution.
 
 
 **Pre-requisite** : [SCIM server must be installed](/documentation/scim20/installation.html) in the Visual Studio Solution.
@@ -99,7 +102,9 @@ dotnet run --urls=http://localhost:60002
 ## MongoDB
 
 > [!WARNING]
-> A SimpleIdServer template exists to create SCIM server with MongoDB support. Execute the command line `dotnet new scimongodb` and don't forget to update the `CONNECTIONSTRING` and `DATABASENAME` parameters in the `Startup.cs` file before running the solution.
+> A SimpleIdServer template exists to create SCIM server with MongoDB support. 
+> * Execute the command line `dotnet new scimongodb -n ScimHost`.
+> * Update  the `CONNECTIONSTRING` and `DATABASENAME` parameters in the `Startup.cs` file before running the solution.
 
 **Pre-requisite** : [SCIM server must be installed](/documentation/scim20/installation.html) in the Visual Studio Solution.
 

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OpenID.EF;
+using SimpleIdServer.OpenID;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

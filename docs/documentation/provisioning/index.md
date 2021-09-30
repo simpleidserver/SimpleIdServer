@@ -26,7 +26,7 @@ The workflow above describes the user provisioning / deprovisioning implementati
 
 This chapter explains how to automatically provision a user who is authenticating with an external identity provider. This scenario is called "Just In Time Provisioning". 
 
-Before starting, ensure that SimpleIdServer is properly configured and installed on your machine:
+Before starting, ensure that [SimpleIdServer is properly configured and installed](/documentation/gettingstarted/index.html) on your machine:
 
 1. Open the [administration portal](http://localhost:4200) and authenticate with an external identity provider (Facebook, SAMLIDP etc…). 
 

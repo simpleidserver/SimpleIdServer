@@ -23,7 +23,7 @@ There are different grant-types to get tokens, the choice depends on the type of
 Server-Side application should use **authorization code** grant-type.
 
 > [!WARNING]
-> Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
+> Before you start, Make sure there is a Visual Studio Solution with a [configured OpenId server](/documentation/openid/installation.html).
 	
 ### Source Code
 
@@ -193,7 +193,7 @@ dotnet run --urls=https://localhost:7000
 SPA application use **authorization code** grant-type with **PKCE** client authentication method.
 
 > [!WARNING]
-> Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
+> Before you start, Make sure there is a Visual Studio Solution with a [configured OpenId server](/documentation/openid/installation.html).
 	
 ### Source Code
 
@@ -374,7 +374,7 @@ dotnet run --urls=http://localhost:4200
 Native application use **authorization code** grant-type with **PKCE** client authentication method.
 
 > [!WARNING]
-> Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
+> Before you start, Make sure there is a Visual Studio Solution with a [configured OpenId server](/documentation/openid/installation.html).
 	
 ### Source Code
 
@@ -757,7 +757,7 @@ Server-Side application should use **password** grant-type.
 If you own both the client application and the resource that is accessing, then your application can be trusted.
 
 > [!WARNING]
-> Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
+> Before you start, Make sure there is a Visual Studio Solution with a [configured OpenId server](/documentation/openid/installation.html).
 
 ### Source Code
 

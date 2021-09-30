@@ -14,7 +14,7 @@ This tutorial explains how to protect a REST.API from undesirable clients.
 The client is going to use the **client credentials** grant type to get an access token, it will be passed in all outgoing HTTP requests.
 
 > [!WARNING]
-> Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.
+> Before you start, Make sure there is a Visual Studio Solution with a [configured OpenId server](/documentation/openid/installation.html).
 	
 ### Source Code
 
@@ -123,7 +123,7 @@ public IEnumerable<WeatherForecast> Get()
 }
 ```
 
-* Edit the `Startup.cs` file and configure the authentication. Copy the following content in the `ConfigureServices` method. The `TokenValidationParameters` class contains importants properties used during access token validation.
+* Edit the `Startup.cs` file and configure the authentication. Copy the following content in the `ConfigureServices` method. The `TokenValidationParameters` class contains important properties used during access token validation.
 
   * **IssuerSigningKey** : Certificate public key used to check the signature of the access token. Exponent and modulus are part of the public key.
   * **ValidIssuer** : URL of the OPENID server.

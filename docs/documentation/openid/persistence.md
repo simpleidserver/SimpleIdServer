@@ -5,7 +5,10 @@ By default, all the assets like `Clients`, `Scopes`, `Users` and `JSON Web Keys`
 ## SQLServer
 
 > [!WARNING]
-> A SimpleIdServer template exists to create OPENID server with EF support. Execute the command line `dotnet new openidefbs4` and don't forget to update the `CONNECTIONSTRING` parameter in the files `OpenIDMigration.cs` and `Startup.cs` before running the solution.
+> A SimpleIdServer template exists to create OPENID server with EF support.
+> * Execute the command line `dotnet new openidefbs4 -n OpenId`.
+> * Create the migration scripts `dotnet ef migrations add Init`.
+> * Update the `CONNECTIONSTRING` parameter in the files `OpenIDMigration.cs` and `Startup.cs` before running the solution.
 
 **Pre-requisite** : [OPENID server must be installed](/documentation/openid/installation.html) in the Visual Studio Solution.
 
