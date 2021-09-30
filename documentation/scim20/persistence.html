@@ -73,7 +73,12 @@
 <h2 id="sqlserver">SQLServer</h2>
 <div class="WARNING">
 <h5>Warning</h5>
-<p>A SimpleIdServer template exists to create SCIM server with EF support. Execute the command line <code>dotnet new scimef</code> and don't forget to update the <code>CONNECTIONSTRING</code> parameter in the files <code>ScimMigration.cs</code> and <code>Startup.cs</code> before running the solution.</p>
+<p>A SimpleIdServer template exists to create SCIM server with EF support.</p>
+<ul>
+<li>Execute the command line <code>dotnet new scimef -n ScimHost</code>.</li>
+<li>Create the migration scripts <code>dotnet ef migrations add Init</code>.</li>
+<li>Update the <code>CONNECTIONSTRING</code> parameter in the files <code>ScimMigration.cs</code> and <code>Startup.cs</code> before running the solution.</li>
+</ul>
 </div>
 <p><strong>Pre-requisite</strong> : <a href="/documentation/scim20/installation.html">SCIM server must be installed</a> in the Visual Studio Solution.</p>
 <p>SQL Server data storage can be configured like this :</p>
@@ -156,7 +161,11 @@ dotnet run --urls=http://localhost:60002
 <h2 id="mongodb">MongoDB</h2>
 <div class="WARNING">
 <h5>Warning</h5>
-<p>A SimpleIdServer template exists to create SCIM server with MongoDB support. Execute the command line <code>dotnet new scimongodb</code> and don't forget to update the <code>CONNECTIONSTRING</code> and <code>DATABASENAME</code> parameters in the <code>Startup.cs</code> file before running the solution.</p>
+<p>A SimpleIdServer template exists to create SCIM server with MongoDB support.</p>
+<ul>
+<li>Execute the command line <code>dotnet new scimongodb -n ScimHost</code>.</li>
+<li>Update  the <code>CONNECTIONSTRING</code> and <code>DATABASENAME</code> parameters in the <code>Startup.cs</code> file before running the solution.</li>
+</ul>
 </div>
 <p><strong>Pre-requisite</strong> : <a href="/documentation/scim20/installation.html">SCIM server must be installed</a> in the Visual Studio Solution.</p>
 <p>MongoDB data storage can be configured like this :</p>

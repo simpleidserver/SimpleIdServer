@@ -81,7 +81,7 @@ An access token has two different formats:</p>
 The client is going to use the <strong>client credentials</strong> grant type to get an access token, it will be passed in all outgoing HTTP requests.</p>
 <div class="WARNING">
 <h5>Warning</h5>
-<p>Before you start, Make sure there is a Visual Studio Solution with a configured OpenId server.</p>
+<p>Before you start, Make sure there is a Visual Studio Solution with a <a href="/documentation/openid/installation.html">configured OpenId server</a>.</p>
 </div>
 <h3 id="source-code">Source Code</h3>
 <p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/ProtectAPIFromUndesirableClients">here</a>.</p>
@@ -178,7 +178,7 @@ public IEnumerable&lt;WeatherForecast&gt; Get()
 }
 </code></pre>
 <ul>
-<li><p>Edit the <code>Startup.cs</code> file and configure the authentication. Copy the following content in the <code>ConfigureServices</code> method. The <code>TokenValidationParameters</code> class contains importants properties used during access token validation.</p>
+<li><p>Edit the <code>Startup.cs</code> file and configure the authentication. Copy the following content in the <code>ConfigureServices</code> method. The <code>TokenValidationParameters</code> class contains important properties used during access token validation.</p>
 <ul>
 <li><strong>IssuerSigningKey</strong> : Certificate public key used to check the signature of the access token. Exponent and modulus are part of the public key.</li>
 <li><strong>ValidIssuer</strong> : URL of the OPENID server.</li>

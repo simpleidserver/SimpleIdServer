@@ -82,9 +82,9 @@ dotnet new openidinmembs4 -n OpenId
 <p>The following files will be created :</p>
 <ul>
 <li><em>Program.cs</em> and <em>OpenIdStartup.cs</em> : application entry point.</li>
-<li><em>OpenIdDefaultConfiguration.cs</em> : Resources of the OPENID server like : Client, Users and Scopes.</li>
+<li><em>OpenIdDefaultConfiguration.cs</em> : OPENID server assets for example : Client, Users and Scopes.</li>
 <li><em>Views</em> and <em>Areas</em>.</li>
-<li><em>Resources</em> : translations of the application.</li>
+<li><em>Resources</em> : UI translations in english and french.</li>
 </ul>
 <p>In case the Visual Studio Support is needed, a solution can be created :</p>
 <pre><code>cd ..
@@ -101,7 +101,7 @@ dotnet run
 <p><img src="images/openid-1.png" alt="Well Known Configuration"></p>
 <p>Check if the authentication flow is working:</p>
 <ol>
-<li>Browse the <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state">url</a>.</li>
+<li>Browse the <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state">URL</a>.</li>
 <li>Authenticate with the credentials - Login : <code>sub</code>, Password : <code>password</code>.</li>
 <li>Confirm the consent.</li>
 <li>User agent will be redirected to the callback url <code>https://localhost:60001</code>, the authorization code is passed in the query.</li>
