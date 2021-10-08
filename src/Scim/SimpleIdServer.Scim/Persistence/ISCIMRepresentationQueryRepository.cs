@@ -9,10 +9,10 @@ namespace SimpleIdServer.Scim.Persistence
     public interface ISCIMRepresentationQueryRepository
     {
         Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter);
-        Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId);
-        Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType);
+        Task<SCIMRepresentation?> FindSCIMRepresentationById(string representationId);
+        Task<SCIMRepresentation?> FindSCIMRepresentationById(string representationId, string resourceType);
         Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType);
-        Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, string value, string endpoint = null);
-        Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, int value, string endpoint = null);
+        Task<SCIMRepresentation?> FindSCIMRepresentationByAttribute(string attributeId, string value, string endpoint = null);
+        Task<SCIMRepresentation?> FindSCIMRepresentationByAttribute(string attributeId, int value, string endpoint = null);
     }
 }
