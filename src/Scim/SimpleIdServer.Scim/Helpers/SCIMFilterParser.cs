@@ -356,7 +356,9 @@ namespace SimpleIdServer.Scim.Helpers
                     isTokenSeparatorDetected = true;
                 }
 
-                if ((level == 0 && (groupingIsClosed || isTokenSeparatorDetected)) || IsStandardOperand(filterBuilder.ToString()) || i == filterString.Count() - 1)
+                if ((level == 0 && (groupingIsClosed || isTokenSeparatorDetected))
+                    || (IsStandardOperand(filterBuilder.ToString()) && result.Any() && !IsStandardOperand(result.Last()))
+                    || i == filterString.Count() - 1)
                 {
                     var record = filterBuilder.ToString();
                     result.Add(CleanFilter(filterBuilder.ToString()));

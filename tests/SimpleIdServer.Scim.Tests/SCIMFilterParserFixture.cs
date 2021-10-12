@@ -8,8 +8,8 @@ namespace SimpleIdServer.Scim.Tests
         [Fact]
         public void When_Parse_Filters()
         {
-            var filter = SCIMFilterParser.Parse("members[display eq \"Babs Jensen\" and value co \"2819\"]");
-            Assert.NotNull(filter);
+            var firstFilter = SCIMFilterParser.Parse("members[display eq \"Babs Jensen\" and value co \"2819\"]");
+            Assert.NotNull(firstFilter);
         }
     }
 }

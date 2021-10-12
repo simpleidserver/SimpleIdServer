@@ -30,6 +30,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddBooleanAttribute("active")
                .AddStringAttribute("duplicateAttr")
                .AddIntAttribute("nbPoints")
+               .AddStringAttribute("organizationId")
                .AddBinaryAttribute("eidCertificate")
                .AddComplexAttribute("emails", opt =>
                {
