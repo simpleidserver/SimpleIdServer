@@ -127,6 +127,11 @@ namespace SimpleIdServer.Scim.Domain
                                 attributes.Add(newAttribute);
                                 result.Add(new SCIMPatchResult { Attr = newAttribute, Operation = SCIMPatchOperations.ADD, Path = fullPath });
                             }
+
+                            if (TryGetExternalId(patch, out string externalId))
+                            {
+                                representation.ExternalId = externalId;
+                            }
                         }
                         catch (SCIMSchemaViolatedException)
                         {
@@ -145,6 +150,12 @@ namespace SimpleIdServer.Scim.Domain
                         break;
                     case SCIMPatchOperations.REPLACE:
                         {
+                            if (TryGetExternalId(patch, out string externalId))
+                            {
+                                representation.ExternalId = externalId;
+                                continue;
+                            }
+
                             if (schemaAttributes == null || !schemaAttributes.Any())
                             {
                                 throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
@@ -286,6 +297,30 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             return clone.ToResponse(location, true, false);
+        }
+
+        private static bool TryGetExternalId(PatchOperationParameter patchOperation, out string externalId)
+        {
+            externalId = null;
+            if (patchOperation.Value == null)
+            {
+                return false;
+            }
+
+            var jObj = patchOperation.Value as JObject;
+            if (patchOperation.Path == SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId && patchOperation.Value.GetType() == typeof(string))
+            {
+                externalId = patchOperation.Value.ToString();
+                return true;
+            }
+
+            if (jObj != null && jObj.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId))
+            {
+                externalId = jObj[SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId].ToString();
+                return true;
+            }
+
+            return false;
         }
 
         private static List<SCIMPatchResult> Merge(List<SCIMRepresentationAttribute> attributes, ICollection<SCIMRepresentationAttribute> newAttributes, string fullPath)

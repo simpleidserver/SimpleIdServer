@@ -374,6 +374,52 @@ Scenario: Check user can be updated (HTTP PUT)
 	Then JSON 'name.familyName'='newFamilyName'
 	Then JSON 'name.givenName'='newGivenName'
 
+Scenario: Check externalId can be replaced (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                                                                                      |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]                                                             |
+	| userName       | bjen                                                                                                                                                                       |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                                                                                        |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" }, { "phoneNumber": "04", "type": "home" }, { "phoneNumber": "05", "type": "home05" } ] |
+	| employeeNumber | number                                                                                                                                                                     |
+	| externalId     | externalId                                                                                                                                                                 |
+
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                      |
+	| Operations | [ { "op": "replace", "path": "externalId", "value" : "newExternalId" } ] |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'externalId'='newExternalId'
+
+Scenario: Check externalId can be added (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                                                                                      |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]                                                             |
+	| userName       | bjen                                                                                                                                                                       |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                                                                                        |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" }, { "phoneNumber": "04", "type": "home" }, { "phoneNumber": "05", "type": "home05" } ] |
+	| employeeNumber | number                                                                                                                                                                     |
+	| externalId     | externalId                                                                                                                                                                 |
+
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                      |
+	| Operations | [ { "op": "add", "value" : { "externalId": "newExternalId" } } ]         |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'externalId'='newExternalId'
+
 Scenario: Check user can be patched (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                                                                                      |
