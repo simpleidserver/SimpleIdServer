@@ -53,7 +53,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             return Build(scopes, currentContext, cancellationToken);
         }
 
-        protected JwsPayload BuildPayload(IEnumerable<string> scopes, HandlerContext handlerContext)
+        protected virtual JwsPayload BuildPayload(IEnumerable<string> scopes, HandlerContext handlerContext)
         {
             var jwsPayload = _grantedTokenHelper.BuildAccessToken(new[]
             {

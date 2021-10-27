@@ -8,9 +8,13 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
+using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
+using SimpleIdServer.OpenID.Startup.TokensBuilders;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,6 +92,7 @@ namespace SimpleIdServer.OpenID.Startup
                 .AddSMSAuthentication()
                 .AddDynamicAuthenticationProviders()
                 .AddAuthenticationProviderSchemes(OpenIdDefaultConfiguration.AuthenticationProviderSchemes);
+            ConfigureCustomTokenBuilder(services);
             // ConfigureFireBase();
             var d = Directory.GetCurrentDirectory();
             services.AddDataProtection()
@@ -127,6 +132,14 @@ namespace SimpleIdServer.OpenID.Startup
             {
                 Credential = GoogleCredential.GetApplicationDefault()
             });
+        }
+
+        private void ConfigureCustomTokenBuilder(IServiceCollection services)
+        {
+            services.RemoveAll<ITokenBuilder>();
+            services.AddTransient<ITokenBuilder, OpenIDRefreshTokenBuilder>();
+            services.AddTransient<ITokenBuilder, IdTokenBuilder>();
+            services.AddTransient<ITokenBuilder, CustomAccessTokenBuilder>();
         }
 
         private static JsonWebKey ExtractJsonWebKeyFromRSA(string fileName, string algName)
