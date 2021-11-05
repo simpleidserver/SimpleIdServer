@@ -99,6 +99,10 @@ task pack -depends release, compile {
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml.Idp\SimpleIdServer.Saml.Idp.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml.Sp\SimpleIdServer.Saml.Sp.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	# exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
+}
+
+task publishTemplate -depends release, compile {
 	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
