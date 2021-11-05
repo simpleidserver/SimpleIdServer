@@ -23,7 +23,7 @@
           "hash": "UcrbEMGlCKUTarASVXQliB8/vNTlkPcwlG0/Zrca0JU="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -35,7 +35,7 @@
           "hash": "Z7ASmmmoY0yPmbfbptdZIkoamsts0myJfK/ytYnrjTA="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -47,7 +47,7 @@
           "hash": "wtSdCt1SclzmSPoT9rBt1+jZIx6a4qo+eooLEtFE2HE="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -59,7 +59,7 @@
           "hash": "MEk2iHKHXQwWQaXcPlQN93X48snzTO1AF1+vndcc+Fo="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -214,7 +214,7 @@
           "hash": "mXJ7mWkmtJTHAEmSjuXpRPgBTFjoqLIO6wSGTBaV8+c="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -226,7 +226,7 @@
           "hash": "QLmEGhsh+cCiZc9UzkfKi7QkbfDQRCMeb4anBok0d/Y="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -238,7 +238,7 @@
           "hash": "eJgJx8Oi6BKVd0x74TeWUUdY9mrKYrSJUFIDjgH5inc="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -250,7 +250,7 @@
           "hash": "JZLFmlZyRl3tToCtiCgJrYueeQCSPVc+reNIjMAqhjM="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -262,7 +262,7 @@
           "hash": "ptDueF3xGyI3hk+EFzY+QqiH9puSDBiBx94UNiNac1U="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -321,7 +321,7 @@
           "hash": "laKtQC55CoEND6UCquS6x/1whvBkxtPVTQw9DHEm8l0="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -344,7 +344,7 @@
           "hash": "iY3Mn+uQy0FWextz5A0u2Q1huJN6EGsEnF+L+K7wmFM="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -356,7 +356,7 @@
           "hash": "BIYhTSwSmX1GqeyzQ22Pqeltfs8xOuRyxrWrWPj+7Pw="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -368,7 +368,7 @@
           "hash": "Ihbtx6ryR8ekIvgT/4OpaIePsVYMZfGKX4odRFiI8t4="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -392,7 +392,7 @@
           "hash": "o6n5+zENOsHH53Y5nQru+uElr62xd/mmDAhXwDP40J8="
         }
       },
-      "is_incremental": false,
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -422,19 +422,17 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot build incrementally because last build info is missing.",
+        "can_incremental": true,
         "incrementalPhase": "build",
         "total_file_count": 0,
-        "skipped_file_count": 0,
-        "full_build_reason_code": "NoAvailableBuildCache"
+        "skipped_file_count": 0
       },
       "processors": {
         "ConceptualDocumentProcessor": {
-          "can_incremental": false,
+          "can_incremental": true,
           "incrementalPhase": "build",
           "total_file_count": 14,
-          "skipped_file_count": 0
+          "skipped_file_count": 14
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
@@ -454,8 +452,8 @@
     },
     {
       "status": {
-        "can_incremental": false,
-        "details": "Cannot support incremental post processing, the reason is: last post processor info is null.",
+        "can_incremental": true,
+        "details": "Can support incremental post processing.",
         "incrementalPhase": "postProcessing",
         "total_file_count": 0,
         "skipped_file_count": 0
