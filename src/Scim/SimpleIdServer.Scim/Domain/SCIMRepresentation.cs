@@ -322,7 +322,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public static List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes)
         {
-            var rootId = string.Empty;
+            var rootId = "paul";
 
             var parentsDictionary = new Dictionary<string, List<TreeNode<SCIMRepresentationAttribute>>>();
             var treeNodes = new List<TreeNode<SCIMRepresentationAttribute>>();
