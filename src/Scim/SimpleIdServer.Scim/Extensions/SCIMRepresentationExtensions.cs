@@ -461,7 +461,7 @@ namespace SimpleIdServer.Scim.Domain
                             var jObjVal = new JObject();
                             var values = firstRecord.AttributeNode.Children;
                             EnrichResponse(values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
-                            if (jObjVal.Children().Any())
+                            if (jObjVal.Children().Count() > 0)
                             {
                                 record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, jObjVal);
                             }
@@ -474,7 +474,7 @@ namespace SimpleIdServer.Scim.Domain
                                 var jObjVal = new JObject();
                                 var values = firstRecord.AttributeNode.Children;
                                 EnrichResponse(values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
-                                if (jObjVal.Children().Any())
+                                if (jObjVal.Children().Count() > 0)
                                 {
                                     jArr.Add(jObjVal);
                                 }
