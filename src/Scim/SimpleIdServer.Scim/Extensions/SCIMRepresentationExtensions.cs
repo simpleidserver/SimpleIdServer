@@ -472,7 +472,7 @@ namespace SimpleIdServer.Scim.Domain
                             foreach (var attr in records)
                             {
                                 var jObjVal = new JObject();
-                                var values = firstRecord.AttributeNode.Children;
+                                var values = attr.AttributeNode.Children;
                                 EnrichResponse(values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
                                 if (jObjVal.Children().Count() > 0)
                                 {
@@ -499,11 +499,11 @@ namespace SimpleIdServer.Scim.Domain
 
         public class EnrichParameter
         {
-            public EnrichParameter(SCIMSchema schema, int order, TreeNode<SCIMRepresentationAttribute> attr)
+            public EnrichParameter(SCIMSchema schema, int order, TreeNode<SCIMRepresentationAttribute> attributeNode)
             {
                 Schema = schema;
                 Order = order;
-                AttributeNode = attr;
+                AttributeNode = attributeNode;
             }
 
             public SCIMSchema Schema { get; set; }
