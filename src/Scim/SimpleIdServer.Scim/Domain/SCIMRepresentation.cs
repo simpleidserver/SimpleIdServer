@@ -32,13 +32,13 @@ namespace SimpleIdServer.Scim.Domain
         {
             get
             {
-                return BuildHierarchicalAttributes(null);
+                return BuildHierarchicalAttributes();
             }
         }
 
         public SCIMSchemaAttribute GetSchemaAttributeById(string id)
         {
-            foreach(var schema in Schemas)
+            foreach (var schema in Schemas)
             {
                 var attr = schema.GetAttributeById(id);
                 if (attr != null)
@@ -91,7 +91,7 @@ namespace SimpleIdServer.Scim.Domain
             attr.ValueReference = attribute.ValueReference;
             attr.ValueString = attribute.ValueString;
         }
-        
+
         public void AddAttribute(SCIMRepresentationAttribute parentAttribute, SCIMRepresentationAttribute childAttribute)
         {
             childAttribute.ParentAttributeId = parentAttribute.Id;
@@ -105,7 +105,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public void RemoveAttributesBySchemaAttrId(IEnumerable<string> schemaAttrIds)
         {
-            for(int i = 0; i < schemaAttrIds.Count(); i++)
+            for (int i = 0; i < schemaAttrIds.Count(); i++)
             {
                 var schemaAttrId = schemaAttrIds.ElementAt(i);
                 var attrs = GetAttributesByAttrSchemaId(schemaAttrId).Select(a => a.Id);
@@ -189,7 +189,7 @@ namespace SimpleIdServer.Scim.Domain
         {
             var result = new List<SCIMRepresentationAttribute>();
             result.Add(attr);
-            foreach(var child in GetChildren(attr))
+            foreach (var child in GetChildren(attr))
             {
                 result.AddRange(GetFlatHierarchicalChildren(child));
             }
@@ -269,7 +269,7 @@ namespace SimpleIdServer.Scim.Domain
                 });
             }
 
-            foreach(var schemaId in Schemas.Select(s => s.Id))
+            foreach (var schemaId in Schemas.Select(s => s.Id))
             {
                 AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas))
                 {
@@ -320,18 +320,39 @@ namespace SimpleIdServer.Scim.Domain
             return Id.GetHashCode();
         }
 
-        public static List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes, string parentId)
+        public static List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes)
         {
-            var nodes = attributes.Where(p => (string.IsNullOrWhiteSpace(parentId) && string.IsNullOrWhiteSpace(p.ParentAttributeId)) || p.ParentAttributeId == parentId).Select(s =>
+            var rootId = string.Empty;
+
+            if (attributes.Count == 0)
             {
-                return new TreeNode<SCIMRepresentationAttribute>(s);
-            }).ToList();
-            foreach (var node in nodes)
-            {
-                node.AddChildren(BuildHierarchicalAttributes(attributes, node.Leaf.Id));
+                return new List<TreeNode<SCIMRepresentationAttribute>>();
             }
 
-            return nodes;
+            var parentsDictionary = new Dictionary<string, List<TreeNode<SCIMRepresentationAttribute>>>();
+            var treeNodes = new List<TreeNode<SCIMRepresentationAttribute>>();
+
+            foreach (var scimRepresentationAttribute in attributes)
+            {
+                var parentIdKey = scimRepresentationAttribute.ParentAttributeId ?? rootId;
+                var treeNode = new TreeNode<SCIMRepresentationAttribute>(scimRepresentationAttribute);
+                treeNodes.Add(treeNode);
+
+                if (!parentsDictionary.ContainsKey(parentIdKey))
+                {
+                    parentsDictionary[parentIdKey] = new List<TreeNode<SCIMRepresentationAttribute>>() { treeNode };
+                    continue;
+                }
+
+                parentsDictionary[parentIdKey].Add(treeNode);
+            }
+
+            foreach (var node in treeNodes.Where(node => parentsDictionary.ContainsKey(node.Leaf.Id)))
+            {
+                node.Children = parentsDictionary[node.Leaf.Id];
+            }
+
+            return parentsDictionary[rootId];
         }
 
         public static List<SCIMRepresentationAttribute> BuildFlatAttributes(ICollection<TreeNode<SCIMRepresentationAttribute>> attributes)
@@ -371,9 +392,9 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        private List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes(string parentId)
+        private List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes()
         {
-            return BuildHierarchicalAttributes(Attributes, parentId);
+            return BuildHierarchicalAttributes(Attributes);
         }
     }
 }
