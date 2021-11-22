@@ -1,4 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Persistence.Filters.SCIMExpressions;
@@ -27,7 +27,7 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        public static List<SCIMPatchResult> ApplyPatches(this SCIMRepresentation representation,  ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
+        public static List<SCIMPatchResult> ApplyPatches(this SCIMRepresentation representation, ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMPatchResult>();
             foreach (var patch in patches)
@@ -61,7 +61,7 @@ namespace SimpleIdServer.Scim.Domain
                     foreach (var a in attrs)
                     {
                         var removedAttrs = representation.RemoveAttributeById(a);
-                        foreach(var removedAttr in removedAttrs)
+                        foreach (var removedAttr in removedAttrs)
                         {
                             result.Add(new SCIMPatchResult { Attr = removedAttr, Operation = SCIMPatchOperations.REMOVE, Path = removedAttr.FullPath });
                         }
@@ -105,7 +105,7 @@ namespace SimpleIdServer.Scim.Domain
                                 if (schemaAttr.MultiValued && schemaAttr.Type != SCIMSchemaAttributeTypes.COMPLEX)
                                 {
                                     var filteredAttribute = attributes.FirstOrDefault(_ => _.FullPath == path);
-                                    if(filteredAttribute != null)
+                                    if (filteredAttribute != null)
                                     {
                                         newAttribute.AttributeId = filteredAttribute.AttributeId;
                                     }
@@ -114,7 +114,7 @@ namespace SimpleIdServer.Scim.Domain
                                 }
                                 else if (parentAttributes != null && parentAttributes.Any())
                                 {
-                                    foreach(var parentAttribute in parentAttributes)
+                                    foreach (var parentAttribute in parentAttributes)
                                     {
                                         representation.AddAttribute(parentAttribute, newAttribute);
                                     }
@@ -186,7 +186,7 @@ namespace SimpleIdServer.Scim.Domain
 
                                 if (scimFilter != null && parents.Any())
                                 {
-                                    foreach(var parent in parents)
+                                    foreach (var parent in parents)
                                     {
                                         var flatHiearchy = representation.GetFlatHierarchicalChildren(parent).ToList();
                                         var scimAttributeExpression = scimFilter as SCIMAttributeExpression;
@@ -250,18 +250,18 @@ namespace SimpleIdServer.Scim.Domain
                 representation.AddStandardAttributes(location);
             }
 
-            var attributes = representation.HierarchicalAttributes.Select(a => a.Leaf).Select(a =>
+            var attributes = representation.HierarchicalAttributes.Select(a =>
             {
-                var schema = representation.GetSchema(a);
-                int order = 1;
-                if(schema != null && schema.IsRootSchema)
+                var schema = representation.GetSchema(a.Leaf);
+                var order = 1;
+                if (schema != null && schema.IsRootSchema)
                 {
                     order = 0;
                 }
 
                 return new EnrichParameter(schema, order, a);
             });
-            EnrichResponse(representation, attributes, jObj, isGetRequest);
+            EnrichResponse(attributes, jObj, isGetRequest);
             return jObj;
         }
 
@@ -290,7 +290,7 @@ namespace SimpleIdServer.Scim.Domain
             foreach (var excludedAttribute in excludedAttributes)
             {
                 var attrs = (excludedAttribute as SCIMAttributeExpression).EvaluateAttributes(attributes, true);
-                foreach(var attr in attrs)
+                foreach (var attr in attrs)
                 {
                     clone.RemoveAttributeById(attr);
                 }
@@ -326,7 +326,7 @@ namespace SimpleIdServer.Scim.Domain
         private static List<SCIMPatchResult> Merge(List<SCIMRepresentationAttribute> attributes, ICollection<SCIMRepresentationAttribute> newAttributes, string fullPath)
         {
             var result = new List<SCIMPatchResult>();
-            foreach(var attr in attributes)
+            foreach (var attr in attributes)
             {
                 var newAttr = newAttributes.FirstOrDefault(na => na.FullPath == attr.FullPath);
                 if (newAttr == null)
@@ -356,9 +356,9 @@ namespace SimpleIdServer.Scim.Domain
             var result = new List<SCIMRepresentationAttribute>();
             var jArr = obj as JArray;
             var jObj = obj as JObject;
-            if (jObj != null && schemaAttributes != null && 
-                schemaAttributes.Any() && 
-                schemaAttributes.Count() == 1 && 
+            if (jObj != null && schemaAttributes != null &&
+                schemaAttributes.Any() &&
+                schemaAttributes.Count() == 1 &&
                 schemaAttributes.First().Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
                 jArr = new JArray();
@@ -393,7 +393,7 @@ namespace SimpleIdServer.Scim.Domain
                         result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueInteger: int.Parse(obj.ToString())));
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
-                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueDateTime: DateTime.Parse(obj.ToString()) ));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueDateTime: DateTime.Parse(obj.ToString())));
                         break;
                 }
             }
@@ -401,19 +401,19 @@ namespace SimpleIdServer.Scim.Domain
             return result;
         }
 
-        public static void EnrichResponse(SCIMRepresentation representation, IEnumerable<EnrichParameter> attributes, JObject jObj, bool isGetRequest = false)
+        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JObject jObj, bool isGetRequest = false)
         {
-            foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.Attr.SchemaAttribute.Id))
+            foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.AttributeNode.Leaf.SchemaAttribute.Id))
             {
                 var record = jObj;
                 var records = kvp.ToList();
                 var firstRecord = records.First();
-                if (!firstRecord.Attr.IsReadable(isGetRequest))
+                if (!firstRecord.AttributeNode.Leaf.IsReadable(isGetRequest))
                 {
                     continue;
                 }
 
-                var attributeName = firstRecord.Attr.SchemaAttribute.Name;
+                var attributeName = firstRecord.AttributeNode.Leaf.SchemaAttribute.Name;
                 // Si schéma d'extension alors il faut ajouter à l'object.
                 if (firstRecord.Schema != null && !firstRecord.Schema.IsRootSchema && jObj.ContainsKey(attributeName))
                 {
@@ -428,42 +428,42 @@ namespace SimpleIdServer.Scim.Domain
                     }
                 }
 
-                switch (firstRecord.Attr.SchemaAttribute.Type)
+                switch (firstRecord.AttributeNode.Leaf.SchemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
-                        var valuesStr = records.Select(r => r.Attr.ValueString).Where(r => !string.IsNullOrWhiteSpace(r));
+                        var valuesStr = records.Select(r => r.AttributeNode.Leaf.ValueString).Where(r => !string.IsNullOrWhiteSpace(r));
                         if (valuesStr.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesStr) : valuesStr.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesStr) : valuesStr.First());
                         break;
                     case SCIMSchemaAttributeTypes.REFERENCE:
-                        var valuesRef = records.Select(r => r.Attr.ValueReference).Where(r => !string.IsNullOrWhiteSpace(r));
+                        var valuesRef = records.Select(r => r.AttributeNode.Leaf.ValueReference).Where(r => !string.IsNullOrWhiteSpace(r));
                         if (valuesRef.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesRef) : valuesRef.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesRef) : valuesRef.First());
                         break;
                     case SCIMSchemaAttributeTypes.BOOLEAN:
-                        var valuesBoolean = records.Select(r => r.Attr.ValueBoolean).Where(r => r != null);
+                        var valuesBoolean = records.Select(r => r.AttributeNode.Leaf.ValueBoolean).Where(r => r != null);
                         if (valuesBoolean.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBoolean) : valuesBoolean.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBoolean) : valuesBoolean.First());
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
-                        var valuesInteger = records.Select(r => r.Attr.ValueInteger).Where(r => r != null);
+                        var valuesInteger = records.Select(r => r.AttributeNode.Leaf.ValueInteger).Where(r => r != null);
                         if (valuesInteger.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesInteger) : valuesInteger.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesInteger) : valuesInteger.First());
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
-                        var valuesDateTime = records.Select(r => r.Attr.ValueDateTime).Where(r => r != null);
+                        var valuesDateTime = records.Select(r => r.AttributeNode.Leaf.ValueDateTime).Where(r => r != null);
                         if (valuesDateTime.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesDateTime) : valuesDateTime.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesDateTime) : valuesDateTime.First());
                         break;
                     case SCIMSchemaAttributeTypes.COMPLEX:
-                        if (firstRecord.Attr.SchemaAttribute.MultiValued == false)
+                        if (firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued == false)
                         {
                             var jObjVal = new JObject();
-                            var values = representation.GetChildren(firstRecord.Attr);
-                            EnrichResponse(representation, values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
+                            var values = firstRecord.AttributeNode.Children;
+                            EnrichResponse(values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
                             if (jObjVal.Children().Count() > 0)
                             {
-                                record.Add(firstRecord.Attr.SchemaAttribute.Name, jObjVal);
+                                record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, jObjVal);
                             }
                         }
                         else
@@ -472,26 +472,26 @@ namespace SimpleIdServer.Scim.Domain
                             foreach (var attr in records)
                             {
                                 var jObjVal = new JObject();
-                                var values = representation.GetChildren(attr.Attr);
-                                EnrichResponse(representation, values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
+                                var values = attr.AttributeNode.Children;
+                                EnrichResponse(values.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
                                 if (jObjVal.Children().Count() > 0)
                                 {
                                     jArr.Add(jObjVal);
                                 }
                             }
 
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, jArr);
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, jArr);
                         }
                         break;
                     case SCIMSchemaAttributeTypes.DECIMAL:
-                        var valuesDecimal = records.Select(r => r.Attr.ValueDecimal).Where(r => r != null);
+                        var valuesDecimal = records.Select(r => r.AttributeNode.Leaf.ValueDecimal).Where(r => r != null);
                         if (valuesDecimal.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesDecimal) : valuesDecimal.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesDecimal) : valuesDecimal.First());
                         break;
                     case SCIMSchemaAttributeTypes.BINARY:
-                        var valuesBinary = records.Select(r => r.Attr.ValueBinary).Where(r => r != null);
+                        var valuesBinary = records.Select(r => r.AttributeNode.Leaf.ValueBinary).Where(r => r != null);
                         if (valuesBinary.Any())
-                            record.Add(firstRecord.Attr.SchemaAttribute.Name, firstRecord.Attr.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBinary) : valuesBinary.First());
+                            record.Add(firstRecord.AttributeNode.Leaf.SchemaAttribute.Name, firstRecord.AttributeNode.Leaf.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBinary) : valuesBinary.First());
                         break;
                 }
             }
@@ -499,16 +499,16 @@ namespace SimpleIdServer.Scim.Domain
 
         public class EnrichParameter
         {
-            public EnrichParameter(SCIMSchema schema, int order, SCIMRepresentationAttribute attr)
+            public EnrichParameter(SCIMSchema schema, int order, TreeNode<SCIMRepresentationAttribute> attributeNode)
             {
                 Schema = schema;
                 Order = order;
-                Attr = attr;
+                AttributeNode = attributeNode;
             }
 
             public SCIMSchema Schema { get; set; }
             public int Order { get; set; }
-            public SCIMRepresentationAttribute Attr { get; set; }
+            public TreeNode<SCIMRepresentationAttribute> AttributeNode { get; set; }
         }
     }
 }
