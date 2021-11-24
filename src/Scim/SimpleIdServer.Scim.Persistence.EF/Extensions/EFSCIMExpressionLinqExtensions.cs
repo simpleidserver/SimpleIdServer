@@ -9,22 +9,88 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 {
     public static class EFSCIMExpressionLinqExtensions
     {
+        #region Build Result
+
+        public static SearchSCIMRepresentationsResponse BuildResult(
+            this IQueryable<SCIMRepresentation> representations,
+            SCIMDbContext dbContext,
+            IEnumerable<SCIMAttributeExpression> includedAttributes,
+            IEnumerable<SCIMAttributeExpression> excludedAttributes,
+            int total)
+        {
+            IQueryable<SCIMRepresentationAttribute> filteredAttrs= null;
+            if (includedAttributes != null && includedAttributes.Any())
+            {
+                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(includedAttributes);
+            }
+
+            if(excludedAttributes != null && excludedAttributes.Any())
+            {
+                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(excludedAttributes, false);
+            }
+
+            if (filteredAttrs != null)
+            {
+                var result = from rep in representations
+                                join at in filteredAttrs on rep.Id equals at.RepresentationId into a
+                                from attr in a.DefaultIfEmpty()
+                                select new 
+                                { 
+                                    Attr = attr, 
+                                    Id = rep.Id, 
+                                    Created = rep.Created, 
+                                    LastModified = rep.LastModified, 
+                                    ExternalId = rep.ExternalId, 
+                                    ResourceType = rep.ResourceType,
+                                    DisplayName = rep.DisplayName,
+                                    Version = rep.Version
+                                };
+                var content = result.AsEnumerable().GroupBy(r => r.Id);
+                var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
+                return new SearchSCIMRepresentationsResponse(total, content.Select(c => new SCIMRepresentation
+                {
+                    FlatAttributes = c.Where(_ => _.Attr != null).SelectMany(_ =>
+                    {
+                        var lst = new List<SCIMRepresentationAttribute>
+                        {
+                            _.Attr
+                        };
+                        lst.AddRange(_.Attr.Children.Where(c => includedFullPathLst.Any(f => c.FullPath.StartsWith(f))));
+                        return lst;
+                    }).ToList(),
+                    Id = c.Key,
+                    Created = c.First().Created,
+                    DisplayName = c.First().DisplayName,
+                    ExternalId = c.First().ExternalId,
+                    LastModified = c.First().LastModified,
+                    ResourceType = c.First().ResourceType,
+                    Version = c.First().Version
+                }));
+            }
+
+            var reps = representations.ToList();
+            return new SearchSCIMRepresentationsResponse(total, reps);
+        }
+
+        #endregion
+
         #region Order By
 
-        public static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderBy(this SCIMExpression expression,
+        public static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderBy(
+            this SCIMExpression expression,
             SCIMDbContext dbContext,
             IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
             int count,
-            CancellationToken cancellationToken)
+            IEnumerable<SCIMAttributeExpression> includedAttributes,
+            IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
             var attrExpression = expression as SCIMAttributeExpression;
             if (attrExpression == null)
@@ -32,23 +98,41 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
                 return null;
             }
 
-            var result = await EvaluateOrderByMetadata(attrExpression, representations, order, startIndex, count, cancellationToken);
+            var result = EvaluateOrderByMetadata(dbContext, 
+                attrExpression, 
+                representations, 
+                order, 
+                startIndex, 
+                count,
+                includedAttributes,
+                excludedAttributes);
             if (result == null)
             {
-                result = await EvaluateOrderByProperty(dbContext, attrExpression, representations, order, startIndex, count, cancellationToken);
+                result = EvaluateOrderByProperty(
+                    dbContext,
+                    attrExpression, 
+                    representations, 
+                    order,
+                    startIndex, 
+                    count,
+                    includedAttributes,
+                    excludedAttributes);
             }
 
             return result;
         }
 
-        private static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderByMetadata(
+        private static SearchSCIMRepresentationsResponse EvaluateOrderByMetadata(
+            SCIMDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
             int count,
-            CancellationToken cancellationToken)
+            IEnumerable<SCIMAttributeExpression> includedAttributes,
+            IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
+            int total = representations.Count();
             var fullPath = attrExpression.GetFullPath();
             if (!SCIMConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
             {
@@ -64,77 +148,53 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             var orderExpr = Expression.Call(orderBy, Expression.Constant(representations), innerLambda);
             var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentation>), "f");
             var finalOrderRequestBody = Expression.Lambda(orderExpr, new ParameterExpression[] { finalSelectArg });
-            var result = (IOrderedEnumerable<SCIMRepresentation>)finalOrderRequestBody.Compile().DynamicInvoke(representations);
-            var content = result.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count).ToList();
-            var total = await representations.CountAsync(cancellationToken);
-            return new SearchSCIMRepresentationsResponse(total, content);
+            var result = (IQueryable<SCIMRepresentation>)finalOrderRequestBody.Compile().DynamicInvoke(representations);
+            var content = result.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count);
+            return BuildResult(content, dbContext, includedAttributes, excludedAttributes, total);
         }
 
-        private static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderByProperty(
+        private static SearchSCIMRepresentationsResponse EvaluateOrderByProperty(
             SCIMDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
             int count,
-            CancellationToken cancellationToken)
+            IEnumerable<SCIMAttributeExpression> includedAttributes,
+            IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
+            int total = representations.Count();
             var lastChild = attrExpression.GetLastChild();
-            IQueryable<string> query = null;
-            switch(order)
-            {
-                case SearchSCIMRepresentationOrders.Ascending:
-                    query = from rep in (from s in representations
-                                         join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
-                                         select new
-                                         {
-                                             representation = s,
-                                             representationId = s.Id,
-                                             orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : ""
-                                         })
-                            orderby rep.orderedValue ascending
-                            select rep.representationId;
-                    break;
-                case SearchSCIMRepresentationOrders.Descending:
-                    query = from rep in (from s in representations
-                                         join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
-                                         select new
-                                         {
-                                             representation = s,
-                                             representationId = s.Id,
-                                             orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : ""
-                                         })
-                            orderby rep.orderedValue descending
-                            select rep.representationId;
-                    break;
-            }
-            
-            var orderedIds = await query.Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count).ToListAsync(cancellationToken);
-            var result = await dbContext.SCIMRepresentationLst.Include(a => a.Attributes).Where(s => orderedIds.Contains(s.Id)).ToListAsync(cancellationToken);
-            var comparer = new RepresentationComparer(orderedIds);
-            List<SCIMRepresentation> content = null;
+            var result = from s in representations
+                    join attr in dbContext.SCIMRepresentationAttributeLst on s.Id equals attr.RepresentationId
+                    select new
+                    {
+                        Attr = attr,
+                        Rep = s,
+                        orderedValue = (lastChild.SchemaAttribute.Id == attr.SchemaAttributeId) ? attr.ValueString : ""
+                    };
             switch (order)
             {
                 case SearchSCIMRepresentationOrders.Ascending:
-                    content = result.OrderBy(r => r, comparer).ToList();
+                    result = result.OrderBy(q => q.orderedValue);
                     break;
                 case SearchSCIMRepresentationOrders.Descending:
-                    content = result.OrderByDescending(r => r, comparer).ToList();
+                    result = result.OrderByDescending(q => q.orderedValue);
                     break;
             }
 
-            var total = await representations.CountAsync(cancellationToken);
-            return new SearchSCIMRepresentationsResponse(total, content);
+            var content = result.Select(r => r.Rep).Skip(startIndex <= 1 ? 0 : startIndex - 1).Take(count);
+            return BuildResult(content, dbContext, includedAttributes, excludedAttributes, total);
         }
 
         private static MethodInfo GetOrderByType(SearchSCIMRepresentationOrders order, Type lastChildType)
         {
-            var orderBy = typeof(Enumerable).GetMethods()
+            var orderBy = typeof(Queryable).GetMethods()
                 .Where(m => m.Name == "OrderBy" && m.IsGenericMethod)
                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation), lastChildType);
             if (order == SearchSCIMRepresentationOrders.Descending)
             {
-                orderBy = typeof(Enumerable).GetMethods()
+                orderBy = typeof(Queryable).GetMethods()
                     .Where(m => m.Name == "OrderByDescending" && m.IsGenericMethod)
                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentation), lastChildType);
             }

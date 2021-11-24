@@ -201,24 +201,24 @@ namespace SimpleIdServer.Scim.Tests
                 }
             }, false);
 
-            Assert.True(userRepresentation.Attributes.Count(a => a.SchemaAttribute.FullPath == "adRoles.display" && a.ValueString == "NEWUSER") == 2);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user1") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user2") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user3") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.display" && a.ValueString == "NEWUSER3") == true);
-            Assert.Equal("cassandra", userRepresentation.Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "03") == false);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "05") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "01") == false);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "06") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "familyName" && a.ValueString == "updatedFamilyName") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "roles" && a.ValueString == "firstRole") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "roles" && a.ValueString == "secondRole") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "userName" && a.ValueString == "cassandra") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.Name == "lastName" && a.ValueString == "updatedLastName") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "2") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subtitle.str" && a.ValueString == "2") == true);
-            Assert.True(userRepresentation.Attributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "3") == true);
+            Assert.True(userRepresentation.FlatAttributes.Count(a => a.SchemaAttribute.FullPath == "adRoles.display" && a.ValueString == "NEWUSER") == 2);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user1") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user2") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.value" && a.ValueString == "user3") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "adRoles.display" && a.ValueString == "NEWUSER3") == true);
+            Assert.Equal("cassandra", userRepresentation.FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "03") == false);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "05") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "01") == false);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "phoneNumber" && a.ValueString == "06") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "familyName" && a.ValueString == "updatedFamilyName") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "roles" && a.ValueString == "firstRole") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "roles" && a.ValueString == "secondRole") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "userName" && a.ValueString == "cassandra") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.Name == "lastName" && a.ValueString == "updatedLastName") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "2") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subtitle.str" && a.ValueString == "2") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "3") == true);
         }
     }
 }

@@ -42,8 +42,8 @@ namespace SimpleIdServer.Scim.Helpers
             };
             result.Schemas = schemas;
             var resolutionResult = Resolve(json, mainSchema, extensionSchemas);
-            result.Attributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
-            var attr = result.Attributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
+            result.FlatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            var attr = result.FlatAttributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
             if (attr != null)
             {
                 result.DisplayName = attr.ValueString;

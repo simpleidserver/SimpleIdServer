@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.Benchmark
         private const string baseUrl = "http://localhost:60002";
         private string _groupId;
 
-        [Benchmark]
+        // [Benchmark]
         public async Task AddUserToGroup()
         {
             using (var httpClient = new HttpClient())
@@ -33,6 +33,15 @@ namespace SimpleIdServer.Scim.Benchmark
                 var userId = await AddUser(httpClient);
                 await PatchGroup(httpClient, _groupId, userId);
                 // await PatchUser(httpClient, userId, _groupId);
+            }
+        }
+
+        [Benchmark]
+        public async Task SearchUsers()
+        {
+            using (var httpClient = new HttpClient())
+            {
+                await SearchUsers(httpClient);
             }
         }
 
@@ -79,6 +88,11 @@ namespace SimpleIdServer.Scim.Benchmark
             var httpResponse = await httpClient.SendAsync(request);
             var json = JObject.Parse(await httpResponse.Content.ReadAsStringAsync());
             return json["id"].ToString();
+        }
+
+        private static async Task SearchUsers(HttpClient httpClient)
+        {
+            await httpClient.GetAsync($"{baseUrl}/Users?excludedAttributes=groups");
         }
 
         private static async Task PatchGroup(HttpClient httpClient, string groupId, string userId)

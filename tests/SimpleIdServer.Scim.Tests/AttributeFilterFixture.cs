@@ -46,27 +46,27 @@ namespace SimpleIdServer.Scim.Tests
                 })
                 .Build();
 
-            var firstFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
-            var secondFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema });
-            var thirdFilter = SCIMFilterParser.Parse("userName", new List<SCIMSchema> { userSchema });
-            var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema });
-            var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema });
-            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas });
-            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas });
-            var eightFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
-            var nineFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema });
-            var tenFilter = SCIMFilterParser.Parse("info.age", new List<SCIMSchema> { userSchema });
+            var firstFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var secondFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var thirdFilter = SCIMFilterParser.Parse("userName", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas }) as SCIMAttributeExpression;
+            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas }) as SCIMAttributeExpression;
+            var eightFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var nineFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
+            var tenFilter = SCIMFilterParser.Parse("info.age", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
 
-            var firstJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { firstFilter });
-            var secondJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { secondFilter });
-            var thirdJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { thirdFilter }, "http://localhost");
-            var fourthJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { fourthFilter }, "http://localhost");
-            var fifthJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { fifthFilter }, "http://localhost");
-            var sixJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { sixFilter });
-            var sevenJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { sevenFilter }, "http://localhost");
-            var eightJSON = userRepresentation.ToResponseWithExcludedAttributes(new List<SCIMExpression> { eightFilter }, "http://localhost");
-            var nineJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { nineFilter });
-            var tenJSON = userRepresentation.ToResponseWithIncludedAttributes(new List<SCIMExpression> { tenFilter });
+            var firstJSON = IncludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { firstFilter });
+            var secondJSON = IncludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { secondFilter }, isComplex: true);
+            var thirdJSON = ExcludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { thirdFilter }, "http://localhost");
+            var fourthJSON = ExcludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { fourthFilter }, "http://localhost");
+            var fifthJSON = ExcludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { fifthFilter }, "http://localhost");
+            var sixJSON = IncludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { sixFilter });
+            var sevenJSON = ExcludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { sevenFilter }, "http://localhost");
+            var eightJSON = ExcludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { eightFilter }, "http://localhost");
+            var nineJSON = IncludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { nineFilter });
+            var tenJSON = IncludeAttributes(userRepresentation, new List<SCIMAttributeExpression> { tenFilter });
 
             Assert.Equal("01", firstJSON.SelectToken("phones[0].phoneNumber").ToString());
             Assert.Equal("02", secondJSON.SelectToken("phones[0].phoneNumber").ToString());
@@ -79,6 +79,22 @@ namespace SimpleIdServer.Scim.Tests
             Assert.NotNull(eightJSON.SelectToken("id"));
             Assert.NotNull(nineJSON.SelectToken("id"));
             Assert.Equal("20", tenJSON.SelectToken("info.age").ToString());
+        }
+
+        private static JObject IncludeAttributes(SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> attributes, string location = null, bool isComplex = false)
+        {
+            var clone = representation.Clone() as SCIMRepresentation;
+            clone.FilterAttributes(attributes, new SCIMAttributeExpression[0]);
+            clone.AddStandardAttributes(location, attributes.Select(_ => _.GetFullPath()), true, false);
+            return clone.ToResponse(location, false, false);
+        }
+
+        private static JObject ExcludeAttributes(SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> attributes, string location = null, bool isComplex = false)
+        {
+            var clone = representation.Clone() as SCIMRepresentation;
+            clone.FilterAttributes(new SCIMAttributeExpression[0], attributes);
+            clone.AddStandardAttributes(location, attributes.Select(_ => _.GetFullPath()), false, false);
+            return clone.ToResponse(location, false, false);
         }
     }
 }

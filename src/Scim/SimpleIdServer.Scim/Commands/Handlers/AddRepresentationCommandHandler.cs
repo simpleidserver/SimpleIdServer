@@ -68,8 +68,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.SetUpdated(DateTime.UtcNow);
             scimRepresentation.SetVersion(0);
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
-            var uniqueServerAttributeIds = scimRepresentation.HierarchicalAttributes.Select(s => s.Leaf).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
-            var uniqueGlobalAttributes = scimRepresentation.HierarchicalAttributes.Select(s => s.Leaf).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
+            var uniqueServerAttributeIds = scimRepresentation.FlatAttributes.Where(s => s.IsLeaf()).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
+            var uniqueGlobalAttributes = scimRepresentation.FlatAttributes.Where(s => s.IsLeaf()).Where(a => a.SchemaAttribute.MultiValued == false && a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds, addRepresentationCommand.ResourceType);
             await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
             var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, new SCIMRepresentation(), scimRepresentation);

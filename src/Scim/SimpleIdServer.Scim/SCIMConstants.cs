@@ -146,6 +146,17 @@ namespace SimpleIdServer.Scim
             { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}", "Version" },
         };
 
+        public static List<string> AllStandardPath = new List<string>
+        {
+             StandardSCIMRepresentationAttributes.Id,
+             StandardSCIMRepresentationAttributes.ExternalId,
+             StandardSCIMRepresentationAttributes.Meta,
+             $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.ResourceType}",
+             $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Created}",
+             $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.LastModified}",
+             $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}"
+        };
+
         public static Dictionary<string, SCIMSchemaAttributeTypes> MappingStandardAttributeTypeToType = new Dictionary<string, SCIMSchemaAttributeTypes>
         {
             { StandardSCIMRepresentationAttributes.Id, SCIMSchemaAttributeTypes.STRING},

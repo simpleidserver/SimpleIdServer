@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Commands;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domain;
@@ -176,7 +177,14 @@ namespace SimpleIdServer.Scim.Api
                     return this.BuildError(HttpStatusCode.BadRequest, Global.StartIndexMustBeSuperiorOrEqualTo1);
                 }
 
-                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), searchRequest.Attributes));
+                var standardSchemas = new List<SCIMSchema>
+                {
+                    SCIMConstants.StandardSchemas.StandardResponseSchemas
+                };
+                standardSchemas.AddRange(schemas);
+                var includedAttributes = searchRequest.Attributes == null ? new List<SCIMAttributeExpression>() : searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
+                var excludedAttributes = searchRequest.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
+                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes));
                 var jObj = new JObject
                 {
                     { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },
@@ -195,22 +203,25 @@ namespace SimpleIdServer.Scim.Api
                 await _attributeReferenceEnricher.Enrich(_resourceType, representations, baseUrl);
                 foreach (var record in representations)
                 {
-                    record.ApplyEmptyArray();
                     JObject newJObj = null;
                     var location = $"{baseUrl}/{_resourceType}/{record.Id}";
-                    if (searchRequest.Attributes.Any())
+                    bool includeStandardRequest = true;
+                    if(searchRequest.Attributes.Any())
                     {
-                        newJObj = record.ToResponseWithIncludedAttributes(searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, schemas)).ToList(), location);
+                        record.AddStandardAttributes(location, searchRequest.Attributes, true, false);
+                        includeStandardRequest = false;
                     }
                     else if (searchRequest.ExcludedAttributes.Any())
                     {
-                        newJObj = record.ToResponseWithExcludedAttributes(searchRequest.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, schemas)).ToList(), location);
+                        record.AddStandardAttributes(location, searchRequest.ExcludedAttributes, false, false);
+                        includeStandardRequest = false;
                     }
                     else
                     {
-                        newJObj = record.ToResponse(location, true);
+                        record.ApplyEmptyArray();
                     }
 
+                    newJObj = record.ToResponse(location, true, includeStandardRequest);
                     resources.Add(newJObj);
                 }
 

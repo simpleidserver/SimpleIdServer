@@ -65,7 +65,7 @@ namespace SimpleIdServer.Scim.Extensions
                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
             var attrRepresentation = Expression.Parameter(typeof(SCIMRepresentation), "r");
             var attrRepresentationAttribute = Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
-            var attributesProperty = Expression.Property(attrRepresentation, "Attributes");
+            var attributesProperty = Expression.Property(attrRepresentation, "FlatAttributes");
             var schemaAttributeIdProperty = Expression.Property(attrRepresentationAttribute, "SchemaAttributeId");
             var schemaAttributeIdEqualBody = Expression.Equal(schemaAttributeIdProperty, Expression.Constant(lastChild.SchemaAttribute.Id));
             var schemaAttributeIdEqualLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(schemaAttributeIdEqualBody, attrRepresentationAttribute);
@@ -98,7 +98,7 @@ namespace SimpleIdServer.Scim.Extensions
 
         #region Filter Attributes
 
-        public static ICollection<SCIMRepresentationAttribute> EvaluateAttributes(this SCIMExpression expression, IQueryable<TreeNode<SCIMRepresentationAttribute>> attributes, bool isStrictPath)
+        public static ICollection<SCIMRepresentationAttribute> EvaluateAttributes(this SCIMExpression expression, IQueryable<SCIMRepresentationAttribute> attributes, bool isStrictPath)
         {
             var attr = expression as SCIMAttributeExpression;
             if (attr.SchemaAttribute == null || string.IsNullOrWhiteSpace(attr.SchemaAttribute.Id))
@@ -107,23 +107,22 @@ namespace SimpleIdServer.Scim.Extensions
             }
             else
             {
-                var treeNodeParameter = Expression.Parameter(typeof(TreeNode<SCIMRepresentationAttribute>), "tn");
+                var treeNodeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "tn");
                 var anyWhereExpression = expression.EvaluateAttributes(treeNodeParameter);
                 var enumarableType = typeof(Queryable);
                 var whereMethod = enumarableType.GetMethods()
                      .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
-                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(TreeNode<SCIMRepresentationAttribute>));
-                var equalLambda = Expression.Lambda<Func<TreeNode<SCIMRepresentationAttribute>, bool>>(anyWhereExpression, treeNodeParameter);
+                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
+                var equalLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(anyWhereExpression, treeNodeParameter);
                 var whereExpr = Expression.Call(whereMethod, Expression.Constant(attributes), equalLambda);
-                var finalSelectArg = Expression.Parameter(typeof(IQueryable<TreeNode<SCIMRepresentationAttribute>>), "f");
+                var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentationAttribute>), "f");
                 var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
-                var result = (IQueryable<TreeNode<SCIMRepresentationAttribute>>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
-                var res = SCIMRepresentation.BuildFlatAttributes(result.ToList());
+                var result = (IQueryable<SCIMRepresentationAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
                 var fullPath = attr.GetFullPath();
-                return res.Where(a => isStrictPath ? fullPath == a.FullPath : fullPath.StartsWith(a.FullPath) || a.FullPath.StartsWith(fullPath)).ToList();
+                var res = SCIMRepresentation.BuildFlatAttributes(result.ToList());
+                return res.Where((a) => a != null && (isStrictPath ? fullPath == a.FullPath : fullPath.StartsWith(a.FullPath) || a.FullPath.StartsWith(fullPath))).ToList();
             }
         }
-
         public static Expression EvaluateAttributes(this SCIMExpression expression, ParameterExpression parameterExpression)
         {
             var attrExpression = expression as SCIMAttributeExpression;
@@ -149,8 +148,7 @@ namespace SimpleIdServer.Scim.Extensions
 
         public static Expression EvaluateAttributes(this SCIMAttributeExpression expression, ParameterExpression parameterExpression)
         {
-            var leafProperty = Expression.Property(parameterExpression, "Leaf");
-            var schemaAttributeIdProperty = Expression.Property(leafProperty, "SchemaAttributeId");
+            var schemaAttributeIdProperty = Expression.Property(parameterExpression, "SchemaAttributeId");
             var equal = Expression.Equal(schemaAttributeIdProperty, Expression.Constant(expression.SchemaAttribute.Id));
             var complex = expression as SCIMComplexAttributeExpression;
             if (complex != null)
@@ -159,10 +157,10 @@ namespace SimpleIdServer.Scim.Extensions
                 var enumerableType = typeof(Enumerable);
                 var anyMethod = enumerableType.GetMethods()
                      .Where(m => m.Name == "Any" && m.IsGenericMethodDefinition)
-                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(TreeNode<SCIMRepresentationAttribute>));
-                var childAttribute = Expression.Parameter(typeof(TreeNode<SCIMRepresentationAttribute>), Guid.NewGuid().ToString());
+                     .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
+                var childAttribute = Expression.Parameter(typeof(SCIMRepresentationAttribute), Guid.NewGuid().ToString());
                 var anyLambdaBody = complex.GroupingFilter.EvaluateAttributes(childAttribute);
-                var anyLambda = Expression.Lambda<Func<TreeNode<SCIMRepresentationAttribute>, bool>>(anyLambdaBody, childAttribute);
+                var anyLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(anyLambdaBody, childAttribute);
                 var anyCall = Expression.Call(anyMethod, childrenProperty, anyLambda);
                 equal = Expression.AndAlso(equal, anyCall);
             }
@@ -172,7 +170,7 @@ namespace SimpleIdServer.Scim.Extensions
 
         public static Expression EvaluateAttributes(this SCIMLogicalExpression expression, ParameterExpression parameterExpression)
         {
-            switch(expression.LogicalOperator)
+            switch (expression.LogicalOperator)
             {
                 case SCIMLogicalOperators.AND:
                     return Expression.AndAlso(expression.LeftExpression.EvaluateAttributes(parameterExpression), expression.RightExpression.EvaluateAttributes(parameterExpression));
@@ -183,14 +181,13 @@ namespace SimpleIdServer.Scim.Extensions
 
         public static Expression EvaluateAttributes(this SCIMComparisonExpression expression, ParameterExpression parameterExpression)
         {
-            var leaf = Expression.Property(parameterExpression, "Leaf");
-            var schemaAttributeId = Expression.Property(leaf, "SchemaAttributeId");
-            var propertyValueString = Expression.Property(leaf, "ValueString");
-            var propertyValueInteger = Expression.Property(leaf, "ValueInteger");
-            var propertyValueDatetime = Expression.Property(leaf, "ValueDateTime");
-            var propertyValueBoolean = Expression.Property(leaf, "ValueBoolean");
-            var propertyValueDecimal = Expression.Property(leaf, "ValueDecimal");
-            var propertyValueBinary = Expression.Property(leaf, "ValueBinary");
+            var schemaAttributeId = Expression.Property(parameterExpression, "SchemaAttributeId");
+            var propertyValueString = Expression.Property(parameterExpression, "ValueString");
+            var propertyValueInteger = Expression.Property(parameterExpression, "ValueInteger");
+            var propertyValueDatetime = Expression.Property(parameterExpression, "ValueDateTime");
+            var propertyValueBoolean = Expression.Property(parameterExpression, "ValueBoolean");
+            var propertyValueDecimal = Expression.Property(parameterExpression, "ValueDecimal");
+            var propertyValueBinary = Expression.Property(parameterExpression, "ValueBinary");
             var comparison = BuildComparisonExpression(expression, expression.LeftExpression.SchemaAttribute,
                 propertyValueString,
                 propertyValueInteger,
@@ -285,7 +282,7 @@ namespace SimpleIdServer.Scim.Extensions
 
             var schemaAttr = lastChild.SchemaAttribute;
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
-            var attributes = Expression.Property(parameterExpression, "Attributes");
+            var attributes = Expression.Property(parameterExpression, "FlatAttributes");
             var propertySchemaAttribute = Expression.Property(representationParameter, "SchemaAttributeId");
             var body = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(
                 Expression.Equal(propertySchemaAttribute, Expression.Constant(schemaAttr.Id)),
@@ -336,7 +333,7 @@ namespace SimpleIdServer.Scim.Extensions
                 }
             }
 
-            var attributes = Expression.Property(parameterExpression, "Attributes");
+            var attributes = Expression.Property(parameterExpression, "FlatAttributes");
             var comparison = BuildComparisonExpression(comparisonExpression,
                 schemaAttr, 
                 propertyValueString, 

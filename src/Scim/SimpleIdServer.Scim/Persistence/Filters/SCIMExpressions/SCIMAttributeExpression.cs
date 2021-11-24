@@ -21,6 +21,24 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
         public SCIMAttributeExpression Child { get; set;}
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
 
+        public bool TryContainsGroupingExpression(out SCIMComplexAttributeExpression result)
+        {
+            result = null;
+            if (this is SCIMComplexAttributeExpression)
+            {
+                result = this as SCIMComplexAttributeExpression;
+                return true;
+            }
+
+            if (Child == null)
+            {
+                return false;
+            }
+
+            return Child.TryContainsGroupingExpression(out result);
+
+        }
+
         public string GetFullPath()
         {
             var names = new List<string>();
