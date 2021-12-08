@@ -176,7 +176,7 @@ namespace SimpleIdServer.Scim.Api
                     return this.BuildError(HttpStatusCode.BadRequest, Global.StartIndexMustBeSuperiorOrEqualTo1);
                 }
 
-                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), searchRequest.Attributes, searchRequest.ExcludedAttributes));
+                var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), searchRequest.Attributes));
                 var jObj = new JObject
                 {
                     { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },
