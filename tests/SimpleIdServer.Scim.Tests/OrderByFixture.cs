@@ -68,7 +68,7 @@ namespace SimpleIdServer.Scim.Tests
                 secondRepresentation
             };
 
-            var reps = representations.OrderBy(s => s.Attributes.Where(a => a.FullPath == SCIMConstants.StandardSchemas.UserSchema.GetAttribute("userName").Id).FirstOrDefault()).ToList();
+            var reps = representations.OrderBy(s => s.FlatAttributes.Where(a => a.FullPath == SCIMConstants.StandardSchemas.UserSchema.GetAttribute("userName").Id).FirstOrDefault()).ToList();
 
             var firstResult = ParseAndExecutOrderBy(representations.AsQueryable(), "emails.value", SearchSCIMRepresentationOrders.Ascending);
             var secondResult = ParseAndExecutOrderBy(representations.AsQueryable(), "emails.value", SearchSCIMRepresentationOrders.Descending);
@@ -77,18 +77,18 @@ namespace SimpleIdServer.Scim.Tests
             var firthResult = ParseAndExecutOrderBy(representations.AsQueryable(), "meta.lastModified", SearchSCIMRepresentationOrders.Ascending);
             var sixResult = ParseAndExecutOrderBy(representations.AsQueryable(), "meta.lastModified", SearchSCIMRepresentationOrders.Descending);
 
-            Assert.Equal("Justine", firstResult.ElementAt(0).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("bjensen", firstResult.ElementAt(1).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("bjensen", secondResult.ElementAt(0).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("Justine", secondResult.ElementAt(1).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("bjensen", thirdResult.ElementAt(0).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("Justine", thirdResult.ElementAt(1).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("Justine", fourthResult.ElementAt(0).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("bjensen", fourthResult.ElementAt(1).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("Justine", firthResult.ElementAt(0).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("bjensen", firthResult.ElementAt(1).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("bjensen", sixResult.ElementAt(0).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
-            Assert.Equal("Justine", sixResult.ElementAt(1).Attributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("Justine", firstResult.ElementAt(0).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("bjensen", firstResult.ElementAt(1).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("bjensen", secondResult.ElementAt(0).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("Justine", secondResult.ElementAt(1).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("bjensen", thirdResult.ElementAt(0).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("Justine", thirdResult.ElementAt(1).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("Justine", fourthResult.ElementAt(0).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("bjensen", fourthResult.ElementAt(1).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("Justine", firthResult.ElementAt(0).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("bjensen", firthResult.ElementAt(1).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("bjensen", sixResult.ElementAt(0).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
+            Assert.Equal("Justine", sixResult.ElementAt(1).FlatAttributes.First(a => a.SchemaAttribute.Name == "userName").ValueString);
         }
 
         private IOrderedEnumerable<SCIMRepresentation> ParseAndExecutOrderBy(IQueryable<SCIMRepresentation> representations, string filter, SearchSCIMRepresentationOrders order)

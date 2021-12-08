@@ -11,13 +11,13 @@ namespace SimpleIdServer.Scim.Domain
         public SCIMRepresentation()
         {
             Schemas = new List<SCIMSchema>();
-            Attributes = new List<SCIMRepresentationAttribute>();
+            FlatAttributes = new List<SCIMRepresentationAttribute>();
         }
 
         public SCIMRepresentation(ICollection<SCIMSchema> schemas, ICollection<SCIMRepresentationAttribute> attributes)
         {
             Schemas = schemas;
-            Attributes = attributes;
+            FlatAttributes = attributes;
         }
 
         public string ExternalId { get; set; }
@@ -26,13 +26,20 @@ namespace SimpleIdServer.Scim.Domain
         public string DisplayName { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
-        public ICollection<SCIMRepresentationAttribute> Attributes { get; set; }
+        public ICollection<SCIMRepresentationAttribute> FlatAttributes { get; set; }
         public ICollection<SCIMSchema> Schemas { get; set; }
-        public List<TreeNode<SCIMRepresentationAttribute>> HierarchicalAttributes
+        public ICollection<SCIMRepresentationAttribute> LeafAttributes
         {
             get
             {
-                return BuildHierarchicalAttributes();
+                return FlatAttributes.Where(a => a.IsLeaf()).ToList();
+            }
+        }
+        public ICollection<SCIMRepresentationAttribute> HierarchicalAttributes
+        {
+            get
+            {
+                return BuildHierarchicalAttributes(FlatAttributes);
             }
         }
 
@@ -77,12 +84,12 @@ namespace SimpleIdServer.Scim.Domain
 
         public void AddAttribute(SCIMRepresentationAttribute attribute)
         {
-            Attributes.Add(attribute);
+            FlatAttributes.Add(attribute);
         }
 
         public void UpdateAttribute(SCIMRepresentationAttribute attribute)
         {
-            var attr = Attributes.First(a => a.Id == attribute.Id);
+            var attr = FlatAttributes.First(a => a.Id == attribute.Id);
             attr.ValueBinary = attribute.ValueBinary;
             attr.ValueBoolean = attribute.ValueBoolean;
             attr.ValueDateTime = attribute.ValueDateTime;
@@ -95,7 +102,7 @@ namespace SimpleIdServer.Scim.Domain
         public void AddAttribute(SCIMRepresentationAttribute parentAttribute, SCIMRepresentationAttribute childAttribute)
         {
             childAttribute.ParentAttributeId = parentAttribute.Id;
-            Attributes.Add(childAttribute);
+            FlatAttributes.Add(childAttribute);
         }
 
         public ICollection<SCIMRepresentationAttribute> RemoveAttributeById(SCIMRepresentationAttribute attribute)
@@ -135,13 +142,13 @@ namespace SimpleIdServer.Scim.Domain
                 var children = GetChildren(attr);
                 var childrenIds = children.Select(a => a.Id).ToList();
                 RemoveAttributesById(removedAttrs, childrenIds);
-                Attributes.Remove(attr);
+                FlatAttributes.Remove(attr);
             }
         }
 
         public SCIMRepresentationAttribute GetAttributeById(string id)
         {
-            return Attributes.FirstOrDefault(a => a.Id == id);
+            return FlatAttributes.FirstOrDefault(a => a.Id == id);
         }
 
         public IEnumerable<SCIMRepresentationAttribute> GetAttributesByPath(string fullPath)
@@ -151,12 +158,12 @@ namespace SimpleIdServer.Scim.Domain
                 return new SCIMRepresentationAttribute[0];
             }
 
-            return Attributes.Where(a => a.FullPath == fullPath);
+            return FlatAttributes.Where(a => a.FullPath == fullPath);
         }
 
         public IEnumerable<SCIMRepresentationAttribute> GetAttributesByAttrSchemaId(string attrSchemaId)
         {
-            return Attributes.Where(a => a.SchemaAttributeId == attrSchemaId);
+            return FlatAttributes.Where(a => a.SchemaAttributeId == attrSchemaId);
         }
 
         public SCIMRepresentationAttribute GetParentAttribute(SCIMRepresentationAttribute attr)
@@ -182,7 +189,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public IEnumerable<SCIMRepresentationAttribute> GetChildren(SCIMRepresentationAttribute attr)
         {
-            return Attributes.Where(a => a.ParentAttributeId == attr.Id);
+            return FlatAttributes.Where(a => a.ParentAttributeId == attr.Id);
         }
 
         public IEnumerable<SCIMRepresentationAttribute> GetFlatHierarchicalChildren(SCIMRepresentationAttribute attr)
@@ -225,7 +232,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public bool ContainsAttribute(SCIMRepresentationAttribute attr)
         {
-            return Attributes.Any(a => a.IsSimilar(attr));
+            return FlatAttributes.Any(a => a.IsSimilar(attr));
         }
 
         public void SetDisplayName(string displayName)
@@ -233,48 +240,83 @@ namespace SimpleIdServer.Scim.Domain
             DisplayName = displayName;
         }
 
-        public void AddStandardAttributes(string location)
+        public void AddStandardAttributes(string location, IEnumerable<string> attributes, bool isIncluded = true, bool ignore = true)
         {
             var metadata = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Meta));
-            AddAttribute(metadata);
-            AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}"))
+            var startWithMeta = attributes.Any(a => a.StartsWith(SCIMConstants.StandardSCIMRepresentationAttributes.Meta) && a.Split('.').Count() > 1);
+            var containsMeta = attributes.Contains(SCIMConstants.StandardSCIMRepresentationAttributes.Meta);
+            if (startWithMeta || ignore || !(containsMeta && !isIncluded))
             {
-                ValueString = ResourceType
-            });
-            AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}"))
-            {
-                ValueDateTime = Created
-            });
-            AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}"))
-            {
-                ValueDateTime = LastModified
-            });
-            AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}"))
-            {
-                ValueInteger = Version
-            });
-            if (!string.IsNullOrWhiteSpace(location))
-            {
-                AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Location}"))
+                AddAttribute(metadata);
+                var includeAll = containsMeta && isIncluded;
+                var containsResourceType = attributes.Contains($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}");
+                var containsCreated = attributes.Contains($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}");
+                var containsLastModified = attributes.Contains($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}");
+                var containsVersion = attributes.Contains($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}");
+                var containsLocation = attributes.Contains($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMRepresentationAttributes.Location}");
+                if (containsResourceType && isIncluded || !containsResourceType && !isIncluded || ignore || includeAll)
                 {
-                    ValueString = location
-                });
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}"))
+                    {
+                        ValueString = ResourceType
+                    });
+                }
+
+                if (containsCreated && isIncluded || !containsCreated && !isIncluded || ignore || includeAll)
+                {
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}"))
+                    {
+                        ValueDateTime = Created
+                    });
+                }
+
+                if (containsLastModified && isIncluded || !containsLastModified && !isIncluded || ignore || includeAll)
+                {
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}"))
+                    {
+                        ValueDateTime = LastModified
+                    });
+                }
+
+                if (containsVersion && isIncluded || !containsVersion && !isIncluded || ignore || includeAll)
+                {
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}"))
+                    {
+                        ValueInteger = Version
+                    });
+                }
+
+                if ((containsLocation && isIncluded || !containsLocation && !isIncluded || ignore || includeAll) && !string.IsNullOrWhiteSpace(location))
+                {
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Location}"))
+                    {
+                        ValueString = location
+                    });
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(ExternalId))
+            var containsExternalId = attributes.Contains(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
+            var containsSchemas = attributes.Contains(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas);
+            if (containsExternalId && isIncluded || !containsExternalId && !isIncluded || ignore)
             {
-                AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId))
+                if (!string.IsNullOrWhiteSpace(ExternalId))
                 {
-                    ValueString = ExternalId
-                });
+                    AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId))
+                    {
+                        ValueString = ExternalId
+                    });
+                }
             }
 
-            foreach (var schemaId in Schemas.Select(s => s.Id))
+            if (containsSchemas && isIncluded || !containsSchemas && !isIncluded || ignore)
             {
-                AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas))
+                foreach (var schemaId in Schemas.Select(s => s.Id))
                 {
-                    ValueString = schemaId
-                });
+                    AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas))
+                    {
+                        ValueString = schemaId
+                    });
+                }
             }
         }
 
@@ -289,7 +331,7 @@ namespace SimpleIdServer.Scim.Domain
                 Created = Created,
                 LastModified = LastModified,
                 DisplayName = DisplayName,
-                Attributes = Attributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList(),
+                FlatAttributes = FlatAttributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList(),
                 Schemas = Schemas.Select(a => (SCIMSchema)a.Clone()).ToList()
             };
         }
@@ -319,45 +361,40 @@ namespace SimpleIdServer.Scim.Domain
         {
             return Id.GetHashCode();
         }
+        public static List<SCIMRepresentationAttribute> BuildFlatAttributes(ICollection<SCIMRepresentationAttribute> attributes)
+        {
+            return attributes.SelectMany(a => a.ToFlat()).ToList();
+        }
 
-        public static List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes)
+        public static List<SCIMRepresentationAttribute> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes)
         {
             var rootId = string.Empty;
-
             if (attributes.Count == 0)
             {
-                return new List<TreeNode<SCIMRepresentationAttribute>>();
+                return new List<SCIMRepresentationAttribute>();
             }
 
-            var parentsDictionary = new Dictionary<string, List<TreeNode<SCIMRepresentationAttribute>>>();
-            var treeNodes = new List<TreeNode<SCIMRepresentationAttribute>>();
-
+            var parentsDictionary = new Dictionary<string, List<SCIMRepresentationAttribute>>();
+            var treeNodes = new List<SCIMRepresentationAttribute>();
             foreach (var scimRepresentationAttribute in attributes)
             {
                 var parentIdKey = scimRepresentationAttribute.ParentAttributeId ?? rootId;
-                var treeNode = new TreeNode<SCIMRepresentationAttribute>(scimRepresentationAttribute);
-                treeNodes.Add(treeNode);
-
+                treeNodes.Add(scimRepresentationAttribute);
                 if (!parentsDictionary.ContainsKey(parentIdKey))
                 {
-                    parentsDictionary[parentIdKey] = new List<TreeNode<SCIMRepresentationAttribute>>() { treeNode };
+                    parentsDictionary[parentIdKey] = new List<SCIMRepresentationAttribute>() { scimRepresentationAttribute };
                     continue;
                 }
 
-                parentsDictionary[parentIdKey].Add(treeNode);
+                parentsDictionary[parentIdKey].Add(scimRepresentationAttribute);
             }
 
-            foreach (var node in treeNodes.Where(node => parentsDictionary.ContainsKey(node.Leaf.Id)))
+            foreach (var node in treeNodes.Where(node => parentsDictionary.ContainsKey(node.Id)))
             {
-                node.Children = parentsDictionary[node.Leaf.Id];
+                node.Children = parentsDictionary[node.Id];
             }
 
             return parentsDictionary[rootId];
-        }
-
-        public static List<SCIMRepresentationAttribute> BuildFlatAttributes(ICollection<TreeNode<SCIMRepresentationAttribute>> attributes)
-        {
-            return attributes.SelectMany(a => a.ToFlat()).ToList();
         }
 
         public static string GetParentPath(string fullPath)
@@ -390,11 +427,6 @@ namespace SimpleIdServer.Scim.Domain
             {
                 EnrichAttributesHiearchy(parent, flatAttrsHiearchy, allAttributes);
             }
-        }
-
-        private List<TreeNode<SCIMRepresentationAttribute>> BuildHierarchicalAttributes()
-        {
-            return BuildHierarchicalAttributes(Attributes);
         }
     }
 }

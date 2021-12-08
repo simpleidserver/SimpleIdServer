@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             Created = representation.Created;
             LastModified = representation.LastModified;
             DisplayName = representation.DisplayName;
-            Attributes = representation.Attributes;
+            FlatAttributes = representation.FlatAttributes;
             SchemaRefs = representation.Schemas.Select(s => new MongoDBRef(schemaCollectionName, s.Id)).ToList();
         }
 

@@ -24,7 +24,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {            
             var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueString == value))
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueString == value))
                 .ToMongoFirstAsync();
             if (result == null)
             {
@@ -38,7 +38,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
             var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.Attributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueInteger == value))
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueInteger == value))
                 .ToMongoFirstAsync();
             if (result == null)
             {
@@ -95,23 +95,27 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
-            IEnumerable<SCIMRepresentation> result = new List<SCIMRepresentation>();
+            IEnumerable<SCIMRepresentation> result = null;
+            int totalResults = 0;
             var collection = _scimDbContext.SCIMRepresentationLst;
             var queryableRepresentations = collection.AsQueryable().Where(s => s.ResourceType == parameter.ResourceType);
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
                 var filtered = evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations) as IMongoQueryable<SCIMRepresentation>;
-                int totalResults = filtered.Count();
-                result = filtered.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).ToList();
-                return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+                totalResults = filtered.Count();
+                var representations = filtered.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
+                result = representations.ToList();
             }
             else
             {
-                int totalResults = queryableRepresentations.Count();
-                result = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).ToList();
-                return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
+                totalResults = queryableRepresentations.Count();
+                var representations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
+                result = representations.ToList().Cast<SCIMRepresentation>();
             }
+
+            result.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
+            return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
         }
     }
 }

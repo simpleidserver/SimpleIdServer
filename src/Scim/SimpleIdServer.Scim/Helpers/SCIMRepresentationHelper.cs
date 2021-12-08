@@ -42,8 +42,8 @@ namespace SimpleIdServer.Scim.Helpers
             };
             result.Schemas = schemas;
             var resolutionResult = Resolve(json, mainSchema, extensionSchemas);
-            result.Attributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
-            var attr = result.Attributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
+            result.FlatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            var attr = result.FlatAttributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
             if (attr != null)
             {
                 result.DisplayName = attr.ValueString;
@@ -220,7 +220,13 @@ namespace SimpleIdServer.Scim.Helpers
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
                         var strs = jArr.Select(j => j.ToString()).ToList();
-                        if (schemaAttribute.CanonicalValues != null && schemaAttribute.CanonicalValues.Any() && !ignoreUnsupportedCanonicalValues && !strs.All(_ => schemaAttribute.CanonicalValues.Contains(_)))
+                        if (schemaAttribute.CanonicalValues != null
+                            && schemaAttribute.CanonicalValues.Any()
+                            && !ignoreUnsupportedCanonicalValues
+                            && !strs.All(_ => schemaAttribute.CaseExact ?
+                                schemaAttribute.CanonicalValues.Contains(_)
+                                : schemaAttribute.CanonicalValues.Contains(_, StringComparer.OrdinalIgnoreCase))
+                        )
                         {
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidCanonicalValue, schemaAttribute.Name));
                         }

@@ -28,7 +28,7 @@ namespace SimpleIdServer.Scim.Builder
         private SCIMRepresentationBuilder(SCIMRepresentation scimRepresentation, ICollection<SCIMSchema> schemas)
         {
             _id = scimRepresentation.Id;
-            _attributes = scimRepresentation.Attributes;
+            _attributes = scimRepresentation.FlatAttributes;
             _schemas = schemas;
             _representation = scimRepresentation;
         }

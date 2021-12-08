@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace SimpleIdServer.Scim.Domain
 {
@@ -10,6 +12,7 @@ namespace SimpleIdServer.Scim.Domain
     {
         public SCIMRepresentationAttribute()
         {
+            Children = new List<SCIMRepresentationAttribute>();
         }
 
         public SCIMRepresentationAttribute(string id, string attributeId) : this()
@@ -41,7 +44,10 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
+        #region Properties
+
         public string AttributeId { get; set; }
+        public string ResourceType { get; set; }
         public string ParentAttributeId { get; set; }
         public string SchemaAttributeId { get; set; }
         public string RepresentationId { get; set; }
@@ -55,6 +61,11 @@ namespace SimpleIdServer.Scim.Domain
         public string ValueBinary { get; set; }
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
         public SCIMRepresentation Representation { get; set; }
+        public ICollection<SCIMRepresentationAttribute> Children { get; set; }
+
+        #endregion
+
+        #region Getters
 
         public bool IsReadable(bool isGetRequest = false)
         {
@@ -96,10 +107,27 @@ namespace SimpleIdServer.Scim.Domain
             return false;
         }
 
+        public bool IsLeaf()
+        {
+            return GetLevel() == 1;
+        }
+
         public int GetLevel()
         {
             return FullPath.Split('.').Length;
         }
+
+        public List<SCIMRepresentationAttribute> ToFlat()
+        {
+            var result = new List<SCIMRepresentationAttribute>
+            {
+                this
+            };
+            result.AddRange(Children.SelectMany(c => c.ToFlat()));
+            return result;
+        }
+
+        #endregion
 
         public object Clone()
         {

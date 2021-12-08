@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {
             return _scimDbContext.SCIMRepresentationAttributeLst
-                .Include(a => a.Representation).ThenInclude(a => a.Attributes)
+                .Include(a => a.Representation).ThenInclude(a => a.FlatAttributes)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
                 .Select(a => a.Representation)
                 .FirstOrDefaultAsync();
@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
         {
             return _scimDbContext.SCIMRepresentationAttributeLst
-                .Include(a => a.Representation).ThenInclude(a => a.Attributes)
+                .Include(a => a.Representation).ThenInclude(a => a.FlatAttributes)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueInteger != null && a.ValueInteger == value)
                 .Select(a => a.Representation)
                 .FirstOrDefaultAsync(); 
@@ -41,14 +41,14 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
         {
             return _scimDbContext.SCIMRepresentationLst.
-                Include(r => r.Attributes)
+                Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
         {
             return _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.Attributes)
+                .Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
                 .FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType);
         }
@@ -56,7 +56,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
             IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.Attributes)
+                .Include(r => r.FlatAttributes)
                 .Where(s => s.ResourceType == parameter.ResourceType);
             if (parameter.SortBy == null)
             {
@@ -73,21 +73,22 @@ namespace SimpleIdServer.Scim.Persistence.EF
             {
                 return await parameter.SortBy.EvaluateOrderBy(
                     _scimDbContext,
-                    queryableRepresentations, 
+                    queryableRepresentations,
                     parameter.SortOrder.Value,
                     parameter.StartIndex,
                     parameter.Count,
-                    CancellationToken.None);
+                    parameter.IncludedAttributes,
+                    parameter.ExcludedAttributes);
             }
 
-            int totalResults = queryableRepresentations.Count();
-            IEnumerable<SCIMRepresentation> result = await queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).ToListAsync();
-            return new SearchSCIMRepresentationsResponse(totalResults, result);
+            int total = queryableRepresentations.Count();
+            queryableRepresentations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
+            return queryableRepresentations.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, total);
         }
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
-            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.Attributes).Include(r => r.Schemas).ThenInclude(s => s.Attributes)
+            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes).Include(r => r.Schemas).ThenInclude(s => s.Attributes)
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToListAsync();
             return result;
