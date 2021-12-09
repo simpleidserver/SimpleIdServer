@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.Domain
     {
         public static void FilterAttributes(this IEnumerable<SCIMRepresentation> representations, IEnumerable<SCIMAttributeExpression> includedAttributes, IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
-            foreach(var representation in representations)
+            foreach (var representation in representations)
             {
                 representation.FilterAttributes(includedAttributes, excludedAttributes);
             }
@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Domain
             var queryableAttributes = representation.FlatAttributes.AsQueryable();
             if (includedAttributes != null && includedAttributes.Any())
             {
-               var attrs = queryableAttributes.FilterAttributes(includedAttributes).ToList();
+                var attrs = queryableAttributes.FilterAttributes(includedAttributes).ToList();
                 var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
                 representation.FlatAttributes = attrs.Where(a => a != null).SelectMany(_ =>
                 {
@@ -60,7 +60,7 @@ namespace SimpleIdServer.Scim.Domain
             foreach (var attribute in attributes)
             {
                 Expression record = null;
-                if(attribute.TryContainsGroupingExpression(out SCIMComplexAttributeExpression complexAttributeExpression))
+                if (attribute.TryContainsGroupingExpression(out SCIMComplexAttributeExpression complexAttributeExpression))
                 {
                     record = attribute.EvaluateAttributes(representationParameter);
                 }
@@ -108,7 +108,7 @@ namespace SimpleIdServer.Scim.Domain
         {
             var fp = string.IsNullOrWhiteSpace(parentPath) ? attr.Name : $"{parentPath}.{attr.Name}";
             Expression equal = null;
-            if(fullPath == fp)
+            if (fullPath == fp)
             {
                 var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
                 equal = Expression.Call(member, startWith, Expression.Constant(fullPath));
@@ -362,7 +362,7 @@ namespace SimpleIdServer.Scim.Domain
                 representation.AddStandardAttributes(location, new List<string> { }, ignore: true);
             }
 
-            var attributes = representation.LeafAttributes.Select(a =>
+            var attributes = representation.HierarchicalAttributes.Select(a =>
             {
                 var schema = representation.GetSchema(a);
                 var order = 1;
@@ -373,7 +373,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 return new EnrichParameter(schema, order, a);
             });
-            EnrichResponse(attributes, representation.FlatAttributes, jObj, isGetRequest);
+            EnrichResponse(attributes, jObj, isGetRequest);
             return jObj;
         }
 
@@ -479,7 +479,7 @@ namespace SimpleIdServer.Scim.Domain
             return result;
         }
 
-        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, IEnumerable<SCIMRepresentationAttribute> allAttributes, JObject jObj, bool isGetRequest = false)
+        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JObject jObj, bool isGetRequest = false)
         {
             foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.AttributeNode.SchemaAttribute.Id))
             {
@@ -537,9 +537,9 @@ namespace SimpleIdServer.Scim.Domain
                         if (firstRecord.AttributeNode.SchemaAttribute.MultiValued == false)
                         {
                             var jObjVal = new JObject();
-                            var children = allAttributes.Where(a => a.ParentAttributeId == firstRecord.AttributeNode.Id);
-                            EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), allAttributes, jObjVal, isGetRequest);
-                            if (jObjVal.Children().Count() > 0)
+                            var children = firstRecord.AttributeNode.Children;
+                            EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
+                            if (jObjVal.Children().Any())
                             {
                                 record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, jObjVal);
                             }
@@ -550,9 +550,9 @@ namespace SimpleIdServer.Scim.Domain
                             foreach (var attr in records)
                             {
                                 var jObjVal = new JObject();
-                                var children = allAttributes.Where(a => a.ParentAttributeId == attr.AttributeNode.Id);
-                                EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), allAttributes, jObjVal, isGetRequest);
-                                if (jObjVal.Children().Count() > 0)
+                                var children = attr.AttributeNode.Children;
+                                EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
+                                if (jObjVal.Children().Any())
                                 {
                                     jArr.Add(jObjVal);
                                 }
