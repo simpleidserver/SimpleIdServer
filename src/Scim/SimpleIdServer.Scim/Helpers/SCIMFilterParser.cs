@@ -22,9 +22,28 @@ namespace SimpleIdServer.Scim.Helpers
 
         public static SCIMExpression Parse(string filterString, ICollection<SCIMSchema> scimSchemas)
         {
-            var scimExpression = Parse(filterString);
+            var cleanFilterString = CleanSchemaPrefix(filterString, scimSchemas);
+            var scimExpression = Parse(cleanFilterString);
             Parse(scimExpression, scimSchemas.SelectMany(s => s.HierarchicalAttributes.Select(h => h.Leaf)).ToList(), scimSchemas);
             return scimExpression;
+        }
+
+        private static string CleanSchemaPrefix(string filterString, ICollection<SCIMSchema> scimSchemas)
+        {
+            if (string.IsNullOrEmpty(filterString))
+            {
+                return filterString;
+            }
+
+            foreach (var scimSchema in scimSchemas)
+            {
+                if (filterString.Contains(scimSchema.Id))
+                {
+                    return filterString.Replace($"{scimSchema.Id}:", string.Empty);
+                }
+            }
+
+            return filterString;
         }
 
         private static void Parse(SCIMExpression expression, ICollection<SCIMSchemaAttribute> scimSchemaAttributes, ICollection<SCIMSchema> schemas)
@@ -109,7 +128,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         private static SCIMExpression TransformStringFiltersIntoSCIMExpression(IEnumerable<string> filters)
         {
-            if(ContainsCombinedLogicalExpression(filters))
+            if (ContainsCombinedLogicalExpression(filters))
             {
                 return TransformStringFiltersIntoSCIMLogicalExpression(filters);
             }
@@ -151,7 +170,7 @@ namespace SimpleIdServer.Scim.Helpers
         private static SCIMExpression TransformStringFiltersIntoSCIMLogicalExpression(IEnumerable<string> filters)
         {
             var logicalOperatorIndexes = new List<int>();
-            for(var i = 0; i < filters.Count(); i++)
+            for (var i = 0; i < filters.Count(); i++)
             {
                 SCIMLogicalOperators op;
                 if (Enum.GetNames(typeof(SCIMLogicalOperators)).Any(s => s.Equals(filters.ElementAt(i), StringComparison.InvariantCultureIgnoreCase)) && Enum.TryParse(filters.ElementAt(i), true, out op))
@@ -161,9 +180,9 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             SCIMLogicalExpression rootExpression = null;
-            foreach(var logicalOperatorIndex in logicalOperatorIndexes)
+            foreach (var logicalOperatorIndex in logicalOperatorIndexes)
             {
-                if(logicalOperatorIndex - 1 < 0 || logicalOperatorIndex + 1 >= filters.Count())
+                if (logicalOperatorIndex - 1 < 0 || logicalOperatorIndex + 1 >= filters.Count())
                 {
                     throw new SCIMFilterException(Global.BadLogicalExpression);
                 }
@@ -173,7 +192,7 @@ namespace SimpleIdServer.Scim.Helpers
                 if (rootExpression == null)
                 {
                     var leftExpression = filters.ElementAt(logicalOperatorIndex - 1);
-                    rootExpression = new SCIMLogicalExpression((SCIMLogicalOperators)Enum.Parse(typeof(SCIMLogicalOperators),logicalOperator, true), Parse(leftExpression), Parse(rightExpression));
+                    rootExpression = new SCIMLogicalExpression((SCIMLogicalOperators)Enum.Parse(typeof(SCIMLogicalOperators), logicalOperator, true), Parse(leftExpression), Parse(rightExpression));
                     continue;
                 }
 
@@ -375,13 +394,13 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             var groupedResult = new List<string>();
-            for(var i = 0; i < result.Count(); i++)
+            for (var i = 0; i < result.Count(); i++)
             {
                 var record = result[i];
                 if (IsLogicalOperator(record))
                 {
                     var leftValues = new List<string>();
-                    for(var y = i - 1; y >= 0; y--)
+                    for (var y = i - 1; y >= 0; y--)
                     {
                         if (IsLogicalOperator(result[y]))
                         {
