@@ -21,7 +21,9 @@ namespace SimpleIdServer.Scim.Domain
             AttributeId = attributeId;
         }
 
-        public SCIMRepresentationAttribute(string id, string attributeId, SCIMSchemaAttribute schemaAttribute, int? valueInteger = null, 
+        public SCIMRepresentationAttribute(string id, string attributeId, SCIMSchemaAttribute schemaAttribute, 
+            string namespaceStr, 
+            int? valueInteger = null, 
             bool? valueBoolean = null, 
             string valueString = null, 
             DateTime? valueDateTime = null,
@@ -30,6 +32,7 @@ namespace SimpleIdServer.Scim.Domain
             string valueReference = null) : this(id, attributeId)
         {
             SchemaAttribute = schemaAttribute;
+            Namespace = namespaceStr;
             ValueInteger = valueInteger;
             ValueBoolean = valueBoolean;
             ValueString = valueString;
@@ -59,6 +62,7 @@ namespace SimpleIdServer.Scim.Domain
         public string ValueReference { get; set; }
         public decimal? ValueDecimal { get; set; }
         public string ValueBinary { get; set; }
+        public string Namespace { get; set; }
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
         public SCIMRepresentation Representation { get; set; }
         public ICollection<SCIMRepresentationAttribute> Children { get; set; }
@@ -145,7 +149,10 @@ namespace SimpleIdServer.Scim.Domain
                 SchemaAttribute = (SCIMSchemaAttribute)SchemaAttribute.Clone(),
                 FullPath = FullPath,
                 ParentAttributeId = ParentAttributeId,
-                SchemaAttributeId = SchemaAttributeId
+                SchemaAttributeId = SchemaAttributeId,
+                Namespace = Namespace,
+                RepresentationId = RepresentationId,
+                ResourceType = ResourceType
             };
             return result;
         }

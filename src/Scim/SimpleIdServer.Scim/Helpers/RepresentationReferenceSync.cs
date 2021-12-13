@@ -174,7 +174,7 @@ namespace SimpleIdServer.Scim.Helpers
 			var type = values.FirstOrDefault(s => s.Name == "type");
 			if (value != null)
             {
-				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), value)
+				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), value, value.SchemaId)
 				{
 					ValueString = sourceRepresentation.Id
 				});
@@ -182,7 +182,7 @@ namespace SimpleIdServer.Scim.Helpers
 
 			if (display != null)
 			{
-				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), display)
+				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), display, display.SchemaId)
 				{
 					ValueString = sourceRepresentation.DisplayName
 				});
@@ -190,7 +190,7 @@ namespace SimpleIdServer.Scim.Helpers
 
 			if (type != null)
 			{
-				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), type)
+				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), type, type.SchemaId)
 				{
 					ValueString = sourceResourceType
 				});
@@ -203,7 +203,7 @@ namespace SimpleIdServer.Scim.Helpers
 				attrId = attrs.First().AttributeId;
             }
 
-			var parentAttr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attrId, targetSchemaAttribute)
+			var parentAttr = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attrId, targetSchemaAttribute, targetSchemaAttribute.SchemaId)
 			{
 				SchemaAttribute = targetSchemaAttribute
 			};

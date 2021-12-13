@@ -36,7 +36,7 @@ namespace SimpleIdServer.Scim.Helpers
             var presentExpression = expression as SCIMPresentExpression;
             if (compAttrExpression != null)
             {
-                var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == compAttrExpression.LeftExpression.Name);
+                var schemaAttr = GetSCIMSchemaAttribute(compAttrExpression.LeftExpression.Name, scimSchemaAttributes, schemas);
                 if (schemaAttr != null && schemaAttr.MultiValued && schemaAttr.Type == SCIMSchemaAttributeTypes.COMPLEX && compAttrExpression.LeftExpression.Child == null)
                 {
                     var schema = schemas.FirstOrDefault(s => s.HasAttribute(schemaAttr));
@@ -56,7 +56,7 @@ namespace SimpleIdServer.Scim.Helpers
             }
             else if (attrExpression != null)
             {
-                var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == attrExpression.Name);
+                var schemaAttr = GetSCIMSchemaAttribute(attrExpression.Name, scimSchemaAttributes, schemas);
                 if (schemaAttr == null)
                 {
                     return;
@@ -81,7 +81,7 @@ namespace SimpleIdServer.Scim.Helpers
             }
             else if (presentExpression != null)
             {
-                var schemaAttr = scimSchemaAttributes.FirstOrDefault(s => s.Name == presentExpression.Content.Name);
+                var schemaAttr = GetSCIMSchemaAttribute(presentExpression.Content.Name, scimSchemaAttributes, schemas);
                 if (schemaAttr == null)
                 {
                     return;
@@ -213,6 +213,12 @@ namespace SimpleIdServer.Scim.Helpers
         {
             var firstFilter = filters.First();
             var fullPath = firstFilter;
+            var namespaceStr = SCIMAttributeExpression.ExtractNamespace(fullPath);
+            if (!string.IsNullOrWhiteSpace(namespaceStr))
+            {
+                fullPath = fullPath.Replace(namespaceStr, string.Empty);
+            }
+
             var regex = new Regex(@"(\[.*\])|((\w|\s))*");
             var matches = regex.Matches(fullPath);
             SCIMAttributeExpression result = null;
@@ -223,6 +229,12 @@ namespace SimpleIdServer.Scim.Helpers
                 if (string.IsNullOrWhiteSpace(currentMatch.Value))
                 {
                     continue;
+                }
+
+                var currentMatchValue = currentMatch.Value;
+                if (!string.IsNullOrWhiteSpace(namespaceStr))
+                {
+                    currentMatchValue = $"{namespaceStr}:{currentMatchValue}";
                 }
 
                 var complexAttributeFiltering = string.Empty;
@@ -236,11 +248,11 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     if (string.IsNullOrWhiteSpace(complexAttributeFiltering))
                     {
-                        parentAttributeExpression = new SCIMAttributeExpression(currentMatch.Value);
+                        parentAttributeExpression = new SCIMAttributeExpression(currentMatchValue);
                     }
                     else
                     {
-                        parentAttributeExpression = new SCIMComplexAttributeExpression(currentMatch.Value, Parse(complexAttributeFiltering));
+                        parentAttributeExpression = new SCIMComplexAttributeExpression(currentMatchValue, Parse(complexAttributeFiltering));
                     }
 
                     result = parentAttributeExpression;
@@ -250,11 +262,11 @@ namespace SimpleIdServer.Scim.Helpers
                 SCIMAttributeExpression subAttributeExpression;
                 if (string.IsNullOrWhiteSpace(complexAttributeFiltering))
                 {
-                    subAttributeExpression = new SCIMAttributeExpression(currentMatch.Value);
+                    subAttributeExpression = new SCIMAttributeExpression(currentMatchValue);
                 }
                 else
                 {
-                    subAttributeExpression = new SCIMComplexAttributeExpression(currentMatch.Value, Parse(complexAttributeFiltering));
+                    subAttributeExpression = new SCIMComplexAttributeExpression(currentMatchValue, Parse(complexAttributeFiltering));
                 }
 
                 parentAttributeExpression.SetChild(subAttributeExpression);
@@ -426,6 +438,21 @@ namespace SimpleIdServer.Scim.Helpers
         {
             var lst = Enum.GetNames(typeof(SCIMLogicalOperators)).ToList();
             return lst.Any(s => str.Equals(s, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private static SCIMSchemaAttribute GetSCIMSchemaAttribute(string name, ICollection<SCIMSchemaAttribute> scimSchemaAttributes, ICollection<SCIMSchema> schemas)
+        {
+            foreach(var scimSchemaAttribute in scimSchemaAttributes)
+            {
+                var schema = schemas.First(s => s.HasAttribute(scimSchemaAttribute));
+                var fullPath = $"{schema.Id}:{scimSchemaAttribute.Name}";
+                if ((SCIMAttributeExpression.HasNamespace(name) && name == fullPath) || (!SCIMAttributeExpression.HasNamespace(name) && name == scimSchemaAttribute.Name))
+                {
+                    return scimSchemaAttribute;
+                }
+            }
+
+            return null;
         }
 
         public LambdaExpression Evaluate(IQueryable<SCIMRepresentation> representations)

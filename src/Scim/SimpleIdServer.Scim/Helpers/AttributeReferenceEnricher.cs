@@ -43,7 +43,7 @@ namespace SimpleIdServer.Scim.Helpers
 							continue;
                         }
 
-						representation.AddAttribute(attr, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), referenceAttribute)
+						representation.AddAttribute(attr, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), referenceAttribute, referenceAttribute.SchemaId)
 						{
 							ValueString = $"{baseUrl}/{attributeMapping.TargetResourceType}/{value.ValueString}"
 						});

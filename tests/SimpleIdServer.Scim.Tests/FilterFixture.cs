@@ -37,78 +37,78 @@ namespace SimpleIdServer.Scim.Tests
             {
                 Id = Guid.NewGuid().ToString()
             };
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("title"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("title"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "title"
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("age"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("age"), customSchema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueDecimal = 20
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("eidCertificate"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("eidCertificate"), customSchema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueBinary = "aGVsbG8="
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("filePath"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), customSchema.GetAttribute("filePath"), customSchema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = @"C:\Program Files (x86)\Internet Explorer"
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "Employee"
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails")));
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails.value"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails"), schema.Id));
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails.value"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "example.org"
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails.type"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("emails.type"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "work"
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("phoneNumbers")));
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("phoneNumbers.primary"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("phoneNumbers"), schema.Id));
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("phoneNumbers.primary"), schema.Id)
             {
                 ValueBoolean = true
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "bjensen"
             });
-            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("name.familyName"))
+            representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("name.familyName"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "O'Malley"
             });
-            secondRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"))
+            secondRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "Justine"
             });
-            secondRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"))
+            secondRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "Intern"
             });
-            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"))
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
                 ValueString = "Jule"
             });
-            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims")));
-            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims.type"))
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims"), schema.Id));
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims.type"), schema.Id)
             {
                 ValueString = "xmpp"
             });
-            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims.value"))
+            thirdRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("ims.value"), schema.Id)
             {
                 ValueString = "foo.com"
             });
@@ -139,6 +139,7 @@ namespace SimpleIdServer.Scim.Tests
             var eighteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "age gt 15", customSchema);
             var nineteenResult = ParseAndExecuteFilter(representations.AsQueryable(), "eidCertificate eq \"aGVsbG8=\"", customSchema);
             var twentyResult = ParseAndExecuteFilter(representations.AsQueryable(), "filePath eq \"C:\\Program Files (x86)\\Internet Explorer\"", customSchema);
+            var twentyOneResult = ParseAndExecuteFilter(representations.AsQueryable(), "urn:ietf:params:scim:schemas:core:2.0:User:userName eq \"bjensen\"", customSchema);
 
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
@@ -160,6 +161,7 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(1, eighteenResult.Count());
             Assert.Equal(1, nineteenResult.Count());
             Assert.Equal(1, twentyResult.Count());
+            Assert.Equal(1, twentyOneResult.Count());
         }
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter, SCIMSchema customSchema)

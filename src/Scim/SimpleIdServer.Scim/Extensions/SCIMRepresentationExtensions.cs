@@ -56,6 +56,7 @@ namespace SimpleIdServer.Scim.Domain
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "rp");
             var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
             var fullPathProperty = Expression.Property(representationParameter, "FullPath");
+            var namespaceProperty = Expression.Property(representationParameter, "Namespace");
             Expression expression = null;
             foreach (var attribute in attributes)
             {
@@ -68,12 +69,18 @@ namespace SimpleIdServer.Scim.Domain
                 {
                     if (isIncluded)
                     {
-                        record = FilterIncludedAttributes(fullPathProperty, attribute, null, attribute.GetFullPath());
+                        record = FilterIncludedAttributes(fullPathProperty, attribute, null, attribute.GetFullPath(false));
                     }
                     else
                     {
-                        record = Expression.Call(fullPathProperty, startWith, Expression.Constant(attribute.GetFullPath()));
+                        record = Expression.Call(fullPathProperty, startWith, Expression.Constant(attribute.GetFullPath(false)));
                     }
+                }
+
+                var ns = attribute.GetNamespace();
+                if (!string.IsNullOrWhiteSpace(ns))
+                {
+                    record = Expression.And(record, Expression.Equal(namespaceProperty, Expression.Constant(ns)));
                 }
 
                 if (expression == null)
@@ -107,6 +114,7 @@ namespace SimpleIdServer.Scim.Domain
         private static Expression FilterIncludedAttributes(MemberExpression member, SCIMAttributeExpression attr, string parentPath, string fullPath)
         {
             var fp = string.IsNullOrWhiteSpace(parentPath) ? attr.Name : $"{parentPath}.{attr.Name}";
+            fp = SCIMAttributeExpression.RemoveNamespace(fp);
             Expression equal = null;
             if(fullPath == fp)
             {
@@ -129,12 +137,15 @@ namespace SimpleIdServer.Scim.Domain
 
         public static void ApplyEmptyArray(this SCIMRepresentation representation)
         {
-            var attrs = representation.Schemas.SelectMany(s => s.HierarchicalAttributes.Select(a => a.Leaf).Where(a => a.MultiValued));
-            foreach (var attr in attrs)
+            foreach(var schema in representation.Schemas)
             {
-                if (!representation.FlatAttributes.Any(a => a.SchemaAttribute.Name == attr.Name))
+                var attrs = schema.HierarchicalAttributes.Select(a => a.Leaf).Where(a => a.MultiValued);
+                foreach (var attr in attrs)
                 {
-                    representation.FlatAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), attr));
+                    if (!representation.FlatAttributes.Any(a => a.SchemaAttribute.Name == attr.Name))
+                    {
+                        representation.FlatAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), attr, schema.Id));
+                    }
                 }
             }
         }
@@ -462,16 +473,16 @@ namespace SimpleIdServer.Scim.Domain
                 switch (schemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.BOOLEAN:
-                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueBoolean: bool.Parse(obj.ToString())));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, schemaAttribute.SchemaId, valueBoolean: bool.Parse(obj.ToString())));
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
-                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueString: obj.ToString()));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, schemaAttribute.SchemaId, valueString: obj.ToString()));
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
-                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueInteger: int.Parse(obj.ToString())));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, schemaAttribute.SchemaId, valueInteger: int.Parse(obj.ToString())));
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
-                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, valueDateTime: DateTime.Parse(obj.ToString())));
+                        result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schemaAttribute, schemaAttribute.SchemaId, valueDateTime: DateTime.Parse(obj.ToString())));
                         break;
                 }
             }

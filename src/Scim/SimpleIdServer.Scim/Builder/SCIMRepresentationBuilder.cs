@@ -43,42 +43,42 @@ namespace SimpleIdServer.Scim.Builder
             {
                 foreach (var attr in valuesInt)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueInteger: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, schemaId, valueInteger: attr));
                 }
             }
             else if (valuesBool != null)
             {
                 foreach (var attr in valuesBool)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBoolean: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, schemaId, valueBoolean: attr));
                 }
             }
             else if (valuesString != null)
             {
                 foreach (var attr in valuesString)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueString: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, schemaId, valueString: attr));
                 }
             }
             else if (valuesDateTime != null)
             {
                 foreach (var attr in valuesDateTime)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDateTime: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, schemaId, valueDateTime: attr));
                 }
             }
             else if (valuesDecimal != null)
             {
                 foreach (var attr in valuesDecimal)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueDecimal: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, schemaId, valueDecimal: attr));
                 }
             }
             else if (valuesBinary != null)
             {
                 foreach (var attr in valuesBinary)
                 {
-                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, valueBinary: attr));
+                    _attributes.Add(new SCIMRepresentationAttribute(id, attributeId, schemaAttribute, schemaId, valueBinary: attr));
                 }
             }
 
@@ -122,7 +122,7 @@ namespace SimpleIdServer.Scim.Builder
             var schemaAttribute = schema.Attributes.FirstOrDefault(a => a.Name == name);
             var builder = new SCIMRepresentationAttributeBuilder(id, schema, schemaAttribute);
             callback(builder);
-            var newAttribute = new SCIMRepresentationAttribute(id, Guid.NewGuid().ToString(), schemaAttribute);
+            var newAttribute = new SCIMRepresentationAttribute(id, Guid.NewGuid().ToString(), schemaAttribute, schemaId);
             foreach(var subAttribute in builder.Build())
             {
                 _representation.AddAttribute(subAttribute);

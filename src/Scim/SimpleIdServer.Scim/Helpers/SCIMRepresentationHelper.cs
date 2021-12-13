@@ -104,7 +104,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                             foreach (var str in defaultValueStr)
                             {
-                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, valueString: str));
+                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, defaultAttr.SchemaId, valueString: str));
                             }
                         }
 
@@ -120,7 +120,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                             foreach (var i in defaultValueInt)
                             {
-                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, valueInteger: i));
+                                attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, defaultAttr, defaultAttr.SchemaId, valueInteger: i));
                             }
                         }
 
@@ -144,7 +144,7 @@ namespace SimpleIdServer.Scim.Helpers
             {
                 if (!jArr.Any())
                 {
-                    result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute));
+                    result.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id));
                 }
                 else
                 {
@@ -159,7 +159,7 @@ namespace SimpleIdServer.Scim.Helpers
                         var subAttributes = schema.GetChildren(schemaAttribute).ToList();
                         CheckRequiredAttributes(schema, subAttributes, rec);
                         var resolutionResult = Resolve(rec, schema, subAttributes);
-                        var parent = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute);
+                        var parent = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id);
                         var children = BuildRepresentationAttributes(resolutionResult, subAttributes, ignoreUnsupportedCanonicalValues);
                         foreach(var child in children)
                         {
@@ -188,7 +188,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                         foreach(var b in valuesBooleanResult.Values)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueBoolean: b);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueBoolean: b);
                             result.Add(record);
                         }
                         break;
@@ -201,7 +201,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                         foreach (var i in valuesIntegerResult.Values)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueInteger: i);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueInteger: i);
                             result.Add(record);
                         }
                         break;
@@ -214,7 +214,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                         foreach (var d in valuesDateTimeResult.Values)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueDateTime: d);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueDateTime: d);
                             result.Add(record);
                         }
                         break;
@@ -233,7 +233,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                         foreach (var s in strs)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueString: s);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueString: s);
                             result.Add(record);
                         }
                         break;
@@ -241,7 +241,7 @@ namespace SimpleIdServer.Scim.Helpers
                         var refs = jArr.Select(j => j.ToString()).ToList();
                         foreach (var reference in refs)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueReference: reference);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueReference: reference);
                             result.Add(record);
                         }
                         break;
@@ -254,7 +254,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                         foreach (var d in valuesDecimalResult.Values)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueDecimal: d);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueDecimal: d);
                             result.Add(record);
                         }
                         break;
@@ -281,7 +281,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                         foreach (var b in valuesBinary)
                         {
-                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, valueBinary: b);
+                            var record = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), attributeId, schemaAttribute, schema.Id, valueBinary: b);
                             result.Add(record);
                         }
                         break;

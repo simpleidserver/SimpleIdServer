@@ -242,7 +242,7 @@ namespace SimpleIdServer.Scim.Domain
 
         public void AddStandardAttributes(string location, IEnumerable<string> attributes, bool isIncluded = true, bool ignore = true)
         {
-            var metadata = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Meta));
+            var metadata = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Meta), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id);
             var startWithMeta = attributes.Any(a => a.StartsWith(SCIMConstants.StandardSCIMRepresentationAttributes.Meta) && a.Split('.').Count() > 1);
             var containsMeta = attributes.Contains(SCIMConstants.StandardSCIMRepresentationAttributes.Meta);
             if (startWithMeta || ignore || !(containsMeta && !isIncluded))
@@ -256,7 +256,7 @@ namespace SimpleIdServer.Scim.Domain
                 var containsLocation = attributes.Contains($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMRepresentationAttributes.Location}");
                 if (containsResourceType && isIncluded || !containsResourceType && !isIncluded || ignore || includeAll)
                 {
-                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}"))
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.ResourceType}"), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueString = ResourceType
                     });
@@ -264,7 +264,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 if (containsCreated && isIncluded || !containsCreated && !isIncluded || ignore || includeAll)
                 {
-                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}"))
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Created}"), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueDateTime = Created
                     });
@@ -272,7 +272,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 if (containsLastModified && isIncluded || !containsLastModified && !isIncluded || ignore || includeAll)
                 {
-                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}"))
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.LastModified}"), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueDateTime = LastModified
                     });
@@ -280,7 +280,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 if (containsVersion && isIncluded || !containsVersion && !isIncluded || ignore || includeAll)
                 {
-                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}"))
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Version}"), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueInteger = Version
                     });
@@ -288,7 +288,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 if ((containsLocation && isIncluded || !containsLocation && !isIncluded || ignore || includeAll) && !string.IsNullOrWhiteSpace(location))
                 {
-                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Location}"))
+                    AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute($"{SCIMConstants.StandardSCIMRepresentationAttributes.Meta}.{SCIMConstants.StandardSCIMMetaAttributes.Location}"), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueString = location
                     });
@@ -301,7 +301,7 @@ namespace SimpleIdServer.Scim.Domain
             {
                 if (!string.IsNullOrWhiteSpace(ExternalId))
                 {
-                    AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId))
+                    AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueString = ExternalId
                     });
@@ -312,7 +312,7 @@ namespace SimpleIdServer.Scim.Domain
             {
                 foreach (var schemaId in Schemas.Select(s => s.Id))
                 {
-                    AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas))
+                    AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), SCIMConstants.StandardSchemas.StandardResponseSchemas.GetAttribute(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas), SCIMConstants.StandardSchemas.ResourceTypeSchema.Id)
                     {
                         ValueString = schemaId
                     });

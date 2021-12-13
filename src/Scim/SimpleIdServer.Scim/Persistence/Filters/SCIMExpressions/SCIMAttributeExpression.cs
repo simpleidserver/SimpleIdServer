@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domain;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
 {
@@ -39,11 +40,22 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
 
         }
 
-        public string GetFullPath()
+        public string GetNamespace()
+        {
+            return ExtractNamespace(Name);
+        }
+
+        public string GetFullPath(bool withNamespace = true)
         {
             var names = new List<string>();
             GetFullPath(names);
-            return string.Join(".", names);
+            var result = string.Join(".", names);
+            if (!withNamespace)
+            {
+                result = RemoveNamespace(result);
+            }
+
+            return result;
         }
 
         protected void GetFullPath(List<string> names)
@@ -80,6 +92,34 @@ namespace SimpleIdServer.Persistence.Filters.SCIMExpressions
         public override object Clone()
         {
             return ProtectedClone();
+        }
+
+        public static string RemoveNamespace(string name)
+        {
+            var result = name;
+            var ns = ExtractNamespace(name);
+            if (!string.IsNullOrWhiteSpace(ns))
+            {
+                result = result.Replace(ns, string.Empty).TrimStart(':');
+            }
+
+            return result;
+        }
+
+        public static string ExtractNamespace(string name)
+        {
+            var index = name.LastIndexOf(':');
+            if (index == -1)
+            {
+                return string.Empty;
+            }
+
+            return new string(name.Take(index).ToArray());
+        }
+
+        public static bool HasNamespace(string name)
+        {
+            return name.Contains(':');
         }
 
         protected virtual object ProtectedClone()
