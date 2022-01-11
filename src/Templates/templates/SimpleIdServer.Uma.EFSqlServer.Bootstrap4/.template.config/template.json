@@ -1,0 +1,20 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SimpleIdServer",
+    "Uma",
+	"EF",
+	"SQLServer"
+  ],
+  "name": "UMA2.0 with SqlServer store and Bootstrap4 theme",
+  "identity": "SimpleIdServer.Uma.EFSqlServer.Bootstrap4",
+  "identity": "SimpleIdServer.Uma.EFSqlServer.Bootstrap4",
+  "shortName": "umaefbs4",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.Uma.EFSqlServer.Bootstrap4",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.Uma.EFSqlServer.Bootstrap4.csproj" } ]
+}

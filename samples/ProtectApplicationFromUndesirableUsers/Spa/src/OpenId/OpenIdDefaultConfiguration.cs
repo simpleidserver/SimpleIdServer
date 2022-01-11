@@ -272,42 +272,6 @@ namespace OpenId
                     {
                         "code"
                     }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "website",
-                    ClientSecret = "websiteSecret",
-                    ApplicationKind = ApplicationKinds.SPA,
-                    TokenEndPointAuthMethod = "pkce",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OAuthScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email,
-                        SIDOpenIdConstants.StandardScopes.Role
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "authorization_code"
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "http://localhost:4200"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "token",
-                        "id_token",
-                        "code"
-                    }
                 }
             };
         }

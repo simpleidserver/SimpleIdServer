@@ -102,8 +102,8 @@ namespace UseSCIM.Host
                     var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
                     if (!context.SCIMSchemaLst.Any())
                     {
-                        context.SCIMSchemaLst.Add(userSchema.ToModel());
-                        context.SCIMSchemaLst.Add(groupSchema.ToModel());
+                        context.SCIMSchemaLst.Add(userSchema);
+                        context.SCIMSchemaLst.Add(groupSchema);
                     }
 
                     if (!context.SCIMAttributeMappingLst.Any())
@@ -111,12 +111,13 @@ namespace UseSCIM.Host
                         var attributeMapping = new SCIMAttributeMapping
                         {
                             Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                             SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                             SourceAttributeSelector = "groups",
                             TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                            TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                            TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                         };
-                        context.SCIMAttributeMappingLst.Add(attributeMapping.ToModel());
+                        context.SCIMAttributeMappingLst.Add(attributeMapping);
                     }
 
                     context.SaveChanges();

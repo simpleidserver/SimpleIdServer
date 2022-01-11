@@ -37,7 +37,7 @@ Run the OPENID server and verify JSON is returned when you browse the following 
 
 ```
 cd src/OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 ```
 
 The JSON returned should look like to something like this :

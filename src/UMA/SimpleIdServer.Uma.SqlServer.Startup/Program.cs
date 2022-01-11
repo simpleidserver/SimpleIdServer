@@ -14,6 +14,6 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<UmaStartup>();
     }
 }

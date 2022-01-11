@@ -26,6 +26,18 @@
      href: scim20/persistence.md
    - name: Swagger
      href: scim20/swagger.md
+- name: UMA2.0
+  items:
+   - name: Definition
+     href: uma20/definition.md
+   - name: Installation
+     href: uma20/installation.md
+   - name: Persistence
+     href: uma20/persistence.md
+   - name: Scenarios
+     items:
+       - name: Protect user's resource
+         href: uma20/protectresource.md
 - name: Provisioning
   href: provisioning/index.md
 - name: Certifications

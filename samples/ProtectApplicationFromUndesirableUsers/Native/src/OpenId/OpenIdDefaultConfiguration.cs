@@ -272,39 +272,6 @@ namespace OpenId
                     {
                         "code"
                     }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "nativeXamarin",
-                    ClientSecret = "nativeXamarinSecret",
-                    ApplicationKind = ApplicationKinds.Native,
-                    TokenEndPointAuthMethod = "pkce",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OAuthScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "authorization_code"
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "com.companyname.nativexamarin:/oauth2redirect"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "code"
-                    }
                 }
             };
         }

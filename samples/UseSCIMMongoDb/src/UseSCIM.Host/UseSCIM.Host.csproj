@@ -14,9 +14,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
-    <PackageReference Include="SimpleIdServer.Scim" Version="1.2.0" />
-    <PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="1.2.0" />
-    <PackageReference Include="SimpleIdServer.Jwt" Version="1.2.0" />
+    <PackageReference Include="SimpleIdServer.Scim" Version="2.0.4" />
+    <PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="2.0.4" />
+    <PackageReference Include="SimpleIdServer.Jwt" Version="2.0.4" />
   </ItemGroup>
   <ItemGroup>
     <None Update="oauth_puk.txt">
