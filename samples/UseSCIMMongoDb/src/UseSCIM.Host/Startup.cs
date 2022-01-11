@@ -102,10 +102,11 @@ namespace UseSCIM.Host
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                     SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
                     TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").SubAttributes.First(a => a.Name == "value").Id
+                    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                 }
             });
         }

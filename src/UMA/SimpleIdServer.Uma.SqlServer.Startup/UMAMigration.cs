@@ -11,7 +11,7 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
     {
         public UMAEFDbContext CreateDbContext(string[] args)
         {
-            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            var migrationsAssembly = typeof(UmaStartup).GetTypeInfo().Assembly.GetName().Name;
             var builder = new DbContextOptionsBuilder<UMAEFDbContext>();
             builder.UseSqlServer("Data Source=DESKTOP-T4INEAM\\SQLEXPRESS;Initial Catalog=Uma;Integrated Security=True",
                 optionsBuilder => optionsBuilder.MigrationsAssembly(migrationsAssembly));

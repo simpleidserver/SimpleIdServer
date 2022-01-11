@@ -21,13 +21,7 @@ namespace OpenId
             SIDOpenIdConstants.StandardScopes.OfflineAccessScope,
             SIDOpenIdConstants.StandardScopes.Email,
             SIDOpenIdConstants.StandardScopes.Address,            
-            SIDOpenIdConstants.StandardScopes.ScimScope,
-            new OAuthScope
-            {
-                Name = "get_weather",
-                IsExposedInConfigurationEdp = false,
-                IsStandardScope = false
-            }
+            SIDOpenIdConstants.StandardScopes.ScimScope
         };
 
         public static List<AuthenticationContextClassReference> AcrLst => new List<AuthenticationContextClassReference>
@@ -278,35 +272,6 @@ namespace OpenId
                     {
                         "code"
                     }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "console",
-                    ClientSecret = "consoleSecret",
-                    ApplicationKind = ApplicationKinds.Service,
-                    TokenEndPointAuthMethod = "client_secret_post",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OAuthScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email,
-                        new OAuthScope
-                        {
-                            Name = "get_weather",
-                            IsExposedInConfigurationEdp = false,
-                            IsStandardScope = false
-                        }
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "client_credentials"
-                    },
-                    PreferredTokenProfile = "Bearer"
                 }
             };
         }

@@ -56,10 +56,10 @@ dotnet ef migrations add Init
 * Execute the following command line, the tables will be created in the database :
 
 ```
-dotnet ef database update`
+dotnet ef database update
 ```
 
-* Open the `Startup.cs` file, replace any existing calls to `AddClients`, `AddAcrs`, `AddUsers`, `AddJsonWebKeys` with `AddOpenIDEF`. The CONNECTIONSTRING must be updated.
+* Open the `Startup.cs` file, replace any existing calls to `AddClients`, `AddAcrs`, `AddUsers`, `AddJsonWebKeys` by `AddOpenIDEF`. The `CONNECTIONSTRING` must be updated.
 
 ```
 services

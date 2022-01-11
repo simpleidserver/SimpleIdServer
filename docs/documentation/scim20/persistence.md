@@ -124,9 +124,9 @@ services.AddScimStoreMongoDB(opt =>
 { 
 	opt.ConnectionString = "<<CONNECTIONSTRING>>"; 
 	opt.Database = "<<DATABASENAME>>";  
-	opt.CollectionSchemas = “mappings”; 
-	opt.CollectionSchemas = “schemas”; 
-    opt.CollectionRepresentations = ”representations”; 
+	opt.CollectionSchemas = "mappings"; 
+	opt.CollectionSchemas = "schemas"; 
+    opt.CollectionRepresentations = "representations"; 
 	opt.SupportTransaction = false; 
 }, schemas); 
 ```

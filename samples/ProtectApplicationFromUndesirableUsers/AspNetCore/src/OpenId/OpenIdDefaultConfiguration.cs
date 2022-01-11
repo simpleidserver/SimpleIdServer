@@ -272,40 +272,6 @@ namespace OpenId
                     {
                         "code"
                     }
-                },
-                new OpenIdClient
-                {
-                    ClientId = "website",
-                    ClientSecret = "websiteSecret",
-                    ApplicationKind = ApplicationKinds.Web,
-                    TokenEndPointAuthMethod = "client_secret_post",
-                    ApplicationType = "web",
-                    UpdateDateTime = DateTime.UtcNow,
-                    CreateDateTime = DateTime.UtcNow,
-                    TokenExpirationTimeInSeconds = 60 * 30,
-                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
-                    TokenSignedResponseAlg = "RS256",
-                    IdTokenSignedResponseAlg = "RS256",
-                    AllowedScopes = new List<OAuthScope>
-                    {
-                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
-                        SIDOpenIdConstants.StandardScopes.Profile,
-                        SIDOpenIdConstants.StandardScopes.Email
-                    },
-                    GrantTypes = new List<string>
-                    {
-                        "authorization_code",
-                    },
-                    RedirectionUrls = new List<string>
-                    {
-                        "https://localhost:7000/signin-oidc"
-                    },
-                    PreferredTokenProfile = "Bearer",
-                    ResponseTypes = new List<string>
-                    {
-                        "token",
-                        "id_token"
-                    }
                 }
             };
         }
