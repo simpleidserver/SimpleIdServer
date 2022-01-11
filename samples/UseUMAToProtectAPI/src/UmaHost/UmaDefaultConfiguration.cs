@@ -12,7 +12,7 @@ namespace UmaHost
     {
         public static List<UMAResource> Resources = new List<UMAResource>
         {
-            new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow)
+            new UMAResource("resourceId", DateTime.UtcNow)
             {
                 Translations = new List<UMAResourceTranslation>
                 {
@@ -47,8 +47,7 @@ namespace UmaHost
                 },
                 Scopes = new List<string>
                 {
-                    "scope1",
-                    "scope2"
+                    "read"
                 },
                 Subject = "sub",
                 Type = "type"
@@ -133,18 +132,14 @@ namespace UmaHost
             },
             new OAuthClient
             {
-                ClientId = "portal",
-                ClientSecret = "portalSecret",
+                ClientId = "client",
+                ClientSecret = "clientSecret",
                 TokenEndPointAuthMethod = "client_secret_post",
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow,
                 TokenExpirationTimeInSeconds = 60 * 30,
                 RefreshTokenExpirationTimeInSeconds = 60 * 30,
                 TokenSignedResponseAlg = "RS256",
-                AllowedScopes = new List<OAuthScope>
-                {
-                    UMAConstants.StandardUMAScopes.UmaProtection
-                },
                 GrantTypes = new List<string>
                 {
                     "urn:ietf:params:oauth:grant-type:uma-ticket"

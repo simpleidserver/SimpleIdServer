@@ -211,3 +211,7 @@ docs/_build/
 
 ## Ignore Javascript
 wwwroot/
+
+# Ignore docfx
+
+docs/_site/

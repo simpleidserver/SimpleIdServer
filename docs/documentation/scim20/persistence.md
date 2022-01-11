@@ -10,7 +10,6 @@ By default, all the assets like `Representation`, `Schemas` are stored in memory
 > * Create the migration scripts `dotnet ef migrations add Init`.
 > * Update the `CONNECTIONSTRING` parameter in the files `ScimMigration.cs` and `Startup.cs` before running the solution.
 
-
 **Pre-requisite** : [SCIM server must be installed](/documentation/scim20/installation.html) in the Visual Studio Solution.
 
 SQL Server data storage can be configured like this : 

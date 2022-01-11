@@ -12,9 +12,9 @@ The following schema shows how to access a protected resource
 
 1. The client tries to access to the protected resource without valid access token. An error is returned with the resource id and the UMA server url.
 2. The client uses the resource id, the access / identity token and the scopes (read, write, etc...) to get the access token. A token is returned if the authorization policy assigned to the resource is statisfied. An authorization policy can be satisfied via different ways :
-2.1 If the client_id obtained via the access token matches the excepted one.
-2.2 If the claims extracted from the identity token match the excepted values.
-2.3 If the scopes requested by the client are authorized.
+    1. If the client_id obtained via the access token matches the excepted one.
+    2. If the claims extracted from the identity token match the excepted values.
+    2. If the scopes requested by the client are authorized.
 3. The client uses the access token to get the protected resource.
 4. The access token is checked against the UMA server.
 5. The protected resource is returned.

@@ -10,7 +10,7 @@ By default, all the assets like `Clients`, `Scopes`, `JSON Web Keys` and `UMA Re
 > * Create the migration scripts `dotnet ef migrations add Init`.
 > * Update the `CONNECTIONSTRING` parameter in the files `UmaMigration.cs` and `UmaStartup.cs` before running the solution.
 
-**Pre-requisite** : UMA server must be installed in the Visual Studio Solution.
+**Pre-requisite** : [UMA server must be installed](/documentation/uma20/installation.html) in the Visual Studio Solution.
 
 SQL Server data storage can be configured like this :
 

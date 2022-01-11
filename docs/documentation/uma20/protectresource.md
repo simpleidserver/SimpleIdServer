@@ -1,7 +1,7 @@
 # Protect user's resource
 
 > [!WARNING]
-> In order to run the scenario, an OPENID and UMA server must be configured in a Visual Studio solution.
+> In order to run the scenario, an **OPENID and UMA server must be configured in a Visual Studio solution**.
 > The UMA2.0 server is relying on the OPENID server to authenticate end-users.
 
 In this tutorial, we are going to protect the picture of a user.
@@ -12,10 +12,12 @@ The source code of this project can be found [here](https://github.com/simpleids
 
 ## Configure OpenId server
 
-The first step consists to configure the OPENID client.
+**Pre-requisite**: [OPENID server](/documentation/openid/installation.html) must be installed in the Visual Studio Solution.
+
+The first step consists to configure the OPENID server.
 
 * Open the Visual Studio solution and edit the `OpenIdDefaultConfiguration.cs` file.
-* Register a `umaClient` client. This account is used by the UMA API to authenticate end-users.
+* Register a `umaClient` client. This account is used by the UMA API to authenticate end-users. By default there is a UI installed with the UMA server, the `implicit` grant-type has been chosen to authenticate end-users.
 
 ```
 new OpenIdClient
@@ -56,7 +58,7 @@ new OpenIdClient
 }
 ```
 
-* Register a `tradWebsite` client. This account will be used to get an access token valids on a specific user profile. This token will be transfered to the UMA service, it is used by internal authorization policies to check if incoming request have the permission to access to a specific resource.
+* Register a `tradWebsite` client. This account will be used to get an access token valids on a specific user profile. This token will be transfered to the UMA API, it is used by internal authorization policies to check if incoming request have the permission to access to a specific resource.
 
 ```
 new OpenIdClient
@@ -96,6 +98,31 @@ new OpenIdClient
 }
 ```
 
+* Register a `guest` user. This user is trying to access to the Picture which belongs to the user `sub`.
+
+```
+new OAuthUser
+{
+    Id = "guest",
+    Credentials = new List<UserCredential>
+    {
+        new UserCredential
+        {
+            CredentialType = "pwd",
+            Value = PasswordHelper.ComputeHash("password")
+        }
+    },
+    CreateDateTime = DateTime.Now,
+    UpdateDateTime = DateTime.Now,
+    OAuthUserClaims = new List<UserClaim>
+    {
+        new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "guest"),
+        new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "guest"),
+        new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, "guest")
+    }
+}
+```
+
 * Run the OPENID server.
 
 ```
@@ -105,10 +132,12 @@ dotnet run --urls=https://localhost:5001
 
 ## Configure UMA server
 
+**Pre-requisite**: [UMA server](/documentation/uma20/installation.html) must be installed in the Visual Studio Solution.
+
 The second step consists to configure the UMA server. A picture resource must be specified in order to protect it.
 
 * Open the Visual Studio solution and edit the `UmaDefaultConfiguration.cs` file.
-* Add a new picture resource. This resource belongs to the `sub` user.
+* Add a protected resource. This resource belongs to the `sub` user and corresponds to his picture. When the end-user is authenticated on the [UMA portal](http://localhost:60003), he can choose the users who have access to this resource. 
 
 ```
 new UMAResource("resourceId", DateTime.UtcNow)
@@ -153,7 +182,7 @@ new UMAResource("resourceId", DateTime.UtcNow)
 }
 ```
 
-* Register an `api` client. This account is used by the REST.API service.
+* Register an `api` client. This account is used by the REST.API service to get an access token valids on the scope `uma_protection` (Protection API Access Token or PAT). The PAT is used by the API to get a Permission Ticket (PT) and transfers it to the external client. This ticket will be used during the `uma-ticket` grant-type in order to get a valid Relying Party Token (RPT).
 
 ```
 new OAuthClient
@@ -182,7 +211,7 @@ new OAuthClient
 }
 ```
 
-* Register a `client` client. An external client who is trying to access to the protected resource.
+* Register a `client` client. An external client who is trying to access to the protected resource. This client has the permission to use the grant-type `uma-ticket` to get a Relying Party Token (RPT).
 
 ```
 new OAuthClient
@@ -216,7 +245,7 @@ dotnet run --urls=http://localhost:60003
 
 ## Create API
 
-The third step consists to create a REST.API service. 
+The last step consists to create a REST.API service. 
 It contains one operation used to get a picture by its identifier.
 
 * Open a command prompt and navigate to the `src` subfolder of your project.
@@ -288,7 +317,7 @@ public class Picture
 ```
 
 * Add a new controller `PicturesController`.
-* Add a private function `GetAccessTokenWithUMAProtectionScope`. It will be called to get an access token valids on the `uma_protection` scope and use it to get a permission ticket valids on a specific UMA resource and scope.
+* Add a private function `GetAccessTokenWithUMAProtectionScope`. It will be called to get an access token (Protection API Access Token or PAT) valids on the `uma_protection` scope. This PAT token will be used to get a Permission Ticket (PT) valids on a specific UMA resource and one or more scopes.
 
 ```
 private async Task<string> GetAccessTokenWithUMAProtectionScope()
@@ -332,7 +361,7 @@ private List<Picture> _pictures = new List<Picture>
 };
 ```
 
-* Add a new `Get` API operation. If the incoming request has the permission then the picture is returned.
+* Add a new `Get` API operation. If the incoming request has the permission to access to the picture (Protected Resource) the this object will be returned.
 
 ```
 [HttpGet("{id}")]
@@ -400,18 +429,20 @@ public async Task<IActionResult> Get(string id)
 * Run the REST.API.
 
 ```
-cd src\UmaHost
+cd src\WebApi
 dotnet run --urls=http://localhost:60004
 ```
 
 ## Access to the protected resource
 
-Execute the [POSTMAN requests](https://documenter.getpostman.com/view/574127/UVXgMd2X#20586cf6-f530-4ece-8710-c9bb1221a3e3) in the correct order to access to the protected resource.
+Execute the [POSTMAN requests](https://documenter.getpostman.com/view/574127/UVXgNHuq) in the correct order to access to the protected resource.
 The collection contains the following requests :
-1. If an empty HTTP request (with no Authorization header) is passed to the GET operation then a permission ticket (valids on a specific UMA resource and scope) will be returned.
-2. An access token valids on a specific user profile is returned.
-3. An access token valids on a specific protected resource and scope is returned.  Navigate to the [UMA website](http://localhost:60003), authenticate with the credentials - login : `sub`, password: `password`, click on `My received requests` and confirm the request.
+1. The external client is passing an  emtpy request to the GET operation therefore a permission ticket valids on a specific UMA resource and one or more scopes is returned by the REST.API.
+2. The external client is using the `password` grant-type to get an access token valids on a specific user profile.
+3. The external client is using the `uma_ticket` grant-type to get a Relying Party Token (RPT). When the request is executed for the first time then a JSON object `request_submitted` is returned. It indicates that a request has been added and must be confirmed by the Resource Owner `sub`.
+    1. Navigate to the [UMA website](http://localhost:60003), authenticate with the credentials - login : `sub`, password: `password`, click on `My received requests` and confirm the request.
+	2. Reissue the request from 1 to 3. At the end, an access token (Relying Party Token or RPT) should be returned.
 
 ![My received requests](images/uma-3.png)
 
-4. The picture is returned because the access token has the permission to access to the protected resource.
+4. The external client is passing the Relying Party Token (RPT)to the GET operation. Finally, the picture is returned to the caller.

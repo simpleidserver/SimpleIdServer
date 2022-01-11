@@ -87,6 +87,26 @@ namespace OpenId
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumber, "+1 (310) 123-4567"),
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.PhoneNumberVerified, "true", SimpleIdServer.Jwt.ClaimValueTypes.BOOLEAN)
                 }
+            },
+            new OAuthUser
+            {
+                Id = "guest",
+                Credentials = new List<UserCredential>
+                {
+                    new UserCredential
+                    {
+                        CredentialType = "pwd",
+                        Value = PasswordHelper.ComputeHash("password")
+                    }
+                },
+                CreateDateTime = DateTime.Now,
+                UpdateDateTime = DateTime.Now,
+                OAuthUserClaims = new List<UserClaim>
+                {
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, "guest"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, "guest"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, "guest")
+                }
             }
         };
 
@@ -235,6 +255,42 @@ namespace OpenId
                     PreferredTokenProfile = "Bearer",
                     ResponseTypes = new List<string>
                     {
+                        "code"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "umaClient",
+                    ClientSecret = "umaClientSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "implicit",
+                        "authorization_code"
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "http://localhost:60003/signin-oidc"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token",
                         "code"
                     }
                 }
