@@ -24,3 +24,5 @@ dotnet new --install SimpleIdServer.Templates
 | dotnet new sciminmem      | SCIM2.0 server with InMemory store                         |
 | dotnet new scimongodb     | SCIM2.0 server with MongoDB store                          |
 | dotnet new scimswagger    | SCIM2.0 server with Swagger support                        |
+| dotnet new umainmembs4    | UMA2.0 server with InMemory store and Bootstrap4 theme     |
+| dotnet new umaefbs4       | UMA2.0 server with SQLServer store and Bootstrap4 theme    |

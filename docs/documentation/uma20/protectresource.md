@@ -412,6 +412,6 @@ The collection contains the following requests :
 2. An access token valids on a specific user profile is returned.
 3. An access token valids on a specific protected resource and scope is returned.  Navigate to the [UMA website](http://localhost:60003), authenticate with the credentials - login : `sub`, password: `password`, click on `My received requests` and confirm the request.
 
-[My received requests](images/uma-3.png)
+![My received requests](images/uma-3.png)
 
 4. The picture is returned because the access token has the permission to access to the protected resource.
