@@ -15,7 +15,7 @@ namespace SimpleIdServer.Uma.Host.Acceptance.Tests
             }).AddApplicationPart(typeof(RegistrationController).Assembly)
             .AddApplicationPart(typeof(PermissionsAPIController).Assembly)
             .AddNewtonsoftJson(o => { });
-            services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthorization(p => p.AddDefaultUMAAuthoriztionPolicy());
             services.AddSIDUma(o =>
             {
                 o.OpenIdJsonWebKeySignature = JwksStore.GetInstance().GetJsonWebKey();

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
@@ -33,7 +34,9 @@ namespace SimpleIdServer.Uma.Api
         {
             _umaResourceRepository = umaResourceRepository;
         }
-        
+
+        #region Operations
+
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
@@ -267,6 +270,10 @@ namespace SimpleIdServer.Uma.Api
             return new NoContentResult();
         }
 
+        #endregion
+
+        #region Private Methods
+
         private async Task<IActionResult> InternalSearch(CancellationToken cancellationToken, string subject = null)
         {
             var searchUMAResourceParameter = new SearchUMAResourceParameter();
@@ -436,5 +443,7 @@ namespace SimpleIdServer.Uma.Api
 
             return result;
         }
+
+        #endregion
     }
 }

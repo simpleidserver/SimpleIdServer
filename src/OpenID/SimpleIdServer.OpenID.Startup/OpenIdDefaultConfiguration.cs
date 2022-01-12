@@ -120,6 +120,22 @@ namespace SimpleIdServer.OpenID.Startup
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
+        private static OAuthScope ManageResources = new OAuthScope
+        {
+            Name = "manage_resources",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        private static OAuthScope ManageRequests = new OAuthScope
+        {
+            Name = "manage_requests",
+            IsExposedInConfigurationEdp = true,
+            IsStandardScope = false,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
         public static List<OAuthScope> Scopes = new List<OAuthScope>
         {
             SIDOpenIdConstants.StandardScopes.OpenIdScope,
@@ -141,7 +157,9 @@ namespace SimpleIdServer.OpenID.Startup
             ScimProvision,
             ManageUsers,
             ManageAuthSchemeProviders,
-            ManageRelyingParties
+            ManageRelyingParties,
+            ManageResources,
+            ManageRequests
         };
 
         public static List<AuthenticationSchemeProvider> AuthenticationProviderSchemes => new List<AuthenticationSchemeProvider>
@@ -875,7 +893,9 @@ namespace SimpleIdServer.OpenID.Startup
                         DeleteScimResource,
                         ScimProvision,
                         ManageAuthSchemeProviders,
-                        ManageRelyingParties
+                        ManageRelyingParties,
+                        ManageResources,
+                        ManageRequests
                     },
                     GrantTypes = new List<string>
                     {

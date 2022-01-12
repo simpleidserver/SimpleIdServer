@@ -57,7 +57,6 @@ task compile -depends clean {
 	exec { msbuild -version }
 	
     # exec { msbuild .\SimpleIdServer.Mobile.sln /p:Configuration=$config /p:VersionSuffix=$buildSuffix }
-    exec { msbuild .\SimpleIdServer.MSBuild.sln /p:Configuration=$config /p:VersionSuffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.OAuth.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.OpenId.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
@@ -69,25 +68,16 @@ task compile -depends clean {
 }
  
 task pack -depends release, compile {
-	exec { dotnet publish $source_dir\MSBuild\Nuget.Transform.MSBuild.Task\Nuget.Transform.MSBuild.Task.csproj -c $config -f netcoreapp2.2 }
-	exec { dotnet publish $source_dir\MSBuild\Nuget.Transform.MSBuild.Task\Nuget.Transform.MSBuild.Task.csproj -c $config -f net472 }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth.EF\SimpleIdServer.OAuth.EF.csproj -c $config -no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID.Bootstrap4\SimpleIdServer.OpenID.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID.EF\SimpleIdServer.OpenID.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Email.Bootstrap4\SimpleIdServer.UI.Authenticate.Email.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms.Bootstrap4\SimpleIdServer.UI.Authenticate.Sms.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Bootstrap4\SimpleIdServer.UI.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Bootstrap4\SimpleIdServer.Saml.UI.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -95,7 +85,6 @@ task pack -depends release, compile {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.EF\SimpleIdServer.Uma.EF.csproj -c $config -no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.Bootstrap4\SimpleIdServer.Uma.Bootstrap4.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi\SimpleIdServer.OpenBankingApi.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Domains\SimpleIdServer.OpenBankingApi.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -108,22 +97,16 @@ task packRelease -depends release, compile {
 	exec { dotnet publish $source_dir\MSBuild\Nuget.Transform.MSBuild.Task\Nuget.Transform.MSBuild.Task.csproj -c $config -f netcoreapp2.2 }
 	exec { dotnet publish $source_dir\MSBuild\Nuget.Transform.MSBuild.Task\Nuget.Transform.MSBuild.Task.csproj -c $config -f net472 }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth.EF\SimpleIdServer.OAuth.EF.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj -c $config  --output $result_dir }
-	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID.Bootstrap4\SimpleIdServer.OpenID.Bootstrap4.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID.EF\SimpleIdServer.OpenID.EF.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Email.Bootstrap4\SimpleIdServer.UI.Authenticate.Email.Bootstrap4.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Authenticate.Sms.Bootstrap4\SimpleIdServer.UI.Authenticate.Sms.Bootstrap4.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.UI.Bootstrap4\SimpleIdServer.UI.Bootstrap4.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Bootstrap4\SimpleIdServer.Saml.UI.Bootstrap4.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\UI\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Bootstrap4\SimpleIdServer.Saml.UI.Authenticate.LoginPassword.Bootstrap4.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --output $result_dir }
@@ -131,7 +114,6 @@ task packRelease -depends release, compile {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.EF\SimpleIdServer.Uma.EF.csproj -c $config --output $result_dir }
-	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.Bootstrap4\SimpleIdServer.Uma.Bootstrap4.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi\SimpleIdServer.OpenBankingApi.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Domains\SimpleIdServer.OpenBankingApi.Domains.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj -c $config --output $result_dir }

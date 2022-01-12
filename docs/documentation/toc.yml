@@ -2,22 +2,36 @@
   href: bigpicture/index.md
 - name: Getting Started
   href: gettingstarted/index.md
-- name: OpenId
+- name: Authorization Server
   items:
-   - name: Installation
-     href: openid/installation.md
-   - name: Authentication methods
-     href: openid/authentication.md
-   - name: Persistence
-     href: openid/persistence.md
-   - name: Scenarios
+   - name: OpenId   
      items:
-      - name: Protect application from undesirable users
-        href: openid/protectappsusers.md
-      - name: Protect REST.API from undesirable clients
-        href: openid/protectapiclients.md
-      - name: Protect REST.API from undesirable users
-        href: openid/protectapiusers.md
+      - name: Installation
+        href: openid/installation.md
+      - name: Authentication methods
+        href: openid/authentication.md
+      - name: Persistence
+        href: openid/persistence.md
+      - name: Scenarios
+        items:
+         - name: Protect application from undesirable users
+           href: openid/protectappsusers.md
+         - name: Protect REST.API from undesirable clients
+           href: openid/protectapiclients.md
+         - name: Protect REST.API from undesirable users
+           href: openid/protectapiusers.md
+   - name: UMA2.0
+     items:
+      - name: Definition
+        href: uma20/definition.md
+      - name: Installation
+        href: uma20/installation.md
+      - name: Persistence
+        href: uma20/persistence.md
+      - name: Scenarios
+        items:
+          - name: Protect user's resource
+            href: uma20/protectresource.md   
 - name: SCIM2.0
   items:
    - name: Installation
@@ -26,18 +40,6 @@
      href: scim20/persistence.md
    - name: Swagger
      href: scim20/swagger.md
-- name: UMA2.0
-  items:
-   - name: Definition
-     href: uma20/definition.md
-   - name: Installation
-     href: uma20/installation.md
-   - name: Persistence
-     href: uma20/persistence.md
-   - name: Scenarios
-     items:
-       - name: Protect user's resource
-         href: uma20/protectresource.md
 - name: Provisioning
   href: provisioning/index.md
 - name: Certifications

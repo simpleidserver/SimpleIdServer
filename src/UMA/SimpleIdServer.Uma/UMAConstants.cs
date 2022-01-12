@@ -8,6 +8,7 @@ namespace SimpleIdServer.Uma
     public static class UMAConstants
     {
         public const string SignInScheme = "SimpleIdServerUMA";
+        public const string OAuthSignInScheme = "SimpleIdServerUmaOauth";
         public const string ChallengeAuthenticationScheme = "SimpleIdServerUMA.Challenge";
 
         public static class EndPoints
@@ -15,6 +16,7 @@ namespace SimpleIdServer.Uma
             public const string ResourcesAPI = "rreguri";
             public const string PermissionsAPI = "perm";
             public const string RequestsAPI = "reqs";
+            public const string ManagementAPI = "management";
         }
 
         public static class StandardUMAScopes

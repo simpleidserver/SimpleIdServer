@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
@@ -39,7 +40,7 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
                 Modulus = openidJsonWebKey.Content[RSAFields.Modulus].Base64DecodeBytes(),
                 Exponent = openidJsonWebKey.Content[RSAFields.Exponent].Base64DecodeBytes()
             };
-            var oauthRsaSecurityKey = new Microsoft.IdentityModel.Tokens.RsaSecurityKey(rsaParameters);
+            var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             services.Configure<RequestLocalizationOptions>(options =>
             {
                 var supportedCultures = new List<CultureInfo>
@@ -65,11 +66,24 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
                 opts.DefaultSignInScheme = UMAConstants.SignInScheme;
                 opts.DefaultChallengeScheme = UMAConstants.ChallengeAuthenticationScheme;
             }).AddCookie(UMAConstants.SignInScheme)
+            .AddJwtBearer(UMAConstants.OAuthSignInScheme, cfg =>
+            {
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = "https://localhost:60000",
+                    ValidAudiences = new List<string>
+                    {
+                        "gatewayClient"
+                    },
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = oauthRsaSecurityKey
+                };
+            })
             .AddOpenIdConnect(UMAConstants.ChallengeAuthenticationScheme, options =>
             {
                 options.ClientId = "umaClient";
                 options.ClientSecret = "umaClientSecret";
-                options.Authority = "https://localhost:5001";
+                options.Authority = "https://localhost:60000";
                 options.ResponseType = OpenIdConnectResponseType.CodeIdToken;
                 options.SaveTokens = true;
                 options.CorrelationCookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
@@ -80,7 +94,7 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
                     IssuerSigningKey = oauthRsaSecurityKey
                 };
             });
-            services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthorization(p => p.AddDefaultUMAAuthoriztionPolicy());
             services.AddSIDUma(options =>
             {
                 options.OpenIdJsonWebKeySignature = openidJsonWebKey;
@@ -108,7 +122,7 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
             });
         }
 
-        private JsonWebKey ExtractOpenIDJsonWebKey()
+        private Jwt.JsonWebKey ExtractOpenIDJsonWebKey()
         {
             var json = File.ReadAllText(Path.Combine(_env.ContentRootPath, "openid_puk.txt"));
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
@@ -117,7 +131,7 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
                 Modulus = dic.TryGet(RSAFields.Modulus),
                 Exponent = dic.TryGet(RSAFields.Exponent)
             };
-            JsonWebKey sigJsonWebKey;
+            Jwt.JsonWebKey sigJsonWebKey;
             using (var rsa = RSA.Create(rsaParameters))
             {
                 sigJsonWebKey = new JsonWebKeyBuilder().NewSign("1", new[]
@@ -151,7 +165,7 @@ namespace SimpleIdServer.Uma.SqlServer.Startup
             }
         }
 
-        private JsonWebKey ExtractOAuthJsonWebKey()
+        private Jwt.JsonWebKey ExtractOAuthJsonWebKey()
         {
             using (var rsa = RSA.Create())
             {

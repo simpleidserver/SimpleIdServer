@@ -1,7 +1,6 @@
 # Installation
 
-An OPENID server with bootstrap4 theme can be hosted in ASP.NET CORE project. 
-There is one Nuget package per UI theme, at the moment only Bootstrap4 library is supported: 
+An OPENID server can be hosted in ASP.NET CORE project. 
 
 ```
 mkdir QuickStart
@@ -10,7 +9,7 @@ cd QuickStart
 mkdir src
 cd src
 
-dotnet new openidinmembs4 -n OpenId
+dotnet new openidinmem -n OpenId
 ```
 
 The following files will be created : 

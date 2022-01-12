@@ -47,6 +47,17 @@ namespace SimpleIdServer.Uma.EF.Persistence
             return InternalFind(filtered, searchRequestParameter, cancellationToken);
         }
 
+        public Task<SearchResult<UMAPendingRequest>> Find(SearchRequestParameter searchRequestParameter, CancellationToken cancellationToken)
+        {
+            return InternalFind(_dbContext.PendingRequests, searchRequestParameter, cancellationToken);
+        }
+
+        public Task<SearchResult<UMAPendingRequest>> FindByResource(string resourceId, SearchRequestParameter searchRequestParameter, CancellationToken cancellationToken)
+        {
+            var filtered = _dbContext.PendingRequests.Where(f => f.Resource.Id == resourceId);
+            return InternalFind(filtered, searchRequestParameter, cancellationToken);
+        }
+
         public Task<SearchResult<UMAPendingRequest>> FindByRequester(string requester, SearchRequestParameter searchRequestParameter, CancellationToken cancellationToken)
         {
             var filtered = _dbContext.PendingRequests.Where(f => f.Requester == requester);

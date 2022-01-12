@@ -15,6 +15,7 @@ using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.Startup.TokensBuilders;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,9 @@ namespace SimpleIdServer.OpenID.Startup
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()));
-            services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson();
+            var loginPasswordAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "SimpleIdServer.UI.Authenticate.LoginPassword.Bootstrap4");
+            services.AddMvc(option => option.EnableEndpointRouting = false)
+                .AddNewtonsoftJson();
             services.AddAuthorization(opts => opts.AddDefaultOAUTHAuthorizationPolicy());
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()

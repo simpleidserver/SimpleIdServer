@@ -15,6 +15,12 @@ namespace SimpleIdServer.Uma.Persistence.InMemory
         {
         }
 
+        public Task<SearchResult<UMAPendingRequest>> Find(SearchRequestParameter parameter, CancellationToken cancellationToken)
+        {
+            var filteredUMAPendingRequests = LstData.AsQueryable();
+            return InternalFind(filteredUMAPendingRequests, parameter);
+        }
+
         public Task<SearchResult<UMAPendingRequest>> FindByOwner(string owner, SearchRequestParameter parameter, CancellationToken cancellationToken)
         {
             var filteredUMAPendingRequests = LstData.AsQueryable();
@@ -26,6 +32,13 @@ namespace SimpleIdServer.Uma.Persistence.InMemory
         {
             var filteredUMAPendingRequests = LstData.AsQueryable();
             filteredUMAPendingRequests = filteredUMAPendingRequests.Where(f => f.Requester == requester);
+            return InternalFind(filteredUMAPendingRequests, parameter);
+        }
+
+        public Task<SearchResult<UMAPendingRequest>> FindByResource(string resourceId, SearchRequestParameter parameter, CancellationToken cancellationToken)
+        {
+            var filteredUMAPendingRequests = LstData.AsQueryable();
+            filteredUMAPendingRequests = filteredUMAPendingRequests.Where(f => f.Resource.Id == resourceId);
             return InternalFind(filteredUMAPendingRequests, parameter);
         }
 
