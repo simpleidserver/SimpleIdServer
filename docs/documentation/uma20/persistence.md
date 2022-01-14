@@ -6,7 +6,7 @@ By default, all the assets like `Clients`, `Scopes`, `JSON Web Keys` and `UMA Re
 
 > [!WARNING]
 > A SimpleIdServer template exists to create UMA2.0 server with EF support.
-> * Execute the command line `dotnet new umaefbs4 -n UmaHost`.
+> * Execute the command line `dotnet new umaef -n UmaHost`.
 > * Create the migration scripts `dotnet ef migrations add Init`.
 > * Update the `CONNECTIONSTRING` parameter in the files `UmaMigration.cs` and `UmaStartup.cs` before running the solution.
 

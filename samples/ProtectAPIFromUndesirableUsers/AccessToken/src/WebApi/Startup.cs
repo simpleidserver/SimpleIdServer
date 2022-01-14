@@ -54,7 +54,7 @@ namespace WebApi
                                 var bearer = authorization.Split(" ").Last();
                                 var requestMessage = new HttpRequestMessage
                                 {
-                                    RequestUri = new Uri("http://localhost:5000/userinfo"),
+                                    RequestUri = new Uri("https://localhost:5001/userinfo"),
                                     Method = HttpMethod.Get
                                 };
                                 requestMessage.Headers.Add("Authorization", $"Bearer {bearer}");
@@ -82,7 +82,7 @@ namespace WebApi
                     };
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = "http://localhost:5000",
+                        ValidIssuer = "https://localhost:5001",
                         ValidAudiences = new List<string>
                         {
                             "website"

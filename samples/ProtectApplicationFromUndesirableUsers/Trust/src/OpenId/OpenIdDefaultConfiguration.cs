@@ -272,6 +272,29 @@ namespace OpenId
                     {
                         "code"
                     }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "trusted",
+                    ClientSecret = "trustedSecret",
+                    ApplicationKind = ApplicationKinds.Service,
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "password"
+                    },
+                    PreferredTokenProfile = "Bearer"
                 }
             };
         }

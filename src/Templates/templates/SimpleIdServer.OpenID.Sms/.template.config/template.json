@@ -1,0 +1,19 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SimpleIdServer",
+    "OpenId",
+	"SMS"
+  ],
+  "name": "SimpleIdServer with Sms authentication",
+  "identity": "SimpleIdServer.OpenID.Sms",
+  "groupIdentity": "SimpleIdServer.OpenID.Sms",
+  "shortName": "openidsms",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.OpenID.Sms",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.OpenID.Sms.csproj" } ]
+}

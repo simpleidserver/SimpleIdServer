@@ -48,4 +48,4 @@ Check if the authentication flow is working:
 1. Browse the [URL](https://localhost:5001/authorization?client_id=umaClient&redirect_uri=https://localhost:60001/signin-oidc&response_type=code&scope=openid%20profile&state=state).
 2. Authenticate with the credentials - Login : `sub`, Password : `password`.
 3. Confirm the consent.
-4. User agent will be redirected to the callback url `https://localhost:60001`, the authorization code is passed in the query.
+4. User agent will be redirected to the callback url `https://localhost:60001`. The authorization code is passed in the query.

@@ -38,7 +38,7 @@ namespace WebApi
 				{
 					cfg.TokenValidationParameters = new TokenValidationParameters
 					{
-						ValidIssuer = "http://localhost:5000",
+						ValidIssuer = "https://localhost:5001",
 						ValidAudiences = new List<string>
 						{
 							"website"

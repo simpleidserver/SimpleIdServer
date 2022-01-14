@@ -18,7 +18,7 @@ namespace Console
                     { "client_id", "trusted" },
                     { "client_secret", "trustedSecret" }
                 };
-                var tokenResponse = httpClient.PostAsync("http://localhost:5000/token", new FormUrlEncodedContent(form)).Result;
+                var tokenResponse = httpClient.PostAsync("https://localhost:5001/token", new FormUrlEncodedContent(form)).Result;
                 var json = tokenResponse.Content.ReadAsStringAsync().Result;
                 System.Console.WriteLine(json);
             }

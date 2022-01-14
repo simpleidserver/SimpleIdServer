@@ -26,11 +26,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static SimpleIdServerUmaBuilder AddSIDUma(this IServiceCollection services)
+        public static SimpleIdServerUmaBuilder AddSIDUma(this IServiceCollection services, bool isStandalone = true)
         {
             var builder = new SimpleIdServerUmaBuilder(services);
-            services.AddSIDOAuth()
-                .AddScopes(new List<OAuthScope> { UMAConstants.StandardUMAScopes.UmaProtection });
+            if (isStandalone)
+            {
+                services.AddSIDOAuth()
+                    .AddScopes(new List<OAuthScope> { UMAConstants.StandardUMAScopes.UmaProtection });
+            }
+
             services.AddUMAStore()
                 .AddUMATokenApi()
                 .AddUMAHelpers()
@@ -44,7 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerUmaBuilder AddSIDUma(this IServiceCollection services, Action<UMAHostOptions> umaOptions, Action<OAuthHostOptions> oauthOptions = null)
+        public static SimpleIdServerUmaBuilder AddSIDUma(this IServiceCollection services, Action<UMAHostOptions> umaOptions, Action<OAuthHostOptions> oauthOptions = null, bool isStandalone = true)
         {
             services.Configure(umaOptions);
             if (oauthOptions != null)
@@ -52,7 +56,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Configure(oauthOptions);
             }
 
-            return services.AddSIDUma();
+            return services.AddSIDUma(isStandalone);
         }
 
         private static IServiceCollection AddUMAStore(this IServiceCollection services)

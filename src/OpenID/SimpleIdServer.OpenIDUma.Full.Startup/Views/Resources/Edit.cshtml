@@ -1,0 +1,82 @@
+﻿@model SimpleIdServer.Uma.UI.ViewModels.ResourcesEditViewModel
+@using System.Globalization
+@using SimpleIdServer.OpenIDUma.Full.Startup.Resources
+
+@{
+    Layout = "~/Views/Shared/_OpenIdLayout.cshtml";
+    ViewData["Title"] = UmaGlobal.edit_resource;
+    var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
+}
+
+<div class="container">
+    <div class="spinner-border" id="loading">
+        <span class="sr-only">@UmaGlobal.loading</span>
+    </div>
+    <div id="error-message" class="alert alert-danger" style="display: none;">
+        @UmaGlobal.resource_unknown
+    </div>
+    <div id="content" style="display: none;">
+        <h1>Resource</h1>
+        <div class="from-group">
+            <label>@UmaGlobal.identifier</label>
+            <input type="text" class="form-control" name="_id" disabled />
+        </div>
+        <div class="form-group">
+            <label>@UmaGlobal.name</label>
+            <input type="text" class="form-control" name="name" disabled />
+        </div>
+        <div class="from-group">
+            <label>@UmaGlobal.description</label>
+            <input type="text" class="form-control" name="description" disabled />
+        </div>
+        <div class="from-group">
+            <label>@UmaGlobal.scopes</label>
+            <input type="text" class="form-control" name="resource_scopes" disabled />
+        </div>
+        <div class="from-group">
+            <label>@UmaGlobal.type</label>
+            <input type="text" class="form-control" name="type" disabled />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        let currentCultureKey = "@currentCultureInfo.Name";
+        $.ajax({
+            "url": "@Url.Action("GetMe", "ResourcesAPI", new { id = Model.ResourceId })",
+            "type": "GET",
+            "beforeSend": function (xhr) {
+                xhr.setRequestHeader("Authorization", "@Model.IdToken");
+            },
+            "success": function (jObj) {
+                let name = "", description = "";
+                for (var jObjKey in jObj) {
+                    if (jObjKey.startsWith('name') || jObjKey.startsWith('description')) {
+                        let splittedKey = jObjKey.split('#');
+                        if (splittedKey[1] === currentCultureKey) {
+                            if (splittedKey[0] === 'name') {
+                                name = jObj[jObjKey];
+                            }
+                            else if (splittedKey[0] === 'description') {
+                                description = jObj[jObjKey];
+                            }
+                        }
+                    }
+                }
+
+                $("#content input[name='_id']").val(jObj['_id']);
+                $("#content input[name='name']").val(name);
+                $("#content input[name='description']").val(description);
+                $("#content input[name='resource_scopes']").val(jObj['resource_scopes'].join());
+                $("#content input[name='type']").val(jObj['type']);
+                $("#content").show();
+                $("#loading").hide();
+            },
+            "error": function () {
+                $("#error-message").show();
+                $("#loading").hide();
+            }
+        });
+    </script>
+}

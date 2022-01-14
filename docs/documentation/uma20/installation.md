@@ -1,6 +1,6 @@
 # Installation
 
-A User-Managed Access (UMA2.0) API can be hosted in ASP.NET CORE project :
+A Standalone User-Managed Access (UMA2.0) API can be hosted in ASP.NET CORE project :
 
 ```
 mkdir QuickStart
@@ -9,7 +9,7 @@ cd QuickStart
 mkdir src
 cd src
 
-dotnet new umainmembs4  -n UmaHost
+dotnet new umainmem -n UmaHost
 ```
 
 The following files will be created :

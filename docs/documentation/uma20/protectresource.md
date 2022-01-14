@@ -1,7 +1,7 @@
 # Protect user's resource
 
 > [!WARNING]
-> In order to run the scenario, an **OPENID and UMA server must be configured in a Visual Studio solution**.
+> In order to run the scenario, an **OPENID and a standalone UMA server must be installed and configured in a Visual Studio solution**.
 > The UMA2.0 server is relying on the OPENID server to authenticate end-users.
 
 In this tutorial, we are going to protect the picture of a user.

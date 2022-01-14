@@ -74,7 +74,7 @@ new OpenIdClient
 
 ```
 cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 ```
 
 ### Create REST.API service
@@ -145,7 +145,7 @@ public void ConfigureServices(IServiceCollection services)
 		{
 			cfg.TokenValidationParameters = new TokenValidationParameters
 			{
-				ValidIssuer = "http://localhost:5000",
+				ValidIssuer = "https://localhost:5001",
 				ValidAudiences = new List<string>
 				{
 					"console"
@@ -212,7 +212,7 @@ class Program
                 { "client_id", "console" },
                 { "client_secret", "consoleSecret" }
             };
-            var tokenResponse = httpClient.PostAsync("http://localhost:5000/token", new FormUrlEncodedContent(form)).Result;
+            var tokenResponse = httpClient.PostAsync("https://localhost:5001/token", new FormUrlEncodedContent(form)).Result;
             var json = tokenResponse.Content.ReadAsStringAsync().Result;
             var req = new HttpRequestMessage
             {

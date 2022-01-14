@@ -78,6 +78,7 @@ namespace OpenId
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Picture, "picture"),
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.WebSite, "website"),
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Profile, "profile"),
+                    new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Role, "admin"),
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Gender, "gender"),
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Email, "agentsimpleidserver@gmail.com"),
                     new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.UpdatedAt, "1612355959", SimpleIdServer.Jwt.ClaimValueTypes.INTEGER),
@@ -271,6 +272,41 @@ namespace OpenId
                     ResponseTypes = new List<string>
                     {
                         "code"
+                    }
+                },
+                new OpenIdClient
+                {
+                    ClientId = "website",
+                    ClientSecret = "websiteSecret",
+                    ApplicationKind = ApplicationKinds.Web,
+                    TokenEndPointAuthMethod = "client_secret_post",
+                    ApplicationType = "web",
+                    UpdateDateTime = DateTime.UtcNow,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenExpirationTimeInSeconds = 60 * 30,
+                    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+                    TokenSignedResponseAlg = "RS256",
+                    IdTokenSignedResponseAlg = "RS256",
+                    AllowedScopes = new List<OAuthScope>
+                    {
+                        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+                        SIDOpenIdConstants.StandardScopes.Profile,
+                        SIDOpenIdConstants.StandardScopes.Email,
+                        SIDOpenIdConstants.StandardScopes.Role
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code",
+                    },
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://localhost:7001/signin-oidc"
+                    },
+                    PreferredTokenProfile = "Bearer",
+                    ResponseTypes = new List<string>
+                    {
+                        "token",
+                        "id_token"
                     }
                 }
             };

@@ -1,0 +1,11 @@
+@using $rootnamespace$.Resources
+@model SimpleIdServer.OpenID.UI.ViewModels.ErrorViewModel
+
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_OpenIdLayout.cshtml";
+}
+
+<div class="alert alert-danger" role="alert">
+    @OpenIdGlobal.ResourceManager.GetString(Model.Code)
+</div>

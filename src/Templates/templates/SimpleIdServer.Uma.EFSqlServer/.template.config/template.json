@@ -3,8 +3,8 @@
   "classifications": [
     "SimpleIdServer",
     "Uma",
-	"EF",
-	"SQLServer"
+    "EF",
+    "SQLServer"
   ],
   "name": "UMA2.0 with SqlServer store and Bootstrap4 theme",
   "identity": "SimpleIdServer.Uma.EFSqlServer",

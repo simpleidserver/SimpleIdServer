@@ -77,7 +77,7 @@ new OpenIdClient
 
 ```
 cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 ```
 
 ### Create ASP.NET CORE application
@@ -121,7 +121,7 @@ services.AddAuthentication(options =>
     {
         options.SignInScheme = "Cookies";
 
-        options.Authority = "http://localhost:5000";
+        options.Authority = "https://localhost:5001";
         options.RequireHttpsMetadata = false;
 
         options.ClientId = "website";
@@ -249,7 +249,7 @@ new OpenIdClient
 
 ```
 cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 ```
 
 ### Create angular application
@@ -303,7 +303,7 @@ export class AppModule { }
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authCodeFlowConfig: AuthConfig = {
-  issuer: 'http://localhost:5000',
+  issuer: 'https://localhost:5001',
   redirectUri: window.location.origin,
   clientId: 'website',
   responseType: 'code',
@@ -800,7 +800,7 @@ new OpenIdClient
 
 ```
 cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 ```
 
 ### Create console application
@@ -841,7 +841,7 @@ class Program
                 { "client_id", "trusted" },
                 { "client_secret", "trustedSecret" }
             };
-            var tokenResponse = httpClient.PostAsync("http://localhost:5000/token", new FormUrlEncodedContent(form)).Result;
+            var tokenResponse = httpClient.PostAsync("https://localhost:5001/token", new FormUrlEncodedContent(form)).Result;
             var json = tokenResponse.Content.ReadAsStringAsync().Result;
             System.Console.WriteLine(json);
         }

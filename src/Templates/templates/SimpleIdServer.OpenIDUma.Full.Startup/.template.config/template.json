@@ -1,0 +1,18 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SimpleIdServer",
+    "OpenId"
+  ],
+  "name": "UMA and OPENID server with Email, SMS and Login password authentication",
+  "identity": "SimpleIdServer.OpenIDUma.Full.Startup",
+  "groupIdentity": "SimpleIdServer.OpenIDUma.Full.Startup",
+  "shortName": "openidumafull",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.OpenIDUma.Full.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.OpenIDUma.Full.Startup.csproj" } ]
+}

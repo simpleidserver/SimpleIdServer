@@ -33,7 +33,7 @@ namespace AspNetCore
               {
                   options.SignInScheme = "Cookies";
 
-                  options.Authority = "http://localhost:5000";
+                  options.Authority = "https://localhost:5001";
                   options.RequireHttpsMetadata = false;
                   options.ResponseType = "id_token token";
                   options.ClientId = "website";
