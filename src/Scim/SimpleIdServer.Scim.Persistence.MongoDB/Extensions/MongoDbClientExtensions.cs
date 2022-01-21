@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,8 +34,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 				{
 					var schemas = new List<SCIMSchema>
 					{
-						SCIMConstants.StandardSchemas.GroupSchema,
-						SCIMConstants.StandardSchemas.UserSchema
+						StandardSchemas.GroupSchema,
+						StandardSchemas.UserSchema
                     };
 					schemasCollection.InsertMany(schemas);
 				}

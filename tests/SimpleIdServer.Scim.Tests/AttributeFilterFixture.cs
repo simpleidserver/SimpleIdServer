@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Persistence.Filters.SCIMExpressions;
-using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Parser;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -51,8 +53,8 @@ namespace SimpleIdServer.Scim.Tests
             var thirdFilter = SCIMFilterParser.Parse("userName", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
             var fourthFilter = SCIMFilterParser.Parse("phones.phoneNumber", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
             var fifthFilter = SCIMFilterParser.Parse("phones[phoneNumber eq 02]", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
-            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas }) as SCIMAttributeExpression;
-            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, SCIMConstants.StandardSchemas.StandardResponseSchemas }) as SCIMAttributeExpression;
+            var sixFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, StandardSchemas.StandardResponseSchemas }) as SCIMAttributeExpression;
+            var sevenFilter = SCIMFilterParser.Parse("meta.lastModified", new List<SCIMSchema> { userSchema, StandardSchemas.StandardResponseSchemas }) as SCIMAttributeExpression;
             var eightFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
             var nineFilter = SCIMFilterParser.Parse("id", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;
             var tenFilter = SCIMFilterParser.Parse("info.age", new List<SCIMSchema> { userSchema }) as SCIMAttributeExpression;

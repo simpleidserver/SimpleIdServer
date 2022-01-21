@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Resources;
@@ -303,7 +303,7 @@ namespace SimpleIdServer.Scim.Helpers
             schemas.AddRange(extensionSchemas);
             foreach (var kvp in json)
             {
-                if (kvp.Key == SCIMConstants.StandardSCIMRepresentationAttributes.Schemas || SCIMConstants.StandardSCIMCommonRepresentationAttributes.Contains(kvp.Key))
+                if (kvp.Key == StandardSCIMRepresentationAttributes.Schemas || SCIMConstants.StandardSCIMCommonRepresentationAttributes.Contains(kvp.Key))
                 {
                     continue;
                 }

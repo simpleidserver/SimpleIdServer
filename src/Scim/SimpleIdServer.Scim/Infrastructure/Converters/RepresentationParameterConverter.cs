@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Extensions;
 using System;
@@ -21,11 +22,11 @@ namespace SimpleIdServer.Scim.Infrastructure.Converters
             var jo = JObject.Load(reader);
             var result = new RepresentationParameter
             {
-                ExternalId = jo.GetString(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId),
-                Schemas = jo.GetArray(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas)
+                ExternalId = jo.GetString(StandardSCIMRepresentationAttributes.ExternalId),
+                Schemas = jo.GetArray(StandardSCIMRepresentationAttributes.Schemas)
             };
-            jo.Remove(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas);
-            jo.Remove(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId);
+            jo.Remove(StandardSCIMRepresentationAttributes.Schemas);
+            jo.Remove(StandardSCIMRepresentationAttributes.ExternalId);
             result.Attributes = jo;
             return result;
         }

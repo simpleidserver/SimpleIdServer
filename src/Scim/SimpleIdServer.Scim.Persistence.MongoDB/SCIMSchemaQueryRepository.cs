@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using System.Collections.Generic;
 using System.Linq;

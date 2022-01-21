@@ -3,6 +3,7 @@
 using MassTransit;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
@@ -88,17 +89,17 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var requestedSchemas = patchRepresentation.Schemas;
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Schemas));
             }
 
-            if (!requestedSchemas.SequenceEqual(new List<string> { SCIMConstants.StandardSchemas.PatchRequestSchemas.Id }))
+            if (!requestedSchemas.SequenceEqual(new List<string> { StandardSchemas.PatchRequestSchemas.Id }))
             {
                 throw new SCIMBadSyntaxException(Global.SchemasNotRecognized);
             }
 
             if (patchRepresentation.Operations == null)
             {
-                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Operations));
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Operations));
             }
         }
     }

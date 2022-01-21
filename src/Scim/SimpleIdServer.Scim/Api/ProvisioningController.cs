@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.ExternalEvents;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMConstants.SCIMEndpoints.Provisioning)]
+    [Route(SCIMEndpoints.Provisioning)]
     public class ProvisioningController : Controller
     {
         private readonly IBusControl _busControl;

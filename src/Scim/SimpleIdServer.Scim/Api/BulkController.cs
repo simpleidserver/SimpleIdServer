@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
@@ -23,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMConstants.SCIMEndpoints.Bulk)]
+    [Route(SCIMEndpoints.Bulk)]
     public class BulkController : Controller
     {
         private readonly SCIMHostOptions _options;
@@ -61,8 +62,8 @@ namespace SimpleIdServer.Scim.Api
                 var taskResult = await Task.WhenAll(taskLst);
                 var result = new JObject
                 {
-                    { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.BulkResponseSchemas.Id } ) },
-                    { SCIMConstants.StandardSCIMRepresentationAttributes.Operations, new JArray(taskResult) }
+                    { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.BulkResponseSchemas.Id } ) },
+                    { StandardSCIMRepresentationAttributes.Operations, new JArray(taskResult) }
                 };
                 return new ContentResult
                 {
@@ -93,17 +94,17 @@ namespace SimpleIdServer.Scim.Api
             var requestedSchemas = bulkParameter.Schemas;
             if (!requestedSchemas.Any())
             {
-                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas));
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Schemas));
             }
 
-            if (!new List<string> { SCIMConstants.StandardSchemas.BulkRequestSchemas.Id }.SequenceEqual(requestedSchemas))
+            if (!new List<string> { StandardSchemas.BulkRequestSchemas.Id }.SequenceEqual(requestedSchemas))
             {
                 throw new SCIMBadSyntaxException(Global.SchemasNotRecognized);
             }
 
             if (bulkParameter.Operations == null)
             {
-                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, SCIMConstants.StandardSCIMRepresentationAttributes.Operations));
+                throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Operations));
             }
         }
 
@@ -140,8 +141,8 @@ namespace SimpleIdServer.Scim.Api
             await routeContext.Handler.Invoke(newHttpContext);
             var result = new JObject
             {
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Method, scimBulkOperationRequest.HttpMethod },
-                { SCIMConstants.StandardSCIMRepresentationAttributes.BulkId, scimBulkOperationRequest.BulkIdentifier }
+                { StandardSCIMRepresentationAttributes.Method, scimBulkOperationRequest.HttpMethod },
+                { StandardSCIMRepresentationAttributes.BulkId, scimBulkOperationRequest.BulkIdentifier }
             };
             var statusCode = newHttpContext.Response.StatusCode;
             var statusContent = new JObject();

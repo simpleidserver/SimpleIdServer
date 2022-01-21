@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Builder;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,31 +17,31 @@ namespace SimpleIdServer.Scim
         {
             var content = File.ReadAllText(filePath);
             var jObj = JsonConvert.DeserializeObject<JObject>(content);
-            var builder = SCIMSchemaBuilder.Create(jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Id].ToString(), 
-                jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Name].ToString(), 
+            var builder = SCIMSchemaBuilder.Create(jObj[StandardSCIMRepresentationAttributes.Id].ToString(), 
+                jObj[StandardSCIMRepresentationAttributes.Name].ToString(), 
                 resourceType, 
-                jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Description].ToString(), 
+                jObj[StandardSCIMRepresentationAttributes.Description].ToString(), 
                 isRootSchema);
-            var attributes = jObj[SCIMConstants.StandardSCIMRepresentationAttributes.Attributes] as JArray;
+            var attributes = jObj[StandardSCIMRepresentationAttributes.Attributes] as JArray;
             foreach(JObject attribute in attributes)
             {
                 JArray subAttributes = null;
-                if (attribute.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.SubAttributes))
+                if (attribute.ContainsKey(StandardSCIMRepresentationAttributes.SubAttributes))
                 {
-                    subAttributes = attribute[SCIMConstants.StandardSCIMRepresentationAttributes.SubAttributes] as JArray;
+                    subAttributes = attribute[StandardSCIMRepresentationAttributes.SubAttributes] as JArray;
                 }
 
                 builder.AddAttribute(
-                    ExtractString(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Name),
-                    ExtractEnum<SCIMSchemaAttributeTypes>(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Type),
-                    multiValued: ExtractBoolean(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.MultiValued),
-                    required: ExtractBoolean(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Required),
-                    caseExact: ExtractBoolean(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.CaseExact),
-                    mutability: ExtractEnum<SCIMSchemaAttributeMutabilities>(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Mutability),
-                    returned: ExtractEnum<SCIMSchemaAttributeReturned>(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Returned),
-                    uniqueness: ExtractEnum<SCIMSchemaAttributeUniqueness>(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Uniqueness),
-                    description: ExtractString(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.Description),
-                    canonicalValues: ExtractList(attribute, SCIMConstants.StandardSCIMRepresentationAttributes.CanonicalValues),
+                    ExtractString(attribute, StandardSCIMRepresentationAttributes.Name),
+                    ExtractEnum<SCIMSchemaAttributeTypes>(attribute, StandardSCIMRepresentationAttributes.Type),
+                    multiValued: ExtractBoolean(attribute, StandardSCIMRepresentationAttributes.MultiValued),
+                    required: ExtractBoolean(attribute, StandardSCIMRepresentationAttributes.Required),
+                    caseExact: ExtractBoolean(attribute, StandardSCIMRepresentationAttributes.CaseExact),
+                    mutability: ExtractEnum<SCIMSchemaAttributeMutabilities>(attribute, StandardSCIMRepresentationAttributes.Mutability),
+                    returned: ExtractEnum<SCIMSchemaAttributeReturned>(attribute, StandardSCIMRepresentationAttributes.Returned),
+                    uniqueness: ExtractEnum<SCIMSchemaAttributeUniqueness>(attribute, StandardSCIMRepresentationAttributes.Uniqueness),
+                    description: ExtractString(attribute, StandardSCIMRepresentationAttributes.Description),
+                    canonicalValues: ExtractList(attribute, StandardSCIMRepresentationAttributes.CanonicalValues),
                     callback: (c) =>
                     {
                         if (subAttributes == null)
@@ -53,16 +53,16 @@ namespace SimpleIdServer.Scim
                         {
                             c.AddAttribute(
                                 builder.Build(),
-                                ExtractString(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Name),
-                                ExtractEnum<SCIMSchemaAttributeTypes>(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Type),
-                                multiValued: ExtractBoolean(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.MultiValued),
-                                required: ExtractBoolean(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Required),
-                                caseExact: ExtractBoolean(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.CaseExact),
-                                mutability: ExtractEnum<SCIMSchemaAttributeMutabilities>(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Mutability),
-                                returned: ExtractEnum<SCIMSchemaAttributeReturned>(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Returned),
-                                uniqueness: ExtractEnum<SCIMSchemaAttributeUniqueness>(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Uniqueness),
-                                description: ExtractString(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.Description),
-                                canonicalValues: ExtractList(subAttr, SCIMConstants.StandardSCIMRepresentationAttributes.CanonicalValues)
+                                ExtractString(subAttr, StandardSCIMRepresentationAttributes.Name),
+                                ExtractEnum<SCIMSchemaAttributeTypes>(subAttr, StandardSCIMRepresentationAttributes.Type),
+                                multiValued: ExtractBoolean(subAttr, StandardSCIMRepresentationAttributes.MultiValued),
+                                required: ExtractBoolean(subAttr, StandardSCIMRepresentationAttributes.Required),
+                                caseExact: ExtractBoolean(subAttr, StandardSCIMRepresentationAttributes.CaseExact),
+                                mutability: ExtractEnum<SCIMSchemaAttributeMutabilities>(subAttr, StandardSCIMRepresentationAttributes.Mutability),
+                                returned: ExtractEnum<SCIMSchemaAttributeReturned>(subAttr, StandardSCIMRepresentationAttributes.Returned),
+                                uniqueness: ExtractEnum<SCIMSchemaAttributeUniqueness>(subAttr, StandardSCIMRepresentationAttributes.Uniqueness),
+                                description: ExtractString(subAttr, StandardSCIMRepresentationAttributes.Description),
+                                canonicalValues: ExtractList(subAttr, StandardSCIMRepresentationAttributes.CanonicalValues)
                             );
                         }
                     }

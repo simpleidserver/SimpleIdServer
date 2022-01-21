@@ -3,7 +3,7 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.Common.ExternalEvents;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Provisioning.Provisioner;
 using System;

@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMConstants.SCIMEndpoints.ResourceType)]
+    [Route(SCIMEndpoints.ResourceType)]
     public class ResourceTypesController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
@@ -63,7 +63,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected JObject ToDto(SCIMSchema schema, Dictionary<string, string> controllerEndpoints)
         {
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMConstants.SCIMEndpoints.ResourceType}/{schema.ResourceType}";
+            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.ResourceType}";
             var endpoint = string.Empty;
             if (controllerEndpoints.ContainsKey(schema.ResourceType))
             {
@@ -72,18 +72,18 @@ namespace SimpleIdServer.Scim.Api
 
             return new JObject
             {
-                { SCIMConstants.ResourceTypeAttribute.Schemas, new JArray(new List<string>  { SCIMConstants.StandardSchemas.ResourceTypeSchema.Id }) },
-                { SCIMConstants.ResourceTypeAttribute.Id, schema.ResourceType },
-                { SCIMConstants.ResourceTypeAttribute.Name, schema.Name },
-                { SCIMConstants.ResourceTypeAttribute.Description, schema.Description },
-                { SCIMConstants.ResourceTypeAttribute.Endpoint, endpoint },
-                { SCIMConstants.ResourceTypeAttribute.Schema, schema.Id },
-                { SCIMConstants.ResourceTypeAttribute.SchemaExtensions, new JArray(schema.SchemaExtensions.Select(s => new JObject
+                { ResourceTypeAttribute.Schemas, new JArray(new List<string>  { StandardSchemas.ResourceTypeSchema.Id }) },
+                { ResourceTypeAttribute.Id, schema.ResourceType },
+                { ResourceTypeAttribute.Name, schema.Name },
+                { ResourceTypeAttribute.Description, schema.Description },
+                { ResourceTypeAttribute.Endpoint, endpoint },
+                { ResourceTypeAttribute.Schema, schema.Id },
+                { ResourceTypeAttribute.SchemaExtensions, new JArray(schema.SchemaExtensions.Select(s => new JObject
                 {
-                    { SCIMConstants.ResourceTypeAttribute.Schema, s.Schema },
-                    { SCIMConstants.ResourceTypeAttribute.Required, s.Required }
+                    { ResourceTypeAttribute.Schema, s.Schema },
+                    { ResourceTypeAttribute.Required, s.Required }
                 })) },
-                { SCIMConstants.ResourceTypeAttribute.Meta, new JObject
+                { ResourceTypeAttribute.Meta, new JObject
                 {
                     { SCIMConstants.StandardSCIMMetaAttributes.Location,  location },
                     { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, schema.ResourceType }

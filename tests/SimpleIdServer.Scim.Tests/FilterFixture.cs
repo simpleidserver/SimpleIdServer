@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Scim.Builder;
-using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Extensions;
-using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
+using SimpleIdServer.Scim.Parser;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +16,12 @@ namespace SimpleIdServer.Scim.Tests
         [Fact]
         public void When_Parse_And_Execute_Filter()
         {
-            var customSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:CustomProperties", "User", SimpleIdServer.Scim.SCIMConstants.SCIMEndpoints.User, "Custom properties", false)
+            var customSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:CustomProperties", "User", SCIMEndpoints.User, "Custom properties", false)
                     .AddDecimalAttribute("age")
                     .AddBinaryAttribute("eidCertificate")
                     .AddStringAttribute("filePath")
                     .Build();
-            var schema = SCIMConstants.StandardSchemas.UserSchema;
+            var schema = StandardSchemas.UserSchema;
             var representation = new SCIMRepresentation
             {
                 Id = Guid.NewGuid().ToString(),
@@ -166,7 +166,7 @@ namespace SimpleIdServer.Scim.Tests
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter, SCIMSchema customSchema)
         {
-            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, customSchema });
+            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { StandardSchemas.UserSchema, customSchema });
             var evaluatedExpression = parsed.Evaluate(representations);
             return (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(representations);
         }

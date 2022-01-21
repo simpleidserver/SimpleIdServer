@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace SimpleIdServer.Scim.Extensions
 
         public static IEnumerable<string> GetSchemas(this JObject jObj)
         {
-            return GetArray(jObj, SCIMConstants.StandardSCIMRepresentationAttributes.Schemas);
+            return GetArray(jObj, StandardSCIMRepresentationAttributes.Schemas);
         }
 
         public static bool TryGetInt(this JObject jObj, string name, out int result)

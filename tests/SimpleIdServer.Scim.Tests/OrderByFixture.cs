@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Persistence.Filters;
-using SimpleIdServer.Scim.Builder;
-using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Extensions;
-using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
+using SimpleIdServer.Scim.Parser;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace SimpleIdServer.Scim.Tests
 {
     public class OrderByFixture
     {
-        public static SCIMSchema CustomSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:CustomProperties", "User", SimpleIdServer.Scim.SCIMConstants.SCIMEndpoints.User, "Custom properties", false)
+        public static SCIMSchema CustomSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:CustomProperties", "User", SCIMEndpoints.User, "Custom properties", false)
                     .AddDecimalAttribute("age")
                     .AddBinaryAttribute("eidCertificate")
                     .AddStringAttribute("filePath")
@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Tests
         [Fact]
         public void When_Parse_And_Execute_OrderBy()
         {
-            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, CustomSchema })
+            var firstRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { StandardSchemas.UserSchema, CustomSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "bjensen" })
                 .AddBooleanAttribute("active", "urn:ietf:params:scim:schemas:core:2.0:User", new List<bool> { true })
                 .AddDecimalAttribute("age", "urn:ietf:params:scim:schemas:core:2.0:CustomProperties", new List<decimal> { 22 })
@@ -47,7 +47,7 @@ namespace SimpleIdServer.Scim.Tests
                 .Build();
             firstRepresentation.LastModified = DateTime.Parse("2012-05-13T04:42:34Z");
             firstRepresentation.Version = 2;
-            var secondRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema })
+            var secondRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { StandardSchemas.UserSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Justine" })
                 .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })
                 .AddStringAttribute("userType", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Intern" })
@@ -68,7 +68,7 @@ namespace SimpleIdServer.Scim.Tests
                 secondRepresentation
             };
 
-            var reps = representations.OrderBy(s => s.FlatAttributes.Where(a => a.FullPath == SCIMConstants.StandardSchemas.UserSchema.GetAttribute("userName").Id).FirstOrDefault()).ToList();
+            var reps = representations.OrderBy(s => s.FlatAttributes.Where(a => a.FullPath == StandardSchemas.UserSchema.GetAttribute("userName").Id).FirstOrDefault()).ToList();
 
             var firstResult = ParseAndExecutOrderBy(representations.AsQueryable(), "emails.value", SearchSCIMRepresentationOrders.Ascending);
             var secondResult = ParseAndExecutOrderBy(representations.AsQueryable(), "emails.value", SearchSCIMRepresentationOrders.Descending);
@@ -93,7 +93,7 @@ namespace SimpleIdServer.Scim.Tests
 
         private IOrderedEnumerable<SCIMRepresentation> ParseAndExecutOrderBy(IQueryable<SCIMRepresentation> representations, string filter, SearchSCIMRepresentationOrders order)
         {
-            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { SCIMConstants.StandardSchemas.UserSchema, CustomSchema });
+            var parsed = SCIMFilterParser.Parse(filter, new List<SCIMSchema> { StandardSchemas.UserSchema, CustomSchema });
             var evaluatedExpression = parsed.EvaluateOrderBy(representations, order);
             return (IOrderedEnumerable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(representations);
         }

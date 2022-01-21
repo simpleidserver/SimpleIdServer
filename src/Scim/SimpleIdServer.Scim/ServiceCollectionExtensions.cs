@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Api;
 using SimpleIdServer.Scim.Commands.Handlers;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
@@ -65,8 +65,8 @@ namespace Microsoft.Extensions.DependencyInjection
             var schemas = new List<SCIMSchema>();
             schemas.AddRange(new List<SCIMSchema> 
             { 
-                SCIMConstants.StandardSchemas.UserSchema, 
-                SCIMConstants.StandardSchemas.GroupSchema 
+                StandardSchemas.UserSchema, 
+                StandardSchemas.GroupSchema 
             });
             var provisioningConfigurations = new List<ProvisioningConfiguration>();
             services.TryAddSingleton<ISCIMRepresentationCommandRepository>(new DefaultSCIMRepresentationCommandRepository(representations));

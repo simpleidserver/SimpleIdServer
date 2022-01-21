@@ -1,4 +1,4 @@
-﻿using SimpleIdServer.Scim.Helpers;
+﻿using SimpleIdServer.Scim.Parser;
 using Xunit;
 
 namespace SimpleIdServer.Scim.Tests

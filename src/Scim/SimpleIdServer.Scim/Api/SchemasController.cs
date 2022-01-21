@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMConstants.SCIMEndpoints.Schemas)]
+    [Route(SCIMEndpoints.Schemas)]
     public class SchemasController : Controller
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
@@ -31,10 +32,10 @@ namespace SimpleIdServer.Scim.Api
             var schemas = await _scimSchemaQueryRepository.GetAll();
             var jObj = new JObject
             {
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },
-                { SCIMConstants.StandardSCIMRepresentationAttributes.TotalResults, schemas.Count() },
-                { SCIMConstants.StandardSCIMRepresentationAttributes.ItemsPerPage, schemas.Count()},
-                { SCIMConstants.StandardSCIMRepresentationAttributes.StartIndex, 0 }
+                { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
+                { StandardSCIMRepresentationAttributes.TotalResults, schemas.Count() },
+                { StandardSCIMRepresentationAttributes.ItemsPerPage, schemas.Count()},
+                { StandardSCIMRepresentationAttributes.StartIndex, 0 }
             };
             var resources = new JArray();
             foreach(var schema in schemas)
@@ -42,7 +43,7 @@ namespace SimpleIdServer.Scim.Api
                 resources.Add(schema.ToResponse());
             }
 
-            jObj.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Resources, resources);
+            jObj.Add(StandardSCIMRepresentationAttributes.Resources, resources);
             return new ContentResult
             {
                 StatusCode = (int)HttpStatusCode.OK,

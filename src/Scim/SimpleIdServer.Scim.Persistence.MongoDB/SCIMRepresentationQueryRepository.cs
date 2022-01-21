@@ -3,7 +3,8 @@
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SimpleIdServer.Scim.Domain;
-using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;

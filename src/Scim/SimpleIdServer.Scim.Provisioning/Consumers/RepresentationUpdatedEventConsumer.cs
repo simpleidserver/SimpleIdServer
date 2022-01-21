@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Provisioning.Provisioner;

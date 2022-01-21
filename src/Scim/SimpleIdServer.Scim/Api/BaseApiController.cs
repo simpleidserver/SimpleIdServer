@@ -6,15 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Commands;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Parser;
+using SimpleIdServer.Scim.Parser.Exceptions;
+using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
@@ -179,7 +182,7 @@ namespace SimpleIdServer.Scim.Api
 
                 var standardSchemas = new List<SCIMSchema>
                 {
-                    SCIMConstants.StandardSchemas.StandardResponseSchemas
+                    StandardSchemas.StandardResponseSchemas
                 };
                 standardSchemas.AddRange(schemas);
                 var includedAttributes = searchRequest.Attributes == null ? new List<SCIMAttributeExpression>() : searchRequest.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
@@ -187,10 +190,10 @@ namespace SimpleIdServer.Scim.Api
                 var result = await _scimRepresentationQueryRepository.FindSCIMRepresentations(new SearchSCIMRepresentationsParameter(_resourceType, searchRequest.StartIndex, searchRequest.Count.Value, sortByFilter, searchRequest.SortOrder, SCIMFilterParser.Parse(searchRequest.Filter, schemas), includedAttributes, excludedAttributes));
                 var jObj = new JObject
                 {
-                    { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { SCIMConstants.StandardSchemas.ListResponseSchemas.Id } ) },
-                    { SCIMConstants.StandardSCIMRepresentationAttributes.TotalResults, result.TotalResults },
-                    { SCIMConstants.StandardSCIMRepresentationAttributes.ItemsPerPage, searchRequest.Count },
-                    { SCIMConstants.StandardSCIMRepresentationAttributes.StartIndex, searchRequest.StartIndex }
+                    { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
+                    { StandardSCIMRepresentationAttributes.TotalResults, result.TotalResults },
+                    { StandardSCIMRepresentationAttributes.ItemsPerPage, searchRequest.Count },
+                    { StandardSCIMRepresentationAttributes.StartIndex, searchRequest.StartIndex }
                 };
                 var resources = new JArray();
                 var baseUrl = Request.GetAbsoluteUriWithVirtualPath();
@@ -225,7 +228,7 @@ namespace SimpleIdServer.Scim.Api
                     resources.Add(newJObj);
                 }
 
-                jObj.Add(SCIMConstants.StandardSCIMRepresentationAttributes.Resources, resources);
+                jObj.Add(StandardSCIMRepresentationAttributes.Resources, resources);
                 return new ContentResult
                 {
                     StatusCode = (int)HttpStatusCode.OK,

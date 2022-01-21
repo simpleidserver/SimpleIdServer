@@ -1,11 +1,13 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Persistence.Filters.SCIMExpressions;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Parser;
+using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
@@ -365,7 +367,7 @@ namespace SimpleIdServer.Scim.Domain
         {
             var jObj = new JObject
             {
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Id, representation.Id }
+                { StandardSCIMRepresentationAttributes.Id, representation.Id }
             };
 
             if (includeStandardAttributes)
@@ -397,15 +399,15 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             var jObj = patchOperation.Value as JObject;
-            if (patchOperation.Path == SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId && patchOperation.Value.GetType() == typeof(string))
+            if (patchOperation.Path == StandardSCIMRepresentationAttributes.ExternalId && patchOperation.Value.GetType() == typeof(string))
             {
                 externalId = patchOperation.Value.ToString();
                 return true;
             }
 
-            if (jObj != null && jObj.ContainsKey(SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId))
+            if (jObj != null && jObj.ContainsKey(StandardSCIMRepresentationAttributes.ExternalId))
             {
-                externalId = jObj[SCIMConstants.StandardSCIMRepresentationAttributes.ExternalId].ToString();
+                externalId = jObj[StandardSCIMRepresentationAttributes.ExternalId].ToString();
                 return true;
             }
 

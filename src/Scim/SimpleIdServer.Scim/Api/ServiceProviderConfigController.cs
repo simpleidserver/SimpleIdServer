@@ -3,8 +3,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Scim.Builder;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Resources;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Net;
 
 namespace SimpleIdServer.Scim.Api
 {
-    [Route(SCIMConstants.SCIMEndpoints.ServiceProviderConfig)]
+    [Route(SCIMEndpoints.ServiceProviderConfig)]
     public class ServiceProviderConfigController : Controller
     {
         private readonly SCIMHostOptions _options;
@@ -28,7 +29,7 @@ namespace SimpleIdServer.Scim.Api
         public virtual IActionResult Get()
         {
             _logger.LogInformation(Global.StartGetServiceProviderConfig);
-            var schema = SCIMConstants.StandardSchemas.ServiceProvideConfigSchemas;
+            var schema = StandardSchemas.ServiceProvideConfigSchemas;
             var representation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { schema })
                 .AddComplexAttribute("patch", schema.Id, c =>
                 {
@@ -65,7 +66,7 @@ namespace SimpleIdServer.Scim.Api
                     c.AddStringAttribute("type", new List<string> { "oauthbearertoken" });
                     c.AddBooleanAttribute("primary", new List<bool> { true });
                 }).Build();
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMConstants.SCIMEndpoints.ServiceProviderConfig}";
+            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ServiceProviderConfig}";
             return new ContentResult
             {
                 StatusCode = (int)HttpStatusCode.OK,

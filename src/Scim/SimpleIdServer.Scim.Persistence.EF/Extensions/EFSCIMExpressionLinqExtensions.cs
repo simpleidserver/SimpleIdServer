@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Persistence.Filters;
-using SimpleIdServer.Persistence.Filters.SCIMExpressions;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Parser;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,14 +136,14 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         {
             int total = representations.Count();
             var fullPath = attrExpression.GetFullPath();
-            if (!SCIMConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
+            if (!ParserConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
             {
                 return null;
             }
 
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
-            var propertyName = SCIMConstants.MappingStandardAttributePathToProperty[fullPath];
-            var property = Expression.Property(representationParameter, SCIMConstants.MappingStandardAttributePathToProperty[fullPath]);
+            var propertyName = ParserConstants.MappingStandardAttributePathToProperty[fullPath];
+            var property = Expression.Property(representationParameter, ParserConstants.MappingStandardAttributePathToProperty[fullPath]);
             var propertyType = typeof(SCIMRepresentation).GetProperty(propertyName).PropertyType;
             var orderBy = GetOrderByType(order, propertyType);
             var innerLambda = Expression.Lambda(property, new ParameterExpression[] { representationParameter });

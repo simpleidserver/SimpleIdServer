@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace SimpleIdServer.Scim.Serialization
 {
@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Serialization
             var scimSchemaAttribute = (SCIMSchemaAttribute)scimSchemaAttributes.First();
             var jObj = new JObject
             {
-                { SCIMConstants.StandardSCIMRepresentationAttributes.Schemas, new JArray(scimSchemaAttribute.Schemas) }
+                { StandardSCIMRepresentationAttributes.Schemas, new JArray(scimSchemaAttribute.Schemas) }
             };
             Serialize(instance, jObj);
             return jObj;

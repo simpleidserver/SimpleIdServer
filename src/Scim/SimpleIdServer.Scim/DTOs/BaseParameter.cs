@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
+using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -16,8 +17,8 @@ namespace SimpleIdServer.Scim.DTOs
         /// <summary>
         /// List of one or more URIs that indicate included SCIM schemas that are used to indicate the attributes contained within a resource.
         /// </summary>
-        [DataMember(Name = SCIMConstants.StandardSCIMRepresentationAttributes.Schemas)]
-        [JsonProperty(SCIMConstants.StandardSCIMRepresentationAttributes.Schemas)]
+        [DataMember(Name = StandardSCIMRepresentationAttributes.Schemas)]
+        [JsonProperty(StandardSCIMRepresentationAttributes.Schemas)]
         public IEnumerable<string> Schemas { get; set; }
     }
 }

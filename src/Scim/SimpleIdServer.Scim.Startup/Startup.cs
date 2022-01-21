@@ -10,7 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Startup.Consumers;
 using System;
 using System.Collections.Generic;
@@ -69,15 +70,15 @@ namespace SimpleIdServer.Scim.Startup
                     };
                 });
             var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User, true);
-            var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group, true);
-            var customResource = Builder.SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources", string.Empty, true)
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
+            var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMEndpoints.User);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
+            var customResource = SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources", string.Empty, true)
                 .AddStringAttribute("name")
                 .AddStringAttribute("lastname")
                 .AddDateTimeAttribute("birthDate")
                 .Build();
-            var entitlementSchema = Builder.SCIMSchemaBuilder.Create("urn:entitlement", "Entitlement", "Entitlements", string.Empty, true)
+            var entitlementSchema = SCIMSchemaBuilder.Create("urn:entitlement", "Entitlement", "Entitlements", string.Empty, true)
                 .AddStringAttribute("displayName")
                 .AddComplexAttribute("members", opt =>
                 {
@@ -86,7 +87,7 @@ namespace SimpleIdServer.Scim.Startup
                     opt.AddStringAttribute("type");
                 }, multiValued: true)
                 .Build();
-            var customUserSchema = Builder.SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUsers", string.Empty, true)
+            var customUserSchema = SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUsers", string.Empty, true)
                 .AddStringAttribute("userName", required: true)
                 .AddComplexAttribute("entitlements", opt =>
                 {
@@ -141,9 +142,9 @@ namespace SimpleIdServer.Scim.Startup
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
-                    SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                    SourceResourceType = StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
-                    TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
                     TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping

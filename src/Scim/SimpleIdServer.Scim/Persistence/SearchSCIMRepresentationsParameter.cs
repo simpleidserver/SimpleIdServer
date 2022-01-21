@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Persistence.Filters;
-using SimpleIdServer.Persistence.Filters.SCIMExpressions;
+using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Persistence

@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Provisioning.Extensions;
 using SimpleIdServer.Scim.Provisioning.Helpers;
 using System;

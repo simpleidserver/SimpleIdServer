@@ -10,6 +10,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,8 +60,8 @@ namespace SimpleIdServer.Scim.Swagger
                     };
                 });
             var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User, true);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group, true);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
             var schemas = new List<SCIMSchema>
             {
                 userSchema,
@@ -90,9 +91,9 @@ namespace SimpleIdServer.Scim.Swagger
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
-                    SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                    SourceResourceType = StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
-                    TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
                     TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                 },
             });

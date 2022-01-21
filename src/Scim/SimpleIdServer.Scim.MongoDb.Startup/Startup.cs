@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -73,9 +73,9 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 _.IgnoreUnsupportedCanonicalValues = false;
             });
             var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User, true);
-            var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMConstants.SCIMEndpoints.User);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group, true);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
+            var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMEndpoints.User);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
             userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
             {
                 Id = Guid.NewGuid().ToString(),
@@ -102,18 +102,18 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
-                    SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                    SourceResourceType = StandardSchemas.UserSchema.ResourceType,
                     SourceAttributeSelector = "groups",
-                    TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
                     TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
-                    SourceResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                     SourceAttributeSelector = "members",
-                    TargetResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                    TargetResourceType = StandardSchemas.UserSchema.ResourceType,
                     TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
                 }
             });

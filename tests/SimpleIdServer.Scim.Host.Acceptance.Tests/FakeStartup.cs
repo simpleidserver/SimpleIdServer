@@ -3,8 +3,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.Scim.Builder;
-using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Infrastructure.ValueProviders;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMConstants.SCIMEndpoints.User, "User Account", true)
+            var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMEndpoints.User, "User Account", true)
                .AddStringAttribute("userName", required: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE, caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                .AddComplexAttribute("name", c =>
                {
@@ -72,7 +72,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 .AddStringAttribute("employeeNumber", required: true)
                 .AddStringAttribute("duplicateAttr")
                 .Build();
-            var entitlementSchema = Builder.SCIMSchemaBuilder.Create("urn:entitlement", "Entitlement", "Entitlements", string.Empty, true)
+            var entitlementSchema = SCIMSchemaBuilder.Create("urn:entitlement", "Entitlement", "Entitlements", string.Empty, true)
                 .AddStringAttribute("displayName")
                 .AddComplexAttribute("members", opt =>
                 {
@@ -81,7 +81,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     opt.AddStringAttribute("type");
                 }, multiValued: true)
                 .Build();
-            var customUserSchema = Builder.SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUsers", string.Empty, true)
+            var customUserSchema = SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUsers", string.Empty, true)
                 .AddStringAttribute("userName", required: true)
                 .AddComplexAttribute("entitlements", opt =>
                 {
@@ -95,7 +95,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             {
                 userSchema,
                 enterpriseUser,
-                SCIMConstants.StandardSchemas.GroupSchema,
+                StandardSchemas.GroupSchema,
                 entitlementSchema,
                 customUserSchema
             };
@@ -107,14 +107,14 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                     SourceResourceType = userSchema.ResourceType,
                     SourceAttributeSelector = "groups",
-                    TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
-                    TargetAttributeId = SCIMConstants.StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
+                    TargetAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
-                    SourceAttributeId = SCIMConstants.StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id,
-                    SourceResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                    SourceAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id,
+                    SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                     SourceAttributeSelector = "members",
                     TargetResourceType = userSchema.ResourceType,
                     TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id

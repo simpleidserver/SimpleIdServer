@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
+    <ProjectReference Include="..\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Global.Designer.cs">
