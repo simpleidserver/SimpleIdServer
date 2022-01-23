@@ -154,7 +154,7 @@ Following chapters describe how to implement user authentication for each type o
 <li>Run the OPENID server.</li>
 </ul>
 <pre><code>cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 </code></pre>
 <h3 id="create-aspnet-core-application">Create ASP.NET CORE application</h3>
 <p>The last step consists to create and configure an ASP.NET CORE project.</p>
@@ -192,7 +192,7 @@ dotnet sln add ./src/AspNetCore/AspNetCore.csproj
     {
         options.SignInScheme = &quot;Cookies&quot;;
 
-        options.Authority = &quot;http://localhost:5000&quot;;
+        options.Authority = &quot;https://localhost:5001&quot;;
         options.RequireHttpsMetadata = false;
 
         options.ClientId = &quot;website&quot;;
@@ -308,7 +308,7 @@ Submit the credentials - login : <code>sub</code>, password : <code>password</co
 <li>Run the OPENID server.</li>
 </ul>
 <pre><code>cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 </code></pre>
 <h3 id="create-angular-application">Create angular application</h3>
 <p>The last step consists to create and configure an Angular project.</p>
@@ -355,7 +355,7 @@ export class AppModule { }
 <pre><code>import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authCodeFlowConfig: AuthConfig = {
-  issuer: 'http://localhost:5000',
+  issuer: 'https://localhost:5001',
   redirectUri: window.location.origin,
   clientId: 'website',
   responseType: 'code',
@@ -821,7 +821,7 @@ dotnet run --urls=http://*:5000;https://*:5001
 <li>Run the OPENID server.</li>
 </ul>
 <pre><code>cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 </code></pre>
 <h3 id="create-console-application">Create console application</h3>
 <p>The last step consists to create and configure a console application.</p>
@@ -857,7 +857,7 @@ dotnet sln add ./src/Console/Console.csproj
                 { &quot;client_id&quot;, &quot;trusted&quot; },
                 { &quot;client_secret&quot;, &quot;trustedSecret&quot; }
             };
-            var tokenResponse = httpClient.PostAsync(&quot;http://localhost:5000/token&quot;, new FormUrlEncodedContent(form)).Result;
+            var tokenResponse = httpClient.PostAsync(&quot;https://localhost:5001/token&quot;, new FormUrlEncodedContent(form)).Result;
             var json = tokenResponse.Content.ReadAsStringAsync().Result;
             System.Console.WriteLine(json);
         }
@@ -876,7 +876,7 @@ dotnet sln add ./src/Console/Console.csproj
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/openid/protectappsusers.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/openid/protectappsusers.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

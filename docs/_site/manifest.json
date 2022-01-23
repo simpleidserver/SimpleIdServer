@@ -1,6 +1,6 @@
 {
   "homepages": [],
-  "source_base_path": "C:/Projects/SimpleIdServer/docs",
+  "source_base_path": "c:/Projects/SimpleIdServer/docs",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -44,7 +44,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/gettingstarted/index.html",
-          "hash": "wtSdCt1SclzmSPoT9rBt1+jZIx6a4qo+eooLEtFE2HE="
+          "hash": "Tc99Z6dcG6PrIMYXNavaz8eAmsrZlMi6TL0BO/FWFdY="
         }
       },
       "is_incremental": true,
@@ -56,7 +56,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/authentication.html",
-          "hash": "MEk2iHKHXQwWQaXcPlQN93X48snzTO1AF1+vndcc+Fo="
+          "hash": "MFSz42IfCeR1hjZdMzJLFp9VDh4bJ9l1cTHYshV5gX4="
         }
       },
       "is_incremental": true,
@@ -211,7 +211,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/installation.html",
-          "hash": "mXJ7mWkmtJTHAEmSjuXpRPgBTFjoqLIO6wSGTBaV8+c="
+          "hash": "KdoxOqD9vkFI4lYJ2ctZfe1nOYWDwVySn80FUgdblHY="
         }
       },
       "is_incremental": true,
@@ -223,7 +223,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/persistence.html",
-          "hash": "QLmEGhsh+cCiZc9UzkfKi7QkbfDQRCMeb4anBok0d/Y="
+          "hash": "tdGZL34kEOxh7LjCJ7gjmUpJidMxst0xG5NqgwYOTK8="
         }
       },
       "is_incremental": true,
@@ -235,7 +235,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/protectapiclients.html",
-          "hash": "eJgJx8Oi6BKVd0x74TeWUUdY9mrKYrSJUFIDjgH5inc="
+          "hash": "XCWxvx62s3RJxAiqSDsG8K71ua7A8r6dnAqSsJRsVYs="
         }
       },
       "is_incremental": true,
@@ -247,7 +247,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/protectapiusers.html",
-          "hash": "JZLFmlZyRl3tToCtiCgJrYueeQCSPVc+reNIjMAqhjM="
+          "hash": "C2b+ihuDPAdwg0PP/VK+JPLxBZSkSH4lmn0I47vEC6g="
         }
       },
       "is_incremental": true,
@@ -259,7 +259,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/protectappsusers.html",
-          "hash": "ptDueF3xGyI3hk+EFzY+QqiH9puSDBiBx94UNiNac1U="
+          "hash": "JppGwMnwWSdQzQfEPQxR6DOUNtaSJaT/1Ugr9kHGktk="
         }
       },
       "is_incremental": true,
@@ -353,7 +353,7 @@
       "output": {
         ".html": {
           "relative_path": "documentation/scim20/persistence.html",
-          "hash": "BIYhTSwSmX1GqeyzQ22Pqeltfs8xOuRyxrWrWPj+7Pw="
+          "hash": "LpI4btUbMIlEdexZI32VaEQ97sVNlAw2tpCRkFczIWg="
         }
       },
       "is_incremental": true,
@@ -377,10 +377,91 @@
       "output": {
         ".html": {
           "relative_path": "documentation/toc.html",
-          "hash": "immfpd0Uw0IGWtiaShjz5XA4Ln78urmHUmC4KaEa88M="
+          "hash": "RCNmQomBp3yjlOtbEi7Azl78picexaWJcpooBAbZYxk="
         }
       },
       "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/uma20/definition.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/uma20/definition.html",
+          "hash": "2XUEBdQ81X8KxHs+b6iUjrj2B+Ixfx7eYjj3fP54UiQ="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/uma20/images/uma-1.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/uma20/images/uma-1.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/uma20/images/uma-2.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/uma20/images/uma-2.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "documentation/uma20/images/uma-3.png",
+      "output": {
+        "resource": {
+          "relative_path": "documentation/uma20/images/uma-3.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/uma20/installation.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/uma20/installation.html",
+          "hash": "4RvqJCfMjXGZ51FFAVMzl4HXfoHYz2E7dYTNup21v+o="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/uma20/persistence.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/uma20/persistence.html",
+          "hash": "OD0POYWYZM6OduWZoMwUM2aP883T92NpU9ClMkNFqx4="
+        }
+      },
+      "is_incremental": true,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "documentation/uma20/protectresource.md",
+      "output": {
+        ".html": {
+          "relative_path": "documentation/uma20/protectresource.html",
+          "hash": "bJ849REvbWGBe7jYYFe16jYyDBKKJYDXQiKjjYlVdbg="
+        }
+      },
+      "is_incremental": true,
       "version": ""
     },
     {
@@ -431,8 +512,8 @@
         "ConceptualDocumentProcessor": {
           "can_incremental": true,
           "incrementalPhase": "build",
-          "total_file_count": 14,
-          "skipped_file_count": 14
+          "total_file_count": 18,
+          "skipped_file_count": 18
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,

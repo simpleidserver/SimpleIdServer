@@ -135,7 +135,7 @@ The client is going to use the <strong>client credentials</strong> grant type to
 <li>Run the OPENID server.</li>
 </ul>
 <pre><code>cd src\OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 </code></pre>
 <h3 id="create-restapi-service">Create REST.API service</h3>
 <p>The second step consists to create and protect a REST.API service.</p>
@@ -201,7 +201,7 @@ public IEnumerable&lt;WeatherForecast&gt; Get()
 		{
 			cfg.TokenValidationParameters = new TokenValidationParameters
 			{
-				ValidIssuer = &quot;http://localhost:5000&quot;,
+				ValidIssuer = &quot;https://localhost:5001&quot;,
 				ValidAudiences = new List&lt;string&gt;
 				{
 					&quot;console&quot;
@@ -261,7 +261,7 @@ dotnet sln add ./src/Console/Console.csproj
                 { &quot;client_id&quot;, &quot;console&quot; },
                 { &quot;client_secret&quot;, &quot;consoleSecret&quot; }
             };
-            var tokenResponse = httpClient.PostAsync(&quot;http://localhost:5000/token&quot;, new FormUrlEncodedContent(form)).Result;
+            var tokenResponse = httpClient.PostAsync(&quot;https://localhost:5001/token&quot;, new FormUrlEncodedContent(form)).Result;
             var json = tokenResponse.Content.ReadAsStringAsync().Result;
             var req = new HttpRequestMessage
             {
@@ -288,7 +288,7 @@ dotnet sln add ./src/Console/Console.csproj
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/openid/protectapiclients.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/openid/protectapiclients.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

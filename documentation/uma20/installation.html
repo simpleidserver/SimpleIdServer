@@ -69,42 +69,35 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="installation">Installation</h1>
 
-<p>An OPENID server can be hosted in ASP.NET CORE project.</p>
+<p>A Standalone User-Managed Access (UMA2.0) API can be hosted in ASP.NET CORE project :</p>
 <pre><code>mkdir QuickStart
 cd QuickStart
 
 mkdir src
 cd src
 
-dotnet new openidinmem -n OpenId
+dotnet new umainmem -n UmaHost
 </code></pre>
 <p>The following files will be created :</p>
 <ul>
-<li><em>Program.cs</em> and <em>OpenIdStartup.cs</em> : application entry point.</li>
-<li><em>OpenIdDefaultConfiguration.cs</em> : OPENID server assets for example : Client, Users and Scopes.</li>
-<li><em>Views</em> and <em>Areas</em>.</li>
+<li><em>Program.cs</em> and <em>UmaStartup.cs</em> : application entry point.</li>
+<li><em>UmaDefaultConfiguration.cs</em> : UMA Server assets for example : Uma resource, Pending request and default clients.</li>
+<li><em>Views</em></li>
 <li><em>Resources</em> : UI translations in english and french.</li>
 </ul>
 <p>In case the Visual Studio Support is needed, a solution can be created :</p>
 <pre><code>cd ..
 dotnet new sln -n QuickStart
 </code></pre>
-<p>Add the OPENID server into the solution :</p>
-<pre><code>dotnet sln add ./src/OpenId/OpenId.csproj
+<p>Add the UMA server into the solution :</p>
+<pre><code>dotnet sln add ./src/UmaHost/UmaHost.csproj
 </code></pre>
-<p>Run the OPENID server and verify JSON is returned when you browse the following url : <a href="https://localhost:5001/.well-known/openid-configuration">https://localhost:5001/.well-known/openid-configuration</a>.</p>
-<pre><code>cd src/OpenId
-dotnet run --urls=https://localhost:5001
+<p>Run the UMA server and verify JSON is returned when you browse the following url: http://localhost:60003/.well-known/oauth-authorization-server</p>
+<pre><code>cd src/UmaHost
+dotnet run --urls=http://localhost:60003
 </code></pre>
 <p>The JSON returned should look like to something like this :</p>
-<p><img src="images/openid-1.png" alt="Well Known Configuration"></p>
-<p>Check if the authentication flow is working:</p>
-<ol>
-<li>Browse the <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state">URL</a>.</li>
-<li>Authenticate with the credentials - Login : <code>sub</code>, Password : <code>password</code>.</li>
-<li>Confirm the consent.</li>
-<li>User agent will be redirected to the callback url <code>https://localhost:60001</code>. The authorization code is passed in the query.</li>
-</ol>
+<p><img src="images/uma-1.png" alt="Well Known Configuration"></p>
 </article>
           </div>
           
@@ -113,7 +106,7 @@ dotnet run --urls=https://localhost:5001
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/openid/installation.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/uma20/installation.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

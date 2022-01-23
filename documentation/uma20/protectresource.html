@@ -1,0 +1,534 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Protect user's resource </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Protect user's resource ">
+    <meta name="generator" content="docfx 2.58.3.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="protect-users-resource">Protect user's resource</h1>
+
+<div class="WARNING">
+<h5>Warning</h5>
+<p>In order to run the scenario, an <strong>OPENID and a standalone UMA server must be installed and configured in a Visual Studio solution</strong>.
+The UMA2.0 server is relying on the OPENID server to authenticate end-users.</p>
+</div>
+<p>In this tutorial, we are going to protect the picture of a user.</p>
+<h2 id="source-code">Source Code</h2>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/UseUMAToProtectAPI">here</a>.</p>
+<h2 id="configure-openid-server">Configure OpenId server</h2>
+<p><strong>Pre-requisite</strong>: <a href="/documentation/openid/installation.html">OPENID server</a> must be installed in the Visual Studio Solution.</p>
+<p>The first step consists to configure the OPENID server.</p>
+<ul>
+<li>Open the Visual Studio solution and edit the <code>OpenIdDefaultConfiguration.cs</code> file.</li>
+<li>Register a <code>umaClient</code> client. This account is used by the UMA API to authenticate end-users. By default there is a UI installed with the UMA server, the <code>implicit</code> grant-type has been chosen to authenticate end-users.</li>
+</ul>
+<pre><code>new OpenIdClient
+{
+    ClientId = &quot;umaClient&quot;,
+    ClientSecret = &quot;umaClientSecret&quot;,
+    ApplicationKind = ApplicationKinds.Service,
+    TokenEndPointAuthMethod = &quot;client_secret_post&quot;,
+    ApplicationType = &quot;web&quot;,
+    UpdateDateTime = DateTime.UtcNow,
+    CreateDateTime = DateTime.UtcNow,
+    TokenExpirationTimeInSeconds = 60 * 30,
+    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+    TokenSignedResponseAlg = &quot;RS256&quot;,
+    IdTokenSignedResponseAlg = &quot;RS256&quot;,
+    AllowedScopes = new List&lt;OAuthScope&gt;
+    {
+        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+        SIDOpenIdConstants.StandardScopes.Profile,
+        SIDOpenIdConstants.StandardScopes.Email
+    },
+    GrantTypes = new List&lt;string&gt;
+    {
+        &quot;implicit&quot;,
+        &quot;authorization_code&quot;
+    },
+    RedirectionUrls = new List&lt;string&gt;
+    {
+        &quot;http://localhost:60003/signin-oidc&quot;
+    },
+    PreferredTokenProfile = &quot;Bearer&quot;,
+    ResponseTypes = new List&lt;string&gt;
+    {
+        &quot;token&quot;,
+        &quot;id_token&quot;,
+        &quot;code&quot;
+    }
+}
+</code></pre>
+<ul>
+<li>Register a <code>tradWebsite</code> client. This account will be used to get an access token valids on a specific user profile. This token will be transfered to the UMA API, it is used by internal authorization policies to check if incoming request have the permission to access to a specific resource.</li>
+</ul>
+<pre><code>new OpenIdClient
+{
+    ClientId = &quot;tradWebsite&quot;,
+    ClientSecret = &quot;tradWebsiteSecret&quot;,
+    ApplicationKind = ApplicationKinds.Web,
+    TokenEndPointAuthMethod = &quot;client_secret_post&quot;,
+    ApplicationType = &quot;web&quot;,
+    UpdateDateTime = DateTime.UtcNow,
+    CreateDateTime = DateTime.UtcNow,
+    TokenExpirationTimeInSeconds = 60 * 30,
+    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+    TokenSignedResponseAlg = &quot;RS256&quot;,
+    IdTokenSignedResponseAlg = &quot;RS256&quot;,
+    AllowedScopes = new List&lt;OAuthScope&gt;
+    {
+        SIDOpenIdConstants.StandardScopes.OpenIdScope,
+        SIDOpenIdConstants.StandardScopes.Profile
+    },
+    GrantTypes = new List&lt;string&gt;
+    {
+        &quot;authorization_code&quot;,
+        &quot;password&quot;
+    },
+    RedirectionUrls = new List&lt;string&gt;
+    {
+        &quot;https://localhost:5001/signin-oidc&quot;
+    },
+    PreferredTokenProfile = &quot;Bearer&quot;,
+    ResponseTypes = new List&lt;string&gt;
+    {
+        &quot;code&quot;,
+        &quot;token&quot;,
+        &quot;id_token&quot;
+    }
+}
+</code></pre>
+<ul>
+<li>Register a <code>guest</code> user. This user is trying to access to the Picture which belongs to the user <code>sub</code>.</li>
+</ul>
+<pre><code>new OAuthUser
+{
+    Id = &quot;guest&quot;,
+    Credentials = new List&lt;UserCredential&gt;
+    {
+        new UserCredential
+        {
+            CredentialType = &quot;pwd&quot;,
+            Value = PasswordHelper.ComputeHash(&quot;password&quot;)
+        }
+    },
+    CreateDateTime = DateTime.Now,
+    UpdateDateTime = DateTime.Now,
+    OAuthUserClaims = new List&lt;UserClaim&gt;
+    {
+        new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Subject, &quot;guest&quot;),
+        new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.Name, &quot;guest&quot;),
+        new UserClaim(SimpleIdServer.Jwt.Constants.UserClaims.FamilyName, &quot;guest&quot;)
+    }
+}
+</code></pre>
+<ul>
+<li>Run the OPENID server.</li>
+</ul>
+<pre><code>cd src\OpenId
+dotnet run --urls=https://localhost:5001
+</code></pre>
+<h2 id="configure-uma-server">Configure UMA server</h2>
+<p><strong>Pre-requisite</strong>: <a href="/documentation/uma20/installation.html">UMA server</a> must be installed in the Visual Studio Solution.</p>
+<p>The second step consists to configure the UMA server. A picture resource must be specified in order to protect it.</p>
+<ul>
+<li>Open the Visual Studio solution and edit the <code>UmaDefaultConfiguration.cs</code> file.</li>
+<li>Add a protected resource. This resource belongs to the <code>sub</code> user and corresponds to his picture. When the end-user is authenticated on the <a href="http://localhost:60003">UMA portal</a>, he can choose the users who have access to this resource.</li>
+</ul>
+<pre><code>new UMAResource(&quot;resourceId&quot;, DateTime.UtcNow)
+{
+    Translations = new List&lt;UMAResourceTranslation&gt;
+    {
+        new UMAResourceTranslation
+        {
+            Translation = new OAuthTranslation(Guid.NewGuid().ToString(), &quot;pictureDescription&quot;, &quot;en&quot;)
+            {
+                Type = &quot;description&quot;
+            }
+        },
+        new UMAResourceTranslation
+        {
+            Translation = new OAuthTranslation(Guid.NewGuid().ToString(), &quot;descriptionImage&quot;, &quot;fr&quot;)
+            {
+                Type = &quot;description&quot;
+            }
+        },
+        new UMAResourceTranslation
+        {
+            Translation = new OAuthTranslation(Guid.NewGuid().ToString(), &quot;pictureName&quot;, &quot;en&quot;)
+            {
+                Type = &quot;name&quot;
+            }
+        },
+        new UMAResourceTranslation
+        {
+            Translation = new OAuthTranslation(Guid.NewGuid().ToString(), &quot;nomImage&quot;, &quot;fr&quot;)
+            {
+                Type = &quot;name&quot;
+            }
+        }
+    },
+    Scopes = new List&lt;string&gt;
+    {
+        &quot;read&quot;
+    },
+    Subject = &quot;sub&quot;,
+    Type = &quot;type&quot;
+}
+</code></pre>
+<ul>
+<li>Register an <code>api</code> client. This account is used by the REST.API service to get an access token valids on the scope <code>uma_protection</code> (Protection API Access Token or PAT). The PAT is used by the API to get a Permission Ticket (PT) and transfers it to the external client. This ticket will be used during the <code>uma-ticket</code> grant-type in order to get a valid Relying Party Token (RPT).</li>
+</ul>
+<pre><code>new OAuthClient
+{
+    ClientId = &quot;api&quot;,
+    ClientSecret = &quot;apiSecret&quot;,
+    TokenEndPointAuthMethod = &quot;client_secret_post&quot;,
+    UpdateDateTime = DateTime.UtcNow,
+    CreateDateTime = DateTime.UtcNow,
+    TokenExpirationTimeInSeconds = 60 * 30,
+    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+    TokenSignedResponseAlg = &quot;RS256&quot;,
+    AllowedScopes = new List&lt;OAuthScope&gt;
+    {
+        UMAConstants.StandardUMAScopes.UmaProtection
+    },
+    GrantTypes = new List&lt;string&gt;
+    {
+        &quot;client_credentials&quot;
+    },
+    PreferredTokenProfile = &quot;Bearer&quot;,
+    ResponseTypes = new List&lt;string&gt;
+    {
+        &quot;token&quot;
+    }
+}
+</code></pre>
+<ul>
+<li>Register a <code>client</code> client. An external client who is trying to access to the protected resource. This client has the permission to use the grant-type <code>uma-ticket</code> to get a Relying Party Token (RPT).</li>
+</ul>
+<pre><code>new OAuthClient
+{
+    ClientId = &quot;client&quot;,
+    ClientSecret = &quot;clientSecret&quot;,
+    TokenEndPointAuthMethod = &quot;client_secret_post&quot;,
+    UpdateDateTime = DateTime.UtcNow,
+    CreateDateTime = DateTime.UtcNow,
+    TokenExpirationTimeInSeconds = 60 * 30,
+    RefreshTokenExpirationTimeInSeconds = 60 * 30,
+    TokenSignedResponseAlg = &quot;RS256&quot;,
+    GrantTypes = new List&lt;string&gt;
+    {
+        &quot;urn:ietf:params:oauth:grant-type:uma-ticket&quot;
+    },
+    PreferredTokenProfile = &quot;Bearer&quot;,
+    ResponseTypes = new List&lt;string&gt;
+    {
+        &quot;token&quot;
+    }
+}
+</code></pre>
+<ul>
+<li>Run the UMA server.</li>
+</ul>
+<pre><code>cd src\UmaHost
+dotnet run --urls=http://localhost:60003
+</code></pre>
+<h2 id="create-api">Create API</h2>
+<p>The last step consists to create a REST.API service.
+It contains one operation used to get a picture by its identifier.</p>
+<ul>
+<li>Open a command prompt and navigate to the <code>src</code> subfolder of your project.</li>
+<li>Create a directory <code>WebApi</code> and create an ASP.NET CORE web API project in it :</li>
+</ul>
+<pre><code>mkdir WebApi
+
+dotnet new webapi -n WebApi
+</code></pre>
+<ul>
+<li>Add the <code>WebApi</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..
+dotnet sln add ./src/WebApi/WebApi.csproj
+</code></pre>
+<ul>
+<li>Install the Nuget package <code>Microsoft.AspNetCore.Authentication.JwtBearer</code>. It will be used to add OAUTH2.0 authentication in the project.</li>
+</ul>
+<pre><code>dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+</code></pre>
+<ul>
+<li>Edit the <code>Startup.cs</code> file. Add the following code in the <code>ConfigureServices</code> procedure to configure the OAUTH2.0 authentication :</li>
+</ul>
+<pre><code>const string modulus = &quot;3JsFC7E93xAShgnNp9dDWJPOHjJYLGPX464AfKW9gOB5CGD2uIYiP9m6yuZd73Z334RhQw616IMYijAvtpK25Nkk91KoAvrRoUGv2bl6pmX2JwUjwqe+lbmop4Rj9tzC2UBrGPcWSbIMNLaHkUrqR15DwVdFkG19QBwo9X6gOjCgSDvV0OY7vmwq1M3j2YmDwWnyTXh92wnUn2Hg57mVNZCX8RgdhdaWR6tiFP3QtgEYzZEulOGP6PKilqSr7E6Smg7mUNy6JTRkMGm1KZHTAY6HuNG5PPq0DUmsg8YMmsGEQPHMjw7IdaPxO0qy0aC1fiLj8NgWBOJ6bgrck55vfQ==&quot;;
+const string exponent = &quot;AQAB&quot;;
+var rsa = RSA.Create();
+var rsaParameters = new RSAParameters
+{
+    Modulus = Convert.FromBase64String(modulus),
+    Exponent = Convert.FromBase64String(exponent)
+};
+rsa.ImportParameters(rsaParameters);
+var issuerSigningKey = new RsaSecurityKey(rsa);
+services.AddAuthentication(options =&gt;
+{
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =&gt;
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = issuerSigningKey,
+            ValidAudiences = new List&lt;string&gt;
+            {
+                &quot;client&quot;
+            },
+            ValidIssuers = new List&lt;string&gt;
+            {
+                &quot;http://localhost:60003&quot;
+            }
+        };
+    });
+</code></pre>
+<ul>
+<li>Add a new <code>Picture</code> class.</li>
+</ul>
+<pre><code>public class Picture
+{
+    public string Id { get; set; }
+    public string Description { get; set; }
+    public string Name { get; set; }
+    public string ResourceId { get; set; }
+}
+</code></pre>
+<ul>
+<li>Add a new controller <code>PicturesController</code>.</li>
+<li>Add a private function <code>GetAccessTokenWithUMAProtectionScope</code>. It will be called to get an access token (Protection API Access Token or PAT) valids on the <code>uma_protection</code> scope. This PAT token will be used to get a Permission Ticket (PT) valids on a specific UMA resource and one or more scopes.</li>
+</ul>
+<pre><code>private async Task&lt;string&gt; GetAccessTokenWithUMAProtectionScope()
+{
+    using (var httpClient = new HttpClient())
+    {
+        var request = new HttpRequestMessage
+        {
+            RequestUri = new Uri(&quot;http://localhost:60003/token&quot;),
+            Method = HttpMethod.Post,
+            Content = new FormUrlEncodedContent(new Dictionary&lt;string, string&gt;
+            {
+                { &quot;client_id&quot;, &quot;api&quot; },
+                { &quot;client_secret&quot;, &quot;apiSecret&quot; },
+                { &quot;grant_type&quot;, &quot;client_credentials&quot; },
+                { &quot;response_type&quot;, &quot;token&quot; },
+                { &quot;scope&quot;, &quot;uma_protection&quot; }
+            })
+        };
+
+        var result = await httpClient.SendAsync(request);
+        var json = await result.Content.ReadAsStringAsync();
+        var jObj = JsonDocument.Parse(json);
+        return jObj.RootElement.GetProperty(&quot;access_token&quot;).GetString();
+    }
+}
+</code></pre>
+<ul>
+<li>Store one or more pictures in the <code>PicturesController</code> class.</li>
+</ul>
+<pre><code>private List&lt;Picture&gt; _pictures = new List&lt;Picture&gt;
+{
+    new Picture
+    {
+        Id = &quot;id&quot;,
+        Description = &quot;description&quot;,
+        Name = &quot;name&quot;,
+        ResourceId = &quot;resourceId&quot;
+    }
+};
+</code></pre>
+<ul>
+<li>Add a new <code>Get</code> API operation. If the incoming request has the permission to access to the picture (Protected Resource) the this object will be returned.</li>
+</ul>
+<pre><code>[HttpGet(&quot;{id}&quot;)]
+public async Task&lt;IActionResult&gt; Get(string id)
+{
+    var picture = _pictures.FirstOrDefault(p =&gt; p.Id == id);
+    if (picture == null)
+    {
+        return new NotFoundResult();
+    }
+
+    var authResult = await _authenticationService.AuthenticateAsync(HttpContext, JwtBearerDefaults.AuthenticationScheme);
+    var isAuthorized = authResult.Succeeded;
+    if (isAuthorized)
+    {
+        isAuthorized = authResult.Principal.Claims.Any(c =&gt; {
+            if (c.Type != &quot;permissions&quot;)
+            {
+                return false;
+            }
+
+
+            var jObj = JsonDocument.Parse(c.Value);
+            var resourceId = jObj.RootElement.GetProperty(&quot;resource_id&quot;).GetString();
+            if (resourceId != picture.ResourceId)
+            {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    if (!isAuthorized)
+    {
+        using (var httpClient = new HttpClient())
+        {
+            var jObj = JsonSerializer.Serialize(new
+            {
+                resource_id = picture.ResourceId,
+                resource_scopes = new string[] { &quot;read&quot; }
+            });
+            var accessToken = await GetAccessTokenWithUMAProtectionScope();
+            var httpRequest = new HttpRequestMessage
+            {
+                RequestUri = new Uri(&quot;http://localhost:60003/perm&quot;),
+                Method = HttpMethod.Post,
+                Content = new StringContent(jObj, Encoding.UTF8, &quot;application/json&quot;)
+            };
+            httpRequest.Headers.Add(&quot;Authorization&quot;, $&quot;Bearer {accessToken}&quot;);
+            var httpResult = await httpClient.SendAsync(httpRequest);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            return new BadRequestObjectResult(new
+            {
+                ticket = JsonDocument.Parse(json).RootElement.GetProperty(&quot;ticket&quot;).GetString()
+            });
+
+        }
+    }
+
+    return new OkObjectResult(picture);
+}
+</code></pre>
+<ul>
+<li>Run the REST.API.</li>
+</ul>
+<pre><code>cd src\WebApi
+dotnet run --urls=http://localhost:60004
+</code></pre>
+<h2 id="access-to-the-protected-resource">Access to the protected resource</h2>
+<p>Execute the <a href="https://documenter.getpostman.com/view/574127/UVXgNHuq">POSTMAN requests</a> in the correct order to access to the protected resource.
+The collection contains the following requests :</p>
+<ol>
+<li>The external client is passing an  emtpy request to the GET operation therefore a permission ticket valids on a specific UMA resource and one or more scopes is returned by the REST.API.</li>
+<li>The external client is using the <code>password</code> grant-type to get an access token valids on a specific user profile.</li>
+<li>The external client is using the <code>uma_ticket</code> grant-type to get a Relying Party Token (RPT). When the request is executed for the first time then a JSON object <code>request_submitted</code> is returned. It indicates that a request has been added and must be confirmed by the Resource Owner <code>sub</code>.
+<ol>
+<li>Navigate to the <a href="http://localhost:60003">UMA website</a>, authenticate with the credentials - login : <code>sub</code>, password: <code>password</code>, click on <code>My received requests</code> and confirm the request.</li>
+<li>Reissue the request from 1 to 3. At the end, an access token (Relying Party Token or RPT) should be returned.</li>
+</ol>
+</li>
+</ol>
+<p><img src="images/uma-3.png" alt="My received requests"></p>
+<ol start="4">
+<li>The external client is passing the Relying Party Token (RPT)to the GET operation. Finally, the picture is returned to the caller.</li>
+</ol>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/uma20/protectresource.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

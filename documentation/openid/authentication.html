@@ -74,10 +74,11 @@
 These rules can often be satisfied by using a number of different authentication methods, either singly or in combination.</p>
 <p>In short, the Authentication Context Class Reference (ACR) ensures the correctness of the user identity.
 In SimpleIdServer, the ACR is similar to the Level Of Assurance. The higher your Level Of Assurance, the better the identity of a user can be trusted.</p>
-<p>It's up to the Relying Party to specify the ACR value. This value is passed in the &quot;acr_values&quot; parameter with the authorization query.</p>
+<p>It's up to the Relying Party to specify the ACR value. This value is passed in the <code>acr_values</code> parameter with the authorization query.</p>
 <p><strong>Example</strong> : If you want to authenticate with a Level Of Assurance equals to 2, navigate to the following URL : <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state&amp;acr_values=sid-load-02&amp;prompt=login">https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state&amp;acr_values=sid-load-02&amp;prompt=login</a>.
 During the authentication flow, the user agent will be redirected to the <code>Password</code> and <code>Sms</code> authentication window.</p>
-<p>The list of Authentication Context Class Reference (ACR) can be configured in the <code>OpenIdDefaultConfiguration.cs</code> file. By default, there are two ACR <code>sid-load-01</code> and <code>sid-load-02</code>.</p>
+<p>The list of Authentication Context Class Reference (ACR) can be configured in the <code>OpenIdDefaultConfiguration.cs</code> file.</p>
+<p>By default, there are two ACR values : <code>sid-load-01</code> and <code>sid-load-02</code>.</p>
 <pre><code>public static List&lt;AuthenticationContextClassReference&gt; AcrLst =&gt; new List&lt;AuthenticationContextClassReference&gt;
 {
     new AuthenticationContextClassReference
@@ -126,28 +127,22 @@ During the authentication flow, the user agent will be redirected to the <code>P
 </table>
 <h2 id="login-password-authentication">Login Password Authentication</h2>
 <p><strong>Authentication method</strong> : pwd</p>
-<p>The Login Password authentication is included in the SimpleIdServer template. There is no need to install a specific nuget package.</p>
+<p>The Login/Password authentication is included and configured in all the OPENID templates.
+There is no need to do manual changes.</p>
 <h2 id="email-authentication">Email Authentication</h2>
 <p><strong>Authentication method</strong> : email</p>
-<p>Email authentication can be configured on the OPENID server like this :</p>
-<ul>
-<li>Open a command prompt and navigate to the directory <code>src\OpenID</code>.</li>
-<li>Install the Nuget package <code>SimpleIdServer.UI.Authenticate.Email.Bootstrap4</code>.</li>
-</ul>
-<pre><code>dotnet add package SimpleIdServer.UI.Authenticate.Email.Bootstrap4
+<p>An OPENID server with Login/Password and Email authentications can be installed like this.</p>
+<pre><code>mkdir QuickStart
+cd QuickStart
+
+mkdir src
+cd src
+
+dotnet new openidemail -n OpenIdEmail
 </code></pre>
 <ul>
-<li>Open the <code>OpenIdStartup.cs</code> and add the following code after <code>AddLoginPasswordAuthentication</code> call. Replace the <code>SMTPUSERNAME</code>, <code>SMTPPASSWORD</code>, <code>FROMEMAIL</code>, <code>SMTPHOST</code>, <code>SMTPPORT</code> with the correct values.</li>
+<li>Open the <code>OpenIdStartup.cs</code> and replace the <code>SMTPUSERNAME</code>, <code>SMTPPASSWORD</code>, <code>FROMEMAIL</code>, <code>SMTPHOST</code>, <code>SMTPPORT</code> with the correct values.</li>
 </ul>
-<pre><code>AddEmailAuthentication(opts =&gt;
-{
-    opts.SmtpUserName = &quot;&lt;&lt;SMTPUSERNAME&gt;&gt;&quot;;
-    opts.SmtpPassword = &quot;&lt;&lt;SMTPPASSWORD&gt;&gt;&quot;;
-    opts.FromEmail = &quot;&lt;&lt;FROMEMAIL&gt;&gt;&quot;;
-	opts.SmtpHost = &quot;&lt;&lt;SMTPHOST&gt;&gt;&quot;;
-	opts.SmtpPort = &lt;&lt;SMTPPORT&gt;&gt;
-})
-</code></pre>
 <table>
 <thead>
 <tr>
@@ -185,7 +180,7 @@ During the authentication flow, the user agent will be redirected to the <code>P
 </tbody>
 </table>
 <ul>
-<li>Edit the <code>OpenIdDefaultConfiguration.cs</code> file and add a new ACR :</li>
+<li>Edit the <code>OpenIdDefaultConfiguration.cs</code> file and add an ACR :</li>
 </ul>
 <pre><code>new AuthenticationContextClassReference
 {
@@ -206,7 +201,7 @@ During the authentication flow, the user agent will be redirected to the <code>P
 <ul>
 <li>Run the application</li>
 </ul>
-<pre><code>dotnet run
+<pre><code>dotnet run --urls=https://localhost:5001
 </code></pre>
 <ul>
 <li>Navigate to this URL <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state&amp;acr_values=sid-load-02-1&amp;prompt=login">https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state&amp;acr_values=sid-load-02-1&amp;prompt=login</a></li>
@@ -217,15 +212,17 @@ During the authentication flow, the user agent will be redirected to the <code>P
 <h2 id="sms-authentication">SMS Authentication</h2>
 <p><strong>Authentication method</strong> : sms</p>
 <p>SimpleIdServer is using <a href="https://www.twilio.com/">Twilio</a> to send confirmation code to phones.</p>
-<p>SMS authentication can be configured on the OPENID server like this :</p>
-<ul>
-<li>Open a command prompt and navigate to the directory <code>src\OpenId</code>.</li>
-<li>Install the Nuget package <code>SimpleIdServer.UI.Authenticate.Sms.Bootstrap4</code>.</li>
-</ul>
-<pre><code>dotnet add package SimpleIdServer.UI.Authenticate.Sms.Bootstrap4
+<p>An OPENID server with Login/Password and SMS authentications can be installed like this.</p>
+<pre><code>mkdir QuickStart
+cd QuickStart
+
+mkdir src
+cd src
+
+dotnet new openidsms -n OpenIdSms
 </code></pre>
 <ul>
-<li>Open the <code>OpenIdStartup.cs</code> and add the following code after <code>AddLoginPasswordAuthentication</code> call. Replace the <code>ACCOUNTSID</code>, <code>AUTHTOKEN</code> and <code>FROMPHONENUMBER</code> with the correct values, for more information refer to the <a href="https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-How-to-Change-Them">official website</a>.</li>
+<li>Open the <code>OpenIdStartup.cs</code> and replace the <code>ACCOUNTSID</code>, <code>AUTHTOKEN</code> and <code>FROMPHONENUMBER</code> with the correct values, for more information refer to the <a href="https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-How-to-Change-Them">official website</a>.</li>
 </ul>
 <pre><code>AddSMSAuthentication(opts =&gt;
 {
@@ -243,7 +240,7 @@ During the authentication flow, the user agent will be redirected to the <code>P
 <ul>
 <li>Run the application.</li>
 </ul>
-<pre><code>dotnet run
+<pre><code>dotnet run --urls=https://localhost:5001
 </code></pre>
 <ul>
 <li>Navigate to this URL <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state&amp;acr_values=sid-load-02&amp;prompt=login">https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state&amp;acr_values=sid-load-02&amp;prompt=login</a></li>
@@ -251,6 +248,17 @@ During the authentication flow, the user agent will be redirected to the <code>P
 <li>Submit the confirmation code received on your phone.</li>
 </ul>
 <p><img src="images/openid-3.png" alt="Confirmation code"></p>
+<h2 id="sms-and-email-authentication">SMS and Email authentication</h2>
+<p><strong>Authentication methods</strong> : sms and email</p>
+<p>An OPENID server with all the authentication methods can be installed like this :</p>
+<pre><code>mkdir QuickStart
+cd QuickStart
+
+mkdir src
+cd src
+
+dotnet new openidfull -n OpenIdFull
+</code></pre>
 </article>
           </div>
           
@@ -259,7 +267,7 @@ During the authentication flow, the user agent will be redirected to the <code>P
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/openid/authentication.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/openid/authentication.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

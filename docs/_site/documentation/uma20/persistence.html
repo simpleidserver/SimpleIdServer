@@ -69,24 +69,24 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="persistence">Persistence</h1>
 
-<p>By default, all the assets like <code>Clients</code>, <code>Scopes</code>, <code>Users</code> and <code>JSON Web Keys</code> are stored in memory. The following data storage can be used.</p>
+<p>By default, all the assets like <code>Clients</code>, <code>Scopes</code>, <code>JSON Web Keys</code> and <code>UMA Resources</code> are stored in memory. The following data storage can be used.</p>
 <h2 id="sqlserver">SQLServer</h2>
 <div class="WARNING">
 <h5>Warning</h5>
-<p>A SimpleIdServer template exists to create OPENID server with EF support.</p>
+<p>A SimpleIdServer template exists to create UMA2.0 server with EF support.</p>
 <ul>
-<li>Execute the command line <code>dotnet new openidef -n OpenId</code>.</li>
+<li>Execute the command line <code>dotnet new umaef -n UmaHost</code>.</li>
 <li>Create the migration scripts <code>dotnet ef migrations add Init</code>.</li>
-<li>Update the <code>CONNECTIONSTRING</code> parameter in the files <code>OpenIDMigration.cs</code> and <code>Startup.cs</code> before running the solution.</li>
+<li>Update the <code>CONNECTIONSTRING</code> parameter in the files <code>UmaMigration.cs</code> and <code>UmaStartup.cs</code> before running the solution.</li>
 </ul>
 </div>
-<p><strong>Pre-requisite</strong> : <a href="/documentation/openid/installation.html">OPENID server must be installed</a> in the Visual Studio Solution.</p>
+<p><strong>Pre-requisite</strong> : <a href="/documentation/uma20/installation.html">UMA server must be installed</a> in the Visual Studio Solution.</p>
 <p>SQL Server data storage can be configured like this :</p>
 <ul>
-<li>In a command prompt, navigate to the directory <code>src\OpenId</code>.</li>
-<li>Install the Nuget package <code>SimpleIdServer.OpenID.EF</code>.</li>
+<li>In a command prompt, navigate to the directory <code>src\UmaHost</code>.</li>
+<li>Install the Nuget package <code>SimpleIdServer.Uma.EF</code></li>
 </ul>
-<pre><code>dotnet add package SimpleIdServer.OpenID.EF
+<pre><code>dotnet add package SimpleIdServer.Uma.EF
 </code></pre>
 <ul>
 <li>Install the Nuget package <code>Microsoft.EntityFrameworkCore.SqlServer</code></li>
@@ -99,16 +99,16 @@
 <pre><code>dotnet add package Microsoft.EntityFrameworkCore.Design
 </code></pre>
 <ul>
-<li>Create an <code>OpenIdMigration</code> class and replace the content with the following code. The CONNECTIONSTRING must be updated :</li>
+<li>Create a <code>UmaMigration</code> class  and replace the content with the following code. The <code>CONNECTIONSTRING</code> must be updated :</li>
 </ul>
-<pre><code>public class OpenIDMigration : IDesignTimeDbContextFactory&lt;OpenIdDBContext&gt;
+<pre><code>public class UmaMigration : IDesignTimeDbContextFactory&lt;UMAEFDbContext&gt;
 {
-    public OpenIdDBContext CreateDbContext(string[] args)
+    public UMAEFDbContext CreateDbContext(string[] args)
     {
-        var migrationsAssembly = typeof(OpenIdStartup).GetTypeInfo().Assembly.GetName().Name;
-        var builder = new DbContextOptionsBuilder&lt;OpenIdDBContext&gt;();
+        var migrationsAssembly = typeof(UmaStartup).GetTypeInfo().Assembly.GetName().Name;
+        var builder = new DbContextOptionsBuilder&lt;UMAEFDbContext&gt;();
         builder.UseSqlServer(&quot;&lt;&lt;CONNECTIONSTRING&gt;&gt;&quot;, optionsBuilder =&gt; optionsBuilder.MigrationsAssembly(migrationsAssembly));
-        return new OpenIdDBContext(builder.Options);
+        return new UMAEFDbContext(builder.Options);
     }
 }
 </code></pre>
@@ -123,12 +123,43 @@
 <pre><code>dotnet ef database update
 </code></pre>
 <ul>
-<li>Open the <code>Startup.cs</code> file, replace any existing calls to <code>AddClients</code>, <code>AddAcrs</code>, <code>AddUsers</code>, <code>AddJsonWebKeys</code> by <code>AddOpenIDEF</code>. The <code>CONNECTIONSTRING</code> must be updated.</li>
+<li>Open the <code>Startup.cs</code> file, replace any existing calls to <code>AddScopes</code>, <code>AddUmaResources</code>, <code>AddClients</code> and <code>AddJsonWebKeys</code> by <code>AddSIDUmaEF</code>. The <code>CONNECTIONSTRING</code> must be udated :</li>
 </ul>
-<pre><code>services
-    .AddSIDOpenID()
-    .AddOpenIDEF(opt =&gt; opt.UseSqlServer(&quot;&lt;&lt;CONNECTIONSTRING&gt;&gt;&quot;, o =&gt; o.MigrationsAssembly(typeof(OpenIdStartup).GetTypeInfo().Assembly.GetName().Name)))
-    .AddLoginPasswordAuthentication();
+<pre><code>AddSIDUmaEF(opt =&gt;
+{
+    opt.UseSqlServer(&quot;&lt;&lt;CONNECTIONSTRING&gt;&gt;&quot;, o =&gt; o.MigrationsAssembly(typeof(UmaStartup).GetTypeInfo().Assembly.GetName().Name));
+})
+</code></pre>
+<ul>
+<li>Create a new private <code>InitializeDatabase</code> method. It will be called by the <code>Configured</code> procedure in order to create the database and feed the data.</li>
+</ul>
+<pre><code>private void InitializeDatabase(IApplicationBuilder app)
+{
+    using (var scope = app.ApplicationServices.GetRequiredService&lt;IServiceScopeFactory&gt;().CreateScope())
+    {
+        using (var context = scope.ServiceProvider.GetService&lt;UMAEFDbContext&gt;())
+        {
+            context.Database.Migrate();
+            if (context.Resources.Any())
+            {
+                return;
+            }
+
+            var oauthJsonWebKey = ExtractOAuthJsonWebKey();
+            context.Resources.AddRange(UmaDefaultConfiguration.Resources);
+            context.OAuthClients.AddRange(UmaDefaultConfiguration.DefaultClients);
+            context.OAuthScopes.AddRange(UmaDefaultConfiguration.DefaultScopes);
+            context.JsonWebKeys.Add(oauthJsonWebKey);
+            context.SaveChanges();
+        }
+    }
+}
+</code></pre>
+<ul>
+<li>Run the UMA server and verify JSON is returned when you browse the following URL :</li>
+</ul>
+<pre><code>cd src/UmaHost
+dotnet run --urls=http://localhost:60003
 </code></pre>
 </article>
           </div>
@@ -138,7 +169,7 @@
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/openid/persistence.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/uma20/persistence.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>

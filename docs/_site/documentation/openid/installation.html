@@ -69,15 +69,14 @@
             <article class="content wrap" id="_content" data-uid="">
 <h1 id="installation">Installation</h1>
 
-<p>An OPENID server with bootstrap4 theme can be hosted in ASP.NET CORE project.
-There is one Nuget package per UI theme, at the moment only Bootstrap4 library is supported:</p>
+<p>An OPENID server can be hosted in ASP.NET CORE project.</p>
 <pre><code>mkdir QuickStart
 cd QuickStart
 
 mkdir src
 cd src
 
-dotnet new openidinmembs4 -n OpenId
+dotnet new openidinmem -n OpenId
 </code></pre>
 <p>The following files will be created :</p>
 <ul>
@@ -95,7 +94,7 @@ dotnet new sln -n QuickStart
 </code></pre>
 <p>Run the OPENID server and verify JSON is returned when you browse the following url : <a href="https://localhost:5001/.well-known/openid-configuration">https://localhost:5001/.well-known/openid-configuration</a>.</p>
 <pre><code>cd src/OpenId
-dotnet run
+dotnet run --urls=https://localhost:5001
 </code></pre>
 <p>The JSON returned should look like to something like this :</p>
 <p><img src="images/openid-1.png" alt="Well Known Configuration"></p>
@@ -104,7 +103,7 @@ dotnet run
 <li>Browse the <a href="https://localhost:5001/authorization?client_id=umaClient&amp;redirect_uri=https://localhost:60001/signin-oidc&amp;response_type=code&amp;scope=openid%20profile&amp;state=state">URL</a>.</li>
 <li>Authenticate with the credentials - Login : <code>sub</code>, Password : <code>password</code>.</li>
 <li>Confirm the consent.</li>
-<li>User agent will be redirected to the callback url <code>https://localhost:60001</code>, the authorization code is passed in the query.</li>
+<li>User agent will be redirected to the callback url <code>https://localhost:60001</code>. The authorization code is passed in the query.</li>
 </ol>
 </article>
           </div>
@@ -114,7 +113,7 @@ dotnet run
               <div class="contribution">
                 <ul class="nav">
                   <li>
-                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/openid/installation.md/#L1" class="contribution-link">Improve this Doc</a>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/release/2.0.4/docs/documentation/openid/installation.md/#L1" class="contribution-link">Improve this Doc</a>
                   </li>
                 </ul>
               </div>
