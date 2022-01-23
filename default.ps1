@@ -70,7 +70,7 @@ task compile -depends clean {
 task pack -depends release, compile {
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth.EF\SimpleIdServer.OAuth.EF.csproj -c $config -no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.OAuth.EF\SimpleIdServer.OAuth.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenID\SimpleIdServer.OpenID.EF\SimpleIdServer.OpenID.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -86,7 +86,7 @@ task pack -depends release, compile {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServer\SimpleIdServer.Scim.SqlServer.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma\SimpleIdServer.Uma.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.EF\SimpleIdServer.Uma.EF.csproj -c $config -no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Uma\SimpleIdServer.Uma.EF\SimpleIdServer.Uma.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi\SimpleIdServer.OpenBankingApi.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\OpenBankingApi\SimpleIdServer.OpenBankingApi.Domains\SimpleIdServer.OpenBankingApi.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Saml\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }

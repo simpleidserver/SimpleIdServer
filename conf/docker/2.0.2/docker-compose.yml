@@ -12,14 +12,14 @@ services:
     build:
       context: .
       dockerfile: ./DbDockerFile
-    image: simpleidserver/db:2.0.4
+    image: simpleidserver/db:2.0.2
     volumes:
      - mssqldata:/var/opt/mssql
   openid:
     build:
       context: .
       dockerfile: ./OpenIdDockerFile
-    image: simpleidserver/openid:2.0.4
+    image: simpleidserver/openid:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
       ASPNETCORE_URLS : "https://*:60000"
@@ -32,7 +32,7 @@ services:
     build:
       context: .
       dockerfile: ./ScimDockerFile
-    image: simpleidserver/scim:2.0.4
+    image: simpleidserver/scim:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
     ports:
@@ -45,7 +45,7 @@ services:
     build:
       context: .
       dockerfile: ./BpmnDockerFile
-    image: simpleidserver/bpmn:2.0.4
+    image: simpleidserver/bpmn:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
       ASPNETCORE_URLS : "http://*:60007"
@@ -58,7 +58,7 @@ services:
     build:
       context: .
       dockerfile: ./HumanTaskDockerFile
-    image: simpleidserver/humantask:2.0.4
+    image: simpleidserver/humantask:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
       ASPNETCORE_URLS : "http://*:60006"
@@ -70,7 +70,7 @@ services:
     build:
       context: .
       dockerfile: ./SamlIdpDockerFile
-    image: simpleidserver/samlidp:2.0.4
+    image: simpleidserver/samlidp:2.0.2
     environment:
       ASPNETCORE_URLS : "http://*:7000"
     environment:
@@ -84,7 +84,7 @@ services:
     build:
       context: .
       dockerfile: ./GatewayDockerFile
-    image: simpleidserver/gateway:2.0.4
+    image: simpleidserver/gateway:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
       ASPNETCORE_URLS : "http://*:5001"
@@ -100,7 +100,7 @@ services:
     build:
       context: .
       dockerfile: ./WebsiteDockerFile
-    image: simpleidserver/website:2.0.4
+    image: simpleidserver/website:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
       ASPNETCORE_URLS : "http://*:4200"
@@ -110,7 +110,7 @@ services:
     build:
       context: .
       dockerfile: ./ProvisioningDockerFile
-    image: simpleidserver/provisioning:2.0.4
+    image: simpleidserver/provisioning:2.0.2
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
     depends_on:
