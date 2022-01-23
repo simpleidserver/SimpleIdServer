@@ -1,6 +1,6 @@
 {
   "homepages": [],
-  "source_base_path": "c:/Projects/SimpleIdServer/docs",
+  "source_base_path": "C:/Projects/SimpleIdServer/docs",
   "xrefmap": "xrefmap.yml",
   "files": [
     {
@@ -23,7 +23,7 @@
           "hash": "UcrbEMGlCKUTarASVXQliB8/vNTlkPcwlG0/Zrca0JU="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -35,7 +35,7 @@
           "hash": "Z7ASmmmoY0yPmbfbptdZIkoamsts0myJfK/ytYnrjTA="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -44,10 +44,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/gettingstarted/index.html",
-          "hash": "Tc99Z6dcG6PrIMYXNavaz8eAmsrZlMi6TL0BO/FWFdY="
+          "hash": "RXogIvo0k7EApY/8KvKG4w4j0ZpHNfXp4dCSNtABHjI="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -56,10 +56,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/authentication.html",
-          "hash": "MFSz42IfCeR1hjZdMzJLFp9VDh4bJ9l1cTHYshV5gX4="
+          "hash": "cNdJngYsq9p7aXSQ5lanA0WbVZJ7/BoTiuRNB2VfxyI="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -211,10 +211,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/installation.html",
-          "hash": "KdoxOqD9vkFI4lYJ2ctZfe1nOYWDwVySn80FUgdblHY="
+          "hash": "Jv/2ZxRZvzUmHKDGDa6OgLpmtcmNAeK7Spfeo7Tub+0="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -223,10 +223,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/persistence.html",
-          "hash": "tdGZL34kEOxh7LjCJ7gjmUpJidMxst0xG5NqgwYOTK8="
+          "hash": "pMSsV1kyn0ffUvQWgG/6Q0u46z46QiGSJwsTbmi8eSs="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -235,10 +235,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/protectapiclients.html",
-          "hash": "XCWxvx62s3RJxAiqSDsG8K71ua7A8r6dnAqSsJRsVYs="
+          "hash": "gF5kuQMBSDYXJeImmo/kJVe31J/GIEXf3OOD8pakvYs="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -247,10 +247,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/protectapiusers.html",
-          "hash": "C2b+ihuDPAdwg0PP/VK+JPLxBZSkSH4lmn0I47vEC6g="
+          "hash": "xwKg0OeD3LsSTcOfEB0p/b3ESER3KNeJPN2z78vNnUU="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -259,10 +259,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/openid/protectappsusers.html",
-          "hash": "JppGwMnwWSdQzQfEPQxR6DOUNtaSJaT/1Ugr9kHGktk="
+          "hash": "bGT26s8tUFyCyTr4DYBOmTwl22PVBcb9nqRyHXGh6p4="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -321,7 +321,7 @@
           "hash": "laKtQC55CoEND6UCquS6x/1whvBkxtPVTQw9DHEm8l0="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -344,7 +344,7 @@
           "hash": "iY3Mn+uQy0FWextz5A0u2Q1huJN6EGsEnF+L+K7wmFM="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -353,10 +353,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/scim20/persistence.html",
-          "hash": "LpI4btUbMIlEdexZI32VaEQ97sVNlAw2tpCRkFczIWg="
+          "hash": "lkbRxjA4HsbnOjzXqS4RnYl3PMiv8hQACW5K0M9v0aY="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -368,7 +368,7 @@
           "hash": "Ihbtx6ryR8ekIvgT/4OpaIePsVYMZfGKX4odRFiI8t4="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -389,10 +389,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/uma20/definition.html",
-          "hash": "2XUEBdQ81X8KxHs+b6iUjrj2B+Ixfx7eYjj3fP54UiQ="
+          "hash": "6h8ELATi8f/8oBH19nhjx9m5g567dsgk6DSrnGAyZcc="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -434,10 +434,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/uma20/installation.html",
-          "hash": "4RvqJCfMjXGZ51FFAVMzl4HXfoHYz2E7dYTNup21v+o="
+          "hash": "dN6mBkBZIZC12e9SB05F9hczeeGCR3ogynO97Xu4bnk="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -446,10 +446,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/uma20/persistence.html",
-          "hash": "OD0POYWYZM6OduWZoMwUM2aP883T92NpU9ClMkNFqx4="
+          "hash": "/rPbBFheUYmEfMBW5hlH/RlH5pg70rcnTKVARNL0qDA="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -458,10 +458,10 @@
       "output": {
         ".html": {
           "relative_path": "documentation/uma20/protectresource.html",
-          "hash": "bJ849REvbWGBe7jYYFe16jYyDBKKJYDXQiKjjYlVdbg="
+          "hash": "stPR7MKPIEa+n1x3jjZu7PJ2u6JANNPnG0Bb7WppWw4="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -473,7 +473,7 @@
           "hash": "o6n5+zENOsHH53Y5nQru+uElr62xd/mmDAhXwDP40J8="
         }
       },
-      "is_incremental": true,
+      "is_incremental": false,
       "version": ""
     },
     {
@@ -503,17 +503,19 @@
   "incremental_info": [
     {
       "status": {
-        "can_incremental": true,
+        "can_incremental": false,
+        "details": "Cannot build incrementally because last build info is missing.",
         "incrementalPhase": "build",
         "total_file_count": 0,
-        "skipped_file_count": 0
+        "skipped_file_count": 0,
+        "full_build_reason_code": "NoAvailableBuildCache"
       },
       "processors": {
         "ConceptualDocumentProcessor": {
-          "can_incremental": true,
+          "can_incremental": false,
           "incrementalPhase": "build",
           "total_file_count": 18,
-          "skipped_file_count": 18
+          "skipped_file_count": 0
         },
         "ResourceDocumentProcessor": {
           "can_incremental": false,
@@ -533,8 +535,8 @@
     },
     {
       "status": {
-        "can_incremental": true,
-        "details": "Can support incremental post processing.",
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: last post processor info is null.",
         "incrementalPhase": "postProcessing",
         "total_file_count": 0,
         "skipped_file_count": 0
