@@ -60,6 +60,46 @@ Scenario: Check user can be added to a group
 	Then JSON exists 'groups[0].value'
 	Then JSON 'groups[0].display'='Tour guides'
 
+Scenario: Check user can be removed from a group
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | Tour Guides                                       |
+	| members     | [ { "value": "$id$" } ]                           |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'groupId'
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$groupId$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "remove", "path": "members" } ]								 	|
+
+	And execute HTTP GET request 'http://localhost/Users/$id$'	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'	
+	Then HTTP HEADER contains 'Location'
+	Then HTTP HEADER contains 'ETag'
+	Then JSON exists 'id'
+	Then JSON exists 'meta.created'
+	Then JSON exists 'meta.lastModified'
+	Then JSON exists 'meta.version'
+	Then JSON exists 'meta.location'
+	Then 'groups' length is equals to '0'
+
+
 Scenario: Check group can be updated with multiple users
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |

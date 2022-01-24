@@ -97,7 +97,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
                 var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-                var references = await _representationReferenceSync.Sync(replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, !isReferenceProperty);
+                var references = await _representationReferenceSync.Sync(replaceRepresentationCommand.ResourceType, oldRepresentation,  existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);

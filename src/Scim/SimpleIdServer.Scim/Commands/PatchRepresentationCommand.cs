@@ -8,15 +8,17 @@ namespace SimpleIdServer.Scim.Commands
 {
     public class PatchRepresentationCommand : ISCIMCommand<SCIMRepresentation>
     {
-        public PatchRepresentationCommand(string id, string resourceType, PatchRepresentationParameter patchRepresentation)
+        public PatchRepresentationCommand(string id, string resourceType, PatchRepresentationParameter patchRepresentation, string location)
         {
             Id = id;
             ResourceType = resourceType;
             PatchRepresentation = patchRepresentation;
+            Location = location;
         }
 
         public string Id { get; private set; }
         public PatchRepresentationParameter PatchRepresentation { get; private set; }
         public string ResourceType { get; private set; }
+        public string Location { get; }
     }
 }

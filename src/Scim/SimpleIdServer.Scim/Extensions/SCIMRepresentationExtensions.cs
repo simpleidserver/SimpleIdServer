@@ -363,7 +363,7 @@ namespace SimpleIdServer.Scim.Domain
             return result;
         }
 
-        public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true)
+        public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false)
         {
             var jObj = new JObject
             {
@@ -373,6 +373,11 @@ namespace SimpleIdServer.Scim.Domain
             if (includeStandardAttributes)
             {
                 representation.AddStandardAttributes(location, new List<string> { }, ignore: true);
+            }
+
+            if(addEmptyArray)
+            {
+                representation.ApplyEmptyArray();
             }
 
             var attributes = representation.HierarchicalAttributes.Select(a =>

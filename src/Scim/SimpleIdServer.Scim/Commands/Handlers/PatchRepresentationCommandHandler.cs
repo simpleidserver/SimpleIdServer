@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 var oldRepresentation = existingRepresentation.Clone() as SCIMRepresentation;
                 var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
-                var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult);
+                var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);

@@ -99,6 +99,16 @@ namespace SimpleIdServer.Scim.Domains
             attr.ValueString = attribute.ValueString;
         }
 
+        public SCIMRepresentation Duplicate()
+        {
+            return Clone() as SCIMRepresentation;
+        }
+
+        public string GetLocation(string location)
+        {
+            return $"{location}/{ResourceType}/{Id}";
+        }
+
         public void AddAttribute(SCIMRepresentationAttribute parentAttribute, SCIMRepresentationAttribute childAttribute)
         {
             childAttribute.ParentAttributeId = parentAttribute.Id;

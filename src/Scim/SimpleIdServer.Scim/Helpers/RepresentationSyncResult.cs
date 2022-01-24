@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.ExternalEvents;
 using System;
@@ -26,16 +27,18 @@ namespace SimpleIdServer.Scim.Helpers
             Representations.Add(representation);
         }
 
-        public void AddReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value)
+        public void AddReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {
-            var newEvt = new RepresentationReferenceAttributeAddedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath);
+            var obj = representation.Duplicate().ToResponse(representation.GetLocation(location), false, addEmptyArray: true);
+            var newEvt = new RepresentationReferenceAttributeAddedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
             newEvt.Values.Add(value);
             ProcessReferenceAttr(AddAttrEvts, representation, schemaAttributeId, newEvt, value);
         }
 
-        public void RemoveReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value)
+        public void RemoveReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {
-            var newEvt = new RepresentationReferenceAttributeRemovedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath);
+            var obj = representation.Duplicate().ToResponse(representation.GetLocation(location), false, addEmptyArray: true);
+            var newEvt = new RepresentationReferenceAttributeRemovedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
             newEvt.Values.Add(value);
             ProcessReferenceAttr(RemoveAttrEvts, representation, schemaAttributeId, newEvt, value);
         }
