@@ -232,7 +232,7 @@ namespace SimpleIdServer.Scim.Parser
                 }
 
                 var currentMatchValue = currentMatch.Value;
-                if (!string.IsNullOrWhiteSpace(namespaceStr))
+                if (!string.IsNullOrWhiteSpace(namespaceStr) && parentAttributeExpression == null)
                 {
                     currentMatchValue = $"{namespaceStr}:{currentMatchValue}";
                 }
