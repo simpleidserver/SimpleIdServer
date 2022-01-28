@@ -457,6 +457,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Start to get the resource type &apos;{0}&apos;.
+        /// </summary>
+        public static string StartGetResourceType {
+            get {
+                return ResourceManager.GetString("StartGetResourceType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to start to get resource types.
         /// </summary>
         public static string StartGetResourceTypes {

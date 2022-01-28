@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using System.Collections.Generic;
@@ -48,6 +47,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             }
 
             return result;
+        }
+
+        public Task<SCIMSchema> FindRootSCIMSchemaByName(string name)
+        {
+            var collection = _scimDbContext.SCIMSchemaLst;
+            return collection.AsQueryable().Where(c => c.Name == name).ToMongoFirstAsync();
         }
 
         public async Task<IEnumerable<SCIMSchema>> GetAll()

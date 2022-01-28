@@ -249,6 +249,9 @@
   <data name="StartGetResources" xml:space="preserve">
     <value>start to get resources</value>
   </data>
+  <data name="StartGetResourceType" xml:space="preserve">
+    <value>Start to get the resource type '{0}'</value>
+  </data>
   <data name="StartGetResourceTypes" xml:space="preserve">
     <value>start to get resource types</value>
   </data>

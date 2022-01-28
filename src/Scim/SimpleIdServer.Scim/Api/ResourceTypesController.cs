@@ -10,6 +10,7 @@ using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
@@ -48,6 +49,21 @@ namespace SimpleIdServer.Scim.Api
             return new OkObjectResult(getResult);
         }
 
+        [HttpGet("{id}")]
+        public async virtual Task<IActionResult> Get(string id)
+        {
+            _logger.LogInformation(string.Format(Global.StartGetResourceType, id));
+            var result = await _scimSchemaQueryRepository.FindRootSCIMSchemaByName(id);
+            if (result == null)
+            {
+                _logger.LogError(string.Format(Global.ResourceNotFound, id));
+                return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
+            }
+
+            var controllerEndpoints = ExtractControllerEndpoints();
+            return new OkObjectResult(ToDto(result, controllerEndpoints));
+        }
+
         protected Dictionary<string, string> ExtractControllerEndpoints()
         {
             var dic = new Dictionary<string, string>();
@@ -71,7 +87,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected JObject ToDto(SCIMSchema schema, Dictionary<string, string> controllerEndpoints)
         {
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.ResourceType}";
+            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.Name}";
             var endpoint = string.Empty;
             if (controllerEndpoints.ContainsKey(schema.ResourceType))
             {
@@ -81,7 +97,7 @@ namespace SimpleIdServer.Scim.Api
             return new JObject
             {
                 { ResourceTypeAttribute.Schemas, new JArray(new List<string>  { StandardSchemas.ResourceTypeSchema.Id }) },
-                { ResourceTypeAttribute.Id, schema.ResourceType },
+                { ResourceTypeAttribute.Id, schema.Name },
                 { ResourceTypeAttribute.Name, schema.Name },
                 { ResourceTypeAttribute.Description, schema.Description },
                 { ResourceTypeAttribute.Endpoint, endpoint },

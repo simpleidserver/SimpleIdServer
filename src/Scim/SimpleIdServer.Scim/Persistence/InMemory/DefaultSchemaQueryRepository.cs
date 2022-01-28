@@ -53,5 +53,10 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             return Task.FromResult((IEnumerable<SCIMSchema>)_schemas.Where(s => s.IsRootSchema == true).Select(s => (SCIMSchema)s.Clone()));
         }
+
+        public Task<SCIMSchema> FindRootSCIMSchemaByName(string name)
+        {
+            return Task.FromResult(_schemas.FirstOrDefault(s => s.Name == name));
+        }
     }
 }

@@ -53,5 +53,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .Where(s => s.IsRootSchema == true).ToListAsync();
             return result;
         }
+
+        public Task<SCIMSchema> FindRootSCIMSchemaByName(string name)
+        {
+            return _context.SCIMSchemaLst.Include(s => s.SchemaExtensions).Include(s => s.Attributes)
+                .FirstOrDefaultAsync(s => s.Name == name && s.IsRootSchema == true);
+        }
     }
 }

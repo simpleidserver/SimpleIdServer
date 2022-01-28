@@ -10,6 +10,7 @@ namespace SimpleIdServer.Scim.Persistence
     {
         Task<SCIMSchema> FindSCIMSchemaById(string schemaId);
         Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType);
+        Task<SCIMSchema> FindRootSCIMSchemaByName(string name);
         Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByIdentifiers(IEnumerable<string> schemaIdentifiers);
         Task<IEnumerable<SCIMSchema>> GetAll();
         Task<IEnumerable<SCIMSchema>> GetAllRoot();
