@@ -37,7 +37,15 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.StartGetResourceTypes);
             var result = await _scimSchemaQueryRepository.GetAllRoot();
             var controllerEndpoints = ExtractControllerEndpoints();
-            return new OkObjectResult(new JArray(result.Select(s => ToDto(s, controllerEndpoints))));
+            var getResult = new JObject
+            {
+                { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
+                { StandardSCIMRepresentationAttributes.TotalResults, controllerEndpoints.Count() },
+                { StandardSCIMRepresentationAttributes.ItemsPerPage, controllerEndpoints.Count() },
+                { StandardSCIMRepresentationAttributes.StartIndex, 1 },
+                { StandardSCIMRepresentationAttributes.Resources, new JArray(result.Select(s => ToDto(s, controllerEndpoints)))  }
+            };
+            return new OkObjectResult(getResult);
         }
 
         protected Dictionary<string, string> ExtractControllerEndpoints()
@@ -86,7 +94,7 @@ namespace SimpleIdServer.Scim.Api
                 { ResourceTypeAttribute.Meta, new JObject
                 {
                     { SCIMConstants.StandardSCIMMetaAttributes.Location,  location },
-                    { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, schema.ResourceType }
+                    { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, StandardSchemas.ResourceTypeSchema.Name }
                 }}
             };
         }
