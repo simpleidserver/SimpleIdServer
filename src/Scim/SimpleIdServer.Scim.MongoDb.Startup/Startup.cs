@@ -73,9 +73,9 @@ namespace SimpleIdServer.Scim.MongoDb.Startup
                 _.IgnoreUnsupportedCanonicalValues = false;
             });
             var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
-            var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMEndpoints.User);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+            var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
             userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
             {
                 Id = Guid.NewGuid().ToString(),

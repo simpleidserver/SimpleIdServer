@@ -8,7 +8,7 @@ namespace SimpleIdServer.Scim.Domains
     public static class StandardSchemas
     {
         public static SCIMSchema ResourceTypeSchema =
-            SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ResourceType", "ResourceType", SCIMEndpoints.ResourceType, "Resource type", true)
+            SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:ResourceType", "ResourceType", SCIMResourceTypes.ResourceType, "Resource type", true)
                 .AddStringAttribute(ResourceTypeAttribute.Id)
                 .AddStringAttribute(ResourceTypeAttribute.Name, required: true)
                 .AddStringAttribute(ResourceTypeAttribute.Description)
@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.Domains
                     c.AddStringAttribute(ResourceTypeAttribute.Required, required: true);
                 }).Build();
         public static SCIMSchema UserSchema =
-             SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMEndpoints.User, "User Account", true)
+             SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMResourceTypes.User, "User Account", true)
                 .AddStringAttribute("userName", caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
                 .AddComplexAttribute("name", c =>
                 {
@@ -114,7 +114,7 @@ namespace SimpleIdServer.Scim.Domains
                 }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                 .Build();
 
-        public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMEndpoints.Group, "Group", true)
+        public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMResourceTypes.Group, "Group", true)
                 .AddStringAttribute("displayName")
                 .AddComplexAttribute("members", c =>
                 {

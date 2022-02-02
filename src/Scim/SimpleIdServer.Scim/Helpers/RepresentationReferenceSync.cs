@@ -17,19 +17,22 @@ namespace SimpleIdServer.Scim.Helpers
 	{
 		private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
 		private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
+		private readonly IResourceTypeResolver _resourceTypeResolver;
 
 		public RepresentationReferenceSync(
 			ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
-			ISCIMRepresentationQueryRepository scimRepresentationQueryRepository)
+			ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
+			IResourceTypeResolver resourceTypeResolver)
         {
 			_scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
 			_scimRepresentationQueryRepository = scimRepresentationQueryRepository;
+			_resourceTypeResolver = resourceTypeResolver;
 		}
 
 		public async virtual Task<RepresentationSyncResult> Sync(string resourceType, SCIMRepresentation oldScimRepresentation, SCIMRepresentation newSourceScimRepresentation,string location, bool updateAllReferences = false, bool isScimRepresentationRemoved = false)
 		{
 			var stopWatch = new Stopwatch();
-			var result = new RepresentationSyncResult();
+			var result = new RepresentationSyncResult(_resourceTypeResolver);
 			var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
 			if (!attributeMappingLst.Any())
 			{
@@ -69,7 +72,7 @@ namespace SimpleIdServer.Scim.Helpers
 		public  async Task<RepresentationSyncResult> Sync(string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, string location)
 		{
 			var stopWatch = new Stopwatch();
-			var result = new RepresentationSyncResult();
+			var result = new RepresentationSyncResult(_resourceTypeResolver);
 			var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
 			if (!attributeMappingLst.Any())
 			{

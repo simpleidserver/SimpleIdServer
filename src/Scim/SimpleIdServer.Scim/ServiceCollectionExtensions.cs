@@ -82,6 +82,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
             services.AddTransient<IRepresentationReferenceSync, RepresentationReferenceSync>();
+            services.AddTransient<IResourceTypeResolver, ResourceTypeResolver>();
             return services;
         }
 

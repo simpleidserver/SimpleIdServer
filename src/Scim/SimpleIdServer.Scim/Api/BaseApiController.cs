@@ -41,8 +41,9 @@ namespace SimpleIdServer.Scim.Api
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
         private readonly IBusControl _busControl;
+        private readonly IResourceTypeResolver _resourceTypeResolver;
 
-        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl)
+        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl, IResourceTypeResolver resourceTypeResolver)
         {
             _resourceType = resourceType;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
@@ -55,6 +56,7 @@ namespace SimpleIdServer.Scim.Api
             _options = options.CurrentValue;
             _logger = logger;
             _busControl = busControl;
+            _resourceTypeResolver = resourceTypeResolver;
         }
 
         public string ResourceType => _resourceType;
@@ -207,7 +209,7 @@ namespace SimpleIdServer.Scim.Api
                 foreach (var record in representations)
                 {
                     JObject newJObj = null;
-                    var location = $"{baseUrl}/{_resourceType}/{record.Id}";
+                    var location = $"{baseUrl}/{_resourceTypeResolver.ResolveByResourceType(_resourceType).ControllerName}/{record.Id}";
                     bool includeStandardRequest = true;
                     if(searchRequest.Attributes.Any())
                     {
@@ -460,7 +462,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected string GetLocation(SCIMRepresentation representation)
         {
-            return representation.GetLocation(Request.GetAbsoluteUriWithVirtualPath());
+            return $"{Request.GetAbsoluteUriWithVirtualPath()}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
         }
     }
 }

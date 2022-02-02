@@ -73,12 +73,12 @@ namespace SimpleIdServer.Scim.Startup
             var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
             var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMEndpoints.User);
             var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
-            var customResource = SCIMSchemaBuilder.Create("urn:customresource", "CustomResources", "CustomResources", string.Empty, true)
+            var customResource = SCIMSchemaBuilder.Create("urn:customresource", "CustomResource", "CustomResource", string.Empty, true)
                 .AddStringAttribute("name")
                 .AddStringAttribute("lastname")
                 .AddDateTimeAttribute("birthDate")
                 .Build();
-            var entitlementSchema = SCIMSchemaBuilder.Create("urn:entitlement", "Entitlement", "Entitlements", string.Empty, true)
+            var entitlementSchema = SCIMSchemaBuilder.Create("urn:entitlement", "Entitlement", "Entitlement", string.Empty, true)
                 .AddStringAttribute("displayName")
                 .AddComplexAttribute("members", opt =>
                 {
@@ -87,7 +87,7 @@ namespace SimpleIdServer.Scim.Startup
                     opt.AddStringAttribute("type");
                 }, multiValued: true)
                 .Build();
-            var customUserSchema = SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUsers", string.Empty, true)
+            var customUserSchema = SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUser", string.Empty, true)
                 .AddStringAttribute("userName", required: true)
                 .AddComplexAttribute("entitlements", opt =>
                 {
@@ -151,18 +151,18 @@ namespace SimpleIdServer.Scim.Startup
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id,
-                    SourceResourceType = "CustomUsers",
+                    SourceResourceType = "CustomUser",
                     SourceAttributeSelector = "entitlements",
-                    TargetResourceType = "Entitlements",
+                    TargetResourceType = "Entitlement",
                     TargetAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").Id
                 },
                 new SCIMAttributeMapping
                 {
                     Id = Guid.NewGuid().ToString(),
                     SourceAttributeId = entitlementSchema.Attributes.First(a => a.Name == "members").Id,
-                    SourceResourceType = "Entitlements",
+                    SourceResourceType = "Entitlement",
                     SourceAttributeSelector = "members",
-                    TargetResourceType = "CustomUsers",
+                    TargetResourceType = "CustomUser",
                     TargetAttributeId = customUserSchema.Attributes.First(a => a.Name == "entitlements").Id
                 }
             });

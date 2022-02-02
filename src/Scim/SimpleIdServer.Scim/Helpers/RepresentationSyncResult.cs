@@ -11,11 +11,14 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public class RepresentationSyncResult
     {
-        public RepresentationSyncResult()
+        private readonly IResourceTypeResolver _resourceTypeResolver;
+
+        public RepresentationSyncResult(IResourceTypeResolver resourceTypeResolver)
         {
             Representations = new List<SCIMRepresentation>();
             RemoveAttrEvts = new List<RepresentationReferenceAttributeRemovedEvent>();
             AddAttrEvts = new List<RepresentationReferenceAttributeAddedEvent>();
+            _resourceTypeResolver = resourceTypeResolver;
         }
 
         public ICollection<SCIMRepresentation> Representations { get; set; }
@@ -29,7 +32,8 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void AddReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {
-            var obj = representation.Duplicate().ToResponse(representation.GetLocation(location), false, addEmptyArray: true);
+            location = $"{location}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
+            var obj = representation.Duplicate().ToResponse(location, false, addEmptyArray: true);
             var newEvt = new RepresentationReferenceAttributeAddedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
             newEvt.Values.Add(value);
             ProcessReferenceAttr(AddAttrEvts, representation, schemaAttributeId, newEvt, value);
@@ -37,7 +41,8 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void RemoveReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {
-            var obj = representation.Duplicate().ToResponse(representation.GetLocation(location), false, addEmptyArray: true);
+            location = $"{location}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
+            var obj = representation.Duplicate().ToResponse(location, false, addEmptyArray: true);
             var newEvt = new RepresentationReferenceAttributeRemovedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
             newEvt.Values.Add(value);
             ProcessReferenceAttr(RemoveAttrEvts, representation, schemaAttributeId, newEvt, value);

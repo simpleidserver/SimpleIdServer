@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,16 +20,16 @@ namespace SimpleIdServer.Scim.Api
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
         private readonly ILogger _logger;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IResourceTypeResolver _resourceTypeResolver;
 
         public ResourceTypesController(
             ISCIMSchemaQueryRepository scimSchemaQueryRepository, 
             ILogger<ResourceTypesController> logger,
-            IServiceProvider serviceProvider)
+            IResourceTypeResolver resourceTypeResolver)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            _resourceTypeResolver = resourceTypeResolver;
         }
 
         [HttpGet]
@@ -37,14 +37,14 @@ namespace SimpleIdServer.Scim.Api
         {
             _logger.LogInformation(Global.StartGetResourceTypes);
             var result = await _scimSchemaQueryRepository.GetAllRoot();
-            var controllerEndpoints = ExtractControllerEndpoints();
+            var resolutionResults = _resourceTypeResolver.ResolveAll();
             var getResult = new JObject
             {
                 { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
-                { StandardSCIMRepresentationAttributes.TotalResults, controllerEndpoints.Count() },
-                { StandardSCIMRepresentationAttributes.ItemsPerPage, controllerEndpoints.Count() },
+                { StandardSCIMRepresentationAttributes.TotalResults, resolutionResults.Count() },
+                { StandardSCIMRepresentationAttributes.ItemsPerPage, resolutionResults.Count() },
                 { StandardSCIMRepresentationAttributes.StartIndex, 1 },
-                { StandardSCIMRepresentationAttributes.Resources, new JArray(result.Select(s => ToDto(s, controllerEndpoints)))  }
+                { StandardSCIMRepresentationAttributes.Resources, new JArray(result.Select(s => ToDto(s, resolutionResults)))  }
             };
             return new OkObjectResult(getResult);
         }
@@ -60,45 +60,25 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
             }
 
-            var controllerEndpoints = ExtractControllerEndpoints();
-            return new OkObjectResult(ToDto(result, controllerEndpoints));
+            var resolutionResults = _resourceTypeResolver.ResolveAll();
+            return new OkObjectResult(ToDto(result, resolutionResults));
         }
 
-        protected Dictionary<string, string> ExtractControllerEndpoints()
+        protected JObject ToDto(SCIMSchema schema, List<ResourceTypeResolutionResult> resolutionResults)
         {
-            var dic = new Dictionary<string, string>();
-            var controllers = _serviceProvider.GetService(typeof(IEnumerable<BaseApiController>)) as IEnumerable<BaseApiController>;
-            foreach(var controller in controllers)
-            {
-                var type = controller.GetType();
-                var routeAttrs = type.GetCustomAttributes(typeof(RouteAttribute), true);
-                var name = type.Name.Replace("Controller", string.Empty);
-                if (routeAttrs.Any())
-                {
-                    name = (routeAttrs.First() as RouteAttribute).Template;
-                }
-
-                var relativePath = $"{Request.GetRelativePath()}/{name}";
-                dic.Add(controller.ResourceType, relativePath);
-            }
-
-            return dic;
-        }
-
-        protected JObject ToDto(SCIMSchema schema, Dictionary<string, string> controllerEndpoints)
-        {
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.Name}";
+            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.ResourceType}";
             var endpoint = string.Empty;
-            if (controllerEndpoints.ContainsKey(schema.ResourceType))
+            var resolutionResult = resolutionResults.FirstOrDefault(r => r.ResourceType == schema.ResourceType);
+            if (resolutionResult != null)
             {
-                endpoint = controllerEndpoints[schema.ResourceType];
+                endpoint = $"{Request.GetRelativePath()}/{resolutionResult.ControllerName}";
             }
 
             return new JObject
             {
                 { ResourceTypeAttribute.Schemas, new JArray(new List<string>  { StandardSchemas.ResourceTypeSchema.Id }) },
-                { ResourceTypeAttribute.Id, schema.Name },
-                { ResourceTypeAttribute.Name, schema.Name },
+                { ResourceTypeAttribute.Id, schema.ResourceType },
+                { ResourceTypeAttribute.Name, schema.ResourceType },
                 { ResourceTypeAttribute.Description, schema.Description },
                 { ResourceTypeAttribute.Endpoint, endpoint },
                 { ResourceTypeAttribute.Schema, schema.Id },
@@ -110,7 +90,7 @@ namespace SimpleIdServer.Scim.Api
                 { ResourceTypeAttribute.Meta, new JObject
                 {
                     { SCIMConstants.StandardSCIMMetaAttributes.Location,  location },
-                    { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, StandardSchemas.ResourceTypeSchema.Name }
+                    { SCIMConstants.StandardSCIMMetaAttributes.ResourceType, StandardSchemas.ResourceTypeSchema.ResourceType }
                 }}
             };
         }
