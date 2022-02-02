@@ -35,7 +35,7 @@ namespace SimpleIdServer.Scim.Api
                 { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
                 { StandardSCIMRepresentationAttributes.TotalResults, schemas.Count() },
                 { StandardSCIMRepresentationAttributes.ItemsPerPage, schemas.Count()},
-                { StandardSCIMRepresentationAttributes.StartIndex, 0 }
+                { StandardSCIMRepresentationAttributes.StartIndex, 1 }
             };
             var resources = new JArray();
             foreach(var schema in schemas)
