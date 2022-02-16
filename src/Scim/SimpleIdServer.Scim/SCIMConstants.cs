@@ -15,8 +15,8 @@ namespace SimpleIdServer.Scim
 
         public static Dictionary<string, string> MappingScimResourceTypeToCommonType = new Dictionary<string, string>
         {
-            { SCIMEndpoints.User, CommonConstants.ResourceTypes.ScimUser },
-            { SCIMEndpoints.Group, CommonConstants.ResourceTypes.ScimGroup },
+            { SCIMResourceTypes.User, CommonConstants.ResourceTypes.ScimUser },
+            { SCIMResourceTypes.Group, CommonConstants.ResourceTypes.ScimGroup },
         };
 
         public static class ErrorSCIMTypes
