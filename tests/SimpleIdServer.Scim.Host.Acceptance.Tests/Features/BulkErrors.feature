@@ -11,6 +11,6 @@ Scenario: Error is returned when too many operations are passed
 	
 	Then HTTP status code equals to '413'
 	Then JSON 'status'='413'
-	Then JSON 'response.schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
-	Then JSON 'response.status'='413'
-	Then JSON 'response.scimType'='tooLarge'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='413'
+	Then JSON 'scimType'='tooLarge'

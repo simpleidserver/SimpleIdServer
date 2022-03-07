@@ -13,11 +13,7 @@ namespace SimpleIdServer.Scim.Extensions
         public static IActionResult BuildError(this Controller controller, HttpStatusCode code, string detail, string scimType = null)
         {
             var serializer = new SCIMSerializer();
-            var result = new JObject
-            {
-                { "status", ((int)code).ToString() },
-                { "response",  serializer.Serialize(new SCIMErrorRepresentation(((int)code).ToString(), detail, scimType)) }
-            };
+            var result = serializer.Serialize(new SCIMErrorRepresentation(((int)code).ToString(), detail, scimType));
             return new ContentResult
             {
                 StatusCode = (int)code,
