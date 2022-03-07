@@ -77,7 +77,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 .AddComplexAttribute("members", opt =>
                 {
                     opt.AddStringAttribute("value");
-                    opt.AddStringAttribute("$ref");
+                    opt.AddReferenceAttribute("$ref");
                     opt.AddStringAttribute("type");
                 }, multiValued: true)
                 .Build();
@@ -86,7 +86,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 .AddComplexAttribute("entitlements", opt =>
                 {
                     opt.AddStringAttribute("value");
-                    opt.AddStringAttribute("$ref");
+                    opt.AddReferenceAttribute("$ref");
                     opt.AddStringAttribute("type");
                     opt.AddStringAttribute("display");
                 }, multiValued: true)
