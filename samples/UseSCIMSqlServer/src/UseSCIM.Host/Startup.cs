@@ -11,6 +11,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Domain;
+using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
 using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System;
@@ -98,8 +99,8 @@ namespace UseSCIM.Host
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
-                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMConstants.SCIMEndpoints.User);
-                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMConstants.SCIMEndpoints.Group);
+                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User);
+                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group);
                     if (!context.SCIMSchemaLst.Any())
                     {
                         context.SCIMSchemaLst.Add(userSchema);
@@ -112,9 +113,9 @@ namespace UseSCIM.Host
                         {
                             Id = Guid.NewGuid().ToString(),
                             SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
-                            SourceResourceType = SCIMConstants.StandardSchemas.UserSchema.ResourceType,
+                            SourceResourceType = StandardSchemas.UserSchema.ResourceType,
                             SourceAttributeSelector = "groups",
-                            TargetResourceType = SCIMConstants.StandardSchemas.GroupSchema.ResourceType,
+                            TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
                             TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                         };
                         context.SCIMAttributeMappingLst.Add(attributeMapping);

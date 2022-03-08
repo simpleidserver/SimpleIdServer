@@ -57,8 +57,8 @@ namespace SimpleIdServer.Scim.InMemory
                     };
                 });
             var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
             var schemas = new List<SCIMSchema>
             {
                 userSchema,

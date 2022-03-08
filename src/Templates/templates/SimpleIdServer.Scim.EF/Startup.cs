@@ -61,8 +61,8 @@ namespace SimpleIdServer.Scim.EF
                     };
                 });
             var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group, true);
+            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
             var schemas = new List<SCIMSchema>
             {
                 userSchema,
@@ -95,7 +95,7 @@ namespace SimpleIdServer.Scim.EF
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User, true);
+                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
                     if (!context.SCIMSchemaLst.Any())
                     {
                         context.SCIMSchemaLst.Add(userSchema);

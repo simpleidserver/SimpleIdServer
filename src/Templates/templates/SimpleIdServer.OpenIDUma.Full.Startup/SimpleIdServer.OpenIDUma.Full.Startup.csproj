@@ -11,11 +11,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.8" />
-	  <PackageReference Include="SimpleIdServer.Saml.Sp" Version="2.0.4" />
-	  <PackageReference Include="SimpleIdServer.UI.Authenticate.Email" Version="2.0.4" />
-	  <PackageReference Include="SimpleIdServer.UI.Authenticate.LoginPassword" Version="2.0.4" />
-	  <PackageReference Include="SimpleIdServer.UI.Authenticate.Sms" Version="2.0.4" />
-	  <PackageReference Include="SimpleIdServer.Uma" Version="2.0.4" />
+	  <PackageReference Include="SimpleIdServer.Saml.Sp" Version="2.0.5" />
+	  <PackageReference Include="SimpleIdServer.UI.Authenticate.Email" Version="2.0.5" />
+	  <PackageReference Include="SimpleIdServer.UI.Authenticate.LoginPassword" Version="2.0.5" />
+	  <PackageReference Include="SimpleIdServer.UI.Authenticate.Sms" Version="2.0.5" />
+	  <PackageReference Include="SimpleIdServer.Uma" Version="2.0.5" />
   </ItemGroup>
 
   <ItemGroup>

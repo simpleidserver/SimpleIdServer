@@ -12,7 +12,7 @@ namespace SimpleIdServer.Scim.Startup
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(cfg =>
                 {
-                    cfg.UseUrls("http://*:60002");
+                    cfg.UseUrls("http://*:5002");
                     cfg.UseStartup<Startup>();
                 })
                 .Build();

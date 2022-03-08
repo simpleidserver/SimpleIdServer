@@ -11,9 +11,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3" />
-    <PackageReference Include="SimpleIdServer.Scim" Version="2.0.4" />
-    <PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="2.0.4" />
-    <PackageReference Include="SimpleIdServer.Jwt" Version="2.0.4" />
+    <PackageReference Include="SimpleIdServer.Scim" Version="2.0.5" />
+    <PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="2.0.5" />
+    <PackageReference Include="SimpleIdServer.Jwt" Version="2.0.5" />
   </ItemGroup>
   <ItemGroup>
     <None Update="oauth_puk.txt">
