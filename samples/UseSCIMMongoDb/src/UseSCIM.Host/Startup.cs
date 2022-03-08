@@ -61,6 +61,7 @@ namespace UseSCIM.Host
                 opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
                 opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
                 opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
             });
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
