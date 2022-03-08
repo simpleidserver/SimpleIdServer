@@ -82,6 +82,7 @@ namespace SimpleIdServer.OpenID.EFSqlServer
                 using (var context = scope.ServiceProvider.GetService<OpenIdDBContext>())
                 {
                     context.Database.Migrate();
+                    var sigJsonWebKey = ExtractJsonWebKeyFromRSA("openid_key.txt", "RS256", "1");
                     if (!context.OAuthScopes.Any())
                     {
                         context.OAuthScopes.AddRange(OpenIdDefaultConfiguration.Scopes);
@@ -102,8 +103,28 @@ namespace SimpleIdServer.OpenID.EFSqlServer
                         context.OpenIdClients.AddRange(OpenIdDefaultConfiguration.GetClients());
                     }
 
+                    if (!context.JsonWebKeys.Any())
+                    {
+                        context.JsonWebKeys.Add(sigJsonWebKey);
+                    }
+
                     context.SaveChanges();
                 }
+            }
+        }
+
+        private static JsonWebKey ExtractJsonWebKeyFromRSA(string fileName, string algName, string kid)
+        {
+            using (var rsa = RSA.Create())
+            {
+                var json = File.ReadAllText(fileName);
+                var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                rsa.Import(dic);
+                return new JsonWebKeyBuilder().NewSign(kid, new[]
+                {
+                    KeyOperations.Sign,
+                    KeyOperations.Verify
+                }).SetAlg(rsa, algName).Build();
             }
         }
     }
