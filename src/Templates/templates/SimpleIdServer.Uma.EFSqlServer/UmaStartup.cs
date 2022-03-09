@@ -68,7 +68,7 @@ namespace SimpleIdServer.Uma.EFSqlServer
                 options.CorrelationCookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
                 options.NonceCookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
             });
-            services.AddAuthorization(p => p.AddDefaultOAUTHAuthorizationPolicy());
+            services.AddAuthorization(p => p.AddDefaultUMAAuthoriztionPolicy());
             services.AddSIDUma(options =>
             {
                 options.OpenIdJsonWebKeySignature = openidJsonWebKey;
