@@ -4,15 +4,16 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -60,14 +61,6 @@ namespace SimpleIdServer.Scim.EF
                         IssuerSigningKey = oauthRsaSecurityKey
                     };
                 });
-            var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
-            var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
-            var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
-            var schemas = new List<SCIMSchema>
-            {
-                userSchema,
-                groupSchema
-            };
             services.AddSIDScim(options: _ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
@@ -76,6 +69,10 @@ namespace SimpleIdServer.Scim.EF
              {
                  options.UseSqlServer("<<CONNECTIONSTRING>>", o => o.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name));
              });
+            services.AddDistributedLockSQLServer(opts =>
+            {
+                opts.ConnectionString = "<<CONNECTIONSTRING>>";
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -96,9 +93,35 @@ namespace SimpleIdServer.Scim.EF
                     context.Database.Migrate();
                     var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
                     var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
                     if (!context.SCIMSchemaLst.Any())
                     {
                         context.SCIMSchemaLst.Add(userSchema);
+                        context.SCIMSchemaLst.Add(groupSchema);
+                    }
+
+                    if (!context.SCIMAttributeMappingLst.Any())
+                    {
+                        var firstAttributeMapping = new SCIMAttributeMapping
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                            SourceResourceType = StandardSchemas.UserSchema.ResourceType,
+                            SourceAttributeSelector = "groups",
+                            TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
+                            TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
+                        };
+                        var secondAttributeMapping = new SCIMAttributeMapping
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                            SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                            SourceAttributeSelector = "members",
+                            TargetResourceType = StandardSchemas.UserSchema.ResourceType,
+                            TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
+                        };
+                        context.SCIMAttributeMappingLst.Add(firstAttributeMapping);
+                        context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
                     }
 
                     context.SaveChanges();

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,10 +11,8 @@ using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
-using SimpleIdServer.Scim.Persistence.EF.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,6 +47,7 @@ namespace UseSCIM.Host
             services.AddMvc(o =>
             {
                 o.EnableEndpointRouting = false;
+                o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
             services.AddLogging();
             services.AddAuthorization(opts =>
@@ -83,6 +83,10 @@ namespace UseSCIM.Host
             {
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
             });
+            services.AddDistributedLockSQLServer(opts =>
+            {
+                opts.ConnectionString = Configuration.GetConnectionString("db");
+            });
         }
 
         public void Configure(IApplicationBuilder app)
@@ -100,8 +104,8 @@ namespace UseSCIM.Host
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(Env.ContentRootPath, "Schemas");
-                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMEndpoints.User);
-                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMEndpoints.Group);
+                    var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+                    var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
                     if (!context.SCIMSchemaLst.Any())
                     {
                         context.SCIMSchemaLst.Add(userSchema);
@@ -110,7 +114,7 @@ namespace UseSCIM.Host
 
                     if (!context.SCIMAttributeMappingLst.Any())
                     {
-                        var attributeMapping = new SCIMAttributeMapping
+                        var firstAttributeMapping = new SCIMAttributeMapping
                         {
                             Id = Guid.NewGuid().ToString(),
                             SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
@@ -119,7 +123,17 @@ namespace UseSCIM.Host
                             TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
                             TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
                         };
-                        context.SCIMAttributeMappingLst.Add(attributeMapping);
+                        var secondAttributeMapping = new SCIMAttributeMapping
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                            SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                            SourceAttributeSelector = "members",
+                            TargetResourceType = StandardSchemas.UserSchema.ResourceType,
+                            TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
+                        };
+                        context.SCIMAttributeMappingLst.Add(firstAttributeMapping);
+                        context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
                     }
 
                     context.SaveChanges();
