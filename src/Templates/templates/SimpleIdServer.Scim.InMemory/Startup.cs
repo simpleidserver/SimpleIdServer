@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
