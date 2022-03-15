@@ -2,6 +2,12 @@
 
 There is a problem when swagger is installed in a SCIM2.0 project. All the properties of SCIM representations are documented in the SCIM Schema and by default Swagger is not able to fetch them.
 
+## Source Code
+
+The source code of this project can be found [here](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/UseSCIMSwagger)
+
+## Installation
+
 > [!WARNING]
 > A SimpleIdServer template exists to create SCIM server with Swagger support. Execute the command line `dotnet new scimswagger -n ScimHost`.
 
@@ -10,16 +16,16 @@ There is a problem when swagger is installed in a SCIM2.0 project. All the prope
 Swagger can be configured like this : 
 
 * In a command prompt, navigate to the directory `src\ScimHost`.
-* Install the Nuget package `SimpleIdServer.Scim.Swashbuckle` version `5.5.0`. 
+* Install the Nuget package `SimpleIdServer.Scim.Swashbuckle`. 
 
 ```
-dotnet add package SimpleIdServer.Scim.Swashbuckle --version 5.5.0
+dotnet add package SimpleIdServer.Scim.Swashbuckle
 ```
 
-* Install the Nuget package `Swashbuckle.AspNetCore`.
+* Install the Nuget package `Swashbuckle.AspNetCore` version `5.5.0`.
 
 ```
-dotnet add package Swashbuckle.AspNetCore
+dotnet add package Swashbuckle.AspNetCore --version 5.5.0
 ```
 
 * Edit the `Startup.cs` file and configure Swagger. Copy and paste the following code into `ConfigureService`.

@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 
-namespace SimpleIdServer.Scim.Swagger
+namespace ScimHost
 {
     public class Startup
     {
@@ -45,6 +44,19 @@ namespace SimpleIdServer.Scim.Swagger
                 o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            services.AddSwaggerGen(c =>
+            {
+                var currentAssembly = Assembly.GetExecutingAssembly();
+                var xmlDocs = currentAssembly.GetReferencedAssemblies()
+                    .Union(new AssemblyName[] { currentAssembly.GetName() })
+                    .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+                    .Where(f => File.Exists(f)).ToArray();
+                Array.ForEach(xmlDocs, (d) =>
+                {
+                    c.IncludeXmlComments(d);
+                });
+            });
+            services.AddSCIMSwagger();
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
                 {
@@ -67,19 +79,6 @@ namespace SimpleIdServer.Scim.Swagger
                 userSchema,
                 groupSchema
             };
-            services.AddSwaggerGen(c =>
-            {
-                var currentAssembly = Assembly.GetExecutingAssembly();
-                var xmlDocs = currentAssembly.GetReferencedAssemblies()
-                    .Union(new AssemblyName[] { currentAssembly.GetName() })
-                    .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
-                    .Where(f => File.Exists(f)).ToArray();
-                Array.ForEach(xmlDocs, (d) =>
-                {
-                    c.IncludeXmlComments(d);
-                });
-            });
-            services.AddSCIMSwagger();
             services.AddSIDScim(options: _ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;

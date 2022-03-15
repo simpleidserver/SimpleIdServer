@@ -33,6 +33,28 @@ namespace SimpleIdServer.Scim.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseBranchWithServices("/tenant1", (services) =>
+            {
+                SharedConfigureServices(services, _webHostEnvironment);
+            }, (app) =>
+            {
+                SharedConfigure(app);
+            });
+            app.UseBranchWithServices("/tenant2", (services) =>
+            {
+                SharedConfigureServices(services, _webHostEnvironment);
+            }, (app) =>
+            {
+                SharedConfigure(app);
+            });
+        }
+
+        private static void SharedConfigureServices(IServiceCollection services, IWebHostEnvironment webHostEnvironment)
+        {
             var json = File.ReadAllText("oauth_puk.txt");
             var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
             var rsaParameters = new RSAParameters
@@ -54,7 +76,16 @@ namespace SimpleIdServer.Scim.Startup
                     return s.StartsWith("SimpleIdServer.Scim");
                 });
             });
-            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
+            });
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
                 {
@@ -69,7 +100,7 @@ namespace SimpleIdServer.Scim.Startup
                         IssuerSigningKey = oauthRsaSecurityKey
                     };
                 });
-            var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
+            var basePath = Path.Combine(webHostEnvironment.ContentRootPath, "Schemas");
             var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
             var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMResourceTypes.User);
             var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
@@ -168,7 +199,7 @@ namespace SimpleIdServer.Scim.Startup
             });
         }
 
-        public void Configure(IApplicationBuilder app)
+        private static void SharedConfigure(IApplicationBuilder app)
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
