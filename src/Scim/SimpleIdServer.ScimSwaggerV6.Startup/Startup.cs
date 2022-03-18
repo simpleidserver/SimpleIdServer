@@ -10,9 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
+using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
-using SimpleIdServer.Scim.Startup.Consumers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +20,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 
-namespace SimpleIdServer.Scim.Startup
+namespace SimpleIdServer.ScimSwaggerV6.Startup
 {
     public class Startup
     {
@@ -136,13 +136,6 @@ namespace SimpleIdServer.Scim.Startup
             services.AddSIDScim(options: _ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
-            }, massTransitOptions: _ =>
-            {
-                _.AddConsumer<IntegrationEventConsumer>();
-                _.UsingInMemory((context, cfg) =>
-                {
-                    cfg.ConfigureEndpoints(context);
-                });
             })
             .AddSchemas(schemas)
             .AddAttributeMapping(new List<SCIMAttributeMapping>
