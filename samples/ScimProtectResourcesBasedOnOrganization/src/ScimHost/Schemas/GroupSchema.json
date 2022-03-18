@@ -1,0 +1,86 @@
+{
+  "id": "urn:ietf:params:scim:schemas:core:2.0:Group",
+  "name": "Group",
+  "description": "Group Schema",
+  "attributes": [
+    {
+      "name": "displayName",
+      "type": "string",
+      "multiValued": false,
+      "required": true,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "server",
+      "description": "A human-readable name for the Group."
+    },
+    {
+      "name": "groupType",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Used to identify the relationship between the organization and the group. Typical values used might be 'Organization', 'Site', 'Team', but any value may be used."
+    },
+    {
+      "name": "members",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A list of members of the Group.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "immutable",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "Identifier of the member of this Group."
+        },
+        {
+          "name": "$ref",
+          "type": "reference",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "immutable",
+          "returned": "default",
+          "uniqueness": "none",
+          "referenceTypes": [
+            "Group",
+            "User"
+          ],
+          "description": "The URI corresponding to a SCIM resource that is a member of this Group."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "immutable",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "Group",
+            "User"
+          ],
+          "description": "A label indicating the type of resource, e.g., 'User' or 'Group'."
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "resourceType": "Schema",
+    "location": "https://wdc.test.host/scim/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:Group"
+  }
+}
