@@ -340,7 +340,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to patch resource {0}.
+        ///   Looks up a localized string similar to patch resource &apos;{0}&apos; : &apos;{1}&apos;.
         /// </summary>
         public static string PatchResource {
             get {
@@ -511,7 +511,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to update resource {0}.
+        ///   Looks up a localized string similar to update resource &apos;{0}&apos; : &apos;{1}&apos;.
         /// </summary>
         public static string UpdateResource {
             get {

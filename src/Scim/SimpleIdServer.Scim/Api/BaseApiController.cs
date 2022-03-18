@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Commands;
 using SimpleIdServer.Scim.Commands.Handlers;
@@ -272,7 +273,7 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
-            _logger.LogInformation(string.Format(Global.AddResource, jobj.ToString()));
+            _logger.LogInformation(string.Format(Global.AddResource, jobj == null || jobj.Attributes == null ? string.Empty : jobj.Attributes.ToString()));
             try
             {
                 var command = new AddRepresentationCommand(_resourceType, jobj, Request.GetAbsoluteUriWithVirtualPath());
@@ -340,7 +341,7 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPutNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
-            _logger.LogInformation(string.Format(Global.UpdateResource, id));
+            _logger.LogInformation(string.Format(Global.UpdateResource, id, representationParameter == null || representationParameter.Attributes == null ? string.Empty : representationParameter.Attributes.ToString()));
             try
             {
                 var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, Request.GetAbsoluteUriWithVirtualPath()));
@@ -387,7 +388,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
         {
-            _logger.LogInformation(string.Format(Global.PatchResource, id));
+            _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
                 var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, Request.GetAbsoluteUriWithVirtualPath()));
