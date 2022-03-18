@@ -6,11 +6,12 @@ namespace SimpleIdServer.OAuth.Exceptions
     {
         public OAuthLoginRequiredException() : base(string.Empty, string.Empty) { }
 
-        public OAuthLoginRequiredException(string area) : this()
+        public OAuthLoginRequiredException(string area, bool eraseCookie = false) : this()
         {
             Area = area;
         }
 
         public string Area { get; private set; }
+        public bool EraseCookie { get; private set; }
     }
 }

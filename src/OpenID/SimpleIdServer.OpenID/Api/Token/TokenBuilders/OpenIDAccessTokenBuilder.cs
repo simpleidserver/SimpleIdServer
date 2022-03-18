@@ -43,9 +43,10 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             if (handlerContext.User != null)
             {
                 jwsPayload.Add(UserClaims.Subject, handlerContext.User.Id);
-                if (handlerContext.User.GetActiveSession() != null)
+                var activeSession = handlerContext.User.GetActiveSession();
+                if (activeSession != null)
                 {
-                    jwsPayload.Add(OAuthClaims.AuthenticationTime, handlerContext.User.GetActiveSession().AuthenticationDateTime.ConvertToUnixTimestamp());
+                    jwsPayload.Add(OAuthClaims.AuthenticationTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
                 }
             }
 

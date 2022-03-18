@@ -39,7 +39,7 @@ namespace SimpleIdServer.Jwt
             /// </summary>
             public static string Nbf = "nbf";
             /// <summary>
-            /// entifier for the Session.
+            /// Identifier for the Session.
             /// </summary>
             public static string Sid = "sid";
             public static string Events = "events";

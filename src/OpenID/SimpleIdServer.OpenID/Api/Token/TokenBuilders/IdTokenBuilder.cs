@@ -114,9 +114,10 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 result.Add(OAuthClaims.CHash, ComputeHash(code));
             }
 
-            if (maxAge != null)
+            var activeSession = currentContext.User.GetActiveSession();
+            if (maxAge != null && activeSession != null)
             {
-                result.Add(OAuthClaims.AuthenticationTime, currentContext.User.GetActiveSession().AuthenticationDateTime.ConvertToUnixTimestamp());
+                result.Add(OAuthClaims.AuthenticationTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
             }
 
             if (!string.IsNullOrWhiteSpace(nonce))
@@ -138,9 +139,13 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 scopes = openidClient.AllowedScopes.Where(s => requestedScopes.Any(r => r == s.Name));
             }
 
-            result.Add(OAuthClaims.Sid, currentContext.User.GetActiveSession().SessionId);
+            if (activeSession != null)
+            {
+                result.Add(OAuthClaims.Sid, activeSession.SessionId);
+            }
+
             EnrichWithScopeParameter(result, scopes, currentContext.User, subject);
-            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, currentContext.User.GetActiveSession().AuthenticationDateTime);
+            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, activeSession?.AuthenticationDateTime);
             foreach (var claimsSource in _claimsSources)
             {
                 await claimsSource.Enrich(result, openidClient, cancellationToken);

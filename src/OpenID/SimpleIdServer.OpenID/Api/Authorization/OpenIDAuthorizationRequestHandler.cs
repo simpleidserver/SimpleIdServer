@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
@@ -12,6 +13,7 @@ using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Exceptions;
 using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.OpenID.Options;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -23,7 +25,10 @@ namespace SimpleIdServer.OpenID.Api.Authorization
 {
     public class OpenIDAuthorizationRequestHandler : AuthorizationRequestHandler
     {
+        private readonly OpenIDHostOptions _options;
+
         public OpenIDAuthorizationRequestHandler(
+            IOptions<OpenIDHostOptions> options,
             IEnumerable<IResponseTypeHandler> responseTypeHandlers, 
             IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
             IEnumerable<ITokenProfile> tokenProfiles, 
@@ -37,6 +42,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
                 oauthClientRepository, 
                 oauthUserRepository)
         {
+            _options = options.Value;
         }
 
         public override async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
@@ -66,7 +72,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             catch (OAuthLoginRequiredException ex)
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.SessionCookieName });
             }
             catch (OAuthSelectAccountRequiredException)
             {
@@ -78,6 +84,11 @@ namespace SimpleIdServer.OpenID.Api.Authorization
         private string BuildSessionState(HandlerContext handlerContext)
         {
             var session = handlerContext.User.GetActiveSession();
+            if (session == null)
+            {
+                return null;
+            }
+
             var redirectUrl = handlerContext.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var clientId = handlerContext.Client.ClientId;
             var salt = Guid.NewGuid().ToString();

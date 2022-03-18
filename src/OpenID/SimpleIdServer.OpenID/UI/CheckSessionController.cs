@@ -187,7 +187,7 @@ namespace SimpleIdServer.OpenID.UI
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _oauthUserRepository.FindOAuthUserByLogin(userId, cancellationToken);
-            return user.GetActiveSession().SessionId;
+            return user.GetActiveSession()?.SessionId;
         }
 
         protected string BuildFrontChannelLogoutUrl(OpenIdClient client, string sessionId)

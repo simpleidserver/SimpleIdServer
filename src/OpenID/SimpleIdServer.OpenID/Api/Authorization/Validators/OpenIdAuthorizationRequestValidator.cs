@@ -77,6 +77,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }
 
+            var activeSession = context.User.GetActiveSession();
+            if (activeSession == null)
+            {
+                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken), true);
+            }
+
             await _extractRequestHelper.Extract(context);
             await CommonValidate(context, cancellationToken);
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
@@ -96,12 +102,12 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
             if (maxAge != null)
             {
-                if (DateTime.UtcNow > context.User.GetActiveSession().AuthenticationDateTime.AddSeconds(maxAge.Value))
+                if (DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(maxAge.Value))
                 {
                     throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
                 }
             }
-            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > context.User.GetActiveSession().AuthenticationDateTime.AddSeconds(openidClient.DefaultMaxAge.Value))
+            else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(openidClient.DefaultMaxAge.Value))
             {
                 throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
             }

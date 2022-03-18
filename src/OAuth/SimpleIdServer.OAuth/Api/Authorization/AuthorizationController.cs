@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -52,6 +53,23 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 }
 
                 var redirectActionAuthorizationResponse = authorizationResponse as RedirectActionAuthorizationResponse;
+                if (redirectActionAuthorizationResponse.Disconnect)
+                {
+                    if (redirectActionAuthorizationResponse.CookiesToRemove != null)
+                    {
+                        foreach(var cookieName in redirectActionAuthorizationResponse.CookiesToRemove)
+                        {
+                            Response.Cookies.Delete(cookieName);
+                        }
+                    }
+
+                    try
+                    {
+                        await HttpContext.SignOutAsync();
+                    }
+                    catch { }
+                }
+
                 var parameters = new List<KeyValuePair<string, string>>();
                 foreach(var record in redirectActionAuthorizationResponse.QueryParameters)
                 {

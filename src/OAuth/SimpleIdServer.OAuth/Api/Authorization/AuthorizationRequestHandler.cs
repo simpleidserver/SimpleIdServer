@@ -58,7 +58,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
             catch (OAuthLoginRequiredException ex)
             {
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, ex.EraseCookie);
             }
         }
 

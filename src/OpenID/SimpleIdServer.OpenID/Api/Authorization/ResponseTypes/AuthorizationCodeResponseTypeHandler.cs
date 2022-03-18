@@ -42,9 +42,10 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
                 { UserClaims.Subject, context.User.Id }
             };
 
-            if (context.User.GetActiveSession() != null)
+            var activeSession = context.User.GetActiveSession();
+            if (activeSession != null)
             {
-                dic.Add(OAuthClaims.AuthenticationTime, context.User.GetActiveSession()?.AuthenticationDateTime.ConvertToUnixTimestamp());
+                dic.Add(OAuthClaims.AuthenticationTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
             }
 
             foreach(var record in context.Request.RequestData)
