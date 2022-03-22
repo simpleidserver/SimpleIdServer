@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using System.Linq;
 
@@ -38,9 +37,9 @@ namespace SimpleIdServer.Scim.Extensions
             result.Add(StandardSCIMRepresentationAttributes.Description, scimSchemaAttribute.Leaf.Description);
             result.Add(StandardSCIMRepresentationAttributes.Required, scimSchemaAttribute.Leaf.Required);
             result.Add(StandardSCIMRepresentationAttributes.CaseExact, scimSchemaAttribute.Leaf.CaseExact);
-            result.Add(StandardSCIMRepresentationAttributes.Mutability, scimSchemaAttribute.Leaf.Mutability.ToString().ToLowerInvariant());
-            result.Add(StandardSCIMRepresentationAttributes.Returned, scimSchemaAttribute.Leaf.Returned.ToString().ToLowerInvariant());
-            result.Add(StandardSCIMRepresentationAttributes.Uniqueness, scimSchemaAttribute.Leaf.Uniqueness.ToString().ToLowerInvariant());
+            result.Add(StandardSCIMRepresentationAttributes.Mutability, scimSchemaAttribute.Leaf.Mutability.ToName());
+            result.Add(StandardSCIMRepresentationAttributes.Returned, scimSchemaAttribute.Leaf.Returned.ToName());
+            result.Add(StandardSCIMRepresentationAttributes.Uniqueness, scimSchemaAttribute.Leaf.Uniqueness.ToName());
             if (scimSchemaAttribute.Children != null && scimSchemaAttribute.Children.Any())
             {
                 var subAttributes = new JArray();

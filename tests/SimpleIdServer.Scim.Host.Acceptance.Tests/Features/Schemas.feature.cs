@@ -130,19 +130,22 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'Resources[0].description\'=\'User Account\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 14
+ testRunner.Then("JSON \'Resources[0].attributes[0].mutability\'=\'readWrite\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 15
  testRunner.Then("JSON \'Resources[1].id\'=\'urn:ietf:params:scim:schemas:extension:enterprise:2.0:Use" +
                         "r\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 16
  testRunner.Then("JSON \'Resources[1].name\'=\'EnterpriseUser\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 16
+#line 17
  testRunner.Then("JSON \'Resources[2].id\'=\'urn:ietf:params:scim:schemas:core:2.0:Group\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 17
+#line 18
  testRunner.Then("JSON \'Resources[2].name\'=\'Group\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 18
+#line 19
  testRunner.Then("JSON \'Resources[2].description\'=\'Group\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
