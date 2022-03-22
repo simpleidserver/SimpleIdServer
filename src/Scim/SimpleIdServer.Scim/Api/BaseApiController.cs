@@ -273,7 +273,7 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
-            _logger.LogInformation(string.Format(Global.AddResource, jobj == null || jobj.Attributes == null ? string.Empty : jobj.Attributes.ToString()));
+            _logger.LogInformation(Global.AddResource);
             try
             {
                 var command = new AddRepresentationCommand(_resourceType, jobj, Request.GetAbsoluteUriWithVirtualPath());
@@ -341,7 +341,7 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPutNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             }
 
-            _logger.LogInformation(string.Format(Global.UpdateResource, id, representationParameter == null || representationParameter.Attributes == null ? string.Empty : representationParameter.Attributes.ToString()));
+            _logger.LogInformation(Global.UpdateResource, id);
             try
             {
                 var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, Request.GetAbsoluteUriWithVirtualPath()));

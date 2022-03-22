@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AddResource" xml:space="preserve">
-    <value>add resource {0}</value>
+    <value>add resource</value>
   </data>
   <data name="AttributeImmutable" xml:space="preserve">
     <value>attribute {0} is immutable</value>
@@ -268,6 +268,6 @@
     <value>path {0} doesn't exist</value>
   </data>
   <data name="UpdateResource" xml:space="preserve">
-    <value>update resource '{0}' : '{1}'</value>
+    <value>update resource '{0}'</value>
   </data>
 </root>
