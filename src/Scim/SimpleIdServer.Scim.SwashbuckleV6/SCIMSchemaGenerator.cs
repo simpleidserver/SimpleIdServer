@@ -46,13 +46,13 @@ namespace SimpleIdServer.Scim.Swashbuckle
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
         private readonly ILogger<SCIMSchemaGenerator> _logger;
 
-        public SCIMSchemaGenerator(SchemaGeneratorOptions generatorOptions, ISerializerDataContractResolver serializerDataContractResolver, IServiceProvider serviceProvider, ISCIMSchemaQueryRepository scimSchemaQueryRepository, ILogger<SCIMSchemaGenerator> logger)
+        public SCIMSchemaGenerator(SchemaGeneratorOptions generatorOptions, ISerializerDataContractResolver serializerDataContractResolver, IServiceProvider serviceProvider, ILogger<SCIMSchemaGenerator> logger)
         {
             _generatorOptions = generatorOptions;
             _serializerDataContractResolver = serializerDataContractResolver;
             _serviceProvider = serviceProvider;
-            _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _logger = logger;
+            _scimSchemaQueryRepository = (ISCIMSchemaQueryRepository)serviceProvider.GetService(typeof(ISCIMSchemaQueryRepository));
         }
 
         public OpenApiSchema GenerateSchema(

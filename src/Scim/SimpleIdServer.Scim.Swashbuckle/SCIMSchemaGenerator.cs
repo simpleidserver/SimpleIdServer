@@ -40,13 +40,13 @@ namespace SimpleIdServer.Scim.Swashbuckle
         private readonly IServiceProvider _serviceProvider;
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
 
-        public SCIMSchemaGenerator(ILogger<SCIMSchemaGenerator> logger, IServiceProvider serviceProvider, ISCIMSchemaQueryRepository scimSchemaQueryRepository, SchemaGeneratorOptions generatorOptions, IDataContractResolver dataContractResolver)
+        public SCIMSchemaGenerator(ILogger<SCIMSchemaGenerator> logger, IServiceProvider serviceProvider, SchemaGeneratorOptions generatorOptions, IDataContractResolver dataContractResolver)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _generatorOptions = generatorOptions;
             _dataContractResolver = dataContractResolver;
+            _scimSchemaQueryRepository = (ISCIMSchemaQueryRepository)_serviceProvider.GetService(typeof(ISCIMSchemaQueryRepository));
         }
 
         public OpenApiSchema GenerateSchema(
@@ -177,7 +177,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
                     _logger.LogError($"the schema '{controller.ResourceType}' doesn't exist !");
                 }
 
-                var kvp = schema.Properties.FirstOrDefault(_ => _.Key == "FlatAttributes");
+                var kvp = schema.Properties.FirstOrDefault(_ => _.Key == "FlatAttributes" || _.Key == "attributes");
                 if (!kvp.Equals(default(KeyValuePair<string, OpenApiSchema>)) && !string.IsNullOrWhiteSpace(kvp.Key))
                 {
                     schema.Properties.Remove(kvp);
