@@ -83,9 +83,9 @@ namespace SimpleIdServer.Scim.Domains
             return true;
         }
 
-        public bool IsSimilar(SCIMRepresentationAttribute attr)
+        public bool IsSimilar(SCIMRepresentationAttribute attr, bool ignoreCheckAttributeId = false)
         {
-            if (attr.AttributeId != AttributeId)
+            if (!ignoreCheckAttributeId && attr.AttributeId != AttributeId)
             {
                 return false;
             }
@@ -106,6 +106,11 @@ namespace SimpleIdServer.Scim.Domains
                     return attr.ValueInteger == ValueInteger;
                 case SCIMSchemaAttributeTypes.REFERENCE:
                     return attr.ValueReference == ValueReference;
+                case SCIMSchemaAttributeTypes.COMPLEX:
+                    var schemaAttributeIds = Children.Select(c => c.SchemaAttributeId).Intersect(attr.Children.Select(c => c.SchemaAttributeId));
+                    var filteredChildren = Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                    var filteredAttrChildren = attr.Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                    return filteredChildren.All(fc => filteredAttrChildren.Any(sc => fc.IsSimilar(sc, ignoreCheckAttributeId)));
             }
 
             return false;

@@ -203,6 +203,7 @@ namespace SimpleIdServer.Scim.Domain
                             }
 
                             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                            CheckDuplicate(attributes, newAttributes);
                             removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && a.FullPath == fullPath).ToList());
                             var isAttributeExits = !string.IsNullOrWhiteSpace(fullPath) && attributes.Any(a => a.FullPath == fullPath);
                             foreach (var newAttribute in newAttributes.OrderBy(a => a.GetLevel()))
@@ -361,6 +362,19 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             return result;
+        }
+
+        private static void CheckDuplicate(IEnumerable<SCIMRepresentationAttribute> existingAttributes, ICollection<SCIMRepresentationAttribute> newFlatAttributes)
+        {
+            var rootAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newFlatAttributes);
+            foreach(var newAttribute in rootAttributes)
+            {
+                var filteredAttrs = existingAttributes.Where(a => a.IsSimilar(newAttribute, true));
+                if (existingAttributes.Any(a => a.IsSimilar(newAttribute, true)))
+                {
+                    throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, newAttribute.FullPath));
+                }
+            }
         }
 
         public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false)

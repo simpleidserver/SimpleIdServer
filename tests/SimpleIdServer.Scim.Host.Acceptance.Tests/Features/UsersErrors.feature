@@ -454,3 +454,45 @@ Scenario: Error is returned when trying to add a none canonical value (HTTP POST
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='schemaViolated'
 	Then JSON 'detail'='property type is not a valid canonical value'
+
+Scenario: Error is returned when entitlment is added twice
+	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
+	| Key      | Value                |
+	| schemas  | [ "urn:customuser" ] |
+	| userName | userName             |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | firstEntitlement      |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstEntitlement'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | secondEntitlement     |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondEntitlement'
+
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value                                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                              |
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ] |
+	
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value                                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                              |
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ] |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '409'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'scimType'='uniqueness'
+	Then JSON 'detail'='attribute entitlements must be unique'
