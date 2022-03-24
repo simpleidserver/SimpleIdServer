@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
-using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
@@ -269,6 +268,13 @@ namespace SimpleIdServer.Scim.Domain
                             if (scimFilter == null)
                             {
                                 throw new SCIMNoTargetException(string.Format(Global.InvalidPath, patch.Path));
+                            }
+
+                            if(SCIMFilterParser.DontContainsFilter(patch.Path) && patch.Value != null)
+                            {
+                                var excludedAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                                excludedAttributes = SCIMRepresentation.BuildHierarchicalAttributes(excludedAttributes);
+                                attributes = attributes.Where(a => excludedAttributes.Any(ea => ea.IsSimilar(a, true))).ToList();
                             }
 
                             removeCallback(attributes);

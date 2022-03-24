@@ -20,6 +20,12 @@ namespace SimpleIdServer.Scim.Parser
 
         public SCIMExpression Expression { get; private set; }
 
+        public static bool DontContainsFilter(string filterString)
+        {
+            var regex = new Regex(@"(\w|\.)*");
+            return regex.IsMatch(filterString);
+        }
+
         public static SCIMExpression Parse(string filterString, ICollection<SCIMSchema> scimSchemas)
         {
             var scimExpression = Parse(filterString);

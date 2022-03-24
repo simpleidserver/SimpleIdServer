@@ -60,7 +60,7 @@ Scenario: Check user can be added to a group
 	Then JSON exists 'groups[0].value'
 	Then JSON 'groups[0].display'='Tour guides'
 
-Scenario: Check user can be removed from a group
+Scenario: Check user can be removed from a group (use filter)
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
 	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
@@ -98,6 +98,51 @@ Scenario: Check user can be removed from a group
 	Then JSON exists 'meta.version'
 	Then JSON exists 'meta.location'
 	Then 'groups' length is equals to '0'
+	
+Scenario: Check user can be removed from a group (use value)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid2                                                                                                    |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'sid'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | Tour Guides                                       |
+	| members     | [ { "value": "$id$" }, { "value": "$sid$" } ]     |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'groupId'
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$groupId$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "remove", "path": "members", "value" : [ { "value": "$id$" } ] } ]	|
+	
+	And execute HTTP GET request 'http://localhost/Groups/$groupId$'	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'	
+	Then HTTP HEADER contains 'Location'
+	Then HTTP HEADER contains 'ETag'
+	Then 'members' length is equals to '1'
 
 
 Scenario: Check group can be updated with multiple users
