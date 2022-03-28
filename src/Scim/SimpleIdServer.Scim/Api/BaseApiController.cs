@@ -401,6 +401,11 @@ namespace SimpleIdServer.Scim.Api
 
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
+            catch (SCIMDuplicateAttributeException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.NoContent, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
+            }
             catch (SCIMUniquenessAttributeException ex)
             {
                 _logger.LogError(ex, ex.Message);

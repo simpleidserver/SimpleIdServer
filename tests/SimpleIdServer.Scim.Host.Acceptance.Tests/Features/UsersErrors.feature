@@ -492,7 +492,7 @@ Scenario: Error is returned when entitlment is added twice
 
 	And extract JSON from body
 
-	Then HTTP status code equals to '409'
+	Then HTTP status code equals to '204'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'scimType'='uniqueness'
 	Then JSON 'detail'='attribute entitlements must be unique'

@@ -2191,7 +2191,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 495
- testRunner.Then("HTTP status code equals to \'409\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'204\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 496
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

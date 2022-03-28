@@ -26,8 +26,8 @@ Scenario: Check users cannot be added twice to a group
 	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userid$" } ] } ] |
 	And extract JSON from body
 
-	Then HTTP status code equals to '409'
-	Then JSON 'status'='409'
+	Then HTTP status code equals to '204'
+	Then JSON 'status'='204'
 	Then JSON 'scimType'='uniqueness'
 
 Scenario: Check user can be added to a group	

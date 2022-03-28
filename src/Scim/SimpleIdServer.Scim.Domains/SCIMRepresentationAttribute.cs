@@ -110,7 +110,7 @@ namespace SimpleIdServer.Scim.Domains
                     var schemaAttributeIds = Children.Select(c => c.SchemaAttributeId).Intersect(attr.Children.Select(c => c.SchemaAttributeId));
                     var filteredChildren = Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
                     var filteredAttrChildren = attr.Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
-                    return filteredChildren.All(fc => filteredAttrChildren.Any(sc => fc.IsSimilar(sc, ignoreCheckAttributeId)));
+                    return filteredChildren.Any() && filteredChildren.All(fc => filteredAttrChildren.Any(sc => fc.IsSimilar(sc, ignoreCheckAttributeId)));
             }
 
             return false;

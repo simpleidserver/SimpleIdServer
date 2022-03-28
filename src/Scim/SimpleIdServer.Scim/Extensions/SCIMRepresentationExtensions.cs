@@ -378,7 +378,7 @@ namespace SimpleIdServer.Scim.Domain
                 var filteredAttrs = existingAttributes.Where(a => a.IsSimilar(newAttribute, true));
                 if (existingAttributes.Any(a => a.IsSimilar(newAttribute, true)))
                 {
-                    throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, newAttribute.FullPath));
+                    throw new SCIMDuplicateAttributeException(string.Format(Global.AttributeMustBeUnique, newAttribute.FullPath));
                 }
             }
         }
