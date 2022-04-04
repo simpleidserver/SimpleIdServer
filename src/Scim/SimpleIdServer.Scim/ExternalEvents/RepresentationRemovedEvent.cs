@@ -6,6 +6,11 @@ namespace SimpleIdServer.Scim.ExternalEvents
 {
     public class RepresentationRemovedEvent: IntegrationEvent
     {
-        public RepresentationRemovedEvent(string id, int version, string resourceType) : base(id, version, resourceType) { }
+        public RepresentationRemovedEvent(string id, int version, string resourceType, string token) : base(id, version, resourceType) 
+        {
+            Token = token;
+        }
+
+        public string Token { get; set; }
     }
 }

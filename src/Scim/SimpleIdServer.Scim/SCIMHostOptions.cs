@@ -12,6 +12,7 @@ namespace SimpleIdServer.Scim
             MaxPayloadSize = 1048576;
             MaxResults = 200;
             IgnoreUnsupportedCanonicalValues = true;
+            IncludeToken = false;
         }
 
         /// <summary>
@@ -39,5 +40,9 @@ namespace SimpleIdServer.Scim
         /// If set to 'false' and the canonical value is not supported then an exception is thrown.
         /// </summary>
         public bool IgnoreUnsupportedCanonicalValues { get; set; }
+        /// <summary>
+        /// Include token in external events.
+        /// </summary>
+        public bool IncludeToken { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
@@ -24,17 +25,20 @@ namespace SimpleIdServer.Scim.Api
         private readonly IBusControl _busControl;
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly IProvisioningConfigurationRepository _provisioningConfigurationRepository;
+        private readonly SCIMHostOptions _options;
         private readonly ILogger<ProvisioningController> _logger;
 
         public ProvisioningController(
             IBusControl busControl,
             ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
             IProvisioningConfigurationRepository provisioningConfigurationRepository,
+            IOptions<SCIMHostOptions> options,
             ILogger<ProvisioningController> logger)
         {
             _busControl = busControl;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _provisioningConfigurationRepository = provisioningConfigurationRepository;
+            _options = options.Value;
             _logger = logger;
         }
 
@@ -52,7 +56,7 @@ namespace SimpleIdServer.Scim.Api
             if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(representation.ResourceType))
             {
                 var content = representation.ToResponse(string.Empty, false);
-                await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[representation.ResourceType], content));
+                await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[representation.ResourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
             }
 
             return new NoContentResult();

@@ -282,7 +282,7 @@ namespace SimpleIdServer.Scim.Api
                 var content = scimRepresentation.ToResponse(location, false);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(scimRepresentation.ResourceType))
                 {
-                    await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[scimRepresentation.ResourceType], content));
+                    await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[scimRepresentation.ResourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 }
 
                 return BuildHTTPResult(HttpStatusCode.Created, location, scimRepresentation.Version, content);
@@ -317,7 +317,7 @@ namespace SimpleIdServer.Scim.Api
                 var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, Request.GetAbsoluteUriWithVirtualPath()));
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
                 {
-                    await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType]));
+                    await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], _options.IncludeToken ? Request.GetToken() : string.Empty));
                 }
 
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
@@ -349,7 +349,7 @@ namespace SimpleIdServer.Scim.Api
                 var content = newRepresentation.ToResponse(location, false);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
                 {
-                    await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content));
+                    await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 }
 
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
@@ -396,7 +396,7 @@ namespace SimpleIdServer.Scim.Api
                 var content = newRepresentation.ToResponse(location, false);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
                 {
-                    await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content));
+                    await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 }
 
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
