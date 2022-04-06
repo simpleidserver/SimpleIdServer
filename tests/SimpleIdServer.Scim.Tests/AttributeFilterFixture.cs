@@ -4,7 +4,6 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
-using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;

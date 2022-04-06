@@ -349,6 +349,12 @@ namespace SimpleIdServer.Scim.Domain
                                 {
                                     var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                                     var flatHiearchy = representation.FlatAttributes.ToList();
+                                    var missingAttributes = newAttributes.Where(na => string.IsNullOrEmpty(na.ParentAttributeId) && !flatHiearchy.Any(fh => string.IsNullOrWhiteSpace(fh.ParentAttributeId) && fh.SchemaAttributeId == na.SchemaAttributeId)).ToList();
+                                    missingAttributes.ForEach((ma) =>
+                                    {
+                                        representation.AddAttribute(ma);
+                                        result.Add(new SCIMPatchResult { Attr = ma, Operation = SCIMPatchOperations.ADD, Path = ma.FullPath });
+                                    });
                                     result.AddRange(Merge(flatHiearchy, newAttributes, fullPath));
                                 }
                             }
