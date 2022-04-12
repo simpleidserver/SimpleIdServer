@@ -277,13 +277,14 @@ Scenario: Error is returned when update and required attribute is missing (HTTP 
 	Then JSON 'detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 	
 
-Scenario: Error is returned when update an immutable attribute (HTTP PUT)
+Scenario: Check immutable attribute cannot be updated with a different value
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
 	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
 	| userName       | bjen                                                                                                           |
 	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| employeeNumber | number                                                                                                         |
+	| immutable      | str																											  |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
@@ -292,7 +293,59 @@ Scenario: Error is returned when update an immutable attribute (HTTP PUT)
 	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
 	| userName       | bjen                                                                                                           |
 	| employeeNumber | number                                                                                                         |
-	| immutable      | str                                                                                                            |
+	| immutable      | str2                                                                                                           |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='400'
+	Then JSON 'scimType'='mutability'
+	
+
+Scenario: Check complex immutable attribute cannot be updated with a different value
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key              | Value                                                                                                          |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName         | bjen                                                                                                           |
+	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber   | number                                                                                                         |
+	| complexImmutable | [ { "value": "immutable" } ]																				    |	
+	
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key              | Value                                                                                                          |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName         | bjen                                                                                                           |
+	| employeeNumber   | number                                                                                                         |
+	| complexImmutable | [ { "value": "invalidImmutable" } ]												         				    |	
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='400'
+	Then JSON 'scimType'='mutability'
+	
+Scenario: Check record cannot be added when one immutable record is missing
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| subImmutableComplex                                        | [ { "value": "value" } ]																						  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key                 | Value                                                                               |
+	| schemas             | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                    |
+	| userName            | bjen                                                                                |
+	| subImmutableComplex | [ { "value": "secondValue" }, { "value": "thirdValue" } ]						    |
 	
 	And extract JSON from body
 	

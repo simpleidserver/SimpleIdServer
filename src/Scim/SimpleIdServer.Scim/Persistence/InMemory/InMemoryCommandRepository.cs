@@ -17,6 +17,8 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _lstData = lstData;
         }
 
+        protected List<T> LstData { get => _lstData; }
+
         public Task<ITransaction> StartTransaction(CancellationToken token)
         {
             ITransaction result = new DefaultTransaction();
@@ -29,7 +31,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(true);
         }
 
-        public Task<bool> Update(T data, CancellationToken token)
+        public virtual Task<bool> Update(T data, CancellationToken token)
         {
             var record = _lstData.First(l => l.Equals(data));
             _lstData.Remove(record);

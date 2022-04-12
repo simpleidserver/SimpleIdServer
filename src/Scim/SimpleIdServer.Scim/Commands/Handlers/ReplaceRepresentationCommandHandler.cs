@@ -79,17 +79,28 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     replaceRepresentationCommand.Representation.ExternalId,
                     mainSchema,
                     extensionSchemas);
+                var allExistingAttributes = existingRepresentation.HierarchicalAttributes;
                 existingRepresentation.RemoveAttributesBySchemaAttrId(updatedRepresentation.FlatAttributes.Select(_ => _.SchemaAttribute.Id));
-                foreach (var updatedAttribute in updatedRepresentation.FlatAttributes)
+                foreach (var kvp in updatedRepresentation.HierarchicalAttributes.GroupBy(h => h.FullPath))
                 {
-                    if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
+                    var fullPath = kvp.Key;
+                    var filteredExistingAttributes = allExistingAttributes.Where(a => a.FullPath == fullPath);
+                    var invalidAttrs = filteredExistingAttributes.Where(fa => !kvp.Any(a => a.IsMutabilityValid(fa)));
+                    if (invalidAttrs.Any())
                     {
-                        throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, updatedAttribute.Id));
+                        throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", invalidAttrs.Select(a => a.FullPath))));
                     }
 
-                    if (updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || updatedAttribute.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE)
+                    foreach(var rootAttr in kvp)
                     {
-                        existingRepresentation.AddAttribute(updatedAttribute);
+                        if (rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE || rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
+                        {
+                            var flatAttrs = rootAttr.ToFlat();
+                            foreach (var attr in flatAttrs)
+                            {
+                                existingRepresentation.AddAttribute(attr);
+                            }
+                        }
                     }
                 }
 

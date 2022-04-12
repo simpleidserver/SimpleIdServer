@@ -381,7 +381,6 @@ namespace SimpleIdServer.Scim.Domain
             var rootAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newFlatAttributes);
             foreach(var newAttribute in rootAttributes)
             {
-                var filteredAttrs = existingAttributes.Where(a => a.IsSimilar(newAttribute, true));
                 if (existingAttributes.Any(a => a.IsSimilar(newAttribute, true)))
                 {
                     throw new SCIMDuplicateAttributeException(string.Format(Global.AttributeMustBeUnique, newAttribute.FullPath));

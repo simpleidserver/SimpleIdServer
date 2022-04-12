@@ -26,7 +26,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
                 return Task.FromResult(result);
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult((SCIMRepresentation)result.Clone());
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
@@ -49,7 +49,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
                 return Task.FromResult(result);
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult((SCIMRepresentation)result.Clone());
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, int value, string endpoint = null)

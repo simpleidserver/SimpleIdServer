@@ -1,6 +1,102 @@
 ﻿Feature: Users
 	Check the /Users endpoint
 
+Scenario: Check immutable property can be updated twice with the same value
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| immutable                                                  | immutable																									  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key      | Value                                                                               |
+	| schemas  | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                    |
+	| userName | bjen                                                                                |
+	| immutable| immutable																			 |
+
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'immutable'='immutable'	
+
+Scenario: Check complex immutable attribute can be updated with the same value
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key              | Value                                                                                                          |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName         | bjen                                                                                                           |
+	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber   | number                                                                                                         |
+	| complexImmutable | [ { "value": "immutable" } ]																				    |	
+	
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key              | Value                                                                                                          |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName         | bjen                                                                                                           |
+	| employeeNumber   | number                                                                                                         |
+	| complexImmutable | [ { "value": "immutable" } ]												         				            |	
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'complexImmutable[0].value'='immutable'		
+
+Scenario: Check record can be added into an array of immutable records
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| subImmutableComplex                                        | [ { "value": "value" } ]																						  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key                 | Value                                                                               |
+	| schemas             | [ "urn:ietf:params:scim:schemas:core:2.0:User" ]                                    |
+	| userName            | bjen                                                                                |
+	| subImmutableComplex | [ { "value": "value" }, { "value": "secondValue" } ]							    |
+
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'subImmutableComplex[0].value'='value'	
+	Then JSON 'subImmutableComplex[1].value'='secondValue'
+
+Scenario: Check complex immutable attribute can be updated if the attribute does not exist
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key              | Value                                                                                                          |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName         | bjen                                                                                                           |
+	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber   | number                                                                                                         |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body	
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key              | Value                                                                                                          |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName         | bjen                                                                                                           |
+	| employeeNumber   | number                                                                                                         |
+	| complexImmutable | [ { "value": "immutable" } ]												         				            |	
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'complexImmutable[0].value'='immutable'	
+
 Scenario: Check entitlement can be added
 	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
 	| Key      | Value                |

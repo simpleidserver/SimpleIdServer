@@ -83,6 +83,27 @@ namespace SimpleIdServer.Scim.Domains
             return true;
         }
 
+        public bool IsMutabilityValid(SCIMRepresentationAttribute attr)
+        {
+            if(SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
+            {
+                return IsSimilar(attr, true);
+            }
+
+            if (SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
+            {
+                foreach (var child in Children)
+                {
+                    if (attr.Children.Any(c => !c.IsMutabilityValid(child)))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public bool IsSimilar(SCIMRepresentationAttribute attr, bool ignoreCheckAttributeId = false)
         {
             if (!ignoreCheckAttributeId && attr.AttributeId != AttributeId)

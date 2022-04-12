@@ -32,6 +32,14 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddIntAttribute("nbPoints")
                .AddStringAttribute("organizationId")
                .AddBinaryAttribute("eidCertificate")
+               .AddComplexAttribute("subImmutableComplex", opt =>
+               {
+                   opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE);
+               }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
+               .AddComplexAttribute("complexImmutable", opt =>
+               {
+                   opt.AddStringAttribute("value", description: "Phone number");
+               }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE)
                .AddComplexAttribute("emails", opt =>
                {
                    opt.AddStringAttribute("value");
