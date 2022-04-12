@@ -120,7 +120,7 @@ namespace SimpleIdServer.Scim.Domains
             for (int i = 0; i < schemaAttrIds.Count(); i++)
             {
                 var schemaAttrId = schemaAttrIds.ElementAt(i);
-                var attrs = GetAttributesByAttrSchemaId(schemaAttrId).Select(a => a.Id);
+                var attrs = GetAttributesByAttrSchemaId(schemaAttrId).Select(a => a.Id).ToList();
                 RemoveAttributesById(attrs);
             }
         }
@@ -146,8 +146,8 @@ namespace SimpleIdServer.Scim.Domains
                 removedAttrs.Add(attr);
                 var children = GetChildren(attr);
                 var childrenIds = children.Select(a => a.Id).ToList();
-                RemoveAttributesById(removedAttrs, childrenIds);
                 FlatAttributes.Remove(attr);
+                RemoveAttributesById(removedAttrs, childrenIds);
             }
         }
 

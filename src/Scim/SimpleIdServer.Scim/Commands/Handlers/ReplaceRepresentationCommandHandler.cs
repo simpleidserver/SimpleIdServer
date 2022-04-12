@@ -80,8 +80,9 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     mainSchema,
                     extensionSchemas);
                 var allExistingAttributes = existingRepresentation.HierarchicalAttributes;
-                existingRepresentation.RemoveAttributesBySchemaAttrId(updatedRepresentation.FlatAttributes.Select(_ => _.SchemaAttribute.Id));
-                foreach (var kvp in updatedRepresentation.HierarchicalAttributes.GroupBy(h => h.FullPath))
+                var updatedAttributes = updatedRepresentation.HierarchicalAttributes;;
+                existingRepresentation.RemoveAttributesBySchemaAttrId(updatedAttributes.Select(u => u.SchemaAttribute.Id).Distinct());
+                foreach (var kvp in updatedAttributes.GroupBy(h => h.FullPath))
                 {
                     var fullPath = kvp.Key;
                     var filteredExistingAttributes = allExistingAttributes.Where(a => a.FullPath == fullPath);

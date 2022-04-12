@@ -92,9 +92,12 @@ namespace SimpleIdServer.Scim.Domains
 
             if (SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                foreach (var child in Children)
+                var schemaAttributeIds = Children.Select(c => c.SchemaAttributeId).Intersect(attr.Children.Select(c => c.SchemaAttributeId));
+                var filteredChildren = Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                var filteredAttrChildren = attr.Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                foreach (var child in filteredChildren)
                 {
-                    if (attr.Children.Any(c => !c.IsMutabilityValid(child)))
+                    if (filteredAttrChildren.Any(c => !c.IsMutabilityValid(child)))
                     {
                         return false;
                     }

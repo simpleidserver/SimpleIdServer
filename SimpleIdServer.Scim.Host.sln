@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29503.13
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core Layer", "01. Core Layer", "{E47E7F9F-C5CA-4459-AF46-F320F155B69E}"
 EndProject
@@ -52,6 +52,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.ScimSwaggerV6.Startup", "src\Scim\SimpleIdServer.ScimSwaggerV6.Startup\SimpleIdServer.ScimSwaggerV6.Startup.csproj", "{AE3CAD86-99BE-47E9-AE91-341874E08948}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V6", "V6", "{58CB45EB-8FD5-422A-A2AF-7B1C1A60C429}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet6", "dotnet6", "{6049E60B-7E43-4ED0-B9E2-8E9460D250E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServer.Startup", "src\Scim\dotnet6\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj", "{2B0B6003-18B5-4AE7-82FF-B71DDFA31AFE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Persistence.EFNet6", "src\Scim\dotnet6\SimpleIdServer.Scim.Persistence.EFNet6\SimpleIdServer.Scim.Persistence.EFNet6.csproj", "{5F07C5DE-0FB5-49C2-A880-9754794E4691}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,6 +145,14 @@ Global
 		{AE3CAD86-99BE-47E9-AE91-341874E08948}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE3CAD86-99BE-47E9-AE91-341874E08948}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE3CAD86-99BE-47E9-AE91-341874E08948}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B0B6003-18B5-4AE7-82FF-B71DDFA31AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B0B6003-18B5-4AE7-82FF-B71DDFA31AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B0B6003-18B5-4AE7-82FF-B71DDFA31AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B0B6003-18B5-4AE7-82FF-B71DDFA31AFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F07C5DE-0FB5-49C2-A880-9754794E4691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F07C5DE-0FB5-49C2-A880-9754794E4691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F07C5DE-0FB5-49C2-A880-9754794E4691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F07C5DE-0FB5-49C2-A880-9754794E4691}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +180,9 @@ Global
 		{8D1982A1-C423-4C19-B2D9-487E46EB5BF1} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 		{AE3CAD86-99BE-47E9-AE91-341874E08948} = {58CB45EB-8FD5-422A-A2AF-7B1C1A60C429}
 		{58CB45EB-8FD5-422A-A2AF-7B1C1A60C429} = {32DF2B02-EE73-4928-AA1F-9E74F1573B24}
+		{6049E60B-7E43-4ED0-B9E2-8E9460D250E9} = {32DF2B02-EE73-4928-AA1F-9E74F1573B24}
+		{2B0B6003-18B5-4AE7-82FF-B71DDFA31AFE} = {6049E60B-7E43-4ED0-B9E2-8E9460D250E9}
+		{5F07C5DE-0FB5-49C2-A880-9754794E4691} = {6049E60B-7E43-4ED0-B9E2-8E9460D250E9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}
