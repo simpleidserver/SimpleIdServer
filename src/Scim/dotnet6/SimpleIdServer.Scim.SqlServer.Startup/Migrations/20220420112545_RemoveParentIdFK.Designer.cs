@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.Scim.Persistence.EF;
 
@@ -11,9 +12,10 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    partial class SCIMDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220420112545_RemoveParentIdFK")]
+    partial class RemoveParentIdFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -20,7 +20,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
     public class ReplaceRepresentationCommandHandler : BaseCommandHandler, IReplaceRepresentationCommandHandler
     {
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
-        private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
@@ -28,7 +27,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         public ReplaceRepresentationCommandHandler(
             ISCIMSchemaQueryRepository scimSchemaQueryRepository,
-            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
             ISCIMRepresentationHelper scimRepresentationHelper,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
@@ -36,7 +34,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             IBusControl busControl) : base(busControl)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
-            _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
@@ -65,7 +62,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             await _distributedLock.WaitLock(lockName, CancellationToken.None);
             try
             {
-                var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(replaceRepresentationCommand.Id);
+                var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
                 if (existingRepresentation == null)
                 {
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));

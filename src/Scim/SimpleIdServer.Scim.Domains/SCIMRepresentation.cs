@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SimpleIdServer.Scim.Domains
 {
-    public class SCIMRepresentation : BaseDomain, ICloneable, IEquatable<SCIMRepresentation>
+    public class SCIMRepresentation : BaseDomain, IEquatable<SCIMRepresentation>
     {
         public SCIMRepresentation()
         {
@@ -325,7 +325,7 @@ namespace SimpleIdServer.Scim.Domains
             }
         }
 
-        public object Clone()
+        public override object Clone()
         {
             return new SCIMRepresentation
             {

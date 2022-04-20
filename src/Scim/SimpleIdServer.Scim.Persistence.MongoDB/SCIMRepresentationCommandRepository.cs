@@ -3,7 +3,9 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,6 +36,19 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
             _session = null;
             return new MongoDbTransaction();
+        }
+
+        public async Task<SCIMRepresentation> Get(string representationId, CancellationToken token)
+        {
+            var collection = _scimDbContext.SCIMRepresentationLst;
+            var result = await collection.AsQueryable().Where(a => a.Id == representationId).ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.Init(_scimDbContext.Database);
+            return result;
         }
 
         public async Task<bool> Add(SCIMRepresentation representation, CancellationToken token)

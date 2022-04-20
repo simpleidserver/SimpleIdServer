@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
+using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.InMemory
 {
-    public class InMemoryCommandRepository<T> : ICommandRepository<T> where T : ICloneable
+    public class InMemoryCommandRepository<T> : ICommandRepository<T> where T : BaseDomain
     {
         private readonly List<T> _lstData;
 
@@ -18,6 +18,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         }
 
         protected List<T> LstData { get => _lstData; }
+
+        public Task<T> Get(string id, CancellationToken token)
+        {
+            return Task.FromResult(_lstData.FirstOrDefault(r => r.Id == id));
+        }
 
         public Task<ITransaction> StartTransaction(CancellationToken token)
         {

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Scim.Domains;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,13 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public EFSCIMRepresentationCommandRepository(SCIMDbContext scimDbContext)
         {
             _scimDbContext = scimDbContext;
+        }
+
+        public Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
+        {
+            return _scimDbContext.SCIMRepresentationLst
+                .Include(r => r.FlatAttributes)
+                .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<ITransaction> StartTransaction(CancellationToken token)

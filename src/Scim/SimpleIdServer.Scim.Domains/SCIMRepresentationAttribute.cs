@@ -8,7 +8,7 @@ using System.Linq;
 namespace SimpleIdServer.Scim.Domains
 {
     [DebuggerDisplay("FullPath = {FullPath}, Id = {Id}, ParentAttributeId = {ParentAttributeId}, AttributeId = {AttributeId}")]
-    public class SCIMRepresentationAttribute : BaseDomain, ICloneable, IComparable<SCIMRepresentationAttribute>
+    public class SCIMRepresentationAttribute : BaseDomain, IComparable<SCIMRepresentationAttribute>
     {
         public SCIMRepresentationAttribute()
         {
@@ -162,7 +162,7 @@ namespace SimpleIdServer.Scim.Domains
 
         #endregion
 
-        public object Clone()
+        public override object Clone()
         {
             var result = new SCIMRepresentationAttribute(Id, AttributeId)
             {
