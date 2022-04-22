@@ -43,6 +43,19 @@ namespace SimpleIdServer.Saml.Builders
             return this;
         }
 
+        public AssertionBuilder SetAuthnStatement(string Index, string ClassRef )
+        {
+            _assertion.AuthnStatement = new AuthnStatementType()
+            {
+                AuthnContext = new AuthnContextType()
+                {
+                    AuthnContextClassRef = ClassRef
+                },
+                SessionIndex = Index
+            };
+            return this;
+        }
+
         /// <summary>
         /// Set the subject.
         /// </summary>

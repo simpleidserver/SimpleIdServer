@@ -74,10 +74,12 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnsupportNameIdFormat, nameof(authnRequest.Content.Issuer.Format)));
             }
 
+            /*
             if (!string.IsNullOrWhiteSpace(authnRequest.Content.ProtocolBinding) && authnRequest.Content.ProtocolBinding != Saml.Constants.Bindings.HttpRedirect)
             {
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.UnsupportedBinding, string.Format(Global.UnsupportBinding, authnRequest.Content.ProtocolBinding));
             }
+            */
 
             return authnRequest.Content;
         }
@@ -104,7 +106,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, Global.BadAuthnRequestSignature);
             }
 
-            if((await relyingParty.GetAssertionLocation(_entityDescriptorStore, Saml.Constants.Bindings.HttpRedirect, cancellationToken)) == null)
+            if((await relyingParty.GetAssertionLocation(_entityDescriptorStore, Saml.Constants.Bindings.HttpRedirect, cancellationToken)) == null && (await relyingParty.GetAssertionLocation(_entityDescriptorStore, Saml.Constants.Bindings.HttpPost, cancellationToken)) == null)
             {
                 throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.UnsupportedBinding, Global.BadSPAssertionLocation);
             }
@@ -153,7 +155,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             if (authnRequest.NameIDPolicy != null && 
                 (string.IsNullOrWhiteSpace(authnRequest.NameIDPolicy.Format) || authnRequest.NameIDPolicy.Format == Saml.Constants.NameIdentifierFormats.Unspecified))
             {
-                var attr = attributes.FirstOrDefault(a => a.AttributeFormat == authnRequest.NameIDPolicy.Format);
+                var attr = attributes.FirstOrDefault(a => a.AttributeFormat == (authnRequest.NameIDPolicy.Format ?? ""));
                 if (attr == null)
                 {
                     throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.InvalidNameIDPolicy, string.Format(Global.UnknownNameId, authnRequest.NameIDPolicy.SPNameQualifier));
@@ -173,16 +175,17 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
 
         protected virtual async Task<ResponseType> BuildResponse(AuthnRequestType authnRequest, RelyingPartyAggregate relyingParty, NameIDPolicyValidationResult validationResult, CancellationToken cancellationToken)
         {
-            var builder = SamlResponseBuilder.New()
+            var builder = SamlResponseBuilder.New(_options.IDPId, authnRequest.AssertionConsumerServiceURL, authnRequest.ID)
                 .AddAssertion(cb =>
                 {
-                    cb.SetIssuer(Constants.NameIdentifierFormats.PersistentIdentifier, _options.IDPId);
+                    cb.SetIssuer(null, _options.IDPId);
+                    cb.SetAuthnStatement(authnRequest.ID, _options.DefaultAuthnContextClassRef);
                     cb.SetSubject(s =>
                     {
                         s.SetNameId(validationResult.NameIdFormat, validationResult.NameIdValue);
-                        s.AddSubjectConfirmationBearer(DateTime.UtcNow, DateTime.UtcNow.AddSeconds(relyingParty.AssertionExpirationTimeInSeconds), inResponseTo: authnRequest.ID);
+                        s.AddSubjectConfirmationBearer(DateTime.UtcNow, DateTime.UtcNow.AddSeconds(relyingParty.AssertionExpirationTimeInSeconds), inResponseTo: authnRequest.ID, recipient: authnRequest.AssertionConsumerServiceURL);
                     });
-                    cb.SetConditions(DateTime.UtcNow, DateTime.UtcNow.AddSeconds(relyingParty.AssertionExpirationTimeInSeconds), c =>
+                    cb.SetConditions(DateTime.UtcNow.AddSeconds(-relyingParty.AssertionExpirationBeforeInSeconds), DateTime.UtcNow.AddSeconds(relyingParty.AssertionExpirationTimeInSeconds), c =>
                     {
                         c.AddAudienceRestriction(relyingParty.Id);
                     });
@@ -191,10 +194,14 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                         cb.AddAttributeStatementAttribute(attr.AttributeName, null, attr.Type, attr.Value);
                     }
                 });
-            if (await relyingParty.GetAssertionSigned(_entityDescriptorStore, cancellationToken))
+            //http post responses have to signed per documentation but KeyCloak is able accept even usigned requests
+            if (await relyingParty.GetAssertionSigned(_entityDescriptorStore, cancellationToken) || authnRequest.ProtocolBinding == Constants.Bindings.HttpPost)
             {
                 return builder.SignAndBuild(_options.SigningCertificate, _options.SignatureAlg.Value, _options.CanonicalizationMethod);
             }
+
+            Console.WriteLine(DateTime.Now.ToString());
+            Console.WriteLine(builder.Build().SerializeToXmlDocument().InnerXml);
 
             return builder.Build();
         }

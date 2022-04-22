@@ -23,7 +23,7 @@ namespace SimpleIdServer.Saml.Builders
         /// <param name="location">Specifies the SAML binding supported by the endpoint.</param>
         /// <param name="binding">Specifies the location of the endpoint</param>
         /// <returns></returns>
-        public IDPSSODescriptorBuilder AddSingleSignOnService(string location, string binding)
+        public IDPSSODescriptorBuilder AddSingleSignOnService(string location, string binding, string protocol)
         {
             var endpoint = new EndpointType
             {
@@ -31,6 +31,11 @@ namespace SimpleIdServer.Saml.Builders
                 Binding = binding
             };
             _idpSSODescriptorType.SingleSignOnService = _idpSSODescriptorType.SingleSignOnService.Add(endpoint);
+            string[] protocols = { protocol };
+
+            _idpSSODescriptorType.protocolSupportEnumeration = protocols;
+
+
             return this;
         }
 

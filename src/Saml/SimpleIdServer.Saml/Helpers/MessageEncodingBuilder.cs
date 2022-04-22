@@ -21,6 +21,12 @@ namespace SimpleIdServer.Saml.Helpers
             return EncodeHTTPBinding(uri, obj, "SAMLResponse", relayState, certificate, sigAlg);
         }
 
+        public static string EncodeHTTPPostResponse(XmlElement obj)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(obj.OuterXml);
+            return Convert.ToBase64String(plainTextBytes);
+        }
+
         public static string EncodeHTTPBinding(Uri uri, XmlElement obj, string samlName, string relayState, X509Certificate2 certificate, SignatureAlgorithms? sigAlg)
         {
             var dic = Encode(obj, samlName, relayState);
