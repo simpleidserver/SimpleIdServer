@@ -14,7 +14,7 @@ namespace SimpleIdServer.Saml.Builders
         private static SamlResponseBuilder _instance;
         private ResponseType _response;
 
-        private SamlResponseBuilder()
+        private SamlResponseBuilder(string Issuer)
         {
             _response = new ResponseType
             {
@@ -29,11 +29,19 @@ namespace SimpleIdServer.Saml.Builders
                     }
                 }
             };
+
+            if (!string.IsNullOrEmpty(Issuer))
+                _response.Issuer = new NameIDType() { Value = Issuer };
+
         }
 
-        public static SamlResponseBuilder New()
+        public static SamlResponseBuilder New(string Issuer, string Destination, string InResponseTo)
         {
-            _instance = new SamlResponseBuilder();
+            _instance = new SamlResponseBuilder(Issuer);
+            if (!String.IsNullOrWhiteSpace(Destination))
+                _instance._response.Destination = Destination;
+            if (!String.IsNullOrWhiteSpace(InResponseTo))
+                _instance._response.InResponseTo = InResponseTo;
             return _instance;
         }
 
@@ -59,9 +67,9 @@ namespace SimpleIdServer.Saml.Builders
         {
             var assertion = new AssertionType
             {
-                 Version = Constants.SamlVersion,
-                 ID = $"assertion_{Guid.NewGuid()}",
-                 IssueInstant = DateTime.UtcNow
+                Version = Constants.SamlVersion,
+                ID = $"assertion_{Guid.NewGuid()}",
+                IssueInstant = DateTime.UtcNow
             };
             var builder = new AssertionBuilder(assertion);
             callback(builder);
@@ -78,7 +86,7 @@ namespace SimpleIdServer.Saml.Builders
         /// <returns></returns>
         public ResponseType SignAndBuild(X509Certificate2 certificate, SignatureAlgorithms signatureAlgorithm, CanonicalizationMethods canonicalizationMethod)
         {
-            foreach(var assertion in _response.Items.Where(i => i is AssertionType).Cast<AssertionType>())
+            foreach (var assertion in _response.Items.Where(i => i is AssertionType).Cast<AssertionType>())
             {
                 var assertionSigned = new SamlSignedRequest(assertion.SerializeToXmlElement(), certificate, signatureAlgorithm, canonicalizationMethod);
                 assertionSigned.ComputeSignature(assertion.ID);

@@ -1564,6 +1564,7 @@ namespace SimpleIdServer.Saml.Xsd
         private bool wantAuthnRequestsSignedField;
 
         private bool wantAuthnRequestsSignedFieldSpecified;
+        //private string protocolSupportEnumeration;
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("SingleSignOnService")]
@@ -3283,6 +3284,9 @@ namespace SimpleIdServer.Saml.Xsd
         
         private AdviceType adviceField;
         
+        private AuthnStatementType authnStatement;
+
+
         private StatementAbstractType[] itemsField;
         
         private string versionField;
@@ -3342,9 +3346,20 @@ namespace SimpleIdServer.Saml.Xsd
             }
         }
         
+        public AuthnStatementType AuthnStatement
+        {
+            get
+            {
+                return this.authnStatement;
+            }
+            set
+            {
+                this.authnStatement = value;
+            }
+        }
+
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("AttributeStatement", typeof(AttributeStatementType))]
-        [System.Xml.Serialization.XmlElementAttribute("AuthnStatement", typeof(AuthnStatementType))]
         [System.Xml.Serialization.XmlElementAttribute("AuthzDecisionStatement", typeof(AuthzDecisionStatementType))]
         [System.Xml.Serialization.XmlElementAttribute("Statement", typeof(StatementAbstractType))]
         public StatementAbstractType[] Items {
@@ -4954,8 +4969,16 @@ namespace SimpleIdServer.Saml.Xsd
         
         private string[] authenticatingAuthorityField;
         
-        /// <remarks/>
+        private string authnContextClassRef;
+
         [System.Xml.Serialization.XmlElementAttribute("AuthnContextClassRef", typeof(string), DataType="anyURI")]
+        public string AuthnContextClassRef
+        {
+            get { return authnContextClassRef; }
+            set { authnContextClassRef = value; }
+        }
+
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("AuthnContextDecl", typeof(object))]
         [System.Xml.Serialization.XmlElementAttribute("AuthnContextDeclRef", typeof(string), DataType="anyURI")]
         [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemsElementName")]
