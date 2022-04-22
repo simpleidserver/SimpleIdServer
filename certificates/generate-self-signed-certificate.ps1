@@ -1,0 +1,1 @@
+New-SelfSignedCertificate -DnsName "firstClient" -CertStoreLocation "Cert:\CurrentUser\My"
