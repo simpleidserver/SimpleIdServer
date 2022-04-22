@@ -37,6 +37,8 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddSSOApi(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<ISingleSignOnHandler, SingleSignOnHandler>();
+            serviceCollection.AddTransient<IResponseBuilder, HttpPostResponseBuilder>();
+            serviceCollection.AddTransient<IResponseBuilder, HttpRedirectResponseBuilder>();
             return serviceCollection;
         }
 

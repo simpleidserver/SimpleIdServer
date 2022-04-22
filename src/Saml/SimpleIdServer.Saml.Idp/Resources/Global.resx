@@ -138,6 +138,9 @@
   <data name="MissingParameter" xml:space="preserve">
     <value>Parameter {0} is missing</value>
   </data>
+  <data name="NoSupportedBinding" xml:space="preserve">
+    <value>No supported binding</value>
+  </data>
   <data name="UnknownAuthContextClassRef" xml:space="preserve">
     <value>AuthContextClassRef {0} don't exist</value>
   </data>

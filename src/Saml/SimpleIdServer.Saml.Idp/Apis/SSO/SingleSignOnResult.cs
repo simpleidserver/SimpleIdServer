@@ -1,33 +1,45 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Saml.Idp.Domains;
-using SimpleIdServer.Saml.Xsd;
-
 namespace SimpleIdServer.Saml.Idp.Apis.SSO
 {
+    public enum SingleSignOnActions
+    {
+        AUTHENTICATE = 0,
+        REDIRECT = 1,
+        HTML = 2
+    }
+
     public class SingleSignOnResult
     {
-        public bool IsValid { get; private set; }
-        public ResponseType Response { get; private set; }
-        public RelyingPartyAggregate RelyingParty { get; private set; }
+        public SingleSignOnActions Action { get; private set; }
         public string Amr { get; private set; }
+        public string Location { get; private set; }
+        public string Content { get; private set; }
 
-        public static SingleSignOnResult Ok(ResponseType response, RelyingPartyAggregate relyingParty)
+        public static SingleSignOnResult Authenticate(string amr)
         {
             return new SingleSignOnResult
             {
-                IsValid = true,
-                Response = response,
-                RelyingParty = relyingParty
+                Action = SingleSignOnActions.AUTHENTICATE,
+                Amr = amr
             };
         }
 
-        public static SingleSignOnResult Redirect(string amr)
+        public static SingleSignOnResult Redirect(string location)
         {
             return new SingleSignOnResult
             {
-                IsValid = false,
-                Amr = amr
+                Action = SingleSignOnActions.REDIRECT,
+                Location = location
+            };
+        }
+
+        public static SingleSignOnResult Html(string html)
+        {
+            return new SingleSignOnResult
+            {
+                Action = SingleSignOnActions.HTML,
+                Content = html
             };
         }
     }

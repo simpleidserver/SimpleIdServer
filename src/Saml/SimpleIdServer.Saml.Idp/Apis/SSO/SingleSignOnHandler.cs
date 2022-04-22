@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Common.Domains;
 using SimpleIdServer.Saml.Builders;
@@ -28,6 +27,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
         private readonly IEntityDescriptorStore _entityDescriptorStore;
         private readonly IRelyingPartyRepository _relyingPartyRepository;
         private readonly IEnumerable<IAuthenticator> _authenticators;
+        private readonly IEnumerable<IResponseBuilder> _responseBuilders;
         private readonly IUserRepository _userRepository;
         private readonly SamlIdpOptions _options;
 
@@ -35,12 +35,14 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             IEntityDescriptorStore entityDescriptorStore,
             IRelyingPartyRepository relyingPartyRepository,
             IEnumerable<IAuthenticator> authenticators,
+            IEnumerable<IResponseBuilder> responseBuilders,
             IUserRepository userRepository,
             IOptions<SamlIdpOptions> options)
         {
             _entityDescriptorStore = entityDescriptorStore;
             _relyingPartyRepository = relyingPartyRepository;
             _authenticators = authenticators;
+            _responseBuilders = responseBuilders;
             _userRepository = userRepository;
             _options = options.Value;
         }
@@ -52,13 +54,15 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             var authenticator = CheckAuthnContextClassRef(authnRequest);
             if (string.IsNullOrWhiteSpace(userId))
             {
-                return SingleSignOnResult.Redirect(authenticator.Amr);
+                return SingleSignOnResult.Authenticate(authenticator.Amr);
             }
 
             var user = await _userRepository.Get(userId, cancellationToken);
             var validationResult = CheckNameIDPolicy(relyingParty, user, authnRequest);
-            var response = await BuildResponse(authnRequest, relyingParty, validationResult, cancellationToken);
-            return SingleSignOnResult.Ok(response, relyingParty);
+            var response = await BuildResponse(authnRequest, relyingParty, validationResult, authenticator, cancellationToken);
+            var locationResult = await BuidLocation(relyingParty, authnRequest, cancellationToken);
+            var responseBuilder = _responseBuilders.Single(r => r.Binding == locationResult.Binding);
+            return responseBuilder.Build(locationResult.Location, response, parameter.RelayState);
         }
 
         protected virtual AuthnRequestType CheckParameter(SAMLRequestDto parameter)
@@ -66,20 +70,19 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             var authnRequest = SAMLValidator.CheckSaml<AuthnRequestType>(parameter.SAMLRequest, parameter.RelayState);
             if (authnRequest.Content.Issuer == null || string.IsNullOrWhiteSpace(authnRequest.Content.Issuer.Value))
             {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(authnRequest.Content.Issuer)));
+                throw new SamlException(HttpStatusCode.BadRequest, Constants.StatusCodes.Requester, string.Format(Global.MissingParameter, nameof(authnRequest.Content.Issuer)));
             }
 
             if (!string.IsNullOrWhiteSpace(authnRequest.Content.Issuer.Format) && authnRequest.Content.Issuer.Format != Saml.Constants.NameIdentifierFormats.EntityIdentifier)
             {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnsupportNameIdFormat, nameof(authnRequest.Content.Issuer.Format)));
+                throw new SamlException(HttpStatusCode.BadRequest, Constants.StatusCodes.Requester, string.Format(Global.UnsupportNameIdFormat, nameof(authnRequest.Content.Issuer.Format)));
             }
 
-            /*
-            if (!string.IsNullOrWhiteSpace(authnRequest.Content.ProtocolBinding) && authnRequest.Content.ProtocolBinding != Saml.Constants.Bindings.HttpRedirect)
+            var responseBuilder = _responseBuilders.SingleOrDefault(r => r.Binding == authnRequest.Content.ProtocolBinding);
+            if (!string.IsNullOrWhiteSpace(authnRequest.Content.ProtocolBinding) && responseBuilder == null)
             {
-                throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.UnsupportedBinding, string.Format(Global.UnsupportBinding, authnRequest.Content.ProtocolBinding));
+                throw new SamlException(HttpStatusCode.BadRequest, Constants.StatusCodes.UnsupportedBinding, string.Format(Global.UnsupportBinding, authnRequest.Content.ProtocolBinding));
             }
-            */
 
             return authnRequest.Content;
         }
@@ -89,7 +92,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             var relyingParty = await _relyingPartyRepository.Get(authnRequest.Issuer.Value, cancellationToken);
             if (relyingParty == null)
             {
-                throw new SamlException(HttpStatusCode.NotFound, Saml.Constants.StatusCodes.Requester, string.Format(Global.UnknownIssuer, nameof(authnRequest.Issuer.Value)));
+                throw new SamlException(HttpStatusCode.NotFound, Constants.StatusCodes.Requester, string.Format(Global.UnknownIssuer, nameof(authnRequest.Issuer.Value)));
             }
 
             if (await relyingParty.GetAuthnRequestsSigned(_entityDescriptorStore, cancellationToken))
@@ -150,15 +153,15 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
         protected virtual NameIDPolicyValidationResult CheckNameIDPolicy(RelyingPartyAggregate relyingParty, User user, AuthnRequestType authnRequest)
         {
             var attributes = ConvertAttributes(relyingParty, user);
-            string nameIdFormat = Saml.Constants.NameIdentifierFormats.EntityIdentifier;
+            string nameIdFormat = Constants.NameIdentifierFormats.EntityIdentifier;
             string nameIdValue = user.Claims.First(c => c.Type == Jwt.Constants.UserClaims.Subject).Value;
             if (authnRequest.NameIDPolicy != null && 
                 (string.IsNullOrWhiteSpace(authnRequest.NameIDPolicy.Format) || authnRequest.NameIDPolicy.Format == Saml.Constants.NameIdentifierFormats.Unspecified))
             {
-                var attr = attributes.FirstOrDefault(a => a.AttributeFormat == (authnRequest.NameIDPolicy.Format ?? ""));
+                var attr = attributes.FirstOrDefault(a => a.AttributeFormat == authnRequest.NameIDPolicy.Format);
                 if (attr == null)
                 {
-                    throw new SamlException(HttpStatusCode.BadRequest, Saml.Constants.StatusCodes.InvalidNameIDPolicy, string.Format(Global.UnknownNameId, authnRequest.NameIDPolicy.SPNameQualifier));
+                    throw new SamlException(HttpStatusCode.BadRequest, Constants.StatusCodes.InvalidNameIDPolicy, string.Format(Global.UnknownNameId, authnRequest.NameIDPolicy.SPNameQualifier));
                 }
 
                 nameIdFormat = attr.AttributeFormat;
@@ -173,13 +176,13 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             };
         }
 
-        protected virtual async Task<ResponseType> BuildResponse(AuthnRequestType authnRequest, RelyingPartyAggregate relyingParty, NameIDPolicyValidationResult validationResult, CancellationToken cancellationToken)
+        protected virtual async Task<ResponseType> BuildResponse(AuthnRequestType authnRequest, RelyingPartyAggregate relyingParty, NameIDPolicyValidationResult validationResult, IAuthenticator authenticator, CancellationToken cancellationToken)
         {
             var builder = SamlResponseBuilder.New(_options.IDPId, authnRequest.AssertionConsumerServiceURL, authnRequest.ID)
                 .AddAssertion(cb =>
                 {
                     cb.SetIssuer(null, _options.IDPId);
-                    cb.SetAuthnStatement(authnRequest.ID, _options.DefaultAuthnContextClassRef);
+                    cb.SetAuthnStatement(authnRequest.ID, authenticator.AuthnContextClassRef);
                     cb.SetSubject(s =>
                     {
                         s.SetNameId(validationResult.NameIdFormat, validationResult.NameIdValue);
@@ -194,16 +197,42 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
                         cb.AddAttributeStatementAttribute(attr.AttributeName, null, attr.Type, attr.Value);
                     }
                 });
-            //http post responses have to signed per documentation but KeyCloak is able accept even usigned requests
-            if (await relyingParty.GetAssertionSigned(_entityDescriptorStore, cancellationToken) || authnRequest.ProtocolBinding == Constants.Bindings.HttpPost)
+            if (await relyingParty.GetAssertionSigned(_entityDescriptorStore, cancellationToken))
             {
                 return builder.SignAndBuild(_options.SigningCertificate, _options.SignatureAlg.Value, _options.CanonicalizationMethod);
             }
 
-            Console.WriteLine(DateTime.Now.ToString());
-            Console.WriteLine(builder.Build().SerializeToXmlDocument().InnerXml);
-
             return builder.Build();
+        }
+
+        protected async Task<LocationResult> BuidLocation(RelyingPartyAggregate relyingParty, AuthnRequestType authnRequest, CancellationToken cancellationToken)
+        {
+            string location = string.Empty;
+            var binding = authnRequest.ProtocolBinding;
+            if (string.IsNullOrWhiteSpace(authnRequest.ProtocolBinding))
+            {
+                foreach (var responseBuilder in _responseBuilders)
+                {
+                    location = await relyingParty.GetAssertionLocation(_entityDescriptorStore, responseBuilder.Binding, cancellationToken);
+                    if (string.IsNullOrWhiteSpace(location))
+                    {
+                        continue;
+                    }
+
+                    binding = responseBuilder.Binding;
+                    break;
+                }
+
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    throw new SamlException(HttpStatusCode.BadRequest, Constants.StatusCodes.Requester, string.Format(Global.NoSupportedBinding));
+                }
+
+                return new LocationResult { Location = location, Binding = binding };
+            }
+
+            location = await relyingParty.GetAssertionLocation(_entityDescriptorStore, binding, cancellationToken);
+            return new LocationResult { Location = location, Binding = binding };
         }
 
         protected ICollection<SamlAttribute> ConvertAttributes(RelyingPartyAggregate relyingParty, User user)
@@ -235,5 +264,16 @@ namespace SimpleIdServer.Saml.Idp.Apis.SSO
             public string Type { get; set; }
             public string Value { get; set; }
         }
+
+        protected class LocationResult
+        {
+            public string Location { get; set; }
+            public string Binding { get; set; }
+        }
+    }
+
+    public interface ISingleSignOnHandler
+    {
+        Task<SingleSignOnResult> Handle(SAMLRequestDto parameter, string userId, CancellationToken cancellationToken);
     }
 }

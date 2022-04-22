@@ -18,18 +18,12 @@ namespace SimpleIdServer.Saml.Builders
                         Items = new object[]
                         {
                             certificate.RawData,
-                            certificate.SubjectName.Name,
-                            new X509IssuerSerialType
-                            {
-                                X509IssuerName = certificate.IssuerName.Name,
-                                X509SerialNumber = certificate.SerialNumber
-                            }
+                            certificate.SubjectName.Name
                         },
                         ItemsElementName = new ItemsChoiceType[]
                         {
                             ItemsChoiceType.X509Certificate,
-                            ItemsChoiceType.X509SubjectName,
-                            ItemsChoiceType.X509IssuerSerial
+                            ItemsChoiceType.X509SubjectName
                         }
                     },
                 },
