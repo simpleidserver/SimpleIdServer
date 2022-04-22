@@ -27,6 +27,8 @@ namespace SimpleIdServer.Saml.Idp.Domains
         public DateTime UpdateDateTime { get; set; }
         public string MetadataUrl { get; set; }
         public int AssertionExpirationTimeInSeconds { get; set; }
+        //optional workarround for time out-of sync. Seen WSL2 Docker KeyCloak running 1s sooner than Windows run SAML IdP which led to error. 0 is default
+        public int AssertionExpirationBeforeInSeconds { get; set; }
         public ICollection<RelyingPartyClaimMapping> ClaimMappings { get; set; }
 
         #endregion
@@ -107,6 +109,7 @@ namespace SimpleIdServer.Saml.Idp.Domains
             return new RelyingPartyAggregate
             {
                 AssertionExpirationTimeInSeconds = AssertionExpirationTimeInSeconds,
+                AssertionExpirationBeforeInSeconds = AssertionExpirationBeforeInSeconds,
                 ClaimMappings = ClaimMappings.Select(c => (RelyingPartyClaimMapping)c.Clone()).ToList(),
                 CreateDateTime = CreateDateTime,
                 Id = Id,

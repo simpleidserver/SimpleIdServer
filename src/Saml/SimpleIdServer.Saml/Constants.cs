@@ -41,6 +41,7 @@ namespace SimpleIdServer.Saml
 
         public static class AuthnContextClassReferences
         {
+            public const string Unspecified = "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified";
             public const string Password = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password";
             public const string PasswordProtectedTransport = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
             public const string TLSClient = "urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient";
@@ -53,6 +54,12 @@ namespace SimpleIdServer.Saml
         {
             public const string HttpRedirect = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect";
             public const string HttpPost = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
+        }
+
+        public static class Protocols
+        {
+            public const string Saml2Protocol = "urn:oasis:names:tc:SAML:2.0:protocol";
+
         }
 
         public static class SignatureAlgorithms

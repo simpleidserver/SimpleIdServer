@@ -20,7 +20,7 @@ namespace SimpleIdServer.Saml.Idp.Apis.Metadata
             return EntityDescriptorBuilder.Instance(_options.IDPId)
                 .AddIdpSSODescriptor(cb =>
                 {
-                    cb.AddSingleSignOnService($"{_options.BaseUrl}/{Constants.RouteNames.SingleSignOn}/Login", Saml.Constants.Bindings.HttpRedirect);
+                    cb.AddSingleSignOnService($"{_options.BaseUrl}/{Constants.RouteNames.SingleSignOn}/Login", Saml.Constants.Bindings.HttpRedirect, Saml.Constants.Protocols.Saml2Protocol);
                     cb.AddSigningKey(_options.SigningCertificate);
                 }).Build();
         }
