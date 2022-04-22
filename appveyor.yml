@@ -4,7 +4,7 @@ pull_requests:
 branches:
   only:
   - master
-image: Visual Studio 2019
+image: Visual Studio 2022
 environment:
   nodejs_version: "12"
 install:
