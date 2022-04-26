@@ -38,7 +38,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _options = options.Value;
         }
 
-        public async Task<SCIMRepresentation> Handle(PatchRepresentationCommand patchRepresentationCommand)
+        public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
             var lockName = $"representation-{patchRepresentationCommand.Id}";
@@ -53,6 +53,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 var oldRepresentation = existingRepresentation.Clone() as SCIMRepresentation;
                 var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
+                if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
                 var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
@@ -68,7 +69,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 await Notify(references);
                 existingRepresentation.ApplyEmptyArray();
-                return existingRepresentation;
+                return PatchRepresentationResult.Ok(existingRepresentation);
             }
             finally
             {

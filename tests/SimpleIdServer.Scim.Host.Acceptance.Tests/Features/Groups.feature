@@ -27,8 +27,6 @@ Scenario: Check users cannot be added twice to a group
 	And extract JSON from body
 
 	Then HTTP status code equals to '204'
-	Then JSON 'status'='204'
-	Then JSON 'scimType'='uniqueness'
 
 Scenario: Check user can be added to a group	
 	When execute HTTP POST JSON request 'http://localhost/Users'

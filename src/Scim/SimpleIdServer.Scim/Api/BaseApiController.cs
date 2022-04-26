@@ -391,7 +391,9 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
-                var newRepresentation = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, Request.GetAbsoluteUriWithVirtualPath()));
+                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, Request.GetAbsoluteUriWithVirtualPath()));
+                if (!patchResult.IsPatched) return NoContent();
+                var newRepresentation = patchResult.SCIMRepresentation;
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))

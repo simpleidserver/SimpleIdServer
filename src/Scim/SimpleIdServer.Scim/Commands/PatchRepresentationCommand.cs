@@ -6,7 +6,7 @@ using SimpleIdServer.Scim.Infrastructure;
 
 namespace SimpleIdServer.Scim.Commands
 {
-    public class PatchRepresentationCommand : ISCIMCommand<SCIMRepresentation>
+    public class PatchRepresentationCommand : ISCIMCommand<PatchRepresentationResult>
     {
         public PatchRepresentationCommand(string id, string resourceType, PatchRepresentationParameter patchRepresentation, string location)
         {
@@ -20,5 +20,21 @@ namespace SimpleIdServer.Scim.Commands
         public PatchRepresentationParameter PatchRepresentation { get; private set; }
         public string ResourceType { get; private set; }
         public string Location { get; }
+    }
+
+    public class PatchRepresentationResult
+    {
+        public bool IsPatched { get; private set; }
+        public SCIMRepresentation SCIMRepresentation { get; private set; }
+
+        public static PatchRepresentationResult NoPatch()
+        {
+            return new PatchRepresentationResult { IsPatched = false };
+        }
+
+        public static PatchRepresentationResult Ok(SCIMRepresentation scimRepresentation)
+        {
+            return new PatchRepresentationResult { IsPatched = true, SCIMRepresentation = scimRepresentation };
+        }
     }
 }
