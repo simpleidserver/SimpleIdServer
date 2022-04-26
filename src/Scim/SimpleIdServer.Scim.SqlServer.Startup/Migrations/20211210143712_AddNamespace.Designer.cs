@@ -9,7 +9,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
-    [DbContext(typeof(SCIMDbContext))]
+    [DbContext(typeof(SCIMQueryDbContext))]
     [Migration("20211210143712_AddNamespace")]
     partial class AddNamespace
     {

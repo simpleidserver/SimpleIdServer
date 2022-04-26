@@ -10,9 +10,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
 {
     public class EFSCIMSchemaQueryRepository : ISCIMSchemaQueryRepository
     {
-        private readonly SCIMDbContext _context;
+        private readonly SCIMQueryDbContext _context;
 
-        public EFSCIMSchemaQueryRepository(SCIMDbContext context)
+        public EFSCIMSchemaQueryRepository(SCIMQueryDbContext context)
         {
             _context = context;
         }
@@ -47,7 +47,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<IEnumerable<SCIMSchema>> GetAllRoot()
         {
-            var result = await _context.SCIMSchemaLst
+            var result = await _context.SCIMSchemaLst.
                 .Include(s => s.SchemaExtensions)
                 .Include(s => s.Attributes)
                 .Where(s => s.IsRootSchema == true).ToListAsync();
@@ -56,7 +56,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<SCIMSchema> FindRootSCIMSchemaByName(string name)
         {
-            return _context.SCIMSchemaLst.Include(s => s.SchemaExtensions).Include(s => s.Attributes)
+            return _context.SCIMSchemaLst.AsNoTracking().Include(s => s.SchemaExtensions).Include(s => s.Attributes)
                 .FirstOrDefaultAsync(s => s.Name == name && s.IsRootSchema == true);
         }
     }

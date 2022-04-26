@@ -20,21 +20,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 {
     public class PatchRepresentationCommandHandler : BaseCommandHandler, IPatchRepresentationCommandHandler
     {
-        private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IDistributedLock _distributedLock;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly SCIMHostOptions _options;
 
         public PatchRepresentationCommandHandler(
-            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, 
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, 
             IDistributedLock distributedLock,
             IRepresentationReferenceSync representationReferenceSync,
             IOptions<SCIMHostOptions> options,
             IBusControl busControl) : base(busControl)
         {
-            _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _distributedLock = distributedLock;
             _representationReferenceSync = representationReferenceSync;
@@ -48,7 +45,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             await _distributedLock.WaitLock(lockName, CancellationToken.None);
             try
             {
-                var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
+                var existingRepresentation = await _scimRepresentationCommandRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
                 if (existingRepresentation == null)
                 {
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));

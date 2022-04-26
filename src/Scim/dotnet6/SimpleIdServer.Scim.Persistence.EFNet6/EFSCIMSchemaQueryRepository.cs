@@ -10,9 +10,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
 {
     public class EFSCIMSchemaQueryRepository : ISCIMSchemaQueryRepository
     {
-        private readonly SCIMDbContext _context;
+        private readonly SCIMQueryDbContext _context;
 
-        public EFSCIMSchemaQueryRepository(SCIMDbContext context)
+        public EFSCIMSchemaQueryRepository(SCIMQueryDbContext context)
         {
             _context = context;
         }

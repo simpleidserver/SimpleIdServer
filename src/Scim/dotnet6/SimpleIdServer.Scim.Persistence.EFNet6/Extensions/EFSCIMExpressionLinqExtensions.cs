@@ -21,7 +21,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 
         public static SearchSCIMRepresentationsResponse BuildResult(
             this IQueryable<SCIMRepresentation> representations,
-            SCIMDbContext dbContext,
+            SCIMQueryDbContext dbContext,
             IEnumerable<SCIMAttributeExpression> includedAttributes,
             IEnumerable<SCIMAttributeExpression> excludedAttributes,
             int total)
@@ -86,7 +86,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 
         public static async Task<SearchSCIMRepresentationsResponse> EvaluateOrderBy(
             this SCIMExpression expression,
-            SCIMDbContext dbContext,
+            SCIMQueryDbContext dbContext,
             IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
             int startIndex,
@@ -125,7 +125,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         }
 
         private static SearchSCIMRepresentationsResponse EvaluateOrderByMetadata(
-            SCIMDbContext dbContext,
+            SCIMQueryDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,
@@ -156,7 +156,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         }
 
         private static SearchSCIMRepresentationsResponse EvaluateOrderByProperty(
-            SCIMDbContext dbContext,
+            SCIMQueryDbContext dbContext,
             SCIMAttributeExpression attrExpression, 
             IQueryable<SCIMRepresentation> representations, 
             SearchSCIMRepresentationOrders order,

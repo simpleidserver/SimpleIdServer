@@ -6,13 +6,13 @@ using SimpleIdServer.Scim.Domains;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Configurations
 {
-    public class SCIMRepresentationAttributeConfiguration : IEntityTypeConfiguration<SCIMRepresentationAttribute>
+    public class SCIMRepresentationAttributeQueryConfiguration : IEntityTypeConfiguration<SCIMRepresentationAttribute>
     {
         public void Configure(EntityTypeBuilder<SCIMRepresentationAttribute> builder)
         {
             builder.HasKey(a => a.Id);
             builder.HasOne(a => a.SchemaAttribute).WithMany().HasForeignKey(a => a.SchemaAttributeId);
-            builder.Ignore(a => a.Children);
+            builder.HasMany(a => a.Children).WithOne().HasForeignKey("ParentAttributeId");
         }
     }
 }

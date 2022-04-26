@@ -100,7 +100,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
         {
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetService<SCIMDbContext>())
+                using (var context = scope.ServiceProvider.GetService<SCIMQueryDbContext>())
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");

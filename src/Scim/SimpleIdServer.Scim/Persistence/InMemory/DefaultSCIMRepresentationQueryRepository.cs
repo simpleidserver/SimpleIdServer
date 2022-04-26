@@ -41,28 +41,6 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(clone);
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, string value, string endpoint = null)
-        {
-            var result = _representations.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value));
-            if (result == null)
-            {
-                return Task.FromResult(result);
-            }
-
-            return Task.FromResult((SCIMRepresentation)result.Clone());
-        }
-
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, int value, string endpoint = null)
-        {
-            var result = _representations.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueInteger == value));
-            if (result == null)
-            {
-                return Task.FromResult(result);
-            }
-
-            return Task.FromResult(result);
-        }
-
         public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string attrSchemaId, IEnumerable<string> values, string endpoint = null)
         {
             var result = _representations.Where(r =>
@@ -93,12 +71,6 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             result = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count).Select(r => (SCIMRepresentation)r.Clone()).ToList();
             result.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
             return Task.FromResult(new SearchSCIMRepresentationsResponse(totalResults, result));
-        }
-
-        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
-        {
-            IEnumerable<SCIMRepresentation> representations = _representations.AsQueryable().Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
-            return Task.FromResult(representations);
         }
     }
 }

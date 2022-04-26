@@ -14,6 +14,57 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
         }
 
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
+        {
+            var result = LstData.FirstOrDefault(r => r.Id == representationId);
+            if (result == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            return Task.FromResult((SCIMRepresentation)result.Clone());
+        }
+
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
+        {
+            var result = LstData.FirstOrDefault(r => r.Id == representationId && r.ResourceType == resourceType);
+            if (result == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            var clone = (SCIMRepresentation)result.Clone();
+            return Task.FromResult(clone);
+        }
+
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
+        {
+            IEnumerable<SCIMRepresentation> representations = LstData.AsQueryable().Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
+            return Task.FromResult(representations);
+        }
+
+        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, string value, string endpoint = null)
+        {
+            var result = LstData.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value));
+            if (result == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            return Task.FromResult((SCIMRepresentation)result.Clone());
+        }
+
+        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, int value, string endpoint = null)
+        {
+            var result = LstData.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueInteger == value));
+            if (result == null)
+            {
+                return Task.FromResult(result);
+            }
+
+            return Task.FromResult(result);
+        }
+
         public override Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
             var record = LstData.First(l => l.Id == data.Id);

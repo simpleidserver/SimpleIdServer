@@ -8,7 +8,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
-    [DbContext(typeof(SCIMDbContext))]
+    [DbContext(typeof(SCIMQueryDbContext))]
     partial class SCIMDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -196,7 +196,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ParentAttributeId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RepresentationId")
                         .HasColumnType("nvarchar(450)");
@@ -229,6 +229,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentAttributeId");
 
                     b.HasIndex("RepresentationId");
 
@@ -379,6 +381,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>
                 {
+                    b.HasOne("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", null)
+                        .WithMany("Children")
+                        .HasForeignKey("ParentAttributeId");
+
                     b.HasOne("SimpleIdServer.Scim.Domains.SCIMRepresentation", "Representation")
                         .WithMany("FlatAttributes")
                         .HasForeignKey("RepresentationId")
@@ -424,6 +430,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentation", b =>
                 {
                     b.Navigation("FlatAttributes");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchema", b =>

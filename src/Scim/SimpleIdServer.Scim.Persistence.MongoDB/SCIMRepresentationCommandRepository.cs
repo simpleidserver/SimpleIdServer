@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,78 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _scimDbContext = scimDbContext;
             _mongoClient = mongoClient;
             _options = options.Value;
+        }
+
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
+        {
+            var collection = _scimDbContext.SCIMRepresentationLst;
+            var result = await collection.AsQueryable().Where(a => a.Id == representationId).ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.Init(_scimDbContext.Database);
+            return result;
+        }
+
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
+        {
+            var collection = _scimDbContext.SCIMRepresentationLst;
+            var result = await collection.AsQueryable().Where(a => a.Id == representationId && a.ResourceType == resourceType).ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.Init(_scimDbContext.Database);
+            return result;
+        }
+
+        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
+        {
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
+                .ToMongoListAsync<SCIMRepresentationModel>();
+            if (result.Any())
+            {
+                var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
+                var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
+                foreach (var representation in result)
+                {
+                    representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
+        {
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueString == value))
+                .ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.Init(_scimDbContext.Database);
+            return result;
+        }
+
+        public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, int value, string endpoint = null)
+        {
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueInteger == value))
+                .ToMongoFirstAsync();
+            if (result == null)
+            {
+                return null;
+            }
+
+            result.Init(_scimDbContext.Database);
+            return result;
         }
 
         public async Task<ITransaction> StartTransaction(CancellationToken token)

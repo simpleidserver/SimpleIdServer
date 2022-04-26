@@ -16,9 +16,9 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             _schemas = schemas;
         }
 
-        public Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
+        public Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
         {
-            var result = _schemas.FirstOrDefault(s => s.Id == schemaId);
+            var result = _schemas.FirstOrDefault(s => s.ResourceType == resourceType && s.IsRootSchema == true);
             if (result == null)
             {
                 return Task.FromResult(result);
@@ -33,9 +33,9 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result.Select(r => (SCIMSchema)r.Clone()));
         }
 
-        public Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
+        public Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
         {
-            var result = _schemas.FirstOrDefault(s => s.ResourceType == resourceType && s.IsRootSchema == true);
+            var result = _schemas.FirstOrDefault(s => s.Id == schemaId);
             if (result == null)
             {
                 return Task.FromResult(result);
