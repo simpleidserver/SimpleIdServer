@@ -10,9 +10,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
 {
     public class EFSCIMAttributeMappingQueryRepository : ISCIMAttributeMappingQueryRepository
     {
-        private readonly SCIMQueryDbContext _scimDbContext;
+        private readonly SCIMDbContext _scimDbContext;
 
-        public EFSCIMAttributeMappingQueryRepository(SCIMQueryDbContext scimDbContext)
+        public EFSCIMAttributeMappingQueryRepository(SCIMDbContext scimDbContext)
         {
             _scimDbContext = scimDbContext;
         }

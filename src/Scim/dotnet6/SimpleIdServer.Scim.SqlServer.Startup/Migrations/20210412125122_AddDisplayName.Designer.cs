@@ -9,7 +9,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
-    [DbContext(typeof(SCIMQueryDbContext))]
+    [DbContext(typeof(SCIMDbContext))]
     [Migration("20210412125122_AddDisplayName")]
     partial class AddDisplayName
     {

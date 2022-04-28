@@ -6,7 +6,7 @@ using SimpleIdServer.Scim.Domains;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Configurations
 {
-    public class SCIMRepresentationAttributeQueryConfiguration : IEntityTypeConfiguration<SCIMRepresentationAttribute>
+    public class SCIMRepresentationAttributeConfiguration : IEntityTypeConfiguration<SCIMRepresentationAttribute>
     {
         public void Configure(EntityTypeBuilder<SCIMRepresentationAttribute> builder)
         {

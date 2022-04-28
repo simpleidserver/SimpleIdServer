@@ -19,21 +19,21 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 {
     public class ReplaceRepresentationCommandHandler : BaseCommandHandler, IReplaceRepresentationCommandHandler
     {
-        private readonly ISCIMSchemaCommandRepository _scimSchemaCommandRepository;
+        private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IDistributedLock _distributedLock;
 
         public ReplaceRepresentationCommandHandler(
-            ISCIMSchemaCommandRepository scimSchemaCommandRepository,
+            ISCIMSchemaQueryRepository scimSchemaQueryRepository,
             ISCIMRepresentationHelper scimRepresentationHelper,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IDistributedLock distributedLock,
             IBusControl busControl) : base(busControl)
         {
-            _scimSchemaCommandRepository = scimSchemaCommandRepository;
+            _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
@@ -48,7 +48,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Schemas));
             }
 
-            var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
+            var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(replaceRepresentationCommand.ResourceType);
             var allSchemas = new List<string> { schema.Id };
             allSchemas.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
             var unsupportedSchemas = requestedSchemas.Where(s => !allSchemas.Contains(s));
@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
             }
 
-            var schemas = await _scimSchemaCommandRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
+            var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
             var lockName = $"representation-{replaceRepresentationCommand.Id}";
             await _distributedLock.WaitLock(lockName, CancellationToken.None);
             try

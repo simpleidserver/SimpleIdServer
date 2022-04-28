@@ -8,7 +8,7 @@ using SimpleIdServer.Scim.Persistence.EF;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
-    [DbContext(typeof(SCIMQueryDbContext))]
+    [DbContext(typeof(SCIMDbContext))]
     partial class SCIMDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

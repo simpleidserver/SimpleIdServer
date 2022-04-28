@@ -16,16 +16,16 @@ namespace SimpleIdServer.Scim.Helpers
     public class RepresentationReferenceSync : IRepresentationReferenceSync
 	{
 		private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
-		private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+		private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
 		private readonly IResourceTypeResolver _resourceTypeResolver;
 
 		public RepresentationReferenceSync(
 			ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
-			ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
+			ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
 			IResourceTypeResolver resourceTypeResolver)
         {
 			_scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
-			_scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+			_scimRepresentationQueryRepository = scimRepresentationQueryRepository;
 			_resourceTypeResolver = resourceTypeResolver;
 		}
 
@@ -109,7 +109,7 @@ namespace SimpleIdServer.Scim.Helpers
 
 		protected virtual async Task RemoveReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, string location)
 		{
-			var targetRepresentations = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
+			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
 			if (targetRepresentations.Any())
             {
 				var firstTargetRepresentation = targetRepresentations.First();
@@ -130,7 +130,7 @@ namespace SimpleIdServer.Scim.Helpers
 
 		protected virtual async Task UpdateReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, string location)
 		{
-			var targetRepresentations = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
+			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
 			var missingIds = ids.Where(i => !targetRepresentations.Any(r => r.Id == i));
 			if (missingIds.Any())
             {

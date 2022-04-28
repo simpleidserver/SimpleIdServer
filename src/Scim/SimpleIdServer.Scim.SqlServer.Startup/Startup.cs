@@ -50,7 +50,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 o.EnableEndpointRouting = false;
                 o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
-            services.AddLogging(); 
+            services.AddLogging();
             services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
@@ -101,7 +101,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
         {
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                using (var context = scope.ServiceProvider.GetService<SCIMQueryDbContext>())
+                using (var context = scope.ServiceProvider.GetService<SCIMDbContext>())
                 {
                     context.Database.Migrate();
                     var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");

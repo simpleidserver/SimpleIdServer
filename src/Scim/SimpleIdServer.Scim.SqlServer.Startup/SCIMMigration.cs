@@ -7,15 +7,15 @@ using System.Reflection;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup
 {
-    public class SCIMMigration : IDesignTimeDbContextFactory<SCIMQueryDbContext>
+    public class SCIMMigration : IDesignTimeDbContextFactory<SCIMDbContext>
     {
-        public SCIMQueryDbContext CreateDbContext(string[] args)
+        public SCIMDbContext CreateDbContext(string[] args)
         {
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            var builder = new DbContextOptionsBuilder<SCIMQueryDbContext>();
+            var builder = new DbContextOptionsBuilder<SCIMDbContext>();
             builder.UseSqlServer("Data Source=DESKTOP-F641MIJ\\SQLEXPRESS;Initial Catalog=SCIM;Integrated Security=True",
                 optionsBuilder => optionsBuilder.MigrationsAssembly(migrationsAssembly));
-            return new SCIMQueryDbContext(builder.Options);
+            return new SCIMDbContext(builder.Options);
         }
     }
 }

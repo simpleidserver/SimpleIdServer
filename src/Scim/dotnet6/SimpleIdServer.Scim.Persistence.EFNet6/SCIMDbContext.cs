@@ -6,11 +6,10 @@ using SimpleIdServer.Scim.Persistence.EF.Configurations;
 
 namespace SimpleIdServer.Scim.Persistence.EF
 {
-    public class SCIMQueryDbContext : DbContext
+    public class SCIMDbContext : DbContext
     {
-        public SCIMQueryDbContext(DbContextOptions<SCIMQueryDbContext> dbContextOptions) : base(dbContextOptions)
+        public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions) : base(dbContextOptions)
         {
-
         }
 
         public DbSet<SCIMAttributeMapping> SCIMAttributeMappingLst { get; set; }
@@ -27,7 +26,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             modelBuilder.ApplyConfiguration(new ProvisioningConfigurationHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new ProvisioningConfigurationRecordConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMAttributeMappingConfiguration());
-            modelBuilder.ApplyConfiguration(new SCIMRepresentationAttributeQueryConfiguration());
+            modelBuilder.ApplyConfiguration(new SCIMRepresentationAttributeConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMRepresentationConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMSchemaAttributeConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMSchemaConfiguration());

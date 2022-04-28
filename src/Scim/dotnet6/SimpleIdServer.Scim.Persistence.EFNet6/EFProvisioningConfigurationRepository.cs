@@ -24,9 +24,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
             { "representationId", "RepresentationId" },
             { "representationVersion", "RepresentationVersion" }
         };
-        private readonly SCIMQueryDbContext _dbContext;
+        private readonly SCIMDbContext _dbContext;
 
-        public EFProvisioningConfigurationRepository(SCIMQueryDbContext dbContext)
+        public EFProvisioningConfigurationRepository(SCIMDbContext dbContext)
         {
             _dbContext = dbContext;
         }
