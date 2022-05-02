@@ -221,7 +221,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "number"});
                 table21.AddRow(new string[] {
                             "complexImmutable",
-                            "[ { \"value\": \"immutable\" } ]"});
+                            "[ { \"value\": \"immutable\", \"type\": \"type\" } ]"});
 #line 30
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table21, "When ");
 #line hidden
@@ -246,7 +246,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "number"});
                 table22.AddRow(new string[] {
                             "complexImmutable",
-                            "[ { \"value\": \"immutable\" } ]"});
+                            "[ { \"value\": \"immutable\", \"type\": \"type\" } ]"});
 #line 40
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table22, "And ");
 #line hidden

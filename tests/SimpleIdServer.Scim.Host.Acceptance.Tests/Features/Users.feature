@@ -33,7 +33,7 @@ Scenario: Check complex immutable attribute can be updated with the same value
 	| userName         | bjen                                                                                                           |
 	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| employeeNumber   | number                                                                                                         |
-	| complexImmutable | [ { "value": "immutable" } ]																				    |	
+	| complexImmutable | [ { "value": "immutable", "type": "type" } ]																	|	
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
@@ -42,7 +42,7 @@ Scenario: Check complex immutable attribute can be updated with the same value
 	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
 	| userName         | bjen                                                                                                           |
 	| employeeNumber   | number                                                                                                         |
-	| complexImmutable | [ { "value": "immutable" } ]												         				            |	
+	| complexImmutable | [ { "value": "immutable", "type": "type" } ]												         			|	
 	
 	And extract JSON from body
 	

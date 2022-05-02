@@ -97,10 +97,7 @@ namespace SimpleIdServer.Scim.Domains
                 var filteredAttrChildren = attr.Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
                 foreach (var child in filteredChildren)
                 {
-                    if (filteredAttrChildren.Any(c => !c.IsMutabilityValid(child)))
-                    {
-                        return false;
-                    }
+                    if (filteredAttrChildren.All(c => !c.IsMutabilityValid(child))) return false;
                 }
             }
 

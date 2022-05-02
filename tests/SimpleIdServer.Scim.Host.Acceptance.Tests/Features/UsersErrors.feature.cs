@@ -1493,8 +1493,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "employeeNumber",
                             "number"});
                 table76.AddRow(new string[] {
-                            "complexImmutable",
-                            "[ { \"value\": \"immutable\" } ]"});
+                            "subImmutableComplex",
+                            "[ { \"value\": \"immutable\", \"type\": \"type\" } ]"});
 #line 307
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table76, "When ");
 #line hidden
@@ -1518,8 +1518,8 @@ this.ScenarioInitialize(scenarioInfo);
                             "employeeNumber",
                             "number"});
                 table77.AddRow(new string[] {
-                            "complexImmutable",
-                            "[ { \"value\": \"invalidImmutable\" } ]"});
+                            "subImmutableComplex",
+                            "[ { \"value\": \"immutable\", \"type\": \"invalidType\" } ]"});
 #line 317
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table77, "And ");
 #line hidden

@@ -35,10 +35,12 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                .AddComplexAttribute("subImmutableComplex", opt =>
                {
                    opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE);
+                   opt.AddStringAttribute("type", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE);
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddComplexAttribute("complexImmutable", opt =>
                {
-                   opt.AddStringAttribute("value", description: "Phone number");
+                   opt.AddStringAttribute("value");
+                   opt.AddStringAttribute("type");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE)
                .AddComplexAttribute("emails", opt =>
                {

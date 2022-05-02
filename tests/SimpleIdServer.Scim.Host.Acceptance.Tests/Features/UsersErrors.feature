@@ -310,16 +310,16 @@ Scenario: Check complex immutable attribute cannot be updated with a different v
 	| userName         | bjen                                                                                                           |
 	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
 	| employeeNumber   | number                                                                                                         |
-	| complexImmutable | [ { "value": "immutable" } ]																				    |	
+	| subImmutableComplex | [ { "value": "immutable", "type": "type" } ]																|	
 	
 	And extract JSON from body
 	And extract 'id' from JSON body	
 	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
-	| Key              | Value                                                                                                          |
-	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
-	| userName         | bjen                                                                                                           |
-	| employeeNumber   | number                                                                                                         |
-	| complexImmutable | [ { "value": "invalidImmutable" } ]												         				    |	
+	| Key                 | Value                                                                                                          |
+	| schemas             | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName            | bjen                                                                                                           |
+	| employeeNumber      | number                                                                                                         |
+	| subImmutableComplex | [ { "value": "immutable", "type": "invalidType" } ]												         	   |	
 	
 	And extract JSON from body
 	
