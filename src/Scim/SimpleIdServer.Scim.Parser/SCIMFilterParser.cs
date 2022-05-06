@@ -446,13 +446,16 @@ namespace SimpleIdServer.Scim.Parser
             return lst.Any(s => str.Equals(s, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private static SCIMSchemaAttribute GetSCIMSchemaAttribute(string name, ICollection<SCIMSchemaAttribute> scimSchemaAttributes, ICollection<SCIMSchema> schemas)
+        private static SCIMSchemaAttribute GetSCIMSchemaAttribute(string name,
+            ICollection<SCIMSchemaAttribute> scimSchemaAttributes, ICollection<SCIMSchema> schemas)
         {
-            foreach(var scimSchemaAttribute in scimSchemaAttributes)
+            foreach (var scimSchemaAttribute in scimSchemaAttributes)
             {
                 var schema = schemas.First(s => s.HasAttribute(scimSchemaAttribute));
                 var fullPath = $"{schema.Id}:{scimSchemaAttribute.Name}";
-                if ((SCIMAttributeExpression.HasNamespace(name) && name == fullPath) || (!SCIMAttributeExpression.HasNamespace(name) && name == scimSchemaAttribute.Name))
+                if ((SCIMAttributeExpression.HasNamespace(name) && name == fullPath) ||
+                    (!SCIMAttributeExpression.HasNamespace(name) && string.Equals(name, scimSchemaAttribute.Name,
+                        StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return scimSchemaAttribute;
                 }
