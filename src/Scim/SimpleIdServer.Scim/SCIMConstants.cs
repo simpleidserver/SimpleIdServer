@@ -56,6 +56,13 @@ namespace SimpleIdServer.Scim
             public const string Version = "version";
         }
 
+        public static class StandardSCIMReferenceProperties
+        {
+            public const string Value = "value";
+            public const string Display = "display";
+            public const string Type = "type";
+        }
+
         public static class StandardSCIMSearchAttributes
         {
             public const string Attributes = "attributes";

@@ -19,6 +19,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 {
     public class ReplaceRepresentationCommandHandler : BaseCommandHandler, IReplaceRepresentationCommandHandler
     {
+        private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
@@ -26,6 +27,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly IDistributedLock _distributedLock;
 
         public ReplaceRepresentationCommandHandler(
+            ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
             ISCIMSchemaQueryRepository scimSchemaQueryRepository,
             ISCIMRepresentationHelper scimRepresentationHelper,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
@@ -33,6 +35,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             IDistributedLock distributedLock,
             IBusControl busControl) : base(busControl)
         {
+            _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
@@ -76,37 +79,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     replaceRepresentationCommand.Representation.ExternalId,
                     mainSchema,
                     extensionSchemas);
-                var allExistingAttributes = existingRepresentation.HierarchicalAttributes;
-                var updatedAttributes = updatedRepresentation.HierarchicalAttributes;;
-                existingRepresentation.RemoveAttributesBySchemaAttrId(updatedAttributes.Select(u => u.SchemaAttribute.Id).Distinct());
-                foreach (var kvp in updatedAttributes.GroupBy(h => h.FullPath))
-                {
-                    var fullPath = kvp.Key;
-                    var filteredExistingAttributes = allExistingAttributes.Where(a => a.FullPath == fullPath);
-                    var invalidAttrs = filteredExistingAttributes.Where(fa => !kvp.Any(a => a.IsMutabilityValid(fa)));
-                    if (invalidAttrs.Any())
-                    {
-                        throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", invalidAttrs.Select(a => a.FullPath))));
-                    }
-
-                    foreach(var rootAttr in kvp)
-                    {
-                        if (rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE || rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
-                        {
-                            var flatAttrs = rootAttr.ToFlat();
-                            foreach (var attr in flatAttrs)
-                            {
-                                existingRepresentation.AddAttribute(attr);
-                            }
-                        }
-                    }
-                }
-
+                var updateResult = await UpdateExistingRepresentation(replaceRepresentationCommand.ResourceType, existingRepresentation, updatedRepresentation);
                 existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
                 existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
                 existingRepresentation.SetUpdated(DateTime.UtcNow);
                 var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-                var references = await _representationReferenceSync.Sync(replaceRepresentationCommand.ResourceType, oldRepresentation,  existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
+                var references = await _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
                 using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
                 {
                     await _scimRepresentationCommandRepository.Update(existingRepresentation);
@@ -126,6 +104,57 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             {
                 await _distributedLock.ReleaseLock(lockName, CancellationToken.None);
             }
+        }
+
+        private async Task<UpdateRepresentationResult> UpdateExistingRepresentation(string resourceType, SCIMRepresentation existingRepresentation, SCIMRepresentation updatedRepresentation)
+        {
+            var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
+            RemoveUnusedAttributes(attributeMappings, updatedRepresentation);
+            var updatedAttributes = updatedRepresentation.HierarchicalAttributes;
+            var allExistingAttributes = existingRepresentation.HierarchicalAttributes;
+            existingRepresentation.RemoveAttributesBySchemaAttrId(updatedAttributes.Select(u => u.SchemaAttribute.Id).Distinct());
+            foreach (var kvp in updatedAttributes.GroupBy(h => h.FullPath))
+            {
+                var fullPath = kvp.Key;
+                var filteredExistingAttributes = allExistingAttributes.Where(a => a.FullPath == fullPath);
+                var invalidAttrs = filteredExistingAttributes.Where(fa => !kvp.Any(a => a.IsMutabilityValid(fa)));
+                if (invalidAttrs.Any())
+                {
+                    throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", invalidAttrs.Select(a => a.FullPath))));
+                }
+
+                foreach (var rootAttr in kvp)
+                {
+                    if (rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.WRITEONLY || rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READWRITE || rootAttr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE)
+                    {
+                        var flatAttrs = rootAttr.ToFlat();
+                        foreach (var attr in flatAttrs)
+                        {
+                            existingRepresentation.AddAttribute(attr);
+                        }
+                    }
+                }
+            }
+
+            return new UpdateRepresentationResult { AttributeMappingLst = attributeMappings };
+        }
+
+        private void RemoveUnusedAttributes(IEnumerable<SCIMAttributeMapping> attributeMappings, SCIMRepresentation updatedRepresentation)
+        {
+            var hierarchicalUpdatedAttributes = updatedRepresentation.HierarchicalAttributes;
+            foreach (var attributeMapping in attributeMappings)
+            {
+                var attrLstToRemove = hierarchicalUpdatedAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId)
+                    .SelectMany(a => a.Children)
+                    .Where(c => 
+                    c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type || c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
+                updatedRepresentation.RemoveAttributesById(attrLstToRemove.Select(a => a.Id));
+            }
+        }
+
+        private class UpdateRepresentationResult
+        {
+            public IEnumerable<SCIMAttributeMapping> AttributeMappingLst { get; set; }
         }
     }
 }

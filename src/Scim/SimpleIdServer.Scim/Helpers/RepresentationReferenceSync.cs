@@ -29,11 +29,16 @@ namespace SimpleIdServer.Scim.Helpers
 			_resourceTypeResolver = resourceTypeResolver;
 		}
 
-		public async virtual Task<RepresentationSyncResult> Sync(string resourceType, SCIMRepresentation oldScimRepresentation, SCIMRepresentation newSourceScimRepresentation,string location, bool updateAllReferences = false, bool isScimRepresentationRemoved = false)
+		public async virtual Task<RepresentationSyncResult> Sync(string resourceType, SCIMRepresentation oldScimRepresentation, SCIMRepresentation newSourceScimRepresentation, string location, bool updateAllReferences = false, bool isScimRepresentationRemoved = false)
+		{
+			var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
+			return await Sync(attributeMappingLst, resourceType, oldScimRepresentation, newSourceScimRepresentation, location, updateAllReferences, isScimRepresentationRemoved);
+		}
+
+		public async virtual Task<RepresentationSyncResult> Sync(IEnumerable<SCIMAttributeMapping> attributeMappingLst, string resourceType, SCIMRepresentation oldScimRepresentation, SCIMRepresentation newSourceScimRepresentation, string location, bool updateAllReferences = false, bool isScimRepresentationRemoved = false)
 		{
 			var stopWatch = new Stopwatch();
 			var result = new RepresentationSyncResult(_resourceTypeResolver);
-			var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
 			if (!attributeMappingLst.Any())
 			{
 				return result;
@@ -173,9 +178,9 @@ namespace SimpleIdServer.Scim.Helpers
 			var attributes = new List<SCIMRepresentationAttribute>();
 			var targetSchemaAttribute = rootSchema.GetAttributeById(attributeId);
 			var values = rootSchema.GetChildren(targetSchemaAttribute);
-			var value = values.FirstOrDefault(s => s.Name == "value");
-			var display = values.FirstOrDefault(s => s.Name == "display");
-			var type = values.FirstOrDefault(s => s.Name == "type");
+			var value = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
+			var display = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
+			var type = values.FirstOrDefault(s => s.Name == SCIMConstants.StandardSCIMReferenceProperties.Type);
 			if (value != null)
             {
 				attributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), value, value.SchemaId)

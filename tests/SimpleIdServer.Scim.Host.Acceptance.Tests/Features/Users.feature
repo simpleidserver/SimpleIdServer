@@ -378,6 +378,29 @@ Scenario: Check user can be filtered (HTTP GET)
 	Then JSON 'Resources[0].name.familyName'='familyName'
 	Then JSON 'Resources[0].name.givenName'='givenName'
 
+Scenario: Check user can be filtered (HTTP GET) - Filter is case insensitive.
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| phones         | [ { "phoneNumber": "01", "type": "mobile" }, { "phoneNumber": "02", "type": "home" } ]                         |
+	| employeeNumber | number                                                                                                         |
+
+	And execute HTTP GET request 'http://localhost/Users?filter=UserName%20Eq%20bjen&count=3'	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON exists 'Resources[0].phones'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:ListResponse'
+	Then JSON 'totalResults'='1'
+	Then JSON 'startIndex'='1'
+	Then JSON 'itemsPerPage'='3'
+	Then JSON 'Resources[0].userName'='bjen'
+	Then JSON 'Resources[0].name.formatted'='formatted'
+	Then JSON 'Resources[0].name.familyName'='familyName'
+	Then JSON 'Resources[0].name.givenName'='givenName'
+
 Scenario: Check user can be filtered (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
