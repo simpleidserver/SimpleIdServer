@@ -268,24 +268,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table58 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table58.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table58.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table58.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table58.AddRow(new string[] {
+                table69.AddRow(new string[] {
                             "name",
                             "{"});
 #line 35
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table58, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table69, "When ");
 #line hidden
 #line 41
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -337,24 +337,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table59 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table59.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table59.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table59.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table59.AddRow(new string[] {
+                table70.AddRow(new string[] {
                             "active",
                             "test"});
 #line 50
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table59, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table70, "When ");
 #line hidden
 #line 56
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -406,24 +406,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table60 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table60.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table60.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table60.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table60.AddRow(new string[] {
+                table71.AddRow(new string[] {
                             "age",
                             "test"});
 #line 65
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table60, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table71, "When ");
 #line hidden
 #line 71
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -475,24 +475,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table61 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table61.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table61.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table61.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table61.AddRow(new string[] {
+                table72.AddRow(new string[] {
                             "birthDate",
                             "test"});
 #line 80
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table61, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table72, "When ");
 #line hidden
 #line 86
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -544,24 +544,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table62 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table62.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table62.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table62.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table62.AddRow(new string[] {
+                table73.AddRow(new string[] {
                             "nbPoints",
                             "test"});
 #line 95
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table62, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table73, "When ");
 #line hidden
 #line 101
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -613,24 +613,24 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table63 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table74 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table63.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table63.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table63.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table63.AddRow(new string[] {
+                table74.AddRow(new string[] {
                             "eidCertificate",
                             "%HELLO%"});
 #line 110
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table63, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table74, "When ");
 #line hidden
 #line 116
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -682,15 +682,15 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table64 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table64.AddRow(new string[] {
+                table75.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
 #line 125
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table64, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table75, "When ");
 #line hidden
 #line 128
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -743,21 +743,21 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table76 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table65.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table65.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "userName",
                             ""});
-                table65.AddRow(new string[] {
+                table76.AddRow(new string[] {
                             "employeeNumber",
                             ""});
 #line 137
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table65, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table76, "When ");
 #line hidden
 #line 142
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -810,11 +810,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table66 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table77 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 151
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table66, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table77, "When ");
 #line hidden
 #line 154
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -866,14 +866,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table67 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table78 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table67.AddRow(new string[] {
+                table78.AddRow(new string[] {
                             "schemas",
                             "[ \"invalidschema\" ]"});
 #line 163
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table67, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table78, "When ");
 #line hidden
 #line 167
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -929,45 +929,45 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table68 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table79 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table68.AddRow(new string[] {
+                table79.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table68.AddRow(new string[] {
+                table79.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table68.AddRow(new string[] {
+                table79.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table68.AddRow(new string[] {
+                table79.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
 #line 176
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table68, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table79, "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table80 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table69.AddRow(new string[] {
+                table80.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table69.AddRow(new string[] {
+                table80.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table69.AddRow(new string[] {
+                table80.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table69.AddRow(new string[] {
+                table80.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
 #line 184
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table69, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table80, "When ");
 #line hidden
 #line 191
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1119,11 +1119,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table81 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 220
- testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table70, "When ");
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table81, "When ");
 #line hidden
 #line 223
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1175,14 +1175,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table82 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table71.AddRow(new string[] {
+                table82.AddRow(new string[] {
                             "schemas",
                             "[ \"invalidschema\" ]"});
 #line 232
- testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table71, "When ");
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table82, "When ");
 #line hidden
 #line 236
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1234,15 +1234,15 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table83 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table72.AddRow(new string[] {
+                table83.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
 #line 245
- testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table72, "When ");
+ testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table83, "When ");
 #line hidden
 #line 249
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1294,25 +1294,25 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table84 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table73.AddRow(new string[] {
+                table84.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table73.AddRow(new string[] {
+                table84.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table73.AddRow(new string[] {
+                table84.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table73.AddRow(new string[] {
+                table84.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
 #line 258
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table73, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table84, "When ");
 #line hidden
 #line 265
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1320,17 +1320,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 266
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table74 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table85 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table74.AddRow(new string[] {
+                table85.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\" ]"});
-                table74.AddRow(new string[] {
+                table85.AddRow(new string[] {
                             "employeeNumber",
                             "01"});
 #line 267
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table74, "And ");
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table85, "And ");
 #line hidden
 #line 272
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1380,28 +1380,28 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table86 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table75.AddRow(new string[] {
+                table86.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table75.AddRow(new string[] {
+                table86.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table75.AddRow(new string[] {
+                table86.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table75.AddRow(new string[] {
+                table86.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table75.AddRow(new string[] {
+                table86.AddRow(new string[] {
                             "immutable",
                             "str"});
 #line 281
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table75, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table86, "When ");
 #line hidden
 #line 289
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1409,24 +1409,24 @@ this.ScenarioInitialize(scenarioInfo);
 #line 290
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table76 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table87 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table76.AddRow(new string[] {
+                table87.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table76.AddRow(new string[] {
+                table87.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table76.AddRow(new string[] {
+                table87.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table76.AddRow(new string[] {
+                table87.AddRow(new string[] {
                             "immutable",
                             "str2"});
 #line 291
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table76, "And ");
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table87, "And ");
 #line hidden
 #line 298
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1475,28 +1475,28 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table77 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table88 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table77.AddRow(new string[] {
+                table88.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table77.AddRow(new string[] {
+                table88.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table77.AddRow(new string[] {
+                table88.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table77.AddRow(new string[] {
+                table88.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table77.AddRow(new string[] {
+                table88.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"immutable\", \"type\": \"type\" } ]"});
 #line 307
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table77, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table88, "When ");
 #line hidden
 #line 315
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1504,24 +1504,24 @@ this.ScenarioInitialize(scenarioInfo);
 #line 316
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table78 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table89 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table78.AddRow(new string[] {
+                table89.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table78.AddRow(new string[] {
+                table89.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table78.AddRow(new string[] {
+                table89.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table78.AddRow(new string[] {
+                table89.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"immutable\", \"type\": \"invalidType\" } ]"});
 #line 317
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table78, "And ");
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table89, "And ");
 #line hidden
 #line 324
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1570,34 +1570,34 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table79 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table90 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "externalId",
                             "externalid"});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
                             "{ \"employeeNumber\" : \"number\" }"});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "eidCertificate",
                             "aGVsbG8="});
-                table79.AddRow(new string[] {
+                table90.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"value\" } ]"});
 #line 332
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table79, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table90, "When ");
 #line hidden
 #line 342
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1605,20 +1605,20 @@ this.ScenarioInitialize(scenarioInfo);
 #line 343
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table80 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table91 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table80.AddRow(new string[] {
+                table91.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\" ]"});
-                table80.AddRow(new string[] {
+                table91.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table80.AddRow(new string[] {
+                table91.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"secondValue\" }, { \"value\": \"thirdValue\" } ]"});
 #line 344
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table80, "And ");
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table91, "And ");
 #line hidden
 #line 350
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1667,11 +1667,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table81 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table92 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 358
- testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table81, "When ");
+ testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table92, "When ");
 #line hidden
 #line 361
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1723,14 +1723,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table82 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table93 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table82.AddRow(new string[] {
+                table93.AddRow(new string[] {
                             "schemas",
                             "[ \"invalidschema\" ]"});
 #line 371
- testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table82, "When ");
+ testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table93, "When ");
 #line hidden
 #line 375
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1782,17 +1782,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table83 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table94 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table83.AddRow(new string[] {
+                table94.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table83.AddRow(new string[] {
+                table94.AddRow(new string[] {
                             "Operations",
                             "[ ]"});
 #line 384
- testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table83, "When ");
+ testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table94, "When ");
 #line hidden
 #line 389
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1847,35 +1847,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table84 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table95 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "phones",
                             "[ { \"phoneNumber\": \"01\", \"type\": \"mobile\" }, { \"phoneNumber\": \"02\", \"type\": \"home" +
                                 "\" } ]"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "scores",
                             "{ \"math\" : [ { \"score\" : \"10\" } ] }"});
-                table84.AddRow(new string[] {
+                table95.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
 #line 398
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table84, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table95, "When ");
 #line hidden
 #line 408
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1883,17 +1883,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 409
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table85 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table96 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table85.AddRow(new string[] {
+                table96.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table85.AddRow(new string[] {
+                table96.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"remove\" } ]"});
 #line 410
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table85, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table96, "And ");
 #line hidden
 #line 415
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1945,35 +1945,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table86 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table97 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "phones",
                             "[ { \"phoneNumber\": \"01\", \"type\": \"mobile\" }, { \"phoneNumber\": \"02\", \"type\": \"home" +
                                 "\" } ]"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "scores",
                             "{ \"math\" : [ { \"score\" : \"10\" } ] }"});
-                table86.AddRow(new string[] {
+                table97.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
 #line 422
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table86, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table97, "When ");
 #line hidden
 #line 432
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1981,17 +1981,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 433
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table87 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table98 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table87.AddRow(new string[] {
+                table98.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table87.AddRow(new string[] {
+                table98.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"add\", \"path\": \"fakepath\" } ]"});
 #line 434
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table87, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table98, "And ");
 #line hidden
 #line 438
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2040,35 +2040,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table88 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table99 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "phones",
                             "[ { \"phoneNumber\": \"01\", \"type\": \"mobile\" }, { \"phoneNumber\": \"02\", \"type\": \"home" +
                                 "\" } ]"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "scores",
                             "{ \"math\" : [ { \"score\" : \"10\" } ] }"});
-                table88.AddRow(new string[] {
+                table99.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
 #line 447
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table88, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table99, "When ");
 #line hidden
 #line 457
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2076,17 +2076,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 458
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table89 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table100 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table89.AddRow(new string[] {
+                table100.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table89.AddRow(new string[] {
+                table100.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"replace\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
 #line 459
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table89, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table100, "And ");
 #line hidden
 #line 464
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2135,35 +2135,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table90 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table101 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "name",
                             "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
                                 " }"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "phones",
                             "[ { \"phoneNumber\": \"01\", \"type\": \"mobile\" }, { \"phoneNumber\": \"02\", \"type\": \"home" +
                                 "\" } ]"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "scores",
                             "{ \"math\" : [ { \"score\" : \"10\" } ] }"});
-                table90.AddRow(new string[] {
+                table101.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
 #line 471
-  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table90, "When ");
+  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table101, "When ");
 #line hidden
 #line 481
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2171,17 +2171,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 482
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table91 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table102 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table91.AddRow(new string[] {
+                table102.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table91.AddRow(new string[] {
+                table102.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"invalid-op\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
 #line 483
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table91, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table102, "And ");
 #line hidden
 #line 488
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2230,27 +2230,27 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table92 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table103 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table92.AddRow(new string[] {
+                table103.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-                table92.AddRow(new string[] {
+                table103.AddRow(new string[] {
                             "userName",
                             "bjen"});
-                table92.AddRow(new string[] {
+                table103.AddRow(new string[] {
                             "externalId",
                             "externalid"});
-                table92.AddRow(new string[] {
+                table103.AddRow(new string[] {
                             "type",
                             "unsupported"});
-                table92.AddRow(new string[] {
+                table103.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
 #line 495
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table92, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table103, "When ");
 #line hidden
 #line 503
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2302,17 +2302,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table93 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table104 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table93.AddRow(new string[] {
+                table104.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:customuser\" ]"});
-                table93.AddRow(new string[] {
+                table104.AddRow(new string[] {
                             "userName",
                             "userName"});
 #line 512
- testRunner.When("execute HTTP POST JSON request \'http://localhost/CustomUsers\'", ((string)(null)), table93, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/CustomUsers\'", ((string)(null)), table104, "When ");
 #line hidden
 #line 517
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2320,17 +2320,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 518
  testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table94 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table105 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table94.AddRow(new string[] {
+                table105.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:entitlement\" ]"});
-                table94.AddRow(new string[] {
+                table105.AddRow(new string[] {
                             "displayName",
                             "firstEntitlement"});
 #line 520
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Entitlements\'", ((string)(null)), table94, "And ");
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Entitlements\'", ((string)(null)), table105, "And ");
 #line hidden
 #line 525
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2338,17 +2338,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 526
  testRunner.And("extract \'id\' from JSON body into \'firstEntitlement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table95 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table106 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table95.AddRow(new string[] {
+                table106.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:entitlement\" ]"});
-                table95.AddRow(new string[] {
+                table106.AddRow(new string[] {
                             "displayName",
                             "secondEntitlement"});
 #line 528
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Entitlements\'", ((string)(null)), table95, "And ");
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Entitlements\'", ((string)(null)), table106, "And ");
 #line hidden
 #line 533
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2356,31 +2356,31 @@ this.ScenarioInitialize(scenarioInfo);
 #line 534
  testRunner.And("extract \'id\' from JSON body into \'secondEntitlement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table96 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table107 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table96.AddRow(new string[] {
+                table107.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table96.AddRow(new string[] {
+                table107.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\": \"add\", \"path\": \"entitlements\", \"value\" : [ { \"value\": \"$firstEntitlemen" +
                                 "t$\" }, { \"value\": \"$secondEntitlement$\" } ] } ]"});
 #line 536
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/CustomUsers/$userId$\'", ((string)(null)), table96, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/CustomUsers/$userId$\'", ((string)(null)), table107, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table97 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table108 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table97.AddRow(new string[] {
+                table108.AddRow(new string[] {
                             "schemas",
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table97.AddRow(new string[] {
+                table108.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\": \"add\", \"path\": \"entitlements\", \"value\" : [ { \"value\": \"$firstEntitlemen" +
                                 "t$\" }, { \"value\": \"$secondEntitlement$\" } ] } ]"});
 #line 541
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/CustomUsers/$userId$\'", ((string)(null)), table97, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/CustomUsers/$userId$\'", ((string)(null)), table108, "And ");
 #line hidden
 #line 546
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

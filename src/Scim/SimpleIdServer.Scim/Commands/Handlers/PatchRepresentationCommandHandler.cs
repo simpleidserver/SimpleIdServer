@@ -20,6 +20,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 {
     public class PatchRepresentationCommandHandler : BaseCommandHandler, IPatchRepresentationCommandHandler
     {
+        private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IDistributedLock _distributedLock;
@@ -27,6 +28,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly SCIMHostOptions _options;
 
         public PatchRepresentationCommandHandler(
+            ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
             ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IDistributedLock distributedLock,
@@ -34,6 +36,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             IOptions<SCIMHostOptions> options,
             IBusControl busControl) : base(busControl)
         {
+            _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _distributedLock = distributedLock;
@@ -54,29 +57,48 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
                 }
 
-                var oldRepresentation = existingRepresentation.Clone() as SCIMRepresentation;
-                var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
-                if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
-                existingRepresentation.SetUpdated(DateTime.UtcNow);
-                var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
-                using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
-                {
-                    await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                    foreach (var reference in references.Representations)
-                    {
-                        await _scimRepresentationCommandRepository.Update(reference);
-                    }
-
-                    await transaction.Commit();
-                }
-
-                await Notify(references);
-                existingRepresentation.ApplyEmptyArray();
-                return PatchRepresentationResult.Ok(existingRepresentation);
+                return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
             }
             finally
             {
                 await _distributedLock.ReleaseLock(lockName, CancellationToken.None);
+            }
+        }
+
+        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand)
+        {
+            var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
+            RemoveUnusedAttributes(attributeMappings, existingRepresentation);
+            var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
+            if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
+            existingRepresentation.SetUpdated(DateTime.UtcNow);
+            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            {
+                await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                foreach (var reference in references.Representations)
+                {
+                    await _scimRepresentationCommandRepository.Update(reference);
+                }
+
+                await transaction.Commit();
+            }
+
+            await Notify(references);
+            existingRepresentation.ApplyEmptyArray();
+            return PatchRepresentationResult.Ok(existingRepresentation);
+        }
+
+        private void RemoveUnusedAttributes(IEnumerable<SCIMAttributeMapping> attributeMappings, SCIMRepresentation updatedRepresentation)
+        {
+            var hierarchicalUpdatedAttributes = updatedRepresentation.HierarchicalAttributes;
+            foreach (var attributeMapping in attributeMappings)
+            {
+                var attrLstToRemove = hierarchicalUpdatedAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId)
+                    .SelectMany(a => a.Children)
+                    .Where(c =>
+                    c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type || c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
+                updatedRepresentation.RemoveAttributesById(attrLstToRemove.Select(a => a.Id));
             }
         }
 

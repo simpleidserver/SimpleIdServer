@@ -138,6 +138,93 @@ Scenario: Check entitlement can be added
 	Then JSON 'entitlements[1].display'='secondEntitlement'
 	Then JSON 'entitlements[1].$ref'='http://localhost/Entitlements/$secondEntitlement$'
 
+Scenario: Check entitlement can be added twice with the same value
+	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
+	| Key      | Value                |
+	| schemas  | [ "urn:customuser" ] |
+	| userName | userName             |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | firstEntitlement      |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstEntitlement'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | secondEntitlement     |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondEntitlement'
+
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value                                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                              |
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ] |
+	
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value                                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                              |
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ] |
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'
+
+	
+Scenario: Check third entitlement can be added 
+	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
+	| Key      | Value                |
+	| schemas  | [ "urn:customuser" ] |
+	| userName | userName             |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | firstEntitlement      |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstEntitlement'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | secondEntitlement     |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondEntitlement'
+
+	And execute HTTP POST JSON request 'http://localhost/Entitlements'
+	| Key         | Value                 |
+	| schemas     | [ "urn:entitlement" ] |
+	| displayName | thirdEntitlement      |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdEntitlement'
+
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value																																								|
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]																													|
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" } ] } ]										|
+	
+	And execute HTTP PATCH JSON request 'http://localhost/CustomUsers/$userId$'
+	| Key        | Value																																								|
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]																													|
+	| Operations | [ { "op": "add", "path": "entitlements", "value" : [ { "value": "$firstEntitlement$" }, { "value": "$secondEntitlement$" }, { "value": "$thirdEntitlement$" } ] } ]	|
+
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+
 Scenario: Check emails can be erased	
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key                                                        | Value                                                                                                          |
