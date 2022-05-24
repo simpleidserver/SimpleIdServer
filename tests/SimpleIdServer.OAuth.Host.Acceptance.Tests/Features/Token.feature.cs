@@ -130,7 +130,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "BankCvSecret"});
                 table53.AddRow(new string[] {
                             "scope",
-                            "scope1"});
+                            "scope1 scope2"});
                 table53.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
@@ -152,6 +152,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 21
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 22
+ testRunner.Then("Extract JWS payload from \'access_token\' and check claim \'scope\' is array", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
             }
             this.ScenarioCleanup();
         }
@@ -167,7 +170,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use client_credentials grant type & use tls_client_auth authentication type to ge" +
                     "t an access token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 23
+#line 24
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -208,13 +211,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table54.AddRow(new string[] {
                             "tls_client_auth_san_dns",
                             "firstMtlsClient"});
-#line 24
+#line 25
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table54, "When ");
 #line hidden
-#line 33
+#line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 34
+#line 35
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table55 = new TechTalk.SpecFlow.Table(new string[] {
@@ -232,22 +235,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table55.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-#line 36
+#line 37
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table55, "And ");
 #line hidden
-#line 43
+#line 44
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 45
+#line 46
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 46
+#line 47
  testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 47
+#line 48
  testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 48
+#line 49
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -265,7 +268,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use client_credentials grant type & use self_signed_tls_client_auth authenticatio" +
                     "n type to get an access token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 50
+#line 51
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -325,13 +328,13 @@ this.ScenarioInitialize(scenarioInfo);
                                 "vdxE6UgpczlR71X62hfe3h0UwzJDLbWHalJrKnTzI3x7FTXhXpDvQGH+nvCM31D8wbXcATjRZPV9lu/t" +
                                 "0YjWpg6HXMPLHqKyx8uCfJuZL6CqhFo7YnFH2ktQf5G5bfCjTHX9kkrHh1EslgExF2arcUx0+wjm0B2Q" +
                                 "UepAgrtOCV/WEINWA==\"]}]}"});
-#line 51
+#line 52
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table56, "When ");
 #line hidden
-#line 60
+#line 61
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 62
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table57 = new TechTalk.SpecFlow.Table(new string[] {
@@ -349,22 +352,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table57.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "selfSignedCertificate.cer"});
-#line 63
+#line 64
  testRunner.And("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table57, "And ");
 #line hidden
-#line 70
+#line 71
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 72
+#line 73
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 73
+#line 74
  testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 74
+#line 75
  testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 75
+#line 76
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -379,7 +382,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use password grant type to get an access token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 77
+#line 78
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -407,7 +410,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 78
+#line 79
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table58, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table59 = new TechTalk.SpecFlow.Table(new string[] {
@@ -428,22 +431,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table59.AddRow(new string[] {
                             "grant_type",
                             "password"});
-#line 82
+#line 83
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table59, "And ");
 #line hidden
-#line 90
+#line 91
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 92
+#line 93
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 93
+#line 94
  testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 94
+#line 95
  testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 95
+#line 96
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -458,7 +461,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use authorization_code grant type to get an access token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 97
+#line 98
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -486,10 +489,10 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 98
+#line 99
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table60, "When ");
 #line hidden
-#line 102
+#line 103
  testRunner.And("add user consent : user=\'administrator\', scope=\'scope1\', clientId=\'f3d35cce-de69-" +
                         "45bf-958c-4a8796f8ed37\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -511,10 +514,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table61.AddRow(new string[] {
                             "response_mode",
                             "query"});
-#line 104
+#line 105
  testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table61, "And ");
 #line hidden
-#line 112
+#line 113
  testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table62 = new TechTalk.SpecFlow.Table(new string[] {
@@ -535,22 +538,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table62.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-#line 114
+#line 115
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table62, "And ");
 #line hidden
-#line 122
+#line 123
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 124
+#line 125
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 125
+#line 126
  testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 126
+#line 127
  testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 127
+#line 128
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -565,7 +568,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use refresh_token grant type to get an access token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 129
+#line 130
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -593,7 +596,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 130
+#line 131
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table63, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table64 = new TechTalk.SpecFlow.Table(new string[] {
@@ -611,13 +614,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table64.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 134
+#line 135
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table64, "And ");
 #line hidden
-#line 141
+#line 142
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 142
+#line 143
  testRunner.And("extract parameter \'refresh_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
@@ -635,22 +638,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table65.AddRow(new string[] {
                             "grant_type",
                             "refresh_token"});
-#line 144
+#line 145
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table65, "And ");
 #line hidden
-#line 151
+#line 152
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 153
+#line 154
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 154
+#line 155
  testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 155
+#line 156
  testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 156
+#line 157
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -665,7 +668,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Revoke refresh_token", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 158
+#line 159
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -693,7 +696,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "SIG",
                             "1",
                             "RS256"});
-#line 159
+#line 160
  testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table66, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table67 = new TechTalk.SpecFlow.Table(new string[] {
@@ -711,13 +714,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table67.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 163
+#line 164
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table67, "And ");
 #line hidden
-#line 170
+#line 171
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 171
+#line 172
  testRunner.And("extract parameter \'refresh_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table68 = new TechTalk.SpecFlow.Table(new string[] {
@@ -732,10 +735,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table68.AddRow(new string[] {
                             "client_secret",
                             "BankCvSecret"});
-#line 173
+#line 174
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table68, "And ");
 #line hidden
-#line 179
+#line 180
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -750,7 +753,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use authorization_code grant type to get an access token (PKCE)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 181
+#line 182
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -784,21 +787,22 @@ this.ScenarioInitialize(scenarioInfo);
                             "[authorization_code]"});
                 table69.AddRow(new string[] {
                             "scope",
-                            "scope1"});
+                            "scope1 scope2"});
                 table69.AddRow(new string[] {
                             "redirect_uris",
                             "[http://localhost:8080]"});
-#line 182
+#line 183
  testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table69, "When ");
 #line hidden
-#line 190
+#line 191
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 191
+#line 192
  testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 192
- testRunner.And("add user consent : user=\'administrator\', scope=\'scope1\', clientId=\'$client_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 193
+ testRunner.And("add user consent : user=\'administrator\', scope=\'scope1 scope2\', clientId=\'$client" +
+                        "_id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -814,17 +818,17 @@ this.ScenarioInitialize(scenarioInfo);
                             "state"});
                 table70.AddRow(new string[] {
                             "scope",
-                            "scope1"});
+                            "scope1 scope2"});
                 table70.AddRow(new string[] {
                             "code_challenge",
                             "VpTQii5T_8rgwxA-Wtb2B2q9lg6x-KVldwQLwQKPcCs"});
                 table70.AddRow(new string[] {
                             "code_challenge_method",
                             "S256"});
-#line 194
+#line 195
  testRunner.And("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table70, "And ");
 #line hidden
-#line 203
+#line 204
  testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
@@ -848,23 +852,26 @@ this.ScenarioInitialize(scenarioInfo);
                 table71.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-#line 205
+#line 206
  testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table71, "And ");
 #line hidden
-#line 214
+#line 215
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 216
+#line 217
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 217
+#line 218
  testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 218
+#line 219
  testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 219
+#line 220
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 221
+ testRunner.Then("JSON \'scope\'=\'scope1 scope2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

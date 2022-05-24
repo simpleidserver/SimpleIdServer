@@ -42,7 +42,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             return new JObject
             {
                 { TokenResponseParameters.ExpiresIn, context.Client.TokenExpirationTimeInSeconds },
-                { TokenResponseParameters.Scope, new JArray(scopes) }
+                { TokenResponseParameters.Scope, string.Join(" ", scopes) }
             };
         }
 

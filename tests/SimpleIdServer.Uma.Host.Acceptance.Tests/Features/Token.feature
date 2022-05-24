@@ -85,7 +85,7 @@ Scenario: Use uma-ticket grant type to get an access token
 	Then JSON exists 'refresh_token'
 	Then JSON exists 'access_token'
 	Then JSON 'token_type'='Bearer'
-	Then JSON 'scope[0]'='scope1'	
+	Then JSON 'scope'='scope1 scope3'	
 	Then token contains 'aud'
 	Then token contains 'iss'
 	Then token contains 'scope'

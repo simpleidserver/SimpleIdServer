@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Persistence;
 using System.Collections.Generic;

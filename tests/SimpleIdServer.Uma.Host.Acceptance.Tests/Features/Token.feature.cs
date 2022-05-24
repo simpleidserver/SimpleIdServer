@@ -317,7 +317,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 88
- testRunner.Then("JSON \'scope[0]\'=\'scope1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scope\'=\'scope1 scope3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 89
  testRunner.Then("token contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

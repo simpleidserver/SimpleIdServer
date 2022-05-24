@@ -10,7 +10,7 @@ Scenario: Use client_credentials grant type to get an access token
 	| Key           | Value                                |
 	| client_id     | f3d35cce-de69-45bf-958c-4a8796f8ed37 |
 	| client_secret | BankCvSecret                         |
-	| scope         | scope1                               |
+	| scope         | scope1 scope2                        |
 	| grant_type    | client_credentials                   |
 
 	And extract JSON from body
@@ -19,6 +19,7 @@ Scenario: Use client_credentials grant type to get an access token
 	Then JSON exists 'access_token'
 	Then JSON exists 'refresh_token'
 	Then JSON 'token_type'='Bearer'
+	Then Extract JWS payload from 'access_token' and check claim 'scope' is array
 
 Scenario: Use client_credentials grant type & use tls_client_auth authentication type to get an access token
 	When execute HTTP POST JSON request 'https://localhost:8080/register'
@@ -184,19 +185,19 @@ Scenario: Use authorization_code grant type to get an access token (PKCE)
 	| token_endpoint_auth_method	| pkce						|
 	| response_types				| [code]					|
 	| grant_types					| [authorization_code]		|
-	| scope							| scope1					|
+	| scope							| scope1 scope2				|
 	| redirect_uris					| [http://localhost:8080]	|	
 
 	And extract JSON from body
 	And extract parameter 'client_id' from JSON body	
-	And add user consent : user='administrator', scope='scope1', clientId='$client_id$'
+	And add user consent : user='administrator', scope='scope1 scope2', clientId='$client_id$'
 	
 	And execute HTTP GET request 'https://localhost:8080/authorization'
 	| Key					| Value											|
 	| response_type			| code											|
 	| client_id				| $client_id$									|
 	| state					| state											|
-	| scope					| scope1										|
+	| scope					| scope1 scope2									|
 	| code_challenge		| VpTQii5T_8rgwxA-Wtb2B2q9lg6x-KVldwQLwQKPcCs	|
 	| code_challenge_method	| S256											|	
 	
@@ -208,7 +209,7 @@ Scenario: Use authorization_code grant type to get an access token (PKCE)
 	| client_secret | BankCvSecret				|
 	| grant_type	| authorization_code		|
 	| code			| $code$					|
-	| code_verifier | code					|
+	| code_verifier | code						|
 	| redirect_uri  | http://localhost:8080		|
 	
 	And extract JSON from body
@@ -217,3 +218,4 @@ Scenario: Use authorization_code grant type to get an access token (PKCE)
 	Then JSON exists 'access_token'
 	Then JSON exists 'refresh_token'
 	Then JSON 'token_type'='Bearer'
+	Then JSON 'scope'='scope1 scope2'

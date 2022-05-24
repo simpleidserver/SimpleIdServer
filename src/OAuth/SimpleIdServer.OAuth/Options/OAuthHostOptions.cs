@@ -26,6 +26,7 @@ namespace SimpleIdServer.OAuth.Options
             TOTPStep = 30;
             OTPAlg = OTPAlgs.TOTP;
             OTPIssuer = "SimpleIdServer";
+            IsScopeClaimConcatenationEnabled = false;
         }
 
         /// <summary>
@@ -88,5 +89,10 @@ namespace SimpleIdServer.OAuth.Options
         /// Default OTP issuer.
         /// </summary>
         public string OTPIssuer { get; set; }
+        /// <summary>
+        /// If true then "scope" claim is expressed as a list of space-delimited case sensistive strings"
+        /// If false then "scope" claim is expressed as an array of string.
+        /// </summary>
+        public bool IsScopeClaimConcatenationEnabled { get; set; }
     }
 }

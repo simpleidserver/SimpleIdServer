@@ -46,7 +46,7 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
             IUMAResourceRepository umaResourceRepository, 
             IUMAPendingRequestRepository umaPendingRequestRepository, 
             IEnumerable<ITokenBuilder> tokenBuilders, 
-            IOptions<UMAHostOptions> umaHostOptions, 
+            IOptions<UMAHostOptions> umaHostOptions,
             IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
         {
             _tokenProfiles = tokenProfiles;

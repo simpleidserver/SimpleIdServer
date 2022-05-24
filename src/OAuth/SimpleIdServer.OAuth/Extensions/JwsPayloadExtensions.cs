@@ -30,7 +30,9 @@ namespace SimpleIdServer.OAuth.Extensions
 
         public static string[] GetScopes(this JwsPayload jwsPayload)
         {
-            return jwsPayload.GetArrayClaim(OAuthClaims.Scopes);
+            var arr = jwsPayload.GetArrayClaim(OAuthClaims.Scopes);
+            if (arr != null && arr.Length == 1) return arr[0].Split(' ');
+            return arr;
         }
 
         public static string GetAzp(this JwsPayload jwsPayload)

@@ -22,8 +22,11 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
-        public ClientCredentialsHandler(IClientCredentialsGrantTypeValidator clientCredentialsGrantTypeValidator, IEnumerable<ITokenProfile> tokenProfiles,
-            IEnumerable<ITokenBuilder> tokenBuilders, IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
+        public ClientCredentialsHandler(
+            IClientCredentialsGrantTypeValidator clientCredentialsGrantTypeValidator, 
+            IEnumerable<ITokenProfile> tokenProfiles,
+            IEnumerable<ITokenBuilder> tokenBuilders, 
+            IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
         {
             _clientCredentialsGrantTypeValidator = clientCredentialsGrantTypeValidator;
             _tokenProfiles = tokenProfiles;

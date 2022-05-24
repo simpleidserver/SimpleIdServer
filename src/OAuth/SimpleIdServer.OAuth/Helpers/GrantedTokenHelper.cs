@@ -1,12 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OAuth.Persistence.Parameters;
 using SimpleIdServer.OAuth.Persistence.Results;
@@ -44,11 +46,13 @@ namespace SimpleIdServer.OAuth.Helpers
     {
         private readonly IDistributedCache _distributedCache;
         private readonly ITokenRepository _tokenRepository;
+        private readonly OAuthHostOptions _oauthHostOptions;
 
-        public GrantedTokenHelper(IDistributedCache distributedCache, ITokenRepository tokenRepository)
+        public GrantedTokenHelper(IDistributedCache distributedCache, ITokenRepository tokenRepository, IOptions<OAuthHostOptions> oauthHostOptions)
         {
             _distributedCache = distributedCache;
             _tokenRepository = tokenRepository;
+            _oauthHostOptions = oauthHostOptions.Value;
         }
 
         #region Tokens
@@ -97,7 +101,7 @@ namespace SimpleIdServer.OAuth.Helpers
             {
                 { OAuthClaims.Audiences, audiences },
                 { OAuthClaims.Issuer, issuerName },
-                { OAuthClaims.Scopes, scopes }
+                { OAuthClaims.Scopes, BuildScopeClaim(scopes) }
             };
         }
 
@@ -245,6 +249,12 @@ namespace SimpleIdServer.OAuth.Helpers
         }
 
         #endregion
+
+        public object BuildScopeClaim(IEnumerable<string> scopes)
+        {
+            if (_oauthHostOptions.IsScopeClaimConcatenationEnabled) return string.Join(" ", scopes);
+            return scopes;
+        }
 
         private static void AddExpirationAndIssueTime(JwsPayload jwsPayload, double validityPeriodsInSeconds)
         {

@@ -41,6 +41,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             },
             new OAuthScope
             {
+                Name = "scope2",
+                IsExposedInConfigurationEdp = true
+            },
+            new OAuthScope
+            {
                 Name = "role",
                 IsExposedInConfigurationEdp = true
             }
@@ -72,6 +77,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                     new OAuthScope
                     {
                         Name = "scope1"
+                    },
+                    new OAuthScope
+                    {
+                        Name = "scope2"
                     }
                 },
                 GrantTypes = new List<string>

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json.Linq;
+using SimpleIdServer.Jwt.Jws;
+using SimpleIdServer.Jwt.Jws.Handlers;
 using System.Net.Http;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -37,6 +39,16 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.Equal(code, (int)httpResponseMessage.StatusCode);
+        }
+
+        [Then("Extract JWS payload from '(.*)' and check claim '(.*)' is array")]
+        public void ThenJWSPayloadClaimEqualsTo(string key, string name)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var json = jsonHttpBody[key].ToString();
+            var jsonPayload = new JwsGenerator(new ISignHandler[0]).ExtractPayload(json);
+            var jArr = JArray.Parse(jsonPayload[name].ToString());
+            Assert.NotNull(jArr);
         }
     }
 }

@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;

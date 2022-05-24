@@ -31,7 +31,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
             IGrantedTokenHelper grantedTokenHelper, 
             IEnumerable<ITokenProfile> tokenProfiles,
-            IEnumerable<ITokenBuilder> tokenBuilders, 
+            IEnumerable<ITokenBuilder> tokenBuilders,
             IClientAuthenticationHelper clientAuthenticationHelper,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper)
         {
