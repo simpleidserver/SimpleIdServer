@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <VersionPrefix>2.0.7</VersionPrefix>
+        <VersionPrefix>2.0.8</VersionPrefix>
         <Authors>SimpleIdServer</Authors>
         <Owners>SimpleIdServer</Owners>
     </PropertyGroup>
