@@ -151,7 +151,7 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        public static List<SCIMPatchResult> ApplyPatches(this SCIMRepresentation representation, ICollection<PatchOperationParameter> patches, bool ignoreUnsupportedCanonicalValues)
+        public static List<SCIMPatchResult> ApplyPatches(this SCIMRepresentation representation, ICollection<PatchOperationParameter> patches, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMPatchResult>();
             foreach (var patch in patches)
@@ -202,6 +202,7 @@ namespace SimpleIdServer.Scim.Domain
                             }
 
                             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                            newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
                             newAttributes = FilterDuplicate(attributes, newAttributes);
                             removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && a.FullPath == fullPath).ToList());
                             var isAttributeExits = !string.IsNullOrWhiteSpace(fullPath) && attributes.Any(a => a.FullPath == fullPath);
@@ -274,6 +275,7 @@ namespace SimpleIdServer.Scim.Domain
                             if(SCIMFilterParser.DontContainsFilter(patch.Path) && patch.Value != null)
                             {
                                 var excludedAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                                excludedAttributes = RemoveStandardReferenceProperties(excludedAttributes, attributeMappings);
                                 excludedAttributes = SCIMRepresentation.BuildHierarchicalAttributes(excludedAttributes);
                                 attributes = attributes.Where(a => excludedAttributes.Any(ea => ea.IsSimilar(a, true))).ToList();
                             }
@@ -349,15 +351,7 @@ namespace SimpleIdServer.Scim.Domain
                                 }
                                 else
                                 {
-                                    var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
-                                    var flatHiearchy = representation.FlatAttributes.ToList();
-                                    var missingAttributes = newAttributes.Where(na => string.IsNullOrEmpty(na.ParentAttributeId) && !flatHiearchy.Any(fh => string.IsNullOrWhiteSpace(fh.ParentAttributeId) && fh.SchemaAttributeId == na.SchemaAttributeId)).ToList();
-                                    missingAttributes.ForEach((ma) =>
-                                    {
-                                        representation.AddAttribute(ma);
-                                        result.Add(new SCIMPatchResult { Attr = ma, Operation = SCIMPatchOperations.ADD, Path = ma.FullPath });
-                                    });
-                                    result.AddRange(Merge(flatHiearchy, newAttributes, fullPath));
+                                    result.AddRange(ReplaceComplexMultiValuedAttribute(representation, attributes, schemaAttributes, patch, attributeMappings, ignoreUnsupportedCanonicalValues));
                                 }
                             }
                             catch (SCIMSchemaViolatedException)
@@ -378,6 +372,33 @@ namespace SimpleIdServer.Scim.Domain
             return result;
         }
 
+        private static List<SCIMPatchResult> ReplaceComplexMultiValuedAttribute(SCIMRepresentation representation, List<SCIMRepresentationAttribute> attributes, IEnumerable<SCIMSchemaAttribute> schemaAttributes, PatchOperationParameter patch, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues)
+        {
+            var result = new List<SCIMPatchResult>();
+            var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+            newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
+            var newHierarchicalAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newAttributes);
+            var fullPath = newHierarchicalAttributes.First().FullPath;
+            var existingAttributesToRemove = attributes.Where(a => a.FullPath == fullPath && !newHierarchicalAttributes.Any(na => na.IsSimilar(a, true)));
+            foreach(var existingAttributeToRemove in existingAttributesToRemove)
+            {
+                representation.RemoveAttributeById(existingAttributeToRemove);
+                foreach (var flatAttr in existingAttributeToRemove.ToFlat()) result.Add(new SCIMPatchResult { Attr = flatAttr, Operation = SCIMPatchOperations.REMOVE, Path = flatAttr.FullPath });
+            }
+
+            var newAttributesToAdd = newHierarchicalAttributes.Where(na => !attributes.Any(a => a.FullPath == fullPath && na.IsSimilar(a, true)));
+            foreach (var newAttributeToAdd in newAttributesToAdd)
+            {
+                foreach (var newFlatAttr in newAttributeToAdd.ToFlat())
+                {
+                    representation.AddAttribute(newFlatAttr);
+                    result.Add(new SCIMPatchResult { Attr = newFlatAttr, Operation = SCIMPatchOperations.ADD, Path = newFlatAttr.FullPath });
+                }
+            }
+
+            return result;
+        }
+
         private static ICollection<SCIMRepresentationAttribute> FilterDuplicate(IEnumerable<SCIMRepresentationAttribute> existingAttributes, ICollection<SCIMRepresentationAttribute> newFlatAttributes)
         {
             var result = new List<SCIMRepresentationAttribute>();
@@ -393,6 +414,17 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             return SCIMRepresentation.BuildFlatAttributes(result);
+        }
+
+        private static ICollection<SCIMRepresentationAttribute> RemoveStandardReferenceProperties(ICollection<SCIMRepresentationAttribute> newFlatAttributes, IEnumerable<SCIMAttributeMapping> attributeMappings)
+        {
+            return newFlatAttributes.Where((nfa) =>
+            {
+                var parentAttr = newFlatAttributes.FirstOrDefault(a => a.Id == nfa.ParentAttributeId);
+                if (parentAttr == null || !attributeMappings.Any(am => am.SourceAttributeId == parentAttr.SchemaAttributeId)) return true;
+                if (nfa.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type || nfa.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Display) return false;
+                return true;
+            }).ToList();
         }
 
         public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false)

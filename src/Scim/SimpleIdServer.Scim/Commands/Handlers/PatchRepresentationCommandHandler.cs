@@ -68,8 +68,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand)
         {
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
-            RemoveUnusedAttributes(attributeMappings, existingRepresentation);
-            var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, _options.IgnoreUnsupportedCanonicalValues);
+            var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues);
             if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
             existingRepresentation.SetUpdated(DateTime.UtcNow);
             var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
@@ -89,7 +88,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             return PatchRepresentationResult.Ok(existingRepresentation);
         }
 
-        private void RemoveUnusedAttributes(IEnumerable<SCIMAttributeMapping> attributeMappings, SCIMRepresentation updatedRepresentation)
+        private void RemoveUnusedAttributes(IEnumerable<SCIMAttributeMapping> attributeMappings, SCIMRepresentation updatedRepresentation, PatchRepresentationCommand patchRepresentationCommand)
         {
             var hierarchicalUpdatedAttributes = updatedRepresentation.HierarchicalAttributes;
             foreach (var attributeMapping in attributeMappings)

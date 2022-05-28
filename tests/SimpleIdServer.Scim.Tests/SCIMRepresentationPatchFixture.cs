@@ -22,6 +22,12 @@ namespace SimpleIdServer.Scim.Tests
                .AddStringAttribute("lastName")
                .AddStringAttribute("roles", multiValued: true)
                .AddStringAttribute("familyName")
+               .AddComplexAttribute("scimRoles", opt =>
+               {
+                   opt.AddStringAttribute("value");
+                   opt.AddStringAttribute("type");
+                   opt.AddStringAttribute("display");
+               }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddComplexAttribute("adRoles", opt =>
                {
                    opt.AddStringAttribute("display");
@@ -58,6 +64,15 @@ namespace SimpleIdServer.Scim.Tests
                 {
                     b.AddStringAttribute("phoneNumber", new List<string> { "02" });
                     b.AddStringAttribute("type", new List<string> { "home" });
+                })
+                .AddComplexAttribute("scimRoles", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("value", new List<string> { "firstRole" });
+                    b.AddStringAttribute("type", new List<string> { "roleType" });
+                })
+                .AddComplexAttribute("scimRoles", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
+                {
+                    b.AddStringAttribute("value", new List<string> { "secondRole" });
                 })
                 .AddComplexAttribute("attributes", "urn:ietf:params:scim:schemas:core:2.0:User", (b) =>
                 {
@@ -199,6 +214,18 @@ namespace SimpleIdServer.Scim.Tests
                     Operation = SCIMPatchOperations.ADD,
                     Path = "adRoles[value eq user3].display",
                     Value = "NEWUSER3"
+                },
+                new PatchOperationParameter
+                {
+                    Operation = SCIMPatchOperations.REPLACE,
+                    Path = "scimRoles",
+                    Value = JArray.Parse("[{ 'value': 'firstRole', 'type' : 'newType' }]")
+                }
+            }, new List<SCIMAttributeMapping>
+            {
+                new SCIMAttributeMapping
+                {
+                    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "scimRoles").Id
                 }
             }, false);
 
@@ -220,6 +247,8 @@ namespace SimpleIdServer.Scim.Tests
             Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "2") == true);
             Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subtitle.str" && a.ValueString == "2") == true);
             Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "attributes.subattributes.str" && a.ValueString == "3") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "scimRoles.value" && a.ValueString == "firstRole") == true);
+            Assert.True(userRepresentation.FlatAttributes.Any(a => a.SchemaAttribute.FullPath == "scimRoles.value" && a.ValueString == "secondRole") == false);
         }
     }
 }
