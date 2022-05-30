@@ -88,19 +88,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             return PatchRepresentationResult.Ok(existingRepresentation);
         }
 
-        private void RemoveUnusedAttributes(IEnumerable<SCIMAttributeMapping> attributeMappings, SCIMRepresentation updatedRepresentation, PatchRepresentationCommand patchRepresentationCommand)
-        {
-            var hierarchicalUpdatedAttributes = updatedRepresentation.HierarchicalAttributes;
-            foreach (var attributeMapping in attributeMappings)
-            {
-                var attrLstToRemove = hierarchicalUpdatedAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId)
-                    .SelectMany(a => a.Children)
-                    .Where(c =>
-                    c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type || c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
-                updatedRepresentation.RemoveAttributesById(attrLstToRemove.Select(a => a.Id));
-            }
-        }
-
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)
         {
             if (patchRepresentation == null)
