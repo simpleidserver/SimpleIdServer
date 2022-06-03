@@ -15,7 +15,7 @@
     "@angular/animations": "8.2.12",
     "@angular/common": "8.2.12",
     "@angular/compiler": "8.2.12",
-    "@angular/core": "8.2.12",
+    "@angular/core": "11.0.5",
     "@angular/forms": "8.2.12",
     "@angular/platform-browser": "8.2.12",
     "@angular/platform-browser-dynamic": "8.2.12",
