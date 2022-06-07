@@ -60,6 +60,7 @@ namespace SimpleIdServer.Scim
         {
             public const string Value = "value";
             public const string Display = "display";
+            public const string DisplayName = "displayName";
             public const string Type = "type";
         }
 

@@ -107,16 +107,23 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                     var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
                     var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
                     var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
+                    var entrepriseUser = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUser.json"), SCIMResourceTypes.User);
                     userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
                     {
                         Id = Guid.NewGuid().ToString(),
                         Schema = "urn:ietf:params:scim:schemas:extension:eid:2.0:User"
+                    });
+                    userSchema.SchemaExtensions.Add(new SCIMSchemaExtension
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Schema = "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
                     });
                     if (!context.SCIMSchemaLst.Any())
                     {
                         context.SCIMSchemaLst.Add(userSchema);
                         context.SCIMSchemaLst.Add(groupSchema);
                         context.SCIMSchemaLst.Add(eidUserSchema);
+                        context.SCIMSchemaLst.Add(entrepriseUser);
                     }
 
                     if (!context.SCIMAttributeMappingLst.Any())
@@ -139,8 +146,17 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                             TargetResourceType = StandardSchemas.UserSchema.ResourceType,
                             TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
                         };
+                        var thirdAttributeMapping = new SCIMAttributeMapping
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = entrepriseUser.Attributes.First(a => a.Name == "manager").Id,
+                            SourceResourceType = StandardSchemas.UserSchema.ResourceType,
+                            SourceAttributeSelector = "manager",
+                            TargetResourceType = StandardSchemas.UserSchema.ResourceType
+                        };
                         context.SCIMAttributeMappingLst.Add(firstAttributeMapping);
                         context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
+                        context.SCIMAttributeMappingLst.Add(thirdAttributeMapping);
                     }
 
                     if (!context.ProvisioningConfigurations.Any())
