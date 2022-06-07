@@ -143,7 +143,7 @@ namespace SimpleIdServer.Scim.Domain
                 var attrs = schema.HierarchicalAttributes.Select(a => a.Leaf).Where(a => a.MultiValued);
                 foreach (var attr in attrs)
                 {
-                    if (!representation.FlatAttributes.Any(a => a.SchemaAttribute.Name == attr.Name))
+                    if (!representation.FlatAttributes.Any(a => a.SchemaAttributeId == attr.Id))
                     {
                         representation.FlatAttributes.Add(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), attr, schema.Id));
                     }
