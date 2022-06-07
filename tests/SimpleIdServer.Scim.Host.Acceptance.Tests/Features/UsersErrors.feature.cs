@@ -300,7 +300,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 46
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 47
  testRunner.Then("JSON \'detail\'=\'{ is not a valid JSON\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -369,7 +369,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 61
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 62
  testRunner.Then("JSON \'detail\'=\'\'test\' are not valid boolean\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -438,7 +438,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 76
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 77
  testRunner.Then("JSON \'detail\'=\'\'test\' are not valid decimal\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -507,7 +507,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 91
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 92
  testRunner.Then("JSON \'detail\'=\'\'test\' are not valid DateTime\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -576,7 +576,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 106
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 107
  testRunner.Then("JSON \'detail\'=\'\'test\' are not valid integer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -645,7 +645,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 121
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 122
  testRunner.Then("JSON \'detail\'=\'\'%HELLO%\' are not valid Base64String\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -705,7 +705,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 133
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 134
  testRunner.Then("JSON \'detail\'=\'required attributes urn:ietf:params:scim:schemas:core:2.0:User:use" +
@@ -772,7 +772,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 147
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 148
  testRunner.Then("JSON \'detail\'=\'required attributes urn:ietf:params:scim:schemas:core:2.0:User:use" +
@@ -1342,7 +1342,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 276
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 277
  testRunner.Then("JSON \'detail\'=\'required attributes urn:ietf:params:scim:schemas:core:2.0:User:use" +
@@ -2265,7 +2265,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 508
- testRunner.Then("JSON \'scimType\'=\'schemaViolated\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 509
  testRunner.Then("JSON \'detail\'=\'property type is not a valid canonical value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -2387,6 +2387,71 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 548
  testRunner.Then("HTTP status code equals to \'204\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when emails.value is not passed")]
+        [Xunit.TraitAttribute("FeatureTitle", "UsersErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when emails.value is not passed")]
+        public virtual void ErrorIsReturnedWhenEmails_ValueIsNotPassed()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when emails.value is not passed", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 550
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table109 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table109.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:customuser\" ]"});
+                table109.AddRow(new string[] {
+                            "userName",
+                            "userName"});
+                table109.AddRow(new string[] {
+                            "emails",
+                            "[ { \"primary\" : \"true\" } ]"});
+#line 551
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/CustomUsers\'", ((string)(null)), table109, "When ");
+#line hidden
+#line 557
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 559
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 560
+ testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 561
+ testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 562
+ testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 563
+ testRunner.Then("JSON \'detail\'=\'required attributes urn:customuser:emails.value are missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -43,7 +43,7 @@ Scenario: Error is returned when pass invalid JSON object in sub attribute
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'='{ is not a valid JSON'
 
 Scenario: Error is returned when pass invalid boolean (HTTP POST)
@@ -58,7 +58,7 @@ Scenario: Error is returned when pass invalid boolean (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'=''test' are not valid boolean'
 
 Scenario: Error is returned when pass invalid decimal (HTTP POST)
@@ -73,7 +73,7 @@ Scenario: Error is returned when pass invalid decimal (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'=''test' are not valid decimal'
 
 Scenario: Error is returned when pass invalid DateTime (HTTP POST)
@@ -88,7 +88,7 @@ Scenario: Error is returned when pass invalid DateTime (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'=''test' are not valid DateTime'
 
 Scenario: Error is returned when pass invalid int (HTTP POST)
@@ -103,7 +103,7 @@ Scenario: Error is returned when pass invalid int (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'=''test' are not valid integer'
 
 Scenario: Error is returned when pass invalid Base64 (HTTP POST)
@@ -118,7 +118,7 @@ Scenario: Error is returned when pass invalid Base64 (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'=''%HELLO%' are not valid Base64String'
 
 Scenario: Error is returned when required attribute is missing (HTTP POST)
@@ -130,7 +130,7 @@ Scenario: Error is returned when required attribute is missing (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 
 Scenario: Error is returned when required attribute is empty (HTTP POST)
@@ -144,7 +144,7 @@ Scenario: Error is returned when required attribute is empty (HTTP POST)
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 
 Scenario: Error is returned when schemas attribute is missing (HTTP POST)
@@ -273,7 +273,7 @@ Scenario: Error is returned when update and required attribute is missing (HTTP 
 
 	Then HTTP status code equals to '400'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'='required attributes urn:ietf:params:scim:schemas:core:2.0:User:userName are missing'
 	
 
@@ -505,14 +505,14 @@ Scenario: Error is returned when trying to add a none canonical value (HTTP POST
 	Then HTTP status code equals to '400'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
-	Then JSON 'scimType'='schemaViolated'
+	Then JSON 'scimType'='invalidValue'
 	Then JSON 'detail'='property type is not a valid canonical value'
 
 Scenario: Error is returned when entitlment is added twice
 	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
-	| Key      | Value                |
-	| schemas  | [ "urn:customuser" ] |
-	| userName | userName             |
+	| Key      | Value                     |
+	| schemas  | [ "urn:customuser" ]      |
+	| userName | userName                  |
 	
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
@@ -546,3 +546,18 @@ Scenario: Error is returned when entitlment is added twice
 	And extract JSON from body
 
 	Then HTTP status code equals to '204'
+
+Scenario: Error is returned when emails.value is not passed
+	When execute HTTP POST JSON request 'http://localhost/CustomUsers'
+	| Key      | Value                      |
+	| schemas  | [ "urn:customuser" ]       |
+	| userName | userName                   |
+	| emails   | [ { "primary" : "true" } ] |	
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='400'
+	Then JSON 'scimType'='invalidValue'
+	Then JSON 'detail'='required attributes urn:customuser:emails.value are missing'

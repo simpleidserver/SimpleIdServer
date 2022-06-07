@@ -401,7 +401,7 @@ namespace SimpleIdServer.Scim.Helpers
             var missingRequiredAttributes = schemaAttributes.Where(a => a.Required && !json.HasNotEmptyElement(a.Name, schema.Id));
             if (missingRequiredAttributes.Any())
             {
-                throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => $"{schema.Id}:{a.Name}"))));
+                throw new SCIMSchemaViolatedException(string.Format(Global.RequiredAttributesAreMissing, string.Join(",", missingRequiredAttributes.Select(a => $"{schema.Id}:{a.FullPath}"))));
             }
         }
 

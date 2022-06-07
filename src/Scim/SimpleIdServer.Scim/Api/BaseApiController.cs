@@ -290,7 +290,7 @@ namespace SimpleIdServer.Scim.Api
             catch(SCIMSchemaViolatedException ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.SchemaViolated);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
             }
             catch (SCIMBadSyntaxException ex)
             {
@@ -362,7 +362,7 @@ namespace SimpleIdServer.Scim.Api
             catch (SCIMSchemaViolatedException ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.SchemaViolated);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
             }
             catch (SCIMBadSyntaxException ex)
             {

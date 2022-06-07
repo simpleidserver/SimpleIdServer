@@ -93,6 +93,10 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 .Build();
             var customUserSchema = SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUser", string.Empty, true)
                 .AddStringAttribute("userName", required: true)
+                .AddComplexAttribute("emails", o =>
+                {
+                    o.AddStringAttribute("value", required: true);
+                }, multiValued: true)
                 .AddComplexAttribute("entitlements", opt =>
                 {
                     opt.AddStringAttribute("value");
