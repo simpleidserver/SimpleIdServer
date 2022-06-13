@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,7 +49,7 @@ namespace SimpleIdServer.Scim.Domains
 
         public SCIMSchemaAttribute GetAttribute(string path)
         {
-            return Attributes.FirstOrDefault(a => a.FullPath == path);
+            return Attributes.FirstOrDefault(a => a.FullPath == path || $"{Id}:{a.FullPath}" == path);
         }
 
         public SCIMSchemaAttribute GetAttributeById(string attributeId)

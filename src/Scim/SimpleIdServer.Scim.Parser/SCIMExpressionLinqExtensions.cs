@@ -33,7 +33,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                 var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentationAttribute>), "f");
                 var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
                 var result = (IQueryable<SCIMRepresentationAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
-                var fullPath = attr.GetFullPath();
+                var fullPath = attr.GetFullPath(false);
                 var res = SCIMRepresentation.BuildFlatAttributes(result.ToList());
                 return res.Where((a) => a != null && (isStrictPath ? fullPath == a.FullPath : fullPath.StartsWith(a.FullPath) || a.FullPath.StartsWith(fullPath))).ToList();
             }
