@@ -47,7 +47,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType)
         {
             return _scimDbContext.SCIMRepresentationLst
-                .Include(r => r.FlatAttributes)
+                .Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes)
                 .FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType);
         }
