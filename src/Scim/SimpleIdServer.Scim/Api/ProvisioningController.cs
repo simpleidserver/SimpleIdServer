@@ -55,7 +55,7 @@ namespace SimpleIdServer.Scim.Api
 
             if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(representation.ResourceType))
             {
-                var content = representation.ToResponse(string.Empty, false);
+                var content = representation.ToResponse(string.Empty, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[representation.ResourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
             }
 

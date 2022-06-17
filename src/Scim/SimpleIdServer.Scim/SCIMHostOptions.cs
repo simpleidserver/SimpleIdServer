@@ -13,6 +13,7 @@ namespace SimpleIdServer.Scim
             MaxResults = 200;
             IgnoreUnsupportedCanonicalValues = true;
             IncludeToken = false;
+            MergeExtensionAttributes = false;
         }
 
         /// <summary>
@@ -44,5 +45,9 @@ namespace SimpleIdServer.Scim
         /// Include token in external events.
         /// </summary>
         public bool IncludeToken { get; set; }
+        /// <summary>
+        /// When this option is true then extension attributes will be merged into core attributes.
+        /// </summary>
+        public bool MergeExtensionAttributes { get; set; }
     }
 }

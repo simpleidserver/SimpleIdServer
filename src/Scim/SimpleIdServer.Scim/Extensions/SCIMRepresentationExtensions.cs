@@ -427,7 +427,7 @@ namespace SimpleIdServer.Scim.Domain
             }).ToList();
         }
 
-        public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false)
+        public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false, bool mergeExtensionAttributes = false)
         {
             var jObj = new JObject
             {
@@ -455,7 +455,7 @@ namespace SimpleIdServer.Scim.Domain
 
                 return new EnrichParameter(schema, order, a);
             });
-            EnrichResponse(attributes, jObj, isGetRequest);
+            EnrichResponse(attributes, jObj, mergeExtensionAttributes, isGetRequest);
             return jObj;
         }
 
@@ -561,7 +561,7 @@ namespace SimpleIdServer.Scim.Domain
             return result;
         }
 
-        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JObject jObj, bool isGetRequest = false)
+        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JObject jObj, bool mergeExtensionAttributes = false, bool isGetRequest = false)
         {
             foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.AttributeNode.SchemaAttribute.Id))
             {
@@ -574,8 +574,9 @@ namespace SimpleIdServer.Scim.Domain
                 }
 
                 var attributeName = firstRecord.AttributeNode.SchemaAttribute.Name;
-                // Si schéma d'extension alors il faut ajouter à l'object.
-                if (firstRecord.Schema != null && !firstRecord.Schema.IsRootSchema && jObj.ContainsKey(attributeName))
+                if (firstRecord.Schema != null && !firstRecord.Schema.IsRootSchema && 
+                    ((mergeExtensionAttributes && jObj.ContainsKey(attributeName)) || (!mergeExtensionAttributes && string.IsNullOrWhiteSpace(firstRecord.AttributeNode.ParentAttributeId)))
+                )
                 {
                     if (jObj.ContainsKey(firstRecord.Schema.Id))
                     {
@@ -620,7 +621,7 @@ namespace SimpleIdServer.Scim.Domain
                         {
                             var jObjVal = new JObject();
                             var children = firstRecord.AttributeNode.Children;
-                            EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
+                            EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, mergeExtensionAttributes, isGetRequest);
                             if (jObjVal.Children().Any())
                             {
                                 record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, jObjVal);
@@ -633,7 +634,7 @@ namespace SimpleIdServer.Scim.Domain
                             {
                                 var jObjVal = new JObject();
                                 var children = attr.AttributeNode.Children;
-                                EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, isGetRequest);
+                                EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, mergeExtensionAttributes, isGetRequest);
                                 if (jObjVal.Children().Any())
                                 {
                                     jArr.Add(jObjVal);

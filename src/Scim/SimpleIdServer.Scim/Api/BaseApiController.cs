@@ -227,7 +227,7 @@ namespace SimpleIdServer.Scim.Api
                         record.ApplyEmptyArray();
                     }
 
-                    newJObj = record.ToResponse(location, true, includeStandardRequest);
+                    newJObj = record.ToResponse(location, true, includeStandardRequest, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                     resources.Add(newJObj);
                 }
 
@@ -279,7 +279,7 @@ namespace SimpleIdServer.Scim.Api
                 var command = new AddRepresentationCommand(_resourceType, jobj, Request.GetAbsoluteUriWithVirtualPath());
                 var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
                 var location = GetLocation(scimRepresentation);
-                var content = scimRepresentation.ToResponse(location, false);
+                var content = scimRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(scimRepresentation.ResourceType))
                 {
                     await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[scimRepresentation.ResourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -346,7 +346,7 @@ namespace SimpleIdServer.Scim.Api
             {
                 var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, Request.GetAbsoluteUriWithVirtualPath()));
                 var location = GetLocation(newRepresentation);
-                var content = newRepresentation.ToResponse(location, false);
+                var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
                 {
                     await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -395,7 +395,7 @@ namespace SimpleIdServer.Scim.Api
                 if (!patchResult.IsPatched) return NoContent();
                 var newRepresentation = patchResult.SCIMRepresentation;
                 var location = GetLocation(newRepresentation);
-                var content = newRepresentation.ToResponse(location, false);
+                var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
                 {
                     await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -452,7 +452,7 @@ namespace SimpleIdServer.Scim.Api
         protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
         {
             var location = GetLocation(representation);
-            var content = representation.ToResponse(location, isGetRequest);
+            var content = representation.ToResponse(location, isGetRequest, mergeExtensionAttributes: _options.MergeExtensionAttributes);
             return BuildHTTPResult(status, location, representation.Version, content);
         }
 

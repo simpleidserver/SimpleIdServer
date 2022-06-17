@@ -163,6 +163,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             {
                 o.MaxOperations = 3;
                 o.IgnoreUnsupportedCanonicalValues = false;
+                o.MergeExtensionAttributes = true;
             })
                 .AddSchemas(schemas)
                 .AddAttributeMapping(attributesMapping);
