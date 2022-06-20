@@ -196,6 +196,13 @@ namespace SimpleIdServer.Scim.Domain
                     case SCIMPatchOperations.ADD:
                         try
                         {
+                            if (TryGetExternalId(patch, out string externalId))
+                            {
+                                representation.ExternalId = externalId;
+                                result.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
+                                continue;
+                            }
+
                             if (schemaAttributes == null || !schemaAttributes.Any())
                             {
                                 throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
@@ -252,12 +259,6 @@ namespace SimpleIdServer.Scim.Domain
 
                                 attributes.Add(newAttribute);
                                 result.Add(new SCIMPatchResult { Attr = newAttribute, Operation = SCIMPatchOperations.ADD, Path = fullPath });
-                            }
-
-                            if (TryGetExternalId(patch, out string externalId))
-                            {
-                                representation.ExternalId = externalId;
-                                result.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
                             }
                         }
                         catch (SCIMSchemaViolatedException)
