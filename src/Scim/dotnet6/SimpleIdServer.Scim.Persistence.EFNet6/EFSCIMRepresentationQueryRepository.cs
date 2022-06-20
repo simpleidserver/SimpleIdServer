@@ -36,7 +36,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
-            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes).Include(r => r.Schemas).ThenInclude(s => s.Attributes)
+            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToListAsync();
             return result;
