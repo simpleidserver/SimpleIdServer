@@ -52,11 +52,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             try
             {
                 var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
-                if (existingRepresentation == null)
-                {
-                    throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
-                }
-
+                if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
                 return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
             }
             finally
