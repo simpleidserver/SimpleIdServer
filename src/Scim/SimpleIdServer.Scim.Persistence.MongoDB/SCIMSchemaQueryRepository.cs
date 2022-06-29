@@ -39,11 +39,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByResourceTypes(IEnumerable<string> resourceTypes)
         {
-            var result = await _scimDbContext.SCIMSchemaLst
-                .Include(s => s.SchemaExtensions)
-                .Include(s => s.Attributes)
+            var result = await _scimDbContext.SCIMSchemaLst.AsQueryable()
                 .Where(s => resourceTypes.Contains(s.ResourceType))
-                .ToListAsync();
+                .ToMongoListAsync();
             return result;
         }
 
