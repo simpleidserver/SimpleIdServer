@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -19,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,13 +31,13 @@ namespace SimpleIdServer.Scim.Api
     {
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public BulkController(
-            IOptionsMonitor<SCIMHostOptions> options, 
-            ILogger<BulkController> logger)
+        public BulkController(IOptionsMonitor<SCIMHostOptions> options, ILogger<BulkController> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _options = options.CurrentValue;
             _logger = logger;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         [HttpPost]
@@ -121,6 +123,9 @@ namespace SimpleIdServer.Scim.Api
             features.Set<IResponseCookiesFeature>(new ResponseCookiesFeature(features));
             var newHttpContext = new DefaultHttpContext(features);
             newHttpContext.Request.Path = scimBulkOperationRequest.Path;
+            newHttpContext.Request.PathBase = HttpContext.Request.PathBase;
+            newHttpContext.Request.Host = HttpContext.Request.Host;
+            newHttpContext.User = BuildUser();
             newHttpContext.Request.Method = scimBulkOperationRequest.HttpMethod;
             if (scimBulkOperationRequest.Data != null && (scimBulkOperationRequest.HttpMethod.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
                 scimBulkOperationRequest.HttpMethod.Equals("PUT", StringComparison.InvariantCultureIgnoreCase) ||
@@ -130,59 +135,72 @@ namespace SimpleIdServer.Scim.Api
                 newHttpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(scimBulkOperationRequest.Data.ToString()));
             }
 
-            newHttpContext.RequestServices = HttpContext.RequestServices;
-            newHttpContext.Response.Body = new MemoryStream();
-            var routeContext = new RouteContext(newHttpContext)
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                RouteData = RouteData
-            };
-            await router.RouteAsync(routeContext);
-            var ctx = routeContext.HttpContext;
-            await routeContext.Handler.Invoke(newHttpContext);
-            var result = new JObject
+                newHttpContext.RequestServices = scope.ServiceProvider;
+                newHttpContext.Response.Body = new MemoryStream();
+                var routeContext = new RouteContext(newHttpContext)
+                {
+                    RouteData = RouteData
+                };
+                await router.RouteAsync(routeContext);
+                var ctx = routeContext.HttpContext;
+                await routeContext.Handler.Invoke(newHttpContext);
+                var result = new JObject
             {
                 { StandardSCIMRepresentationAttributes.Method, scimBulkOperationRequest.HttpMethod },
                 { StandardSCIMRepresentationAttributes.BulkId, scimBulkOperationRequest.BulkIdentifier }
             };
-            var statusCode = newHttpContext.Response.StatusCode;
-            var statusContent = new JObject();
-            statusContent.Add("code", statusCode);
-            if (statusCode >= 400)
-            {
-                newHttpContext.Response.Body.Position = 0;
-                using (var reader = new StreamReader(newHttpContext.Response.Body))
+                var statusCode = newHttpContext.Response.StatusCode;
+                var statusContent = new JObject();
+                statusContent.Add("code", statusCode);
+                if (statusCode >= 400)
                 {
-                    var responseBody = await reader.ReadToEndAsync();
-                    JObject json = (JObject)JsonConvert.DeserializeObject(responseBody);
-                    var response = new JObject();
-                    var scimTypeToken = json.SelectToken("response.scimType");
-                    var detailToken = json.SelectToken("response.detail");
-                    if (scimTypeToken != null)
+                    newHttpContext.Response.Body.Position = 0;
+                    using (var reader = new StreamReader(newHttpContext.Response.Body))
                     {
-                        response.Add("scimType", scimTypeToken.ToString());
-                    }
+                        var responseBody = await reader.ReadToEndAsync();
+                        JObject json = (JObject)JsonConvert.DeserializeObject(responseBody);
+                        var response = new JObject();
+                        if(json != null)
+                        {
+                            var scimTypeToken = json.SelectToken("response.scimType");
+                            var detailToken = json.SelectToken("response.detail");
+                            if (scimTypeToken != null) response.Add("scimType", scimTypeToken.ToString());
+                            if (detailToken != null) response.Add("detail", detailToken.ToString());
+                        }
 
-                    if (detailToken != null)
-                    {
-                        response.Add("detail", detailToken.ToString());
+                        statusContent.Add("response", response);
                     }
-
-                    statusContent.Add("response", response);
                 }
-            }
 
-            result.Add("status", statusContent);
-            if (newHttpContext.Response.Headers.ContainsKey("ETag"))
+                result.Add("status", statusContent);
+                if (newHttpContext.Response.Headers.ContainsKey("ETag"))
+                {
+                    result.Add("version", newHttpContext.Response.Headers["ETag"].First());
+                }
+
+                if (newHttpContext.Response.Headers.ContainsKey("Location"))
+                {
+                    result.Add("location", newHttpContext.Response.Headers["Location"].First());
+                }
+
+                return result;
+            }
+        }
+
+        private ClaimsPrincipal BuildUser()
+        {
+            var claims = new List<Claim>
             {
-                result.Add("version", newHttpContext.Response.Headers["ETag"].First());
-            }
-
-            if (newHttpContext.Response.Headers.ContainsKey("Location"))
-            {
-                result.Add("location", newHttpContext.Response.Headers["Location"].First());
-            }
-
-            return result;
+                new Claim("scope", "query_scim_resource"),
+                new Claim("scope", "add_scim_resource"),
+                new Claim("scope", "delete_scim_resource"),
+                new Claim("scope", "update_scim_resource")
+            };
+            var claimsIdentity = new ClaimsIdentity(claims, SCIMConstants.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            return claimsPrincipal;
         }
     }
 }
