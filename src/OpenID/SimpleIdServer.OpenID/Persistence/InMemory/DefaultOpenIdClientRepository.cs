@@ -101,7 +101,7 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             var result = new List<string>();
             foreach (var client in _clients)
             {
-                if (result.Contains(client.ClientId) && client.Scopes.Any(s => names.Contains(s.Scope))) result.Add(client.ClientId);
+                if (!result.Contains(client.ClientId) && client.Scopes != null && client.Scopes.Any(s => names.Contains(s.Scope))) result.Add(client.ClientId);
             }
 
             return Task.FromResult(result);
