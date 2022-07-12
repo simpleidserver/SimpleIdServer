@@ -102,6 +102,18 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 },
                 PreferredTokenProfile = "Bearer",
                 TokenSignedResponseAlg = "RS256"
+            },
+            new OAuthClient
+            {
+                ClientId = "resourceId",
+                Scopes = new List<ClientScope>
+                {
+                    new ClientScope
+                    {
+                        ClientId = "resourceId",
+                        Scope = "scope1"
+                    }
+                }
             }
         };
     }

@@ -14,5 +14,6 @@ namespace SimpleIdServer.OAuth.Persistence
         Task<BaseClient> FindOAuthClientById(string clientId, CancellationToken cancellationToken);
         Task<IEnumerable<BaseClient>> FindOAuthClientByIds(IEnumerable<string> clientIds, CancellationToken token);
         Task<SearchResult<BaseClient>> Find(SearchClientParameter parameter, CancellationToken token);
+        Task<List<string>> GetResources(IEnumerable<string> names, CancellationToken cancellationToken);
     }
 }

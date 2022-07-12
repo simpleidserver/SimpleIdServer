@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.OpenID.EF;
 
 namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(OpenIdDBContext))]
-    partial class OpenIdDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220712131355_AddClientScope")]
+    partial class AddClientScope
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

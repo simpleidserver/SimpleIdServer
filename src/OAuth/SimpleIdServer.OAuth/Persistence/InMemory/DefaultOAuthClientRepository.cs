@@ -96,6 +96,17 @@ namespace SimpleIdServer.OAuth.Persistence.InMemory
             return Task.FromResult(1);
         }
 
+        public Task<List<string>> GetResources(IEnumerable<string> names, CancellationToken cancellationToken)
+        {
+            var result = new List<string>();
+            foreach(var client in _clients)
+            {
+                if(!result.Contains(client.ClientId) && client.Scopes != null && client.Scopes.Any(s => names.Contains(s.Scope))) result.Add(client.ClientId);
+            }
+
+            return Task.FromResult(result);
+        }
+
         public void Dispose()
         {
         }

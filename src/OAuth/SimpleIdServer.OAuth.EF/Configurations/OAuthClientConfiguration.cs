@@ -29,6 +29,7 @@ namespace SimpleIdServer.OAuth.EF.Configurations
             builder.HasMany(c => c.OAuthAllowedScopes).WithMany(c => c.Clients);
             builder.Ignore(c => c.AllowedScopes);
             builder.HasMany(c => c.Translations).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.Scopes).WithOne().HasForeignKey(c => c.ClientId).OnDelete(DeleteBehavior.Cascade);
             builder.Ignore(c => c.ClientNames);
             builder.Ignore(c => c.LogoUris);
             builder.Ignore(c => c.ClientUris);

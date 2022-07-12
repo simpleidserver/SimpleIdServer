@@ -96,6 +96,11 @@ namespace SimpleIdServer.OAuth.EF.Repositories
             return Task.FromResult(true);
         }
 
+        public Task<List<string>> GetResources(IEnumerable<string> names, CancellationToken cancellationToken)
+        {
+            return _dbContext.ClientScopes.Where(c => names.Contains(c.Scope)).Select(c => c.ClientId).Distinct().ToListAsync(cancellationToken);
+        }
+
         public Task<int> SaveChanges(CancellationToken token)
         {
             return _dbContext.SaveChangesAsync(token);

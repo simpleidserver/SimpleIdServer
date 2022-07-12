@@ -877,6 +877,86 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="Use client_credentials grant type to get an access token and check audience")]
+        [Xunit.TraitAttribute("FeatureTitle", "Token")]
+        [Xunit.TraitAttribute("Description", "Use client_credentials grant type to get an access token and check audience")]
+        public virtual void UseClient_CredentialsGrantTypeToGetAnAccessTokenAndCheckAudience()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Use client_credentials grant type to get an access token and check audience", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 223
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table72 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Type",
+                            "Kid",
+                            "AlgName"});
+                table72.AddRow(new string[] {
+                            "SIG",
+                            "1",
+                            "RS256"});
+#line 224
+ testRunner.When("add JSON web key to Authorization Server and store into \'jwks\'", ((string)(null)), table72, "When ");
+#line hidden
+                TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table73.AddRow(new string[] {
+                            "client_id",
+                            "f3d35cce-de69-45bf-958c-4a8796f8ed37"});
+                table73.AddRow(new string[] {
+                            "client_secret",
+                            "BankCvSecret"});
+                table73.AddRow(new string[] {
+                            "scope",
+                            "scope1 scope2"});
+                table73.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+#line 228
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table73, "And ");
+#line hidden
+#line 235
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 237
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 238
+ testRunner.Then("JSON exists \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 239
+ testRunner.Then("JSON exists \'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 240
+ testRunner.Then("JSON \'token_type\'=\'Bearer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 241
+ testRunner.Then("Extract JWS payload from \'access_token\' and check claim \'aud\' contains \'resourceI" +
+                        "d\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.7.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

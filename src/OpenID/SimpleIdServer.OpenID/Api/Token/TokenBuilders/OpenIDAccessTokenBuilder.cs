@@ -9,6 +9,7 @@ using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.DTOs;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,8 +21,8 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
     public class OpenIDAccessTokenBuilder : AccessTokenBuilder
     {
         public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, 
-            IJwtBuilder jwtBuilder, 
-            IOptions<OAuthHostOptions> options) : base(grantedTokenHelper, jwtBuilder, options) {
+            IJwtBuilder jwtBuilder,
+            IOAuthClientRepository oauthClientRepository) : base(grantedTokenHelper, jwtBuilder, oauthClientRepository) {
         }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
@@ -37,9 +38,9 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             await SetResponse(currentContext, jwsPayload, cancellationToken);
         }
 
-        protected virtual Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, JObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
+        protected virtual async Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, JObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var jwsPayload = BuildPayload(scopes, handlerContext);
+            var jwsPayload = await BuildPayload(scopes, handlerContext, cancellationToken);
             if (handlerContext.User != null)
             {
                 jwsPayload.Add(UserClaims.Subject, handlerContext.User.Id);
@@ -56,7 +57,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 jwsPayload.Add(AuthorizationRequestParameters.Claims, value);
             }
 
-            return Task.FromResult(jwsPayload);
+            return jwsPayload;
         }
     }
 }

@@ -1,14 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
@@ -20,13 +19,13 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly OAuthHostOptions _oauthHostOptions;
+        private readonly IOAuthClientRepository _clientRepository;
 
-        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IOptions<OAuthHostOptions> options)
+        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IOAuthClientRepository clientRepository)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;
-            _oauthHostOptions = options.Value;
+            _clientRepository = clientRepository;
         }
 
         public string Name => TokenResponseParameters.AccessToken;
@@ -38,12 +37,8 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         
         public async virtual Task Build(IEnumerable<string> scopes, JObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var jwsPayload = BuildPayload(scopes, handlerContext);
-            foreach(var record in jObj)
-            {
-                jwsPayload.Add(record.Key, record.Value);
-            }
-
+            var jwsPayload = await BuildPayload(scopes, handlerContext, cancellationToken);
+            foreach(var record in jObj) jwsPayload.Add(record.Key, record.Value);
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 
@@ -53,12 +48,11 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             return Build(scopes, currentContext, cancellationToken);
         }
 
-        protected virtual JwsPayload BuildPayload(IEnumerable<string> scopes, HandlerContext handlerContext)
+        protected virtual async Task<JwsPayload> BuildPayload(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var jwsPayload = _grantedTokenHelper.BuildAccessToken(new[]
-            {
-                handlerContext.Client.ClientId
-            }, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
+            var audiences = await _clientRepository.GetResources(scopes, cancellationToken);
+            if(!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
+            var jwsPayload = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);

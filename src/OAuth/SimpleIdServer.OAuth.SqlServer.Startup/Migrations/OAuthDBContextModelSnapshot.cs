@@ -49,6 +49,139 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.ToTable("OAuthConsentOAuthScope");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceRegistrationToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OTPCounter")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OTPKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserClaim");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserCredential", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CredentialType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCredential");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserExternalAuthProvider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Scheme")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserExternalAuthProvider");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserSession", b =>
+                {
+                    b.Property<string>("SessionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("AuthenticationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("SessionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSession");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Jwt.JsonWebKey", b =>
                 {
                     b.Property<string>("Kid")
@@ -100,6 +233,26 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.HasIndex("JsonWebKeyKid");
 
                     b.ToTable("JsonWebKeyKeyOperation");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.ClientScope", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Scope")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("ClientScopes");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClient", b =>
@@ -244,6 +397,9 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.Property<bool>("IsExposedInConfigurationEdp")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsStandardScope")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
 
@@ -302,75 +458,6 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.ToTable("OAuthTranslation");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Claims")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceRegistrationToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserCredential", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CredentialType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OAuthUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OAuthUserId");
-
-                    b.ToTable("OAuthUserCredential");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserSession", b =>
-                {
-                    b.Property<string>("SessionId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("AuthenticationDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OAuthUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("State")
-                        .HasColumnType("int");
-
-                    b.HasKey("SessionId");
-
-                    b.HasIndex("OAuthUserId");
-
-                    b.ToTable("OAuthUserSession");
-                });
-
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.Token", b =>
                 {
                     b.Property<int>("PkID")
@@ -407,6 +494,13 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.ToTable("Tokens");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUser", b =>
+                {
+                    b.HasBaseType("SimpleIdServer.Common.Domains.User");
+
+                    b.HasDiscriminator().HasValue("OAuthUser");
+                });
+
             modelBuilder.Entity("OAuthClientOAuthScope", b =>
                 {
                     b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
@@ -437,6 +531,38 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserClaim", b =>
+                {
+                    b.HasOne("SimpleIdServer.Common.Domains.User", null)
+                        .WithMany("OAuthUserClaims")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserCredential", b =>
+                {
+                    b.HasOne("SimpleIdServer.Common.Domains.User", null)
+                        .WithMany("Credentials")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserExternalAuthProvider", b =>
+                {
+                    b.HasOne("SimpleIdServer.Common.Domains.User", null)
+                        .WithMany("ExternalAuthProviders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.UserSession", b =>
+                {
+                    b.HasOne("SimpleIdServer.Common.Domains.User", null)
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.Jwt.JsonWebKey", b =>
                 {
                     b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
@@ -449,6 +575,14 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.HasOne("SimpleIdServer.Jwt.JsonWebKey", null)
                         .WithMany("KeyOperationLst")
                         .HasForeignKey("JsonWebKeyKid");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.ClientScope", b =>
+                {
+                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
+                        .WithMany("Scopes")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClientTranslation", b =>
@@ -480,20 +614,15 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                         .HasForeignKey("OAuthScopeName");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserCredential", b =>
+            modelBuilder.Entity("SimpleIdServer.Common.Domains.User", b =>
                 {
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthUser", null)
-                        .WithMany("Credentials")
-                        .HasForeignKey("OAuthUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
+                    b.Navigation("Credentials");
 
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUserSession", b =>
-                {
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthUser", null)
-                        .WithMany("Sessions")
-                        .HasForeignKey("OAuthUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.Navigation("ExternalAuthProviders");
+
+                    b.Navigation("OAuthUserClaims");
+
+                    b.Navigation("Sessions");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Jwt.JsonWebKey", b =>
@@ -504,6 +633,8 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClient", b =>
                 {
                     b.Navigation("JsonWebKeys");
+
+                    b.Navigation("Scopes");
 
                     b.Navigation("Translations");
                 });
@@ -516,10 +647,6 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUser", b =>
                 {
                     b.Navigation("Consents");
-
-                    b.Navigation("Credentials");
-
-                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

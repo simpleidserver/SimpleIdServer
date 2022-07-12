@@ -223,6 +223,12 @@ namespace SimpleIdServer.OAuth.Domains
         ///  A string containing the value of an expected rfc822Name SAN entry in the certificate.
         /// </summary>
         public string TlsClientAuthSanEmail { get; set; }
+
+        /// <summary>
+        /// Scopes used by the client to control its access.
+        /// </summary>
+        public ICollection<ClientScope> Scopes { get; set; }
+
         /// <summary>
         /// Allowed scopes
         /// </summary>

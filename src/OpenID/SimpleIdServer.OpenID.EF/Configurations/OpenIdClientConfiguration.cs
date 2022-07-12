@@ -32,6 +32,7 @@ namespace SimpleIdServer.OpenID.EF.Configurations
             builder.HasMany(c => c.OpenIdAllowedScopes).WithOne();
             builder.Ignore(c => c.AllowedScopes);
             builder.HasMany(c => c.Translations).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.Scopes).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.Ignore(c => c.ClientNames);
             builder.Ignore(c => c.LogoUris);
             builder.Ignore(c => c.ClientUris);

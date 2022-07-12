@@ -96,6 +96,17 @@ namespace SimpleIdServer.OpenID.Persistence.InMemory
             });
         }
 
+        public Task<List<string>> GetResources(IEnumerable<string> names, CancellationToken cancellationToken)
+        {
+            var result = new List<string>();
+            foreach (var client in _clients)
+            {
+                if (result.Contains(client.ClientId) && client.Scopes.Any(s => names.Contains(s.Scope))) result.Add(client.ClientId);
+            }
+
+            return Task.FromResult(result);
+        }
+
         public void Dispose() { }
     }
 }

@@ -218,4 +218,24 @@ Scenario: Use authorization_code grant type to get an access token (PKCE)
 	Then JSON exists 'access_token'
 	Then JSON exists 'refresh_token'
 	Then JSON 'token_type'='Bearer'
-	Then JSON 'scope'='scope1 scope2'
+	Then JSON 'scope'='scope1 scope2'	
+
+Scenario: Use client_credentials grant type to get an access token and check audience
+	When add JSON web key to Authorization Server and store into 'jwks'
+	| Type | Kid | AlgName |
+	| SIG  | 1   | RS256   |
+
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value                                |
+	| client_id     | f3d35cce-de69-45bf-958c-4a8796f8ed37 |
+	| client_secret | BankCvSecret                         |
+	| scope         | scope1 scope2                        |
+	| grant_type    | client_credentials                   |
+
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON exists 'access_token'
+	Then JSON exists 'refresh_token'
+	Then JSON 'token_type'='Bearer'
+	Then Extract JWS payload from 'access_token' and check claim 'aud' contains 'resourceId'

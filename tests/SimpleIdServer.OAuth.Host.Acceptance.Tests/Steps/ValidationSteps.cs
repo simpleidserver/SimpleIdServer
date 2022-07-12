@@ -3,6 +3,7 @@
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.Jwt.Jws.Handlers;
+using System.Linq;
 using System.Net.Http;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -42,13 +43,23 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         }
 
         [Then("Extract JWS payload from '(.*)' and check claim '(.*)' is array")]
-        public void ThenJWSPayloadClaimEqualsTo(string key, string name)
+        public void ThenJWSPayloadClaimContains(string key, string name)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
             var json = jsonHttpBody[key].ToString();
             var jsonPayload = new JwsGenerator(new ISignHandler[0]).ExtractPayload(json);
             var jArr = JArray.Parse(jsonPayload[name].ToString());
             Assert.NotNull(jArr);
+        }
+
+        [Then("Extract JWS payload from '(.*)' and check claim '(.*)' contains '(.*)'")]
+        public void ThenJWSPayloadClaimEqualsTo(string key, string name, string value)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JObject;
+            var json = jsonHttpBody[key].ToString();
+            var jsonPayload = new JwsGenerator(new ISignHandler[0]).ExtractPayload(json);
+            var jArr = JArray.Parse(jsonPayload[name].ToString()).Select(s => s.ToString());
+            Assert.True(jArr.Contains(value));
         }
     }
 }
