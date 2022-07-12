@@ -328,6 +328,7 @@ namespace SimpleIdServer.Scim.Parser
         public static IEnumerable<string> SplitStringIntoFilters(string filterString)
         {
             var level = 0;
+            var nbGroupingRoot = 0;
             var result = new List<string>();
             var filterBuilder = new StringBuilder();
             var groupingIsClosed = false;
@@ -349,6 +350,7 @@ namespace SimpleIdServer.Scim.Parser
 
                 if ('(' == character && (string.IsNullOrWhiteSpace(filterBuilder.ToString()) || filterBuilder.ToString() == "not"))
                 {
+                    if ('(' == character && level == 0 && filterBuilder.Length == 0) nbGroupingRoot++;
                     level++;
                     groupingIsOpened = true;
                 }
@@ -389,6 +391,7 @@ namespace SimpleIdServer.Scim.Parser
 
             if (!result.Any(r => IsLogicalOperator(r)))
             {
+                if (nbGroupingRoot == 1) return SplitStringIntoFilters(result.First());
                 return result;
             }
 
