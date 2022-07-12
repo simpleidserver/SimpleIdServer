@@ -7,6 +7,7 @@ using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,7 +23,7 @@ namespace SimpleIdServer.OpenBankingApi.Api.Token.TokenBuilders
             IGrantedTokenHelper grantedTokenHelper,
             IJwtBuilder jwtBuilder,
             IOptions<OAuthHostOptions> options,
-            IOpenBankingApiAuthRequestEnricher openBankingApiAuthRequestEnricher) : base(grantedTokenHelper, jwtBuilder, options)
+            IOpenBankingApiAuthRequestEnricher openBankingApiAuthRequestEnricher, IOAuthClientRepository oauthClientRepository) : base(grantedTokenHelper, jwtBuilder, oauthClientRepository)
         {
             _openBankingApiAuthRequestEnricher = openBankingApiAuthRequestEnricher;
         }
