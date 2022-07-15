@@ -593,12 +593,12 @@ namespace SimpleIdServer.Scim.Domain
                 switch (firstRecord.AttributeNode.SchemaAttribute.Type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
-                        var valuesStr = records.Select(r => r.AttributeNode.ValueString).Where(r => !string.IsNullOrWhiteSpace(r));
+                        var valuesStr = records.Select(r => r.AttributeNode.ValueString).Where(r => r != null);
                         if (valuesStr.Any())
                             record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesStr) : valuesStr.First());
                         break;
                     case SCIMSchemaAttributeTypes.REFERENCE:
-                        var valuesRef = records.Select(r => r.AttributeNode.ValueReference).Where(r => !string.IsNullOrWhiteSpace(r));
+                        var valuesRef = records.Select(r => r.AttributeNode.ValueReference).Where(r => r != null);
                         if (valuesRef.Any())
                             record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesRef) : valuesRef.First());
                         break;
