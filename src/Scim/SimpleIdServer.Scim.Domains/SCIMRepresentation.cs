@@ -146,7 +146,6 @@ namespace SimpleIdServer.Scim.Domains
                 removedAttrs.Add(attr);
                 var children = GetChildren(attr);
                 var childrenIds = children.Select(a => a.Id).ToList();
-                attr.RepresentationId = null;
                 FlatAttributes.Remove(attr);
                 RemoveAttributesById(removedAttrs, childrenIds);
             }
