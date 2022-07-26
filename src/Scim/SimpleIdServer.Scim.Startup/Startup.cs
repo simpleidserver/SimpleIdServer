@@ -132,7 +132,6 @@ namespace SimpleIdServer.Scim.Startup
                 });
             });
             services.AddSCIMSwagger();
-            services.AddMassTransitHostedService(true);
             services.AddSIDScim(options: _ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;

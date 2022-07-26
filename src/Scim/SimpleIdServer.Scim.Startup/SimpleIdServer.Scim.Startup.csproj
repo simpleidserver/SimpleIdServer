@@ -10,7 +10,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0 " />
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.1.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />

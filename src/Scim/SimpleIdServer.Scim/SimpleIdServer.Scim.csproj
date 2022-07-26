@@ -7,8 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
-    <PackageReference Include="MassTransit" Version="7.1.8" />
-    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.1.8" />
+    <PackageReference Include="MassTransit" Version="8.*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
