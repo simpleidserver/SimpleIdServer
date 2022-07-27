@@ -21,15 +21,18 @@ namespace SimpleIdServer.Scim.Api
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
         private readonly ILogger _logger;
         private readonly IResourceTypeResolver _resourceTypeResolver;
+        private readonly IUriProvider _uriProvider;
 
         public ResourceTypesController(
             ISCIMSchemaQueryRepository scimSchemaQueryRepository, 
             ILogger<ResourceTypesController> logger,
-            IResourceTypeResolver resourceTypeResolver)
+            IResourceTypeResolver resourceTypeResolver,
+            IUriProvider uriProvider)
         {
             _scimSchemaQueryRepository = scimSchemaQueryRepository;
             _logger = logger;
             _resourceTypeResolver = resourceTypeResolver;
+            _uriProvider = uriProvider;
         }
 
         [HttpGet]
@@ -66,12 +69,12 @@ namespace SimpleIdServer.Scim.Api
 
         protected JObject ToDto(SCIMSchema schema, List<ResourceTypeResolutionResult> resolutionResults)
         {
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.ResourceType}";
+            var location = $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ResourceType}/{schema.ResourceType}";
             var endpoint = string.Empty;
             var resolutionResult = resolutionResults.FirstOrDefault(r => r.ResourceType == schema.ResourceType);
             if (resolutionResult != null)
             {
-                endpoint = $"{Request.GetRelativePath()}/{resolutionResult.ControllerName}";
+                endpoint = $"{_uriProvider.GetRelativePath()}/{resolutionResult.ControllerName}";
             }
 
             return new JObject

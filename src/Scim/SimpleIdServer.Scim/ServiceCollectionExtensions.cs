@@ -82,6 +82,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
             services.AddTransient<IRepresentationReferenceSync, RepresentationReferenceSync>();
             services.AddTransient<IResourceTypeResolver, ResourceTypeResolver>();
+            services.AddHttpContextAccessor();
+            services.AddTransient<IUriProvider, UriProvider>();
             return services;
         }
 

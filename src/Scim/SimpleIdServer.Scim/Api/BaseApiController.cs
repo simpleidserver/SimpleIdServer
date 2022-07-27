@@ -43,8 +43,9 @@ namespace SimpleIdServer.Scim.Api
         private readonly ILogger _logger;
         private readonly IBusControl _busControl;
         private readonly IResourceTypeResolver _resourceTypeResolver;
+        private readonly IUriProvider _uriProvider;
 
-        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl, IResourceTypeResolver resourceTypeResolver)
+        public BaseApiController(string resourceType, IAddRepresentationCommandHandler addRepresentationCommandHandler, IDeleteRepresentationCommandHandler deleteRepresentationCommandHandler, IReplaceRepresentationCommandHandler replaceRepresentationCommandHandler, IPatchRepresentationCommandHandler patchRepresentationCommandHandler, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository, ISCIMSchemaQueryRepository scimSchemaQueryRepository, IAttributeReferenceEnricher attributeReferenceEnricher, IOptionsMonitor<SCIMHostOptions> options, ILogger logger, IBusControl busControl, IResourceTypeResolver resourceTypeResolver, IUriProvider uriProvider)
         {
             _resourceType = resourceType;
             _addRepresentationCommandHandler = addRepresentationCommandHandler;
@@ -58,6 +59,7 @@ namespace SimpleIdServer.Scim.Api
             _logger = logger;
             _busControl = busControl;
             _resourceTypeResolver = resourceTypeResolver;
+            _uriProvider = uriProvider;
         }
 
         public string ResourceType => _resourceType;
@@ -199,7 +201,7 @@ namespace SimpleIdServer.Scim.Api
                     { StandardSCIMRepresentationAttributes.StartIndex, searchRequest.StartIndex }
                 };
                 var resources = new JArray();
-                var baseUrl = Request.GetAbsoluteUriWithVirtualPath();
+                var baseUrl = _uriProvider.GetAbsoluteUriWithVirtualPath();
                 var representations = result.Content.ToList();
                 foreach(var representation in representations)
                 {
@@ -262,7 +264,7 @@ namespace SimpleIdServer.Scim.Api
             }
 
             representation.ApplyEmptyArray();
-            await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, Request.GetAbsoluteUriWithVirtualPath());
+            await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
             return BuildHTTPResult(representation, HttpStatusCode.OK, true);
         }
 
@@ -276,7 +278,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.AddResource);
             try
             {
-                var command = new AddRepresentationCommand(_resourceType, jobj, Request.GetAbsoluteUriWithVirtualPath());
+                var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
                 var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
                 var location = GetLocation(scimRepresentation);
                 var content = scimRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
@@ -314,7 +316,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
             {
-                var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, Request.GetAbsoluteUriWithVirtualPath()));
+                var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
                 {
                     await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], _options.IncludeToken ? Request.GetToken() : string.Empty));
@@ -344,7 +346,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.UpdateResource, id);
             try
             {
-                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, Request.GetAbsoluteUriWithVirtualPath()));
+                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
@@ -391,7 +393,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
-                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, Request.GetAbsoluteUriWithVirtualPath()));
+                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
                 if (!patchResult.IsPatched) return NoContent();
                 var newRepresentation = patchResult.SCIMRepresentation;
                 var location = GetLocation(newRepresentation);
@@ -470,7 +472,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected string GetLocation(SCIMRepresentation representation)
         {
-            return $"{Request.GetAbsoluteUriWithVirtualPath()}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
+            return $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
         }
     }
 }

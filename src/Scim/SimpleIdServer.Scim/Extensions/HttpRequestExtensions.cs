@@ -7,19 +7,6 @@ namespace SimpleIdServer.Scim.Extensions
 {
     public static class HttpRequestExtensions
     {
-        public static string GetAbsoluteUriWithVirtualPath(this HttpRequest requestMessage)
-        {
-            var host = requestMessage.Host.Value;
-            var http = "http://";
-            if (requestMessage.IsHttps)
-            {
-                http = "https://";
-            }
-
-            var relativePath = requestMessage.PathBase.Value;
-            return http + host + relativePath;
-        }
-
         public static string GetToken(this HttpRequest requestMessage)
         {
             if (!requestMessage.Headers.ContainsKey("Authorization"))
@@ -40,11 +27,6 @@ namespace SimpleIdServer.Scim.Extensions
             }
 
             return splitted[1];
-        }
-
-        public static string GetRelativePath(this HttpRequest requestMessage)
-        {
-            return requestMessage.PathBase.Value;
         }
     }
 }
