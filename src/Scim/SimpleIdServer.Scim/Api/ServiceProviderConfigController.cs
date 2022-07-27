@@ -6,10 +6,10 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
-using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Resources;
 using System.Collections.Generic;
 using System.Net;
+using SimpleIdServer.Scim.Helpers;
 
 namespace SimpleIdServer.Scim.Api
 {
@@ -17,11 +17,13 @@ namespace SimpleIdServer.Scim.Api
     public class ServiceProviderConfigController : Controller
     {
         private readonly SCIMHostOptions _options;
+        private readonly IUriProvider _uriProvider;
         private readonly ILogger _logger;
 
-        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options, ILogger<ServiceProviderConfigController> logger)
+        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options, IUriProvider uriProvider, ILogger<ServiceProviderConfigController> logger)
         {
             _options = options.CurrentValue;
+            _uriProvider = uriProvider;
             _logger = logger;
         }
 
@@ -66,7 +68,7 @@ namespace SimpleIdServer.Scim.Api
                     c.AddStringAttribute("type", new List<string> { "oauthbearertoken" });
                     c.AddBooleanAttribute("primary", new List<bool> { true });
                 }).Build();
-            var location = $"{Request.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ServiceProviderConfig}";
+            var location = $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ServiceProviderConfig}";
             return new ContentResult
             {
                 StatusCode = (int)HttpStatusCode.OK,
