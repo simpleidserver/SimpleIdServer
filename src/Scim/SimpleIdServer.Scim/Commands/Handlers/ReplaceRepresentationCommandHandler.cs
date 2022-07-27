@@ -136,6 +136,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 }
             }
 
+            var missingSchemas = updatedRepresentation.Schemas.Where(s => !existingRepresentation.Schemas.Any(sh => sh.Id == s.Id));
+            foreach (var missingSchema in missingSchemas) existingRepresentation.Schemas.Add(missingSchema);
             return new UpdateRepresentationResult { AttributeMappingLst = attributeMappings };
         }
 
