@@ -6,6 +6,11 @@ namespace SimpleIdServer.Common.ExternalEvents
 {
     public class IntegrationEvent
     {
+        public IntegrationEvent()
+        {
+
+        }
+
         public IntegrationEvent(string id, int version, string resourceType)
         {
             Id = id;
@@ -16,12 +21,19 @@ namespace SimpleIdServer.Common.ExternalEvents
 
         public IntegrationEvent(string id, int version, string resourceType, JObject representation) : this(id, version, resourceType)
         {
-            Representation = representation;
+            SerializedRepresentation = representation?.ToString();
         }
 
         public string Id { get; set; }
         public int Version { get; set; }
         public string ResourceType { get; set; }
-        public JObject Representation { get; set; }
+        public string SerializedRepresentation { get; set; }
+        public JObject Representation
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(SerializedRepresentation) ? null : JObject.Parse(SerializedRepresentation);
+            }
+        }
     }
 }

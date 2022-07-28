@@ -7,6 +7,11 @@ namespace SimpleIdServer.Scim.ExternalEvents
 {
     public class RepresentationAddedEvent : IntegrationEvent
     {
+        public RepresentationAddedEvent()
+        {
+
+        }
+
         public RepresentationAddedEvent(string id, int version, string resourceType, JObject representation, string token) : base(id, version, resourceType, representation) 
         {
             Token = token;

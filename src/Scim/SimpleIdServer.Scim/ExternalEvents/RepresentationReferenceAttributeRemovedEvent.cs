@@ -7,6 +7,11 @@ namespace SimpleIdServer.Scim.ExternalEvents
 {
     public class RepresentationReferenceAttributeRemovedEvent : BaseReferenceAttributeEvent
     {
+        public RepresentationReferenceAttributeRemovedEvent()
+        {
+
+        }
+
         public RepresentationReferenceAttributeRemovedEvent(string id, int version, string resourceType, string representationAggregateId, string schemaAttributeId, string attributeFullPath, JObject representation) : base(id, version, resourceType, representationAggregateId, schemaAttributeId, attributeFullPath, representation)
         {
         }

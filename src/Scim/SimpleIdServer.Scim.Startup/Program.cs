@@ -2,12 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Startup
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(cfg =>
@@ -16,7 +17,7 @@ namespace SimpleIdServer.Scim.Startup
                     cfg.UseStartup<Startup>();
                 })
                 .Build();
-            host.Run();
+            await host.RunAsync();
         }
     }
 }
