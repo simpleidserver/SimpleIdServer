@@ -11,8 +11,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
         public void Configure(EntityTypeBuilder<SCIMRepresentationAttribute> builder)
         {
             builder.HasKey(a => a.Id);
-            builder.HasOne(a => a.SchemaAttribute).WithMany().HasForeignKey(a => a.SchemaAttributeId);
-            builder.HasMany(a => a.Children).WithOne().HasForeignKey("ParentAttributeId").OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(a => a.SchemaAttribute).WithMany().HasForeignKey(a => a.SchemaAttributeId).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(a => a.Children).WithOne().HasForeignKey("ParentAttributeId");
         }
     }
 }
