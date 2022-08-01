@@ -219,7 +219,7 @@ namespace SimpleIdServer.Scim.Helpers
                         }
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
-                        var strs = jArr.Select(j => j.ToString()).ToList();
+                        var strs = jArr.Select(j => j.Type == JTokenType.Null ? null : j.ToString()).ToList();
                         if (schemaAttribute.CanonicalValues != null
                             && schemaAttribute.CanonicalValues.Any()
                             && !ignoreUnsupportedCanonicalValues
@@ -469,6 +469,7 @@ namespace SimpleIdServer.Scim.Helpers
             var method = typeof(T).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, argTypes, null);
             foreach(var record in jArr)
             {
+                if (record.Type == JTokenType.Null) continue;
                 var parameters = new object[] { record.ToString(), null };
                 var success = (bool)method.Invoke(null, parameters);
                 if (!success)
