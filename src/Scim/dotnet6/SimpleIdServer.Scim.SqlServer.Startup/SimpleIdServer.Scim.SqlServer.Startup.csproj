@@ -15,7 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
-    <ProjectReference Include="..\..\SimpleIdServer.Scim.SqlServer\SimpleIdServer.Scim.SqlServer.csproj" />
     <ProjectReference Include="..\..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim.Persistence.EFNet6\SimpleIdServer.Scim.Persistence.EFNet6.csproj" />
   </ItemGroup>
