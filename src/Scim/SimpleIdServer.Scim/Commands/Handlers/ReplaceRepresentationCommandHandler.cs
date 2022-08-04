@@ -6,13 +6,11 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
-using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -24,7 +22,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationHelper _scimRepresentationHelper;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
-        private readonly IDistributedLock _distributedLock;
 
         public ReplaceRepresentationCommandHandler(
             ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
@@ -32,7 +29,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             ISCIMRepresentationHelper scimRepresentationHelper,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
-            IDistributedLock distributedLock,
             IBusControl busControl) : base(busControl)
         {
             _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
@@ -40,7 +36,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _scimRepresentationHelper = scimRepresentationHelper;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
-            _distributedLock = distributedLock;
         }
 
         public async Task<SCIMRepresentation> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
@@ -61,49 +56,40 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             var schemas = await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            var lockName = $"representation-{replaceRepresentationCommand.Id}";
-            await _distributedLock.WaitLock(lockName, CancellationToken.None);
-            try
+            var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
+            if (existingRepresentation == null)
             {
-                var existingRepresentation = await _scimRepresentationCommandRepository.Get(replaceRepresentationCommand.Id);
-                if (existingRepresentation == null)
+                throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
+            }
+
+            var oldRepresentation = (SCIMRepresentation)existingRepresentation.Clone();
+            var mainSchema = schemas.First(s => s.Id == schema.Id);
+            var extensionSchemas = schemas.Where(s => s.Id != schema.Id).ToList();
+            var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(
+                replaceRepresentationCommand.Representation.Attributes,
+                replaceRepresentationCommand.Representation.ExternalId,
+                mainSchema,
+                extensionSchemas);
+            var updateResult = await UpdateExistingRepresentation(replaceRepresentationCommand.ResourceType, existingRepresentation, updatedRepresentation);
+            existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
+            existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
+            existingRepresentation.SetUpdated(DateTime.UtcNow);
+            var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
+            var references = await _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
+            using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
+            {
+                await _scimRepresentationCommandRepository.Update(existingRepresentation);
+                foreach (var reference in references.Representations)
                 {
-                    throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
+                    await _scimRepresentationCommandRepository.Update(reference);
                 }
 
-                var oldRepresentation = (SCIMRepresentation)existingRepresentation.Clone();
-                var mainSchema = schemas.First(s => s.Id == schema.Id);
-                var extensionSchemas = schemas.Where(s => s.Id != schema.Id).ToList();
-                var updatedRepresentation = _scimRepresentationHelper.ExtractSCIMRepresentationFromJSON(
-                    replaceRepresentationCommand.Representation.Attributes,
-                    replaceRepresentationCommand.Representation.ExternalId,
-                    mainSchema,
-                    extensionSchemas);
-                var updateResult = await UpdateExistingRepresentation(replaceRepresentationCommand.ResourceType, existingRepresentation, updatedRepresentation);
-                existingRepresentation.SetDisplayName(updatedRepresentation.DisplayName);
-                existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
-                existingRepresentation.SetUpdated(DateTime.UtcNow);
-                var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-                var references = await _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
-                using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
-                {
-                    await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                    foreach (var reference in references.Representations)
-                    {
-                        await _scimRepresentationCommandRepository.Update(reference);
-                    }
-
-                    await transaction.Commit();
-                }
-
-                await Notify(references);
-                existingRepresentation.ApplyEmptyArray();
-                return existingRepresentation;
+                await transaction.Commit();
             }
-            finally
-            {
-                await _distributedLock.ReleaseLock(lockName, CancellationToken.None);
-            }
+
+            await Notify(references);
+            existingRepresentation.ApplyEmptyArray();
+            return existingRepresentation;
         }
 
         private async Task<UpdateRepresentationResult> UpdateExistingRepresentation(string resourceType, SCIMRepresentation existingRepresentation, SCIMRepresentation updatedRepresentation)

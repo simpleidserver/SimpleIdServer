@@ -7,13 +7,11 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
-using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -23,7 +21,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
-        private readonly IDistributedLock _distributedLock;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly SCIMHostOptions _options;
 
@@ -31,7 +28,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
             ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
-            IDistributedLock distributedLock,
             IRepresentationReferenceSync representationReferenceSync,
             IOptions<SCIMHostOptions> options,
             IBusControl busControl) : base(busControl)
@@ -39,7 +35,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
             _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
-            _distributedLock = distributedLock;
             _representationReferenceSync = representationReferenceSync;
             _options = options.Value;
         }
@@ -47,18 +42,9 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
-            var lockName = $"representation-{patchRepresentationCommand.Id}";
-            await _distributedLock.WaitLock(lockName, CancellationToken.None);
-            try
-            {
-                var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
-                if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
-                return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
-            }
-            finally
-            {
-                await _distributedLock.ReleaseLock(lockName, CancellationToken.None);
-            }
+            var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
+            if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
+            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
         }
 
         private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand)

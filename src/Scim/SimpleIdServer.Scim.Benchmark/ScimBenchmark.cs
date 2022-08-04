@@ -17,10 +17,10 @@ namespace SimpleIdServer.Scim.Benchmark
     [RPlotExporter]
     public class ScimBenchmark
     {
-        private const string baseUrl = "http://localhost:60002";
+        private const string baseUrl = "http://localhost:5002";
         private string _groupId;
 
-        // [Benchmark]
+        [Benchmark]
         public async Task AddUserToGroup()
         {
             using (var httpClient = new HttpClient())

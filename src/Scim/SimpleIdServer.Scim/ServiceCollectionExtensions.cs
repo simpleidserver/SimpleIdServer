@@ -7,7 +7,6 @@ using SimpleIdServer.Scim.Api;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Helpers;
-using SimpleIdServer.Scim.Infrastructure.Lock;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.InMemory;
 using System;
@@ -89,7 +88,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.TryAddSingleton<IDistributedLock, InMemoryDistributedLock>();
             foreach (var assm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 services.RegisterAllAssignableType(typeof(BaseApiController), assm, true);
