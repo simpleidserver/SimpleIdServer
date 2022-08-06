@@ -14,6 +14,8 @@ namespace SimpleIdServer.Scim
             IgnoreUnsupportedCanonicalValues = true;
             IncludeToken = false;
             MergeExtensionAttributes = false;
+            IsUserPublishEvtsEnabled = true;
+            IsGroupPublishEvtsEnabled = true;
         }
 
         /// <summary>
@@ -49,5 +51,13 @@ namespace SimpleIdServer.Scim
         /// When this option is true then extension attributes will be merged into core attributes.
         /// </summary>
         public bool MergeExtensionAttributes { get; set; }
+        /// <summary>
+        /// Enable/Disable publishing user evts.
+        /// </summary>
+        public bool IsUserPublishEvtsEnabled { get; set; }
+        /// <summary>
+        /// Enable/Disable publishing group evts.
+        /// </summary>
+        public bool IsGroupPublishEvtsEnabled { get; set; }
     }
 }

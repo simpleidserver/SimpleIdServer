@@ -63,6 +63,8 @@ namespace SimpleIdServer.Scim.Api
         }
 
         public string ResourceType => _resourceType;
+        protected virtual bool IsPublishEvtsEnabled => true;
+        protected SCIMHostOptions Options => _options;
 
         [HttpGet]
         [Authorize("QueryScimResource")]
@@ -279,14 +281,10 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath());
-                var scimRepresentation = await _addRepresentationCommandHandler.Handle(command);
+                var scimRepresentation = await _addRepresentationCommandHandler.Handle(command, IsPublishEvtsEnabled);
                 var location = GetLocation(scimRepresentation);
                 var content = scimRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(scimRepresentation.ResourceType))
-                {
-                    await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[scimRepresentation.ResourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                }
-
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(scimRepresentation.Id, scimRepresentation.Version, GetResourceType(scimRepresentation.ResourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return BuildHTTPResult(HttpStatusCode.Created, location, scimRepresentation.Version, content);
             }
             catch(SCIMSchemaViolatedException ex)
@@ -316,12 +314,8 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
             {
-                var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()));
-                if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
-                {
-                    await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], _options.IncludeToken ? Request.GetToken() : string.Empty));
-                }
-
+                var representation = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath()), IsPublishEvtsEnabled);
+                if(IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMNotFoundException ex)
@@ -346,14 +340,10 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.UpdateResource, id);
             try
             {
-                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var newRepresentation = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath()), IsPublishEvtsEnabled);
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
-                {
-                    await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                }
-
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
             catch (SCIMUniquenessAttributeException ex)
@@ -393,16 +383,12 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
-                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()));
+                var patchResult = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath()), IsPublishEvtsEnabled);
                 if (!patchResult.IsPatched) return NoContent();
                 var newRepresentation = patchResult.SCIMRepresentation;
                 var location = GetLocation(newRepresentation);
                 var content = newRepresentation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(_resourceType))
-                {
-                    await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[_resourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                }
-
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(newRepresentation.Id, newRepresentation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return BuildHTTPResult(HttpStatusCode.OK, location, newRepresentation.Version, content);
             }
             catch (SCIMDuplicateAttributeException ex)
@@ -473,6 +459,11 @@ namespace SimpleIdServer.Scim.Api
         protected string GetLocation(SCIMRepresentation representation)
         {
             return $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
+        }
+
+        protected virtual string GetResourceType(string resourceType)
+        {
+            return !SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(resourceType) ? resourceType : SCIMConstants.MappingScimResourceTypeToCommonType[resourceType];
         }
     }
 }

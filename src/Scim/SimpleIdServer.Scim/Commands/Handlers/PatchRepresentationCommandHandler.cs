@@ -39,15 +39,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _options = options.Value;
         }
 
-        public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
+        public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand, bool isPublishEvtsEnabled)
         {
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
             var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
             if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
-            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
+            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand, isPublishEvtsEnabled);
         }
 
-        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand)
+        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand, bool isPublishEvtsEnabled)
         {
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
             var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues);
@@ -65,7 +65,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit();
             }
 
-            await Notify(references);
+            if (isPublishEvtsEnabled) await Notify(references);
             existingRepresentation.ApplyEmptyArray();
             return PatchRepresentationResult.Ok(existingRepresentation);
         }

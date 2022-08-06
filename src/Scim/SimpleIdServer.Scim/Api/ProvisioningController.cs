@@ -53,12 +53,8 @@ namespace SimpleIdServer.Scim.Api
                 return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
             }
 
-            if (SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(representation.ResourceType))
-            {
-                var content = representation.ToResponse(string.Empty, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, SCIMConstants.MappingScimResourceTypeToCommonType[representation.ResourceType], content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-            }
-
+            var content = representation.ToResponse(string.Empty, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+            await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(representation.ResourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
             return new NoContentResult();
         }
 
@@ -104,6 +100,11 @@ namespace SimpleIdServer.Scim.Api
         {
             var histories = await _provisioningConfigurationRepository.SearchHistory(parameter, cancellationToken);
             return new OkObjectResult(histories);
+        }
+
+        private static string GetResourceType(string resourceType)
+        {
+            return !SCIMConstants.MappingScimResourceTypeToCommonType.ContainsKey(resourceType) ? resourceType : SCIMConstants.MappingScimResourceTypeToCommonType[resourceType];
         }
     }
 }
