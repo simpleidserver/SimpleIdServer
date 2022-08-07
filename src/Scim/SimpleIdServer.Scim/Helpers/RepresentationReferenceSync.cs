@@ -151,7 +151,11 @@ namespace SimpleIdServer.Scim.Helpers
         {
 			if (!patchOperations.Any(p => IsDisplayName(p.Attr.FullPath))) return;
 			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
-			foreach(var targetRepresentation in targetRepresentations) UpdateScimRepresentation(targetRepresentation, sourceScimRepresentation, attributeMapping.TargetAttributeId, attributeMapping.SourceResourceType, targetSchema, out bool isAttrUpdated);
+			foreach (var targetRepresentation in targetRepresentations)
+			{
+				UpdateScimRepresentation(targetRepresentation, sourceScimRepresentation, attributeMapping.TargetAttributeId, attributeMapping.SourceResourceType, targetSchema, out bool isAttrUpdated);
+				targetRepresentation.SetUpdated(DateTime.UtcNow);
+			}
 		}
 
 		protected virtual void UpdateScimRepresentation(SCIMRepresentation scimRepresentation, SCIMRepresentation sourceRepresentation, string attributeId, string resourceType, SCIMSchema targetSchema, out bool isAttrUpdated)
