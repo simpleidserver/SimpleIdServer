@@ -37,7 +37,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async Task<SCIMRepresentation> Handle(AddRepresentationCommand addRepresentationCommand, bool isPublishEvtsEnabled)
+        public async Task<SCIMRepresentation> Handle(AddRepresentationCommand addRepresentationCommand)
         {
             var requestedSchemas = addRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -85,7 +85,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit();
             }
 
-            if (isPublishEvtsEnabled) await Notify(references);
+            await Notify(references);
             scimRepresentation.ApplyEmptyArray();
             return scimRepresentation;
         }

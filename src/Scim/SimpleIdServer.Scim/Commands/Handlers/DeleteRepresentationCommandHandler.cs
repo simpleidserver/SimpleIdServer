@@ -26,7 +26,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _representationReferenceSync = representationReferenceSync;
         }
 
-        public async Task<SCIMRepresentation> Handle(DeleteRepresentationCommand request, bool isPublishEvtsEnabled)
+        public async Task<SCIMRepresentation> Handle(DeleteRepresentationCommand request)
         {
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(request.Id, request.ResourceType);
             if (representation == null)
@@ -46,7 +46,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit();
             }
 
-            if (isPublishEvtsEnabled) await Notify(references);
+            await Notify(references);
             return representation;
         }
     }
