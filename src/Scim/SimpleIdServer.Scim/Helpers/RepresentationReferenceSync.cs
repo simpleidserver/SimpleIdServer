@@ -138,7 +138,7 @@ namespace SimpleIdServer.Scim.Helpers
 				foreach (var targetRepresentation in targetRepresentations)
 				{
 					bool isAttrUpdated;
-					var sourceSchema = sourceScimRepresentation.Schemas.First(s => s.ResourceType == attributeMapping.SourceResourceType);
+					var sourceSchema = sourceScimRepresentation.Schemas.First(s => s.ResourceType == attributeMapping.SourceResourceType && s.GetAttributeById(attributeMapping.SourceAttributeId) != null);
 					UpdateScimRepresentation(targetRepresentation, sourceScimRepresentation, attributeMapping.TargetAttributeId, attributeMapping.SourceResourceType, targetSchema, out isAttrUpdated);
 					UpdateScimRepresentation(sourceScimRepresentation, targetRepresentation, attributeMapping.SourceAttributeId, attributeMapping.TargetResourceType, sourceSchema, out bool b);
 					if (!isAttrUpdated && !string.IsNullOrWhiteSpace(attributeMapping.TargetAttributeId)) result.AddReferenceAttr(targetRepresentation, attributeMapping.TargetAttributeId, targetSchema.GetAttributeById(attributeMapping.TargetAttributeId).FullPath, sourceScimRepresentation.Id, location);
