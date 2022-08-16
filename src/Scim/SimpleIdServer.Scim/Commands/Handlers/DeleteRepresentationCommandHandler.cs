@@ -13,22 +13,19 @@ namespace SimpleIdServer.Scim.Commands.Handlers
     public class DeleteRepresentationCommandHandler : BaseCommandHandler, IDeleteRepresentationCommandHandler
     {
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
-        private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
 
         public DeleteRepresentationCommandHandler(ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
-            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IBusControl busControl) : base(busControl)
         {
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
-            _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _representationReferenceSync = representationReferenceSync;
         }
 
         public async Task<SCIMRepresentation> Handle(DeleteRepresentationCommand request)
         {
-            var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(request.Id, request.ResourceType);
+            var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null)
             {
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));

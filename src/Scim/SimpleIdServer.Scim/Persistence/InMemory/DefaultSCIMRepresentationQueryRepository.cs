@@ -41,37 +41,6 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(clone);
         }
 
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, string value, string endpoint = null)
-        {
-            var result = _representations.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueString == value));
-            if (result == null)
-            {
-                return Task.FromResult(result);
-            }
-
-            return Task.FromResult(result);
-        }
-
-        public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attrSchemaId, int value, string endpoint = null)
-        {
-            var result = _representations.FirstOrDefault(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == attrSchemaId && a.ValueInteger == value));
-            if (result == null)
-            {
-                return Task.FromResult(result);
-            }
-
-            return Task.FromResult(result);
-        }
-
-        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByAttributes(string attrSchemaId, IEnumerable<string> values, string endpoint = null)
-        {
-            var result = _representations.Where(r =>
-            {
-                return r.GetAttributesByAttrSchemaId(attrSchemaId).Any(a => values.Contains(a.ValueString) && (endpoint == null || endpoint == r.ResourceType));
-            });
-            return Task.FromResult(result);
-        }
-
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
             var queryableRepresentations = _representations.AsQueryable().Where(r => r.ResourceType == parameter.ResourceType);

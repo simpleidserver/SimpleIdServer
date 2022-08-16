@@ -16,19 +16,19 @@ namespace SimpleIdServer.Scim.Helpers
     public class RepresentationReferenceSync : IRepresentationReferenceSync
 	{
 		private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
-		private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
-		private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
+		private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+		private readonly ISCIMSchemaCommandRepository _scimSchemaCommandRepository;
 		private readonly IResourceTypeResolver _resourceTypeResolver;
 
 		public RepresentationReferenceSync(
 			ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
-			ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
-			ISCIMSchemaQueryRepository scimSchemaQueryRepository,
+			ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
+			ISCIMSchemaCommandRepository scimSchemaCommandRepository,
 			IResourceTypeResolver resourceTypeResolver)
         {
 			_scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
-			_scimRepresentationQueryRepository = scimRepresentationQueryRepository;
-			_scimSchemaQueryRepository = scimSchemaQueryRepository;
+			_scimRepresentationCommandRepository = scimRepresentationCommandRepository;
+			_scimSchemaCommandRepository = scimSchemaCommandRepository;
 			_resourceTypeResolver = resourceTypeResolver;
 		}
 
@@ -43,7 +43,7 @@ namespace SimpleIdServer.Scim.Helpers
 			var stopWatch = new Stopwatch();
 			var result = new RepresentationSyncResult(_resourceTypeResolver);
 			if (!attributeMappingLst.Any()) return result;
-			var targetSchemas = await _scimSchemaQueryRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.TargetResourceType).Distinct());
+			var targetSchemas = await _scimSchemaCommandRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.TargetResourceType).Distinct());
 			foreach (var attributeMapping in attributeMappingLst)
 			{
 				var newIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => newSourceScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
@@ -81,7 +81,7 @@ namespace SimpleIdServer.Scim.Helpers
 			var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
 			if (!attributeMappingLst.Any()) return result;
 
-			var targetSchemas = await _scimSchemaQueryRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.TargetResourceType).Distinct());
+			var targetSchemas = await _scimSchemaCommandRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.TargetResourceType).Distinct());
 			foreach (var attributeMapping in attributeMappingLst)
 			{
 				var allCurrentIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => newSourceScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
@@ -110,7 +110,7 @@ namespace SimpleIdServer.Scim.Helpers
 
 		protected virtual async Task RemoveReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, string location)
 		{
-			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
+			var targetRepresentations = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
 			if (targetRepresentations.Any())
             {
 				var firstTargetRepresentation = targetRepresentations.First();
@@ -130,7 +130,7 @@ namespace SimpleIdServer.Scim.Helpers
 
 		protected virtual async Task AddReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, string location, SCIMSchema targetSchema)
 		{
-			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
+			var targetRepresentations = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
 			var missingIds = ids.Where(i => !targetRepresentations.Any(r => r.Id == i));
 			if (missingIds.Any()) throw new SCIMNotFoundException(string.Format(Global.ReferencesDontExist, string.Join(",", missingIds)));
 			if (targetRepresentations.Any())
@@ -150,7 +150,7 @@ namespace SimpleIdServer.Scim.Helpers
 		protected virtual async Task UpdateReferenceAttributes(IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, SCIMSchema targetSchema)
         {
 			if (!patchOperations.Any(p => IsDisplayName(p.Attr.FullPath))) return;
-			var targetRepresentations = await _scimRepresentationQueryRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
+			var targetRepresentations = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
 			foreach (var targetRepresentation in targetRepresentations)
 			{
 				UpdateScimRepresentation(targetRepresentation, sourceScimRepresentation, attributeMapping.TargetAttributeId, attributeMapping.SourceResourceType, targetSchema, out bool isAttrUpdated);
