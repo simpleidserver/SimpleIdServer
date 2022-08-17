@@ -171,7 +171,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ResourceType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Version")
                         .HasColumnType("int");
@@ -202,7 +203,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ResourceType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SchemaAttributeId")
                         .HasColumnType("nvarchar(450)");

@@ -43,6 +43,11 @@ namespace SimpleIdServer.Scim.Domains
             }
         }
 
+        public void RefreshHierarchicalAttributesCache()
+        {
+            BuildHierarchicalAttributes(FlatAttributes);
+        }
+
         public SCIMSchemaAttribute GetSchemaAttributeById(string id)
         {
             foreach (var schema in Schemas)
@@ -146,6 +151,7 @@ namespace SimpleIdServer.Scim.Domains
                 removedAttrs.Add(attr);
                 var children = GetChildren(attr);
                 var childrenIds = children.Select(a => a.Id).ToList();
+                attr.Children?.Clear();
                 FlatAttributes.Remove(attr);
                 RemoveAttributesById(removedAttrs, childrenIds);
             }
@@ -374,11 +380,7 @@ namespace SimpleIdServer.Scim.Domains
         public static List<SCIMRepresentationAttribute> BuildHierarchicalAttributes(ICollection<SCIMRepresentationAttribute> attributes)
         {
             var rootId = string.Empty;
-            if (attributes.Count == 0)
-            {
-                return new List<SCIMRepresentationAttribute>();
-            }
-
+            if (attributes.Count == 0) return new List<SCIMRepresentationAttribute>();
             var parentsDictionary = new Dictionary<string, List<SCIMRepresentationAttribute>>();
             var treeNodes = new List<SCIMRepresentationAttribute>();
             foreach (var scimRepresentationAttribute in attributes)
@@ -395,10 +397,7 @@ namespace SimpleIdServer.Scim.Domains
             }
 
             foreach (var node in treeNodes.Where(node => parentsDictionary.ContainsKey(node.Id)))
-            {
-                node.Children = parentsDictionary[node.Id];
-            }
-
+                node.CachedChildren = parentsDictionary[node.Id];
             return parentsDictionary[rootId];
         }
 

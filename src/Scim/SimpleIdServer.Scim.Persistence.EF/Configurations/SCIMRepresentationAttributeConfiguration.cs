@@ -13,6 +13,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
             builder.HasKey(a => a.Id);
             builder.HasOne(a => a.SchemaAttribute).WithMany().HasForeignKey(a => a.SchemaAttributeId);
             builder.HasMany(a => a.Children).WithOne().HasForeignKey("ParentAttributeId");
+            builder.Ignore(a => a.CachedChildren);
+            builder.Property(r => r.ResourceType).HasMaxLength(255);
         }
     }
 }

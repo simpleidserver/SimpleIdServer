@@ -15,6 +15,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
             builder.HasMany(r => r.Schemas).WithMany(s => s.Representations);
             builder.Ignore(r => r.LeafAttributes);
             builder.Ignore(r => r.HierarchicalAttributes);
+            builder.Property(r => r.ResourceType).HasMaxLength(255);
         }
     }
 }

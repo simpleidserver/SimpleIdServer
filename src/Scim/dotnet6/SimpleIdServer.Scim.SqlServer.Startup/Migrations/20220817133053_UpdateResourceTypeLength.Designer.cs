@@ -12,14 +12,14 @@ using SimpleIdServer.Scim.Persistence.EF;
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
-    [Migration("20220622134431_IgnoreChildren")]
-    partial class IgnoreChildren
+    [Migration("20220817133053_UpdateResourceTypeLength")]
+    partial class UpdateResourceTypeLength
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -178,7 +178,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ResourceType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Version")
                         .HasColumnType("int");
@@ -203,7 +204,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ParentAttributeId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RepresentationId")
                         .HasColumnType("nvarchar(450)");
@@ -233,9 +234,12 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ValueString")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentAttributeId");
 
                     b.HasIndex("RepresentationId");
 
@@ -386,6 +390,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>
                 {
+                    b.HasOne("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", null)
+                        .WithMany("Children")
+                        .HasForeignKey("ParentAttributeId");
+
                     b.HasOne("SimpleIdServer.Scim.Domains.SCIMRepresentation", "Representation")
                         .WithMany("FlatAttributes")
                         .HasForeignKey("RepresentationId")
@@ -393,7 +401,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 
                     b.HasOne("SimpleIdServer.Scim.Domains.SCIMSchemaAttribute", "SchemaAttribute")
                         .WithMany()
-                        .HasForeignKey("SchemaAttributeId");
+                        .HasForeignKey("SchemaAttributeId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Representation");
 
@@ -431,6 +440,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentation", b =>
                 {
                     b.Navigation("FlatAttributes");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>
+                {
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchema", b =>

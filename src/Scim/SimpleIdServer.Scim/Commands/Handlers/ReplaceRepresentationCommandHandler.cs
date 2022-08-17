@@ -80,16 +80,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             {
                 await _scimRepresentationCommandRepository.Update(existingRepresentation);
                 foreach (var reference in references.Representations)
-                {
                     await _scimRepresentationCommandRepository.Update(reference);
-                }
-
                 await transaction.Commit();
+                await Notify(references);
+                existingRepresentation.ApplyEmptyArray();
+                return existingRepresentation;
             }
-
-            await Notify(references);
-            existingRepresentation.ApplyEmptyArray();
-            return existingRepresentation;
         }
 
         private async Task<UpdateRepresentationResult> UpdateExistingRepresentation(string resourceType, SCIMRepresentation existingRepresentation, SCIMRepresentation updatedRepresentation)
@@ -133,7 +129,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             foreach (var attributeMapping in attributeMappings)
             {
                 var attrLstToRemove = hierarchicalUpdatedAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId)
-                    .SelectMany(a => a.Children)
+                    .SelectMany(a => a.CachedChildren)
                     .Where(c => 
                     c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type || c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
                 updatedRepresentation.RemoveAttributesById(attrLstToRemove.Select(a => a.Id));
