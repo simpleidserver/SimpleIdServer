@@ -13,6 +13,7 @@ namespace SimpleIdServer.Scim.Domains
         public SCIMRepresentationAttribute()
         {
             Children = new List<SCIMRepresentationAttribute>();
+            CachedChildren = new List<SCIMRepresentationAttribute>();
         }
 
         public SCIMRepresentationAttribute(string id, string attributeId) : this()
@@ -66,6 +67,7 @@ namespace SimpleIdServer.Scim.Domains
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
         public SCIMRepresentation Representation { get; set; }
         public ICollection<SCIMRepresentationAttribute> Children { get; set; }
+        public ICollection<SCIMRepresentationAttribute> CachedChildren { get; set; }
 
         #endregion
 
@@ -92,9 +94,9 @@ namespace SimpleIdServer.Scim.Domains
 
             if (SchemaAttribute.Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                var schemaAttributeIds = Children.Select(c => c.SchemaAttributeId).Intersect(attr.Children.Select(c => c.SchemaAttributeId));
-                var filteredChildren = Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
-                var filteredAttrChildren = attr.Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                var schemaAttributeIds = CachedChildren.Select(c => c.SchemaAttributeId).Intersect(attr.CachedChildren.Select(c => c.SchemaAttributeId));
+                var filteredChildren = CachedChildren.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                var filteredAttrChildren = attr.CachedChildren.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
                 foreach (var child in filteredChildren)
                 {
                     if (filteredAttrChildren.All(c => !c.IsMutabilityValid(child))) return false;
@@ -128,9 +130,9 @@ namespace SimpleIdServer.Scim.Domains
                 case SCIMSchemaAttributeTypes.REFERENCE:
                     return attr.ValueReference == ValueReference;
                 case SCIMSchemaAttributeTypes.COMPLEX:
-                    var schemaAttributeIds = Children.Select(c => c.SchemaAttributeId).Intersect(attr.Children.Select(c => c.SchemaAttributeId));
-                    var filteredChildren = Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
-                    var filteredAttrChildren = attr.Children.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                    var schemaAttributeIds = CachedChildren.Select(c => c.SchemaAttributeId).Intersect(attr.CachedChildren.Select(c => c.SchemaAttributeId));
+                    var filteredChildren = CachedChildren.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
+                    var filteredAttrChildren = attr.CachedChildren.Where(c => schemaAttributeIds.Contains(c.SchemaAttributeId));
                     return filteredChildren.Any() && filteredChildren.All(fc => filteredAttrChildren.Any(sc => fc.IsSimilar(sc, ignoreCheckAttributeId)));
             }
 
@@ -153,7 +155,7 @@ namespace SimpleIdServer.Scim.Domains
             {
                 this
             };
-            result.AddRange(Children.SelectMany(c => c.ToFlat()));
+            result.AddRange(CachedChildren.SelectMany(c => c.ToFlat()));
             return result;
         }
 

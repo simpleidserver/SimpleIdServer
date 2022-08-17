@@ -43,32 +43,20 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             var attrExpression = expression as SCIMAttributeExpression;
             var logicalExpression = expression as SCIMLogicalExpression;
             var comparisonExpression = expression as SCIMComparisonExpression;
-            if (attrExpression != null)
-            {
-                return attrExpression.EvaluateAttributes(parameterExpression);
-            }
-
-            if (logicalExpression != null)
-            {
-                return logicalExpression.EvaluateAttributes(parameterExpression);
-            }
-
-            if (comparisonExpression != null)
-            {
-                return comparisonExpression.EvaluateAttributes(parameterExpression);
-            }
-
+            if (attrExpression != null) return attrExpression.EvaluateAttributes(parameterExpression);
+            if (logicalExpression != null) return logicalExpression.EvaluateAttributes(parameterExpression);
+            if (comparisonExpression != null) return comparisonExpression.EvaluateAttributes(parameterExpression);
             return null;
         }
 
-        public static Expression EvaluateAttributes(this SCIMAttributeExpression expression, ParameterExpression parameterExpression)
+        public static Expression EvaluateAttributes(this SCIMAttributeExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren")
         {
             var schemaAttributeIdProperty = Expression.Property(parameterExpression, "SchemaAttributeId");
             var equal = Expression.Equal(schemaAttributeIdProperty, Expression.Constant(expression.SchemaAttribute.Id));
             var complex = expression as SCIMComplexAttributeExpression;
             if (complex != null)
             {
-                var childrenProperty = Expression.Property(parameterExpression, "Children");
+                var childrenProperty = Expression.Property(parameterExpression, propertyName);
                 var enumerableType = typeof(Enumerable);
                 var anyMethod = enumerableType.GetMethods()
                      .Where(m => m.Name == "Any" && m.IsGenericMethodDefinition)

@@ -19,18 +19,13 @@ namespace SimpleIdServer.Scim.Domain
     {
         public static void FilterAttributes(this IEnumerable<SCIMRepresentation> representations, IEnumerable<SCIMAttributeExpression> includedAttributes, IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
-            foreach (var representation in representations)
-            {
-                representation.FilterAttributes(includedAttributes, excludedAttributes);
-            }
+            foreach (var representation in representations) representation.FilterAttributes(includedAttributes, excludedAttributes);
         }
 
         public static void FilterAttributes(this SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> includedAttributes, IEnumerable<SCIMAttributeExpression> excludedAttributes)
         {
-            var allAttributes = new List<SCIMRepresentationAttribute>();
-            allAttributes.AddRange(representation.FlatAttributes);
-            allAttributes.AddRange(representation.HierarchicalAttributes);
             var queryableAttributes = representation.FlatAttributes.AsQueryable();
+            representation.RefreshHierarchicalAttributesCache();
             if (includedAttributes != null && includedAttributes.Any())
             {
                 var attrs = queryableAttributes.FilterAttributes(includedAttributes).ToList();
@@ -38,14 +33,12 @@ namespace SimpleIdServer.Scim.Domain
                 representation.FlatAttributes = attrs.Where(a => a != null).SelectMany(_ =>
                 {
                     var lst = new List<SCIMRepresentationAttribute> { _ };
-                    lst.AddRange(_.Children.Where(c => includedFullPathLst.Any(f => c.FullPath.StartsWith(f))));
+                    lst.AddRange(_.CachedChildren.Where(c => includedFullPathLst.Any(f => c.FullPath.StartsWith(f))));
                     return lst;
                 }).ToList();
             }
             else if (excludedAttributes != null && excludedAttributes.Any())
-            {
                 representation.FlatAttributes = queryableAttributes.FilterAttributes(excludedAttributes, false).ToList();
-            }
         }
 
         public static IQueryable<SCIMRepresentationAttribute> FilterAttributes(this IQueryable<SCIMRepresentationAttribute> representationAttributes, IEnumerable<SCIMAttributeExpression> attributes, bool isIncluded = true)
@@ -621,7 +614,7 @@ namespace SimpleIdServer.Scim.Domain
                         if (firstRecord.AttributeNode.SchemaAttribute.MultiValued == false)
                         {
                             var jObjVal = new JObject();
-                            var children = firstRecord.AttributeNode.Children;
+                            var children = firstRecord.AttributeNode.CachedChildren;
                             EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, mergeExtensionAttributes, isGetRequest);
                             if (jObjVal.Children().Any())
                             {
@@ -634,7 +627,7 @@ namespace SimpleIdServer.Scim.Domain
                             foreach (var attr in records)
                             {
                                 var jObjVal = new JObject();
-                                var children = attr.AttributeNode.Children;
+                                var children = attr.AttributeNode.CachedChildren;
                                 EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, mergeExtensionAttributes, isGetRequest);
                                 if (jObjVal.Children().Any())
                                 {
