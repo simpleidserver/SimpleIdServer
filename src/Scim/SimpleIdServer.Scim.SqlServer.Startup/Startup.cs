@@ -47,7 +47,17 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
             services.AddLogging();
-            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
+            });
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
                 {
@@ -65,7 +75,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
-            }, massTransitOptions: x =>
+            }/*, massTransitOptions: x =>
             {
                 x.UsingRabbitMq((c, t) =>
                 {
@@ -75,7 +85,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         t.Host(connectionString);
                     }
                 });
-            });
+            }*/);
             services.AddScimStoreEF(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o =>

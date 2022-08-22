@@ -19,10 +19,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _scimDbContext = scimDbContext;
         }
 
-        public async Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
+        public async Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
         {
             var collection = _scimDbContext.SCIMSchemaLst;
-            var result = await collection.AsQueryable().Where(s => s.Id == schemaId).ToMongoFirstAsync();
+            var result = await collection.AsQueryable().Where(s => s.ResourceType == resourceType).ToMongoFirstAsync();
             if (result == null)
             {
                 return null;
@@ -37,18 +37,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return await collection.AsQueryable().Where(s => schemaIdentifiers.Contains(s.Id)).ToMongoListAsync();
         }
 
-        public async Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByResourceTypes(IEnumerable<string> resourceTypes)
-        {
-            var result = await _scimDbContext.SCIMSchemaLst.AsQueryable()
-                .Where(s => resourceTypes.Contains(s.ResourceType))
-                .ToMongoListAsync();
-            return result;
-        }
-
-        public async Task<SCIMSchema> FindRootSCIMSchemaByResourceType(string resourceType)
+        public async Task<SCIMSchema> FindSCIMSchemaById(string schemaId)
         {
             var collection = _scimDbContext.SCIMSchemaLst;
-            var result = await collection.AsQueryable().Where(s => s.ResourceType == resourceType).ToMongoFirstAsync();
+            var result = await collection.AsQueryable().Where(s => s.Id == schemaId).ToMongoFirstAsync();
             if (result == null)
             {
                 return null;

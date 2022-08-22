@@ -19,21 +19,18 @@ namespace SimpleIdServer.Scim.Commands.Handlers
     public class PatchRepresentationCommandHandler : BaseCommandHandler, IPatchRepresentationCommandHandler
     {
         private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
-        private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly SCIMHostOptions _options;
 
         public PatchRepresentationCommandHandler(
             ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
-            ISCIMRepresentationQueryRepository scimRepresentationQueryRepository,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IOptions<SCIMHostOptions> options,
             IBusControl busControl) : base(busControl)
         {
             _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
-            _scimRepresentationQueryRepository = scimRepresentationQueryRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
             _options = options.Value;
@@ -42,7 +39,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         public async Task<PatchRepresentationResult> Handle(PatchRepresentationCommand patchRepresentationCommand)
         {
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
-            var existingRepresentation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(patchRepresentationCommand.Id);
+            var existingRepresentation = await _scimRepresentationCommandRepository.Get(patchRepresentationCommand.Id);
             if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
             return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
         }

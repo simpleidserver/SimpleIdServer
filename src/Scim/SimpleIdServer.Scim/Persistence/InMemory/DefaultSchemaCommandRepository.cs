@@ -29,5 +29,11 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             var result = LstData.Where(s => schemaIdentifiers.Contains(s.Id));
             return Task.FromResult(result.Select(r => (SCIMSchema)r.Clone()));
         }
+
+        public Task<IEnumerable<SCIMSchema>> FindSCIMSchemaByResourceTypes(IEnumerable<string> resourceTypes)
+        {
+            var result = LstData.Where(s => resourceTypes.Contains(s.ResourceType));
+            return Task.FromResult(result.Select(r => (SCIMSchema)r.Clone()));
+        }
     }
 }
