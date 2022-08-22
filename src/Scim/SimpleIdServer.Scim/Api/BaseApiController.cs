@@ -352,6 +352,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.StartGetResources);
             try
             {
+                if(searchRequest == null) return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
                 if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null)
                 {
                     searchRequest.Count = _options.MaxResults;
