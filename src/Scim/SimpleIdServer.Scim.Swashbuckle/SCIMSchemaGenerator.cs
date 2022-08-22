@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using SimpleIdServer.Scim.Api;
 using SimpleIdServer.Scim.Domains;
@@ -171,6 +172,8 @@ namespace SimpleIdServer.Scim.Swashbuckle
                 if (scimSchema != null)
                 {
                     Enrich(scimSchema, scimSchema.HierarchicalAttributes.Select(a => a.Leaf).ToList(), schema.Properties);
+                    var schemaDef = schema.Properties.First(p => p.Key == "schemas").Value.Items;
+                    schemaDef.Example = new OpenApiString(scimSchema.Id);
                 }
                 else
                 {
@@ -193,7 +196,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
 
         private static void Enrich(SCIMSchema schema, ICollection<SCIMSchemaAttribute> attributes, IDictionary<string, OpenApiSchema> properties)
         {
-            foreach (var attr in attributes)
+            foreach (var attr in attributes.Where(a => a.Required))
             {
                 var sc = new OpenApiSchema
                 {

@@ -55,8 +55,9 @@ namespace SimpleIdServer.Scim.DTOs
         [FromQuery(Name = SCIMConstants.StandardSCIMSearchAttributes.Count)]
         public int? Count { get; set; }
         /// <summary>
-        /// The filter string used to request a subset of resources.
+        /// The filter string used to request a subset of resources (RFC 7644) https://www.rfc-editor.org/rfc/rfc7644.html#section-3.4.2.2
         /// </summary>
+        /// <example>userName eq john</example>
         [JsonProperty(SCIMConstants.StandardSCIMSearchAttributes.Filter)]
         [FromQuery(Name = SCIMConstants.StandardSCIMSearchAttributes.Filter)]
         public string Filter { get; set; }

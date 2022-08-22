@@ -25,6 +25,12 @@ namespace SimpleIdServer.Scim.Api
             _logger = logger;
         }
 
+        /// <summary>
+        /// Returns the schemas.
+        /// </summary>
+        /// <response code="200">Schemas are found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
         [HttpGet]
         public async virtual Task<IActionResult> Get()
         {
@@ -52,6 +58,14 @@ namespace SimpleIdServer.Scim.Api
             };
         }
 
+        /// <summary>
+        /// Returns the details of one schema.
+        /// </summary>
+        /// <response code="200">Schema is found</response>
+        /// <response code="404">Schema is not found</response>
+        /// <returns>Unique ID of the schema</returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         [HttpGet("{id}")]
         public async virtual Task<IActionResult> Get(string id)
         {

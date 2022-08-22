@@ -66,6 +66,17 @@ namespace SimpleIdServer.Scim.Api
         protected virtual bool IsPublishEvtsEnabled => true;
         protected SCIMHostOptions Options => _options;
 
+        /// <summary>
+        /// Search representations according to the filter, sort and pagination parameters (HTTP GET).
+        /// </summary>
+        /// <param name="searchRequest"></param>
+        /// <response code="200">Valid representations are found</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Valid representations are not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         [HttpGet]
         [Authorize("QueryScimResource")]
         public virtual Task<IActionResult> Get([FromQuery] SearchSCIMResourceParameter searchRequest)
@@ -73,7 +84,17 @@ namespace SimpleIdServer.Scim.Api
             return InternalSearch(searchRequest);
         }
 
-
+        /// <summary>
+        /// Search representations according to the filter, sort and pagination parameters (HTTP POST).
+        /// </summary>
+        /// <param name="searchRequest"></param>
+        /// <response code="200">Valid representations are found</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Valid representations are not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         [HttpPost(".search")]
         [Authorize("QueryScimResource")]
         public virtual Task<IActionResult> Search([FromBody] SearchSCIMResourceParameter searchRequest)
@@ -81,6 +102,17 @@ namespace SimpleIdServer.Scim.Api
             return InternalSearch(searchRequest);
         }
 
+        /// <summary>
+        /// Returns the representation details of a particular representation using its unique ID.
+        /// </summary>
+        /// <response code="200">Valid representation is found</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Valid representation is not found</response>
+        /// <param name="id">Unique identifier of the resource type.</param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         [HttpGet("{id}")]
         [Authorize("QueryScimResource")]
         public virtual Task<IActionResult> Get(string id)
@@ -88,6 +120,18 @@ namespace SimpleIdServer.Scim.Api
             return InternalGet(id);
         }
 
+        /// <summary>
+        /// The operation can be executed only by authenticated user.
+        /// Returns the representation details of a particular representation using its unique ID.
+        /// </summary>
+        /// <param name="id">Unique identifier of the resource type.</param>
+        /// <response code="200">Valid representation is found</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Valid representation is not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         [HttpGet("Me")]
         [Authorize("UserAuthenticated")]
         public virtual Task<IActionResult> GetMe(string id)
@@ -98,15 +142,46 @@ namespace SimpleIdServer.Scim.Api
             });
         }
 
+        /// <summary>
+        /// Create representation and returns the details of the created representation including its unique ID.
+        /// </summary>
+        /// <response code="201">Valid representation is created</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="409">At least one representation exists with the same unique attribute</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="param"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize("AddScimResource")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
         public virtual Task<IActionResult> Add([FromBody] RepresentationParameter param)
         {
             return InternalAdd(param);
         }
 
+        /// <summary>
+        /// The operation can be executed only by authenticated user.
+        /// Create representation and returns the details of the created representation including its unique ID.
+        /// </summary>
+        /// <response code="201">Valid representation is created</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="409">At least one representation exists with the same unique attribute</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="param"></param>
+        /// <returns></returns>
         [HttpPost("Me")]
         [Authorize("UserAuthenticated")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
         public virtual Task<IActionResult> AddMe([FromBody] RepresentationParameter param)
         {
             return ExecuteActionIfAuthenticated(() =>
@@ -115,6 +190,19 @@ namespace SimpleIdServer.Scim.Api
             });
         }
 
+        /// <summary>
+        /// Delete a particular representation using its unique ID.
+        /// </summary>
+        /// <response code="204">Representation is deleted</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Representation is not found</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="id">Unique ID of the resource type</param>
+        /// <returns></returns>
+        [ProducesResponseType(204)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         [HttpDelete("{id}")]
         [Authorize("DeleteScimResource")]
         public virtual Task<IActionResult> Delete(string id)
@@ -122,6 +210,20 @@ namespace SimpleIdServer.Scim.Api
             return InternalDelete(id);
         }
 
+        /// <summary>
+        /// The operation can be executed only by authenticated user.
+        /// Delete a particular representation using its unique ID.
+        /// </summary>
+        /// <response code="204">Representation is deleted</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Representation is not found</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="id">Unique ID of the resource type</param>
+        /// <returns></returns>
+        [ProducesResponseType(204)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         [HttpDelete("Me/{id}")]
         [Authorize("UserAuthenticated")]
         public virtual Task<IActionResult> DeleteMe(string id)
@@ -132,6 +234,24 @@ namespace SimpleIdServer.Scim.Api
             });
         }
 
+        /// <summary>
+        /// Update the representation details and returns the updated representation details using a PUT operation.
+        /// </summary>
+        /// <response code="200">Representation is updated</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Representation is not found</response>
+        /// <response code="409">At least one representation exists with the same unique attribute</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="id">Unique ID of the resource type</param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
         [HttpPut("{id}")]
         [Authorize("UpdateScimResource")]
         public virtual Task<IActionResult> Update(string id, [FromBody] RepresentationParameter param)
@@ -139,6 +259,25 @@ namespace SimpleIdServer.Scim.Api
             return InternalUpdate(id, param);
         }
 
+        /// <summary>
+        /// The operation can be executed only by authenticated user.
+        /// Update the representation details and returns the updated representation details using a PUT operation.
+        /// </summary>
+        /// <response code="200">Representation is updated</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Representation is not found</response>
+        /// <response code="409">At least one representation exists with the same unique attribute</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="id">Unique ID of the resource type</param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
         [HttpPut("Me/{id}")]
         [Authorize("UserAuthenticated")]
         public virtual Task<IActionResult> UpdateMe(string id, [FromBody] RepresentationParameter param)
@@ -149,6 +288,27 @@ namespace SimpleIdServer.Scim.Api
             });
         }
 
+
+        /// <summary>
+        /// Update the representation details and returns the updated representation details using a PATCH operation.
+        /// </summary>
+        /// <response code="200">Representation is updated</response>
+        /// <response code="204">No changes have been made.</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Representation is not found</response>
+        /// <response code="409">At least one representation exists with the same unique attribute</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="id">Unique ID of the resource type</param>
+        /// <param name="patchRepresentation"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
         [HttpPatch("{id}")]
         [Authorize("UpdateScimResource")]
         public virtual Task<IActionResult> Patch(string id, [FromBody] PatchRepresentationParameter patchRepresentation)
@@ -156,6 +316,27 @@ namespace SimpleIdServer.Scim.Api
             return InternalPatch(id, patchRepresentation);
         }
 
+        /// <summary>
+        /// The operation can be executed only by authenticated user.
+        /// Update the representation details and returns the updated representation details using a PATCH operation.
+        /// </summary>
+        /// <response code="200">Representation is updated</response>
+        /// <response code="204">No changes have been made.</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="401">Unauthorized</response>
+        /// <response code="404">Representation is not found</response>
+        /// <response code="409">At least one representation exists with the same unique attribute</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="id">Unique ID of the resource type</param>
+        /// <param name="patchRepresentation"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
         [HttpPatch("Me/{id}")]
         [Authorize("UserAuthenticated")]
         public virtual Task<IActionResult> PatchMe(string id, [FromBody] PatchRepresentationParameter patchRepresentation)

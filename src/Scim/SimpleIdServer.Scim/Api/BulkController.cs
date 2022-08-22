@@ -40,6 +40,19 @@ namespace SimpleIdServer.Scim.Api
             _serviceScopeFactory = serviceScopeFactory;
         }
 
+        /// <summary>
+        /// Create multiple representations at once.
+        /// </summary>
+        /// <response code="200">Representations are created</response>
+        /// <response code="400">Request is not valid</response>
+        /// <response code="413">Request is too large</response>
+        /// <response code="500">Something goes wrong in the server</response>
+        /// <param name="bulk"></param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(413)]
+        [ProducesResponseType(500)]
         [HttpPost]
         [Authorize("BulkScimResource")]
         public async virtual Task<IActionResult> Index([FromBody] BulkParameter bulk)

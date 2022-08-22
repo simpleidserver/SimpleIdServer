@@ -35,6 +35,12 @@ namespace SimpleIdServer.Scim.Api
             _uriProvider = uriProvider;
         }
 
+        /// <summary>
+        /// Returns metadata about resource types.
+        /// </summary>
+        /// <response code="200">Metadata are found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
         [HttpGet]
         public async virtual Task<IActionResult> Get()
         {
@@ -52,6 +58,15 @@ namespace SimpleIdServer.Scim.Api
             return new OkObjectResult(getResult);
         }
 
+        /// <summary>
+        /// Retourn metadata of one resource type.
+        /// </summary>
+        /// <response code="200">Metadata is found</response>
+        /// <response code="404">Resource type is not found</response>
+        /// <param name="id">Unique identifier of the resource type.</param>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         [HttpGet("{id}")]
         public async virtual Task<IActionResult> Get(string id)
         {

@@ -61,6 +61,19 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
                 opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
             });
+            services.AddSwaggerGen(c =>
+            {
+                var currentAssembly = Assembly.GetExecutingAssembly();
+                var xmlDocs = currentAssembly.GetReferencedAssemblies()
+                    .Union(new AssemblyName[] { currentAssembly.GetName() })
+                    .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+                    .Where(f => File.Exists(f)).ToArray();
+                Array.ForEach(xmlDocs, (d) =>
+                {
+                    c.IncludeXmlComments(d);
+                });
+            });
+            services.AddSCIMSwagger();
             services.AddAuthentication(SCIMConstants.AuthenticationScheme)
                 .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
                 {
@@ -91,6 +104,11 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SCIM API V1");
+            });
             InitializeDatabase(app);
             app.UseAuthentication();
             app.UseMvc();

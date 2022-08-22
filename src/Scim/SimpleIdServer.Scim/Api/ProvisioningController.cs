@@ -42,6 +42,15 @@ namespace SimpleIdServer.Scim.Api
             _logger = logger;
         }
 
+        /// <summary>
+        /// Launch the provisioning of one representation.
+        /// </summary>
+        /// <response code="204">Provisioning is launched</response>
+        /// <response code="404">Representation is not found</response>
+        /// <param name="id">Unique ID of the representation.</param>
+        /// <returns></returns>
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [HttpGet("{id}")]
         [Authorize("Provison")]
         public async Task<IActionResult> Provision(string id)
@@ -58,6 +67,12 @@ namespace SimpleIdServer.Scim.Api
             return new NoContentResult();
         }
 
+        /// <summary>
+        /// Search provisioning configurations.
+        /// </summary>
+        /// <response code="200">Configurations are found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
         [HttpPost("configurations/.search")]
         public async Task<IActionResult> SearchConfigurations([FromBody] SearchProvisioningConfigurationParameter parameter, CancellationToken cancellationToken)
         {
@@ -65,6 +80,14 @@ namespace SimpleIdServer.Scim.Api
             return new OkObjectResult(configurations);
         }
 
+        /// <summary>
+        /// Get configurations of one provisioning.
+        /// </summary>
+        /// <response code="200">Provisioning is found</response>
+        /// <response code="404">Provisioning is not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         [HttpGet("configurations/{id}")]
         public async Task<IActionResult> GetConfiguration(string id, CancellationToken cancellationToken)
         {
@@ -77,6 +100,14 @@ namespace SimpleIdServer.Scim.Api
             return new OkObjectResult(configuration);
         }
 
+        /// <summary>
+        /// Update configurations of one provisioning.
+        /// </summary>
+        /// <response code="204">Configuration is updated</response>
+        /// <response code="404">Provisioning is not found</response>
+        /// <returns></returns>
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [HttpPut("configurations/{id}")]
         public async Task<IActionResult> UpdateConfiguration(string id, [FromBody] UpdateProvisioningConfigurationParameter parameter, CancellationToken cancellationToken)
         {
@@ -95,6 +126,12 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
+        /// <summary>
+        /// Search provisioning histories.
+        /// </summary>
+        /// <response code="200">Histories are returned.</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
         [HttpPost("histories/.search")]
         public async Task<IActionResult> SearchHistories([FromBody] SearchProvisioningHistoryParameter parameter, CancellationToken cancellationToken)
         {

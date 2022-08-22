@@ -6,10 +6,10 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
+using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Resources;
 using System.Collections.Generic;
 using System.Net;
-using SimpleIdServer.Scim.Helpers;
 
 namespace SimpleIdServer.Scim.Api
 {
@@ -27,6 +27,12 @@ namespace SimpleIdServer.Scim.Api
             _logger = logger;
         }
 
+        /// <summary>
+        /// Returns the service provider's configuration details.
+        /// </summary>
+        /// <response code="200">Service provider's configuration details are found</response>
+        /// <returns></returns>
+        [ProducesResponseType(200)]
         [HttpGet]
         public virtual IActionResult Get()
         {
