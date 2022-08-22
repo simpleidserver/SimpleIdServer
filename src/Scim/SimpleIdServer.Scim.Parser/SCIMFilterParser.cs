@@ -88,9 +88,12 @@ namespace SimpleIdServer.Scim.Parser
             else if (presentExpression != null)
             {
                 var schemaAttr = GetSCIMSchemaAttribute(presentExpression.Content.Name, scimSchemaAttributes, schemas);
-                if (schemaAttr == null)
+                if (schemaAttr == null) return;
+                if (presentExpression.Content.Child != null)
                 {
-                    return;
+                    var schema = schemas.FirstOrDefault(s => s.HasAttribute(schemaAttr));
+                    var subAttributes = schema.GetChildren(schemaAttr).ToList();
+                    Parse(presentExpression.Content.Child, subAttributes, schemas);
                 }
 
                 presentExpression.Content.SchemaAttribute = schemaAttr;

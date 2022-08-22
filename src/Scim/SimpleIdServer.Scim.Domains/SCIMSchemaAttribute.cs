@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SimpleIdServer.Scim.Domains
 {
-    [DebuggerDisplay("Attribute '{Name}'")]
+    [DebuggerDisplay("Attribute '{FullPath}'")]
     public class SCIMSchemaAttribute : ICloneable
     {
         public SCIMSchemaAttribute(string id)

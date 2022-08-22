@@ -12,6 +12,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
+using SimpleIdServer.Scim.SwashbuckleV6;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,6 +64,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             });
             services.AddSwaggerGen(c =>
             {
+                c.SchemaFilter<EnumDocumentFilter>();
                 var currentAssembly = Assembly.GetExecutingAssembly();
                 var xmlDocs = currentAssembly.GetReferencedAssemblies()
                     .Union(new AssemblyName[] { currentAssembly.GetName() })

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.EF.Extensions;
@@ -81,7 +82,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 return await parameter.SortBy.EvaluateOrderBy(
                     _scimDbContext,
                     queryableRepresentations,
-                    parameter.SortOrder.Value,
+                    parameter.SortOrder ?? SearchSCIMRepresentationOrders.Descending,
                     parameter.StartIndex,
                     parameter.Count,
                     parameter.IncludedAttributes,
