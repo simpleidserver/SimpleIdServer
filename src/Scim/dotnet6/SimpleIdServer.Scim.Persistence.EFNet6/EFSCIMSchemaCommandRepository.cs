@@ -11,9 +11,9 @@ namespace SimpleIdServer.Scim.Persistence.EF
 {
     public class EFSCIMSchemaCommandRepository : ISCIMSchemaCommandRepository
     {
-        private readonly SCIMDbContextCommand _context;
+        private readonly SCIMDbContext _context;
 
-        public EFSCIMSchemaCommandRepository(SCIMDbContextCommand context)
+        public EFSCIMSchemaCommandRepository(SCIMDbContext context)
         {
             _context = context;
         }

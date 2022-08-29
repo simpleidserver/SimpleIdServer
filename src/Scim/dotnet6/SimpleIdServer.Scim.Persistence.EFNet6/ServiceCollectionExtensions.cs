@@ -18,7 +18,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ISCIMAttributeMappingQueryRepository, EFSCIMAttributeMappingQueryRepository>();
             services.AddTransient<IProvisioningConfigurationRepository, EFProvisioningConfigurationRepository>();
             services.AddDbContext<SCIMDbContext>(optionsAction);
-            services.AddDbContext<SCIMDbContextCommand>(optionsAction);
             return services;
         }
     }
