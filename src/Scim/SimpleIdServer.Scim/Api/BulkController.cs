@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -138,7 +137,7 @@ namespace SimpleIdServer.Scim.Api
             newHttpContext.Request.Path = scimBulkOperationRequest.Path;
             newHttpContext.Request.PathBase = HttpContext.Request.PathBase;
             newHttpContext.Request.Host = HttpContext.Request.Host;
-            newHttpContext.User = BuildUser();
+            newHttpContext.User = this.User;
             newHttpContext.Request.Method = scimBulkOperationRequest.HttpMethod;
             if (scimBulkOperationRequest.Data != null && (scimBulkOperationRequest.HttpMethod.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
                 scimBulkOperationRequest.HttpMethod.Equals("PUT", StringComparison.InvariantCultureIgnoreCase) ||
@@ -200,20 +199,6 @@ namespace SimpleIdServer.Scim.Api
 
                 return result;
             }
-        }
-
-        private ClaimsPrincipal BuildUser()
-        {
-            var claims = new List<Claim>
-            {
-                new Claim("scope", "query_scim_resource"),
-                new Claim("scope", "add_scim_resource"),
-                new Claim("scope", "delete_scim_resource"),
-                new Claim("scope", "update_scim_resource")
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, SCIMConstants.AuthenticationScheme);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-            return claimsPrincipal;
         }
     }
 }
