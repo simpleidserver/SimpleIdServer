@@ -28,5 +28,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
             var result = await _scimDbContext.SCIMAttributeMappingLst.Where(a => a.SourceResourceType == sourceResourceType).ToListAsync();
             return result;
         }
+
+        public async Task<IEnumerable<SCIMAttributeMapping>> GetAll()
+        {
+            var result = await _scimDbContext.SCIMAttributeMappingLst.ToListAsync();
+            return result;
+        }
     }
 }

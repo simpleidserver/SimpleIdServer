@@ -144,6 +144,124 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when bulkId it not well formatted")]
+        [Xunit.TraitAttribute("FeatureTitle", "BulkErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when bulkId it not well formatted")]
+        public virtual void ErrorIsReturnedWhenBulkIdItNotWellFormatted()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when bulkId it not well formatted", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 18
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table3.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\" ]"});
+                table3.AddRow(new string[] {
+                            "Operations",
+                            @"[ { ""method"": ""POST"", ""path"": ""/Users"", ""bulkId"": ""1"", ""data"": { ""schemas"": [ ""urn:ietf:params:scim:schemas:core:2.0:User"", ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"" ], ""employeeNumber"": ""number"", ""userName"": ""bjen"", ""name"": { ""formatted"" : ""formatted"", ""familyName"": ""familyName"", ""givenName"": ""givenName"" } } }, { ""method"": ""POST"", ""path"": ""/Groups"", ""bulkId"": ""2"", ""data"": { ""schemas"": [ ""urn:ietf:params:scim:schemas:core:2.0:Group"" ], ""displayName"": ""Tour Guides"", ""members"": [ { ""value"": ""bulkId"" } ] } } ]"});
+#line 19
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Bulk\'", ((string)(null)), table3, "When ");
+#line hidden
+#line 24
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 26
+ testRunner.Then("JSON \'Operations[1].bulkId\'=\'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 27
+ testRunner.Then("JSON \'Operations[1].status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 28
+ testRunner.Then("JSON \'Operations[1].response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 29
+ testRunner.Then("JSON \'Operations[1].response.detail\'=\'bulkId bulkId is not well formatted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when bulkId doesn\'t exist")]
+        [Xunit.TraitAttribute("FeatureTitle", "BulkErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when bulkId doesn\'t exist")]
+        public virtual void ErrorIsReturnedWhenBulkIdDoesntExist()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when bulkId doesn\'t exist", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 31
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table4.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\" ]"});
+                table4.AddRow(new string[] {
+                            "Operations",
+                            @"[ { ""method"": ""POST"", ""path"": ""/Users"", ""bulkId"": ""1"", ""data"": { ""schemas"": [ ""urn:ietf:params:scim:schemas:core:2.0:User"", ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"" ], ""employeeNumber"": ""number"", ""userName"": ""bjen"", ""name"": { ""formatted"" : ""formatted"", ""familyName"": ""familyName"", ""givenName"": ""givenName"" } } }, { ""method"": ""POST"", ""path"": ""/Groups"", ""bulkId"": ""2"", ""data"": { ""schemas"": [ ""urn:ietf:params:scim:schemas:core:2.0:Group"" ], ""displayName"": ""Tour Guides"", ""members"": [ { ""value"": ""bulkId:invalid"" } ] } } ]"});
+#line 32
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Bulk\'", ((string)(null)), table4, "When ");
+#line hidden
+#line 37
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 39
+ testRunner.Then("JSON \'Operations[1].bulkId\'=\'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 40
+ testRunner.Then("JSON \'Operations[1].status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 41
+ testRunner.Then("JSON \'Operations[1].response.scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 42
+ testRunner.Then("JSON \'Operations[1].response.detail\'=\'bulkId invalid doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.7.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

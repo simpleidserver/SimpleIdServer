@@ -157,7 +157,17 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                 o.EnableEndpointRouting = false;
                 o.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
             }).AddNewtonsoftJson(o => { });
-            services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
+                opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
+            });
+            // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
             services.AddSIDScim(o =>
             {

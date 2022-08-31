@@ -147,6 +147,9 @@
   <data name="BodyNotValidJSON" xml:space="preserve">
     <value>Body is not a valid JSON</value>
   </data>
+  <data name="BulkIdIsNotWellFormatted" xml:space="preserve">
+    <value>bulkId {0} is not well formatted</value>
+  </data>
   <data name="ComparisonOperatorNotSupported" xml:space="preserve">
     <value>the comparison operator {0} is not supported</value>
   </data>
@@ -185,6 +188,9 @@
   </data>
   <data name="MissingSCIMSchemaAttribute" xml:space="preserve">
     <value>instance cannot be serialized because no SCIMSchemaAttribute has been found</value>
+  </data>
+  <data name="NoIdReceivedFromBulkIdOperation" xml:space="preserve">
+    <value>no identifier has been returned from the bulk operation {0}</value>
   </data>
   <data name="NotValidBase64" xml:space="preserve">
     <value>'{0}' are not valid Base64String</value>
@@ -263,6 +269,9 @@
   </data>
   <data name="StartIndexMustBeSuperiorOrEqualTo1" xml:space="preserve">
     <value>startIndex must be &gt;= 1</value>
+  </data>
+  <data name="UnknownBulkId" xml:space="preserve">
+    <value>bulkId {0} doesn't exist</value>
   </data>
   <data name="UnknownPath" xml:space="preserve">
     <value>path {0} doesn't exist</value>

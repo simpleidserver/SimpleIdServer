@@ -10,5 +10,6 @@ namespace SimpleIdServer.Scim.Persistence
     {
         Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes);
         Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType);
+        Task<IEnumerable<SCIMAttributeMapping>> GetAll();
     }
 }
