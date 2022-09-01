@@ -33,7 +33,7 @@ namespace SimpleIdServer.Scim.Domain
                 representation.FlatAttributes = attrs.Where(a => a != null).SelectMany(_ =>
                 {
                     var lst = new List<SCIMRepresentationAttribute> { _ };
-                    lst.AddRange(_.CachedChildren.Where(c => includedFullPathLst.Any(f => c.FullPath.StartsWith(f))));
+                    lst.AddRange(_.Children.Where(c => includedFullPathLst.Any(f => c.FullPath.StartsWith(f))));
                     return lst;
                 }).ToList();
             }
@@ -41,7 +41,7 @@ namespace SimpleIdServer.Scim.Domain
                 representation.FlatAttributes = queryableAttributes.FilterAttributes(excludedAttributes, false).ToList();
         }
 
-        public static IQueryable<SCIMRepresentationAttribute> FilterAttributes(this IQueryable<SCIMRepresentationAttribute> representationAttributes, IEnumerable<SCIMAttributeExpression> attributes, bool isIncluded = true)
+        public static IQueryable<SCIMRepresentationAttribute> FilterAttributes(this IQueryable<SCIMRepresentationAttribute> representationAttributes, IEnumerable<SCIMAttributeExpression> attributes, bool isIncluded = true, string propertyName = "CachedChildren")
         {
             var enumarableType = typeof(Queryable);
             var whereMethod = enumarableType.GetMethods()
@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.Domain
                 Expression record = null;
                 if (attribute.TryContainsGroupingExpression(out SCIMComplexAttributeExpression complexAttributeExpression))
                 {
-                    record = attribute.EvaluateAttributes(representationParameter);
+                    record = attribute.EvaluateAttributes(representationParameter, propertyName);
                 }
                 else
                 {

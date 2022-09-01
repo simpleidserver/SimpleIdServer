@@ -29,12 +29,12 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             IQueryable<SCIMRepresentationAttribute> filteredAttrs= null;
             if (includedAttributes != null && includedAttributes.Any())
             {
-                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(includedAttributes);
+                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(includedAttributes, propertyName: "Children");
             }
 
             if(excludedAttributes != null && excludedAttributes.Any())
             {
-                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(excludedAttributes, false);
+                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(excludedAttributes, false, "Children");
             }
 
             if (filteredAttrs != null)
