@@ -462,7 +462,8 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             var jObj = patchOperation.Value as JObject;
-            if (patchOperation.Path == StandardSCIMRepresentationAttributes.ExternalId && patchOperation.Value.GetType() == typeof(string))
+            if (patchOperation.Path == StandardSCIMRepresentationAttributes.ExternalId && 
+                (patchOperation.Value.GetType() == typeof(string) || patchOperation.Value.GetType() == typeof(JValue)))
             {
                 externalId = patchOperation.Value.ToString();
                 return true;

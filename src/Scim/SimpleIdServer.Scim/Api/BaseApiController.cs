@@ -454,11 +454,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
         {
-            if (jobj == null)
-            {
-                return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
-            }
-
+            if (jobj == null) return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
             _logger.LogInformation(Global.AddResource);
             try
             {

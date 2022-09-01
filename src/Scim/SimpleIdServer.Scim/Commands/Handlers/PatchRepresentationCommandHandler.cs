@@ -69,7 +69,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)
         {
-            if (patchRepresentation == null)
+            if (patchRepresentation == null || (patchRepresentation.Operations != null && patchRepresentation.Operations.Any(o => o.Operation == null)))
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.RequestIsNotWellFormatted, "PATCH"));
             }

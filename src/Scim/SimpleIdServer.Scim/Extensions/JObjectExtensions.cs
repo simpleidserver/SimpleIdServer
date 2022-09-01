@@ -1,9 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 
 namespace SimpleIdServer.Scim.Extensions
@@ -48,7 +51,7 @@ namespace SimpleIdServer.Scim.Extensions
 
         public static IEnumerable<string> GetSchemas(this JObject jObj)
         {
-            return GetArray(jObj, StandardSCIMRepresentationAttributes.Schemas);
+            return GetArrayIgnoreCase(jObj, StandardSCIMRepresentationAttributes.Schemas);
         }
 
         public static bool TryGetInt(this JObject jObj, string name, out int result)
@@ -68,25 +71,6 @@ namespace SimpleIdServer.Scim.Extensions
             return false;
         }
 
-        public static bool TryGetEnum<T>(this JObject jObj, string name, out T result) where T : struct
-        {
-            result = default(T);
-            string r;
-            if (!jObj.TryGetString(name, out r))
-            {
-                return false;
-            }
-
-            var enumName = Enum.GetNames(typeof(T)).FirstOrDefault(n => n.Equals(r, StringComparison.InvariantCultureIgnoreCase));
-            if (string.IsNullOrWhiteSpace(enumName))
-            {
-                return false;
-            }
-
-            result = (T)Enum.Parse(typeof(T), enumName);
-            return true;
-        }
-
         public static bool TryGetString(this JObject jObj, string name, out string result)
         {
             result = null;
@@ -99,30 +83,55 @@ namespace SimpleIdServer.Scim.Extensions
             return true;
         }
 
-        public static string GetString(this JObject jObj, string name)
+        public static string GetStringIgnoreCase(this JObject jObj, string name)
         {
-            if (!jObj.ContainsKey(name))
-            {
-                return null;
-            }
-
-            return jObj[name].ToString();
+            if (jObj.TryGetValue(name, StringComparison.InvariantCultureIgnoreCase, out JToken value)) return value.ToString();
+            return null;
         }
 
-        public static IEnumerable<string> GetArray(this JObject jObj, string name)
+        public static bool TryGetEnumIgnoreCase<T>(this JObject jObj, string name, out T result) where T : struct
         {
-            if (!jObj.ContainsKey(name))
+            result = default(T);
+            string r = jObj.GetStringIgnoreCase(name);
+            if (string.IsNullOrWhiteSpace(r)) return false;
+            var enumName = Enum.GetNames(typeof(T)).FirstOrDefault(n => n.Equals(r, StringComparison.InvariantCultureIgnoreCase));
+            if (string.IsNullOrWhiteSpace(enumName))
             {
-                return new string[0];
+                return false;
             }
 
-            var jArr = jObj[name] as JArray;
-            if (jArr == null)
-            {
-                return new string[0];
-            }
+            result = (T)Enum.Parse(typeof(T), enumName);
+            return true;
+        }
 
+        public static IEnumerable<string> GetArrayIgnoreCase(this JObject jObj, string name)
+        {
+            JToken value = null;
+            if (!jObj.TryGetValue(name, StringComparison.InvariantCultureIgnoreCase, out value)) return new string[0];
+            var jArr = value as JArray;
+            if (jArr == null) return new string[0];
             return jArr.Values<string>().ToList();
+        }
+
+        public static void RemoveIgnoreCase(this JObject jObj, string name)
+        {
+            JToken value = null;
+            var child = jObj.Children().FirstOrDefault(x => string.Equals(x.Path, name, StringComparison.InvariantCultureIgnoreCase));
+            if (child == null) return;
+            jObj.Remove(child.Path);
+        }
+
+        public static JToken ToCamelCase(this JToken token)
+        {
+            if(token.Type == JTokenType.Object) return JObject.FromObject(token.ToObject<ExpandoObject>(), JsonSerializer.Create(new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+            if(token.Type == JTokenType.Array)
+            {
+                var result = new JArray();
+                foreach (JToken record in (token as JArray)) result.Add(record.ToCamelCase());
+                return result;
+            }
+
+            return token;
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using SimpleIdServer.Scim.Infrastructure.Converters;
 using System.Runtime.Serialization;
 
 namespace SimpleIdServer.Scim.DTOs
 {
+    [JsonConverter(typeof(PatchOperationParameterConverter))]
     public class PatchOperationParameter
     {
         /// <summary>
@@ -14,7 +14,7 @@ namespace SimpleIdServer.Scim.DTOs
         /// </summary>
         [DataMember(Name = SCIMConstants.PathOperationAttributes.Operation)]
         [JsonProperty(SCIMConstants.PathOperationAttributes.Operation)]
-        public SCIMPatchOperations Operation { get; set; }
+        public SCIMPatchOperations? Operation { get; set; }
         /// <summary>
         /// Attribute path describing the target of the operation.
         /// </summary>

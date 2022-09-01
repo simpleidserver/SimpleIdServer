@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Extensions;
 using System;
@@ -10,30 +9,29 @@ using System.Reflection;
 
 namespace SimpleIdServer.Scim.Infrastructure.Converters
 {
-    public class RepresentationParameterConverter : JsonConverter
+    public class PatchOperationParameterConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType.GetTypeInfo().Equals(typeof(RepresentationParameter).GetTypeInfo());
+            return objectType.GetTypeInfo().Equals(typeof(PatchOperationParameter).GetTypeInfo());
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var jo = JObject.Load(reader);
-            var result = new RepresentationParameter
+            var json = JObject.Load(reader);
+            var result = new PatchOperationParameter
             {
-                ExternalId = jo.GetStringIgnoreCase(StandardSCIMRepresentationAttributes.ExternalId),
-                Schemas = jo.GetArrayIgnoreCase(StandardSCIMRepresentationAttributes.Schemas)
+                Path = json.GetStringIgnoreCase(SCIMConstants.PathOperationAttributes.Path)
             };
-            jo.RemoveIgnoreCase(StandardSCIMRepresentationAttributes.Schemas);
-            jo.RemoveIgnoreCase(StandardSCIMRepresentationAttributes.ExternalId);
-            result.Attributes = jo.ToCamelCase() as JObject;
+            if (json.TryGetEnumIgnoreCase(SCIMConstants.PathOperationAttributes.Operation, out SCIMPatchOperations op))
+                result.Operation = op;
+            if (json.TryGetValue(SCIMConstants.PathOperationAttributes.Value, StringComparison.InvariantCultureIgnoreCase, out JToken val))
+                result.Value = val.ToCamelCase();
             return result;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
         }
     }
 }
