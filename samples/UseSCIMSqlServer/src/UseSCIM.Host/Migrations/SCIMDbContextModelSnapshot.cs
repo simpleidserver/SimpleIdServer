@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.Scim.Persistence.EF;
 
+#nullable disable
+
 namespace UseSCIM.Host.Migrations
 {
     [DbContext(typeof(SCIMDbContext))]
@@ -15,9 +17,10 @@ namespace UseSCIM.Host.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.3")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "6.0.7")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
                 {
@@ -57,8 +60,9 @@ namespace UseSCIM.Host.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -98,8 +102,9 @@ namespace UseSCIM.Host.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<bool>("IsArray")
                         .HasColumnType("bit");
@@ -171,7 +176,8 @@ namespace UseSCIM.Host.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ResourceType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("Version")
                         .HasColumnType("int");
@@ -226,7 +232,8 @@ namespace UseSCIM.Host.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ValueString")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -392,7 +399,8 @@ namespace UseSCIM.Host.Migrations
 
                     b.HasOne("SimpleIdServer.Scim.Domains.SCIMSchemaAttribute", "SchemaAttribute")
                         .WithMany()
-                        .HasForeignKey("SchemaAttributeId");
+                        .HasForeignKey("SchemaAttributeId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Representation");
 

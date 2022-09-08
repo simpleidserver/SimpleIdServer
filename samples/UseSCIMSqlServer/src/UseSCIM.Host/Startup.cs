@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
+using UseSCIM.Host.Consumers;
 
 namespace UseSCIM.Host
 {
@@ -78,14 +80,17 @@ namespace UseSCIM.Host
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
+            }, massTransitOptions: _ =>
+            {
+                _.AddConsumer<IntegrationEventConsumer>();
+                _.UsingInMemory((context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                });
             });
             services.AddScimStoreEF(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("db"), o => o.MigrationsAssembly(migrationsAssembly));
-            });
-            services.AddDistributedLockSQLServer(opts =>
-            {
-                opts.ConnectionString = Configuration.GetConnectionString("db");
             });
         }
 

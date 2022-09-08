@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Persistence.EF;
+using SimpleIdServer.Scim.SqlServer.Startup.Consumers;
 using SimpleIdServer.Scim.SwashbuckleV6;
 using System;
 using System.Collections.Generic;
@@ -93,6 +95,13 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
             services.AddSIDScim(_ =>
             {
                 _.IgnoreUnsupportedCanonicalValues = false;
+            }, massTransitOptions: _ =>
+            {
+                _.AddConsumer<IntegrationEventConsumer>();
+                _.UsingInMemory((context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                });
             });
             services.AddScimStoreEF(options =>
             {
