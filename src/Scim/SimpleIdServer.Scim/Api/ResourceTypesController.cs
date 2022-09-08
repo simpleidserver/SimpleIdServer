@@ -50,8 +50,8 @@ namespace SimpleIdServer.Scim.Api
             var getResult = new JObject
             {
                 { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
-                { StandardSCIMRepresentationAttributes.TotalResults, resolutionResults.Count() },
-                { StandardSCIMRepresentationAttributes.ItemsPerPage, resolutionResults.Count() },
+                { StandardSCIMRepresentationAttributes.TotalResults, result.Count() },
+                { StandardSCIMRepresentationAttributes.ItemsPerPage, result.Count() },
                 { StandardSCIMRepresentationAttributes.StartIndex, 1 },
                 { StandardSCIMRepresentationAttributes.Resources, new JArray(result.Select(s => ToDto(s, resolutionResults)))  }
             };
