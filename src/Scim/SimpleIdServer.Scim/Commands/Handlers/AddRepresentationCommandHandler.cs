@@ -43,6 +43,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(addRepresentationCommand.ResourceType);
+            if (schema == null) throw new SCIMSchemaNotFoundException();
             var allSchemas = new List<string> { schema.Id };
             var requiredSchemas = new List<string> { schema.Id };
             allSchemas.AddRange(schema.SchemaExtensions.Select(s => s.Schema));

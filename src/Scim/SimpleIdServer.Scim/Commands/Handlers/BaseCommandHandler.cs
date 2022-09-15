@@ -17,15 +17,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         protected async Task Notify(RepresentationSyncResult result)
         {
-            foreach(var removeAttr in result.RemoveAttrEvts)
-            {
-                await _busControl.Publish(removeAttr);
-            }
-
-            foreach(var addAttr in result.AddAttrEvts)
-            {
-                await _busControl.Publish(addAttr);
-            }
+            foreach(var removeAttr in result.RemoveAttrEvts) await _busControl.Publish(removeAttr);
+            foreach(var addAttr in result.AddAttrEvts) await _busControl.Publish(addAttr);
         }
     }
 }

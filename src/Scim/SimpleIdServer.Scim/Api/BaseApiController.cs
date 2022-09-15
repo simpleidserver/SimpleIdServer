@@ -359,6 +359,7 @@ namespace SimpleIdServer.Scim.Api
                 }
 
                 var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
+                if (schema == null) return new NotFoundResult();
                 var schemaIds = new List<string> { schema.Id };
                 schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
                 var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
@@ -440,6 +441,8 @@ namespace SimpleIdServer.Scim.Api
         protected async Task<IActionResult> InternalGet(string id)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
+            var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
+            if (schema == null) return new NotFoundResult();
             var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType);
             if (representation == null)
             {
@@ -480,6 +483,11 @@ namespace SimpleIdServer.Scim.Api
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
             }
+            catch(SCIMSchemaNotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new NotFoundResult();
+            }
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
@@ -501,7 +509,12 @@ namespace SimpleIdServer.Scim.Api
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
             }
-            catch(Exception ex)
+            catch (SCIMSchemaNotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new NotFoundResult();
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
@@ -548,6 +561,11 @@ namespace SimpleIdServer.Scim.Api
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch (SCIMSchemaNotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new NotFoundResult();
             }
             catch (Exception ex)
             {
@@ -596,6 +614,11 @@ namespace SimpleIdServer.Scim.Api
             catch (SCIMNotFoundException ex)
             {
                 return this.BuildError(HttpStatusCode.NotFound, ex.Message, SCIMConstants.ErrorSCIMTypes.Unknown);
+            }
+            catch (SCIMSchemaNotFoundException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new NotFoundResult();
             }
             catch (Exception ex)
             {
