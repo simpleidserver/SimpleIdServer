@@ -8,6 +8,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Resources;
+using System;
 using System.Collections.Generic;
 using System.Net;
 
@@ -74,6 +75,9 @@ namespace SimpleIdServer.Scim.Api
                     c.AddStringAttribute("type", new List<string> { "oauthbearertoken" });
                     c.AddBooleanAttribute("primary", new List<bool> { true });
                 }).Build();
+            representation.Created = DateTime.UtcNow;
+            representation.SetUpdated(DateTime.UtcNow);
+            representation.SetResourceType(SCIMResourceTypes.ServiceProviderConfig);
             var location = $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ServiceProviderConfig}";
             return new ContentResult
             {
