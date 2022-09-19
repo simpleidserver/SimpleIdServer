@@ -46,7 +46,7 @@ namespace SimpleIdServer.Scim.Api
                 })
                 .AddComplexAttribute("bulk", schema.Id, c =>
                  {
-                     c.AddBooleanAttribute("supported", new List<bool> { true });
+                     c.AddBooleanAttribute("supported", new List<bool> { _options.IsBulkEnabled });
                      c.AddIntegerAttribute("maxOperations", new List<int> { _options.MaxOperations });
                      c.AddIntegerAttribute("maxPayloadSize", new List<int> { _options.MaxPayloadSize });
                  })

@@ -65,5 +65,9 @@ namespace SimpleIdServer.Scim
         /// Function used to generate ServiceProviderConfig identifier.
         /// </summary>
         public Func<string> ServiceProviderConfigIdGenerator { get; set; } = () => Guid.NewGuid().ToString();
+        /// <summary>
+        /// Enable or disable bulk operations.
+        /// </summary>
+        public bool IsBulkEnabled { get; set; } = true;
     }
 }

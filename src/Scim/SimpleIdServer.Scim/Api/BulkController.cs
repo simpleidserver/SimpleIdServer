@@ -14,6 +14,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Extensions;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using SimpleIdServer.Scim.Serialization;
@@ -28,6 +29,7 @@ using System.Threading.Tasks;
 namespace SimpleIdServer.Scim.Api
 {
     [Route(SCIMEndpoints.Bulk)]
+    [TypeFilter(typeof(ActivatorActionFilter), Arguments = new object[] { "IsBulkEnabled" })]
     public class BulkController : Controller
     {
         private readonly SCIMHostOptions _options;
