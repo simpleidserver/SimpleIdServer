@@ -136,14 +136,11 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
         {
             int total = representations.Count();
             var fullPath = attrExpression.GetFullPath();
-            if (!ParserConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
-            {
-                return null;
-            }
-
+            var record = ParserConstants.MappingStandardAttributePathToProperty.FirstOrDefault(kvp => string.Equals(kvp.Key, fullPath, StringComparison.InvariantCultureIgnoreCase));
+            if (record.Equals(default(KeyValuePair<string, string>)) || string.IsNullOrWhiteSpace(record.Key)) return null;
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
-            var propertyName = ParserConstants.MappingStandardAttributePathToProperty[fullPath];
-            var property = Expression.Property(representationParameter, ParserConstants.MappingStandardAttributePathToProperty[fullPath]);
+            var propertyName = record.Value;
+            var property = Expression.Property(representationParameter, record.Value);
             var propertyType = typeof(SCIMRepresentation).GetProperty(propertyName).PropertyType;
             var orderBy = GetOrderByType(order, propertyType);
             var innerLambda = Expression.Lambda(property, new ParameterExpression[] { representationParameter });

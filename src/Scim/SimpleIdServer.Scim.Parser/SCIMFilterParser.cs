@@ -459,9 +459,7 @@ namespace SimpleIdServer.Scim.Parser
             {
                 var schema = schemas.First(s => s.HasAttribute(scimSchemaAttribute));
                 var fullPath = $"{schema.Id}:{scimSchemaAttribute.Name}";
-                if ((SCIMAttributeExpression.HasNamespace(name) && name == fullPath) ||
-                    (!SCIMAttributeExpression.HasNamespace(name) && string.Equals(name, scimSchemaAttribute.Name,
-                        StringComparison.InvariantCultureIgnoreCase)))
+                if ((SCIMAttributeExpression.HasNamespace(name) && name == fullPath) || (!SCIMAttributeExpression.HasNamespace(name) && string.Equals(name, scimSchemaAttribute.Name, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return scimSchemaAttribute;
                 }

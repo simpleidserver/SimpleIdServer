@@ -353,11 +353,7 @@ namespace SimpleIdServer.Scim.Api
             try
             {
                 if(searchRequest == null) return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPostNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
-                if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null)
-                {
-                    searchRequest.Count = _options.MaxResults;
-                }
-
+                if (searchRequest.Count > _options.MaxResults || searchRequest.Count == null) searchRequest.Count = _options.MaxResults;
                 var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
                 if (schema == null) return new NotFoundResult();
                 var schemaIds = new List<string> { schema.Id };

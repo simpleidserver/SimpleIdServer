@@ -128,31 +128,11 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             var logicalExpression = expression as SCIMLogicalExpression;
             var notExpression = expression as SCIMNotExpression;
             var presentExpression = expression as SCIMPresentExpression;
-            if (compAttrExpression != null)
-            {
-                return compAttrExpression.Evaluate(parameterExpression);
-            }
-
-            if (attrExpression != null)
-            {
-                return attrExpression.Evaluate(parameterExpression);
-            }
-
-            if (logicalExpression != null)
-            {
-                return logicalExpression.Evaluate(parameterExpression);
-            }
-
-            if (notExpression != null)
-            {
-                return notExpression.Evaluate(parameterExpression);
-            }
-
-            if (presentExpression != null)
-            {
-                return presentExpression.Evaluate(parameterExpression);
-            }
-
+            if (compAttrExpression != null) return compAttrExpression.Evaluate(parameterExpression);
+            if (attrExpression != null) return attrExpression.Evaluate(parameterExpression);
+            if (logicalExpression != null) return logicalExpression.Evaluate(parameterExpression);
+            if (notExpression != null) return notExpression.Evaluate(parameterExpression);
+            if (presentExpression != null) return presentExpression.Evaluate(parameterExpression);
             return null;
         }
 
@@ -205,11 +185,12 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             var propertyValueInteger = Expression.Property(representationParameter, "ValueInteger");
             var propertyValueDatetime = Expression.Property(representationParameter, "ValueDateTime");
             var schemaAttr = lastChild.SchemaAttribute;
-            if (ParserConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
+            var record = ParserConstants.MappingStandardAttributePathToProperty.FirstOrDefault(r => string.Equals(r.Key, fullPath, StringComparison.InvariantCultureIgnoreCase));
+            if (!record.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(record.Key))
             {
                 isMetadata = true;
-                var name = ParserConstants.MappingStandardAttributePathToProperty[fullPath];
-                var type = ParserConstants.MappingStandardAttributeTypeToType[fullPath];
+                var name = record.Value;
+                var type = ParserConstants.MappingStandardAttributeTypeToType.Single(m => string.Equals(m.Key, fullPath, StringComparison.InvariantCultureIgnoreCase)).Value;
                 switch (type)
                 {
                     case SCIMSchemaAttributeTypes.STRING:
@@ -259,11 +240,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
         private static Expression Evaluate(this SCIMAttributeExpression attributeExpression, ParameterExpression parameterExpression)
         {
             var complexAttr = attributeExpression as SCIMComplexAttributeExpression;
-            if (complexAttr == null)
-            {
-                return Expression.IsTrue(Expression.Constant(true));
-            }
-
+            if (complexAttr == null) return Expression.IsTrue(Expression.Constant(true));
             return complexAttr.GroupingFilter.Evaluate(parameterExpression);
         }
 

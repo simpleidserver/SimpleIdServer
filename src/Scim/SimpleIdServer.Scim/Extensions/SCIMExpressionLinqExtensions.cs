@@ -3,6 +3,7 @@
 using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domains;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -33,14 +34,11 @@ namespace SimpleIdServer.Scim.Parser.Expressions
         public static LambdaExpression EvaluateOrderByMetadata(SCIMAttributeExpression attrExpression, IQueryable<SCIMRepresentation> representations, SearchSCIMRepresentationOrders order)
         {
             var fullPath = attrExpression.GetFullPath();
-            if (!ParserConstants.MappingStandardAttributePathToProperty.ContainsKey(fullPath))
-            {
-                return null;
-            }
-
+            var record = ParserConstants.MappingStandardAttributePathToProperty.FirstOrDefault(kvp => string.Equals(kvp.Key, fullPath, StringComparison.InvariantCultureIgnoreCase));
+            if (record.Equals(default(KeyValuePair<string, string>)) || string.IsNullOrWhiteSpace(record.Key)) return null;
             var representationParameter = Expression.Parameter(typeof(SCIMRepresentation), "rp");
-            var propertyName = ParserConstants.MappingStandardAttributePathToProperty[fullPath];
-            var property = Expression.Property(representationParameter, ParserConstants.MappingStandardAttributePathToProperty[fullPath]);
+            var propertyName = record.Value;
+            var property = Expression.Property(representationParameter, record.Value);
             var propertyType = typeof(SCIMRepresentation).GetProperty(propertyName).PropertyType;
             var orderBy = GetOrderByType(order, propertyType);
             var innerLambda = Expression.Lambda(property, new ParameterExpression[] { representationParameter });
