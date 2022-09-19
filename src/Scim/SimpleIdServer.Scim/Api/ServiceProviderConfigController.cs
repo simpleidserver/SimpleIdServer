@@ -39,7 +39,7 @@ namespace SimpleIdServer.Scim.Api
         {
             _logger.LogInformation(Global.StartGetServiceProviderConfig);
             var schema = StandardSchemas.ServiceProvideConfigSchemas;
-            var representation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { schema })
+            var representation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { schema }, _options.ServiceProviderConfigIdGenerator == null ? null : _options.ServiceProviderConfigIdGenerator())
                 .AddComplexAttribute("patch", schema.Id, c =>
                 {
                     c.AddBooleanAttribute("supported", new List<bool> { true });

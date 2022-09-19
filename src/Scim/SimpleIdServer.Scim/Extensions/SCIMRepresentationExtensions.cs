@@ -423,11 +423,8 @@ namespace SimpleIdServer.Scim.Domain
 
         public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false, bool mergeExtensionAttributes = false)
         {
-            var jObj = new JObject
-            {
-                { StandardSCIMRepresentationAttributes.Id, representation.Id }
-            };
-
+            var jObj = new JObject();
+            if (!string.IsNullOrEmpty(representation.Id)) jObj.Add(StandardSCIMRepresentationAttributes.Id, representation.Id);
             if (includeStandardAttributes)
             {
                 representation.AddStandardAttributes(location, new List<string> { }, ignore: true);

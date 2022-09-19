@@ -13,9 +13,13 @@ namespace SimpleIdServer.Scim.Domains.Builders
         private readonly ICollection<SCIMSchema> _schemas;
         private readonly SCIMRepresentation _representation;
 
-        private SCIMRepresentationBuilder(ICollection<SCIMSchema> schemas)
+        private SCIMRepresentationBuilder(ICollection<SCIMSchema> schemas) : this(schemas, Guid.NewGuid().ToString())
         {
-            _id = Guid.NewGuid().ToString();
+        }
+
+        private SCIMRepresentationBuilder(ICollection<SCIMSchema> schemas, string id)
+        {
+            _id = id;
             _attributes = new List<SCIMRepresentationAttribute>();
             _schemas = schemas;
             _representation = new SCIMRepresentation(_schemas, _attributes)
@@ -139,6 +143,11 @@ namespace SimpleIdServer.Scim.Domains.Builders
         public static SCIMRepresentationBuilder Create(ICollection<SCIMSchema> schemas)
         {
             return new SCIMRepresentationBuilder(schemas);
+        }
+
+        public static SCIMRepresentationBuilder Create(ICollection<SCIMSchema> schemas, string id)
+        {
+            return new SCIMRepresentationBuilder(schemas, id);
         }
 
         public static SCIMRepresentationBuilder Load(SCIMRepresentation scimRepresentation, ICollection<SCIMSchema> schemas)

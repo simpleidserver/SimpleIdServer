@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using System;
+
 namespace SimpleIdServer.Scim
 {
     public class SCIMHostOptions
@@ -59,5 +61,9 @@ namespace SimpleIdServer.Scim
         /// Enable/Disable publishing group evts.
         /// </summary>
         public bool IsGroupPublishEvtsEnabled { get; set; }
+        /// <summary>
+        /// Function used to generate ServiceProviderConfig identifier.
+        /// </summary>
+        public Func<string> ServiceProviderConfigIdGenerator { get; set; } = () => Guid.NewGuid().ToString();
     }
 }
