@@ -89,10 +89,12 @@ namespace SimpleIdServer.Scim.Api
         /// </summary>
         /// <param name="searchRequest"></param>
         /// <response code="200">Valid representations are found</response>
+        /// <response code="400">Request is not valid</response>
         /// <response code="401">Unauthorized</response>
         /// <response code="404">Valid representations are not found</response>
         /// <returns></returns>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [HttpPost(".search")]
