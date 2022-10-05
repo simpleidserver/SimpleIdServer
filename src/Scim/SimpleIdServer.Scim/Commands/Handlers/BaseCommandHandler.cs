@@ -19,6 +19,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         {
             foreach(var removeAttr in result.RemoveAttrEvts) await _busControl.Publish(removeAttr);
             foreach(var addAttr in result.AddAttrEvts) await _busControl.Publish(addAttr);
+            foreach (var updateAttr in result.UpdateAttrEvts) await _busControl.Publish(updateAttr);
         }
     }
 }

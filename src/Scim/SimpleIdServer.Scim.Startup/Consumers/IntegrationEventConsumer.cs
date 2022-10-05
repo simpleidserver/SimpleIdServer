@@ -9,7 +9,8 @@ namespace SimpleIdServer.Scim.Startup.Consumers
 {
     public class IntegrationEventConsumer : IConsumer<RepresentationAddedEvent>,
         IConsumer<RepresentationRemovedEvent>,
-        IConsumer<RepresentationUpdatedEvent>
+        IConsumer<RepresentationUpdatedEvent>,
+        IConsumer<RepresentationReferenceAttributeUpdatedEvent>
     {
         private readonly ILogger<IntegrationEventConsumer> _logger;
 
@@ -31,6 +32,12 @@ namespace SimpleIdServer.Scim.Startup.Consumers
         }
 
         public Task Consume(ConsumeContext<RepresentationUpdatedEvent> context)
+        {
+            _logger.LogInformation($"Event received : Representation '{context.Message.ResourceType}' has been updated");
+            return Task.CompletedTask;
+        }
+
+        public Task Consume(ConsumeContext<RepresentationReferenceAttributeUpdatedEvent> context)
         {
             _logger.LogInformation($"Event received : Representation '{context.Message.ResourceType}' has been updated");
             return Task.CompletedTask;

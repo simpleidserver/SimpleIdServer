@@ -18,12 +18,14 @@ namespace SimpleIdServer.Scim.Helpers
             Representations = new List<SCIMRepresentation>();
             RemoveAttrEvts = new List<RepresentationReferenceAttributeRemovedEvent>();
             AddAttrEvts = new List<RepresentationReferenceAttributeAddedEvent>();
+            UpdateAttrEvts = new List<RepresentationReferenceAttributeUpdatedEvent>();
             _resourceTypeResolver = resourceTypeResolver;
         }
 
         public ICollection<SCIMRepresentation> Representations { get; set; }
         public ICollection<RepresentationReferenceAttributeRemovedEvent> RemoveAttrEvts { get; set; }
         public ICollection<RepresentationReferenceAttributeAddedEvent> AddAttrEvts { get; set; }
+        public ICollection<RepresentationReferenceAttributeUpdatedEvent> UpdateAttrEvts { get; set; }
 
         public void AddRepresentation(SCIMRepresentation representation)
         {
@@ -46,6 +48,15 @@ namespace SimpleIdServer.Scim.Helpers
             var newEvt = new RepresentationReferenceAttributeRemovedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
             newEvt.Values.Add(value);
             ProcessReferenceAttr(RemoveAttrEvts, representation, schemaAttributeId, newEvt, value);
+        }
+
+        public void UpdateReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
+        {
+            location = $"{location}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
+            var obj = representation.Duplicate().ToResponse(location, false, addEmptyArray: true);
+            var newEvt = new RepresentationReferenceAttributeUpdatedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
+            newEvt.Values.Add(value);
+            ProcessReferenceAttr(UpdateAttrEvts, representation, schemaAttributeId, newEvt, value);
         }
 
         private void ProcessReferenceAttr<T>(ICollection<T> evts, SCIMRepresentation representation, string schemaAttributeId, T newEvt, string value) where T : BaseReferenceAttributeEvent
