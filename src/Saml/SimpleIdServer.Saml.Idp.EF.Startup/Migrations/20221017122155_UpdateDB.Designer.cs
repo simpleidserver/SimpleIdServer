@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.Saml.Idp.EF;
 
 namespace SimpleIdServer.Saml.Idp.EF.Startup.Migrations
 {
     [DbContext(typeof(SamlIdpDBContext))]
-    partial class SamlIdpDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221017122155_UpdateDB")]
+    partial class UpdateDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
