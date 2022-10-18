@@ -75,9 +75,10 @@ namespace SimpleIdServer.Scim.Api
                     c.AddStringAttribute("type", new List<string> { "oauthbearertoken" });
                     c.AddBooleanAttribute("primary", new List<bool> { true });
                 }).Build();
-            representation.Created = DateTime.UtcNow;
-            representation.SetUpdated(DateTime.UtcNow);
+            representation.Created = _options.StartDateTime;
+            representation.SetUpdated(_options.StartDateTime);
             representation.SetResourceType(SCIMResourceTypes.ServiceProviderConfig);
+            representation.Id = _options.ServiceProviderConfigId;
             var location = $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ServiceProviderConfig}";
             return new ContentResult
             {

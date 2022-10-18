@@ -69,5 +69,13 @@ namespace SimpleIdServer.Scim
         /// Enable or disable bulk operations.
         /// </summary>
         public bool IsBulkEnabled { get; set; } = true;
+        /// <summary>
+        /// Set the application start datetime.
+        /// </summary>
+        public DateTime StartDateTime { get; set; } = DateTime.UtcNow;
+        /// <summary>
+        /// Set the service provider configuration identifier.
+        /// </summary>
+        public string ServiceProviderConfigId { get; set; } = Guid.NewGuid().ToString();
     }
 }
