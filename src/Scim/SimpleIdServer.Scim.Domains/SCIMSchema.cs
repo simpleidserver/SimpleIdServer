@@ -88,9 +88,7 @@ namespace SimpleIdServer.Scim.Domains
         {
             var attributes = StandardSchemas.StandardResponseSchemas.Attributes;
             foreach(var attr in attributes)
-            {
                 Attributes.Add(attr);
-            }
         }
 
         public override object Clone()

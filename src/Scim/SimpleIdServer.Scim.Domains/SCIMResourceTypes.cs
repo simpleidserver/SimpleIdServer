@@ -6,5 +6,6 @@
         public const string Group = "Group";
         public const string ResourceType = "ResourceType";
         public const string ServiceProviderConfig = "ServiceProviderConfig";
+        public const string Schema = "Schema";
     }
 }
