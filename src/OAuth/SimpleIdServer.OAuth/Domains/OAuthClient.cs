@@ -72,7 +72,8 @@ namespace SimpleIdServer.OAuth.Domains
                 TlsClientAuthSanIP = TlsClientAuthSanIP,
                 TlsClientAuthSanURI = TlsClientAuthSanURI,
                 TlsClientAuthSubjectDN = TlsClientAuthSubjectDN,
-                TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken
+                TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken,
+                IsConsentDisabled = IsConsentDisabled
             };
         }
     }

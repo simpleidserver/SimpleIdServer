@@ -599,6 +599,9 @@ namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
                     b.Property<string>("InitiateLoginUri")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsConsentDisabled")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JwksUri")
                         .HasColumnType("nvarchar(max)");
 

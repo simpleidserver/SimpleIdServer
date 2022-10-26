@@ -41,6 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
             }
 
+            if (context.Client.IsConsentDisabled) return;
             var consent = _userConsentFetcher.FetchFromAuthorizationRequest(context.User, context.Request.RequestData);
             if (consent == null)
             {

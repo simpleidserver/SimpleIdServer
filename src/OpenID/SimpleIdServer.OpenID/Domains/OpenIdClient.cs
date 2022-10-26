@@ -323,7 +323,8 @@ namespace SimpleIdServer.OpenID.Domains
                 TlsClientAuthSanURI = TlsClientAuthSanURI,
                 TlsClientAuthSubjectDN = TlsClientAuthSubjectDN,
                 TlsClientCertificateBoundAccessToken = TlsClientCertificateBoundAccessToken,
-                ApplicationKind = ApplicationKind
+                ApplicationKind = ApplicationKind,
+                IsConsentDisabled = IsConsentDisabled,
             };
         }
     }

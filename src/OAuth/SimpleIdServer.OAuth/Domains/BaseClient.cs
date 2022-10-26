@@ -225,6 +225,11 @@ namespace SimpleIdServer.OAuth.Domains
         public string TlsClientAuthSanEmail { get; set; }
 
         /// <summary>
+        /// Enable or disble the consent screen.
+        /// </summary>
+        public bool IsConsentDisabled { get; set; }
+
+        /// <summary>
         /// Scopes used by the client to control its access.
         /// </summary>
         public ICollection<ClientScope> Scopes { get; set; }

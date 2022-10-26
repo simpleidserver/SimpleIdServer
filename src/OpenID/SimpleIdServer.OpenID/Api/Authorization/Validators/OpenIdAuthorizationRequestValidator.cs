@@ -155,6 +155,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.Validators
 
         protected virtual void RedirectToConsentView(HandlerContext context)
         {
+            if (context.Client.IsConsentDisabled) return;
             throw new OAuthUserConsentRequiredException();
         }
 

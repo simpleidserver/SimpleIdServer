@@ -3,36 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SimpleIdServer.OAuth.EF;
+using SimpleIdServer.OpenID.EF;
 
-namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
+namespace SimpleIdServer.OpenID.SqlServer.Startup.Migrations
 {
-    [DbContext(typeof(OAuthDBContext))]
-    partial class OAuthDBContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(OpenIdDBContext))]
+    [Migration("20221026091933_AddConsentIsDisabled")]
+    partial class AddConsentIsDisabled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("OAuthClientOAuthScope", b =>
-                {
-                    b.Property<string>("ClientsClientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("OAuthAllowedScopesName")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ClientsClientId", "OAuthAllowedScopesName");
-
-                    b.HasIndex("OAuthAllowedScopesName");
-
-                    b.ToTable("OAuthClientOAuthScope");
-                });
 
             modelBuilder.Entity("OAuthConsentOAuthScope", b =>
                 {
@@ -199,7 +186,7 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.Property<int>("Kty")
                         .HasColumnType("int");
 
-                    b.Property<string>("OAuthClientClientId")
+                    b.Property<string>("OpenIdClientClientId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RotationJWKId")
@@ -210,7 +197,7 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
 
                     b.HasKey("Kid");
 
-                    b.HasIndex("OAuthClientClientId");
+                    b.HasIndex("OpenIdClientClientId");
 
                     b.ToTable("JsonWebKeys");
                 });
@@ -243,6 +230,9 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpenIdClientClientId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Scope")
@@ -250,100 +240,9 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("OpenIdClientClientId");
 
                     b.ToTable("ClientScopes");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClient", b =>
-                {
-                    b.Property<string>("ClientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ClientSecret")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ClientSecretExpirationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Contacts")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GrantTypes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsConsentDisabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("JwksUri")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PostLogoutRedirectUris")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PreferredTokenProfile")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RedirectionUrls")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("RefreshTokenExpirationTimeInSeconds")
-                        .HasColumnType("float");
-
-                    b.Property<string>("RegistrationAccessToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ResponseTypes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SoftwareId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SoftwareVersion")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TlsClientAuthSanDNS")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TlsClientAuthSanEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TlsClientAuthSanIP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TlsClientAuthSanURI")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TlsClientAuthSubjectDN")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TlsClientCertificateBoundAccessToken")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("TokenEncryptedResponseAlg")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TokenEncryptedResponseEnc")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TokenEndPointAuthMethod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("TokenExpirationTimeInSeconds")
-                        .HasColumnType("float");
-
-                    b.Property<string>("TokenSignedResponseAlg")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ClientId");
-
-                    b.ToTable("OAuthClients");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClientTranslation", b =>
@@ -353,7 +252,7 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("OAuthClientClientId")
+                    b.Property<string>("OpenIdClientClientId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("TranslationId")
@@ -361,7 +260,7 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OAuthClientClientId");
+                    b.HasIndex("OpenIdClientClientId");
 
                     b.HasIndex("TranslationId");
 
@@ -497,26 +396,339 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.ToTable("Tokens");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.AuthenticationContextClassReference", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AuthenticationMethodReferences")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Acrs");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.AuthenticationSchemeProvider", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HandlerFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JsonConverter")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Options")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OptionsFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostConfigureOptionsFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuthenticationSchemeProviders");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorize", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Interval")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NextFetchTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NotificationEdp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotificationMode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotificationToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RejectionSentDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Scopes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BCAuthorizeLst");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorizePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BCAuthorizeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConsentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PermissionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BCAuthorizeId");
+
+                    b.ToTable("BCAuthorizePermission");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.OpenIdClient", b =>
+                {
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("ApplicationKind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ApplicationType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApplicationTypeCategory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BCAuthenticationRequestSigningAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BCClientNotificationEndpoint")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BCTokenDeliveryMode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("BCUserCodeParameter")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("BackChannelLogoutSessionRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("BackChannelLogoutUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ClientSecretExpirationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Contacts")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DefaultAcrValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("DefaultMaxAge")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("FrontChannelLogoutSessionRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FrontChannelLogoutUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GrantTypes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdTokenEncryptedResponseAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdTokenEncryptedResponseEnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdTokenSignedResponseAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InitiateLoginUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsConsentDisabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JwksUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PairWiseIdentifierSalt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostLogoutRedirectUris")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PreferredTokenProfile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RedirectionUrls")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("RefreshTokenExpirationTimeInSeconds")
+                        .HasColumnType("float");
+
+                    b.Property<string>("RegistrationAccessToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestObjectEncryptionAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestObjectEncryptionEnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestObjectSigningAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("RequireAuthTime")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ResponseTypes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SectorIdentifierUri")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SoftwareId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SoftwareVersion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubjectType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TlsClientAuthSanDNS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TlsClientAuthSanEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TlsClientAuthSanIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TlsClientAuthSanURI")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TlsClientAuthSubjectDN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TlsClientCertificateBoundAccessToken")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TokenEncryptedResponseAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenEncryptedResponseEnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenEndPointAuthMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("TokenExpirationTimeInSeconds")
+                        .HasColumnType("float");
+
+                    b.Property<string>("TokenSignedResponseAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserInfoEncryptedResponseAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserInfoEncryptedResponseEnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserInfoSignedResponseAlg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ClientId");
+
+                    b.ToTable("OpenIdClients");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.OpenIdClientScope", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("OpenIdClientClientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ScopeName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OpenIdClientClientId");
+
+                    b.HasIndex("ScopeName");
+
+                    b.ToTable("OpenIdClientScope");
+                });
+
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUser", b =>
                 {
                     b.HasBaseType("SimpleIdServer.Common.Domains.User");
 
                     b.HasDiscriminator().HasValue("OAuthUser");
-                });
-
-            modelBuilder.Entity("OAuthClientOAuthScope", b =>
-                {
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
-                        .WithMany()
-                        .HasForeignKey("ClientsClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthScope", null)
-                        .WithMany()
-                        .HasForeignKey("OAuthAllowedScopesName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("OAuthConsentOAuthScope", b =>
@@ -546,8 +758,7 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                 {
                     b.HasOne("SimpleIdServer.Common.Domains.User", null)
                         .WithMany("Credentials")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Common.Domains.UserExternalAuthProvider", b =>
@@ -568,9 +779,9 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.Jwt.JsonWebKey", b =>
                 {
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
+                    b.HasOne("SimpleIdServer.OpenID.Domains.OpenIdClient", null)
                         .WithMany("JsonWebKeys")
-                        .HasForeignKey("OAuthClientClientId");
+                        .HasForeignKey("OpenIdClientClientId");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Jwt.JsonWebKeyKeyOperation", b =>
@@ -582,17 +793,17 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.ClientScope", b =>
                 {
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
+                    b.HasOne("SimpleIdServer.OpenID.Domains.OpenIdClient", null)
                         .WithMany("Scopes")
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("OpenIdClientClientId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClientTranslation", b =>
                 {
-                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthClient", null)
+                    b.HasOne("SimpleIdServer.OpenID.Domains.OpenIdClient", null)
                         .WithMany("Translations")
-                        .HasForeignKey("OAuthClientClientId")
+                        .HasForeignKey("OpenIdClientClientId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SimpleIdServer.OAuth.Domains.OAuthTranslation", "Translation")
@@ -617,6 +828,28 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                         .HasForeignKey("OAuthScopeName");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorizePermission", b =>
+                {
+                    b.HasOne("SimpleIdServer.OpenID.Domains.BCAuthorize", null)
+                        .WithMany("Permissions")
+                        .HasForeignKey("BCAuthorizeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.OpenIdClientScope", b =>
+                {
+                    b.HasOne("SimpleIdServer.OpenID.Domains.OpenIdClient", null)
+                        .WithMany("OpenIdAllowedScopes")
+                        .HasForeignKey("OpenIdClientClientId");
+
+                    b.HasOne("SimpleIdServer.OAuth.Domains.OAuthScope", "Scope")
+                        .WithMany()
+                        .HasForeignKey("ScopeName")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Scope");
+                });
+
             modelBuilder.Entity("SimpleIdServer.Common.Domains.User", b =>
                 {
                     b.Navigation("Credentials");
@@ -633,18 +866,25 @@ namespace SimpleIdServer.OAuth.SqlServer.Startup.Migrations
                     b.Navigation("KeyOperationLst");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthClient", b =>
+            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthScope", b =>
+                {
+                    b.Navigation("Claims");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.BCAuthorize", b =>
+                {
+                    b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenID.Domains.OpenIdClient", b =>
                 {
                     b.Navigation("JsonWebKeys");
+
+                    b.Navigation("OpenIdAllowedScopes");
 
                     b.Navigation("Scopes");
 
                     b.Navigation("Translations");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthScope", b =>
-                {
-                    b.Navigation("Claims");
                 });
 
             modelBuilder.Entity("SimpleIdServer.OAuth.Domains.OAuthUser", b =>
