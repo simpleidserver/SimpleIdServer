@@ -439,18 +439,26 @@ namespace SimpleIdServer.Scim.Api
         protected async Task<IActionResult> InternalGet(string id)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
-            var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
-            if (schema == null) return new NotFoundResult();
-            var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType);
-            if (representation == null)
+            try
             {
-                _logger.LogError(string.Format(Global.ResourceNotFound, id));
-                return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
-            }
+                var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
+                if (schema == null) return new NotFoundResult();
+                var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType);
+                if (representation == null)
+                {
+                    _logger.LogError(string.Format(Global.ResourceNotFound, id));
+                    return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
+                }
 
-            representation.ApplyEmptyArray();
-            await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
-            return BuildHTTPResult(representation, HttpStatusCode.OK, true);
+                representation.ApplyEmptyArray();
+                await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
+                return BuildHTTPResult(representation, HttpStatusCode.OK, true);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+            }
         }
 
         protected async Task<IActionResult> InternalAdd(RepresentationParameter jobj)
