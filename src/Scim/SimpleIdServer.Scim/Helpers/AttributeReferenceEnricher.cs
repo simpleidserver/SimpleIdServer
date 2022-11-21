@@ -39,10 +39,11 @@ namespace SimpleIdServer.Scim.Helpers
                     {
 						var values = representation.GetChildren(attr);
 						var value = values.FirstOrDefault(v => v.SchemaAttribute.Name == "value");
+						var type = values.FirstOrDefault(v => v.SchemaAttribute.Name == "type");
 						var reference = values.FirstOrDefault(v => v.SchemaAttribute.Name == "$ref");
 						var schema = representation.GetSchema(attr);
 						var referenceAttribute = representation.GetSchema(attr).GetChildren(attr.SchemaAttribute).FirstOrDefault(v => v.Name == "$ref");
-						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference != null || referenceAttribute == null)
+						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference != null || referenceAttribute == null || type == null || type.ValueString != attributeMapping.TargetResourceType)
                         {
 							continue;
                         }

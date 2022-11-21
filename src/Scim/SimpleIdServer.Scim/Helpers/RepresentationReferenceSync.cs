@@ -84,21 +84,33 @@ namespace SimpleIdServer.Scim.Helpers
 			if (!attributeMappingLst.Any()) return result;
 
 			var targetSchemas = await _scimSchemaCommandRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.TargetResourceType).Distinct());
-			foreach (var attributeMapping in attributeMappingLst)
+			foreach (var kvp in attributeMappingLst.GroupBy(m => m.SourceAttributeId))
 			{
-				var allCurrentIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).SelectMany(a => newSourceScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
+				var missingIds = new List<string>();
+				bool isReferenceMissing = true;
+				var allCurrentIds = newSourceScimRepresentation.GetAttributesByAttrSchemaId(kvp.Key).SelectMany(a => newSourceScimRepresentation.GetChildren(a).Where(v => v.SchemaAttribute.Name == "value")).Select(v => v.ValueString);
 				var newIds = patchOperations
-					.Where(p => p.Operation == SCIMPatchOperations.ADD && p.Attr.SchemaAttributeId == attributeMapping.SourceAttributeId)
+					.Where(p => p.Operation == SCIMPatchOperations.ADD && p.Attr.SchemaAttributeId == kvp.Key)
 					.SelectMany(p => patchOperations.Where(po => po.Attr.ParentAttributeId == p.Attr.Id && po.Attr.SchemaAttribute.Name == "value").Select(po => po.Attr.ValueString));
 				var idsToBeRemoved = patchOperations
-					.Where(p => p.Operation == SCIMPatchOperations.REMOVE && p.Attr.SchemaAttributeId == attributeMapping.SourceAttributeId)
+					.Where(p => p.Operation == SCIMPatchOperations.REMOVE && p.Attr.SchemaAttributeId == kvp.Key)
 					.SelectMany(p => patchOperations.Where(po => po.Attr.ParentAttributeId == p.Attr.Id && po.Attr.SchemaAttribute.Name == "value").Select(po => po.Attr.ValueString));
 				var existingIds = allCurrentIds.Where(i => !idsToBeRemoved.Contains(i));
 				var duplicateIds = allCurrentIds.GroupBy(i => i).Where(i => i.Count() > 1);
 				if (duplicateIds.Any()) throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Select(_ => _.Key).Distinct())));
-				await RemoveReferenceAttributes(result, idsToBeRemoved, attributeMapping, newSourceScimRepresentation, location);
-				await AddReferenceAttributes(result, newIds, attributeMapping, newSourceScimRepresentation, location, targetSchemas.First(s => s.ResourceType == attributeMapping.TargetResourceType));
-				await UpdateReferenceAttributes(result, existingIds, attributeMapping, newSourceScimRepresentation, patchOperations, targetSchemas.First(s => s.ResourceType == attributeMapping.TargetResourceType), location: location);
+				foreach(var attributeMapping in kvp)
+				{
+                    await RemoveReferenceAttributes(result, idsToBeRemoved, attributeMapping, newSourceScimRepresentation, location);
+					var res = await AddReferenceAttributes(result, newIds, attributeMapping, newSourceScimRepresentation, location, targetSchemas.First(s => s.ResourceType == attributeMapping.TargetResourceType));
+					if (res.Item1)
+						isReferenceMissing = false;
+					else
+						missingIds.AddRange(res.Item2.ToList());
+                    await UpdateReferenceAttributes(result, existingIds, attributeMapping, newSourceScimRepresentation, patchOperations, targetSchemas.First(s => s.ResourceType == attributeMapping.TargetResourceType), location: location);
+                }
+
+				if (missingIds.Any() && isReferenceMissing)
+					throw new SCIMNotFoundException(string.Format(Global.ReferencesDontExist, string.Join(",", missingIds.Distinct())));
 			}
 
 			return result;
@@ -130,11 +142,11 @@ namespace SimpleIdServer.Scim.Helpers
 			}
 		}
 
-		protected virtual async Task AddReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, string location, SCIMSchema targetSchema)
+		protected virtual async Task<(bool, IEnumerable<string>)> AddReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, string location, SCIMSchema targetSchema)
 		{
 			var targetRepresentations = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, attributeMapping.TargetResourceType);
 			var missingIds = ids.Where(i => !targetRepresentations.Any(r => r.Id == i));
-			if (missingIds.Any()) throw new SCIMNotFoundException(string.Format(Global.ReferencesDontExist, string.Join(",", missingIds)));
+			if (missingIds.Any()) return (false, missingIds);
 			if (targetRepresentations.Any())
 			{
 				foreach (var targetRepresentation in targetRepresentations)
@@ -150,6 +162,8 @@ namespace SimpleIdServer.Scim.Helpers
 					result.AddRepresentation(targetRepresentation);
 				}
 			}
+
+			return (true, null);
 		}
 
 		protected virtual async Task UpdateReferenceAttributes(RepresentationSyncResult result, IEnumerable<string> ids, SCIMAttributeMapping attributeMapping, SCIMRepresentation sourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, SCIMSchema targetSchema, string location)
