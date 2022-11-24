@@ -1,0 +1,57 @@
+﻿@model SimpleIdServer.Saml.UI.Authenticate.LoginPassword.ViewModels.LoginViewModel
+@using OpenId.Resources
+
+@{ 
+    ViewBag.Title = SamlGlobal.LoginPwdAuthenticateTitle;
+}
+
+<div>
+    <div class="card" id="loginpwd-card">
+        <div class="card-header">@SamlGlobal.LoginPwdAuthenticateTitle</div>
+        @using (Html.BeginForm("Index", "Authenticate", new { area = "samlpwd" }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <div class="card-body">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <ul class="list-group">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
+                            {
+                                <li class="list-group-item list-group-item-danger">@SamlGlobal.ResourceManager.GetString(error.ErrorMessage)</li>
+                            }
+                        }
+                    </ul>
+                }
+                <input type="hidden" name="Parameter.SAMLRequest" value="@Model.Parameter.SAMLRequest" />
+                <input type="hidden" name="Parameter.RelayState" value="@Model.Parameter.RelayState" />
+                <div class="form-group">
+                    <label>@SamlGlobal.Login</label>
+                    <input type="text" value="@Model.Login" name="Login" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>@SamlGlobal.Password</label>
+                    <input type="password" value="@Model.Password" name="Password" class="form-control" />
+                </div>
+                <div>
+                    <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
+                    <label>@SamlGlobal.RememberMe</label>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary card-link">@SamlGlobal.Authenticate</button>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#loginpwd-card form input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}
