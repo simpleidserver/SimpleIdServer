@@ -165,7 +165,7 @@ namespace SimpleIdServer.Scim.Domain
                     schemaAttributes = representation.Schemas
                         .Select(s => s.GetAttribute(fullPath))
                         .Where(s => s != null);
-
+                    fullPath = SCIMAttributeExpression.RemoveNamespace(fullPath);
                     attributes = scimAttributeExpression.EvaluateAttributes(representation.HierarchicalAttributes.AsQueryable(), true).ToList();
                 }
                 else
