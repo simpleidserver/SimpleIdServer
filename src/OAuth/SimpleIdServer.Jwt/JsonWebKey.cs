@@ -1,12 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Jwt
 {
@@ -200,12 +199,12 @@ namespace SimpleIdServer.Jwt
             };
         }
 
-        public JObject Serialize()
+        public JsonObject Serialize()
         {
-            var result = new JObject
+            var result = new JsonObject
             {
-                { "kty", MAPPING_KEYTYPEENUM_TO_STR[Kty] },
-                { "use", MAPPING_USAGESENUM_TO_STR[Use] }
+                ["kty"] = MAPPING_KEYTYPEENUM_TO_STR[Kty],
+                ["use"] = MAPPING_USAGESENUM_TO_STR[Use]
             };
             if (!string.IsNullOrWhiteSpace(Alg))
             {
@@ -219,7 +218,7 @@ namespace SimpleIdServer.Jwt
 
             if (KeyOps != null && KeyOps.Any())
             {
-                var jArr = new JArray();
+                var jArr = new JsonArray();
                 foreach(var ko in KeyOps)
                 {
                     jArr.Add(MAPPING_KEYOPERATIONENUM_TO_STR[ko]);
@@ -239,18 +238,21 @@ namespace SimpleIdServer.Jwt
             return result;
         }
 
-        public JObject GetPublicJwt()
+        public JsonObject GetPublicJwt()
         {
-            var result = new JObject
+            var result = new JsonObject
             {
-                { "kty",  MAPPING_KEYTYPEENUM_TO_STR[Kty] },
-                { "use",  MAPPING_USAGESENUM_TO_STR[Use] },
-                { "alg",  Alg },
-                { "kid",  Kid }
+                ["kty"] =  MAPPING_KEYTYPEENUM_TO_STR[Kty],
+                ["use"] =  MAPPING_USAGESENUM_TO_STR[Use],
+                ["alg"] =  Alg,
+                ["kid"] =  Kid
             };
             if (KeyOps.Any())
             {
-                result.Add("key_ops", JArray.FromObject(KeyOps.Where(k => PUBLIC_KEY_OPERATIONS.Contains(k)).Select(s => MAPPING_KEYOPERATIONENUM_TO_STR[s])));
+                var arr = new JsonArray();
+                foreach (var val in KeyOps.Where(k => PUBLIC_KEY_OPERATIONS.Contains(k)).Select(s => MAPPING_KEYOPERATIONENUM_TO_STR[s]))
+                    arr.Add(val);
+                result.Add("key_ops", arr);
             }
 
             var publicFields = MAPPING_KEYTYPE_TO_PUBLIC_KEYS[Kty];
@@ -269,7 +271,7 @@ namespace SimpleIdServer.Jwt
 
         public static JsonWebKey Deserialize(string json)
         {
-            var jObj = JsonConvert.DeserializeObject<JObject>(json);
+            var jObj = JsonObject.Parse(json).AsObject();
             var result = new JsonWebKey();
             KeyTypes kty;
             Usages use;
@@ -295,7 +297,7 @@ namespace SimpleIdServer.Jwt
 
             if (jObj.ContainsKey("key_ops"))
             {
-                var keyOps = jObj["key_ops"] as JArray;
+                var keyOps = jObj["key_ops"].AsArray();
                 if (keyOps != null)
                 {
                     var kos = new List<KeyOperations>();
@@ -326,7 +328,7 @@ namespace SimpleIdServer.Jwt
             return result;
         }
 
-        private static bool Extract<T>(JObject jObj, string name, Dictionary<T, string> dic, out T result)
+        private static bool Extract<T>(JsonObject jObj, string name, Dictionary<T, string> dic, out T result)
         {
             if (jObj.ContainsKey(name))
             {

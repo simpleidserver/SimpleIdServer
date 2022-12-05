@@ -3,7 +3,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SimpleIdServer.Common.Helpers
+namespace SimpleIdServer.Helpers
 {
     public static class PasswordHelper
     {

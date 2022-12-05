@@ -1,7 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Exceptions;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Helpers;
@@ -10,6 +8,9 @@ using SimpleIdServer.Jwt.Jwe.EncHandlers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Jwt.Jwe
 {
@@ -39,7 +40,7 @@ namespace SimpleIdServer.Jwt.Jwe
             IEnumerable<string> parts = null;
             if (IsValid(payload, out parts))
             {
-                return JsonConvert.DeserializeObject<JweHeader>(parts.First().Base64Decode());
+                return JsonSerializer.Deserialize<JweHeader>(parts.First().Base64Decode());
             }
 
             return null;
@@ -103,11 +104,12 @@ namespace SimpleIdServer.Jwt.Jwe
 
             var key = splittedCEK.Last();
             var cipherText = encEncryptionHandler.Encrypt(payload, key, iv);
-            var protectedHeader = JsonConvert.SerializeObject(new JweHeader(alg, enc, jsonWebKey.Kid), Formatting.None,
-                new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                });
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true
+            };
+            var protectedHeader = JsonSerializer.Serialize(new JweHeader(alg, enc, jsonWebKey.Kid), options);
             var protectedHeaderJson = protectedHeader.ToString();
             var aad = Encoding.ASCII.GetBytes(Encoding.UTF8.GetBytes(protectedHeaderJson).Base64EncodeBytes());
             var al = BitHelper.LongToBytes(aad.Length * 8);
@@ -139,7 +141,7 @@ namespace SimpleIdServer.Jwt.Jwe
             var iv = parts.ElementAt(2).Base64DecodeBytes();
             var cipherText = parts.ElementAt(3).Base64DecodeBytes();
             var authenticationTag = parts.ElementAt(4).Base64DecodeBytes();
-            var protectedHeader = JsonConvert.DeserializeObject(serializedProtectedHeader) as JObject;
+            var protectedHeader = JsonObject.Parse(serializedProtectedHeader);
             var alg = protectedHeader["alg"].ToString();
             var enc = protectedHeader["enc"].ToString();
             var contentEncryptionKeyHandler = _cekHandlers.FirstOrDefault(e => e.AlgName == alg);

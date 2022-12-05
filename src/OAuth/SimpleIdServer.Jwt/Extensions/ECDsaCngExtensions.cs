@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Jwt.Extensions
 {
@@ -75,7 +75,7 @@ namespace SimpleIdServer.Jwt.Extensions
             return result;
         }
 
-        public static JObject ExtractToJson(this ECDsaCng eCDsaCng)
+        public static JsonObject ExtractToJson(this ECDsaCng eCDsaCng)
         {
             var parameters = eCDsaCng.ExportParameters(true);
             string crv = string.Empty;
@@ -92,12 +92,12 @@ namespace SimpleIdServer.Jwt.Extensions
                 crv = "P-521";
             }
 
-            return new JObject
+            return new JsonObject
             {
-                { ECFields.CURVE, crv },
-                { ECFields.X, parameters.Q.X.Base64EncodeBytes() },
-                { ECFields.Y, parameters.Q.Y.Base64EncodeBytes() },
-                { ECFields.D, parameters.D.Base64EncodeBytes() },
+                [ECFields.CURVE] = crv,
+                [ECFields.X] = parameters.Q.X.Base64EncodeBytes(),
+                [ECFields.Y] = parameters.Q.Y.Base64EncodeBytes(),
+                [ECFields.D] = parameters.D.Base64EncodeBytes()
             };
         }
     }

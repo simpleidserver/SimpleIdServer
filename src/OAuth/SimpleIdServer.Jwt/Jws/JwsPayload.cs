@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Security.Claims;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Jwt.Jws
 {
@@ -52,7 +52,7 @@ namespace SimpleIdServer.Jwt.Jws
 
             var claim = this[claimName];
             var arr = claim as object[];
-            var jArr = claim as JArray;
+            var jArr = (claim as JsonNode)?.AsArray();
             if (arr != null)
             {
                 return arr.Select(c => c.ToString()).ToArray();
@@ -148,7 +148,7 @@ namespace SimpleIdServer.Jwt.Jws
                     {
                         if (!string.IsNullOrWhiteSpace(claim.Value))
                         {
-                            var jObj = JObject.Parse(claim.Value);
+                            var jObj = JsonObject.Parse(claim.Value);
                             if (jObj != null)
                             {
                                 return jObj;

@@ -1,12 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
 
-namespace SimpleIdServer.Common.Domains
+namespace SimpleIdServer.Domains
 {
     public class UserSession : ICloneable
     {
-        public string SessionId { get; set; }
+        public string SessionId { get; set; } = null!;
         public DateTime AuthenticationDateTime { get; set; }
         public DateTime ExpirationDateTime { get; set; }
         public UserSessionStates State { get; set; }

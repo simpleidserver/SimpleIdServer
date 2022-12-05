@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json;
 using SimpleIdServer.Jwt.Exceptions;
 using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Jwt.Jws.Handlers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace SimpleIdServer.Jwt.Jws
 {
@@ -33,7 +33,7 @@ namespace SimpleIdServer.Jwt.Jws
             IEnumerable<string> parts = null;
             if (IsValid(payload, out parts))
             {
-                return JsonConvert.DeserializeObject<JwsHeader>(parts.First().Base64Decode());
+                return JsonSerializer.Deserialize<JwsHeader>(parts.First().Base64Decode());
             }
 
             return null;
@@ -44,7 +44,7 @@ namespace SimpleIdServer.Jwt.Jws
             IEnumerable<string> parts = null;
             if (IsValid(jws, out parts))
             {
-                return JsonConvert.DeserializeObject<JwsPayload>(parts.ElementAt(1).Base64Decode());
+                return JsonSerializer.Deserialize<JwsPayload>(parts.ElementAt(1).Base64Decode());
             }
 
             return null;
@@ -57,7 +57,7 @@ namespace SimpleIdServer.Jwt.Jws
                 throw new JwtException(ErrorCodes.INTERNAL_ERROR, ErrorMessages.BAD_JWS);
             }
 
-            return JsonConvert.DeserializeObject<JwsPayload>(jws.GetParts().ElementAt(1).Base64Decode());
+            return JsonSerializer.Deserialize<JwsPayload>(jws.GetParts().ElementAt(1).Base64Decode());
         }
 
         public bool IsValid(string payload, out IEnumerable<string> parts)
@@ -82,7 +82,7 @@ namespace SimpleIdServer.Jwt.Jws
             }
 
             var header = new JwsHeader("JWT", alg, jsonWebKey == null ? null : jsonWebKey.Kid);
-            var serializedProtectedHeader = JsonConvert.SerializeObject(header).ToString();
+            var serializedProtectedHeader = JsonSerializer.Serialize(header);
             var base64EncodedSerializedProtectedHeader = serializedProtectedHeader.Base64Encode();
             var base64EncodedSerializedPayload = payload.Base64Encode();
             var combinedProtectedHeaderAndPayLoad = string.Format("{0}.{1}", base64EncodedSerializedProtectedHeader, base64EncodedSerializedPayload);
@@ -99,7 +99,7 @@ namespace SimpleIdServer.Jwt.Jws
             }
 
             var serializedProtectedHeader = parts.ElementAt(0).Base64Decode();
-            var protectedHeader = JsonConvert.DeserializeObject<JwsHeader>(serializedProtectedHeader);
+            var protectedHeader = JsonSerializer.Deserialize<JwsHeader>(serializedProtectedHeader);
             var serializedPayload = parts.ElementAt(1).Base64Decode();
             var signature = parts.ElementAt(2).Base64DecodeBytes();
             var combinedProtectedHeaderAndPayLoad = $"{parts.ElementAt(0)}.{parts.ElementAt(1)}";

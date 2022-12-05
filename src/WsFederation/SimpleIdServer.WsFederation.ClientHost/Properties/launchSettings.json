@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SimpleIdServer.WsFederation.ClientHost": {
+      "commandName": "Project",
+      "applicationUrl": "http://localhost:6001"
+    }
+  }
+}

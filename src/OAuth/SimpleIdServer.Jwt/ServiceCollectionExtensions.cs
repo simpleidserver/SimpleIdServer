@@ -1,13 +1,12 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jwe.CEKHandlers;
 using SimpleIdServer.Jwt.Jwe.EncHandlers;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.Jwt.Jws.Handlers;
 
-namespace SimpleIdServer.Jwt
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {

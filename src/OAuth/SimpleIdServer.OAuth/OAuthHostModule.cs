@@ -8,6 +8,7 @@ namespace SimpleIdServer.OAuth
     public class OAuthHostModule : IModule
     {
         public string Name => "OAuthHostModule";
+
         public void Register(IServiceCollection services)
         {
             services.AddSIDOAuth();

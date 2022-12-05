@@ -1,8 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
 
-namespace SimpleIdServer.Common.Domains
+namespace SimpleIdServer.Domains
 {
     public class UserClaim : ICloneable
     {
@@ -19,9 +18,9 @@ namespace SimpleIdServer.Common.Domains
             Type = type;
         }
 
-        public string Name { get; set; }
-        public string Value { get; set; }
-        public string Type { get; set; }
+        public string Name { get; set; } = null!;
+        public string Value { get; set; } = null!;
+        public string Type { get; set; } = null!; 
 
         public object Clone()
         {

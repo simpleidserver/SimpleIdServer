@@ -1,9 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Jwt.Extensions
 {
@@ -58,21 +57,21 @@ namespace SimpleIdServer.Jwt.Extensions
             }
         }
 
-        public static JObject ExtractToJSON(this RSA rsa)
+        public static JsonObject ExtractToJSON(this RSA rsa)
         {
             try
             {
                 var parameters = rsa.ExportParameters(true);
-                return new JObject
+                return new JsonObject
                 {
-                    { RSAFields.D, parameters.D.Base64EncodeBytes() },
-                    { RSAFields.P, parameters.P.Base64EncodeBytes() },
-                    { RSAFields.Q, parameters.Q.Base64EncodeBytes() },
-                    { RSAFields.DP, parameters.DP.Base64EncodeBytes() },
-                    { RSAFields.DQ, parameters.DQ.Base64EncodeBytes() },
-                    { RSAFields.InverseQ, parameters.InverseQ.Base64EncodeBytes() },
-                    { RSAFields.Modulus, parameters.Modulus.Base64EncodeBytes() },
-                    { RSAFields.Exponent, parameters.Exponent.Base64EncodeBytes() }
+                    [RSAFields.D] = parameters.D.Base64EncodeBytes(),
+                    [RSAFields.P] = parameters.P.Base64EncodeBytes(),
+                    [RSAFields.Q] = parameters.Q.Base64EncodeBytes(),
+                    [RSAFields.DP] = parameters.DP.Base64EncodeBytes(),
+                    [RSAFields.DQ] = parameters.DQ.Base64EncodeBytes(),
+                    [RSAFields.InverseQ] =parameters.InverseQ.Base64EncodeBytes(),
+                    [RSAFields.Modulus] = parameters.Modulus.Base64EncodeBytes(),
+                    [RSAFields.Exponent] = parameters.Exponent.Base64EncodeBytes()
                 };
             }
             catch
