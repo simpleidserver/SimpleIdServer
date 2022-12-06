@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
@@ -16,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -75,7 +75,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.REFRESH_TOKEN_IS_EXPIRED);
                 }
 
-                var jwsPayload = JObject.Parse(tokenResult.Data);
+                var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
                 var clientId = jwsPayload.GetClientIdFromAuthorizationRequest();
                 if (string.IsNullOrWhiteSpace(clientId))
                 {

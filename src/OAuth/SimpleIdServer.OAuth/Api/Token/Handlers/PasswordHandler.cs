@@ -1,7 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.Common.Helpers;
+using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Helpers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
@@ -9,7 +10,7 @@ using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,19 +22,19 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
     public class PasswordHandler : BaseCredentialsHandler
     {
         private readonly IPasswordGrantTypeValidator _passwordGrantTypeValidator;
-        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
         public PasswordHandler(
             IPasswordGrantTypeValidator passwordGrantTypeValidator, 
-            IOAuthUserRepository oauthUserRepository, 
+            IUserRepository userRepository, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
-            _oauthUserRepository = oauthUserRepository;
+            _userRepository = userRepository;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
         }
@@ -48,10 +49,10 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _passwordGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.AllowedScopes.Select(s => s.Name));
+                var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Scope));
                 var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                 var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
-                var user = await _oauthUserRepository.FindOAuthUserByLoginAndCredential(userName, "pwd", PasswordHelper.ComputeHash(password), cancellationToken);
+                var user = await _userRepository.Query().Include(u=> u.Credentials).AsNoTracking().FirstOrDefaultAsync(u => u.Id == userName && u.Credentials.Any(c => c.CredentialType == "pwd" && c.Value == PasswordHelper.ComputeHash(password)), cancellationToken);
                 if (user == null)
                 {
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);

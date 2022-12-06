@@ -32,6 +32,7 @@ namespace SimpleIdServer.Domains
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
+        public ICollection<Consent> Consents { get; set; } = new List<Consent>();
 
         public virtual object Clone()
         {

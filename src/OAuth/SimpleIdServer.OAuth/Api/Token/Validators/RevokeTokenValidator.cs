@@ -1,17 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OAuth.Api.Token.Validators
 {
     public interface IRevokeTokenValidator
     {
-        RevokeTokenValidationResult Validate(JObject jObjBody);
+        RevokeTokenValidationResult Validate(JsonObject jObjBody);
     }
 
     public class RevokeTokenValidationResult
@@ -28,7 +28,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Validators
 
     public class RevokeTokenValidator : IRevokeTokenValidator
     {
-        public RevokeTokenValidationResult Validate(JObject jObjBody)
+        public RevokeTokenValidationResult Validate(JsonObject jObjBody)
         {
             var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
             if (string.IsNullOrWhiteSpace(token))

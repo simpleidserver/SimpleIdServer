@@ -11,7 +11,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\SimpleIdServer.Common\SimpleIdServer.Common.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Store\SimpleIdServer.Store.csproj" />
 	</ItemGroup>
 </Project>

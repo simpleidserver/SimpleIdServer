@@ -16,10 +16,12 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
 
         public void Handle(RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
-            var queryBuilder = new QueryBuilder(authorizationResponse.QueryParameters);
-            queryBuilder.Add("redirect_url", authorizationResponse.RedirectUrl);
+            var queryBuilder = new QueryBuilder(authorizationResponse.QueryParameters)
+            {
+                { "redirect_url", authorizationResponse.RedirectUrl }
+            };
             var issuer = httpContext.Request.GetAbsoluteUriWithVirtualPath();
-            var redirectUrl = $"{issuer}/{Constants.EndPoints.Form}{queryBuilder.ToQueryString().ToString()}";
+            var redirectUrl = $"{issuer}/{Constants.EndPoints.Form}{queryBuilder.ToQueryString()}";
             httpContext.Response.Redirect(redirectUrl);            
         }
     }

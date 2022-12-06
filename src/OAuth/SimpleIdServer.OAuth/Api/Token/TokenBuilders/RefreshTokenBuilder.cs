@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,12 +24,12 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            return Build(scopes, new JObject(), handlerContext, cancellationToken);
+            return Build(scopes, new JsonObject(), handlerContext, cancellationToken);
         }
 
-        public virtual async Task Build(IEnumerable<string> scopes, JObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task Build(IEnumerable<string> scopes, JsonObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var dic = new JObject();
+            var dic = new JsonObject();
             if (handlerContext.Request.RequestData != null)
             {
                 foreach (var record in handlerContext.Request.RequestData)
@@ -48,7 +48,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
 
-        public virtual async Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task Refresh(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);

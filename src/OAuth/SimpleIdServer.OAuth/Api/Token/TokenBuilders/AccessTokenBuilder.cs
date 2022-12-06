@@ -1,15 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,9 +19,9 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly IOAuthClientRepository _clientRepository;
+        private readonly IClientRepository _clientRepository;
 
-        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IOAuthClientRepository clientRepository)
+        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IClientRepository clientRepository)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;
@@ -32,17 +32,17 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            return Build(scopes, new JObject(), handlerContext, cancellationToken);
+            return Build(scopes, new JsonObject(), handlerContext, cancellationToken);
         }
         
-        public async virtual Task Build(IEnumerable<string> scopes, JObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public async virtual Task Build(IEnumerable<string> scopes, JsonObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var jwsPayload = await BuildPayload(scopes, handlerContext, cancellationToken);
             foreach(var record in jObj) jwsPayload.Add(record.Key, record.Value);
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 
-        public virtual Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
+        public virtual Task Refresh(JsonObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             return Build(scopes, currentContext, cancellationToken);
@@ -56,7 +56,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);
-                jwsPayload.Add(SimpleIdServer.Jwt.Constants.OAuthClaims.Cnf, new JObject
+                jwsPayload.Add(SimpleIdServer.Jwt.Constants.OAuthClaims.Cnf, new JsonObject
                 {
                     { SimpleIdServer.Jwt.Constants.OAuthClaims.X5TS256, thumbprint }
                 });

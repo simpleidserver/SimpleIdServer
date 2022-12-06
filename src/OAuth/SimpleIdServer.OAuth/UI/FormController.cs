@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.DTOs;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OAuth.UI
 {
@@ -17,7 +17,7 @@ namespace SimpleIdServer.OAuth.UI
             var queryCollection = Request.Query;
             if (!queryCollection.ContainsKey("redirect_url"))
             {
-                var jObj = new JObject
+                var jObj = new JsonObject
                 {
                     { ErrorResponseParameters.Error, ErrorCodes.INVALID_REQUEST },
                     { ErrorResponseParameters.ErrorDescription, string.Format(ErrorMessages.MISSING_PARAMETER, "redirect_url") }

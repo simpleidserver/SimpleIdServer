@@ -174,7 +174,7 @@ namespace SimpleIdServer.Jwt
         /// <summary>
         /// Gets or sets the content of the key.
         /// </summary>
-        public Dictionary<string, string> Content { get; set; }
+        public Dictionary<string, string>? Content { get; set; } = new Dictionary<string, string>();
         /// <summary>
         /// KID of the rotation key.
         /// </summary>

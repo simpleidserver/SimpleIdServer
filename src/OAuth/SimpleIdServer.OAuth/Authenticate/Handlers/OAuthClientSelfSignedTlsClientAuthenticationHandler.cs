@@ -1,15 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,13 +19,16 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
     public class OAuthClientSelfSignedTlsClientAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IClientHelper _clientHelper;
         private readonly ILogger<OAuthClientSelfSignedTlsClientAuthenticationHandler> _logger;
 
         public OAuthClientSelfSignedTlsClientAuthenticationHandler(
             IHttpClientFactory httpClientFactory,
+            IClientHelper clientHelper,
             ILogger<OAuthClientSelfSignedTlsClientAuthenticationHandler> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _clientHelper = clientHelper;
             _logger = logger;
         }
 
@@ -35,7 +39,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public const string AUTH_METHOD = "self_signed_tls_client_auth";
         public string AuthMethod => AUTH_METHOD;
 
-        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, BaseClient client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var certificate = authenticateInstruction.Certificate;
             if (certificate == null)
@@ -47,7 +51,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
             return true;
         }
 
-        private async Task CheckCertificate(X509Certificate2 certificate, BaseClient client, string errorCode)
+        private async Task CheckCertificate(X509Certificate2 certificate, Client client, string errorCode)
         {
             if (!certificate.IsSelfSigned())
             {
@@ -55,7 +59,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                 throw new OAuthException(errorCode, ErrorMessages.CERTIFICATE_IS_NOT_SELF_SIGNED);
             }
 
-            var jsonWebKeys = await client.ResolveJsonWebKeys(_httpClientFactory);
+            var jsonWebKeys = await _clientHelper.ResolveJsonWebKeys(client);
             foreach(var jsonWebKey in jsonWebKeys)
             {
                 var x5c = jsonWebKey.Content.FirstOrDefault(c => c.Key == "x5c");
@@ -64,7 +68,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
                     continue;
                 }
 
-                var x5cBase64Str = JArray.Parse(x5c.Value)[0].ToString();
+                var x5cBase64Str = JsonArray.Parse(x5c.Value)[0].ToString();
                 var clientCertificate = new X509Certificate2(Convert.FromBase64String(x5cBase64Str));
                 if(clientCertificate.Thumbprint == certificate.Thumbprint)
                 {

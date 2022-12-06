@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.Domains;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OAuth.Api
 {
@@ -55,36 +55,36 @@ namespace SimpleIdServer.OAuth.Api
             UserSubject = userSubject;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, JObject data) : this(issuerName, userSubject)
+        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data) : this(issuerName, userSubject)
         {
             OriginalRequestData = data;
             RequestData = data;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader) : this(issuerName, userSubject, data)
+        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader) : this(issuerName, userSubject, data)
         {
             HttpHeader = httpHeader;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader, IRequestCookieCollection cookies): this(issuerName, userSubject, data, httpHeader)
+        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies): this(issuerName, userSubject, data, httpHeader)
         {
             Cookies = cookies;
         }
 
-        public HandlerContextRequest(string issuerName, string userSubject, JObject data, JObject httpHeader, IRequestCookieCollection cookies, X509Certificate2 certificate) : this(issuerName, userSubject, data, httpHeader, cookies)
+        public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader, IRequestCookieCollection cookies, X509Certificate2 certificate) : this(issuerName, userSubject, data, httpHeader, cookies)
         {
             Certificate = certificate;
         }
 
         public string IssuerName { get; private set; }
         public string UserSubject { get; private set; }
-        public JObject OriginalRequestData { get; private set; }
-        public JObject RequestData { get; private set; }
-        public JObject HttpHeader { get; private set; }
+        public JsonObject OriginalRequestData { get; private set; }
+        public JsonObject RequestData { get; private set; }
+        public JsonObject HttpHeader { get; private set; }
         public IRequestCookieCollection Cookies { get; set; }
         public X509Certificate2 Certificate { get; set; }
 
-        public void SetRequestData(JObject data)
+        public void SetRequestData(JsonObject data)
         {
             RequestData = data;
         }
@@ -98,9 +98,9 @@ namespace SimpleIdServer.OAuth.Api
 
             var authorizationValue = HttpHeader["Authorization"];
             var values = new List<string>();
-            if (authorizationValue is JArray)
+            if (authorizationValue is JsonArray)
             {
-                var jArr = authorizationValue as JArray;
+                var jArr = authorizationValue.AsArray();
                 foreach(var rec in jArr)
                 {
                     values.Add(rec.ToString());
@@ -140,29 +140,17 @@ namespace SimpleIdServer.OAuth.Api
             Response = response;
         }
 
-        public OAuthUser User { get; private set; }
-        public BaseClient Client { get; private set; }
+        public User User { get; private set; }
+        public Client Client { get; private set; }
         public HandlerContextRequest Request { get; private set; }
         public HandlerContextResponse Response { get; private set; }
 
-        public void SetClient(BaseClient client)
-        {
-            Client = client;
-        }
+        public void SetClient(Client client) => Client = client;
 
-        public void SetUser(OAuthUser user)
-        {
-            User = user;
-        }
+        public void SetUser(User user) => User = user;
 
-        public void SetResponse(HandlerContextResponse response)
-        {
-            Response = response;
-        }
+        public void SetResponse(HandlerContextResponse response) => Response = response;
 
-        public void SetRequest(HandlerContextRequest request)
-        {
-            Request = request;
-        }
+        public void SetRequest(HandlerContextRequest request) => Request = request;
     }
 }

@@ -5,4 +5,7 @@
 		<Nullable>enable</Nullable>
 		<Description>Common domains used by SimpleIdServer.</Description>
 	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
+	</ItemGroup>
 </Project>

@@ -17,23 +17,20 @@ namespace SimpleIdServer.OAuth.Api.Register
     {
         private readonly IAddOAuthClientHandler _addOAuthClientHandler;
         private readonly IGetOAuthClientHandler _getOAuthClientHandler;
-        private readonly IUpdateOAuthClientHandler _updateOAuthClientHandler;
         private readonly IDeleteOAuthClientHandler _deleteOAuthClientHandler;
 
         public RegistrationController(
             IAddOAuthClientHandler registerRequestHandler,
             IGetOAuthClientHandler getOAuthClientHandler,
-            IUpdateOAuthClientHandler updateOAuthClientHandler,
             IDeleteOAuthClientHandler deleteOAuthClientHandler)
         {
             _addOAuthClientHandler = registerRequestHandler;
             _getOAuthClientHandler = getOAuthClientHandler;
-            _updateOAuthClientHandler = updateOAuthClientHandler;
             _deleteOAuthClientHandler = deleteOAuthClientHandler;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] JObject jObj, CancellationToken token)
+        public async Task<IActionResult> Add([FromBody] JsonObject jObj, CancellationToken token)
         {
             try
             {
@@ -48,7 +45,7 @@ namespace SimpleIdServer.OAuth.Api.Register
             }
             catch(OAuthException ex)
             {
-                var res = new JObject
+                var res = new JsonObject
                 {
                     { ErrorResponseParameters.Error, ex.Code },
                     { ErrorResponseParameters.ErrorDescription, ex.Message }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
@@ -12,6 +11,7 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Options;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,7 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 
         public async Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
-            var dic = new JObject();
+            var dic = new JsonObject();
             foreach (var record in context.Request.RequestData)
             {
                 dic.Add(record.Key, record.Value);

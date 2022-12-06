@@ -1,17 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,22 +29,22 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         private readonly IEnumerable<IAuthorizationRequestValidator> _authorizationRequestValidators;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
-        private readonly IOAuthClientRepository _oauthClientRepository;
-        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IClientRepository _clientRepository;
+        private readonly IUserRepository _userRepository;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
             IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher,
-            IOAuthClientRepository oauthClientRepository,
-            IOAuthUserRepository oauthUserRepository)
+            IClientRepository clientRepository,
+            IUserRepository userRepository)
         {
             _responseTypeHandlers = responseTypeHandlers;
             _authorizationRequestValidators = authorizationRequestValidators;
             _tokenProfiles = tokenProfiles;
             _authorizationRequestEnricher = authorizationRequestEnricher;
-            _oauthClientRepository = oauthClientRepository;
-            _oauthUserRepository = oauthUserRepository;
+            _clientRepository = clientRepository;
+            _userRepository = userRepository;
         }
 
         public virtual async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
@@ -78,7 +79,11 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
 
             context.SetClient(await AuthenticateClient(context.Request.RequestData, cancellationToken));
-            context.SetUser(await _oauthUserRepository.FindOAuthUserByLogin(context.Request.UserSubject, cancellationToken));
+            var user = await _userRepository.Query()
+                .Include(u => u.Consents)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == context.Request.UserSubject, cancellationToken);
+            context.SetUser(user);
             foreach (var validator in _authorizationRequestValidators)
             {
                 await validator.Validate(context, cancellationToken);
@@ -106,7 +111,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 
-        private async Task<BaseClient> AuthenticateClient(JObject jObj, CancellationToken cancellationToken)
+        private async Task<Client> AuthenticateClient(JsonObject jObj, CancellationToken cancellationToken)
         {
             var clientId = jObj.GetClientIdFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(clientId))
@@ -114,7 +119,9 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
             }
 
-            var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+            var client = await _clientRepository.Query().Include(c => c.Scopes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             if (client == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));

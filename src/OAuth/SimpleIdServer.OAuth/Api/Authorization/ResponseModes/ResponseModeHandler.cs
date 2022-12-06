@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
 {
@@ -18,7 +18,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseModes
             _oauthResponseModeHandlers = oauthResponseModeHandlers;
         }
 
-        public void Handle(JObject queryParams, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
+        public void Handle(JsonObject queryParams, RedirectURLAuthorizationResponse authorizationResponse, HttpContext httpContext)
         {
             var responseTypes = queryParams.GetResponseTypesFromAuthorizationRequest();
             var responseMode = queryParams.GetResponseModeFromAuthorizationRequest();

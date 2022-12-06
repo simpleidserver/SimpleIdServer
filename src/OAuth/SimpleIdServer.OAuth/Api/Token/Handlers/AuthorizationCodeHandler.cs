@@ -9,7 +9,6 @@ using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OAuth.Persistence.Parameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,13 +56,10 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 if (previousRequest == null)
                 {
                     // https://tools.ietf.org/html/rfc6749#section-4.1.2
-                    var searchResult = await _grantedTokenHelper.SearchTokens(new SearchTokenParameter
+                    var searchResult = await _grantedTokenHelper.GetTokensByAuthorizationCode(code, cancellationToken);
+                    if (searchResult.Any())
                     {
-                        AuthorizationCode = code
-                    }, cancellationToken);
-                    if (searchResult.Content.Any())
-                    {
-                        await _grantedTokenHelper.RemoveTokens(searchResult.Content, cancellationToken);
+                        await _grantedTokenHelper.RemoveTokens(searchResult, cancellationToken);
                         _logger.LogError($"authorization code '{code}' has already been used, all tokens previously issued have been revoked");
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_ALREADY_USED);
                     }

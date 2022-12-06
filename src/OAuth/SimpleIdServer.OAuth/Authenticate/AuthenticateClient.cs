@@ -1,10 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Domains;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,36 +16,36 @@ namespace SimpleIdServer.OAuth.Authenticate
 {
     public interface IAuthenticateClient
     {
-        Task<BaseClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task<Client> Authenticate(AuthenticateInstruction authenticateIsnstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
     }
 
     public class AuthenticateClient : IAuthenticateClient
     {
         private readonly IJwsGenerator _jwsGenerator;
         private readonly IJwtParser _jwtParser;
-        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _handlers;
 
-        public AuthenticateClient(IJwsGenerator jwsGenerator, IJwtParser jwtParser, IOAuthClientRepository oauthClientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers)
+        public AuthenticateClient(IJwsGenerator jwsGenerator, IJwtParser jwtParser, IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers)
         {
             _jwsGenerator = jwsGenerator;
             _jwtParser = jwtParser;
-            _oauthClientRepository = oauthClientRepository;
+            _clientRepository = clientRepository;
             _handlers = handlers;
         }
 
-        public async Task<BaseClient> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<Client> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null)
             {
                 throw new ArgumentNullException(nameof(authenticateInstruction));
             }
 
-            BaseClient client = null;
+            Client client = null;
             var clientId = TryGettingClientId(authenticateInstruction);
             if (!string.IsNullOrWhiteSpace(clientId))
             {
-                client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+                client = await _clientRepository.Query().Include(c => c.JsonWebKeys).Include(c => c.Scopes).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             }
 
             if (client == null)

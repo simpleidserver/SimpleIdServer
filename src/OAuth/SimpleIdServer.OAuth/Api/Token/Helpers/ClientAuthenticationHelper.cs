@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Authenticate;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +13,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
 {
     public interface IClientAuthenticationHelper
     {
-        Task<BaseClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task<Client> AuthenticateClient(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
     }
 
     public class ClientAuthenticationHelper : IClientAuthenticationHelper
@@ -25,7 +25,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
             _authenticateClient = authenticateClient;
         }
 
-        public async Task<BaseClient> AuthenticateClient(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<Client> AuthenticateClient(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var authenticateInstruction = BuildAuthenticateInstruction(jObjHeader, jObjBody, certificate);
             var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
@@ -37,7 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
             return oauthClient;
         }
 
-        private AuthenticateInstruction BuildAuthenticateInstruction(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate)
+        private AuthenticateInstruction BuildAuthenticateInstruction(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate)
         {
             var clientCredential = jObjHeader.GetClientCredentials();
             return new AuthenticateInstruction

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,13 +25,13 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         /// <param name="handlerContext"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task Build(IEnumerable<string> scopes, JObject claims, HandlerContext handlerContext, CancellationToken cancellationToken);
+        Task Build(IEnumerable<string> scopes, JsonObject claims, HandlerContext handlerContext, CancellationToken cancellationToken);
         /// <summary>
         /// Refresh token from previous one.
         /// </summary>
         /// <param name="previousQueryParameters"></param>
         /// <param name="handlerContext"></param>
         /// <returns></returns>
-        Task Refresh(JObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token);
+        Task Refresh(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token);
     }
 }

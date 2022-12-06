@@ -1,12 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Domains;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Infrastructures;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace SimpleIdServer.OAuth.Jwt
         string Decrypt(string jwe, JsonWebKey jsonWebKey);
         Task<string> DecryptWithPassword(string jwe, string password, CancellationToken cancellationToken);
         Task<string> Decrypt(string jwe, string clientId, CancellationToken cancellationToken);
-        Task<string> Decrypt(string jwe, OAuthClient client);
+        Task<string> Decrypt(string jwe, Client client);
         Task<string> Decrypt(string jwe, string clientId, string password, CancellationToken cancellationToken);
         JwsHeader ExtractJwsHeader(string jws);
         JweHeader ExtractJweHeader(string jwe);
@@ -40,20 +41,20 @@ namespace SimpleIdServer.OAuth.Jwt
         private readonly IJweGenerator _jweGenerator;
         private readonly IJwsGenerator _jwsGenerator;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
 
         public JwtParser(
             IJweGenerator jweGenerator,
             IJwsGenerator jwsGenerator,
             IHttpClientFactory httpClientFactory,
-            IOAuthClientRepository oauthClientRepository,
+            IClientRepository clientRepository,
             IJsonWebKeyRepository jsonWebKeyRepository)
         {
             _jweGenerator = jweGenerator;
             _jwsGenerator = jwsGenerator;
             _httpClientFactory = httpClientFactory;
-            _oauthClientRepository = oauthClientRepository;
+            _clientRepository = clientRepository;
             _jsonWebKeyRepository = jsonWebKeyRepository;
         }
 
@@ -82,7 +83,7 @@ namespace SimpleIdServer.OAuth.Jwt
                 return string.Empty;
             }
 
-            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid, cancellationToken);
+            var jsonWebKey = await _jsonWebKeyRepository.Query().AsNoTracking().FirstOrDefaultAsync(j => j.Kid == protectedHeader.Kid, cancellationToken);
             if (jsonWebKey == null)
             {
                 return string.Empty;
@@ -109,7 +110,7 @@ namespace SimpleIdServer.OAuth.Jwt
                 return string.Empty;
             }
 
-            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid, cancellationToken);
+            var jsonWebKey = await _jsonWebKeyRepository.Query().AsNoTracking().FirstOrDefaultAsync(j => j.Kid == protectedHeader.Kid, cancellationToken);
             if (jsonWebKey == null)
             {
                 return string.Empty;

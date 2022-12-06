@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.Jwt;
+
 namespace SimpleIdServer.Domains
 {
     public class Client : IEquatable<Client>
@@ -153,7 +155,7 @@ namespace SimpleIdServer.Domains
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>
-        public ICollection<ClientSerializedJsonWebKey> JsonWebKeys { get; set; } = new List<ClientSerializedJsonWebKey>();
+        public ICollection<JsonWebKey> JsonWebKeys { get; set; } = new List<JsonWebKey>();
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
 
         public override bool Equals(object obj)

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +15,7 @@ namespace SimpleIdServer.OAuth.Api.Token
 {
     public interface IRevokeTokenRequestHandler
     {
-        Task Handle(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken token);
+        Task Handle(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken token);
     }
 
     public class RevokeTokenRequestHandler : IRevokeTokenRequestHandler
@@ -37,7 +37,7 @@ namespace SimpleIdServer.OAuth.Api.Token
             _logger = logger;
         }
 
-        public async Task Handle(JObject jObjHeader, JObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
+        public async Task Handle(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
         {
             var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
             var validationResult = _revokeTokenValidator.Validate(jObjBody);

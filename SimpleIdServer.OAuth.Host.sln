@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29503.13
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Startup Layer", "02. Startup Layer", "{68306EFF-55D9-497B-9482-FEB81C485914}"
 EndProject
@@ -18,6 +18,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OAuth.Host.Acceptance.Tests", "tests\SimpleIdServer.OAuth.Host.Acceptance.Tests\SimpleIdServer.OAuth.Host.Acceptance.Tests.csproj", "{FBF9C3A0-B8EA-4C8A-88C0-C145EA5BBBF5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OAuth", "src\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj", "{5B659D07-E2DE-4D79-A90D-AC80D0039AEA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00. Common Layer", "00. Common Layer", "{918F6269-4816-4C84-8390-0E0295BF024E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Domains", "src\OAuth\SimpleIdServer.Domains\SimpleIdServer.Domains.csproj", "{2EF1149C-EEFA-4793-924F-CF7ED3E455A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Store", "src\OAuth\SimpleIdServer.Store\SimpleIdServer.Store.csproj", "{F18C137F-904D-4E29-AE75-5E5EBBDFE51C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,16 +51,26 @@ Global
 		{5B659D07-E2DE-4D79-A90D-AC80D0039AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B659D07-E2DE-4D79-A90D-AC80D0039AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B659D07-E2DE-4D79-A90D-AC80D0039AEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EF1149C-EEFA-4793-924F-CF7ED3E455A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EF1149C-EEFA-4793-924F-CF7ED3E455A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EF1149C-EEFA-4793-924F-CF7ED3E455A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EF1149C-EEFA-4793-924F-CF7ED3E455A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F18C137F-904D-4E29-AE75-5E5EBBDFE51C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18C137F-904D-4E29-AE75-5E5EBBDFE51C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18C137F-904D-4E29-AE75-5E5EBBDFE51C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18C137F-904D-4E29-AE75-5E5EBBDFE51C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0AD6A1C2-CA06-4811-B66D-9011CC78E4CE} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
+		{0AD6A1C2-CA06-4811-B66D-9011CC78E4CE} = {918F6269-4816-4C84-8390-0E0295BF024E}
 		{1FCE1C15-6706-4047-86B5-E4BCA8552687} = {68306EFF-55D9-497B-9482-FEB81C485914}
 		{B34B5C8F-D297-4CCA-9237-5E5167AE0471} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
 		{FBF9C3A0-B8EA-4C8A-88C0-C145EA5BBBF5} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
 		{5B659D07-E2DE-4D79-A90D-AC80D0039AEA} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
+		{2EF1149C-EEFA-4793-924F-CF7ED3E455A5} = {918F6269-4816-4C84-8390-0E0295BF024E}
+		{F18C137F-904D-4E29-AE75-5E5EBBDFE51C} = {918F6269-4816-4C84-8390-0E0295BF024E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

@@ -1,13 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Domains;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains;
+using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
+using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +18,8 @@ namespace SimpleIdServer.OAuth.Jwt
 {
     public interface IJwtBuilder
     {
-        Task<string> BuildAccessToken(BaseClient client, JwsPayload jwsPayload, CancellationToken cancellationToken);
-        Task<string> BuildClientToken(BaseClient client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken);
+        Task<string> BuildAccessToken(Client client, JwsPayload jwsPayload, CancellationToken cancellationToken);
+        Task<string> BuildClientToken(Client client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken);
         Task<string> Sign(JwsPayload jwsPayload, string jwsAlg, CancellationToken cancellationToken);
         string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey, string jwsAlg);
         Task<string> Encrypt(string jws, string jweAlg, string jweEnc, CancellationToken cancellationToken);
@@ -30,21 +33,23 @@ namespace SimpleIdServer.OAuth.Jwt
         private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
         private readonly IJwsGenerator _jwsGenerator;
         private readonly IJweGenerator _jweGenerator;
+        private readonly IClientHelper _clientHelper;
 
-        public JwtBuilder(IHttpClientFactory httpClientFactory, IJsonWebKeyRepository jsonWebKeyRepository, IJwsGenerator jwsGenerator, IJweGenerator jweGenerator)
+        public JwtBuilder(IHttpClientFactory httpClientFactory, IJsonWebKeyRepository jsonWebKeyRepository, IJwsGenerator jwsGenerator, IJweGenerator jweGenerator, IClientHelper clientHelper)
         {
             _httpClientFactory = httpClientFactory;
             _jsonWebKeyRepository = jsonWebKeyRepository;
             _jwsGenerator = jwsGenerator;
             _jweGenerator = jweGenerator;
+            _clientHelper = clientHelper;
         }
 
-        public Task<string> BuildAccessToken(BaseClient client, JwsPayload jwsPayload, CancellationToken cancellationToken)
+        public Task<string> BuildAccessToken(Client client, JwsPayload jwsPayload, CancellationToken cancellationToken)
         {
             return BuildClientToken(client, jwsPayload, client.TokenSignedResponseAlg, client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, cancellationToken);
         }
 
-        public async Task<string> BuildClientToken(BaseClient client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken)
+        public async Task<string> BuildClientToken(Client client, JwsPayload jwsPayload, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken)
         {
             var jwt = await Sign(jwsPayload, sigAlg, cancellationToken);
             if (string.IsNullOrWhiteSpace(encAlg))
@@ -52,7 +57,7 @@ namespace SimpleIdServer.OAuth.Jwt
                 return jwt;
             }
 
-            var jsonWebKeys = await client.ResolveJsonWebKeys(_httpClientFactory);
+            var jsonWebKeys = await _clientHelper.ResolveJsonWebKeys(client);
             var jsonWebKey = jsonWebKeys.FirstOrDefault(j => j.Use == Usages.ENC && j.Alg == encAlg);
             if (jsonWebKey == null)
             {
@@ -64,25 +69,38 @@ namespace SimpleIdServer.OAuth.Jwt
 
         public async Task<string> Sign(JwsPayload jwsPayload, string jwsAlg, CancellationToken cancellationToken)
         {
-            var jsonWebKeys = await _jsonWebKeyRepository.FindJsonWebKeys(Usages.SIG, jwsAlg, new[]
+            var operations = new[]
             {
                 KeyOperations.Sign
-            }, cancellationToken);
+            };
+            var currentDateTime = DateTime.UtcNow;
+            int nbOperations = operations.Count();
+            var jsonWebKeys = await _jsonWebKeyRepository.Query().Include(j => j.KeyOperationLst).Where(j =>
+                (j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime) &&
+                (j.Use == Usages.SIG && j.Alg == jwsAlg && j.KeyOperationLst.Where(k => operations.Contains(k.Operation)).Count() == nbOperations))
+                .ToListAsync(cancellationToken);
             return Sign(jwsPayload, jsonWebKeys.FirstOrDefault(), jwsAlg);
         }
 
         public string Sign(JwsPayload jwsPayload, JsonWebKey jsonWebKey, string jwsAlg)
         {
-            var serializedPayload = JsonConvert.SerializeObject(jwsPayload);
+            var serializedPayload = JsonSerializer.Serialize(jwsPayload);
             return _jwsGenerator.Build(serializedPayload, jwsAlg, jsonWebKey);
         }
 
         public async Task<string> Encrypt(string jws, string jweAlg, string jweEnc, CancellationToken cancellationToken)
         {
-            var jsonWebKeys = await _jsonWebKeyRepository.FindJsonWebKeys(Usages.ENC, jweAlg, new[]
+            var operations = new[]
             {
                 KeyOperations.Encrypt
-            }, cancellationToken);
+            };
+            var currentDateTime = DateTime.UtcNow;
+            int nbOperations = operations.Count();
+            var jsonWebKeys = await _jsonWebKeyRepository.Query().Include(j => j.KeyOperationLst).Where(j =>
+                (j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime) &&
+                (j.Use == Usages.ENC && j.Alg == jweAlg && j.KeyOperationLst.Where(k => operations.Contains(k.Operation)).Count() == nbOperations))
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
             if (!jsonWebKeys.Any())
             {
                 return jws;

@@ -1,23 +1,22 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using SimpleIdServer.Domains;
 using SimpleIdServer.Jwt.Jwe.EncHandlers;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,13 +37,13 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
         private readonly IHttpClientFactory _httpClientFactory;
 
         public AddOAuthClientHandler(
-            IOAuthClientRepository oAuthClientRepository,
+            IClientRepository clientRepository,
             IJwtParser jwtParser,
             IHttpClientFactory httpClientFactory,
             IOAuthClientValidator oauthClientValidator,
             IOptions<OAuthHostOptions> oauthHostOptions)
         {
-            OAuthClientRepository = oAuthClientRepository;
+            OAuthClientRepository = clientRepository;
             _jwtParser = jwtParser;
             _httpClientFactory = httpClientFactory;
             _oauthClientValidator = oauthClientValidator;
@@ -52,19 +51,19 @@ namespace SimpleIdServer.OAuth.Api.Register.Handlers
         }
 
         protected readonly OAuthHostOptions OauthHostOptions;
-        protected IOAuthClientRepository OAuthClientRepository { get; private set; }
+        protected IClientRepository ClientRepository { get; private set; }
 
-        public async Task<JObject> Handle(HandlerContext handlerContext, CancellationToken cancellationToken)
+        public async Task<JsonObject> Handle(HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             await ExtractSoftwareStatement(handlerContext.Request.RequestData);
             var oauthClient = ExtractClient(handlerContext);
             await _oauthClientValidator.Validate(oauthClient, cancellationToken);
-            await OAuthClientRepository.Add(oauthClient, cancellationToken);
-            await OAuthClientRepository.SaveChanges(cancellationToken);
+            ClientRepository.Add(oauthClient);
+            ClientRepository.SaveChanges(cancellationToken);
             return BuildResponse(oauthClient, handlerContext.Request.IssuerName);
         }
 
-        protected virtual BaseClient ExtractClient(HandlerContext handlerContext)
+        protected virtual Client ExtractClient(HandlerContext handlerContext)
         {
             var result = handlerContext.Request.RequestData.ToDomain();
             EnrichClient(result);

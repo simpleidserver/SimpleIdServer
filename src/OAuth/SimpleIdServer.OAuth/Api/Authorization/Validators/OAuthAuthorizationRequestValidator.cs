@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Infrastructures;
+using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,16 +14,16 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
     {
         private readonly IUserConsentFetcher _userConsentFetcher;
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IClientHelper _clientHelper;
 
         public OAuthAuthorizationRequestValidator(
             IUserConsentFetcher userConsentFetcher,
             IEnumerable<IOAuthResponseMode> oauthResponseModes,
-            IHttpClientFactory httpClientFactory)
+            IClientHelper clientHelper)
         {
             _userConsentFetcher = userConsentFetcher;
             _oauthResponseModes = oauthResponseModes;
-            _httpClientFactory = httpClientFactory;
+            _clientHelper = clientHelper;
         }
 
         public virtual async Task Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
 
             await CommonValidate(context, cancellationToken);
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            var unsupportedScopes = scopes.Where(s => !context.Client.AllowedScopes.Any(sc => sc.Name == s));
+            var unsupportedScopes = scopes.Where(s => !context.Client.Scopes.Any(sc => sc.Scope == s));
             if (unsupportedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
@@ -56,7 +56,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             var responseMode = context.Request.RequestData.GetResponseModeFromAuthorizationRequest();
             var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
-            var redirectionUrls = await client.GetRedirectionUrls(_httpClientFactory, cancellationToken);
+            var redirectionUrls = await _clientHelper.GetRedirectionUrls(client, cancellationToken);
             if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Contains(redirectUri))
             {
                 throw new OAuthExceptionBadRequestURIException(redirectUri);

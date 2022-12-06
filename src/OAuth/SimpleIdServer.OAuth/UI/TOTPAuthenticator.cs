@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
@@ -19,17 +20,17 @@ namespace SimpleIdServer.OAuth.UI
 
         public OTPAlgs Alg => OTPAlgs.TOTP;
 
-        public long GenerateOtp(OAuthUser oauthUser)
+        public long GenerateOtp(User oauthUser)
         {
             return GenerateOtp(oauthUser.GetOTPKey(), CalculateTimeStep(DateTime.UtcNow));
         }
 
-        public long GenerateOtp(OAuthUser oauthUser, DateTime date)
+        public long GenerateOtp(User oauthUser, DateTime date)
         {
             return GenerateOtp(oauthUser.GetOTPKey(), CalculateTimeStep(date));
         }
 
-        public bool Verify(long otp, OAuthUser user)
+        public bool Verify(long otp, User user)
         {
             var currentDateTime = DateTime.UtcNow;
             var key = user.GetOTPKey();

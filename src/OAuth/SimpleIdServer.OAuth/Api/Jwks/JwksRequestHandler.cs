@@ -1,9 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Store;
+using System;
+using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +14,7 @@ namespace SimpleIdServer.OAuth.Api.Jwks
 {
     public interface IJwksRequestHandler
     {
-        Task<JObject> Get(CancellationToken cancellationToken);
+        Task<JsonObject> Get(CancellationToken cancellationToken);
         Task<bool> Rotate(CancellationToken token);
     }
 
@@ -28,30 +31,33 @@ namespace SimpleIdServer.OAuth.Api.Jwks
             _options = options.Value;
         }
 
-        public async Task<JObject> Get(CancellationToken cancellationToken)
+        public async Task<JsonObject> Get(CancellationToken cancellationToken)
         {
-            var jsonWebKeys = await _jsonWebKeyRepository.GetActiveJsonWebKeys(cancellationToken);
-            var keys = new JArray();
+            var currentDateTime = DateTime.UtcNow;
+            var jsonWebKeys = await _jsonWebKeyRepository.Query()
+                .Include(j => j.KeyOperationLst)
+                .AsNoTracking()
+                .Where(j => j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime)
+                .ToListAsync(cancellationToken);
+            var keys = new JsonArray();
             foreach(var jsonWebKey in jsonWebKeys)
-            {
                 keys.Add(jsonWebKey.GetPublicJwt());
-            }
-
-            var result = new JObject
+            var result = new JsonObject
             {
-                { "keys", keys }
+                ["keys"] = keys
             };
             return result;
         }
 
         public async Task<bool> Rotate(CancellationToken cancellationToken)
         {
-            var jsonWebKeys = await _jsonWebKeyRepository.GetNotRotatedJsonWebKeys(cancellationToken);
+            var jsonWebKeys = await _jsonWebKeyRepository.Query()
+                .Where(j => string.IsNullOrWhiteSpace(j.RotationJWKId))
+                .ToListAsync(cancellationToken);
             foreach (var jsonWebKey in jsonWebKeys)
             {
                 var newJsonWebKey = jsonWebKey.Rotate(_options.JWKExpirationTimeInSeconds);
-                await _jsonWebKeyRepository.Update(jsonWebKey, cancellationToken);
-                await _jsonWebKeyRepository.Add(newJsonWebKey, cancellationToken);
+                _jsonWebKeyRepository.Add(newJsonWebKey);
             }
 
             await _jsonWebKeyRepository.SaveChanges(cancellationToken);

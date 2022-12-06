@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
@@ -16,6 +15,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -73,9 +73,9 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 var parameters = new List<KeyValuePair<string, string>>();
                 foreach(var record in redirectActionAuthorizationResponse.QueryParameters)
                 {
-                    var jArr = record.Value as JArray;
-                    if (jArr != null)
+                    if (record.Value is JsonArray)
                     {
+                        var jArr = record.Value.AsArray();
                         foreach(var rec in jArr)
                         {
                             parameters.Add(new KeyValuePair<string, string>(record.Key, rec.ToString()));
@@ -114,11 +114,11 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         {
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
-            var jObj = new JObject
-                {
-                    { ErrorResponseParameters.Error, ex.Code },
-                    { ErrorResponseParameters.ErrorDescription, ex.Message }
-                };
+            var jObj = new JsonObject
+            {
+                [ErrorResponseParameters.Error] = ex.Code,
+                [ErrorResponseParameters.ErrorDescription] = ex.Message
+            };
             if (!string.IsNullOrWhiteSpace(state))
             {
                 jObj.Add(ErrorResponseParameters.State, state);
