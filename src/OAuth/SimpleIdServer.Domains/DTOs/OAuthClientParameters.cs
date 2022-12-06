@@ -1,9 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-namespace SimpleIdServer.OAuth.DTOs
+namespace SimpleIdServer.Domains.DTOs
 {
-    public static class OAuthClientParameters
+    public class OAuthClientParameters
     {
         public const string ClientId = "client_id";
         public const string ClientSecret = "client_secret";
@@ -39,5 +38,9 @@ namespace SimpleIdServer.OAuth.DTOs
         public const string TlsClientAuthSanEmail = "tls_client_auth_san_email";
         public const string UpdateDateTime = "update_datetime";
         public const string CreateDateTime = "create_datetime";
+        public const string PostLogoutRedirectUris = "post_logout_redirect_uris";
+        public const string PreferredTokenProfile = "preferred_token_profile";
+        public const string TlsClientCertificateBoundAccessToken = "tls_client_certificate_bound_access_token";
+        public const string IsConsentDisabled = "is_consent_disabled";
     }
 }

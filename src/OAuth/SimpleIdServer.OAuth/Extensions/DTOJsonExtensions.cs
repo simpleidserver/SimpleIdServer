@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,54 +20,6 @@ namespace SimpleIdServer.OAuth.Extensions
                 { OAuthScopeParameters.CreateDateTime, scope.CreateDateTime },
                 { OAuthScopeParameters.Claims, new JArray(scope.Claims.Select(c => c.ClaimName).ToArray()) }
             };
-        }
-
-        public static JObject ToDto(this BaseClient client, string issuer)
-        {
-            var result = new JObject();
-            result.AddNotEmpty(OAuthClientParameters.ClientId, client.ClientId)
-                .AddNotEmpty(OAuthClientParameters.RegistrationAccessToken, client.RegistrationAccessToken)
-                .AddNotEmpty(OAuthClientParameters.GrantTypes, client.GrantTypes)
-                .AddNotEmpty(OAuthClientParameters.RedirectUris, client.RedirectionUrls)
-                .AddNotEmpty(OAuthClientParameters.TokenEndpointAuthMethod, client.TokenEndPointAuthMethod)
-                .AddNotEmpty(OAuthClientParameters.ResponseTypes, client.ResponseTypes)
-                .AddNotEmpty(OAuthClientParameters.ClientName, client.ClientNames)
-                .AddNotEmpty(OAuthClientParameters.ClientUri, client.ClientUris)
-                .AddNotEmpty(OAuthClientParameters.LogoUri, client.LogoUris)
-                .AddNotEmpty(OAuthClientParameters.Contacts, client.Contacts)
-                .AddNotEmpty(OAuthClientParameters.TosUri, client.TosUris)
-                .AddNotEmpty(OAuthClientParameters.PolicyUri, client.PolicyUris)
-                .AddNotEmpty(OAuthClientParameters.JwksUri, client.JwksUri)
-                .AddNotEmpty(OAuthClientParameters.SoftwareId, client.SoftwareId)
-                .AddNotEmpty(OAuthClientParameters.SoftwareVersion, client.SoftwareVersion)
-                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSubjectDN, client.TlsClientAuthSubjectDN)
-                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanDNS, client.TlsClientAuthSanDNS)
-                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanUri, client.TlsClientAuthSanURI)
-                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanIp, client.TlsClientAuthSanIP)
-                .AddNotEmpty(OAuthClientParameters.TlsClientAuthSanEmail, client.TlsClientAuthSanEmail)
-                .AddNotEmpty(OAuthClientParameters.ClientSecret, client.ClientSecret)
-                .AddNotEmpty(OAuthClientParameters.ClientSecretExpiresAt, client.ClientSecretExpirationTime);
-            result.Add(OAuthClientParameters.UpdateDateTime, client.UpdateDateTime);
-            result.Add(OAuthClientParameters.CreateDateTime, client.CreateDateTime);
-            result.Add(OAuthClientParameters.ClientIdIssuedAt, client.CreateDateTime.ConvertToUnixTimestamp());
-            result.Add(OAuthClientParameters.RegistrationClientUri, $"{issuer}/{Constants.EndPoints.Registration}/{client.ClientId}");
-            result.Add(OAuthClientParameters.TokenExpirationTimeInSeconds, client.TokenExpirationTimeInSeconds);
-            result.Add(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds, client.RefreshTokenExpirationTimeInSeconds);
-            if (client.AllowedScopes != null && client.AllowedScopes.Any())
-            {
-                result.Add(OAuthClientParameters.Scope, string.Join(" ", client.AllowedScopes.Select(_ => _.Name)));
-            }
-
-            if (client.JsonWebKeys != null && client.JsonWebKeys.Any())
-            {
-                var keys = new JObject
-                {
-                    { "keys", JArray.FromObject(client.JsonWebKeys.Select(_ => _.Serialize())) }
-                };
-                result.Add(OAuthClientParameters.Jwks, keys);
-            }
-
-            return result;
         }
 
         public static OAuthClient ToDomain(this JObject jObj)

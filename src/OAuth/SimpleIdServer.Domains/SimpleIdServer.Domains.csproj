@@ -6,6 +6,7 @@
 		<Description>Common domains used by SimpleIdServer.</Description>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Helpers\SimpleIdServer.Helpers.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
 	</ItemGroup>
 </Project>

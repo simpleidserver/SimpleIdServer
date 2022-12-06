@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Jwt
 {
@@ -146,15 +147,18 @@ namespace SimpleIdServer.Jwt
         /// <summary>
         /// Gets or sets the cryptographic algorithm family used with the key.
         /// </summary>
+        [JsonPropertyName("kty")]
         public KeyTypes Kty { get; set; }
         /// <summary>
         /// Gets or sets the intended use of the public key.
         /// Employed to indicate whether a public key is used for encrypting data or verifying the signature on data.
         /// </summary>
+        [JsonPropertyName("use")]
         public Usages Use { get; set; }
         /// <summary>
         /// Gets or sets the operation(s) that the key is intended to be user for.
         /// </summary>
+        [JsonPropertyName("key_ops")]
         public IEnumerable<KeyOperations> KeyOps
         {
             get
@@ -166,14 +170,17 @@ namespace SimpleIdServer.Jwt
         /// <summary>
         /// Gets or sets the algorithm intended for use with the key
         /// </summary>
+        [JsonPropertyName("alg")]
         public string Alg { get; set; }
         /// <summary>
         /// Gets or sets the KID (key id). 
         /// </summary>
+        [JsonPropertyName("kid")]
         public string Kid { get; set; }
         /// <summary>
         /// Gets or sets the content of the key.
         /// </summary>
+        [JsonIgnore]
         public Dictionary<string, string>? Content { get; set; } = new Dictionary<string, string>();
         /// <summary>
         /// KID of the rotation key.

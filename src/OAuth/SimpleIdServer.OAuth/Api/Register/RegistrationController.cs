@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api.Register.Handlers;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
@@ -19,10 +18,7 @@ namespace SimpleIdServer.OAuth.Api.Register
         private readonly IGetOAuthClientHandler _getOAuthClientHandler;
         private readonly IDeleteOAuthClientHandler _deleteOAuthClientHandler;
 
-        public RegistrationController(
-            IAddOAuthClientHandler registerRequestHandler,
-            IGetOAuthClientHandler getOAuthClientHandler,
-            IDeleteOAuthClientHandler deleteOAuthClientHandler)
+        public RegistrationController(IAddOAuthClientHandler registerRequestHandler, IGetOAuthClientHandler getOAuthClientHandler, IDeleteOAuthClientHandler deleteOAuthClientHandler)
         {
             _addOAuthClientHandler = registerRequestHandler;
             _getOAuthClientHandler = getOAuthClientHandler;
