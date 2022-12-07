@@ -13,5 +13,12 @@ namespace SimpleIdServer.Scim.Domains
         public string SourceAttributeSelector { get; set; }
         public string TargetResourceType { get; set; }
         public string TargetAttributeId { get; set; }
+        public Mode Mode { get; set; } = Mode.STANDARD;
+    }
+
+    public enum Mode
+    {
+        STANDARD =  0,
+        PROPAGATE_INHERITANCE = 1
     }
 }

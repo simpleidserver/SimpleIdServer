@@ -155,7 +155,8 @@ namespace SimpleIdServer.Scim.Startup
                     SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                     SourceAttributeSelector = "members",
                     TargetResourceType = StandardSchemas.UserSchema.ResourceType,
-                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
+                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                    Mode = Mode.PROPAGATE_INHERITANCE
                 },
                 new SCIMAttributeMapping
                 {
