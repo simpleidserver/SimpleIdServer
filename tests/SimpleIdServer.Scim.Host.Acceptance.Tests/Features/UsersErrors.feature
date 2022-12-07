@@ -20,6 +20,40 @@ Scenario: Error is returned when pass invalid JSON object (HTTP POST)
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidSyntax'
 	Then JSON 'detail'='HTTP POST request is not well formatted'
+
+Scenario: Error is returned when value doesn't respect the type defined in the schema (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key              | Value																												|
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]		|
+	| userName         | bjen																												|
+	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }								|
+	| employeeNumber   | 100																												|
+
+	And extract JSON from body
+	And extract 'id' from JSON body	
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key              | Value                                                                                     |
+	| schemas          | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                       |
+	| Operations	   | [ { "op": "replace", "path": "active", "value" : 1234 } ]								   |
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='400'
+	Then JSON 'scimType'='invalidValue'
+	Then JSON 'detail'=''active' not valid boolean'
+
+
+Scenario: Error is returned when pass invalid JSON object (HTTP PATCH)
+	When execute HTTP PATCH JSON request 'http://localhost/Users/id' with body '{ "schemas": [ "..." , "Operations": [ { "op": "replace", "path": "active", "value" : 234 } ]  }'
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='400'
+	Then JSON 'scimType'='invalidSyntax'
+	Then JSON 'detail'='HTTP PATCH request is not well formatted'
 	
 Scenario: Error is returned when pass invalid JSON object (HTTP PUT)
 	When execute HTTP PUT JSON request 'http://localhost/Users/id' with body '{ "schemas": [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ], "userName": "externalId": "externalId" }'
@@ -59,7 +93,7 @@ Scenario: Error is returned when pass invalid boolean (HTTP POST)
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidValue'
-	Then JSON 'detail'=''test' are not valid boolean'
+	Then JSON 'detail'=''test' not valid boolean'
 
 Scenario: Error is returned when pass invalid decimal (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -74,7 +108,7 @@ Scenario: Error is returned when pass invalid decimal (HTTP POST)
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidValue'
-	Then JSON 'detail'=''test' are not valid decimal'
+	Then JSON 'detail'=''test' not valid decimal'
 
 Scenario: Error is returned when pass invalid DateTime (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -89,7 +123,7 @@ Scenario: Error is returned when pass invalid DateTime (HTTP POST)
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidValue'
-	Then JSON 'detail'=''test' are not valid DateTime'
+	Then JSON 'detail'=''test' not valid DateTime'
 
 Scenario: Error is returned when pass invalid int (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -104,7 +138,7 @@ Scenario: Error is returned when pass invalid int (HTTP POST)
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidValue'
-	Then JSON 'detail'=''test' are not valid integer'
+	Then JSON 'detail'=''test' not valid integer'
 
 Scenario: Error is returned when pass invalid Base64 (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'
@@ -119,7 +153,7 @@ Scenario: Error is returned when pass invalid Base64 (HTTP POST)
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidValue'
-	Then JSON 'detail'=''%HELLO%' are not valid Base64String'
+	Then JSON 'detail'=''%HELLO%' not valid Base64String'
 
 Scenario: Error is returned when required attribute is missing (HTTP POST)
 	When execute HTTP POST JSON request 'http://localhost/Users'

@@ -205,6 +205,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à HTTP PATCH request is not well formatted.
+        /// </summary>
+        public static string HttpPatchNotWellFormatted {
+            get {
+                return ResourceManager.GetString("HttpPatchNotWellFormatted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à HTTP POST request is not well formatted.
         /// </summary>
         public static string HttpPostNotWellFormatted {
@@ -286,7 +295,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid Base64String.
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; not valid Base64String.
         /// </summary>
         public static string NotValidBase64 {
             get {
@@ -295,7 +304,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid boolean.
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; not valid boolean.
         /// </summary>
         public static string NotValidBoolean {
             get {
@@ -313,7 +322,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid DateTime.
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; not valid DateTime.
         /// </summary>
         public static string NotValidDateTime {
             get {
@@ -322,7 +331,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid decimal.
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; not valid decimal.
         /// </summary>
         public static string NotValidDecimal {
             get {
@@ -331,7 +340,7 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; are not valid integer.
+        ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; not valid integer.
         /// </summary>
         public static string NotValidInteger {
             get {

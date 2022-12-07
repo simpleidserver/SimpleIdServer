@@ -582,6 +582,11 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
         {
+            if (patchRepresentation == null)
+            {
+                return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPatchNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
+
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
@@ -602,6 +607,11 @@ namespace SimpleIdServer.Scim.Api
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
+            }
+            catch (SCIMSchemaViolatedException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
             }
             catch (SCIMFilterException ex)
             {
