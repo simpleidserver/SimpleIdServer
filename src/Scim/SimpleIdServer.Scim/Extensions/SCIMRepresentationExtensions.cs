@@ -203,7 +203,7 @@ namespace SimpleIdServer.Scim.Domain
                             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                             newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
                             newAttributes = FilterDuplicate(attributes, newAttributes);
-                            removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && a.FullPath == fullPath).ToList());
+                            if(newAttributes.Any()) removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && a.FullPath == fullPath).ToList());
                             var isAttributeExits = !string.IsNullOrWhiteSpace(fullPath) && attributes.Any(a => a.FullPath == fullPath);
                             foreach (var newAttribute in newAttributes.OrderBy(a => a.GetLevel()))
                             {
@@ -314,6 +314,8 @@ namespace SimpleIdServer.Scim.Domain
                                     var flatHiearchy = representation.GetFlatHierarchicalChildren(parent).ToList();
                                     var scimAttributeExpression = scimFilter as SCIMAttributeExpression;
                                     var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
+                                    var filteredAttrs = attributes.Where(a => a.ParentAttributeId == parent.Id);
+                                    newAttributes = FilterDuplicate(filteredAttrs, newAttributes);
                                     foreach (var newAttribute in newAttributes.OrderBy(l => l.GetLevel()))
                                     {
                                         if (!flatHiearchy.Any(a => a.FullPath == newAttribute.FullPath))
@@ -359,6 +361,8 @@ namespace SimpleIdServer.Scim.Domain
             var result = new List<SCIMPatchResult>();
             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
             newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
+            newAttributes = FilterDuplicate(attributes, newAttributes);
+            if (!newAttributes.Any()) return result;
             var newHierarchicalAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newAttributes);
             var fullPath = newHierarchicalAttributes.First().FullPath;
             var existingAttributesToRemove = attributes.Where(a => a.FullPath == fullPath && !newHierarchicalAttributes.Any(na => na.IsSimilar(a, true)));

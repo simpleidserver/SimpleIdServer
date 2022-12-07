@@ -26,6 +26,132 @@ Scenario: Check immutable property can be updated twice with the same value
 	Then HTTP status code equals to '200'
 	Then JSON 'immutable'='immutable'	
 
+Scenario: Check no content (HTTP 204) is returned when patching name.givenName with the same value (HTTP PATCH replace)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						|
+	| Operations | [ { "op": "replace", "path": "name.givenName", "value" : "givenName" } ] |
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'
+
+Scenario: Check no content (HTTP 204) is returned when patch userName with the same value (HTTP PATCH replace)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						|
+	| Operations | [ { "op": "replace", "path": "userName", "value" : "bjen" } ]			|
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'
+
+Scenario: Check no content (HTTP 204) is returned when patch name with the same value (HTTP PATCH replace)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value																																			|
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]																								|
+	| Operations | [ { "op": "replace", "path": "name", "value" : { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" } } ]			|
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'	
+
+Scenario: Check no content (HTTP 204) is returned when patching name.givenName with the same value (HTTP PATCH add)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						|
+	| Operations | [ { "op": "add", "path": "name.givenName", "value" : "givenName" } ]		|
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'
+
+Scenario: Check no content (HTTP 204) is returned when patch userName with the same value (HTTP PATCH add)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                    |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						|
+	| Operations | [ { "op": "add", "path": "userName", "value" : "bjen" } ]				|
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'
+
+Scenario: Check no content (HTTP 204) is returned when patch name with the same value (HTTP PATCH add)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value																																			|
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]																								|
+	| Operations | [ { "op": "add", "path": "name", "value" : { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" } } ]			|
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '204'
+
 Scenario: Check complex immutable attribute can be updated with the same value
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key              | Value                                                                                                          |
