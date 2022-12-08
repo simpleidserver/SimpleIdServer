@@ -85,6 +85,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> value, string resourceType)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<SCIMRepresentation> Get(string representationId, CancellationToken token)
         {
             var collection = _scimDbContext.SCIMRepresentationLst;

@@ -52,6 +52,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .FirstOrDefaultAsync();
         }
 
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> value, string resourceType)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public async Task<ITransaction> StartTransaction(CancellationToken token)
         {
             var transaction = await _scimDbContext.Database.BeginTransactionAsync(token);

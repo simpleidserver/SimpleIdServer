@@ -42,6 +42,15 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result);
         }
 
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
+        {
+            var result = LstData.Where(r =>
+            {
+                return r.ResourceType == resourceType && r.FlatAttributes.Any(a => a.FullPath == fullPath && values.Contains(a.ValueString));
+            });
+            return Task.FromResult(result);
+        }
+
         public override Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
             var record = LstData.First(l => l.Id == data.Id);

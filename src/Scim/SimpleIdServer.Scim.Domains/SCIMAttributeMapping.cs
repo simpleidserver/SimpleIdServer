@@ -14,6 +14,13 @@ namespace SimpleIdServer.Scim.Domains
         public string TargetResourceType { get; set; }
         public string TargetAttributeId { get; set; }
         public Mode Mode { get; set; } = Mode.STANDARD;
+        public bool IsSelf
+        {
+            get
+            {
+                return SourceResourceType == TargetResourceType;
+            }
+        }
     }
 
     public enum Mode
