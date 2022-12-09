@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,9 +53,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .FirstOrDefaultAsync();
         }
 
-        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> value, string resourceType)
+        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
         {
-            throw new System.NotImplementedException();
+            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+                .Where(r => r.ResourceType == resourceType && r.FlatAttributes.Any(a => a.FullPath == fullPath && values.Contains(a.ValueString)))
+                .ToListAsync();
+            return result;
         }
 
         public async Task<ITransaction> StartTransaction(CancellationToken token)

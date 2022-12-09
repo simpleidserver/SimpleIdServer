@@ -52,6 +52,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                {
                    opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
                    opt.AddStringAttribute("display", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                   opt.AddStringAttribute("type", new List<string> { "direct", "indirect" }, mutability: SCIMSchemaAttributeMutabilities.READONLY);
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                .AddComplexAttribute("phones", opt =>
                {
@@ -131,7 +132,16 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                     SourceAttributeSelector = "members",
                     TargetResourceType = userSchema.ResourceType,
-                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
+                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                    Mode = Mode.PROPAGATE_INHERITANCE
+                },
+                new SCIMAttributeMapping
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    SourceAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id,
+                    SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                    SourceAttributeSelector = "members",
+                    TargetResourceType = StandardSchemas.GroupSchema.ResourceType
                 },
                 new SCIMAttributeMapping
                 {

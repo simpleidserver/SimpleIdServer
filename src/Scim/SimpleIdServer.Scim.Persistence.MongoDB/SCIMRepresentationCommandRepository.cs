@@ -85,9 +85,22 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> value, string resourceType)
+        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
         {
-            throw new System.NotImplementedException();
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
+                .Where(r => r.ResourceType == resourceType && r.FlatAttributes.Any(a => a.FullPath == fullPath && values.Contains(a.ValueString)))
+                .ToMongoListAsync<SCIMRepresentationModel>();
+            if (result.Any())
+            {
+                var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
+                var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
+                foreach (var representation in result)
+                {
+                    representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
+                }
+            }
+
+            return result;
         }
 
         public async Task<SCIMRepresentation> Get(string representationId, CancellationToken token)

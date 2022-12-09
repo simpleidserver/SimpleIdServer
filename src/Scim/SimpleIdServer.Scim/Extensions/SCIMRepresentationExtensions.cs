@@ -315,7 +315,7 @@ namespace SimpleIdServer.Scim.Domain
                                     var scimAttributeExpression = scimFilter as SCIMAttributeExpression;
                                     var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
                                     var filteredAttrs = attributes.Where(a => a.ParentAttributeId == parent.Id);
-                                    newAttributes = FilterDuplicate(filteredAttrs, newAttributes);
+                                    if (IsExactlySimilar(filteredAttrs, newAttributes)) break;
                                     foreach (var newAttribute in newAttributes.OrderBy(l => l.GetLevel()))
                                     {
                                         if (!flatHiearchy.Any(a => a.FullPath == newAttribute.FullPath))
@@ -361,8 +361,7 @@ namespace SimpleIdServer.Scim.Domain
             var result = new List<SCIMPatchResult>();
             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
             newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
-            newAttributes = FilterDuplicate(attributes, newAttributes);
-            if (!newAttributes.Any()) return result;
+            if (IsExactlySimilar(attributes, newAttributes)) return result;
             var newHierarchicalAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newAttributes);
             var fullPath = newHierarchicalAttributes.First().FullPath;
             var existingAttributesToRemove = attributes.Where(a => a.FullPath == fullPath && !newHierarchicalAttributes.Any(na => na.IsSimilar(a, true)));
@@ -383,6 +382,21 @@ namespace SimpleIdServer.Scim.Domain
             }
 
             return result;
+        }
+
+        private static bool IsExactlySimilar(IEnumerable<SCIMRepresentationAttribute> existingAttributes, ICollection<SCIMRepresentationAttribute> newFlatAttributes)
+        {
+            var excludedAttributeIds = new List<string>();
+            var rootAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newFlatAttributes);
+            if (rootAttributes.Count() != existingAttributes.Count()) return false;
+            foreach(var rootAttribute in rootAttributes)
+            {
+                var attr = existingAttributes.FirstOrDefault(e => !excludedAttributeIds.Contains(e.Id) && e.IsSimilar(rootAttribute, true));
+                if (attr == null) return false;
+                excludedAttributeIds.Add(attr.Id);
+            }
+
+            return true;
         }
 
         private static ICollection<SCIMRepresentationAttribute> FilterDuplicate(IEnumerable<SCIMRepresentationAttribute> existingAttributes, ICollection<SCIMRepresentationAttribute> newFlatAttributes)
