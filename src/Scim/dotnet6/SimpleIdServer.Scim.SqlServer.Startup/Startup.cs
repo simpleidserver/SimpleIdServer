@@ -173,7 +173,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                             SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                             SourceAttributeSelector = "members",
                             TargetResourceType = StandardSchemas.UserSchema.ResourceType,
-                            TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
+                            TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                            Mode = Mode.PROPAGATE_INHERITANCE
                         };
                         var thirdAttributeMapping = new SCIMAttributeMapping
                         {
@@ -183,9 +184,19 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                             SourceAttributeSelector = "manager",
                             TargetResourceType = StandardSchemas.UserSchema.ResourceType
                         };
+                        var fourthAttributeMapping = new SCIMAttributeMapping
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                            SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                            SourceAttributeSelector = "members",
+                            TargetResourceType = StandardSchemas.GroupSchema.ResourceType
+                        };
+
                         context.SCIMAttributeMappingLst.Add(firstAttributeMapping);
                         context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
                         context.SCIMAttributeMappingLst.Add(thirdAttributeMapping);
+                        context.SCIMAttributeMappingLst.Add(fourthAttributeMapping);
                     }
 
                     if (!context.ProvisioningConfigurations.Any())

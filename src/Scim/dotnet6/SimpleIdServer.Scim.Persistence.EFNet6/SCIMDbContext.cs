@@ -31,6 +31,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             modelBuilder.ApplyConfiguration(new SCIMSchemaAttributeConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMSchemaConfiguration());
             modelBuilder.ApplyConfiguration(new SCIMSchemaExtensionConfiguration());
+            modelBuilder.ApplyConfiguration(new SCIMRepresentationIndirectReferenceConfiguration());
         }
     }
 }

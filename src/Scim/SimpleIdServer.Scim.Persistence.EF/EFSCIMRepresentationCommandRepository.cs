@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +22,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             var result = await _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.FlatAttributes)
+                .Include(r => r.IndirectReferences)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == id, token);
             return result;
         }
@@ -30,6 +30,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
             IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+                .Include(r => r.IndirectReferences)
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToListAsync();
             return result;
@@ -39,6 +40,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             return _scimDbContext.SCIMRepresentationAttributeLst
                 .Include(a => a.Representation).ThenInclude(a => a.FlatAttributes)
+                .Include(a => a.Representation).ThenInclude(a => a.IndirectReferences)  
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
                 .Select(a => a.Representation)
                 .FirstOrDefaultAsync();
@@ -48,6 +50,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             return _scimDbContext.SCIMRepresentationAttributeLst
                 .Include(a => a.Representation).ThenInclude(a => a.FlatAttributes)
+                .Include(a => a.Representation).ThenInclude(a => a.IndirectReferences)
                 .Where(a => (endpoint == null || endpoint == a.Representation.ResourceType) && a.SchemaAttributeId == schemaAttributeId && a.ValueInteger != null && a.ValueInteger == value)
                 .Select(a => a.Representation)
                 .FirstOrDefaultAsync();
@@ -56,6 +59,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType)
         {
             IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+                .Include(r => r.IndirectReferences)
                 .Where(r => r.ResourceType == resourceType && r.FlatAttributes.Any(a => a.FullPath == fullPath && values.Contains(a.ValueString)))
                 .ToListAsync();
             return result;
