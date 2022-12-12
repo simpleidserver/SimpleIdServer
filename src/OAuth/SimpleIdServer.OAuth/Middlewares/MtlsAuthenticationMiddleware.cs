@@ -19,10 +19,7 @@ namespace SimpleIdServer.OAuth.Middlewares
         private readonly ILogger<MtlsAuthenticationMiddleware> _logger;
         private readonly OAuthHostOptions _options;
 
-        public MtlsAuthenticationMiddleware(
-            RequestDelegate next, 
-            ILogger<MtlsAuthenticationMiddleware> logger,
-            IOptions<OAuthHostOptions> options)
+        public MtlsAuthenticationMiddleware(RequestDelegate next, ILogger<MtlsAuthenticationMiddleware> logger, IOptions<OAuthHostOptions> options)
         {
             _next = next;
             _logger = logger;

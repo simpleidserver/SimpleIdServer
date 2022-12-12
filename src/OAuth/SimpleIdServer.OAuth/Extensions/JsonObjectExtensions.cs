@@ -1,20 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Domains;
+using SimpleIdServer.Domains.DTOs;
 using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Extensions;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Web;
 
-namespace SimpleIdServer.OAuth.Extensions
+namespace System.Text.Json.Nodes
 {
     public class ClientCredentials
     {
@@ -30,33 +28,15 @@ namespace SimpleIdServer.OAuth.Extensions
 
     public static class JsonObjectExtensions
     {
-        public static IEnumerable<KeyValuePair<string, string>> ToEnumerable(this JsonObject jObj)
-        {
-            var result = new List<KeyValuePair<string, string>>();
-            foreach(JProperty record in jObj.Properties())
-            {
-                result.Add(new KeyValuePair<string, string>(record.Name, record.Value.ToString()));
-            }
-
-            return result;
-        }
+        public static IEnumerable<KeyValuePair<string, string>> ToEnumerable(this JsonObject jObj) => jObj.ToDictionary(r => r.Key, r => r.Value.ToJsonString());
 
         #region Authorization request
 
-        public static string GetCodeChallengeFromAuthorizationRequest(this JsonObject jObj)
-        {
-            return jObj.GetStr(AuthorizationRequestParameters.CodeChallenge);
-        }
+        public static string GetCodeChallengeFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.CodeChallenge);
 
-        public static string GetCodeChallengeMethodFromAuthorizationRequest(this JsonObject jObj)
-        {
-            return jObj.GetStr(AuthorizationRequestParameters.CodeChallengeMethod);
-        }
+        public static string GetCodeChallengeMethodFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.CodeChallengeMethod);
 
-        public static string GetStateFromAuthorizationRequest(this JsonObject jObj)
-        {
-            return jObj.GetStr(AuthorizationRequestParameters.State);
-        }
+        public static string GetStateFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.State);
 
         public static IEnumerable<string> GetScopesFromAuthorizationRequest(this JsonObject jObj)
         {
@@ -91,15 +71,9 @@ namespace SimpleIdServer.OAuth.Extensions
             return uiLocales.Split(' ');
         }
 
-        public static string GetClientIdFromAuthorizationRequest(this JsonObject jObj)
-        {
-            return jObj.GetStr(AuthorizationRequestParameters.ClientId);
-        }
+        public static string GetClientIdFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ClientId);
 
-        public static string GetResponseModeFromAuthorizationRequest(this JsonObject jObj)
-        {
-            return jObj.GetStr(AuthorizationRequestParameters.ResponseMode);
-        }
+        public static string GetResponseModeFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseMode);
 
         public static string GetRedirectUriFromAuthorizationRequest(this JsonObject jObj)
         {
@@ -112,49 +86,25 @@ namespace SimpleIdServer.OAuth.Extensions
 
         #region Token request
 
-        public static string GetGrantType(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.GrantType);
-        }
+        public static string GetGrantType(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.GrantType);
 
-        public static string GetClientAssertion(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.ClientAssertion);
-        }
+        public static string GetClientAssertion(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ClientAssertion);
 
-        public static string GetClientAssertionType(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.ClientAssertionType);
-        }
+        public static string GetClientAssertionType(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ClientAssertionType);
 
-        public static string GetClientId(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.ClientId);
-        }
+        public static string GetClientId(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ClientId);
 
-        public static string GetClientSecret(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.ClientSecret);
-        }
+        public static string GetClientSecret(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ClientSecret);
 
-        public static string GetRefreshToken(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.RefreshToken);
-        }
+        public static string GetRefreshToken(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.RefreshToken);
 
-        public static string GetAuthorizationCode(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.Code);
-        }
+        public static string GetAuthorizationCode(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.Code);
 
-        public static string GetCodeVerifier(this JsonObject jObj)
-        {
-            return jObj.GetStr(TokenRequestParameters.CodeVerifier);
-        }
+        public static string GetCodeVerifier(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.CodeVerifier);
 
         public static ClientCredentials GetClientCredentials(this JsonObject jObj)
         {
-            var authorization = jObj.GetToken(Constants.AuthorizationHeaderName);
+            var authorization = jObj.GetToken(SimpleIdServer.OAuth.Constants.AuthorizationHeaderName);
             if (authorization == null)
             {
                 return null;
@@ -204,105 +154,45 @@ namespace SimpleIdServer.OAuth.Extensions
 
         #region OAuth client parameters
 
-        public static int? GetRefreshTokenExpirationTimeInSeconds(this JsonObject jObj)
-        {
-            return jObj.GetInt(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds);
-        }
+        public static int? GetRefreshTokenExpirationTimeInSeconds(this JsonObject jObj) => jObj.GetInt(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds);
 
-        public static int? GetTokenExpirationTimeInSeconds(this JsonObject jObj)
-        {
-            return jObj.GetInt(OAuthClientParameters.TokenExpirationTimeInSeconds);
-        }
+        public static int? GetTokenExpirationTimeInSeconds(this JsonObject jObj) => jObj.GetInt(OAuthClientParameters.TokenExpirationTimeInSeconds);
 
-        public static string GetTokenSignedResponseAlg(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TokenSignedResponseAlg);
-        }
+        public static string GetTokenSignedResponseAlg(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TokenSignedResponseAlg);
 
-        public static string GetTokenEncryptedResponseAlg(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TokenEncryptedResponseAlg);
-        }
+        public static string GetTokenEncryptedResponseAlg(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TokenEncryptedResponseAlg);
 
-        public static string GetTokenEncryptedResponseEnc(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TokenEncryptedResponseEnc);
-        }
+        public static string GetTokenEncryptedResponseEnc(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TokenEncryptedResponseEnc);
 
-        public static IEnumerable<string> GetGrantTypes(this JsonObject jObj)
-        {
-            return jObj.GetArray(OAuthClientParameters.GrantTypes);
-        }
+        public static IEnumerable<string> GetGrantTypes(this JsonObject jObj) => jObj.GetArray(OAuthClientParameters.GrantTypes);
 
-        public static IEnumerable<string> GetRedirectUris(this JsonObject jObj)
-        {
-            return jObj.GetArray(OAuthClientParameters.RedirectUris);
-        }
+        public static IEnumerable<string> GetRedirectUris(this JsonObject jObj) => jObj.GetArray(OAuthClientParameters.RedirectUris);
 
-        public static string GetTokenEndpointAuthMethod(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TokenEndpointAuthMethod);
-        }
+        public static string GetTokenEndpointAuthMethod(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TokenEndpointAuthMethod);
 
-        public static IEnumerable<string> GetResponseTypes(this JsonObject jObj)
-        {
-            return jObj.GetArray(OAuthClientParameters.ResponseTypes).SelectMany(_ => _.Trim().Split(' '));
-        }
+        public static IEnumerable<string> GetResponseTypes(this JsonObject jObj) =>jObj.GetArray(OAuthClientParameters.ResponseTypes).SelectMany(_ => _.Trim().Split(' '));
 
-        public static string GetClientName(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.ClientName);
-        }
+        public static string GetClientName(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.ClientName);
 
-        public static Dictionary<string, string> GetClientNames(this JsonObject jObj)
-        {            
-            return jObj.GetTranslations(OAuthClientParameters.ClientName);
-        }
+        public static Dictionary<string, string> GetClientNames(this JsonObject jObj) => jObj.GetTranslations(OAuthClientParameters.ClientName);
 
-        public static Dictionary<string, string> GetClientUris(this JsonObject jObj)
-        {
-            return jObj.GetTranslations(OAuthClientParameters.ClientUri);
-        }
+        public static Dictionary<string, string> GetClientUris(this JsonObject jObj) => jObj.GetTranslations(OAuthClientParameters.ClientUri);
 
-        public static Dictionary<string, string> GetLogoUris(this JsonObject jObj)
-        {
-            return jObj.GetTranslations(OAuthClientParameters.LogoUri);
-        }
+        public static Dictionary<string, string> GetLogoUris(this JsonObject jObj) => jObj.GetTranslations(OAuthClientParameters.LogoUri);
 
-        public static Dictionary<string, string> GetTosUris(this JsonObject jObj)
-        {
-            return jObj.GetTranslations(OAuthClientParameters.TosUri);
-        }
+        public static Dictionary<string, string> GetTosUris(this JsonObject jObj) => jObj.GetTranslations(OAuthClientParameters.TosUri);
 
-        public static Dictionary<string, string> GetPolicyUris(this JsonObject jObj)
-        {
-            return jObj.GetTranslations(OAuthClientParameters.PolicyUri);
-        }
+        public static Dictionary<string, string> GetPolicyUris(this JsonObject jObj) => jObj.GetTranslations(OAuthClientParameters.PolicyUri);
 
-        public static string GetJwksUri(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.JwksUri);
-        }
+        public static string GetJwksUri(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.JwksUri);
 
-        public static string GetSoftwareId(this JObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.SoftwareId);
-        }
+        public static string GetSoftwareId(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.SoftwareId);
 
-        public static string GetSoftwareStatement(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.SoftwareStatement);
-        }
+        public static string GetSoftwareStatement(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.SoftwareStatement);
 
-        public static string GetSoftwareVersion(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.SoftwareVersion);
-        }
+        public static string GetSoftwareVersion(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.SoftwareVersion);
 
-        public static string GetRegistrationAccessToken(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.RegistrationAccessToken);
-        }
+        public static string GetRegistrationAccessToken(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.RegistrationAccessToken);
 
         public static IEnumerable<JsonWebKey> GetJwks(this JsonObject jObj)
         {
@@ -312,14 +202,10 @@ namespace SimpleIdServer.OAuth.Extensions
                 return null;
             }
 
-            var json = JsonObject.Parse(str);
-            if (json == null || !json.ContainsKey("keys"))
-            {
-                return null;
-            }
+            var keys = JsonObject.Parse(str)?["keys"]?.AsArray();
+            if (keys == null) return null;
 
-            var keysJson = json["keys"].ToString();
-            return JsonConvert.DeserializeObject<JArray>(keysJson).Select(k => JsonWebKey.Deserialize(k.ToString()));
+            return keys.Select(k => JsonWebKey.Deserialize(k.ToJsonString()));
         }
 
         public static IEnumerable<string> GetScopes(this JsonObject jObj)
@@ -333,10 +219,7 @@ namespace SimpleIdServer.OAuth.Extensions
             return scope.Split(' ');
         }
 
-        public static IEnumerable<string> GetContacts(this JsonObject jObj)
-        {
-            return jObj.GetArray(OAuthClientParameters.Contacts);
-        }
+        public static IEnumerable<string> GetContacts(this JsonObject jObj) => jObj.GetArray(OAuthClientParameters.Contacts);
 
         public static Dictionary<string, string> GetTranslations(this JsonObject jObj, string name)
         {
@@ -367,44 +250,23 @@ namespace SimpleIdServer.OAuth.Extensions
             return result;
         }
 
-        public static string GetTlsClientAuthSubjectDn(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSubjectDN);
-        }
+        public static string GetTlsClientAuthSubjectDn(this JsonObject jObj) =>  jObj.GetStr(OAuthClientParameters.TlsClientAuthSubjectDN);
 
-        public static string GetTlsClientAuthSanDNS(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanDNS);
-        }
+        public static string GetTlsClientAuthSanDNS(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TlsClientAuthSanDNS);
 
-        public static string GetTlsClientAuthSanUri(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanUri);
-        }
+        public static string GetTlsClientAuthSanUri(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TlsClientAuthSanUri);
 
-        public static string GetTlsClientAuthSanIP(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanIp);
-        }
+        public static string GetTlsClientAuthSanIP(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TlsClientAuthSanIp);
 
-        public static string GetTlsClientAuthSanEmail(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthClientParameters.TlsClientAuthSanEmail);
-        }
+        public static string GetTlsClientAuthSanEmail(this JsonObject jObj) => jObj.GetStr(OAuthClientParameters.TlsClientAuthSanEmail);
 
         #endregion
 
         #region OAuth Scope parameters
 
-        public static string GetScopeName(this JsonObject jObj)
-        {
-            return jObj.GetStr(OAuthScopeParameters.Name);
-        }
+        public static string GetScopeName(this JsonObject jObj) => jObj.GetStr(OAuthScopeParameters.Name);
 
-        public static IEnumerable<string> GetClaims(this JsonObject jObj)
-        {
-            return jObj.GetArray(OAuthScopeParameters.Claims);
-        }
+        public static IEnumerable<string> GetClaims(this JsonObject jObj) => jObj.GetArray(OAuthScopeParameters.Claims);
 
         #endregion
 
@@ -499,37 +361,26 @@ namespace SimpleIdServer.OAuth.Extensions
         public static IEnumerable<string> GetArray(this JsonObject jObj, string name)
         {
             var result = jObj.GetToken(name);
-            if (!(result is JsonArray))
-            {
-                return new string[0];
-            }
+            if (!(result is JsonArray)) return new string[0];
 
             var lst = new List<string>();
-            foreach(var record in (JArray)result.AsArray())
-            {
+            foreach(var record in result.AsArray())
                 lst.Add(record.ToString());
-            }
 
             return lst;
         }
 
         public static JsonNode GetToken(this JsonObject jObj, string name)
         {
-            JsonNode jToken;
-            if (!jObj.TryGetValue(name, out jToken))
-            {
-                return null;
-            }
-
-            return jToken;
+            var result = jObj[name];
+            if (result == null) return null;
+            return result;
         }
 
         public static JsonObject AddNotEmpty(this JsonObject jObj, string name, string value)
         {
             if (!string.IsNullOrWhiteSpace(value))
-            {
                 jObj.Add(name, value);
-            }
 
             return jObj;
         }
@@ -537,9 +388,7 @@ namespace SimpleIdServer.OAuth.Extensions
         public static JsonObject AddNotEmpty(this JsonObject jObj, string name, DateTime? value)
         {
             if (value != null)
-            {
                 jObj.Add(name, value);
-            }
 
             return jObj;
         }
@@ -555,7 +404,7 @@ namespace SimpleIdServer.OAuth.Extensions
             return jObj;
         }
 
-        public static JsonObject AddNotEmpty(this JsonObject jObj, string name, ICollection<OAuthTranslation> translations)
+        public static JsonObject AddNotEmpty(this JsonObject jObj, string name, ICollection<Translation> translations)
         {
             if (translations != null && translations.Any())
             {

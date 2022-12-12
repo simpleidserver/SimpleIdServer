@@ -6,7 +6,6 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.Store;
 using System;
 using System.Linq;
@@ -29,15 +28,13 @@ namespace SimpleIdServer.OAuth.Jwt
 
     public class JwtBuilder : IJwtBuilder
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
         private readonly IJwsGenerator _jwsGenerator;
         private readonly IJweGenerator _jweGenerator;
         private readonly IClientHelper _clientHelper;
 
-        public JwtBuilder(IHttpClientFactory httpClientFactory, IJsonWebKeyRepository jsonWebKeyRepository, IJwsGenerator jwsGenerator, IJweGenerator jweGenerator, IClientHelper clientHelper)
+        public JwtBuilder(IJsonWebKeyRepository jsonWebKeyRepository, IJwsGenerator jwsGenerator, IJweGenerator jweGenerator, IClientHelper clientHelper)
         {
-            _httpClientFactory = httpClientFactory;
             _jsonWebKeyRepository = jsonWebKeyRepository;
             _jwsGenerator = jwsGenerator;
             _jweGenerator = jweGenerator;
@@ -75,9 +72,9 @@ namespace SimpleIdServer.OAuth.Jwt
             };
             var currentDateTime = DateTime.UtcNow;
             int nbOperations = operations.Count();
-            var jsonWebKeys = await _jsonWebKeyRepository.Query().Include(j => j.KeyOperationLst).Where(j =>
+            var jsonWebKeys = await _jsonWebKeyRepository.Query().Where(j =>
                 (j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime) &&
-                (j.Use == Usages.SIG && j.Alg == jwsAlg && j.KeyOperationLst.Where(k => operations.Contains(k.Operation)).Count() == nbOperations))
+                (j.Use == Usages.SIG && j.Alg == jwsAlg && j.KeyOps.Where(k => operations.Contains(k)).Count() == nbOperations))
                 .ToListAsync(cancellationToken);
             return Sign(jwsPayload, jsonWebKeys.FirstOrDefault(), jwsAlg);
         }
@@ -96,9 +93,9 @@ namespace SimpleIdServer.OAuth.Jwt
             };
             var currentDateTime = DateTime.UtcNow;
             int nbOperations = operations.Count();
-            var jsonWebKeys = await _jsonWebKeyRepository.Query().Include(j => j.KeyOperationLst).Where(j =>
+            var jsonWebKeys = await _jsonWebKeyRepository.Query().Where(j =>
                 (j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime) &&
-                (j.Use == Usages.ENC && j.Alg == jweAlg && j.KeyOperationLst.Where(k => operations.Contains(k.Operation)).Count() == nbOperations))
+                (j.Use == Usages.ENC && j.Alg == jweAlg && j.KeyOps.Where(k => operations.Contains(k)).Count() == nbOperations))
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
             if (!jsonWebKeys.Any())
@@ -109,23 +106,8 @@ namespace SimpleIdServer.OAuth.Jwt
             return Encrypt(jws, jweEnc, jsonWebKeys.First());
         }
 
-        public string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey)
-        {
-            return _jweGenerator.Build(
-                jws,
-                jsonWebKey.Alg,
-                jweEnc,
-                jsonWebKey);
-        }
+        public string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey) => _jweGenerator.Build(jws, jsonWebKey.Alg, jweEnc, jsonWebKey);
 
-        public string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey, string password)
-        {
-            return _jweGenerator.Build(
-                jws,
-                jsonWebKey.Alg,
-                jweEnc,
-                jsonWebKey,
-                password);
-        }
+        public string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey, string password) => _jweGenerator.Build(jws, jsonWebKey.Alg, jweEnc, jsonWebKey, password);
     }
 }

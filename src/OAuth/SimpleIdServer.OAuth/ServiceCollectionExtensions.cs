@@ -1,15 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Jwks;
-using SimpleIdServer.OAuth.Api.Register.Handlers;
-using SimpleIdServer.OAuth.Api.Register.Validators;
 using SimpleIdServer.OAuth.Api.Token;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
@@ -31,13 +28,17 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+
         /// <summary>
         /// Register OAUTH2.0 dependencies.
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerOAuthBuilder AddSIDIdentityServer(this IServiceCollection services)
+        public static SimpleIdServerOAuthBuilder AddSIDIdentityServer(this IServiceCollection services, Action<OAuthHostOptions> callback = null)
         {
+            if (callback != null) services.Configure(callback);
+            else services.Configure<OAuthHostOptions>(o => { });
             services.AddDistributedMemoryCache();
             services.AddStore()
                 .AddResponseModeHandlers()
@@ -48,23 +49,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthJwt()
                 .AddLib()
                 .AddJwt()
-                .AddRegisterApi()
-                .AddManagementApi()
                 .AddConfigurationApi()
                 .AddUI();
             return new SimpleIdServerOAuthBuilder(services);
-        }
-
-        /// <summary>
-        /// Register OAUTH2.0 dependencies.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static SimpleIdServerOAuthBuilder AddSIDOAuth(this IServiceCollection services, Action<OAuthHostOptions> options)
-        {
-            services.Configure(options);
-            return services.AddSIDOAuth();
         }
 
         #region Private methods
@@ -121,7 +108,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenBuilder, RefreshTokenBuilder>();
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
-            services.AddTransient<ITranslationHelper, TranslationHelper>();
             services.AddTransient<IRequestObjectValidator, RequestObjectValidator>();
             return services;
         }
@@ -154,36 +140,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IConfigurationRequestHandler, ConfigurationRequestHandler>();
             services.AddTransient<IOAuthWorkflowConverter, OAuthWorkflowConverter>();
-            return services;
-        }
-
-        private static IServiceCollection AddRegisterApi(this IServiceCollection services)
-        {
-            services.AddTransient<IAddOAuthClientHandler, AddOAuthClientHandler>();
-            services.AddTransient<IGetOAuthClientHandler, GetOAuthClientHandler>();
-            services.AddTransient<IUpdateOAuthClientHandler, UpdateOAuthClientHandler>();
-            services.AddTransient<IDeleteOAuthClientHandler, DeleteOAuthClientHandler>();
-            services.AddTransient<IOAuthClientValidator, OAuthClientValidator>();
-            return services;
-        }
-
-        private static IServiceCollection AddManagementApi(this IServiceCollection services)
-        {
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOAuthClientHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOAuthClientHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOauthClientsHandler, SimpleIdServer.OAuth.Api.Management.Handlers.SearchOauthClientsHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthClientHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateOAuthClientHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthClientHandler, SimpleIdServer.OAuth.Api.Management.Handlers.AddOAuthClientHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IDeleteOAuthClientHandler, SimpleIdServer.OAuth.Api.Management.Handlers.DeleteOAuthClientHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.ISearchOAuthScopesHandler, SimpleIdServer.OAuth.Api.Management.Handlers.SearchOAuthScopesHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateOAuthScopeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateOAuthScopeHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthScopeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.AddOAuthScopeHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IDeleteOAuthScopeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.DeleteOAuthScopeHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateUserBySCIMIdHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetUserBySCIMIdHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IUpdateUserPasswordHandler, SimpleIdServer.OAuth.Api.Management.Handlers.UpdateUserPasswordHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IAddOAuthUserBySCIMIdHandler, SimpleIdServer.OAuth.Api.Management.Handlers.AddOAuthUserBySCIMIdHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOTPCodeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOTPCodeHandler>();
-            services.AddTransient<SimpleIdServer.OAuth.Api.Management.Handlers.IGetOTPQRCodeHandler, SimpleIdServer.OAuth.Api.Management.Handlers.GetOTPQRCodeHandler>();
             return services;
         }
 

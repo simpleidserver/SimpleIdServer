@@ -9,38 +9,18 @@ namespace SimpleIdServer.OAuth.Options
 {
     public class OAuthHostOptions
     {
-        public OAuthHostOptions()
-        {
-            DefaultScopes = new List<string>();
-            DefaultTokenProfile = BearerTokenProfile.DEFAULT_NAME;
-            ClientSecretExpirationInSeconds = null;
-            SoftwareStatementTrustedParties = new List<SoftwareStatementTrustedParty>();
-            AuthorizationCodeExpirationInSeconds = 10 * 60;
-            MtlsEnabled = false;
-            CertificateAuthenticationScheme = "Certificate";
-            DefaultTokenSignedResponseAlg = RSA256SignHandler.ALG_NAME;
-            JWKExpirationTimeInSeconds = 60 * 5;
-            DefaultTokenExpirationTimeInSeconds= 60 * 30;
-            DefaultRefreshTokenExpirationTimeInSeconds = 60 * 30;
-            HOTPWindow = 5;
-            TOTPStep = 30;
-            OTPAlg = OTPAlgs.TOTP;
-            OTPIssuer = "SimpleIdServer";
-            IsScopeClaimConcatenationEnabled = false;
-        }
-
         /// <summary>
         /// OAUTH2.0 client's default scopes.
         /// </summary>
-        public ICollection<string> DefaultScopes { get; set; }
+        public ICollection<string> DefaultScopes { get; set; } = new List<string>();
         /// <summary>
         /// OAUTH2.0 client's default token profile.
         /// </summary>
-        public string DefaultTokenProfile { get; set; }
+        public string DefaultTokenProfile { get; set; } = BearerTokenProfile.DEFAULT_NAME;
         /// <summary>
         /// Client secret expiration time in seconds.
         /// </summary>
-        public int? ClientSecretExpirationInSeconds { get; set; }
+        public int? ClientSecretExpirationInSeconds { get; set; } = null;
         /// <summary>
         /// Authorization cod expiration time in seconds.
         /// </summary>
@@ -48,39 +28,39 @@ namespace SimpleIdServer.OAuth.Options
         /// <summary>
         /// Trusted parties used to validate the software statement.
         /// </summary>
-        public ICollection<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; }
+        public ICollection<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; } = new List<SoftwareStatementTrustedParty>();
         /// <summary>
         /// Mututal TLS is enabled.
         /// </summary>
-        public bool MtlsEnabled { get; set; }
+        public bool MtlsEnabled { get; set; } = false;
         /// <summary>
         /// Client certificate authentication scheme.
         /// </summary>
-        public string CertificateAuthenticationScheme { get; set; }
+        public string CertificateAuthenticationScheme { get; set; } = "Certificate";
         /// <summary>
         /// Default token signed response algorithm.
         /// </summary>
-        public string DefaultTokenSignedResponseAlg { get; set; }
+        public string DefaultTokenSignedResponseAlg { get; set; } = RSA256SignHandler.ALG_NAME;
         /// <summary>
         /// JWK expiration time in seconds.
         /// </summary>
-        public int JWKExpirationTimeInSeconds { get; set; }
+        public int JWKExpirationTimeInSeconds { get; set; } = 60 * 5;
         /// <summary>
         /// Default Token Expiration Time in seconds.
         /// </summary>
-        public int DefaultTokenExpirationTimeInSeconds { get; set; }
+        public int DefaultTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>
-        public int DefaultRefreshTokenExpirationTimeInSeconds { get; set; }
+        public int DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
         /// HOTP Window.
         /// </summary>
-        public int HOTPWindow { get; set; }
+        public int HOTPWindow { get; set; } = 5;
         /// <summary>
         /// Calculate time windows.
         /// </summary>
-        public int TOTPStep { get; set; }
+        public int TOTPStep { get; set; } = 30;
         /// <summary>
         /// Default OTP algorithm.
         /// </summary>
@@ -88,11 +68,11 @@ namespace SimpleIdServer.OAuth.Options
         /// <summary>
         /// Default OTP issuer.
         /// </summary>
-        public string OTPIssuer { get; set; }
+        public string OTPIssuer { get; set; } = "SimpleIdServer";
         /// <summary>
         /// If true then "scope" claim is expressed as a list of space-delimited case sensistive strings"
         /// If false then "scope" claim is expressed as an array of string.
         /// </summary>
-        public bool IsScopeClaimConcatenationEnabled { get; set; }
+        public bool IsScopeClaimConcatenationEnabled { get; set; } = false;
     }
 }

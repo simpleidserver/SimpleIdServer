@@ -4,10 +4,10 @@ using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 

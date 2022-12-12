@@ -33,7 +33,6 @@ namespace SimpleIdServer.Store
             builder.ApplyConfiguration(new UserExternalAuthProviderConfiguration());
             builder.ApplyConfiguration(new UserSessionConfiguration());
             builder.ApplyConfiguration(new JsonWebKeyConfiguration());
-            builder.ApplyConfiguration(new JsonWebKeyKeyOperationConfigurationConfiguration());
             builder.ApplyConfiguration(new TokenConfiguration());
         }
     }

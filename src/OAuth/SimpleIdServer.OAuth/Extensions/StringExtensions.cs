@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleIdServer.OAuth.Extensions
+namespace System
 {
     public static class StringExtensions
     {

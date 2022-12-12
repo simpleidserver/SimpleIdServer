@@ -23,9 +23,7 @@ namespace SimpleIdServer.OAuth.Api.Jwks
         private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
         private readonly OAuthHostOptions _options;
 
-        public JwksRequestHandler(
-            IJsonWebKeyRepository jsonWebKeyRepository, 
-            IOptions<OAuthHostOptions> options)
+        public JwksRequestHandler(IJsonWebKeyRepository jsonWebKeyRepository, IOptions<OAuthHostOptions> options)
         {
             _jsonWebKeyRepository = jsonWebKeyRepository;
             _options = options.Value;
@@ -35,7 +33,6 @@ namespace SimpleIdServer.OAuth.Api.Jwks
         {
             var currentDateTime = DateTime.UtcNow;
             var jsonWebKeys = await _jsonWebKeyRepository.Query()
-                .Include(j => j.KeyOperationLst)
                 .AsNoTracking()
                 .Where(j => j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime)
                 .ToListAsync(cancellationToken);

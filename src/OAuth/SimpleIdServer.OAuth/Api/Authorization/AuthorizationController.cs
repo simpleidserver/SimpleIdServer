@@ -146,9 +146,6 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             }
         }
 
-        private static bool IsHtmlEncoded(string url)
-        {
-            return HttpUtility.UrlDecode(url) != url;
-        }
+        private static bool IsHtmlEncoded(string url) => HttpUtility.UrlDecode(url) != url;
     }
 }

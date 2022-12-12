@@ -1,14 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace SimpleIdServer.OAuth.Extensions
+namespace Microsoft.AspNetCore.Http
 {
     public static class HeaderDictionaryExtensions
     {
-        public static JsonObject ToJObject(this IHeaderDictionary headerDictionary)
+        public static JsonObject ToJsonObject(this IHeaderDictionary headerDictionary)
         {
             var jObj = new JsonObject();
             foreach(var kvp in headerDictionary)

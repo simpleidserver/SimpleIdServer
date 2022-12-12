@@ -117,13 +117,13 @@ namespace SimpleIdServer.Jwt
 
     public class JsonWebKeyBuilder
     {
-        public JsonWebKeyEncBuilder NewEnc(string keyId, IEnumerable<KeyOperations> keyOps)
+        public JsonWebKeyEncBuilder NewEnc(string keyId, ICollection<KeyOperations> keyOps)
         {
             var jsonWebKey = new JsonWebKey(keyId, Usages.ENC, keyOps);
             return new JsonWebKeyEncBuilder(jsonWebKey);
         }
 
-        public JsonWebKeySignBuilder NewSign(string keyId, IEnumerable<KeyOperations> keyOps)
+        public JsonWebKeySignBuilder NewSign(string keyId, ICollection<KeyOperations> keyOps)
         {
             var jsonWebKey = new JsonWebKey(keyId, Usages.SIG, keyOps);
             return new JsonWebKeySignBuilder(jsonWebKey);

@@ -6,14 +6,8 @@ namespace SimpleIdServer.OAuth.Infrastructures
 {
     public class HttpClientFactory : IHttpClientFactory
     {
-        public HttpClient GetHttpClient()
-        {
-            return new HttpClient();
-        }
+        public HttpClient GetHttpClient() => new HttpClient();
 
-        public HttpClient GetHttpClient(HttpClientHandler handler)
-        {
-            return new HttpClient(handler);
-        }
+        public HttpClient GetHttpClient(HttpClientHandler handler) => new HttpClient(handler);
     }
 }

@@ -1,32 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws;
 using System;
 using static SimpleIdServer.Jwt.Constants;
 
-namespace SimpleIdServer.OAuth.Extensions
+namespace SimpleIdServer.Jwt.Jws
 {
     public static class JwsPayloadExtensions
     {
-        public static string GetIssuer(this JwsPayload jwsPayload)
-        {
-            return jwsPayload.GetClaimValue(OAuthClaims.Issuer);
-        }
+        public static string GetIssuer(this JwsPayload jwsPayload) => jwsPayload.GetClaimValue(OAuthClaims.Issuer);
 
-        public static string[] GetAudiences(this JwsPayload jwsPayload)
-        {
-            return jwsPayload.GetArrayClaim(OAuthClaims.Audiences);
-        }
+        public static string[] GetAudiences(this JwsPayload jwsPayload) => jwsPayload.GetArrayClaim(OAuthClaims.Audiences);
 
-        public static double GetExpirationTime(this JwsPayload jwsPayload) 
-        {
-            return jwsPayload.GetDoubleClaim(OAuthClaims.ExpirationTime);
-        }
+        public static double GetExpirationTime(this JwsPayload jwsPayload)  => jwsPayload.GetDoubleClaim(OAuthClaims.ExpirationTime);
 
-        public static double GetIat(this JwsPayload jwsPayload)
-        {
-            return jwsPayload.GetDoubleClaim(OAuthClaims.Iat);
-        }
+        public static double GetIat(this JwsPayload jwsPayload) =>  jwsPayload.GetDoubleClaim(OAuthClaims.Iat);
 
         public static string[] GetScopes(this JwsPayload jwsPayload)
         {
@@ -35,20 +22,11 @@ namespace SimpleIdServer.OAuth.Extensions
             return arr;
         }
 
-        public static string GetAzp(this JwsPayload jwsPayload)
-        {
-            return jwsPayload.GetClaimValue(OAuthClaims.Azp);
-        }
+        public static string GetAzp(this JwsPayload jwsPayload) => jwsPayload.GetClaimValue(OAuthClaims.Azp);
 
-        public static double GetNbf(this JwsPayload jwsPayload)
-        {
-            return jwsPayload.GetDoubleClaim(OAuthClaims.Nbf);
-        }
+        public static double GetNbf(this JwsPayload jwsPayload) => jwsPayload.GetDoubleClaim(OAuthClaims.Nbf);
 
-        public static string GetJti(this JwsPayload jwsPayload)
-        {
-            return jwsPayload.GetClaimValue(OAuthClaims.Jti);
-        }
+        public static string GetJti(this JwsPayload jwsPayload) => jwsPayload.GetClaimValue(OAuthClaims.Jti);
 
         public static DateTime? GetAuthTime(this JwsPayload jwsPayload)
         {

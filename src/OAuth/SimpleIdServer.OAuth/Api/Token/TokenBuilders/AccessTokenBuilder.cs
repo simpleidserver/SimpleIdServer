@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Extensions;
@@ -8,6 +9,7 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.Store;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -50,7 +52,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         protected virtual async Task<JwsPayload> BuildPayload(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var audiences = await _clientRepository.GetResources(scopes, cancellationToken);
+            var audiences = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Scope))).Select(c => c.ClientId).ToListAsync(cancellationToken);
             if(!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
             var jwsPayload = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)

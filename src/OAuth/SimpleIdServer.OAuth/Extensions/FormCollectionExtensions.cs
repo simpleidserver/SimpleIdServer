@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace SimpleIdServer.OAuth.Extensions
+namespace Microsoft.AspNetCore.Http
 {
     public static class FormCollectionExtensions
     {
-        public static JsonObject ToJObject(this IFormCollection formCollection)
+        public static JsonObject ToJsonObject(this IFormCollection formCollection)
         {
             var jObj = new JsonObject();
             foreach(var record in formCollection)

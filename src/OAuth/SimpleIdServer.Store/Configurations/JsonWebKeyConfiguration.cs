@@ -13,7 +13,10 @@ namespace SimpleIdServer.Store.Configurations
         {
             builder.HasKey(j => j.Kid);
             builder.Ignore(j => j.KeyOps);
-            builder.HasMany(j => j.KeyOperationLst).WithOne();
+            builder.Property(j => j.KeyOps)
+                .HasConversion(
+                v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                v => JsonSerializer.Deserialize<ICollection<KeyOperations>>(v, new JsonSerializerOptions()));
             builder.Property(j => j.Content).HasConversion(
                 v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                 v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, new JsonSerializerOptions()));

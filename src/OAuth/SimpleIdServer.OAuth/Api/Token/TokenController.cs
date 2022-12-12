@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
@@ -31,8 +32,8 @@ namespace SimpleIdServer.OAuth.Api.Token
             var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
-            var jObjHeader = Request.Headers.ToJObject();
-            var jObjBody = Request.Form.ToJObject();
+            var jObjHeader = Request.Headers.ToJsonObject();
+            var jObjBody = Request.Form.ToJsonObject();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate));
             var result = await _tokenRequestHandler.Handle(context, token);
             // rfc6749 : the authorization server must include the HTTP "Cache-Control" response header field with a value of "no-store"
@@ -47,8 +48,8 @@ namespace SimpleIdServer.OAuth.Api.Token
             try
             {
                 var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
-                var jObjHeader = Request.Headers.ToJObject();
-                var jObjBody = Request.Form.ToJObject();
+                var jObjHeader = Request.Headers.ToJsonObject();
+                var jObjBody = Request.Form.ToJsonObject();
                 await _revokeTokenRequestHandler.Handle(jObjHeader, jObjBody, clientCertificate, Request.GetAbsoluteUriWithVirtualPath(), cancellationToken);
                 return new OkResult();
             }

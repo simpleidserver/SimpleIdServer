@@ -6,6 +6,7 @@ using SimpleIdServer.Jwt;
 using SimpleIdServer.Jwt.Jwe;
 using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.Store;
 using System;
@@ -31,7 +32,7 @@ namespace SimpleIdServer.OAuth.Jwt
         JwsPayload ExtractJwsPayload(string jws);
         Task<JwsPayload> Unsign(string jws, CancellationToken cancellationToken);
         Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
-        Task<JwsPayload> Unsign(string jws, BaseClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
+        Task<JwsPayload> Unsign(string jws, Client client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
         JwsPayload Unsign(string jws, JsonWebKey jwk);
     }
 
@@ -43,19 +44,22 @@ namespace SimpleIdServer.OAuth.Jwt
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IClientRepository _clientRepository;
         private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
+        private readonly IClientHelper _clientHelper;
 
         public JwtParser(
             IJweGenerator jweGenerator,
             IJwsGenerator jwsGenerator,
             IHttpClientFactory httpClientFactory,
             IClientRepository clientRepository,
-            IJsonWebKeyRepository jsonWebKeyRepository)
+            IJsonWebKeyRepository jsonWebKeyRepository,
+            IClientHelper clientHelper)
         {
             _jweGenerator = jweGenerator;
             _jwsGenerator = jwsGenerator;
             _httpClientFactory = httpClientFactory;
             _clientRepository = clientRepository;
             _jsonWebKeyRepository = jsonWebKeyRepository;
+            _clientHelper = clientHelper;
         }
 
         public bool IsJweToken(string jwe)
@@ -92,10 +96,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jweGenerator.Decrypt(jwe, jsonWebKey);
         }
 
-        public string Decrypt(string jwe, JsonWebKey jsonWebKey)
-        {
-            return _jweGenerator.Decrypt(jwe, jsonWebKey);
-        }
+        public string Decrypt(string jwe, JsonWebKey jsonWebKey) => _jweGenerator.Decrypt(jwe, jsonWebKey);
 
         public async Task<string> DecryptWithPassword(string jwe, string password, CancellationToken cancellationToken)
         {
@@ -130,7 +131,7 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jweGenerator.Decrypt(jwe, jsonWebKey);
         }
 
-        public async Task<string> Decrypt(string jwe, OAuthClient client)
+        public async Task<string> Decrypt(string jwe, Client client)
         {
             var jsonWebKey = await GetJsonWebKeyToDecrypt(jwe, client);
             if (jsonWebKey == null)
@@ -152,20 +153,11 @@ namespace SimpleIdServer.OAuth.Jwt
             return _jweGenerator.Decrypt(jwe, jsonWebKey, password);
         }
 
-        public JwsHeader ExtractJwsHeader(string jws)
-        {
-            return _jwsGenerator.ExtractHeader(jws);
-        }
+        public JwsHeader ExtractJwsHeader(string jws) => _jwsGenerator.ExtractHeader(jws);
 
-        public JweHeader ExtractJweHeader(string jwe)
-        {
-            return _jweGenerator.ExtractHeader(jwe);
-        }
+        public JweHeader ExtractJweHeader(string jwe) => _jweGenerator.ExtractHeader(jwe);
 
-        public JwsPayload ExtractJwsPayload(string jws)
-        {
-            return _jwsGenerator.ExtractPayload(jws);
-        }
+        public JwsPayload ExtractJwsPayload(string jws) =>  _jwsGenerator.ExtractPayload(jws);
 
         public async Task<JwsPayload> Unsign(string jws, CancellationToken cancellationToken)
         {
@@ -180,22 +172,18 @@ namespace SimpleIdServer.OAuth.Jwt
                 return null;
             }
 
-            var jsonWebKey = await _jsonWebKeyRepository.FindJsonWebKeyById(protectedHeader.Kid, cancellationToken);
+            var jsonWebKey = await _jsonWebKeyRepository.Query().AsNoTracking().FirstOrDefaultAsync(q => q.Kid == protectedHeader.Kid, cancellationToken);
             return _jwsGenerator.ExtractPayload(jws, jsonWebKey);
         }
 
         public async Task<JwsPayload> Unsign(string jws, string clientId, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
-            var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
-            if (client == null)
-            {
-                throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
-            }
-
+            var client = await _clientRepository.Query().Include(c => c.JsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+            if (client == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             return await Unsign(jws, client, errorCode);
         }
 
-        public async Task<JwsPayload> Unsign(string jws, BaseClient client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
+        public async Task<JwsPayload> Unsign(string jws, Client client, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
             var protectedHeader = _jwsGenerator.ExtractHeader(jws);
             if (protectedHeader == null)
@@ -224,30 +212,23 @@ namespace SimpleIdServer.OAuth.Jwt
 
         private async Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, string clientId, CancellationToken cancellationToken)
         {
-            var client = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
+            var client = await _clientRepository.Query().Include(c => c.JsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             if (client == null)
-            {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
-            }
-
             return await GetJsonWebKeyToDecrypt(jwe, client);
         }
 
-        private Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, BaseClient client)
+        private Task<JsonWebKey> GetJsonWebKeyToDecrypt(string jwe, Client client)
         {
             var protectedHeader = _jweGenerator.ExtractHeader(jwe);
-            if (protectedHeader == null)
-            {
-                return null;
-            }
-
+            if (protectedHeader == null) return null;
             return GetJsonWebKeyFromClient(client, protectedHeader.Kid);
         }
 
-        private async Task<JsonWebKey> GetJsonWebKeyFromClient(BaseClient client, string kid)
+        private async Task<JsonWebKey> GetJsonWebKeyFromClient(Client client, string kid)
         {
-            var jsonWebKeys = await client.ResolveJsonWebKeys(_httpClientFactory);
-            return jsonWebKeys.FirstOrDefault(j => j.Kid == kid);
+            var jsonWebKeys = await _clientHelper.ResolveJsonWebKeys(client);
+            return jsonWebKeys.SingleOrDefault(j => j.Kid == kid);
         }
     }
 }

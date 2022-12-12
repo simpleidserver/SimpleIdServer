@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using SimpleIdServer.OAuth.Persistence.Parameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 
-namespace SimpleIdServer.OAuth.Extensions
+namespace Microsoft.AspNetCore.Http
 {
     public static class QueryCollectionExtensions
     {
@@ -132,25 +131,6 @@ namespace SimpleIdServer.OAuth.Extensions
             return false;
         }
 
-        public static bool TryGet(this IEnumerable<KeyValuePair<string, string>> queryCollection, string name, out SortOrders order)
-        {
-            string orderStr;
-            order = SortOrders.ASC;
-            if (!queryCollection.TryGet(name, out orderStr))
-            {
-                return false;
-            }
-
-            SortOrders result;
-            if (Enum.TryParse(orderStr.ToUpperInvariant(), out result))
-            {
-                order = result;
-                return true;
-            }
-
-            return false;
-        }
-
         public static bool TryGet(this IEnumerable<KeyValuePair<string, string>> queryCollection, string name, out int startIndex)
         {
             startIndex = 0;
@@ -182,25 +162,25 @@ namespace SimpleIdServer.OAuth.Extensions
             return queryCollection.Where(q => q.Key == name).Select(q => q.Value);
         }
 
-        public static JObject ToJObject(this IQueryCollection queryCollection)
+        public static JsonObject ToJObject(this IQueryCollection queryCollection)
         {
-            var jObj = new JObject();
+            var jObj = new JsonObject();
             foreach(var record in queryCollection)
-            {
                 jObj.Add(record.Key, GetValue(record.Value));
-            }
 
             return jObj;
         }
 
-        private static JToken GetValue(StringValues strValues)
+        private static JsonNode GetValue(StringValues strValues)
         {
             if (strValues.Count() == 1)
             {
-                return new JValue(strValues.First());
+                return strValues.First();
             }
 
-            return new JArray(strValues);
+            var result = new JsonArray();
+            foreach (var str in strValues) result.Add(str);
+            return result;
         }
     }
 }
