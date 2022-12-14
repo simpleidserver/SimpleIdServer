@@ -1,11 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.Domains;
-using SimpleIdServer.Jwt.Exceptions;
-using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Helpers;
 using System;
 using System.Linq;
 using System.Threading;
@@ -15,85 +13,47 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 {
     public class OAuthClientPrivateKeyJwtAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        private readonly IJwsGenerator _jwsGenerator;
-        private readonly IJwtParser _jwtParser;
+        private readonly IClientHelper _clientHelper;
 
-        public OAuthClientPrivateKeyJwtAuthenticationHandler(IJwsGenerator jwsGenerator, IJwtParser jwtParser)
+        public OAuthClientPrivateKeyJwtAuthenticationHandler(IClientHelper clientHelper)
         {
-            _jwsGenerator = jwsGenerator;
-            _jwtParser = jwtParser;
+            _clientHelper = clientHelper;
         }
 
         public string AuthMethod => "private_key_jwt";
 
         public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
-            if (authenticateInstruction == null)
-            {
-                throw new ArgumentNullException(nameof(authenticateInstruction));
-            }
+            if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
+            if (client == null) throw new ArgumentNullException(nameof(client));
 
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
+            var handler = new JsonWebTokenHandler();
             var clientAssertion = authenticateInstruction.ClientAssertion;
-            var isJwsToken = _jwtParser.IsJwsToken(clientAssertion);
-            if (!isJwsToken)
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
-            }
+            if (!handler.CanReadToken(clientAssertion)) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
+            var token = handler.ReadJsonWebToken(clientAssertion);
+            if (!token.IsSigned) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
 
-            var jwsPayload = _jwsGenerator.ExtractPayload(clientAssertion);
-            if (jwsPayload == null)
+            var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, token.Kid, cancellationToken);
+            var validationResult = handler.ValidateToken(clientAssertion, new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
-            }
-
-            var clientId = jwsPayload.GetIssuer();
-            JwsPayload payload;
-            try
-            {
-                payload = await _jwtParser.Unsign(clientAssertion, clientId, cancellationToken, errorCode);
-            }
-            catch(JwtException ex)
-            {
-                throw new OAuthException(errorCode, ex.Message);
-            }
-
-            if (payload == null)
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);
-            }
-
-            return ValidateJwsPayLoad(payload, expectedIssuer, errorCode);
+                IssuerSigningKey = jsonWebKey
+            });
+            if (!validationResult.IsValid) throw new OAuthException(errorCode, validationResult.Exception.ToString());
+            return ValidateJwsPayLoad(token, expectedIssuer, errorCode);
         }
 
-        private bool ValidateJwsPayLoad(JwsPayload jwsPayload, string expectedIssuer, string errorCode)
+        private bool ValidateJwsPayLoad(JsonWebToken jsonWebToken, string expectedIssuer, string errorCode)
         {
-            var jwsIssuer = jwsPayload.GetIssuer();
-            var jwsSubject = jwsPayload.GetClaimValue(SimpleIdServer.Jwt.Constants.UserClaims.Subject);
-            var jwsAudiences = jwsPayload.GetAudiences();
-            var expirationDateTime = jwsPayload.GetExpirationTime().ConvertFromUnixTimestamp();
+            var jwsIssuer = jsonWebToken.Issuer;
+            var jwsSubject = jsonWebToken.Subject;
+            var jwsAudiences = jsonWebToken.Audiences;
+            var expirationDateTime = jsonWebToken.ValidTo;
             // 1. Check the client is correct.
-            if (jwsSubject != jwsIssuer)
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
-            }
-
+            if (jwsSubject != jwsIssuer) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_ISSUER);
             // 2. Check if the audience is correct
-            if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(expectedIssuer)))
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
-            }
-
+            if (jwsAudiences == null || !jwsAudiences.Any() || !jwsAudiences.Any(j => j.Contains(expectedIssuer))) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_AUDIENCES);
             // 3. Check the expiration time
-            if (DateTime.UtcNow > expirationDateTime)
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
-            }
-
+            if (DateTime.UtcNow > expirationDateTime) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_EXPIRED);
             return true;
         }
     }

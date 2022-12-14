@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
 using System;
 
@@ -37,10 +36,7 @@ namespace SimpleIdServer.OAuth.UI
             for (long offset = -1; offset <= 1; offset++)
             {
                 var step = CalculateTimeStep(currentDateTime) + offset;
-                if (GenerateOtp(key, step) == otp)
-                {
-                    return true;
-                }
+                if (GenerateOtp(key, step) == otp) return true;
             }
 
             return false;

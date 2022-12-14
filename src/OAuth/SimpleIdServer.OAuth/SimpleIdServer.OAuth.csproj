@@ -4,14 +4,14 @@
 		<Description>OAUTH2.0 implementation.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="QRCoder" Version="1.4.1" />
+		<PackageReference Include="QRCoder" Version="1.4.3" />
+		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.25.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleIdServer.Helpers\SimpleIdServer.Helpers.csproj" />
-		<ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Store\SimpleIdServer.Store.csproj" />
 	</ItemGroup>
 </Project>

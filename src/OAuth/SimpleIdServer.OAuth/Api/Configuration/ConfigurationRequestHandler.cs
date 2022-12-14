@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
@@ -31,7 +30,6 @@ namespace SimpleIdServer.OAuth.Api.Configuration
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
         private readonly IEnumerable<IGrantTypeHandler> _grantTypeHandlers;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _oauthClientAuthenticationHandlers;
-        private readonly IEnumerable<ISignHandler> _signHandlers;
         private readonly IOAuthWorkflowConverter _oauthWorkflowConverter;
         private readonly OAuthHostOptions _options;
 
@@ -41,7 +39,6 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             IEnumerable<IOAuthResponseMode> oauthResponseModes,
             IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
             IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers,
-            IEnumerable<ISignHandler> signHandlers,
             IOAuthWorkflowConverter oauthWorkflowConverter,
             IOptions<OAuthHostOptions> options)
         {
@@ -50,7 +47,6 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             _oauthResponseModes = oauthResponseModes;
             _grantTypeHandlers = grantTypeHandlers;
             _oauthClientAuthenticationHandlers = oauthClientAuthenticationHandlers;
-            _signHandlers = signHandlers;
             _oauthWorkflowConverter = oauthWorkflowConverter;
             _options = options.Value;
         }
@@ -71,7 +67,10 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JsonSerializer.SerializeToNode(_oauthResponseModes.Select(s => s.ResponseMode)));
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
-            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(_signHandlers.Select(s => s.AlgName)));
+            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(new List<string>
+            {
+                "ES256", "ES384", "ES512", "HS256", "HS384", "HS512", "PS256", "PS384", "PS512", "RS256", "RS384", "RS512"
+            }));
             if (_options.MtlsEnabled)
             {
                 jObj.Add(OAuthConfigurationNames.MtlsEndpointAliases, new JsonObject

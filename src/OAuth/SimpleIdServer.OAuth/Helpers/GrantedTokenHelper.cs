@@ -3,21 +3,20 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
-using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OAuth.Helpers
 {
@@ -26,12 +25,11 @@ namespace SimpleIdServer.OAuth.Helpers
         Task<IEnumerable<Token>> GetTokensByAuthorizationCode(string code, CancellationToken cancellationToken);
         Task<bool> RemoveToken(string token, CancellationToken cancellationToken);
         Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
-        JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
-        JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
+        SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
+        SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
         Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken);
-        Task<JwsPayload> GetAccessToken(string accessToken, CancellationToken cancellationToken);
+        Task<SecurityToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
-        void RefreshAccessToken(JwsPayload jwsPayload, double validityPeriodsInSeconds);
         Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject jwsPayload, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<Token> GetRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task RemoveRefreshToken(string refreshToken, CancellationToken cancellationToken);
@@ -87,21 +85,25 @@ namespace SimpleIdServer.OAuth.Helpers
 
         #region Access token
 
-        public JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName)
+        public SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName)
         {
-            return new JwsPayload
+            var claims = new Dictionary<string, object>
             {
-                { OAuthClaims.Audiences, audiences },
-                { OAuthClaims.Issuer, issuerName },
-                { OAuthClaims.Scopes, BuildScopeClaim(scopes) }
+                { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud, audiences },
+                { OpenIdConnectParameterNames.Scope, BuildScopeClaim(scopes) }
+            };
+            return new SecurityTokenDescriptor
+            {
+                Issuer = issuerName,
+                Claims = claims
             };
         }
 
-        public JwsPayload BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds)
+        public SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds)
         {
-            var jwsPayload = BuildAccessToken(audiences, scopes, issuerName);
-            AddExpirationAndIssueTime(jwsPayload, validityPeriodsInSeconds);
-            return jwsPayload;
+            var descriptor = BuildAccessToken(audiences, scopes, issuerName);
+            AddExpirationAndIssueTime(descriptor, validityPeriodsInSeconds);
+            return descriptor;
         }
 
         public async Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken)
@@ -118,41 +120,22 @@ namespace SimpleIdServer.OAuth.Helpers
             return true;
         }
 
-        public async Task<JwsPayload> GetAccessToken(string accessToken, CancellationToken cancellationToken)
+        public async Task<SecurityToken> GetAccessToken(string accessToken, CancellationToken cancellationToken)
         {
             var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
-            if (result == null)
-            {
-                return null;
-            }
-
-            return JsonSerializer.Deserialize<JwsPayload>(result.Data);
+            if (result == null) return null;
+            var handler = new JsonWebTokenHandler();
+            return handler.ReadToken(result.Data);
         }
 
         public async Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken)
         {
             var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
-            if (result == null)
-            {
-                return false;
-            }
-
-            if (result.ClientId != clientId)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
-            }
-
+            if (result == null) return false;
+            if (result.ClientId != clientId) throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.UNAUTHORIZED_CLIENT);
             _tokenRepository.Remove(result);
             await _tokenRepository.SaveChanges(cancellationToken);
             return true;
-        }
-
-        public void RefreshAccessToken(JwsPayload jwsPayload, double validityPeriodsInSeconds)
-        {
-            var currentDateTime = DateTime.UtcNow;
-            var expirationDateTime = currentDateTime.AddSeconds(validityPeriodsInSeconds);
-            jwsPayload[OAuthClaims.Iat] = currentDateTime.ConvertToUnixTimestamp();
-            jwsPayload[OAuthClaims.ExpirationTime] = expirationDateTime.ConvertToUnixTimestamp();
         }
 
         #endregion
@@ -240,12 +223,12 @@ namespace SimpleIdServer.OAuth.Helpers
             return scopes;
         }
 
-        private static void AddExpirationAndIssueTime(JwsPayload jwsPayload, double validityPeriodsInSeconds)
+        private static void AddExpirationAndIssueTime(SecurityTokenDescriptor descriptor, double validityPeriodsInSeconds)
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationDateTime = currentDateTime.AddSeconds(validityPeriodsInSeconds);
-            jwsPayload.Add(OAuthClaims.Iat, currentDateTime.ConvertToUnixTimestamp());
-            jwsPayload.Add(OAuthClaims.ExpirationTime, expirationDateTime.ConvertToUnixTimestamp());
+            descriptor.Expires = expirationDateTime;
+            descriptor.IssuedAt = currentDateTime;
         }
     }
 }

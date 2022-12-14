@@ -3,7 +3,6 @@
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Authenticate;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
 using System.Threading;

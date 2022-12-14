@@ -7,6 +7,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.Helpers\SimpleIdServer.Helpers.csproj" />
-	  <ProjectReference Include="..\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.25.1" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
 	</ItemGroup>
 </Project>

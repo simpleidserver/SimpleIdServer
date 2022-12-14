@@ -1,64 +1,40 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.Store;
-using System;
-using System.Linq;
+using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.OAuth.Stores;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Jwks
 {
     public interface IJwksRequestHandler
     {
-        Task<JsonObject> Get(CancellationToken cancellationToken);
-        Task<bool> Rotate(CancellationToken token);
+        JwksResult Get();
     }
 
     public class JwksRequestHandler : IJwksRequestHandler
     {
-        private readonly IJsonWebKeyRepository _jsonWebKeyRepository;
-        private readonly OAuthHostOptions _options;
+        private readonly IKeyStore _keyStore;
 
-        public JwksRequestHandler(IJsonWebKeyRepository jsonWebKeyRepository, IOptions<OAuthHostOptions> options)
+        public JwksRequestHandler(IKeyStore keyStore)
         {
-            _jsonWebKeyRepository = jsonWebKeyRepository;
-            _options = options.Value;
+            _keyStore = keyStore;
         }
 
-        public async Task<JsonObject> Get(CancellationToken cancellationToken)
+        public JwksResult Get()
         {
-            var currentDateTime = DateTime.UtcNow;
-            var jsonWebKeys = await _jsonWebKeyRepository.Query()
-                .AsNoTracking()
-                .Where(j => j.ExpirationDateTime == null || currentDateTime < j.ExpirationDateTime)
-                .ToListAsync(cancellationToken);
-            var keys = new JsonArray();
-            foreach(var jsonWebKey in jsonWebKeys)
-                keys.Add(jsonWebKey.GetPublicJwt());
-            var result = new JsonObject
-            {
-                ["keys"] = keys
-            };
+            var result = new JwksResult();
+            var keys = _keyStore.GetAllSigningKeys();
+            foreach(var key in keys)
+                result.JsonWebKeys.Add(Convert(key));
+
             return result;
-        }
 
-        public async Task<bool> Rotate(CancellationToken cancellationToken)
-        {
-            var jsonWebKeys = await _jsonWebKeyRepository.Query()
-                .Where(j => string.IsNullOrWhiteSpace(j.RotationJWKId))
-                .ToListAsync(cancellationToken);
-            foreach (var jsonWebKey in jsonWebKeys)
+            JsonObject Convert(SigningCredentials signingCredentials)
             {
-                var newJsonWebKey = jsonWebKey.Rotate(_options.JWKExpirationTimeInSeconds);
-                _jsonWebKeyRepository.Add(newJsonWebKey);
+                var publicJwk = signingCredentials.SerializePublicJWK();
+                return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
             }
-
-            await _jsonWebKeyRepository.SaveChanges(cancellationToken);
-            return true;
         }
     }
 }

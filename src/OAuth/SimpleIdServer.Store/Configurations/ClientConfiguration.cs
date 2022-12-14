@@ -28,7 +28,7 @@ namespace SimpleIdServer.Store.Configurations
                 v => v.Split(',', StringSplitOptions.None));
             builder.HasMany(c => c.Translations).WithMany();
             builder.HasMany(c => c.Scopes).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(c => c.JsonWebKeys).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.SerializedJsonWebKeys).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

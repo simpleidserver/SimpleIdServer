@@ -1,7 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains.DTOs;
-using SimpleIdServer.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -192,10 +193,19 @@ namespace SimpleIdServer.Domains
         {
             get
             {
+                var keys = new JsonArray();
+                foreach (var jwk in SerializedJsonWebKeys) keys.Add(jwk.Serialize());
                 return new JsonObject
                 {
-                    { "keys", JsonSerializer.Serialize(JsonWebKeys.Select(j => j.Serialize())) }
+                    { "keys", keys }
                 };
+            }
+        }
+        public IEnumerable<JsonWebKey> JsonWebKeys
+        {
+            get
+            {
+                return SerializedJsonWebKeys.Select(j=> JsonExtensions.DeserializeFromJson<JsonWebKey>(j.SerializedJsonWebKey));
             }
         }
         /// <summary>
@@ -242,7 +252,7 @@ namespace SimpleIdServer.Domains
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>
         [JsonIgnore]
-        public ICollection<JsonWebKey> JsonWebKeys { get; set; } = new List<JsonWebKey>();
+        public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonIgnore]
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
 

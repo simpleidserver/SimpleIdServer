@@ -20,22 +20,13 @@ namespace System
 
         public static string ExtractAuthorizationValue(this string str, IEnumerable<string> authenticationSchemes)
         {
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                return null;
-            }
+            if (string.IsNullOrWhiteSpace(str)) return null;
 
             var splitted = str.Split(' ');
-            if (splitted.Count() != 2)
-            {
-                return null;
-            }
+            if (splitted.Count() != 2) return null;
 
             var first = splitted.First();
-            if (!authenticationSchemes.Contains(first))
-            {
-                return null;
-            }
+            if (!authenticationSchemes.Contains(first)) return null;
 
             return splitted.Last();
         }

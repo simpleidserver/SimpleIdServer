@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
@@ -24,10 +23,10 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            return Build(scopes, new JsonObject(), handlerContext, cancellationToken);
+            return Build(scopes, new Dictionary<string, object>(), handlerContext, cancellationToken);
         }
 
-        public virtual async Task Build(IEnumerable<string> scopes, JsonObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task Build(IEnumerable<string> scopes, Dictionary<string, object> claims, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JsonObject();
             if (handlerContext.Request.RequestData != null)

@@ -1,13 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
 using SimpleIdServer.Domains.DTOs;
-using SimpleIdServer.Jwt;
-using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
@@ -205,7 +205,7 @@ namespace System.Text.Json.Nodes
             var keys = JsonObject.Parse(str)?["keys"]?.AsArray();
             if (keys == null) return null;
 
-            return keys.Select(k => JsonWebKey.Deserialize(k.ToJsonString()));
+            return keys.Select(k => JsonExtensions.DeserializeFromJson<JsonWebKey>(k.ToJsonString()));
         }
 
         public static IEnumerable<string> GetScopes(this JsonObject jObj)

@@ -1,13 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jwe;
-using SimpleIdServer.Jwt.Jwe.CEKHandlers;
-using SimpleIdServer.Jwt.Jwe.EncHandlers;
-using System.Security.Cryptography;
-using Xunit;
 
 namespace SimpleIdServer.Jwt.Tests.Jwe
 {
+    /*
     public class JweGeneratorFixture
     {
         private static IJweGenerator _jweGenerator;
@@ -50,4 +46,5 @@ namespace SimpleIdServer.Jwt.Tests.Jwe
             });
         }
     }
+    */
 }

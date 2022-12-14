@@ -1,14 +1,10 @@
 ﻿Feature: Jwks
-	Get the JWKS and check its content
+	Get JWKS and check its content
 
-Scenario: Get the jwks
+Scenario: Get JWKS
 	When execute HTTP GET request 'https://localhost:8080/jwks'
-	| Key			| Value													|
-
-	Then HTTP status code equals to '200'
-
-Scenario: Rotate jwks
-	When execute HTTP PUT request 'https://localhost:8080/jwks'
 	| Key | Value |
 
-	Then HTTP status code equals to '204'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'

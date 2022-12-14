@@ -15,21 +15,9 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
         public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
-            if (authenticateInstruction == null)
-            {
-                throw new ArgumentNullException(nameof(authenticateInstruction));
-            }
-
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            if (string.IsNullOrWhiteSpace(client.ClientSecret))
-            {
-                return Task.FromResult(false);
-            }
-
+            if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
+            if (client == null) throw new ArgumentNullException(nameof(client));
+            if (string.IsNullOrWhiteSpace(client.ClientSecret)) return Task.FromResult(false);
             var result = string.Compare(client.ClientSecret, authenticateInstruction.ClientSecretFromHttpRequestBody, StringComparison.CurrentCultureIgnoreCase) == 0;
             return Task.FromResult(result);
         }

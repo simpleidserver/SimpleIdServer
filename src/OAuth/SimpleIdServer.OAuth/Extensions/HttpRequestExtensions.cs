@@ -10,11 +10,7 @@ namespace SimpleIdServer.OAuth.Extensions
         {
             var host = requestMessage.Host.Value;
             var http = "http://";
-            if (requestMessage.IsHttps)
-            {
-                http = "https://";
-            }
-
+            if (requestMessage.IsHttps) http = "https://";
             var relativePath = requestMessage.PathBase.Value;
             return http + host + relativePath;
         }

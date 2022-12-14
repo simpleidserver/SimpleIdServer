@@ -30,36 +30,21 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
         public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             var codeVerifier = authenticateInstruction.RequestData.GetCodeVerifier();
-            if (string.IsNullOrWhiteSpace(codeVerifier))
-            {
-                throw new OAuthException(errorCode, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.CodeVerifier));
-            }
+            if (string.IsNullOrWhiteSpace(codeVerifier)) throw new OAuthException(errorCode, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.CodeVerifier));
 
             var code = authenticateInstruction.RequestData.GetAuthorizationCode();
-            if (code == null)
-            {
-                return false;
-            }
+            if (code == null) return false;
 
             var previousRequest = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
-            if (previousRequest == null)
-            {
-                return false;
-            }
+            if (previousRequest == null) return false;
 
             var codeChallenge = previousRequest.GetCodeChallengeFromAuthorizationRequest();
             var codeChallengeMethod = previousRequest.GetCodeChallengeMethodFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(codeChallengeMethod))
-            {
-                codeChallengeMethod = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
-            }
+            if (string.IsNullOrWhiteSpace(codeChallengeMethod)) codeChallengeMethod = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
 
             var codeChallengeMethodHandler = _codeChallengeMethodHandlers.First(c => c.Name == codeChallengeMethod);
             var newCodeChallenge = codeChallengeMethodHandler.Calculate(codeVerifier);
-            if (newCodeChallenge != codeChallenge)
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CODE_VERIFIER);
-            }
+            if (newCodeChallenge != codeChallenge) throw new OAuthException(errorCode, ErrorMessages.BAD_CODE_VERIFIER);
 
             return true;
         }

@@ -10,7 +10,6 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
         {
             services.AddTransient<IClientRepository, ClientRepository>();
-            services.AddTransient<IJsonWebKeyRepository, JsonWebKeyRepository>();
             services.AddTransient<IScopeRepository, ScopeRepository>();
             services.AddTransient<ITokenRepository, TokenRepository>();
             services.AddTransient<ITranslationRepository, TranslationRepository>();

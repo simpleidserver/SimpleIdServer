@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
@@ -23,6 +22,7 @@ using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.UI;
 using SimpleIdServer.Store;
 using System;
+using System.Text.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -35,10 +35,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static SimpleIdServerOAuthBuilder AddSIDIdentityServer(this IServiceCollection services, Action<OAuthHostOptions> callback = null)
+        public static IdServerBuilder AddSIDIdentityServer(this IServiceCollection services, Action<OAuthHostOptions> callback = null)
         {
             if (callback != null) services.Configure(callback);
             else services.Configure<OAuthHostOptions>(o => { });
+            services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
             services.AddDistributedMemoryCache();
             services.AddStore()
                 .AddResponseModeHandlers()
@@ -48,10 +49,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthAuthorizationApi()
                 .AddOAuthJwt()
                 .AddLib()
-                .AddJwt()
                 .AddConfigurationApi()
                 .AddUI();
-            return new SimpleIdServerOAuthBuilder(services);
+            return new IdServerBuilder(services);
         }
 
         #region Private methods
@@ -70,7 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
         {
-            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IJwsGenerator>(), s.GetService<IJwtParser>(), s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>() ));
+            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>() ));
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
@@ -109,6 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
             services.AddTransient<IRequestObjectValidator, RequestObjectValidator>();
+            services.AddTransient<IClientHelper, OAuthClientHelper>();
             return services;
         }
 
@@ -126,7 +127,6 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddOAuthJwt(this IServiceCollection services)
         {
             services.AddTransient<IJwtBuilder, JwtBuilder>();
-            services.AddTransient<IJwtParser, JwtParser>();
             return services;
         }
 

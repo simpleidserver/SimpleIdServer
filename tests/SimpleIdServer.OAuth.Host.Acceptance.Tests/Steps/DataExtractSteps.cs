@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -24,7 +24,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-            _scenarioContext.Set(JsonConvert.DeserializeObject<JObject>(json), "jsonHttpBody");
+            _scenarioContext.Set(JsonDocument.Parse(json), "jsonHttpBody");
         }
 
         [When("extract query parameters into JSON")]
@@ -32,7 +32,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var queryValues = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
-            var jObj = new JObject();
+            var jObj = new JsonObject();
             foreach (var kvp in queryValues)
             {
                 jObj.Add(kvp.Key, queryValues[kvp.Key][0]);
@@ -53,15 +53,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("extract parameter '(.*)' from JSON body")]
         public void GivenExtractParameterFromBody(string parameter)
         {
-            var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
-            _scenarioContext.Set(jObj[parameter].ToString(), parameter);
+            var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
+            // _scenarioContext.Set(jObj[parameter].ToString(), parameter);
         }
 
         [When("extract parameter '(.*)' from JSON body into '(.*)'")]
         public void GivenExtractParameterFromBody(string parameter, string key)
         {
-            var jObj = _scenarioContext.Get<JObject>("jsonHttpBody");
-            _scenarioContext.Set(jObj[parameter].ToString(), key);
+            var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
+            // _scenarioContext.Set(jObj[parameter].ToString(), key);
         }
     }
 }

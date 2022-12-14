@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws.Handlers;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Options
         /// <summary>
         /// Default token signed response algorithm.
         /// </summary>
-        public string DefaultTokenSignedResponseAlg { get; set; } = RSA256SignHandler.ALG_NAME;
+        public string DefaultTokenSignedResponseAlg { get; set; } = SecurityAlgorithms.RsaSha256;
         /// <summary>
         /// JWK expiration time in seconds.
         /// </summary>

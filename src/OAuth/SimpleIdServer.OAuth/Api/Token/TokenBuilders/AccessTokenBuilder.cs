@@ -2,9 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.Jwt.Jws;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.Store;
@@ -34,14 +33,14 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            return Build(scopes, new JsonObject(), handlerContext, cancellationToken);
+            return Build(scopes, new Dictionary<string, object>(), handlerContext, cancellationToken);
         }
         
-        public async virtual Task Build(IEnumerable<string> scopes, JsonObject jObj, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public async virtual Task Build(IEnumerable<string> scopes, Dictionary<string, object> claims, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var jwsPayload = await BuildPayload(scopes, handlerContext, cancellationToken);
-            foreach(var record in jObj) jwsPayload.Add(record.Key, record.Value);
-            await SetResponse(handlerContext, jwsPayload, cancellationToken);
+            var tokenDescriptor = await BuildTokenDescriptor(scopes, handlerContext, cancellationToken);
+            foreach(var claim in claims) tokenDescriptor.Claims.Add(claim);
+            await SetResponse(handlerContext, tokenDescriptor, cancellationToken);
         }
 
         public virtual Task Refresh(JsonObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
@@ -50,24 +49,24 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             return Build(scopes, currentContext, cancellationToken);
         }
 
-        protected virtual async Task<JwsPayload> BuildPayload(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
+        protected virtual async Task<SecurityTokenDescriptor> BuildTokenDescriptor(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var audiences = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Scope))).Select(c => c.ClientId).ToListAsync(cancellationToken);
-            if(!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
-            var jwsPayload = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
+            if (!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
+            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);
-                jwsPayload.Add(SimpleIdServer.Jwt.Constants.OAuthClaims.Cnf, new JsonObject
+                tokenDescriptor.Claims.Add(ConfirmationClaimTypes.Cnf, new JsonObject
                 {
-                    { SimpleIdServer.Jwt.Constants.OAuthClaims.X5TS256, thumbprint }
+                    { JsonWebKeyParameterNames.X5tS256, thumbprint }
                 });
             }
 
-            return jwsPayload;
+            return tokenDescriptor;
         }
 
-        protected async Task SetResponse(HandlerContext handlerContext, JwsPayload jwsPayload, CancellationToken cancellationToken)
+        protected async Task SetResponse(HandlerContext handlerContext, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken)
         {
             var authorizationCode = string.Empty;
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
@@ -75,7 +74,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
             }
 
-            var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, jwsPayload, cancellationToken);
+            var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, securityTokenDescriptor, cancellationToken);
             await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }

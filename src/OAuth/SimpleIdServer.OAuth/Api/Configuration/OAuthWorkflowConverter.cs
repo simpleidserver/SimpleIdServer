@@ -6,6 +6,12 @@ using System.Linq;
 
 namespace SimpleIdServer.OAuth.Api.Configuration
 {
+    public interface IOAuthWorkflowConverter
+    {
+        bool TryGetWorkflow(IEnumerable<string> responseTypes, out string workflowName);
+        List<OAuthWorkflow> GetOAuthWorkflows();
+    }
+
     public class OAuthWorkflowConverter : IOAuthWorkflowConverter
     {
         public bool TryGetWorkflow(IEnumerable<string> responseTypes, out string workflowName)
@@ -30,5 +36,17 @@ namespace SimpleIdServer.OAuth.Api.Configuration
                 new OAuthWorkflow("hybrid", new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE })
             };
         }
+    }
+
+    public class OAuthWorkflow
+    {
+        public OAuthWorkflow(string workflowName, IEnumerable<string> responseTypes)
+        {
+            WorkflowName = workflowName;
+            ResponseTypes = responseTypes;
+        }
+
+        public string WorkflowName { get; set; }
+        public IEnumerable<string> ResponseTypes { get; set; }
     }
 }

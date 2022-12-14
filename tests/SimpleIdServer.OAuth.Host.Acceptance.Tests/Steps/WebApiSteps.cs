@@ -2,22 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt;
-using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -28,15 +20,12 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
     {
         private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert" };
         private ScenarioContext _scenarioContext;
-        private CustomWebApplicationFactory<FakeStartup> _factory;
+        private CustomWebApplicationFactory<Program> _factory;
 
-        public WebApiSteps(ScenarioContext scenarioContext)
+        public WebApiSteps(ScenarioContext scenarioContext, CustomWebApplicationFactory<Program> factory)
         {
             _scenarioContext = scenarioContext;
-            _factory = new CustomWebApplicationFactory<FakeStartup>((o) =>
-            {
-                o.AddSingleton(scenarioContext);
-            });
+            _factory = factory;
             var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = false
@@ -46,29 +35,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         }
 
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
-        public async Task WhenAddUserConsent(string user, string scope, string clientId)
+        public Task WhenAddUserConsent(string user, string scope, string clientId)
         {
-            var repository = (IOAuthUserRepository)_factory.Server.Host.Services.GetService(typeof(IOAuthUserRepository));
-            var oauthUser = await repository.FindOAuthUserByLogin(ParseValue(user).ToString(), CancellationToken.None);
-            oauthUser.Consents.Add(new OAuthConsent
-            {
-                ClientId = ParseValue(clientId).ToString(),
-                Scopes = scope.Split(' ').Select(s => new OAuthScope { Name = s })
-            });
+            return Task.CompletedTask;
         }
 
         [When("add JSON web key to Authorization Server and store into '(.*)'")]
-        public async Task WhenAddJsonWebKey(string name, Table table)
+        public Task WhenAddJsonWebKey(string name, Table table)
         {
-            var repository = (IJsonWebKeyRepository)_factory.Server.Host.Services.GetService(typeof(IJsonWebKeyRepository));
-            var jwks = ExtractJsonWebKeys(table);
-            foreach (var jwk in jwks)
-            {
-                repository.Add(jwk, CancellationToken.None).Wait();
-            }
-
-            await repository.SaveChanges(CancellationToken.None);
-            _scenarioContext.Set(jwks, name);
+            return Task.CompletedTask;
         }
 
         [When("execute HTTP GET request '(.*)'")]
@@ -208,6 +183,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         [When("build software statement")]
         public void WhenBuildSoftwareStatement(Table table)
         {
+            /*
             var jwsPayload = new JwsPayload();
             foreach (var record in table.Rows)
             {
@@ -226,9 +202,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             }
 
             var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            var jwk = FakeJwks.GetInstance().Jwks.First();
-            var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
-            _scenarioContext.Set(jws, "softwareStatement");
+            // var jwk = FakeJwks.GetInstance().Jwks.First();
+            // var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
+            // _scenarioContext.Set(jws, "softwareStatement");
+            */
         }
 
         private string ExtractUrl(string url, Table table)
@@ -249,9 +226,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             return url;
         }
 
-        private JObject ExtractBody(Table table)
+        private JsonObject ExtractBody(Table table)
         {
-            var result = new JObject();
+            var result = new JsonObject();
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
@@ -261,9 +238,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                     continue;
                 }
 
-                if (value is JArray)
+                if (value is JsonArray)
                 {
-                    result.Add(key, value as JArray);
+                    result.Add(key, value as JsonArray);
                 }
                 else
                 {
@@ -303,7 +280,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             if (val.StartsWith('[') && val.EndsWith(']'))
             {
                 val = val.TrimStart('[').TrimEnd(']');
-                return JArray.FromObject(val.Split(','));
+                var res = new JsonArray();
+                foreach (var item in val.Split(',')) res.Add(item);
+                return res;
             }
 
             var regularExpression = new Regex(@"\$([a-zA-Z]|_)*\$");
@@ -318,71 +297,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             });
 
             return result;
-        }
-
-        private static IEnumerable<JsonWebKey> ExtractJsonWebKeys(Table table)
-        {
-            var builder = new JsonWebKeyBuilder();
-            var jwks = new List<JsonWebKey>();
-            foreach (var record in table.Rows)
-            {
-                var type = record["Type"];
-                var kid = record["Kid"];
-                var algName = record["AlgName"];
-                JsonWebKey jwk = null;
-                switch (type)
-                {
-                    case "SIG":
-                        if (algName.StartsWith("ES"))
-                        {
-                            using (var ec = new ECDsaCng())
-                            {
-                                jwk = builder.NewSign(kid, new[]
-                                {
-                                    KeyOperations.Sign,
-                                    KeyOperations.Verify
-                                }).SetAlg(ec, algName).Build();
-                            }
-                        }
-                        else if (algName.StartsWith("HS"))
-                        {
-                            using (var hmac = new HMACSHA256())
-                            {
-                                jwk = builder.NewSign(kid, new[]
-                                {
-                                    KeyOperations.Sign,
-                                    KeyOperations.Verify
-                                }).SetAlg(hmac, algName).Build();
-                            }
-                        }
-                        else
-                        {
-                            using (var rsa = RSA.Create())
-                            {
-                                jwk = builder.NewSign(kid, new[]
-                                {
-                                    KeyOperations.Sign,
-                                    KeyOperations.Verify
-                                }).SetAlg(rsa, algName).Build();
-                            }
-                        }
-                        break;
-                    case "ENC":
-                        using (var rsa = RSA.Create())
-                        {
-                            jwk = builder.NewEnc(kid, new[]
-                            {
-                                    KeyOperations.Encrypt,
-                                    KeyOperations.Decrypt
-                                }).SetAlg(rsa, algName).Build();
-                        }
-                        break;
-                }
-
-                jwks.Add(jwk);
-            }
-
-            return jwks;
         }
     }
 }

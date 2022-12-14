@@ -25,7 +25,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         /// <param name="handlerContext"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task Build(IEnumerable<string> scopes, JsonObject claims, HandlerContext handlerContext, CancellationToken cancellationToken);
+        Task Build(IEnumerable<string> scopes, Dictionary<string, object> claims, HandlerContext handlerContext, CancellationToken cancellationToken);
         /// <summary>
         /// Refresh token from previous one.
         /// </summary>

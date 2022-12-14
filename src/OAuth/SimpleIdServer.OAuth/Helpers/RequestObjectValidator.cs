@@ -1,27 +1,21 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Domains;
-using SimpleIdServer.Jwt.Exceptions;
-using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Jwt;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Helpers
 {
+    public interface IRequestObjectValidator
+    {
+        Task<RequestObjectValidatorResult> Validate(string request, Client oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT);
+    }
+
     public class RequestObjectValidator : IRequestObjectValidator
     {
-        private readonly IJwtParser _jwtParser;
-
-        public RequestObjectValidator(IJwtParser jwtParser)
-        {
-            _jwtParser = jwtParser;
-        }
-
         public virtual async Task<RequestObjectValidatorResult> Validate(string request, Client oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
+            /*
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request)) throw new OAuthException(errorCode, ErrorMessages.INVALID_REQUEST_PARAMETER);
             var jws = request;
             if (_jwtParser.IsJweToken(request))
@@ -51,6 +45,22 @@ namespace SimpleIdServer.OAuth.Helpers
             }
 
             return new RequestObjectValidatorResult(jwsPayload, header);
+            */
+            return null;
         }
+    }
+
+    public class RequestObjectValidatorResult
+    {
+        /*
+        public RequestObjectValidatorResult(JwsPayload jwsPayload, JwsHeader header)
+        {
+            JwsPayload = jwsPayload;
+            JwsHeader = header;
+        }
+
+        public JwsPayload JwsPayload { get; private set; }
+        public JwsHeader JwsHeader { get; private set; }
+        */
     }
 }

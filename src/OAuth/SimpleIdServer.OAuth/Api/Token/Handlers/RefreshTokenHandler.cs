@@ -2,17 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OAuth.Jwt;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
@@ -27,8 +25,6 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
-        private readonly IJwtParser _jwtParser;
-        private readonly IJwsGenerator _jwsGenerator;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -37,16 +33,12 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IJwtParser jwtParser,
-            IJwsGenerator jwsGenerator,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper)
         {
             _refreshTokenGrantTypeValidator = refreshTokenGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
-            _jwtParser = jwtParser;
-            _jwsGenerator = jwsGenerator;
             _logger = logger;
         }
 
@@ -86,21 +78,22 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED);
                     }
 
-                    var isJwsToken = _jwtParser.IsJwsToken(clientAssertion);
+                    var jwsHandler = new JwtSecurityTokenHandler();
+                    var isJwsToken = jwsHandler.CanReadToken(clientAssertion);
                     if (!isJwsToken)
                     {
                         _logger.LogError("client_assertion doesn't have a correct JWS format");
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
                     }
 
-                    var payload = _jwsGenerator.ExtractPayload(clientAssertion);
-                    if (jwsPayload == null)
+                    var extractedJws = jwsHandler.ReadJwtToken(clientAssertion);
+                    if (extractedJws == null)
                     {
                         _logger.LogError("payload cannot be extracted from client_assertion");
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
                     }
 
-                    clientId = payload.GetIssuer();
+                    clientId = extractedJws.Issuer;
                 }
 
                 if (!clientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
