@@ -51,7 +51,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
 
         protected virtual async Task<SecurityTokenDescriptor> BuildTokenDescriptor(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var audiences = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Scope))).Select(c => c.ClientId).ToListAsync(cancellationToken);
+            var audiences = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Name))).Select(c => c.ClientId).ToListAsync(cancellationToken);
             if (!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
             var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSIDIdentityServer()
     .AddInMemoryScopes(IdServerConfiguration.Scopes)
+    .AddInMemoryClients(IdServerConfiguration.Clients)
     .AddSigningKey(BuildSecurityKey());
 
 var app = builder.Build();

@@ -185,7 +185,7 @@ namespace SimpleIdServer.Domains
         {
             get
             {
-                return string.Join(" ", Scopes.Select(s => s.Scope));
+                return string.Join(" ", Scopes.Select(s => s.Name));
             }
         }
         [JsonPropertyName(OAuthClientParameters.Jwks)]
@@ -201,6 +201,7 @@ namespace SimpleIdServer.Domains
                 };
             }
         }
+        [JsonIgnore]
         public IEnumerable<JsonWebKey> JsonWebKeys
         {
             get
@@ -247,7 +248,7 @@ namespace SimpleIdServer.Domains
         /// Scopes used by the client to control its access.
         /// </summary>
         [JsonIgnore]
-        public ICollection<ClientScope> Scopes { get; set; } = new List<ClientScope>();
+        public IEnumerable<ClientScope> Scopes { get; set; } = new List<ClientScope>();
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>

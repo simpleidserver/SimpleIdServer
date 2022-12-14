@@ -42,6 +42,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                         return "true";
                     case JsonValueKind.False:
                         return "false";
+                    case JsonValueKind.Number:
+                        return selectedToken?.GetInt32().ToString();
                     default:
                         return selectedToken?.GetString().ToLowerInvariant();
                 }

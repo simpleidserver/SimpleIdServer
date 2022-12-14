@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
@@ -69,7 +70,19 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(new List<string>
             {
-                "ES256", "ES384", "ES512", "HS256", "HS384", "HS512", "PS256", "PS384", "PS512", "RS256", "RS384", "RS512"
+                SecurityAlgorithms.EcdsaSha256,
+                SecurityAlgorithms.EcdsaSha384,
+                SecurityAlgorithms.EcdsaSha512,
+                SecurityAlgorithms.HmacSha256,
+                SecurityAlgorithms.HmacSha384,
+                SecurityAlgorithms.HmacSha512,
+                SecurityAlgorithms.RsaSsaPssSha256,
+                SecurityAlgorithms.RsaSsaPssSha384,
+                SecurityAlgorithms.RsaSsaPssSha512,
+                SecurityAlgorithms.RsaSha256,
+                SecurityAlgorithms.RsaSha384,
+                SecurityAlgorithms.RsaSha512,
+                SecurityAlgorithms.None
             }));
             if (_options.MtlsEnabled)
             {

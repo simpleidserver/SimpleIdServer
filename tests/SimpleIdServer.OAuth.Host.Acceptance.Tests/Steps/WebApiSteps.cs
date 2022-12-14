@@ -18,20 +18,24 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
     [Binding]
     public class WebApiSteps
     {
+        private static object _lck = new object();
         private static IEnumerable<string> PARAMETERS_IN_HEADER = new[] { "Authorization", "X-Testing-ClientCert" };
         private ScenarioContext _scenarioContext;
         private CustomWebApplicationFactory<Program> _factory;
 
-        public WebApiSteps(ScenarioContext scenarioContext, CustomWebApplicationFactory<Program> factory)
+        public WebApiSteps(ScenarioContext scenarioContext)
         {
             _scenarioContext = scenarioContext;
-            _factory = factory;
-            var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+            lock(_lck)
             {
-                AllowAutoRedirect = false
-            });
-            var mock = new Mock<Infrastructures.IHttpClientFactory>();
-            mock.Setup(m => m.GetHttpClient()).Returns(client);
+                _factory = new CustomWebApplicationFactory<Program>();
+                var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+                {
+                    AllowAutoRedirect = false
+                });
+                var mock = new Mock<Infrastructures.IHttpClientFactory>();
+                mock.Setup(m => m.GetHttpClient()).Returns(client);
+            }
         }
 
         [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]

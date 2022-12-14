@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Stores;
 using System.Linq;
 using System.Threading;
@@ -26,14 +28,16 @@ namespace SimpleIdServer.OAuth.Jwt
     {
         private readonly IKeyStore _keyStore;
         private readonly IClientHelper _clientHelper;
+        private readonly OAuthHostOptions _options;
 
-        public JwtBuilder(IKeyStore keyStore, IClientHelper clientHelper)
+        public JwtBuilder(IKeyStore keyStore, IClientHelper clientHelper, IOptions<OAuthHostOptions> options)
         {
             _keyStore = keyStore;
             _clientHelper = clientHelper;
+            _options = options.Value;
         }
 
-        public Task<string> BuildAccessToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken) => BuildClientToken(client, securityTokenDescriptor, client.TokenSignedResponseAlg, client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, cancellationToken);
+        public Task<string> BuildAccessToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken) => BuildClientToken(client, securityTokenDescriptor, client.TokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg, client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, cancellationToken);
 
         public async Task<string> BuildClientToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken)
         {

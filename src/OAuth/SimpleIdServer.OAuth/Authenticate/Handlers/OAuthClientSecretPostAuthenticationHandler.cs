@@ -11,7 +11,8 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
     {
         public OAuthClientSecretPostAuthenticationHandler() { }
 
-        public string AuthMethod => "client_secret_post";
+        public string AuthMethod => AUTH_METHOD;
+        public const string AUTH_METHOD = "client_secret_post";
 
         public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {

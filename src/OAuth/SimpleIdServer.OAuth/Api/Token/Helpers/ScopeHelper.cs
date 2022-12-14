@@ -21,18 +21,12 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
                 .Where(g => g.Count() > 1)
                 .Select(g => g.Key)
                 .ToList();
-            if (duplicates.Any())
-            {
-                throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.DUPLICATE_SCOPES, duplicates.Join()));
-            }
+            if (duplicates.Any()) throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.DUPLICATE_SCOPES, duplicates.Join()));
 
             var invalidScopes = scopes
                 .Where(s => !allowedScopes.Contains(s))
                 .ToList();
-            if (invalidScopes.Any())
-            {
-                throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.INVALID_SCOPES, invalidScopes.Join()));
-            }
+            if (invalidScopes.Any()) throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.INVALID_SCOPES, invalidScopes.Join()));
 
             return scopes;
         }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
+using SimpleIdServer.OAuth.Authenticate.Handlers;
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
 
@@ -13,10 +14,6 @@ namespace SimpleIdServer.OAuth.Options
         /// OAUTH2.0 client's default scopes.
         /// </summary>
         public ICollection<string> DefaultScopes { get; set; } = new List<string>();
-        /// <summary>
-        /// OAUTH2.0 client's default token profile.
-        /// </summary>
-        public string DefaultTokenProfile { get; set; } = BearerTokenProfile.DEFAULT_NAME;
         /// <summary>
         /// Client secret expiration time in seconds.
         /// </summary>
@@ -37,10 +34,6 @@ namespace SimpleIdServer.OAuth.Options
         /// Client certificate authentication scheme.
         /// </summary>
         public string CertificateAuthenticationScheme { get; set; } = "Certificate";
-        /// <summary>
-        /// Default token signed response algorithm.
-        /// </summary>
-        public string DefaultTokenSignedResponseAlg { get; set; } = SecurityAlgorithms.RsaSha256;
         /// <summary>
         /// JWK expiration time in seconds.
         /// </summary>
@@ -74,5 +67,17 @@ namespace SimpleIdServer.OAuth.Options
         /// If false then "scope" claim is expressed as an array of string.
         /// </summary>
         public bool IsScopeClaimConcatenationEnabled { get; set; } = false;
+        /// <summary>
+        /// Default authentication method used by the client.
+        /// </summary>
+        public string DefaultTokenEndPointAuthMethod { get; set; } = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
+        /// <summary>
+        /// Default token signed response algorithm.
+        /// </summary>
+        public string DefaultTokenSignedResponseAlg { get; set; } = SecurityAlgorithms.RsaSha256;
+        /// <summary>
+        /// OAUTH2.0 client's default token profile.
+        /// </summary>
+        public string DefaultTokenProfile { get; set; } = BearerTokenProfile.DEFAULT_NAME;
     }
 }

@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Stores;
 using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -38,8 +39,24 @@ namespace Microsoft.Extensions.DependencyInjection
         public IdServerBuilder AddInMemoryScopes(ICollection<Scope> scopes)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            storeDbContext.Scopes.AddRange(scopes);
-            storeDbContext.SaveChanges();
+            if (!storeDbContext.Scopes.Any())
+            {
+                storeDbContext.Scopes.AddRange(scopes);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerBuilder AddInMemoryClients(ICollection<Client> clients)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.Clients.Any())
+            {
+                storeDbContext.Clients.AddRange(clients);
+                storeDbContext.SaveChanges();
+            }
+
             return this;
         }
     }

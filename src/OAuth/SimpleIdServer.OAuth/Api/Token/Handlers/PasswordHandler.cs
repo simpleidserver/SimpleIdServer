@@ -49,7 +49,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 _passwordGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Scope));
+                var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                 var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                 var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
                 var user = await _userRepository.Query().Include(u=> u.Credentials).AsNoTracking().FirstOrDefaultAsync(u => u.Id == userName && u.Credentials.Any(c => c.CredentialType == "pwd" && c.Value == PasswordHelper.ComputeHash(password)), cancellationToken);

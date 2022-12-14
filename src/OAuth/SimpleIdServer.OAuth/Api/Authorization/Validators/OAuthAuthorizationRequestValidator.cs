@@ -35,7 +35,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.Validators
 
             await CommonValidate(context, cancellationToken);
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            var unsupportedScopes = scopes.Where(s => !context.Client.Scopes.Any(sc => sc.Scope == s));
+            var unsupportedScopes = scopes.Where(s => !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));

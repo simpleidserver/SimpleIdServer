@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -24,11 +26,13 @@ namespace SimpleIdServer.OAuth.Authenticate
     {
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _handlers;
+        private readonly OAuthHostOptions _options;
 
-        public AuthenticateClient(IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers)
+        public AuthenticateClient(IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers, IOptions<OAuthHostOptions> options)
         {
             _clientRepository = clientRepository;
             _handlers = handlers;
+            _options = options.Value;
         }
 
         public async Task<Client> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
@@ -46,7 +50,7 @@ namespace SimpleIdServer.OAuth.Authenticate
             if (isAuthorizationCodeGrantType)
                 return client;
 
-            var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod;
+            var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod ?? _options.DefaultTokenEndPointAuthMethod;
             var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
             if (handler == null)
                 throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));

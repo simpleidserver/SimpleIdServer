@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
@@ -8,6 +9,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -31,13 +33,15 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
+        private readonly OAuthHostOptions _options;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
             IEnumerable<IAuthorizationRequestValidator> authorizationRequestValidators,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IClientRepository clientRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IOptions<OAuthHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
             _authorizationRequestValidators = authorizationRequestValidators;
@@ -45,6 +49,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _clientRepository = clientRepository;
             _userRepository = userRepository;
+            _options = options.Value;
         }
 
         public virtual async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
@@ -67,16 +72,12 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         {
             var requestedResponseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
             if (!requestedResponseTypes.Any())
-            {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ResponseType));
-            }
 
             var responseTypeHandlers = _responseTypeHandlers.Where(r => requestedResponseTypes.Contains(r.ResponseType));
             var unsupportedResponseType = requestedResponseTypes.Where(r => !_responseTypeHandlers.Any(rh => rh.ResponseType == r));
             if (unsupportedResponseType.Any())
-            {
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
-            }
 
             context.SetClient(await AuthenticateClient(context.Request.RequestData, cancellationToken));
             var user = await _userRepository.Query()
@@ -107,7 +108,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
                 await responseTypeHandler.Enrich(context, cancellationToken);
             }
 
-            _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
+            _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 

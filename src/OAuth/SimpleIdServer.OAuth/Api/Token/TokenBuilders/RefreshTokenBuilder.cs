@@ -30,18 +30,12 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         {
             var dic = new JsonObject();
             if (handlerContext.Request.RequestData != null)
-            {
                 foreach (var record in handlerContext.Request.RequestData)
-                {
-                    dic.Add(record.Key, record.Value);
-                }
-            }
+                    dic.Add(record.Key, record.Value.GetValue<string>());
 
             var authorizationCode = string.Empty;
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
-            {
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
-            }
 
             var refreshToken = await _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
