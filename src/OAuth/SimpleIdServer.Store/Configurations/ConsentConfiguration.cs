@@ -11,7 +11,9 @@ namespace SimpleIdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<Consent> builder)
         {
             builder.HasKey(c => c.Id);
-            builder.HasMany(c => c.Scopes).WithMany(s => s.Consents);
+            builder.Property(c => c.Scopes).HasConversion(
+                c => string.Join(',', c),
+                c => c.Split(',', StringSplitOptions.None));
             builder.Property(c => c.Claims).HasConversion(
                 c => string.Join(',', c),
                 c => c.Split(',', StringSplitOptions.None));

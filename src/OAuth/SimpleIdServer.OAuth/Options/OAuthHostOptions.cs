@@ -19,9 +19,9 @@ namespace SimpleIdServer.OAuth.Options
         /// </summary>
         public int? ClientSecretExpirationInSeconds { get; set; } = null;
         /// <summary>
-        /// Authorization cod expiration time in seconds.
+        /// Authorization code expiration time in seconds.
         /// </summary>
-        public int AuthorizationCodeExpirationInSeconds { get; set; }
+        public int AuthorizationCodeExpirationInSeconds { get; set; } = 600;
         /// <summary>
         /// Trusted parties used to validate the software statement.
         /// </summary>
@@ -41,7 +41,7 @@ namespace SimpleIdServer.OAuth.Options
         /// <summary>
         /// Default Token Expiration Time in seconds.
         /// </summary>
-        public int DefaultTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
+        public double DefaultTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>

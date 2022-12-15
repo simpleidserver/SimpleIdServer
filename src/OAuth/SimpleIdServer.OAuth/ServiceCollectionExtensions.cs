@@ -41,6 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (callback != null) services.Configure(callback);
             else services.Configure<OAuthHostOptions>(o => { });
             services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
+            services.AddDataProtection();
             services.AddDistributedMemoryCache();
             services.AddStore()
                 .AddResponseModeHandlers()

@@ -38,9 +38,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
         {
             var dic = new JsonObject();
             foreach (var record in context.Request.RequestData)
-            {
-                dic.Add(record.Key, record.Value);
-            }
+                dic.Add(record.Key, record.Value.GetValue<string>());
 
             CheckPKCEParameters(context);
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);

@@ -151,78 +151,81 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'$.scopes_supported[0]\'=\'firstScope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 23
- testRunner.And("JSON \'$.grant_types_supported[0]\'=\'client_credentials\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.scopes_supported[1]\'=\'secondScope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 24
- testRunner.And("JSON \'$.grant_types_supported[1]\'=\'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[0]\'=\'client_credentials\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 25
- testRunner.And("JSON \'$.grant_types_supported[2]\'=\'password\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[1]\'=\'refresh_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 26
- testRunner.And("JSON \'$.grant_types_supported[3]\'=\'authorization_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[2]\'=\'password\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 27
- testRunner.And("JSON \'$.grant_types_supported[3]\'=\'implicit\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[3]\'=\'authorization_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 28
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[0]\'=\'private_key_jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.grant_types_supported[3]\'=\'implicit\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 29
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[1]\'=\'client_secret_basic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[0]\'=\'private_key_jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 30
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[2]\'=\'client_secret_jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[1]\'=\'client_secret_basic\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 31
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[3]\'=\'client_secret_post\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[2]\'=\'client_secret_jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 32
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[4]\'=\'pkce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[3]\'=\'client_secret_post\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 33
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[5]\'=\'tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[4]\'=\'pkce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 34
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[6]\'=\'self_signed_tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[5]\'=\'tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 35
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[0]\'=\'ES256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[6]\'=\'self_signed_tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 36
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[1]\'=\'ES384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[0]\'=\'ES256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 37
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[2]\'=\'ES512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[1]\'=\'ES384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 38
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[3]\'=\'HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[2]\'=\'ES512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 39
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[4]\'=\'HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[3]\'=\'HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 40
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[5]\'=\'HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[4]\'=\'HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 41
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[6]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[5]\'=\'HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 42
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[7]\'=\'RS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[6]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 43
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[8]\'=\'RS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[7]\'=\'RS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[9]\'=\'PS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[8]\'=\'RS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 45
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[10]\'=\'PS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[9]\'=\'PS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 46
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[11]\'=\'PS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[10]\'=\'PS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 47
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[11]\'=\'PS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 48
  testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[12]\'=\'none\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

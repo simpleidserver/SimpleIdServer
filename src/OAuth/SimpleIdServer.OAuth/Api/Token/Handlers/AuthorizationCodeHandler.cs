@@ -1,13 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +27,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly OAuthHostOptions _options;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
         public AuthorizationCodeHandler(
@@ -32,12 +36,14 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders,
             IClientAuthenticationHelper clientAuthenticationHelper,
-            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper)
+            IOptions<OAuthHostOptions> options,
+            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
         {
             _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
+            _options = options.Value;
             _logger = logger;
         }
 
@@ -81,7 +87,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                     await tokenBuilder.Refresh(previousRequest, context, cancellationToken);
                 }
 
-                _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
+                _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)
                 {
                     result.Add(kvp.Key, kvp.Value);

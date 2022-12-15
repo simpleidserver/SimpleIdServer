@@ -2,10 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +23,14 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IClientRepository _clientRepository;
+        private readonly OAuthHostOptions _options;
 
-        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IClientRepository clientRepository)
+        public AccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IJwtBuilder jwtBuilder, IClientRepository clientRepository, IOptions<OAuthHostOptions> options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _jwtBuilder = jwtBuilder;
             _clientRepository = clientRepository;
+            _options = options.Value;
         }
 
         public string Name => TokenResponseParameters.AccessToken;
@@ -53,7 +57,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         {
             var audiences = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Name))).Select(c => c.ClientId).ToListAsync(cancellationToken);
             if (!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
-            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds);
+            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);

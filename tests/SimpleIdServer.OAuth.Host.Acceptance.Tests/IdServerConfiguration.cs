@@ -1,5 +1,8 @@
-﻿using SimpleIdServer.Domains;
-using SimpleIdServer.OAuth.Api.Token.Handlers;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Domains;
+using SimpleIdServer.OAuth.Builders;
+using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
@@ -12,21 +15,39 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             {
                 Name = "firstScope",
                 IsExposedInConfigurationEdp = true,
+            },
+            new Scope
+            {
+                Name = "secondScope",
+                IsExposedInConfigurationEdp = true
             }
         };
 
         public static List<Client> Clients = new List<Client>
         {
-            new Client
+            ClientBuilder.BuildApiClient("firstClient", "password").AddScope("firstScope").Build(),
+            ClientBuilder.BuildApiClient("secondClient", "password").AddScope("firstScope").UseOnlyPasswordGrantType().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("thirdClient", "password", "http://localhost:8080").AddScope("secondScope").Build()
+        };
+
+        public static List<User> Users = new List<User>
+        {
+            new User
             {
-                ClientId = "firstClient",
-                ClientSecret = "password",
-                Scopes = new List<ClientScope>
+                Id = "user",
+                Credentials = new List<UserCredential>
                 {
-                    "firstScope"
+                    UserCredential.CreatePassword("password")
                 },
-                GrantTypes = new string[] { ClientCredentialsHandler.GRANT_TYPE },
-                TokenExpirationTimeInSeconds = 3600
+                Consents = new List<Consent>
+                {
+                    new Consent
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ClientId = "thirdClient",
+                        Scopes = new [] { "secondScope" }
+                    }
+                }
             }
         };
     }

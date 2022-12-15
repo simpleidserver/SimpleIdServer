@@ -28,7 +28,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext = scenarioContext;
             lock(_lck)
             {
-                _factory = new CustomWebApplicationFactory<Program>();
+                _factory = new CustomWebApplicationFactory<Program>(scenarioContext);
                 var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
                 {
                     AllowAutoRedirect = false
@@ -36,18 +36,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                 var mock = new Mock<Infrastructures.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
             }
-        }
-
-        [When("add user consent : user='(.*)', scope='(.*)', clientId='(.*)'")]
-        public Task WhenAddUserConsent(string user, string scope, string clientId)
-        {
-            return Task.CompletedTask;
-        }
-
-        [When("add JSON web key to Authorization Server and store into '(.*)'")]
-        public Task WhenAddJsonWebKey(string name, Table table)
-        {
-            return Task.CompletedTask;
         }
 
         [When("execute HTTP GET request '(.*)'")]
@@ -61,9 +49,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                 RequestUri = new Uri(url)
             };
             foreach(var kvp in headers)
-            {
                 httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
-            }
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
@@ -182,34 +168,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             var httpClient = _factory.CreateClient();
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
-        }
-
-        [When("build software statement")]
-        public void WhenBuildSoftwareStatement(Table table)
-        {
-            /*
-            var jwsPayload = new JwsPayload();
-            foreach (var record in table.Rows)
-            {
-                var key = record["Key"];
-                var value = record["Value"];
-                if (value.StartsWith('[') && value.EndsWith(']'))
-                {
-                    value = value.TrimStart('[').TrimEnd(']');
-                    var splitted = value.Split(',');
-                    jwsPayload.Add(key, JArray.FromObject(splitted));
-                }
-                else
-                {
-                    jwsPayload.Add(key, value);
-                }
-            }
-
-            var jwtBuilder = (IJwtBuilder)_factory.Server.Host.Services.GetService(typeof(IJwtBuilder));
-            // var jwk = FakeJwks.GetInstance().Jwks.First();
-            // var jws = jwtBuilder.Sign(jwsPayload, jwk, jwk.Alg);
-            // _scenarioContext.Set(jws, "softwareStatement");
-            */
         }
 
         private string ExtractUrl(string url, Table table)

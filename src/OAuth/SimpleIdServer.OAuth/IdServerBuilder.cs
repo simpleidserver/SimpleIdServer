@@ -59,5 +59,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return this;
         }
+
+        public IdServerBuilder AddInMemoryUsers(ICollection<User> users)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.Users.Any())
+            {
+                storeDbContext.Users.AddRange(users);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
     }
 }

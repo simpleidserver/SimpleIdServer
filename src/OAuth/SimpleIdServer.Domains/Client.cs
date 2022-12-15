@@ -30,7 +30,7 @@ namespace SimpleIdServer.Domains
         /// Array of OAUTH2.0 grant type strings that the client can use at the token endpoint.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.GrantTypes)]
-        public IEnumerable<string> GrantTypes { get; set; } = new List<string>();
+        public ICollection<string> GrantTypes { get; set; } = new List<string>();
         /// <summary>
         /// Array of redirection URIS for use in redirect-based flows.
         /// </summary>
@@ -174,7 +174,7 @@ namespace SimpleIdServer.Domains
         /// Token expiration time in seconds.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TokenExpirationTimeInSeconds)]
-        public double TokenExpirationTimeInSeconds { get; set; }
+        public double? TokenExpirationTimeInSeconds { get; set; }
         /// <summary>
         /// Refresh token expiration time in seconds.
         /// </summary>
@@ -248,7 +248,7 @@ namespace SimpleIdServer.Domains
         /// Scopes used by the client to control its access.
         /// </summary>
         [JsonIgnore]
-        public IEnumerable<ClientScope> Scopes { get; set; } = new List<ClientScope>();
+        public ICollection<ClientScope> Scopes { get; set; } = new List<ClientScope>();
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>

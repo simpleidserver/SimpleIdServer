@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSIDIdentityServer()
     .AddInMemoryScopes(IdServerConfiguration.Scopes)
     .AddInMemoryClients(IdServerConfiguration.Clients)
+    .AddInMemoryUsers(IdServerConfiguration.Users)
     .AddSigningKey(BuildSecurityKey());
 
 var app = builder.Build();

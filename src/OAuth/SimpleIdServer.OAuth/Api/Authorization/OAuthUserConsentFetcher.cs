@@ -17,10 +17,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                Scopes = scopes.Select(s => new Scope
-                {
-                    Name = s
-                })
+                Scopes = scopes
             };
         }
 
@@ -28,7 +25,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization
         {
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
             return oauthUser.Consents.FirstOrDefault(c => queryParameters.GetClientIdFromAuthorizationRequest() == c.ClientId &&
-                (scopes == null || (scopes.All(s => c.Scopes.Any(sc => sc.Name == s)))));
+                (scopes == null || (scopes.All(s => c.Scopes.Contains(s)))));
         }
     }
 }

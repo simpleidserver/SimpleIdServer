@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using BlushingPenguin.JsonPath;
+using Microsoft.IdentityModel.JsonWebTokens;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using TechTalk.SpecFlow;
@@ -16,6 +18,13 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         public ValidationSteps(ScenarioContext scenarioContext)
         {
             _scenarioContext = scenarioContext;
+        }
+
+        [Then("parameter '(.*)'='(.*)'")]
+        public void ThenParametersEqualsTo(string parameter, string value)
+        {
+            var val = _scenarioContext.Get<string>(parameter);
+            Assert.Equal(value, val);
         }
 
 
@@ -51,6 +60,35 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             }
         }
 
+        [Then("access_token audience contains '(.*)'")]
+        public void ThenAccessTokenAudienceContains(string value)
+        {
+            var jwt = GetAccessToken();
+            Assert.Contains(value, jwt.Audiences);
+        }
+
+        [Then("access_token scope contains '(.*)'")]
+        public void ThenAccessTokenScopeContains(string value)
+        {
+            var jwt = GetAccessToken();
+            var scopes = jwt.Claims.Where(c => c.Type == "scope").Select(s => s.Value);
+            Assert.Contains(value, scopes);
+        }
+
+        [Then("access_token alg equals to '(.*)'")]
+        public void ThenAccessTokenAlgEqualsTo(string alg)
+        {
+            var jwt = GetAccessToken();
+            Assert.Equal(alg, jwt.Alg);
+        }
+
+        [Then("access_token kid equals to '(.*)'")]
+        public void ThenAccessTokenKidEqualsTo(string kid)
+        {
+            var jwt = GetAccessToken();
+            Assert.Equal(kid, jwt.Kid);
+        }
+
         [Then("HTTP status code equals to '(.*)'")]
         public void ThenCheckHttpStatusCode(int code)
         {
@@ -58,28 +96,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             Assert.Equal(code, (int)httpResponseMessage.StatusCode);
         }
 
-        [Then("Extract JWS payload from '(.*)' and check claim '(.*)' is array")]
-        public void ThenJWSPayloadClaimContains(string key, string name)
+        private JsonWebToken GetAccessToken()
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
-            /*
-            var json = jsonHttpBody[key].ToString();
-            var jsonPayload = new JwsGenerator(new ISignHandler[0]).ExtractPayload(json);
-            var jArr = JArray.Parse(jsonPayload[name].ToString());
-            Assert.NotNull(jArr);
-            */
-        }
-
-        [Then("Extract JWS payload from '(.*)' and check claim '(.*)' contains '(.*)'")]
-        public void ThenJWSPayloadClaimEqualsTo(string key, string name, string value)
-        {
-            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
-            /*
-            var json = jsonHttpBody[key].ToString();
-            var jsonPayload = new JwsGenerator(new ISignHandler[0]).ExtractPayload(json);
-            var jArr = JArray.Parse(jsonPayload[name].ToString()).Select(s => s.ToString());
-            Assert.True(jArr.Contains(value));
-            */
+            var handler = new JsonWebTokenHandler();
+            return handler.ReadJsonWebToken(jsonHttpBody.SelectToken("$.access_token").Value.GetString());
         }
     }
 }

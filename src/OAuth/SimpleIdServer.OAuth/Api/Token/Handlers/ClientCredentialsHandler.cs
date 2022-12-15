@@ -30,7 +30,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IOptions<OAuthHostOptions> options) : base(clientAuthenticationHelper)
+            IOptions<OAuthHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _clientCredentialsGrantTypeValidator = clientCredentialsGrantTypeValidator;
             _tokenProfiles = tokenProfiles;

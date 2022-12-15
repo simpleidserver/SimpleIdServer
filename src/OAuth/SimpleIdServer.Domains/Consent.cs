@@ -6,11 +6,11 @@ namespace SimpleIdServer.Domains
     {
         public Consent()
         {
-            Scopes = new List<Scope>();
+            Scopes = new List<string>();
             Claims = new List<string>();
         }
 
-        public Consent(string id, string clientId, IEnumerable<Scope> scopes, IEnumerable<string> claims)
+        public Consent(string id, string clientId, IEnumerable<string> scopes, IEnumerable<string> claims)
         {
             Id = id;
             ClientId = clientId;
@@ -21,7 +21,7 @@ namespace SimpleIdServer.Domains
 
         public string Id { get; set; } = null!;
         public string ClientId { get; set; } = null!;
-        public IEnumerable<Scope> Scopes { get; set; } = new List<Scope>();
+        public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public IEnumerable<string> Claims { get; set; } = new List<string>();
 
         public object Clone()
@@ -30,7 +30,7 @@ namespace SimpleIdServer.Domains
             {
                 Id = Id,
                 ClientId = ClientId,
-                Scopes = Scopes == null ? new List<Scope>() : Scopes.Select(s => (Scope)s.Clone()),
+                Scopes = Scopes.ToList(),
                 Claims = Claims.ToList()
             };
         }

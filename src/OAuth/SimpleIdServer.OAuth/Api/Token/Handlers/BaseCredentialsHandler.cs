@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,10 +19,12 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
     public abstract class BaseCredentialsHandler : IGrantTypeHandler
     {
         private readonly IClientAuthenticationHelper _clientAuthenticationHelper;
+        private readonly OAuthHostOptions _options;
 
-        public BaseCredentialsHandler(IClientAuthenticationHelper clientAuthenticationHelper)
+        public BaseCredentialsHandler(IClientAuthenticationHelper clientAuthenticationHelper, IOptions<OAuthHostOptions> options)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
+            _options = options.Value;
         }
 
         public abstract string GrantType { get; }
@@ -41,7 +45,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
         {
             return new JsonObject
             {
-                [TokenResponseParameters.ExpiresIn] = context.Client.TokenExpirationTimeInSeconds,
+                [TokenResponseParameters.ExpiresIn] = context.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds,
                 [TokenResponseParameters.Scope] = string.Join(" ", scopes)
             };
         }
