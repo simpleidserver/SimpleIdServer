@@ -39,24 +39,18 @@ namespace SimpleIdServer.OAuth.Authenticate
         {
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
 
-            Client client = null;
             var clientId = TryGettingClientId(authenticateInstruction);
-            if (!string.IsNullOrWhiteSpace(clientId))
-            client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).Include(c => c.Scopes).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+            if(string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(errorCode, ErrorMessages.MISSING_CLIENT_ID);
 
-            if (client == null)
-            throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
-
-            if (isAuthorizationCodeGrantType)
-                return client;
+            var client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).Include(c => c.Scopes).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+            if (client == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
+            if (isAuthorizationCodeGrantType) return client;
 
             var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod ?? _options.DefaultTokenEndPointAuthMethod;
             var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
-            if (handler == null)
-                throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));
+            if (handler == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, tokenEndPointAuthMethod));
 
-            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode))
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
+            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode)) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
 
             return client;
         }

@@ -102,6 +102,8 @@ namespace System.Text.Json.Nodes
 
         public static string GetCodeVerifier(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.CodeVerifier);
 
+        public static string GetRedirectUri(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.RedirectUri);
+
         public static ClientCredentials GetClientCredentials(this JsonObject jObj)
         {
             var authorization = jObj.GetToken(SimpleIdServer.OAuth.Constants.AuthorizationHeaderName);

@@ -1,7 +1,7 @@
 ﻿Feature: Jwks
 	Get JWKS and check its content
 
-Scenario: Get JWKS
+Scenario: Get Json Web Keys (JWKS)
 	When execute HTTP GET request 'https://localhost:8080/jwks'
 	| Key | Value |
 

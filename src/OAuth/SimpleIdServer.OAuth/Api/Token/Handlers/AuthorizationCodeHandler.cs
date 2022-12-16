@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -58,6 +57,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var code = context.Request.RequestData.GetAuthorizationCode();
+                var redirectUri = context.Request.RequestData.GetRedirectUri();
                 var previousRequest = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
                 if (previousRequest == null)
                 {
@@ -74,11 +74,9 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 }
 
                 var previousClientId = previousRequest.GetClientId();
-                if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.REFRESH_TOKEN_NOT_ISSUED_BY_CLIENT);
-                }
-
+                var previousRedirectUrl = previousRequest.GetRedirectUri();
+                if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT);
+                if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.NOT_SAME_REDIRECT_URI);
                 await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
                 var scopes = previousRequest.GetScopesFromAuthorizationRequest();
                 var result = BuildResult(context, scopes);

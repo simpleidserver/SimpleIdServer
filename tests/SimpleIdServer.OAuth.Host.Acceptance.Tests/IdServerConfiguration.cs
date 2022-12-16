@@ -27,7 +27,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         {
             ClientBuilder.BuildApiClient("firstClient", "password").AddScope("firstScope").Build(),
             ClientBuilder.BuildApiClient("secondClient", "password").AddScope("firstScope").UseOnlyPasswordGrantType().Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("thirdClient", "password", "http://localhost:8080").AddScope("secondScope").Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("thirdClient", "password", "http://localhost:8080").AddScope("secondScope").Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fourthClient", "password", "http://localhost:9080").AddScope("secondScope").Build()
         };
 
         public static List<User> Users = new List<User>

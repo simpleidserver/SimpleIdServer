@@ -15,15 +15,8 @@ namespace SimpleIdServer.OAuth.Api.Token.Validators
     {
         public void Validate(HandlerContext context)
         {
-            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.Code)))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.Code));
-            }
-
-            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RedirectUri)))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.RedirectUri));
-            }
+            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.Code))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.Code));
+            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RedirectUri))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, TokenRequestParameters.RedirectUri));
         }
     }
 }

@@ -36,11 +36,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         }
 
         [Then("JSON '(.*)'='(.*)'")]
-        public void ThenEqualsTo(string key, string value)
+        public void ThenEqualsTo(string key, string expectedValue)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
-            value = GetValue(jsonHttpBody);
-            Assert.Equal(value, value);
+            var value = GetValue(jsonHttpBody);
+            Assert.Equal(expectedValue, value);
 
             string GetValue(JsonDocument elt)
             {
@@ -54,7 +54,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                     case JsonValueKind.Number:
                         return selectedToken?.GetInt32().ToString();
                     default:
-                        return selectedToken?.GetString().ToLowerInvariant();
+                        return selectedToken?.GetString();
                 }
 
             }

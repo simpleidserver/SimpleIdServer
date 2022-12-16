@@ -26,7 +26,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
             var invalidScopes = scopes
                 .Where(s => !allowedScopes.Contains(s))
                 .ToList();
-            if (invalidScopes.Any()) throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.INVALID_SCOPES, invalidScopes.Join()));
+            if (invalidScopes.Any()) throw new OAuthException(ErrorCodes.INVALID_SCOPE, string.Format(ErrorMessages.UNAUTHORIZED_TO_SCOPES, invalidScopes.Join()));
 
             return scopes;
         }

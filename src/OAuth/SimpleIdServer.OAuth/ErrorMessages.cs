@@ -12,7 +12,7 @@ namespace SimpleIdServer.OAuth
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
-        public const string INVALID_SCOPES = "invalid scopes : {0}";
+        public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
@@ -24,7 +24,7 @@ namespace SimpleIdServer.OAuth
         public const string BAD_ISSUER_SOFTWARE_STATEMENT = "software statement issuer is not trusted";
         public const string BAD_USER_CREDENTIAL = "bad user credential";
         public const string BAD_CLIENT_CREDENTIAL = "bad client credential";
-        public const string BAD_CLIENT_GRANT_TYPE = "grant type {0} not supported by the client";
+        public const string BAD_CLIENT_GRANT_TYPE = "grant type {0} is not supported by the client";
         public const string BAD_CLIENT_ASSERTION_DECRYPTION = "bad client assertion decryption";
         public const string BAD_CLIENT_ASSERTION_FORMAT = "bad client assertion format";
         public const string BAD_CLIENT_ASSERTION_SIGNATURE = "bad client assertion signature";
@@ -51,6 +51,7 @@ namespace SimpleIdServer.OAuth
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";
         public const string MISSING_ACCESS_TOKEN = "access token is missing";
+        public const string MISSING_CLIENT_ID = "missing client_id";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC = "token_encrypted_response_enc is not supported";
         public const string UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG = "token_signed_response_alg is not supported";
@@ -62,6 +63,7 @@ namespace SimpleIdServer.OAuth
         public const string DUPLICATE_JWKS = "jwks and jwks_uri parameters cannot be passed at the same time";
         public const string LOGIN_IS_REQUIRED = "login is required";
         public const string AUTHORIZATION_CODE_ALREADY_USED = "authorization code has already been used, all tokens previously issued have been revoked";
+        public const string AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT = "authorization code has not been issued by the client";
         public const string ACCESS_TOKEN_REJECTED = "access token has been rejected";
         public const string REFRESH_TOKEN_IS_EXPIRED = "refresh token is expired";
         public const string ACCESS_TOKEN_VALID_CLIENT = "access token can be used for the client '{0}' and not for '{1}'";
@@ -83,5 +85,6 @@ namespace SimpleIdServer.OAuth
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
         public const string SCOPE_ALREADY_EXISTS = "scope '{0}' already exists";
         public const string USER_ALREADY_EXISTS = "user '{0}' already exists";
+        public const string NOT_SAME_REDIRECT_URI = "not the same redirect_uri";
     }
 }

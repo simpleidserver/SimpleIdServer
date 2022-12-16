@@ -8,15 +8,9 @@ namespace System
 {
     public static class StringExtensions
     {
-        public static ICollection<string> ToScopes(this string str)
-        {
-            return string.IsNullOrWhiteSpace(str) ? new List<string>() : str.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-        }
+        public static ICollection<string> ToScopes(this string str) => string.IsNullOrWhiteSpace(str) ? new List<string>() : str.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
 
-        public static string Join(this IEnumerable<string> arr, string separator = ",")
-        {
-            return string.Join(separator, arr);
-        }
+        public static string Join(this IEnumerable<string> arr, string separator = ",") => string.Join(separator, arr);
 
         public static string ExtractAuthorizationValue(this string str, IEnumerable<string> authenticationSchemes)
         {

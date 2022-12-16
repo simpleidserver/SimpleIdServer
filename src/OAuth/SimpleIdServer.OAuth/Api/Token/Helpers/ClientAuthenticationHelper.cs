@@ -28,11 +28,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Helpers
         {
             var authenticateInstruction = BuildAuthenticateInstruction(jObjHeader, jObjBody, certificate);
             var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
-            if (oauthClient == null)
-            {
-                throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
-            }
-
+            if (oauthClient == null) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_CREDENTIAL);
             return oauthClient;
         }
 

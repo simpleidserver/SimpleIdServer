@@ -59,9 +59,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                 var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                 var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
                 var user = await _userRepository.Query().Include(u=> u.Credentials).AsNoTracking().FirstOrDefaultAsync(u => u.Id == userName && u.Credentials.Any(c => c.CredentialType == UserCredential.PWD && c.Value == PasswordHelper.ComputeHash(password)), cancellationToken);
-                if (user == null)
-                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
-
+                if (user == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.BAD_USER_CREDENTIAL);
                 context.SetUser(user);
                 var result = BuildResult(context, scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
