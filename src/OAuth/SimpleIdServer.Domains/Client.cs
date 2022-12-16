@@ -179,7 +179,7 @@ namespace SimpleIdServer.Domains
         /// Refresh token expiration time in seconds.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
-        public double RefreshTokenExpirationTimeInSeconds { get; set; }
+        public double? RefreshTokenExpirationTimeInSeconds { get; set; }
         [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
         public string Scope
         {

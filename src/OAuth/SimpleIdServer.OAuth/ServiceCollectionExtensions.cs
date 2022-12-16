@@ -15,6 +15,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.Authenticate;
+using SimpleIdServer.OAuth.Authenticate.AssertionParsers;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
@@ -45,6 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddStore()
                 .AddResponseModeHandlers()
                 .AddOAuthClientAuthentication()
+                .AddClientAssertionParsers()
                 .AddOAuthJwksApi()
                 .AddOAuthTokenApi()
                 .AddOAuthAuthorizationApi()
@@ -71,7 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
         {
-            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetService<IOptions<OAuthHostOptions>>() ));
+            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IOptions<OAuthHostOptions>>() ));
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
@@ -79,6 +81,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthPKCEAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
+            return services;
+        }
+
+        private static IServiceCollection AddClientAssertionParsers(this IServiceCollection services)
+        {
+            services.AddTransient<IClientAssertionParser, ClientJwtAssertionParser>();
             return services;
         }
 

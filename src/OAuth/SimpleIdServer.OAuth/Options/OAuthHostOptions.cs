@@ -45,7 +45,7 @@ namespace SimpleIdServer.OAuth.Options
         /// <summary>
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>
-        public int DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
+        public double DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
         /// HOTP Window.
         /// </summary>

@@ -9,6 +9,13 @@ namespace SimpleIdServer.OAuth.Builders
 {
     public class ClientBuilder
     {
+        /// <summary>
+        /// Build client for REST.API.
+        /// By default client_credentials grant-type is used to obtain an access token outside of the context of a user.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <returns></returns>
         public static ApiClientBuilder BuildApiClient(string clientId, string clientSecret)
         {
             var client = new Client
@@ -20,6 +27,14 @@ namespace SimpleIdServer.OAuth.Builders
             return new ApiClientBuilder(client);
         }
 
+        /// <summary>
+        /// Build client for traditional website like ASP.NET CORE.
+        /// By default authorization_code grant-type is used by confidential and public clients to exchange an authoriaztion code for an access token.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="redirectUrls"></param>
+        /// <returns></returns>
         public static TraditionalWebsiteClientBuilder BuildTraditionalWebsiteClient(string clientId, string clientSecret, params string[] redirectUrls)
         {
             var client = new Client

@@ -2,16 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.Domains;
+using SimpleIdServer.OAuth.Authenticate.AssertionParsers;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,12 +24,14 @@ namespace SimpleIdServer.OAuth.Authenticate
     {
         private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _handlers;
+        private readonly IEnumerable<IClientAssertionParser> _clientAssertionParsers;
         private readonly OAuthHostOptions _options;
 
-        public AuthenticateClient(IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers, IOptions<OAuthHostOptions> options)
+        public AuthenticateClient(IClientRepository clientRepository, IEnumerable<IOAuthClientAuthenticationHandler> handlers, IEnumerable<IClientAssertionParser> clientAssertionParsers, IOptions<OAuthHostOptions> options)
         {
             _clientRepository = clientRepository;
             _handlers = handlers;
+            _clientAssertionParsers = clientAssertionParsers;
             _options = options.Value;
         }
 
@@ -39,10 +39,14 @@ namespace SimpleIdServer.OAuth.Authenticate
         {
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
 
-            var clientId = TryGettingClientId(authenticateInstruction);
-            if(string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(errorCode, ErrorMessages.MISSING_CLIENT_ID);
+            string clientId;
+            if (!TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(errorCode, ErrorMessages.MISSING_CLIENT_ID);
 
-            var client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).Include(c => c.Scopes).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+            var client = await _clientRepository.Query()
+                .AsNoTracking()
+                .Include(c => c.SerializedJsonWebKeys)
+                .Include(c => c.Scopes)
+                .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             if (client == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             if (isAuthorizationCodeGrantType) return client;
 
@@ -55,33 +59,31 @@ namespace SimpleIdServer.OAuth.Authenticate
             return client;
         }
 
-        private string TryGettingClientId(AuthenticateInstruction instruction)
+        private bool TryGetClientId(AuthenticateInstruction instruction, out string clientId)
         {
-            var clientId = GetClientIdFromClientAssertion(instruction);
-            if (!string.IsNullOrWhiteSpace(clientId))
-                return clientId;
+            clientId = null;
+            if (TryExtractClientIdFromClientAssertion(instruction, out clientId)) return true;
 
             clientId = instruction.ClientIdFromAuthorizationHeader;
-            if (!string.IsNullOrWhiteSpace(clientId))
-                return clientId;
+            if (!string.IsNullOrWhiteSpace(clientId)) return true;
             
-            return instruction.ClientIdFromHttpRequestBody;
+            clientId = instruction.ClientIdFromHttpRequestBody;
+            if (!string.IsNullOrWhiteSpace(clientId)) return true;
+            return false;
         }
 
-        public string GetClientIdFromClientAssertion(AuthenticateInstruction instruction)
+        public bool TryExtractClientIdFromClientAssertion(AuthenticateInstruction instruction, out string clientId)
         {
-            if (instruction.ClientAssertionType != "urn:ietf:params:oauth:client-assertion-type:jwt-bearer" || string.IsNullOrWhiteSpace(instruction.ClientAssertion))
-                return string.Empty;
-
+            clientId = null;
+            if (string.IsNullOrWhiteSpace(instruction.ClientAssertionType)) return false;
+            var type = instruction.ClientAssertionType;
+            var parser = _clientAssertionParsers.FirstOrDefault(c => c.Type == type);
+            if (parser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.CLIENT_ASSERTION_TYPE_NOT_SUPPORTED, type));
             var clientAssertion = instruction.ClientAssertion;
-            var handler = new JsonWebTokenHandler();
-            var canRead = handler.CanReadToken(clientAssertion);
-            if (!canRead) return string.Empty;
-            var token = handler.ReadJsonWebToken(clientAssertion);
-            if (token.IsEncrypted && token.IsSigned) return string.Empty;
-            if (token.IsEncrypted) return instruction.ClientIdFromHttpRequestBody;
-            var payload = token.GetClaimJson();
-            return payload.GetStr(OpenIdConnectParameterNames.Iss);
+            if (string.IsNullOrWhiteSpace(clientAssertion)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ASSERTION_IS_MISSING);
+            if (!parser.TryExtractClientId(clientAssertion, out clientId)) return true;
+            if (string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION);
+            return true;
         }
     }
 }

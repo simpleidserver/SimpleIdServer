@@ -28,7 +28,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("firstClient", "password").AddScope("firstScope").Build(),
             ClientBuilder.BuildApiClient("secondClient", "password").AddScope("firstScope").UseOnlyPasswordGrantType().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("thirdClient", "password", "http://localhost:8080").AddScope("secondScope").Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fourthClient", "password", "http://localhost:9080").AddScope("secondScope").Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fourthClient", "password", "http://localhost:9080").AddScope("secondScope").Build(),
+            ClientBuilder.BuildApiClient("fifthClient", "password").AddScope("secondScope").AddRefreshTokenGrantType(-1).Build(),
+            ClientBuilder.BuildApiClient("sixClient", "password").AddScope("secondScope").AddRefreshTokenGrantType().Build(),
+            ClientBuilder.BuildApiClient("sevenClient", "password").AddScope("secondScope").UsePrivateKeyJwtAuthentication(JsonWebKeyBuilder.BuildRSA("seventClientKeyId")).Build()
         };
 
         public static List<User> Users = new List<User>

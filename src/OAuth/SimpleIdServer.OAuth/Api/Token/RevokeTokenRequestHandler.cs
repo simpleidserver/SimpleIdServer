@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Api.Token.Validators;
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;

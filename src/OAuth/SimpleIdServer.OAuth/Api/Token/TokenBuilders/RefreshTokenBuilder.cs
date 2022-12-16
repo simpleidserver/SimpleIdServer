@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Options;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -12,10 +14,12 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
     public class RefreshTokenBuilder : ITokenBuilder
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
+        private readonly OAuthHostOptions _options;
 
-        public RefreshTokenBuilder(IGrantedTokenHelper grantedTokenHelper)
+        public RefreshTokenBuilder(IGrantedTokenHelper grantedTokenHelper, IOptions<OAuthHostOptions> options)
         {
             _grantedTokenHelper = grantedTokenHelper;
+            _options = options.Value;
         }
 
         protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
@@ -37,7 +41,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
 
-            var refreshToken = await _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);
+            var refreshToken = await _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, (handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds), cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
 
@@ -45,7 +49,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         {
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
-            var refreshToken = await  _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, previousQueryParameters, handlerContext.Client.RefreshTokenExpirationTimeInSeconds, cancellationToken);
+            var refreshToken = await  _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, previousQueryParameters, (handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds), cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
     }

@@ -1,4 +1,10 @@
-﻿using TechTalk.SpecFlow;
+﻿using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Domains;
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
 {
@@ -16,6 +22,30 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         public void GivenUserIsAuthenticated()
         {
             _scenarioContext.EnableUserAuthentication();
+        }
+
+        [Given("build JWS and sign with a random RS256 algorithm and store into '(.*)'")]
+        public void GivenBuildJwsByUsingRandomRS256SignatureKey(string key, Table table)
+        {
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Claims = new Dictionary<string, object>(),
+                SigningCredentials = new SigningCredentials(new RsaSecurityKey(new RSACryptoServiceProvider(2048))
+                {
+                    KeyId = Guid.NewGuid().ToString()
+                }, SecurityAlgorithms.RsaSha256)
+            };
+            foreach(var row in table.Rows) 
+                tokenDescriptor.Claims.Add(row["Key"].ToString(), row["Value"].ToString());
+            var handler = new JsonWebTokenHandler();
+            var jws = handler.CreateToken(tokenDescriptor);
+            _scenarioContext.Set(jws, key);
+        }
+
+        [Given("build JWS and sign with the key '(.*)' from the client '(.*)'")]
+        public void GivenBuildJwsByUsingClientJwk(string keyid, string clientId, Table table)
+        {
+            // TODO
         }
     }
 }

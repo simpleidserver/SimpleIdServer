@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using BlushingPenguin.JsonPath;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net.Http;
 using System.Text.Json;
@@ -61,7 +62,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
         public void GivenExtractParameterFromBody(string parameter, string key)
         {
             var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
-            // _scenarioContext.Set(jObj[parameter].ToString(), key);
+            _scenarioContext.Set(jObj.SelectToken(parameter).Value.GetString(), key);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Microsoft.IdentityModel.JsonWebTokens
             if (jws.Claims == null) return null;
             var result = new JsonObject();
             foreach(var claim in jws.Claims) { result.Add(claim.Type, claim.Value); }
-            return null;
+            return result;
         }
     }
 }

@@ -374,8 +374,8 @@ namespace System.Text.Json.Nodes
 
         public static JsonNode GetToken(this JsonObject jObj, string name)
         {
+            if (!jObj.ContainsKey(name)) return null;
             var result = jObj[name];
-            if (result == null) return null;
             return result;
         }
 
