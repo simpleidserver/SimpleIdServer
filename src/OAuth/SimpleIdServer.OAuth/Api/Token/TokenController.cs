@@ -13,8 +13,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token
 {
-    [Route(Constants.EndPoints.Token)]
-    [Route(Constants.EndPoints.MtlsToken)]
+    // [Route(Constants.EndPoints.MtlsToken)]
     public class TokenController : Controller
     {
         private readonly ITokenRequestHandler _tokenRequestHandler;

@@ -12,7 +12,6 @@ namespace SimpleIdServer.OAuth.Api.Configuration
     /// <summary>
     /// Implementation : https://tools.ietf.org/html/draft-ietf-oauth-discovery-10
     /// </summary>
-    [Route(Constants.EndPoints.OAuthConfiguration)]
     public class ConfigurationController : Controller
     {
         private readonly IConfigurationRequestHandler _configurationRequestHandler;

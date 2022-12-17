@@ -1,6 +1,7 @@
-﻿using Microsoft.IdentityModel.JsonWebTokens;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.Domains;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -24,7 +25,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             _scenarioContext.EnableUserAuthentication();
         }
 
-        [Given("build JWS and sign with a random RS256 algorithm and store into '(.*)'")]
+        [Given("build JWS by signing with a random RS256 algorithm and store the result into '(.*)'")]
         public void GivenBuildJwsByUsingRandomRS256SignatureKey(string key, Table table)
         {
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -40,12 +41,6 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             var handler = new JsonWebTokenHandler();
             var jws = handler.CreateToken(tokenDescriptor);
             _scenarioContext.Set(jws, key);
-        }
-
-        [Given("build JWS and sign with the key '(.*)' from the client '(.*)'")]
-        public void GivenBuildJwsByUsingClientJwk(string keyid, string clientId, Table table)
-        {
-            // TODO
         }
     }
 }

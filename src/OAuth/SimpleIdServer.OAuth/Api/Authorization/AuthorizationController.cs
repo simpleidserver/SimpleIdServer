@@ -22,7 +22,6 @@ using System.Web;
 
 namespace SimpleIdServer.OAuth.Api.Authorization
 {
-    [Route(Constants.EndPoints.Authorization)]
     public class AuthorizationController : Controller
     {
         private readonly IAuthorizationRequestHandler _authorizationRequestHandler;

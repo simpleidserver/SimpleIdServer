@@ -61,13 +61,36 @@ namespace SimpleIdServer.OAuth.Builders
         public ApiClientBuilder UsePrivateKeyJwtAuthentication(params JsonWebKey[] jsonWebKeys)
         {
             _client.TokenEndPointAuthMethod = OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD;
-            if(jsonWebKeys != null)
+            if (jsonWebKeys != null)
             {
-                _client.SerializedJsonWebKeys = jsonWebKeys.Select(j => new ClientJsonWebKey
+                foreach (var jsonWebKey in jsonWebKeys.Select(j => new ClientJsonWebKey
                 {
                     Kid = j.Kid,
                     SerializedJsonWebKey = JsonExtensions.SerializeToJson(j)
-                }).ToList();
+                }))
+                    _client.SerializedJsonWebKeys.Add(jsonWebKey);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Use 'client_secret_jwt' as authentication method.
+        /// For more information : https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+        /// </summary>
+        /// <param name="jsonWebKeys"></param>
+        /// <returns></returns>
+        public ApiClientBuilder UseClientSecretJwtAuthentication(params JsonWebKey[] jsonWebKeys)
+        {
+            _client.TokenEndPointAuthMethod = OAuthClientSecretJwtAuthenticationHandler.AUTH_METHOD;
+            if (jsonWebKeys != null)
+            {
+                foreach(var jsonWebKey in jsonWebKeys.Select(j => new ClientJsonWebKey
+                {
+                    Kid = j.Kid,
+                    SerializedJsonWebKey = JsonExtensions.SerializeToJson(j)
+                }))
+                    _client.SerializedJsonWebKeys.Add(jsonWebKey);
             }
 
             return this;

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
@@ -21,6 +23,7 @@ using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.OAuth.Stores;
 using SimpleIdServer.OAuth.UI;
 using SimpleIdServer.Store;
 using System;
@@ -40,6 +43,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (callback != null) services.Configure(callback);
             else services.Configure<OAuthHostOptions>(o => { });
+            services.Configure<RouteOptions>(opt =>
+            {
+                opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
+            });
             services.AddControllers();
             services.AddDataProtection();
             services.AddDistributedMemoryCache();
@@ -93,6 +100,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddOAuthJwksApi(this IServiceCollection services)
         {
             services.AddTransient<IJwksRequestHandler, JwksRequestHandler>();
+            services.AddSingleton<IKeyStore, InMemoryKeyStore>();
             return services;
         }
 
@@ -160,5 +168,10 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         #endregion
+    }
+
+    public class RealmRoutePrefixConstraint : IRouteConstraint
+    {
+        public bool Match(HttpContext? httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection) => true;
     }
 }

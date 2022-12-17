@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.ClientAuths
 {
     using TechTalk.SpecFlow;
     using System;
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ClientAuthenticationErrors", "\tCheck errors returned during the client authentication", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/ClientAuths", "ClientAuthenticationErrors", "\tCheck common errors returned during the client authentication", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion_type is not supported")]
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_id is missing")]
         [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion_type is not supported")]
-        public void ErrorIsReturnedWhenClient_Assertion_TypeIsNotSupported()
+        [Xunit.TraitAttribute("Description", "Error is returned when client_id is missing")]
+        public void ErrorIsReturnedWhenClient_IdIsMissing()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion_type is not supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_id is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,31 +98,227 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table14.AddRow(new string[] {
+                table1.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table14.AddRow(new string[] {
+                table1.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table14.AddRow(new string[] {
-                            "client_assertion_type",
-                            "invalid"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table14, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table1, "When ");
 #line hidden
-#line 11
+#line 10
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 12
+#line 11
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 12
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
 #line 13
+ testRunner.And("JSON \'$.error_description\'=\'missing client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_id is invalid")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when client_id is invalid")]
+        public void ErrorIsReturnedWhenClient_IdIsInvalid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_id is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 15
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table2.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table2.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table2.AddRow(new string[] {
+                            "client_id",
+                            "c"});
+#line 16
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table2, "When ");
+#line hidden
+#line 22
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 23
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 24
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 25
+ testRunner.And("JSON \'$.error_description\'=\'unknown client c\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_secret is missing")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when client_secret is missing")]
+        public void ErrorIsReturnedWhenClient_SecretIsMissing()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_secret is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 27
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table3.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table3.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table3.AddRow(new string[] {
+                            "client_id",
+                            "firstClient"});
+#line 28
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table3, "When ");
+#line hidden
+#line 34
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 35
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 36
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 37
+ testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_secret is invalid")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when client_secret is invalid")]
+        public void ErrorIsReturnedWhenClient_SecretIsInvalid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_secret is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 39
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table4.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table4.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table4.AddRow(new string[] {
+                            "client_id",
+                            "firstClient"});
+                table4.AddRow(new string[] {
+                            "client_secret",
+                            "bad"});
+#line 40
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table4, "When ");
+#line hidden
+#line 47
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 48
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 49
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 50
+ testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion_type is not supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion_type is not supported")]
+        public void ErrorIsReturnedWhenClient_Assertion_TypeIsNotSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion_type is not supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 52
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table5.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table5.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table5.AddRow(new string[] {
+                            "client_assertion_type",
+                            "invalid"});
+#line 53
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table5, "When ");
+#line hidden
+#line 59
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 60
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 61
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 14
+#line 62
  testRunner.And("JSON \'$.error_description\'=\'client assertion type invalid is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -140,7 +336,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion_type is specified but client_assertion is" +
                     " missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 16
+#line 64
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -150,31 +346,31 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table15.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table15.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table15.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-#line 17
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table15, "When ");
+#line 65
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table6, "When ");
 #line hidden
-#line 23
+#line 71
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 72
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 25
+#line 73
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 26
+#line 74
  testRunner.And("JSON \'$.error_description\'=\'client assertion is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -189,7 +385,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 28
+#line 76
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -199,228 +395,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table16.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table16.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table16.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table16.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "client_assertion",
                             "invalid"});
-#line 29
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table16, "When ");
+#line 77
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table7, "When ");
 #line hidden
-#line 36
+#line 84
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 37
+#line 85
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 38
+#line 86
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 39
- testRunner.And("JSON \'$.error_description\'=\'client_assertion is not a valid JWT token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion doesn\'t contain iss claim")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion doesn\'t contain iss claim")]
-        public void ErrorIsReturnedWhenClient_AssertionDoesntContainIssClaim()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion doesn\'t contain iss claim", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 41
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table17.AddRow(new string[] {
-                            "user",
-                            "user"});
-#line 42
- testRunner.Given("build JWS and sign with a random RS256 algorithm and store into \'clientAssertion\'" +
-                        "", ((string)(null)), table17, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table18.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table18.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table18.AddRow(new string[] {
-                            "client_assertion_type",
-                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table18.AddRow(new string[] {
-                            "client_assertion",
-                            "$clientAssertion$"});
-#line 46
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table18, "When ");
-#line hidden
-#line 53
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 54
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 55
- testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 56
- testRunner.And("JSON \'$.error_description\'=\'client_id cannot be extracted from client_assertion\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when issuer present in the client_assertion is not a valid clie" +
-            "nt")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when issuer present in the client_assertion is not a valid clie" +
-            "nt")]
-        public void ErrorIsReturnedWhenIssuerPresentInTheClient_AssertionIsNotAValidClient()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when issuer present in the client_assertion is not a valid clie" +
-                    "nt", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 58
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table19.AddRow(new string[] {
-                            "iss",
-                            "bad"});
-#line 59
- testRunner.Given("build JWS and sign with a random RS256 algorithm and store into \'clientAssertion\'" +
-                        "", ((string)(null)), table19, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table20.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table20.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table20.AddRow(new string[] {
-                            "client_assertion_type",
-                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table20.AddRow(new string[] {
-                            "client_assertion",
-                            "$clientAssertion$"});
-#line 63
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table20, "When ");
-#line hidden
-#line 70
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 71
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 72
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 73
- testRunner.And("JSON \'$.error_description\'=\'unknown client bad\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion is not signed by a known json web key (JW" +
-            "K)")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion is not signed by a known json web key (JW" +
-            "K)")]
-        public void ErrorIsReturnedWhenClient_AssertionIsNotSignedByAKnownJsonWebKeyJWK()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion is not signed by a known json web key (JW" +
-                    "K)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 75
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table21.AddRow(new string[] {
-                            "iss",
-                            "sevenClient"});
-#line 76
- testRunner.Given("build JWS and sign with a random RS256 algorithm and store into \'clientAssertion\'" +
-                        "", ((string)(null)), table21, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table22.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table22.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table22.AddRow(new string[] {
-                            "client_assertion_type",
-                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table22.AddRow(new string[] {
-                            "client_assertion",
-                            "$clientAssertion$"});
-#line 80
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table22, "When ");
 #line hidden
 #line 87
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 88
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 89
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 90
- testRunner.And("JSON \'$.error_description\'=\'client assertion is not signed by a known Json Web Ke" +
-                        "y\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error_description\'=\'client_assertion is not a valid JWT token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

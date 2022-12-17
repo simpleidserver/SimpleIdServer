@@ -11,8 +11,7 @@ builder.Services.AddSIDIdentityServer()
     .AddInMemoryUsers(IdServerConfiguration.Users)
     .AddSigningKey(BuildSecurityKey());
 
-var app = builder.Build();
-app.MapControllers();
+var app = builder.Build().UseSID();
 app.Run();
 
 static RsaSecurityKey BuildSecurityKey() => new RsaSecurityKey(new RSACryptoServiceProvider(2048))

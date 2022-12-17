@@ -33,7 +33,7 @@ namespace SimpleIdServer.OAuth
         public const string BAD_CLIENT_ASSERTION_ISSUER = "bad client assertion issuer";
         public const string BAD_CLIENT_ASSERTION_ALG = "the algorithm used by client assertion is not correct";
         public const string BAD_CLIENT_ASSERTION_AUDIENCES = "bad client assertion audiences";
-        public const string BAD_CLIENT_ASSERTION_EXPIRED = "bad client assertion expired";
+        public const string BAD_CLIENT_ASSERTION_EXPIRED = "client assertion is expired";
         public const string BAD_RESPONSE_TYPES = "response types {0} are not supported";
         public const string BAD_RESPONSE_TYPES_CLIENT = "response types {0} are not supported by the client";
         public const string BAD_ACCESS_TOKEN = "access token is not correct";

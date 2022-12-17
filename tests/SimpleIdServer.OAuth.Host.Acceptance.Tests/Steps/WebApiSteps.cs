@@ -2,7 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Moq;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +38,22 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
                 {
                     AllowAutoRedirect = false
                 });
+                _scenarioContext.Set(_factory, "Factory");
                 var mock = new Mock<Infrastructures.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
             }
+        }
+
+        [Given("build JWS by signing with the key '(.*)' coming from the client '(.*)' and store the result into '(.*)'")]
+        public void GivenBuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table)
+        {
+            BuildJwsByUsingClientJwk(keyid, clientId, key, table);
+        }
+
+        [Given("build expired JWS by signing with the key '(.*)' coming from the client '(.*)' and store the result into '(.*)'")]
+        public void GivenBuildExpiredJwsByUsingClientJwk(string keyid, string clientId, string key, Table table)
+        {
+            BuildJwsByUsingClientJwk(keyid, clientId, key, table, true);
         }
 
         [When("execute HTTP GET request '(.*)'")]
@@ -168,6 +186,27 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             var httpClient = _factory.CreateClient();
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        private void BuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table, bool isExpired = false)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
+                var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).Single(c => c.ClientId == clientId);
+                var jwk = client.JsonWebKeys.Single(j => j.KeyId == keyid);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Claims = new Dictionary<string, object>(),
+                    SigningCredentials = new SigningCredentials(jwk, jwk.Alg)
+                };
+                if (isExpired) tokenDescriptor.Expires = DateTime.UtcNow.AddMinutes(-2);
+                foreach (var row in table.Rows)
+                    tokenDescriptor.Claims.Add(row["Key"].ToString(), row["Value"].ToString());
+                var handler = new JsonWebTokenHandler();
+                var jws = handler.CreateToken(tokenDescriptor);
+                _scenarioContext.Set(jws, key);
+            }
         }
 
         private string ExtractUrl(string url, Table table)

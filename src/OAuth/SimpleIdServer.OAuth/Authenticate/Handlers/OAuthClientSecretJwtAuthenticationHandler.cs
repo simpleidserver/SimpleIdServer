@@ -12,9 +12,13 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Authenticate.Handlers
 {
+    /// <summary>
+    /// https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+    /// </summary>
     public class OAuthClientSecretJwtAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        public string AuthMethod => "client_secret_jwt";
+        public string AuthMethod => AUTH_METHOD;
+        public const string AUTH_METHOD = "client_secret_jwt";
 
         public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {

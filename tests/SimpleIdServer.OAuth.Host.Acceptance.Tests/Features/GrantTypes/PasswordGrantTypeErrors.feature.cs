@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
 {
     using TechTalk.SpecFlow;
     using System;
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "PasswordGrantTypeErrors", "\tCheck errors returned when using \'password\' grant-type", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/GrantTypes", "PasswordGrantTypeErrors", "\tCheck errors returned when using \'password\' grant-type", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -169,14 +169,17 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd\' with no client_id")]
+        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
+            "_secret=password\' with unauthorized grant_type")]
         [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd\' with no client_id")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdWithNoClient_Id()
+        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
+            "_secret=password\' with unauthorized grant_type")]
+        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdFirstClientClient_SecretPasswordWithUnauthorizedGrant_Type()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd\' with no client_id", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
+                    "_secret=password\' with unauthorized grant_type", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -199,34 +202,43 @@ this.ScenarioInitialize(scenarioInfo);
                 table33.AddRow(new string[] {
                             "password",
                             "pwd"});
+                table33.AddRow(new string[] {
+                            "client_id",
+                            "firstClient"});
+                table33.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
 #line 26
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table33, "When ");
 #line hidden
-#line 32
+#line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 33
+#line 35
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 34
+#line 36
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 35
- testRunner.And("JSON \'$.error_description\'=\'missing client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 37
+ testRunner.And("JSON \'$.error_description\'=\'grant type password is not supported by the client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd\' with invalid client_id")]
+        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password\' with duplicate scopes")]
         [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd\' with invalid client_id")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdWithInvalidClient_Id()
+        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password\' with duplicate scopes")]
+        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordWithDuplicateScopes()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd\' with invalid client_id", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 37
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+                    "t_secret=password\' with duplicate scopes", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 39
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -250,38 +262,44 @@ this.ScenarioInitialize(scenarioInfo);
                             "pwd"});
                 table34.AddRow(new string[] {
                             "client_id",
-                            "c"});
-#line 38
+                            "secondClient"});
+                table34.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table34.AddRow(new string[] {
+                            "scope",
+                            "scope scope"});
+#line 40
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table34, "When ");
 #line hidden
-#line 45
+#line 49
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 46
+#line 50
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 47
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 51
+ testRunner.And("JSON \'$.error\'=\'invalid_scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 48
- testRunner.And("JSON \'$.error_description\'=\'unknown client c\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 52
+ testRunner.And("JSON \'$.error_description\'=\'duplicate scopes : scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=firstClient\' with " +
-            "no client_secret")]
+        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password\' with invalid scope")]
         [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=firstClient\' with " +
-            "no client_secret")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdFirstClientWithNoClient_Secret()
+        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password\' with invalid scope")]
+        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordWithInvalidScope()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=firstClient\' with " +
-                    "no client_secret", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 50
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+                    "t_secret=password\' with invalid scope", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 54
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -305,38 +323,44 @@ this.ScenarioInitialize(scenarioInfo);
                             "pwd"});
                 table35.AddRow(new string[] {
                             "client_id",
-                            "firstClient"});
-#line 51
+                            "secondClient"});
+                table35.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table35.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+#line 55
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table35, "When ");
 #line hidden
-#line 58
+#line 64
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 59
+#line 65
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 60
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 66
+ testRunner.And("JSON \'$.error\'=\'invalid_scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 61
- testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 67
+ testRunner.And("JSON \'$.error_description\'=\'unauthorized to scopes : scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
-            "_secret=bad\' with bad client_secret")]
+        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password,scope=firstScope\' with bad user login")]
         [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
-            "_secret=bad\' with bad client_secret")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdFirstClientClient_SecretBadWithBadClient_Secret()
+        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password,scope=firstScope\' with bad user login")]
+        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordScopeFirstScopeWithBadUserLogin()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
-                    "_secret=bad\' with bad client_secret", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 63
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+                    "t_secret=password,scope=firstScope\' with bad user login", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 69
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -354,47 +378,50 @@ this.ScenarioInitialize(scenarioInfo);
                             "password"});
                 table36.AddRow(new string[] {
                             "username",
-                            "user"});
+                            "badUser"});
                 table36.AddRow(new string[] {
                             "password",
-                            "pwd"});
+                            "badPwd"});
                 table36.AddRow(new string[] {
                             "client_id",
-                            "firstClient"});
+                            "secondClient"});
                 table36.AddRow(new string[] {
                             "client_secret",
-                            "bad"});
-#line 64
+                            "password"});
+                table36.AddRow(new string[] {
+                            "scope",
+                            "firstScope"});
+#line 70
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table36, "When ");
 #line hidden
-#line 72
+#line 79
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 73
+#line 80
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 74
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 81
+ testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 75
- testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 82
+ testRunner.And("JSON \'$.error_description\'=\'bad user credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
-            "_secret=password\' with unauthorized grant_type")]
+        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password,scope=firstScope\' with bad user password")]
         [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
-            "_secret=password\' with unauthorized grant_type")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdFirstClientClient_SecretPasswordWithUnauthorizedGrant_Type()
+        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+            "t_secret=password,scope=firstScope\' with bad user password")]
+        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordScopeFirstScopeWithBadUserPassword()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=firstClient,client" +
-                    "_secret=password\' with unauthorized grant_type", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 77
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
+                    "t_secret=password,scope=firstScope\' with bad user password", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 84
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -415,270 +442,29 @@ this.ScenarioInitialize(scenarioInfo);
                             "user"});
                 table37.AddRow(new string[] {
                             "password",
-                            "pwd"});
+                            "badPwd"});
                 table37.AddRow(new string[] {
                             "client_id",
-                            "firstClient"});
+                            "secondClient"});
                 table37.AddRow(new string[] {
                             "client_secret",
                             "password"});
-#line 78
+                table37.AddRow(new string[] {
+                            "scope",
+                            "firstScope"});
+#line 85
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table37, "When ");
 #line hidden
-#line 86
+#line 94
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 87
+#line 95
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 88
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 89
- testRunner.And("JSON \'$.error_description\'=\'grant type password is not supported by the client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password\' with duplicate scopes")]
-        [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password\' with duplicate scopes")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordWithDuplicateScopes()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-                    "t_secret=password\' with duplicate scopes", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 91
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table38.AddRow(new string[] {
-                            "grant_type",
-                            "password"});
-                table38.AddRow(new string[] {
-                            "username",
-                            "user"});
-                table38.AddRow(new string[] {
-                            "password",
-                            "pwd"});
-                table38.AddRow(new string[] {
-                            "client_id",
-                            "secondClient"});
-                table38.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table38.AddRow(new string[] {
-                            "scope",
-                            "scope scope"});
-#line 92
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table38, "When ");
-#line hidden
-#line 101
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 102
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 103
- testRunner.And("JSON \'$.error\'=\'invalid_scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 104
- testRunner.And("JSON \'$.error_description\'=\'duplicate scopes : scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password\' with invalid scope")]
-        [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password\' with invalid scope")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordWithInvalidScope()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-                    "t_secret=password\' with invalid scope", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 106
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table39.AddRow(new string[] {
-                            "grant_type",
-                            "password"});
-                table39.AddRow(new string[] {
-                            "username",
-                            "user"});
-                table39.AddRow(new string[] {
-                            "password",
-                            "pwd"});
-                table39.AddRow(new string[] {
-                            "client_id",
-                            "secondClient"});
-                table39.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table39.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-#line 107
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table39, "When ");
-#line hidden
-#line 116
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 117
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 118
- testRunner.And("JSON \'$.error\'=\'invalid_scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 119
- testRunner.And("JSON \'$.error_description\'=\'unauthorized to scopes : scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password,scope=firstScope\' with bad user login")]
-        [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password,scope=firstScope\' with bad user login")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordScopeFirstScopeWithBadUserLogin()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-                    "t_secret=password,scope=firstScope\' with bad user login", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 121
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table40.AddRow(new string[] {
-                            "grant_type",
-                            "password"});
-                table40.AddRow(new string[] {
-                            "username",
-                            "badUser"});
-                table40.AddRow(new string[] {
-                            "password",
-                            "badPwd"});
-                table40.AddRow(new string[] {
-                            "client_id",
-                            "secondClient"});
-                table40.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table40.AddRow(new string[] {
-                            "scope",
-                            "firstScope"});
-#line 122
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table40, "When ");
-#line hidden
-#line 131
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 132
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 133
+#line 96
  testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 134
- testRunner.And("JSON \'$.error_description\'=\'bad user credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password,scope=firstScope\' with bad user password")]
-        [Xunit.TraitAttribute("FeatureTitle", "PasswordGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-            "t_secret=password,scope=firstScope\' with bad user password")]
-        public void SendGrant_TypePasswordUsernameUserPasswordPwdClient_IdSecondClientClient_SecretPasswordScopeFirstScopeWithBadUserPassword()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=password,username=user,password=pwd,client_id=secondClient,clien" +
-                    "t_secret=password,scope=firstScope\' with bad user password", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 136
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table41.AddRow(new string[] {
-                            "grant_type",
-                            "password"});
-                table41.AddRow(new string[] {
-                            "username",
-                            "user"});
-                table41.AddRow(new string[] {
-                            "password",
-                            "badPwd"});
-                table41.AddRow(new string[] {
-                            "client_id",
-                            "secondClient"});
-                table41.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table41.AddRow(new string[] {
-                            "scope",
-                            "firstScope"});
-#line 137
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table41, "When ");
-#line hidden
-#line 146
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 147
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 148
- testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 149
+#line 97
  testRunner.And("JSON \'$.error_description\'=\'bad user credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SimpleIdServer.OAuth.Api.Jwks
 {
-    [Route(Constants.EndPoints.Jwks)]
     public class JwksController : Controller
     {
         private readonly IJwksRequestHandler _jwksRequestHandler;
