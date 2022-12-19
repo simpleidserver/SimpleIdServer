@@ -98,33 +98,33 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table8.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "user",
                             "user"});
 #line 5
  testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
-                        "entAssertion\'", ((string)(null)), table8, "Given ");
+                        "entAssertion\'", ((string)(null)), table13, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table9.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table9.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table9.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table9.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 9
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table9, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table14, "When ");
 #line hidden
 #line 16
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -163,33 +163,33 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table10.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "iss",
                             "bad"});
 #line 22
  testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
-                        "entAssertion\'", ((string)(null)), table10, "Given ");
+                        "entAssertion\'", ((string)(null)), table15, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table11.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table11.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table11.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table11.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 26
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table11, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table16, "When ");
 #line hidden
 #line 33
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -228,33 +228,33 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table12.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "iss",
                             "sevenClient"});
 #line 39
  testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
-                        "entAssertion\'", ((string)(null)), table12, "Given ");
+                        "entAssertion\'", ((string)(null)), table17, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table13.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table13.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table13.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table13.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 43
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table13, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table18, "When ");
 #line hidden
 #line 50
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -291,36 +291,36 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table14.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "iss",
                             "sevenClient"});
-                table14.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "sub",
                             "sub"});
 #line 56
  testRunner.Given("build JWS by signing with the key \'seventClientKeyId\' coming from the client \'sev" +
-                        "enClient\' and store the result into \'clientAssertion\'", ((string)(null)), table14, "Given ");
+                        "enClient\' and store the result into \'clientAssertion\'", ((string)(null)), table19, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table15.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table15.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table15.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table15.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 61
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table15, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table20, "When ");
 #line hidden
 #line 68
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -356,39 +356,39 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table16.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "iss",
                             "sevenClient"});
-                table16.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "sub",
                             "sevenClient"});
-                table16.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "aud",
                             "invalid"});
 #line 74
  testRunner.Given("build JWS by signing with the key \'seventClientKeyId\' coming from the client \'sev" +
-                        "enClient\' and store the result into \'clientAssertion\'", ((string)(null)), table16, "Given ");
+                        "enClient\' and store the result into \'clientAssertion\'", ((string)(null)), table21, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table17.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table17.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table17.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table17.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 80
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table17, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table22, "When ");
 #line hidden
 #line 87
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -424,39 +424,39 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table18.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "iss",
                             "sevenClient"});
-                table18.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "sub",
                             "sevenClient"});
-                table18.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080/token"});
 #line 93
  testRunner.Given("build expired JWS by signing with the key \'seventClientKeyId\' coming from the cli" +
-                        "ent \'sevenClient\' and store the result into \'clientAssertion\'", ((string)(null)), table18, "Given ");
+                        "ent \'sevenClient\' and store the result into \'clientAssertion\'", ((string)(null)), table23, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table19.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table19.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table19.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table19.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 99
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table19, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table24, "When ");
 #line hidden
 #line 106
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -32,7 +32,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("fifthClient", "password").AddScope("secondScope").AddRefreshTokenGrantType(-1).Build(),
             ClientBuilder.BuildApiClient("sixClient", "password").AddScope("secondScope").AddRefreshTokenGrantType().Build(),
             ClientBuilder.BuildApiClient("sevenClient", "password").AddScope("secondScope").UsePrivateKeyJwtAuthentication(JsonWebKeyBuilder.BuildRSA("seventClientKeyId")).Build(),
-            ClientBuilder.BuildApiClient("eightClient", "password").AddScope("secondScope").UseClientSecretJwtAuthentication(JsonWebKeyBuilder.BuildRSA("eightClientKeyId")).Build()
+            ClientBuilder.BuildApiClient("eightClient", "ProEMLh5e_qnzdNU").AddScope("secondScope").UseClientSecretJwtAuthentication(JsonWebKeyBuilder.BuildRSA("eightClientKeyId")).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("nineClient", "password", "http://localhost:8080").AddScope("secondScope").UseClientPkceAuthentication().Build()
         };
 
         public static List<User> Users = new List<User>
@@ -50,6 +51,12 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                     {
                         Id = Guid.NewGuid().ToString(),
                         ClientId = "thirdClient",
+                        Scopes = new [] { "secondScope" }
+                    },
+                    new Consent
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        ClientId = "nineClient",
                         Scopes = new [] { "secondScope" }
                     }
                 }

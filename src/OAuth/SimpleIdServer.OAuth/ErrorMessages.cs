@@ -53,6 +53,8 @@ namespace SimpleIdServer.OAuth
         public const string CLIENT_ASSERTION_IS_MISSING = "client assertion is missing";
         public const string CLIENT_ASSERTION_TYPE_IS_UNEXPECTED = "unexpected client_assertion_type, must be equals to {0}";
         public const string CLIENT_ASSERTION_IS_NOT_SIGNED = "client assertion must be a signed JWT (JWS)";
+        public const string CLIENT_ASSERTION_IS_NOT_ENCRYPTED = "client assertion must be encrypted JWT (JWE)";
+        public const string CLIENT_ASSERTION_CANNOT_BE_DECRYPTED = "client assertion cannot be decryted by the client secret";
         public const string CLIENT_ASSERTION_NOT_SIGNED_BY_KNOWN_JWK = "client assertion is not signed by a known Json Web Key";
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION = "client_id cannot be extracted from client_assertion";
         public const string MISSING_PARAMETER = "missing parameter {0}";

@@ -56,6 +56,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             BuildJwsByUsingClientJwk(keyid, clientId, key, table, true);
         }
 
+        [Given("build JWE by encrypting the '(.*)' JWS with the client secret '(.*)' and store the result into '(.*)'")]
+        public void GivenBuildJweUsingClientJws(string jwsKey, string clientSecret, string key)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(clientSecret));
+            var handler = new JsonWebTokenHandler();
+            var jwe = handler.EncryptToken(ParseValue(jwsKey).ToString(), new EncryptingCredentials(securityKey, SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256));
+            _scenarioContext.Set(jwe, key);
+        }
+
         [When("execute HTTP GET request '(.*)'")]
         public async Task GivenExecuteHTTPGetRequest(string url, Table table)
         {

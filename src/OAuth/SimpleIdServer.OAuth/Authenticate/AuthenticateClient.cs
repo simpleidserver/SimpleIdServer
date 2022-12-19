@@ -81,7 +81,7 @@ namespace SimpleIdServer.OAuth.Authenticate
             if (parser == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.CLIENT_ASSERTION_TYPE_NOT_SUPPORTED, type));
             var clientAssertion = instruction.ClientAssertion;
             if (string.IsNullOrWhiteSpace(clientAssertion)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ASSERTION_IS_MISSING);
-            if (!parser.TryExtractClientId(clientAssertion, out clientId)) return true;
+            if (!parser.TryExtractClientId(clientAssertion, out clientId)) return false;
             if (string.IsNullOrWhiteSpace(clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION);
             return true;
         }

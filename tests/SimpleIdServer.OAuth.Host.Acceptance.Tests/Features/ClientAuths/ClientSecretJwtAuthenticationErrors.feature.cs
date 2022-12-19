@@ -19,7 +19,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.ClientAuths
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ClientPrivateKeyJwtAuthenticationErrorsFeature : object, Xunit.IClassFixture<ClientPrivateKeyJwtAuthenticationErrorsFeature.FixtureData>, System.IDisposable
+    public partial class ClientSecretJwtAuthenticationErrorsFeature : object, Xunit.IClassFixture<ClientSecretJwtAuthenticationErrorsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.ClientAuths
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ClientPrivateKeyJwtAuthenticationErrors.feature"
+#line 1 "ClientSecretJwtAuthenticationErrors.feature"
 #line hidden
         
-        public ClientPrivateKeyJwtAuthenticationErrorsFeature(ClientPrivateKeyJwtAuthenticationErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ClientSecretJwtAuthenticationErrorsFeature(ClientSecretJwtAuthenticationErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.ClientAuths
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/ClientAuths", "ClientPrivateKeyJwtAuthenticationErrors", "\tCheck errors returned during the \'private_key_jwt\' authentication", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/ClientAuths", "ClientSecretJwtAuthenticationErrors", "\tCheck errors returned during the \'client_secret_jwt\' authentication", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.ClientAuths
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion doesn\'t contain iss claim")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPrivateKeyJwtAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion doesn\'t contain iss claim")]
-        public void ErrorIsReturnedWhenClient_AssertionDoesntContainIssClaim()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion is not a JWE token")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSecretJwtAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion is not a JWE token")]
+        public void ErrorIsReturnedWhenClient_AssertionIsNotAJWEToken()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion doesn\'t contain iss claim", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion is not a JWE token", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,127 +98,65 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table8.AddRow(new string[] {
-                            "user",
-                            "user"});
+                table25.AddRow(new string[] {
+                            "iss",
+                            "eightClient"});
 #line 5
  testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
-                        "entAssertion\'", ((string)(null)), table8, "Given ");
+                        "entAssertion\'", ((string)(null)), table25, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table9.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table9.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table9.AddRow(new string[] {
+                table26.AddRow(new string[] {
+                            "client_id",
+                            "eightClient"});
+                table26.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table9.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "client_assertion",
                             "$clientAssertion$"});
 #line 9
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table9, "When ");
-#line hidden
-#line 16
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table26, "When ");
 #line hidden
 #line 17
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 18
- testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 19
- testRunner.And("JSON \'$.error_description\'=\'client_id cannot be extracted from client_assertion\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 20
+ testRunner.And("JSON \'$.error_description\'=\'client assertion must be encrypted JWT (JWE)\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when issuer present in the client_assertion is not a valid clie" +
-            "nt")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPrivateKeyJwtAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when issuer present in the client_assertion is not a valid clie" +
-            "nt")]
-        public void ErrorIsReturnedWhenIssuerPresentInTheClient_AssertionIsNotAValidClient()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion is not encrypted with the correct client_" +
+            "secret")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSecretJwtAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion is not encrypted with the correct client_" +
+            "secret")]
+        public void ErrorIsReturnedWhenClient_AssertionIsNotEncryptedWithTheCorrectClient_Secret()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when issuer present in the client_assertion is not a valid clie" +
-                    "nt", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 21
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table10.AddRow(new string[] {
-                            "iss",
-                            "bad"});
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion is not encrypted with the correct client_" +
+                    "secret", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 22
- testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
-                        "entAssertion\'", ((string)(null)), table10, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table11.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table11.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table11.AddRow(new string[] {
-                            "client_assertion_type",
-                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table11.AddRow(new string[] {
-                            "client_assertion",
-                            "$clientAssertion$"});
-#line 26
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table11, "When ");
-#line hidden
-#line 33
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 34
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 35
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 36
- testRunner.And("JSON \'$.error_description\'=\'unknown client bad\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion is not signed by a known json web key (JW" +
-            "K)")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPrivateKeyJwtAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_assertion is not signed by a known json web key (JW" +
-            "K)")]
-        public void ErrorIsReturnedWhenClient_AssertionIsNotSignedByAKnownJsonWebKeyJWK()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion is not signed by a known json web key (JW" +
-                    "K)", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 38
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -228,44 +166,121 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table12.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "iss",
-                            "sevenClient"});
-#line 39
+                            "eightClient"});
+#line 23
  testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
-                        "entAssertion\'", ((string)(null)), table12, "Given ");
+                        "entAssertionJws\'", ((string)(null)), table27, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+#line 27
+ testRunner.And("build JWE by encrypting the \'$clientAssertionJws$\' JWS with the client secret \'Pr" +
+                        "oEMLh5e_qnzdNA\' and store the result into \'clientAssertionJwe\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table13.AddRow(new string[] {
+                table28.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table13.AddRow(new string[] {
+                table28.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table13.AddRow(new string[] {
+                table28.AddRow(new string[] {
+                            "client_id",
+                            "eightClient"});
+                table28.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table13.AddRow(new string[] {
+                table28.AddRow(new string[] {
                             "client_assertion",
-                            "$clientAssertion$"});
-#line 43
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table13, "When ");
+                            "$clientAssertionJwe$"});
+#line 29
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table28, "When ");
 #line hidden
-#line 50
+#line 37
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 51
+#line 38
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 52
+#line 39
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 53
+#line 40
+ testRunner.And("JSON \'$.error_description\'=\'client assertion cannot be decryted by the client sec" +
+                        "ret\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when json web token is not signed by the correct Json Web Key")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSecretJwtAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when json web token is not signed by the correct Json Web Key")]
+        public void ErrorIsReturnedWhenJsonWebTokenIsNotSignedByTheCorrectJsonWebKey()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when json web token is not signed by the correct Json Web Key", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 42
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table29.AddRow(new string[] {
+                            "iss",
+                            "eightClient"});
+#line 43
+ testRunner.Given("build JWS by signing with a random RS256 algorithm and store the result into \'cli" +
+                        "entAssertionJws\'", ((string)(null)), table29, "Given ");
+#line hidden
+#line 47
+ testRunner.And("build JWE by encrypting the \'$clientAssertionJws$\' JWS with the client secret \'Pr" +
+                        "oEMLh5e_qnzdNU\' and store the result into \'clientAssertionJwe\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table30.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table30.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table30.AddRow(new string[] {
+                            "client_id",
+                            "eightClient"});
+                table30.AddRow(new string[] {
+                            "client_assertion_type",
+                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
+                table30.AddRow(new string[] {
+                            "client_assertion",
+                            "$clientAssertionJwe$"});
+#line 49
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table30, "When ");
+#line hidden
+#line 57
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 58
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 59
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 60
  testRunner.And("JSON \'$.error_description\'=\'client assertion is not signed by a known Json Web Ke" +
                         "y\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -274,14 +289,14 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="Error is returned when iss != sub")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPrivateKeyJwtAuthenticationErrors")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSecretJwtAuthenticationErrors")]
         [Xunit.TraitAttribute("Description", "Error is returned when iss != sub")]
         public void ErrorIsReturnedWhenIssSub()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when iss != sub", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 55
+#line 62
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -291,62 +306,69 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table14.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "iss",
-                            "sevenClient"});
-                table14.AddRow(new string[] {
+                            "eightClient"});
+                table31.AddRow(new string[] {
                             "sub",
-                            "sub"});
-#line 56
- testRunner.Given("build JWS by signing with the key \'seventClientKeyId\' coming from the client \'sev" +
-                        "enClient\' and store the result into \'clientAssertion\'", ((string)(null)), table14, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table15.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table15.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table15.AddRow(new string[] {
-                            "client_assertion_type",
-                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table15.AddRow(new string[] {
-                            "client_assertion",
-                            "$clientAssertion$"});
-#line 61
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table15, "When ");
+                            "invalid"});
+#line 63
+ testRunner.Given("build JWS by signing with the key \'eightClientKeyId\' coming from the client \'eigh" +
+                        "tClient\' and store the result into \'clientAssertionJws\'", ((string)(null)), table31, "Given ");
 #line hidden
 #line 68
+ testRunner.And("build JWE by encrypting the \'$clientAssertionJws$\' JWS with the client secret \'Pr" +
+                        "oEMLh5e_qnzdNU\' and store the result into \'clientAssertionJwe\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table32.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table32.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table32.AddRow(new string[] {
+                            "client_id",
+                            "eightClient"});
+                table32.AddRow(new string[] {
+                            "client_assertion_type",
+                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
+                table32.AddRow(new string[] {
+                            "client_assertion",
+                            "$clientAssertionJwe$"});
+#line 70
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table32, "When ");
+#line hidden
+#line 78
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 69
+#line 79
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 70
+#line 80
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 71
+#line 81
  testRunner.And("JSON \'$.error_description\'=\'bad client assertion issuer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when audience is invalid")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPrivateKeyJwtAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when audience is invalid")]
-        public void ErrorIsReturnedWhenAudienceIsInvalid()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when aud is invalid")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSecretJwtAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when aud is invalid")]
+        public void ErrorIsReturnedWhenAudIsInvalid()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when audience is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 73
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when aud is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 83
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -356,50 +378,57 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table16.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "iss",
-                            "sevenClient"});
-                table16.AddRow(new string[] {
+                            "eightClient"});
+                table33.AddRow(new string[] {
                             "sub",
-                            "sevenClient"});
-                table16.AddRow(new string[] {
+                            "eightClient"});
+                table33.AddRow(new string[] {
                             "aud",
                             "invalid"});
-#line 74
- testRunner.Given("build JWS by signing with the key \'seventClientKeyId\' coming from the client \'sev" +
-                        "enClient\' and store the result into \'clientAssertion\'", ((string)(null)), table16, "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table17.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table17.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table17.AddRow(new string[] {
-                            "client_assertion_type",
-                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table17.AddRow(new string[] {
-                            "client_assertion",
-                            "$clientAssertion$"});
-#line 80
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table17, "When ");
-#line hidden
-#line 87
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 88
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 89
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 84
+ testRunner.Given("build JWS by signing with the key \'eightClientKeyId\' coming from the client \'eigh" +
+                        "tClient\' and store the result into \'clientAssertionJws\'", ((string)(null)), table33, "Given ");
 #line hidden
 #line 90
+ testRunner.And("build JWE by encrypting the \'$clientAssertionJws$\' JWS with the client secret \'Pr" +
+                        "oEMLh5e_qnzdNU\' and store the result into \'clientAssertionJwe\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table34.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table34.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table34.AddRow(new string[] {
+                            "client_id",
+                            "eightClient"});
+                table34.AddRow(new string[] {
+                            "client_assertion_type",
+                            "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
+                table34.AddRow(new string[] {
+                            "client_assertion",
+                            "$clientAssertionJwe$"});
+#line 92
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table34, "When ");
+#line hidden
+#line 100
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 101
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 102
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 103
  testRunner.And("JSON \'$.error_description\'=\'bad client assertion audiences\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -407,14 +436,14 @@ this.ScenarioInitialize(scenarioInfo);
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_assertion is expired")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPrivateKeyJwtAuthenticationErrors")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSecretJwtAuthenticationErrors")]
         [Xunit.TraitAttribute("Description", "Error is returned when client_assertion is expired")]
         public void ErrorIsReturnedWhenClient_AssertionIsExpired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_assertion is expired", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 92
+#line 105
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -424,50 +453,57 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table18.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "iss",
-                            "sevenClient"});
-                table18.AddRow(new string[] {
+                            "eightClient"});
+                table35.AddRow(new string[] {
                             "sub",
-                            "sevenClient"});
-                table18.AddRow(new string[] {
+                            "eightClient"});
+                table35.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080/token"});
-#line 93
- testRunner.Given("build expired JWS by signing with the key \'seventClientKeyId\' coming from the cli" +
-                        "ent \'sevenClient\' and store the result into \'clientAssertion\'", ((string)(null)), table18, "Given ");
+#line 106
+ testRunner.Given("build expired JWS by signing with the key \'eightClientKeyId\' coming from the clie" +
+                        "nt \'eightClient\' and store the result into \'clientAssertionJws\'", ((string)(null)), table35, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+#line 112
+ testRunner.And("build JWE by encrypting the \'$clientAssertionJws$\' JWS with the client secret \'Pr" +
+                        "oEMLh5e_qnzdNU\' and store the result into \'clientAssertionJwe\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table19.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table19.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table19.AddRow(new string[] {
+                table36.AddRow(new string[] {
+                            "client_id",
+                            "eightClient"});
+                table36.AddRow(new string[] {
                             "client_assertion_type",
                             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"});
-                table19.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "client_assertion",
-                            "$clientAssertion$"});
-#line 99
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table19, "When ");
+                            "$clientAssertionJwe$"});
+#line 114
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table36, "When ");
 #line hidden
-#line 106
+#line 122
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 107
+#line 123
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 108
+#line 124
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 109
+#line 125
  testRunner.And("JSON \'$.error_description\'=\'client assertion is expired\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -481,12 +517,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ClientPrivateKeyJwtAuthenticationErrorsFeature.FeatureSetup();
+                ClientSecretJwtAuthenticationErrorsFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ClientPrivateKeyJwtAuthenticationErrorsFeature.FeatureTearDown();
+                ClientSecretJwtAuthenticationErrorsFeature.FeatureTearDown();
             }
         }
     }

@@ -56,7 +56,7 @@ namespace SimpleIdServer.OAuth.Api.Authorization.ResponseTypes
 
             if (string.IsNullOrWhiteSpace(codeChallengeMethod))
             {
-                codeChallengeMethod = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
+                codeChallengeMethod = _options.DefaultCodeChallengeMethod;
             }
 
             if (!_codeChallengeMethodHandlers.Any(c => c.Name == codeChallengeMethod))

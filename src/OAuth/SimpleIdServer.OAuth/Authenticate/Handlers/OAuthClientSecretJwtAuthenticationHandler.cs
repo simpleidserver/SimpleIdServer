@@ -1,9 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Options;
 using System;
 using System.Linq;
 using System.Text;
@@ -17,29 +21,58 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
     /// </summary>
     public class OAuthClientSecretJwtAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
+        private readonly OAuthHostOptions _options;
+        private readonly IClientHelper _clientHelper;
+        private readonly ILogger<OAuthClientSecretJwtAuthenticationHandler> _logger;
         public string AuthMethod => AUTH_METHOD;
         public const string AUTH_METHOD = "client_secret_jwt";
 
-        public Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public OAuthClientSecretJwtAuthenticationHandler(IOptions<OAuthHostOptions> options, IClientHelper clientHelper, ILogger<OAuthClientSecretJwtAuthenticationHandler> logger)
+        {
+            _options = options.Value;
+            _clientHelper = clientHelper;
+            _logger = logger;
+        }
+
+        public async Task<bool> Handle(AuthenticateInstruction authenticateInstruction, Client client, string expectedIssuer, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
             if (client == null) throw new ArgumentNullException(nameof(client));
-            if (string.IsNullOrWhiteSpace(client.ClientSecret)) throw new OAuthException(errorCode, ErrorMessages.NO_CLIENT_SECRET);
             var clientAssertion = authenticateInstruction.ClientAssertion;
             var handler = new JsonWebTokenHandler();
-            if (!handler.CanReadToken(clientAssertion)) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_FORMAT);
             var token = handler.ReadJsonWebToken(clientAssertion);
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
-            var validationResult = handler.ValidateToken(clientAssertion, new TokenValidationParameters
+            if (!token.IsEncrypted) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_IS_NOT_ENCRYPTED);
+            var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
+            string jws = null;
+            try
+            {
+                jws = handler.DecryptToken(token, new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    ValidateLifetime = false,
+                    TokenDecryptionKey = encryptionSecurityKey
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_CANNOT_BE_DECRYPTED);
+            }
+
+            token = handler.ReadJsonWebToken(jws);
+            var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, token.Kid, cancellationToken);
+            if (jsonWebKey == null) throw new OAuthException(errorCode, ErrorMessages.CLIENT_ASSERTION_NOT_SIGNED_BY_KNOWN_JWK);
+            var validationResult = handler.ValidateToken(jws, new TokenValidationParameters
             {
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateLifetime = false,
-                IssuerSigningKey = securityKey
+                IssuerSigningKey = jsonWebKey
             });
-            if (!validationResult.IsValid) throw new OAuthException(errorCode, ErrorMessages.BAD_CLIENT_ASSERTION_SIGNATURE);
+            if (!validationResult.IsValid) throw new OAuthException(errorCode, validationResult.Exception.ToString());
             ValidateJwsPayLoad(token, expectedIssuer, errorCode);
-            return Task.FromResult(true);
+            return true;
         }
 
         private void ValidateJwsPayLoad(JsonWebToken jsonWebToken, string expectedIssuer, string errorCode)

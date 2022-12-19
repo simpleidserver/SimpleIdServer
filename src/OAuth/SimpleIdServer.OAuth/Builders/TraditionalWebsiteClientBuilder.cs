@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
+using SimpleIdServer.OAuth.Authenticate.Handlers;
 
 namespace SimpleIdServer.OAuth.Builders
 {
@@ -26,6 +27,17 @@ namespace SimpleIdServer.OAuth.Builders
         {
             _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             _client.RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds;
+            return this;
+        }
+
+        /// <summary>
+        /// PKCE is an extension to the Authorization Code flow to prevent CSRF and 
+        /// For more information: https://oauth.net/2/pkce/
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UseClientPkceAuthentication()
+        {
+            _client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return this;
         }
 

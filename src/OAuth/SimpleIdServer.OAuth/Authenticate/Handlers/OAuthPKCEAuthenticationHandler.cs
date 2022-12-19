@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -17,11 +19,13 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ICodeChallengeMethodHandler> _codeChallengeMethodHandlers;
+        private readonly OAuthHostOptions _options;
 
-        public OAuthPKCEAuthenticationHandler(IGrantedTokenHelper grantedTokenHelper, IEnumerable<ICodeChallengeMethodHandler> codeChallengeMethodHandlers)
+        public OAuthPKCEAuthenticationHandler(IGrantedTokenHelper grantedTokenHelper, IEnumerable<ICodeChallengeMethodHandler> codeChallengeMethodHandlers, IOptions<OAuthHostOptions> options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _codeChallengeMethodHandlers = codeChallengeMethodHandlers;
+            _options = options.Value;
         }
 
         public const string AUTH_METHOD = "pkce";
@@ -40,7 +44,7 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 
             var codeChallenge = previousRequest.GetCodeChallengeFromAuthorizationRequest();
             var codeChallengeMethod = previousRequest.GetCodeChallengeMethodFromAuthorizationRequest();
-            if (string.IsNullOrWhiteSpace(codeChallengeMethod)) codeChallengeMethod = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
+            if (string.IsNullOrWhiteSpace(codeChallengeMethod)) codeChallengeMethod = _options.DefaultCodeChallengeMethod;
 
             var codeChallengeMethodHandler = _codeChallengeMethodHandlers.First(c => c.Name == codeChallengeMethod);
             var newCodeChallenge = codeChallengeMethodHandler.Calculate(codeVerifier);

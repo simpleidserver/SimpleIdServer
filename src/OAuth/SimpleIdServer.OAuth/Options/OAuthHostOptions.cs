@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
 using SimpleIdServer.OAuth.Domains;
@@ -79,5 +80,17 @@ namespace SimpleIdServer.OAuth.Options
         /// OAUTH2.0 client's default token profile.
         /// </summary>
         public string DefaultTokenProfile { get; set; } = BearerTokenProfile.DEFAULT_NAME;
+        /// <summary>
+        /// Default encryption alg (JWE).
+        /// </summary>
+        public string DefaultTokenEncrypteAlg { get; set; } = SecurityAlgorithms.Aes128KW;
+        /// <summary>
+        /// Default encryption enc (JWE).
+        /// </summary>
+        public string DefaultTokenEncryptedEnc { get; set; } = SecurityAlgorithms.Aes128CbcHmacSha256;
+        /// <summary>
+        /// Default code challenge method.
+        /// </summary>
+        public string DefaultCodeChallengeMethod { get; set; } = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
     }
 }

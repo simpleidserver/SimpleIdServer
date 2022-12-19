@@ -82,6 +82,7 @@ namespace SimpleIdServer.OAuth.Builders
         /// <returns></returns>
         public ApiClientBuilder UseClientSecretJwtAuthentication(params JsonWebKey[] jsonWebKeys)
         {
+            // TODO : Check the password !!!
             _client.TokenEndPointAuthMethod = OAuthClientSecretJwtAuthenticationHandler.AUTH_METHOD;
             if (jsonWebKeys != null)
             {
