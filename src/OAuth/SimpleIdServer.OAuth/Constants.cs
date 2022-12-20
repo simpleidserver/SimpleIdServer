@@ -8,6 +8,7 @@ namespace SimpleIdServer.OAuth
         public static class EndPoints
         {
             public const string Token = "token";
+            public const string TokenRevoke = "token/revoke";
             public const string Jwks = "jwks";
             public const string Authorization = "authorization";
             public const string Registration = "register";
@@ -30,6 +31,7 @@ namespace SimpleIdServer.OAuth
 
         public static string AuthenticationScheme = "SimpleIdServerOAuth";
         public static string AuthorizationHeaderName = "Authorization";
+        public const string CertificateAuthenticationScheme = "Certificate";
         public const string Prefix = "prefix";
     }
 }

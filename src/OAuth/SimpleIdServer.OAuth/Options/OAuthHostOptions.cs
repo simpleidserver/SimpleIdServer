@@ -34,7 +34,7 @@ namespace SimpleIdServer.OAuth.Options
         /// <summary>
         /// Client certificate authentication scheme.
         /// </summary>
-        public string CertificateAuthenticationScheme { get; set; } = "Certificate";
+        public string CertificateAuthenticationScheme { get; set; } = Constants.CertificateAuthenticationScheme;
         /// <summary>
         /// JWK expiration time in seconds.
         /// </summary>

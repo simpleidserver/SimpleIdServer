@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
@@ -41,6 +42,15 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Steps
             var handler = new JsonWebTokenHandler();
             var jws = handler.CreateToken(tokenDescriptor);
             _scenarioContext.Set(jws, key);
+        }
+
+        [Given("build random X509Certificate2 and store into '(.*)'")]
+        public void GivenBuildRandomCertificate(string key)
+        {
+            var ecdsa = ECDsa.Create();
+            var req = new CertificateRequest($"cn={Guid.NewGuid()}", ecdsa, HashAlgorithmName.SHA256);
+            var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(2));
+            _scenarioContext.Set(cert, key);
         }
     }
 }

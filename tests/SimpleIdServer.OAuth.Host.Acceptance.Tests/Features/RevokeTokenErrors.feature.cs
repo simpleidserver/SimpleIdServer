@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
+namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ClientCredentialsGrantTypeErrorsFeature : object, Xunit.IClassFixture<ClientCredentialsGrantTypeErrorsFeature.FixtureData>, System.IDisposable
+    public partial class RevokeTokenErrorsFeature : object, Xunit.IClassFixture<RevokeTokenErrorsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ClientCredentialsGrantTypeErrors.feature"
+#line 1 "RevokeTokenErrors.feature"
 #line hidden
         
-        public ClientCredentialsGrantTypeErrorsFeature(ClientCredentialsGrantTypeErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public RevokeTokenErrorsFeature(RevokeTokenErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/GrantTypes", "ClientCredentialsGrantTypeErrors", "\tCheck errors returned when using \'client_credentials\' grant-type", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RevokeTokenErrors", "\tCheck errors returned when trying to revoke a token", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=client_credentials\' with no scope parameter")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientCredentialsGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=client_credentials\' with no scope parameter")]
-        public void SendGrant_TypeClient_CredentialsWithNoScopeParameter()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when token is missing")]
+        [Xunit.TraitAttribute("FeatureTitle", "RevokeTokenErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when token is missing")]
+        public void ErrorIsReturnedWhenTokenIsMissing()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=client_credentials\' with no scope parameter", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when token is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,16 +98,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table78 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table50.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table50, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table78, "When ");
 #line hidden
-#line 9
+#line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 10
@@ -117,23 +114,20 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
- testRunner.And("JSON \'$.error_description\'=\'missing parameter scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error_description\'=\'missing parameter token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=client_credentials,scope=scope,client_id=secondClient,client_sec" +
-            "ret=password\' with unauthorized grant-type")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientCredentialsGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=client_credentials,scope=scope,client_id=secondClient,client_sec" +
-            "ret=password\' with unauthorized grant-type")]
-        public void SendGrant_TypeClient_CredentialsScopeScopeClient_IdSecondClientClient_SecretPasswordWithUnauthorizedGrant_Type()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when token_type_hint is invalid")]
+        [Xunit.TraitAttribute("FeatureTitle", "RevokeTokenErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when token_type_hint is invalid")]
+        public void ErrorIsReturnedWhenToken_Type_HintIsInvalid()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=client_credentials,scope=scope,client_id=secondClient,client_sec" +
-                    "ret=password\' with unauthorized grant-type", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when token_type_hint is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 14
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -144,36 +138,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table79 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table51.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table51.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table51.AddRow(new string[] {
-                            "client_id",
-                            "secondClient"});
-                table51.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
+                table79.AddRow(new string[] {
+                            "token",
+                            "token"});
+                table79.AddRow(new string[] {
+                            "token_type_hint",
+                            "bad"});
 #line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table51, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table79, "When ");
 #line hidden
-#line 22
+#line 20
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 23
+#line 22
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 24
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 23
+ testRunner.And("JSON \'$.error\'=\'unsupported_token_type\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 25
- testRunner.And("JSON \'$.error_description\'=\'grant type client_credentials is not supported by the" +
-                        " client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 24
+ testRunner.And("JSON \'$.error_description\'=\'unknown token type hint : bad\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -186,12 +173,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ClientCredentialsGrantTypeErrorsFeature.FeatureSetup();
+                RevokeTokenErrorsFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ClientCredentialsGrantTypeErrorsFeature.FeatureTearDown();
+                RevokeTokenErrorsFeature.FeatureTearDown();
             }
         }
     }

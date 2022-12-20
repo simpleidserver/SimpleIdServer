@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.Tokens
+namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.Tokens
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class TokenErrorsFeature : object, Xunit.IClassFixture<TokenErrorsFeature.FixtureData>, System.IDisposable
+    public partial class RevokeTokenFeature : object, Xunit.IClassFixture<RevokeTokenFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.Tokens
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "TokenErrors.feature"
+#line 1 "RevokeToken.feature"
 #line hidden
         
-        public TokenErrorsFeature(TokenErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public RevokeTokenFeature(RevokeTokenFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.Tokens
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/Tokens", "TokenErrors", "\tCheck errors returned by the token endpoint", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RevokeToken", "\tRevoke access token or refresh token", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.Tokens
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send an empty request")]
-        [Xunit.TraitAttribute("FeatureTitle", "TokenErrors")]
-        [Xunit.TraitAttribute("Description", "Send an empty request")]
-        public void SendAnEmptyRequest()
+        [Xunit.SkippableFactAttribute(DisplayName="Revoke access_token")]
+        [Xunit.TraitAttribute("FeatureTitle", "RevokeToken")]
+        [Xunit.TraitAttribute("Description", "Revoke access_token")]
+        public void RevokeAccess_Token()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send an empty request", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Revoke access_token", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,23 +98,50 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table76 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
+                table76.AddRow(new string[] {
+                            "client_id",
+                            "firstClient"});
+                table76.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table76.AddRow(new string[] {
+                            "scope",
+                            "firstScope"});
+                table76.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table70, "When ");
-#line hidden
-#line 8
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 10
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 11
- testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table76, "When ");
 #line hidden
 #line 12
- testRunner.And("JSON \'$.error_description\'=\'bad grant type\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 13
+ testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table77 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table77.AddRow(new string[] {
+                            "client_id",
+                            "firstClient"});
+                table77.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table77.AddRow(new string[] {
+                            "token",
+                            "$accessToken$"});
+                table77.AddRow(new string[] {
+                            "token_type_hint",
+                            "access_token"});
+#line 15
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table77, "When ");
+#line hidden
+#line 22
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -127,12 +154,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                TokenErrorsFeature.FeatureSetup();
+                RevokeTokenFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                TokenErrorsFeature.FeatureTearDown();
+                RevokeTokenFeature.FeatureTearDown();
             }
         }
     }

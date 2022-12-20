@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OAuth.Infrastructures;
 using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -15,16 +14,13 @@ namespace SimpleIdServer.OAuth.Authenticate.Handlers
 {
     public class OAuthClientSelfSignedTlsClientAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IClientHelper _clientHelper;
         private readonly ILogger<OAuthClientSelfSignedTlsClientAuthenticationHandler> _logger;
 
         public OAuthClientSelfSignedTlsClientAuthenticationHandler(
-            IHttpClientFactory httpClientFactory,
             IClientHelper clientHelper,
             ILogger<OAuthClientSelfSignedTlsClientAuthenticationHandler> logger)
         {
-            _httpClientFactory = httpClientFactory;
             _clientHelper = clientHelper;
             _logger = logger;
         }

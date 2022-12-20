@@ -61,7 +61,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddLib()
                 .AddConfigurationApi()
                 .AddUI();
-            return new IdServerBuilder(services);
+            var authBuilder = services.AddAuthentication();
+            return new IdServerBuilder(services, authBuilder, services.BuildServiceProvider());
         }
 
         #region Private methods

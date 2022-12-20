@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Token
 {
-    // [Route(Constants.EndPoints.MtlsToken)]
     public class TokenController : Controller
     {
         private readonly ITokenRequestHandler _tokenRequestHandler;
@@ -41,7 +40,7 @@ namespace SimpleIdServer.OAuth.Api.Token
             return result;
         }
 
-        [HttpPost("revoke")]
+        [HttpPost]
         public async Task<IActionResult> Revoke(CancellationToken cancellationToken)
         {
             try

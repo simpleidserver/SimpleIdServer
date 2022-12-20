@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -32,16 +31,12 @@ namespace SimpleIdServer.OAuth.Api.Token.Validators
         {
             var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
             if (string.IsNullOrWhiteSpace(token))
-            {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, RevokeTokenRequestParameters.Token));
-            }
 
             var tokenTypeHint = jObjBody.GetStr(RevokeTokenRequestParameters.TokenTypeHint);
             var supportedTokens = GetSupportedTokens();
-            if (!string.IsNullOrWhiteSpace(tokenTypeHint) && supportedTokens.Contains(tokenTypeHint))
-            {
+            if (!string.IsNullOrWhiteSpace(tokenTypeHint) && !supportedTokens.Contains(tokenTypeHint))
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_TOKEN_TYPE, string.Format(ErrorMessages.UNKNOWN_TOKEN_TYPE_HINT, tokenTypeHint));
-            }
 
             return new RevokeTokenValidationResult(token, tokenTypeHint);
         }

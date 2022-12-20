@@ -4,8 +4,11 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.OAuth.Builders
 {
@@ -94,6 +97,58 @@ namespace SimpleIdServer.OAuth.Builders
                     _client.SerializedJsonWebKeys.Add(jsonWebKey);
             }
 
+            return this;
+        }
+
+        /// <summary>
+        /// Use 'self_signed_tls_client_auth' as authentication method.
+        /// For more information : https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-method-metadata
+        /// </summary>
+        /// <returns></returns>
+        public ApiClientBuilder UseClientSelfSignedAuthentication()
+        {
+            _client.TokenEndPointAuthMethod = OAuthClientSelfSignedTlsClientAuthenticationHandler.AUTH_METHOD;
+            return this;
+        }
+
+        /// <summary>
+        /// Use 'tls_client_auth' as authentication method.
+        /// For more information : https://oauth.net/2/mtls/
+        /// </summary>
+        /// <param name="subjectDn">Expected subject distinguished name of the certificate.</param>
+        /// <param name="sanDns">Expected dNSName SAN entry in the certificate.</param>
+        /// <param name="sanEmail">Expected rfc822Name SAN entry in the certificate.</param>
+        /// <param name="sanIp">A string representation of an IP address in either dotted decimal notation (IPV4) or colon-delimited hexadecimal (IPV6) that is expected to be present as an iPAddress SAN entry in the certificate</param>
+        /// <returns></returns>
+        public ApiClientBuilder UseClientTlsAuthentication(string subjectDn, string sanDns = null, string sanEmail = null, string sanIp = null)
+        {
+            _client.TokenEndPointAuthMethod = OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD;
+            _client.TlsClientAuthSubjectDN = subjectDn;
+            _client.TlsClientAuthSanDNS = sanDns;
+            _client.TlsClientAuthSanEmail = sanEmail;
+            _client.TlsClientAuthSanIP = sanIp;
+            return this;
+        }
+
+        /// <summary>
+        /// Add a self signed certificate into the Json Web Key (JWK).
+        /// </summary>
+        /// <returns></returns>
+        public ApiClientBuilder AddSelfSignedCertificate(string keyId, string subjectName = "cn=selfSigned")
+        {
+            var ecdsa = ECDsa.Create();
+            var req = new CertificateRequest(subjectName, ecdsa, HashAlgorithmName.SHA256);
+            var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(2));
+            var key = new X509SecurityKey(cert)
+            {
+                KeyId = keyId
+            };
+            var jwk = JsonWebKeyConverter.ConvertFromX509SecurityKey(key);
+            _client.SerializedJsonWebKeys.Add(new ClientJsonWebKey
+            {
+                Kid = keyId,
+                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jwk)
+            });
             return this;
         }
 

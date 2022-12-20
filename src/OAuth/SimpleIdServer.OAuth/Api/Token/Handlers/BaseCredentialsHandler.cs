@@ -28,6 +28,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
 
         public abstract string GrantType { get; }
         public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken);
+        protected OAuthHostOptions Options => _options;
 
         protected async Task<Client> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
         {

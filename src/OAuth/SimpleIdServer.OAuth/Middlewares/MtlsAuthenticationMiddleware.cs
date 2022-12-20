@@ -30,7 +30,7 @@ namespace SimpleIdServer.OAuth.Middlewares
         {
             if (_options.MtlsEnabled)
             {
-                if (context.Request.Path.StartsWithSegments($"/{Constants.EndPoints.MtlsPrefix}"))
+                if (context.Request.Path.ToString().Contains($"/{Constants.EndPoints.MtlsPrefix}"))
                 {
                     var result = await Authenticate(context);
                     if (!result.Succeeded)

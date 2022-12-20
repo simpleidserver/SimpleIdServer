@@ -1,7 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Stores;
 using SimpleIdServer.Store;
 using System;
@@ -14,11 +17,13 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private readonly IServiceCollection _serviceCollection;
         private readonly IServiceProvider _serviceProvider;
+        private readonly AuthenticationBuilder _authenticationBuilder;
 
-        public IdServerBuilder(IServiceCollection serviceCollection)
+        public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authenticationBuilder, IServiceProvider serviceProvider)
         {
             _serviceCollection = serviceCollection;
-            _serviceProvider = serviceCollection.BuildServiceProvider();
+            _authenticationBuilder = authenticationBuilder;
+            _serviceProvider = serviceProvider;
         }
 
         public IServiceCollection Services => _serviceCollection;
@@ -69,6 +74,34 @@ namespace Microsoft.Extensions.DependencyInjection
                 storeDbContext.SaveChanges();
             }
 
+            return this;
+        }
+
+        public IdServerBuilder AddMutualAuthentication(string authenticationSchema = SimpleIdServer.OAuth.Constants.CertificateAuthenticationScheme, Action<CertificateAuthenticationOptions> callback = null)
+        {
+            _serviceCollection.Configure<OAuthHostOptions>(o =>
+            {
+                o.MtlsEnabled = true;
+                o.CertificateAuthenticationScheme = authenticationSchema;
+            });
+            _authenticationBuilder.AddCertificate(authenticationSchema, callback != null ? callback : o =>
+            {
+
+            });
+            return this;
+        }
+
+        public IdServerBuilder AddMutualAuthenticationSelfSigned(string authenticationSchema = SimpleIdServer.OAuth.Constants.CertificateAuthenticationScheme)
+        {
+            _serviceCollection.Configure<OAuthHostOptions>(o =>
+            {
+                o.MtlsEnabled = true;
+                o.CertificateAuthenticationScheme = authenticationSchema;
+            });
+            _authenticationBuilder.AddCertificate(authenticationSchema, o =>
+            {
+                o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
+            });
             return this;
         }
     }

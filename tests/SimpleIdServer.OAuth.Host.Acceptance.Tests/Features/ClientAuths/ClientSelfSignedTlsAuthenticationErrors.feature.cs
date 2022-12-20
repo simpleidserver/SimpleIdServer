@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
+namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.ClientAuths
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ClientCredentialsGrantTypeErrorsFeature : object, Xunit.IClassFixture<ClientCredentialsGrantTypeErrorsFeature.FixtureData>, System.IDisposable
+    public partial class ClientSelfSignedTlsAuthenticationErrorsFeature : object, Xunit.IClassFixture<ClientSelfSignedTlsAuthenticationErrorsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ClientCredentialsGrantTypeErrors.feature"
+#line 1 "ClientSelfSignedTlsAuthenticationErrors.feature"
 #line hidden
         
-        public ClientCredentialsGrantTypeErrorsFeature(ClientCredentialsGrantTypeErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ClientSelfSignedTlsAuthenticationErrorsFeature(ClientSelfSignedTlsAuthenticationErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/GrantTypes", "ClientCredentialsGrantTypeErrors", "\tCheck errors returned when using \'client_credentials\' grant-type", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/ClientAuths", "ClientSelfSignedTlsAuthenticationErrors", "\tCheck errors returned during the \'self_signed_tls_client_auth\' authentication", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features.GrantTypes
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=client_credentials\' with no scope parameter")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientCredentialsGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=client_credentials\' with no scope parameter")]
-        public void SendGrant_TypeClient_CredentialsWithNoScopeParameter()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when there is no certificate")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSelfSignedTlsAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when there is no certificate")]
+        public void ErrorIsReturnedWhenThereIsNoCertificate()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=client_credentials\' with no scope parameter", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when there is no certificate", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,43 +98,46 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table50.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
+                table37.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table37.AddRow(new string[] {
+                            "client_id",
+                            "elevenClient"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table50, "When ");
-#line hidden
-#line 9
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 10
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table37, "When ");
 #line hidden
 #line 11
- testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
- testRunner.And("JSON \'$.error_description\'=\'missing parameter scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 13
+ testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 14
+ testRunner.And("JSON \'$.error_description\'=\'certificate is required\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send \'grant_type=client_credentials,scope=scope,client_id=secondClient,client_sec" +
-            "ret=password\' with unauthorized grant-type")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientCredentialsGrantTypeErrors")]
-        [Xunit.TraitAttribute("Description", "Send \'grant_type=client_credentials,scope=scope,client_id=secondClient,client_sec" +
-            "ret=password\' with unauthorized grant-type")]
-        public void SendGrant_TypeClient_CredentialsScopeScopeClient_IdSecondClientClient_SecretPasswordWithUnauthorizedGrant_Type()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when certificate is not correct")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientSelfSignedTlsAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when certificate is not correct")]
+        public void ErrorIsReturnedWhenCertificateIsNotCorrect()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send \'grant_type=client_credentials,scope=scope,client_id=secondClient,client_sec" +
-                    "ret=password\' with unauthorized grant-type", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 14
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when certificate is not correct", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -144,36 +147,38 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
+#line 17
+ testRunner.Given("build random X509Certificate2 and store into \'clientCertificate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table51.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-                table51.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "scope",
                             "scope"});
-                table51.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "client_id",
-                            "secondClient"});
-                table51.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-#line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table51, "When ");
+                            "elevenClient"});
+                table38.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "clientCertificate"});
+#line 19
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/token\'", ((string)(null)), table38, "When ");
 #line hidden
-#line 22
+#line 26
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 23
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 27
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 24
+#line 28
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 25
- testRunner.And("JSON \'$.error_description\'=\'grant type client_credentials is not supported by the" +
-                        " client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 29
+ testRunner.And("JSON \'$.error_description\'=\'the certificate is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -186,12 +191,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ClientCredentialsGrantTypeErrorsFeature.FeatureSetup();
+                ClientSelfSignedTlsAuthenticationErrorsFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ClientCredentialsGrantTypeErrorsFeature.FeatureTearDown();
+                ClientSelfSignedTlsAuthenticationErrorsFeature.FeatureTearDown();
             }
         }
     }

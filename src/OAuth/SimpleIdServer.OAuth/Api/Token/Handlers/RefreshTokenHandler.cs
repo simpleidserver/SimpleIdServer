@@ -113,7 +113,7 @@ namespace SimpleIdServer.OAuth.Api.Token.Handlers
                     await tokenBuilder.Refresh(jwsPayload, context, cancellationToken);
                 }
                 
-                _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
+                _tokenProfiles.First(t => t.Profile == ( context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)
                 {
                     result.Add(kvp.Key, kvp.Value);
