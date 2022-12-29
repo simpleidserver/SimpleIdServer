@@ -78,6 +78,7 @@ namespace SimpleIdServer.OAuth
         public const string REFRESH_TOKEN_IS_EXPIRED = "refresh token is expired";
         public const string ACCESS_TOKEN_VALID_CLIENT = "access token can be used for the client '{0}' and not for '{1}'";
         public const string CLIENT_IDENTIFIER_MUST_BE_IDENTICAL = "client identifier must be identical";
+        public const string CLIENT_IDENTIFIER_ALREADY_EXISTS = "client identifier {0} already exists";
         public const string CLIENT_SECRET_MUST_BE_IDENTICAL = "client secret must be identical";
         public const string NO_CLIENT_CERTIFICATE = "no client certificate";
         public const string CERTIFICATE_SUBJECT_INVALID = "certificate subject is invalid";

@@ -37,7 +37,8 @@ namespace SimpleIdServer.OAuth.Api.Configuration
                 [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{Constants.EndPoints.Registration}",
                 [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{Constants.EndPoints.Token}",
                 [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{Constants.EndPoints.Token}/revoke",
-                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{Constants.EndPoints.Jwks}"
+                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{Constants.EndPoints.Jwks}",
+                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{Constants.EndPoints.TokenInfo}"
             };
             await _configurationRequestHandler.Enrich(jObj, issuer, cancellationToken);
             return jObj;

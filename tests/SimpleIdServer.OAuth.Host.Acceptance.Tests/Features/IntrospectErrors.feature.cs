@@ -19,7 +19,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class JwksFeature : object, Xunit.IClassFixture<JwksFeature.FixtureData>, System.IDisposable
+    public partial class IntrospectErrorsFeature : object, Xunit.IClassFixture<IntrospectErrorsFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "Jwks.feature"
+#line 1 "IntrospectErrors.feature"
 #line hidden
         
-        public JwksFeature(JwksFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public IntrospectErrorsFeature(IntrospectErrorsFeature.FixtureData fixtureData, SimpleIdServer_OAuth_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Jwks", "\tGet JWKS and check its content", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "IntrospectErrors", "\tCheck errors returned during the token introspection", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Get Json Web Keys (JWKS)")]
-        [Xunit.TraitAttribute("FeatureTitle", "Jwks")]
-        [Xunit.TraitAttribute("Description", "Get Json Web Keys (JWKS)")]
-        public void GetJsonWebKeysJWKS()
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when token is missing")]
+        [Xunit.TraitAttribute("FeatureTitle", "IntrospectErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when token is missing")]
+        public void ErrorIsReturnedWhenTokenIsMissing()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get Json Web Keys (JWKS)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when token is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,26 +98,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table81 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table80 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost:8080/jwks\'", ((string)(null)), table81, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token_info\'", ((string)(null)), table80, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 10
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 11
- testRunner.And("JSON \'$.keys[0].alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
- testRunner.And("JSON \'$.keys[0].kid\'=\'keyid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 13
- testRunner.And("JSON \'$.keys[0].use\'=\'sig\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error_description\'=\'missing parameter token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -130,12 +127,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                JwksFeature.FeatureSetup();
+                IntrospectErrorsFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                JwksFeature.FeatureTearDown();
+                IntrospectErrorsFeature.FeatureTearDown();
             }
         }
     }

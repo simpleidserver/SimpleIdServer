@@ -152,6 +152,17 @@ namespace SimpleIdServer.OAuth.Builders
             return this;
         }
 
+        /// <summary>
+        /// Set the token expiration time in seconds.
+        /// </summary>
+        /// <param name="tokenExpirationTimeInSeconds"></param>
+        /// <returns></returns>
+        public ApiClientBuilder SetTokenExpirationTimeInSeconds(double tokenExpirationTimeInSeconds)
+        {
+            _client.TokenExpirationTimeInSeconds = tokenExpirationTimeInSeconds;
+            return this;
+        }
+
         public ApiClientBuilder AddScope(params string[] scopes)
         {
             foreach (var scope in scopes) _client.Scopes.Add(scope);

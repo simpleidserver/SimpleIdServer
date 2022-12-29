@@ -14,7 +14,8 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OAuth.Api.Management
 {
-    public partial class ManagementController
+    /*
+    public partial class ClientManagementController
     {
         [HttpPost("clients/.search")]
         [Authorize("ManageClients")]
@@ -72,4 +73,5 @@ namespace SimpleIdServer.OAuth.Api.Management
             });
         }
     }
+    */
 }

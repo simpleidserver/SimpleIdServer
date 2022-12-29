@@ -57,7 +57,7 @@ namespace SimpleIdServer.OAuth.Api.Token.TokenBuilders
         {
             var audiences = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Name))).Select(c => c.ClientId).ToListAsync(cancellationToken);
             if (!audiences.Contains(handlerContext.Client.ClientId)) audiences.Add(handlerContext.Client.ClientId);
-            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
+            var tokenDescriptor = _grantedTokenHelper.BuildAccessToken(handlerContext.Client.ClientId, audiences, scopes, handlerContext.Request.IssuerName, handlerContext.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds);
             if (handlerContext.Request.Certificate != null)
             {
                 var thumbprint = Hash(handlerContext.Request.Certificate.RawData);

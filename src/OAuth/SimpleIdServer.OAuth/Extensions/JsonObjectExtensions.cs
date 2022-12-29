@@ -272,6 +272,12 @@ namespace System.Text.Json.Nodes
 
         #endregion
 
+        #region Introspection request
+
+        public static string GetToken(this JsonObject jObj) => jObj.GetStr(IntrospectionRequestParameters.Token);
+
+        #endregion
+
         public static string GetStr(this JsonObject jObj, string name)
         {
             var result = jObj.GetToken(name);

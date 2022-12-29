@@ -28,6 +28,15 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("tokenRevoke",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.TokenRevoke,
                 defaults: new { controller = "Token", action = "Revoke" });
+            webApplication.MapControllerRoute("tokenInfo",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.TokenInfo,
+                defaults: new { controller = "TokenIntrospection", action = "Introspect" });
+            webApplication.MapControllerRoute("managementClient",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ClientManagement,
+                defaults: new { controller = "ClientManagement", action = "Add" });
+            webApplication.MapControllerRoute("registerClient",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration,
+                defaults: new { controller = "Registration", action = "Add" });
             if (webApplication.Services.GetRequiredService<IOptions<OAuthHostOptions>>().Value.MtlsEnabled)
             {
                 webApplication.MapControllerRoute("tokenMtls",

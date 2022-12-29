@@ -16,6 +16,7 @@ using SimpleIdServer.OAuth.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Api.Token.Validators;
+using SimpleIdServer.OAuth.Api.TokenIntrospection;
 using SimpleIdServer.OAuth.Authenticate;
 using SimpleIdServer.OAuth.Authenticate.AssertionParsers;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
@@ -60,7 +61,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthJwt()
                 .AddLib()
                 .AddConfigurationApi()
-                .AddUI();
+                .AddUI()
+                .AddOAuthIntrospectionTokenApi();
             var authBuilder = services.AddAuthentication();
             return new IdServerBuilder(services, authBuilder, services.BuildServiceProvider());
         }
@@ -128,6 +130,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
             services.AddTransient<IRequestObjectValidator, RequestObjectValidator>();
             services.AddTransient<IClientHelper, OAuthClientHelper>();
+            return services;
+        }
+
+        private static IServiceCollection AddOAuthIntrospectionTokenApi(this IServiceCollection services)
+        {
+            services.AddTransient<ITokenIntrospectionRequestHandler, TokenIntrospectionRequestHandler>();
             return services;
         }
 

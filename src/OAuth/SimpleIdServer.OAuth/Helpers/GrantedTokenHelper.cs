@@ -25,10 +25,10 @@ namespace SimpleIdServer.OAuth.Helpers
         Task<IEnumerable<Token>> GetTokensByAuthorizationCode(string code, CancellationToken cancellationToken);
         Task<bool> RemoveToken(string token, CancellationToken cancellationToken);
         Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
-        SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
-        SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
+        SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
+        SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
         Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken);
-        Task<SecurityToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
+        Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
         Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject jwsPayload, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<Token> GetRefreshToken(string refreshToken, CancellationToken cancellationToken);
@@ -85,11 +85,12 @@ namespace SimpleIdServer.OAuth.Helpers
 
         #region Access token
 
-        public SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName)
+        public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName)
         {
             var claims = new Dictionary<string, object>
             {
                 { System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Aud, audiences },
+                { OpenIdConnectParameterNames.ClientId, clientId },
                 { OpenIdConnectParameterNames.Scope, BuildScopeClaim(scopes) }
             };
             return new SecurityTokenDescriptor
@@ -99,9 +100,9 @@ namespace SimpleIdServer.OAuth.Helpers
             };
         }
 
-        public SecurityTokenDescriptor BuildAccessToken(IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds)
+        public SecurityTokenDescriptor BuildAccessToken(string clientId, IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds)
         {
-            var descriptor = BuildAccessToken(audiences, scopes, issuerName);
+            var descriptor = BuildAccessToken(clientId, audiences, scopes, issuerName);
             AddExpirationAndIssueTime(descriptor, validityPeriodsInSeconds);
             return descriptor;
         }
@@ -120,12 +121,12 @@ namespace SimpleIdServer.OAuth.Helpers
             return true;
         }
 
-        public async Task<SecurityToken> GetAccessToken(string accessToken, CancellationToken cancellationToken)
+        public async Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken)
         {
             var result = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken, cancellationToken);
             if (result == null) return null;
             var handler = new JsonWebTokenHandler();
-            return handler.ReadToken(result.Data);
+            return handler.ReadJsonWebToken(result.Id);
         }
 
         public async Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken)
