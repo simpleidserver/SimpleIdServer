@@ -1,12 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Domains;
 using SimpleIdServer.Domains.DTOs;
+using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Infrastructures;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.Store;
-using System.Runtime.InteropServices;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,20 +25,41 @@ namespace SimpleIdServer.OAuth.Api.Register
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IClientRepository _clientRepository;
+        private readonly OAuthHostOptions _options;
 
-        public RegisterClientRequestHandler(IHttpClientFactory httpClientFactory, IClientRepository clientRepository)
+        public RegisterClientRequestHandler(IHttpClientFactory httpClientFactory, IClientRepository clientRepository, IOptions<OAuthHostOptions> options)
         {
             _httpClientFactory = httpClientFactory;
             _clientRepository = clientRepository;
+            _options = options.Value;
         }
 
         public async Task Handle(RegisterClientRequest request, CancellationToken cancellationToken)
         {
             await Validate(request, cancellationToken);
+            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
             var client = new Client
             {
-                ClientId = request.ClientId
+                ClientId = request.ClientId,
+                RegistrationAccessToken = Guid.NewGuid().ToString(),
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                RefreshTokenExpirationTimeInSeconds = _options.DefaultRefreshTokenExpirationTimeInSeconds,
+                TokenExpirationTimeInSeconds = _options.DefaultTokenExpirationTimeInSeconds,
+                PreferredTokenProfile = _options.DefaultTokenProfile,
+                ClientSecret = Guid.NewGuid().ToString()
             };
+            if (!string.IsNullOrWhiteSpace(request.ClientName)) client.AddClientName(language, request.ClientName);
+            if (request.GrantTypes == null || !request.GrantTypes.Any()) client.GrantTypes = new[] { AuthorizationCodeHandler.GRANT_TYPE };
+            if (string.IsNullOrWhiteSpace(request.Scope))
+                client.Scopes = _options.DefaultScopes.Select(s => new ClientScope
+                {
+                    Name = s
+                }).ToList();
+            else client.Scopes = request.Scope.ToScopes().Select(s => new ClientScope
+            {
+                Name = s
+            }).ToList();
             // CONTINUE...
         }
 

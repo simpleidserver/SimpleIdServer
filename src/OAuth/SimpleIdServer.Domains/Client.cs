@@ -257,6 +257,14 @@ namespace SimpleIdServer.Domains
         [JsonIgnore]
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
 
+        public void AddClientName(string language, string value) => 
+            Translations.Add(new Translation
+            {
+                Key = $"{ClientId}_client_name",
+                Value = value,
+                Language = language
+            });
+
         private string? Translate(string key)
         {
             var translation = Translations.FirstOrDefault(t => t.Key == key && t.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
