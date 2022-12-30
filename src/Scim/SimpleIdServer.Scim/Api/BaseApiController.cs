@@ -117,9 +117,9 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("{id}")]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get(string id)
+        public virtual Task<IActionResult> Get(string id, [FromQuery] GetSCIMResourceParameter parameter)
         {
-            return InternalGet(id);
+            return InternalGet(id, parameter);
         }
 
         /// <summary>
@@ -136,11 +136,11 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("Me")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> GetMe(string id)
+        public virtual Task<IActionResult> GetMe(string id, [FromQuery] GetSCIMResourceParameter parameter)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
-                return InternalGet(id);
+                return InternalGet(id, parameter);
             });
         }
 
@@ -436,7 +436,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<IActionResult> InternalGet(string id)
+        protected async Task<IActionResult> InternalGet(string id, GetSCIMResourceParameter parameter)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
@@ -452,6 +452,17 @@ namespace SimpleIdServer.Scim.Api
 
                 representation.ApplyEmptyArray();
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
+                var schemaIds = new List<string> { schema.Id };
+                schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
+                var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
+                var standardSchemas = new List<SCIMSchema>
+                {
+                    StandardSchemas.StandardResponseSchemas
+                };
+                standardSchemas.AddRange(schemas);
+                var includedAttributes = parameter.Attributes == null ? new List<SCIMAttributeExpression>() : parameter.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
+                var excludedAttributes = parameter.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : parameter.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
+                representation.FilterAttributes(includedAttributes, excludedAttributes);
                 return BuildHTTPResult(representation, HttpStatusCode.OK, true);
             }
             catch(Exception ex)

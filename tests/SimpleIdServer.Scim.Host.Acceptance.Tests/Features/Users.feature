@@ -905,8 +905,25 @@ Scenario: Check users can be filtered by organizationId
 	And execute HTTP GET request 'http://localhost/Users?filter=organizationId%20eq%20number'	
 	And extract JSON from body
 	
-
 	Then HTTP status code equals to '200'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:ListResponse'
 	Then JSON 'totalResults'='1'
 	Then JSON 'startIndex'='1'
+
+Scenario: Check attribute 'employeeNumber' can be excluded
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| organizationId | number                                                                                                         |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP GET request 'http://localhost/Users/$id$?excludedAttributes=employeeNumber'	
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'	
+	Then JSON doesn't exists 'employeeNumber'
