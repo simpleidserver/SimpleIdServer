@@ -179,14 +179,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         var thirdAttributeMapping = new SCIMAttributeMapping
                         {
                             Id = Guid.NewGuid().ToString(),
-                            SourceAttributeId = entrepriseUser.Attributes.First(a => a.Name == "manager").Id,
-                            SourceResourceType = StandardSchemas.UserSchema.ResourceType,
-                            SourceAttributeSelector = "manager",
-                            TargetResourceType = StandardSchemas.UserSchema.ResourceType
-                        };
-                        var fourthAttributeMapping = new SCIMAttributeMapping
-                        {
-                            Id = Guid.NewGuid().ToString(),
                             SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
                             SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                             SourceAttributeSelector = "members",
@@ -196,7 +188,6 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                         context.SCIMAttributeMappingLst.Add(firstAttributeMapping);
                         context.SCIMAttributeMappingLst.Add(secondAttributeMapping);
                         context.SCIMAttributeMappingLst.Add(thirdAttributeMapping);
-                        context.SCIMAttributeMappingLst.Add(fourthAttributeMapping);
                     }
 
                     if (!context.ProvisioningConfigurations.Any())

@@ -210,7 +210,7 @@ Scenario: Add a user to a sub group and check user belongs to two groups (HTTP P
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
-	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
 	| Key        | Value                                                                        |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
 	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
@@ -260,12 +260,7 @@ Scenario: Add a user to two sub groups and check the user belongs to three group
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
-	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
-	| Key        | Value                                                                        |
-	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
-	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
-		
-	And execute HTTP PATCH JSON request 'http://localhost/Groups/$thirdGroup$'
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
 	| Key        | Value                                                                        |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
 	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
@@ -277,9 +272,44 @@ Scenario: Add a user to two sub groups and check the user belongs to three group
 	And 'groups' length is equals to '3'
 	And JSON 'groups[0].type'='direct'
 	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[2].type'='direct'
+	And JSON 'groups[2].type'='indirect'
 
-Scenario: Remove relationship between two groups and check user still belongs to three groups (HTTP PATCH)
+Scenario: Add one user into two groups
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '2'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='indirect'
+	
+Scenario: Remove user from one group and check it has an indirect link to this group (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |
 	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
@@ -317,6 +347,11 @@ Scenario: Remove relationship between two groups and check user still belongs to
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+		
 	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
 	| Key        | Value                                                                        |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
@@ -326,11 +361,11 @@ Scenario: Remove relationship between two groups and check user still belongs to
 	| Key        | Value                                                                        |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
 	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
-
-	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$thirdGroup$'
 	| Key        | Value                                                                        |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
-	| Operations | [ { "op": "remove", "path": "members[value eq $firstGroup$]" } ]				|
+	| Operations | [ { "op": "remove", "path": "members[value eq $userId$]" } ]				    |
 
 	And execute HTTP GET request 'http://localhost/Users/$userId$'	
 	And extract JSON from body
@@ -338,8 +373,8 @@ Scenario: Remove relationship between two groups and check user still belongs to
 	Then HTTP status code equals to '200'
 	And 'groups' length is equals to '3'
 	And JSON 'groups[0].type'='direct'
-	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[2].type'='direct'	
+	And JSON 'groups[1].type'='direct'
+	And JSON 'groups[2].type'='indirect'
 
 Scenario: Remove all relationships and check user belongs to two groups (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
@@ -379,12 +414,7 @@ Scenario: Remove all relationships and check user belongs to two groups (HTTP PA
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
-	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
-	| Key        | Value                                                                        |
-	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
-	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
-		
-	And execute HTTP PATCH JSON request 'http://localhost/Groups/$thirdGroup$'
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
 	| Key        | Value                                                                        |
 	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
 	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
@@ -403,9 +433,8 @@ Scenario: Remove all relationships and check user belongs to two groups (HTTP PA
 	And extract JSON from body
 	
 	Then HTTP status code equals to '200'
-	And 'groups' length is equals to '2'
+	And 'groups' length is equals to '1'
 	And JSON 'groups[0].type'='direct'
-	And JSON 'groups[1].type'='direct'
 
 Scenario: Add a user to a sub group and check user belongs to two groups (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
@@ -436,11 +465,11 @@ Scenario: Add a user to a sub group and check user belongs to two groups (HTTP P
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
-	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]				                             	   |
 
 	And execute HTTP GET request 'http://localhost/Users/$userId$'	
 	And extract JSON from body
@@ -488,17 +517,11 @@ Scenario: Add a user to two sub groups and check the user belongs to three group
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
-	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
-		
-	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
-	| Key				| Value                                                                        |
-	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| thirdGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]												   |
 
 	And execute HTTP GET request 'http://localhost/Users/$userId$'	
 	And extract JSON from body
@@ -507,9 +530,9 @@ Scenario: Add a user to two sub groups and check the user belongs to three group
 	And 'groups' length is equals to '3'
 	And JSON 'groups[0].type'='direct'
 	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[2].type'='direct'
+	And JSON 'groups[2].type'='indirect'
 
-Scenario: Remove relationship between two groups and check user still belongs to three groups (HTTP PUT)
+Scenario: Remove user from one group and check it has an indirect link to this group (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |
 	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
@@ -547,6 +570,12 @@ Scenario: Remove relationship between two groups and check user still belongs to
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| secondGroup																   |
+	| members			| [ { "value": "$userId$" } ]					                               |
+
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
@@ -558,23 +587,23 @@ Scenario: Remove relationship between two groups and check user still belongs to
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
 	| displayName		| thirdGroup																   |
 	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
-
-	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$userId$" } ]												   |
+	| displayName		| thirdGroup																   |
+	| members			| [ { "value": "$firstGroup$" } ]					                           |
 
 	And execute HTTP GET request 'http://localhost/Users/$userId$'	
 	And extract JSON from body
 	
 	Then HTTP status code equals to '200'
 	And 'groups' length is equals to '3'
-	And JSON 'groups[0].type'='indirect'
+	And JSON 'groups[0].type'='direct'
 	And JSON 'groups[1].type'='direct'
-	And JSON 'groups[2].type'='direct'	
+	And JSON 'groups[2].type'='indirect'	
 
-Scenario: Remove all relationships and check user belongs to two groups (HTTP PUT)
+Scenario: Remove all relationships and check user belongs to one direct group (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |
 	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
@@ -612,34 +641,27 @@ Scenario: Remove all relationships and check user belongs to two groups (HTTP PU
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 		
-	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
-		
-	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
-	| Key				| Value                                                                        |
-	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| thirdGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]					                               |
 
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
 	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$userId$" } ]												   |
+	| members			| [ ]												                           |
 
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
 	| Key				| Value                                                                        |
 	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
 	| displayName		| thirdGroup																   |
-	| members			| [ { "value": "$userId$" } ]												   |
+	| members			| [ ]												                           |
 
 	And execute HTTP GET request 'http://localhost/Users/$userId$'	
 	And extract JSON from body
 	
 	Then HTTP status code equals to '200'
-	And 'groups' length is equals to '2'
+	And 'groups' length is equals to '1'
 	And JSON 'groups[0].type'='direct'
-	And JSON 'groups[1].type'='direct'

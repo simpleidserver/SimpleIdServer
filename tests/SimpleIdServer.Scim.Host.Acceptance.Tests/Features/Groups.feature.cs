@@ -804,7 +804,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Operations",
                             "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
 #line 213
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table24, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table24, "And ");
 #line hidden
 #line 218
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -955,57 +955,42 @@ this.ScenarioInitialize(scenarioInfo);
                             "Operations",
                             "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
 #line 263
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table29, "And ");
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table29, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table30.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
-                table30.AddRow(new string[] {
-                            "Operations",
-                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
 #line 268
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table30, "And ");
-#line hidden
-#line 273
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 274
+#line 269
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 276
+#line 271
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 277
+#line 272
  testRunner.And("\'groups\' length is equals to \'3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 278
+#line 273
  testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 279
+#line 274
  testRunner.And("JSON \'groups[1].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 280
- testRunner.And("JSON \'groups[2].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 275
+ testRunner.And("JSON \'groups[2].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Remove relationship between two groups and check user still belongs to three grou" +
-            "ps (HTTP PATCH)")]
+        [Xunit.SkippableFactAttribute(DisplayName="Add one user into two groups")]
         [Xunit.TraitAttribute("FeatureTitle", "Groups")]
-        [Xunit.TraitAttribute("Description", "Remove relationship between two groups and check user still belongs to three grou" +
-            "ps (HTTP PATCH)")]
-        public virtual void RemoveRelationshipBetweenTwoGroupsAndCheckUserStillBelongsToThreeGroupsHTTPPATCH()
+        [Xunit.TraitAttribute("Description", "Add one user into two groups")]
+        public virtual void AddOneUserIntoTwoGroups()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove relationship between two groups and check user still belongs to three grou" +
-                    "ps (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 282
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Add one user into two groups", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 277
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1025,6 +1010,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
+                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table30.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
+                table30.AddRow(new string[] {
+                            "userName",
+                            "bjen2"});
+                table30.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table30.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table30.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 278
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table30, "When ");
+#line hidden
+#line 286
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 287
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
                 TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
@@ -1034,13 +1048,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table31.AddRow(new string[] {
                             "displayName",
                             "firstGroup"});
-#line 283
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table31, "When ");
+                table31.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$userId$\" } ]"});
+#line 289
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table31, "And ");
 #line hidden
-#line 288
+#line 295
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 289
+#line 296
  testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1055,15 +1072,62 @@ this.ScenarioInitialize(scenarioInfo);
                 table32.AddRow(new string[] {
                             "members",
                             "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 291
+#line 298
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table32, "And ");
 #line hidden
-#line 297
+#line 304
+ testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 305
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 298
- testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 307
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 308
+ testRunner.And("\'groups\' length is equals to \'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 309
+ testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 310
+ testRunner.And("JSON \'groups[1].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Remove user from one group and check it has an indirect link to this group (HTTP " +
+            "PATCH)")]
+        [Xunit.TraitAttribute("FeatureTitle", "Groups")]
+        [Xunit.TraitAttribute("Description", "Remove user from one group and check it has an indirect link to this group (HTTP " +
+            "PATCH)")]
+        public virtual void RemoveUserFromOneGroupAndCheckItHasAnIndirectLinkToThisGroupHTTPPATCH()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove user from one group and check it has an indirect link to this group (HTTP " +
+                    "PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 312
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
                 TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
@@ -1072,71 +1136,86 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table33.AddRow(new string[] {
                             "displayName",
-                            "thirdGroup"});
-                table33.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 300
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table33, "And ");
+                            "firstGroup"});
+#line 313
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table33, "When ");
 #line hidden
-#line 306
+#line 318
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 307
- testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 319
+ testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table34.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
-                                "ension:enterprise:2.0:User\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table34.AddRow(new string[] {
-                            "userName",
-                            "bjen2"});
+                            "displayName",
+                            "secondGroup"});
                 table34.AddRow(new string[] {
-                            "externalId",
-                            "externalid"});
-                table34.AddRow(new string[] {
-                            "name",
-                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
-                                " }"});
-                table34.AddRow(new string[] {
-                            "employeeNumber",
-                            "number"});
-#line 309
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table34, "And ");
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 321
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table34, "And ");
 #line hidden
-#line 317
+#line 327
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 318
- testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 328
+ testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table35.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table35.AddRow(new string[] {
-                            "Operations",
-                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
-#line 320
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table35, "And ");
+                            "displayName",
+                            "thirdGroup"});
+                table35.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 330
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table35, "And ");
+#line hidden
+#line 336
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 337
+ testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table36.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
                 table36.AddRow(new string[] {
-                            "Operations",
-                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
-#line 325
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table36, "And ");
+                            "userName",
+                            "bjen2"});
+                table36.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table36.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table36.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 339
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table36, "And ");
+#line hidden
+#line 347
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 348
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1146,30 +1225,66 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
                 table37.AddRow(new string[] {
                             "Operations",
-                            "[ { \"op\": \"remove\", \"path\": \"members[value eq $firstGroup$]\" } ]"});
-#line 330
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table37, "And ");
+                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
+#line 350
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table37, "And ");
 #line hidden
-#line 335
+                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table38.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table38.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
+#line 355
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table38, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table39.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table39.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
+#line 360
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table39, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table40.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table40.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"remove\", \"path\": \"members[value eq $userId$]\" } ]"});
+#line 365
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table40, "And ");
+#line hidden
+#line 370
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 336
+#line 371
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 338
+#line 373
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 339
+#line 374
  testRunner.And("\'groups\' length is equals to \'3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 340
+#line 375
  testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 341
- testRunner.And("JSON \'groups[1].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 376
+ testRunner.And("JSON \'groups[1].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 342
- testRunner.And("JSON \'groups[2].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 377
+ testRunner.And("JSON \'groups[2].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -1183,7 +1298,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove all relationships and check user belongs to two groups (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 344
+#line 379
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1203,130 +1318,94 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table38.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table38.AddRow(new string[] {
-                            "displayName",
-                            "firstGroup"});
-#line 345
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table38, "When ");
-#line hidden
-#line 350
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 351
- testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table39.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table39.AddRow(new string[] {
-                            "displayName",
-                            "secondGroup"});
-                table39.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 353
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table39, "And ");
-#line hidden
-#line 359
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 360
- testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table40.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table40.AddRow(new string[] {
-                            "displayName",
-                            "thirdGroup"});
-                table40.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 362
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table40, "And ");
-#line hidden
-#line 368
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 369
- testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table41.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
-                                "ension:enterprise:2.0:User\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table41.AddRow(new string[] {
-                            "userName",
-                            "bjen2"});
-                table41.AddRow(new string[] {
-                            "externalId",
-                            "externalid"});
-                table41.AddRow(new string[] {
-                            "name",
-                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
-                                " }"});
-                table41.AddRow(new string[] {
-                            "employeeNumber",
-                            "number"});
-#line 371
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table41, "And ");
+                            "displayName",
+                            "firstGroup"});
+#line 380
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table41, "When ");
 #line hidden
-#line 379
+#line 385
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 380
- testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 386
+ testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table42.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table42.AddRow(new string[] {
-                            "Operations",
-                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
-#line 382
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table42, "And ");
+                            "displayName",
+                            "secondGroup"});
+                table42.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 388
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table42, "And ");
+#line hidden
+#line 394
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 395
+ testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table43.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table43.AddRow(new string[] {
-                            "Operations",
-                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
-#line 387
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table43, "And ");
+                            "displayName",
+                            "thirdGroup"});
+                table43.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 397
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table43, "And ");
+#line hidden
+#line 403
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 404
+ testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table44.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
                 table44.AddRow(new string[] {
-                            "Operations",
-                            "[ { \"op\": \"remove\", \"path\": \"members[value eq $firstGroup$]\" } ]"});
-#line 392
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table44, "And ");
+                            "userName",
+                            "bjen2"});
+                table44.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table44.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table44.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 406
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table44, "And ");
+#line hidden
+#line 414
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 415
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1336,27 +1415,48 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
                 table45.AddRow(new string[] {
                             "Operations",
-                            "[ { \"op\": \"remove\", \"path\": \"members[value eq $firstGroup$]\" } ]"});
-#line 397
- testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table45, "And ");
+                            "[ { \"op\": \"add\", \"path\": \"members\", \"value\": [ { \"value\": \"$userId$\" } ] } ]"});
+#line 417
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table45, "And ");
 #line hidden
-#line 402
+                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table46.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table46.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"remove\", \"path\": \"members[value eq $firstGroup$]\" } ]"});
+#line 422
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table46, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table47.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table47.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"remove\", \"path\": \"members[value eq $firstGroup$]\" } ]"});
+#line 427
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table47, "And ");
+#line hidden
+#line 432
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 403
+#line 433
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 405
+#line 435
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 406
- testRunner.And("\'groups\' length is equals to \'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 436
+ testRunner.And("\'groups\' length is equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 407
+#line 437
  testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 408
- testRunner.And("JSON \'groups[1].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -1370,7 +1470,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Add a user to a sub group and check user belongs to two groups (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 410
+#line 439
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1390,73 +1490,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table46.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table46.AddRow(new string[] {
-                            "displayName",
-                            "firstGroup"});
-#line 411
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table46, "When ");
-#line hidden
-#line 416
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 417
- testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table47.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table47.AddRow(new string[] {
-                            "displayName",
-                            "secondGroup"});
-                table47.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 419
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table47, "And ");
-#line hidden
-#line 425
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 426
- testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table48.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
-                                "ension:enterprise:2.0:User\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table48.AddRow(new string[] {
-                            "userName",
-                            "bjen2"});
-                table48.AddRow(new string[] {
-                            "externalId",
-                            "externalid"});
-                table48.AddRow(new string[] {
-                            "name",
-                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
-                                " }"});
-                table48.AddRow(new string[] {
-                            "employeeNumber",
-                            "number"});
-#line 428
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table48, "And ");
+                            "displayName",
+                            "firstGroup"});
+#line 440
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table48, "When ");
 #line hidden
-#line 436
+#line 445
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 437
- testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 446
+ testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1469,23 +1519,73 @@ this.ScenarioInitialize(scenarioInfo);
                             "secondGroup"});
                 table49.AddRow(new string[] {
                             "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 439
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table49, "And ");
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 448
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table49, "And ");
 #line hidden
-#line 445
- testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 446
+#line 454
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 448
+#line 455
+ testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table50.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
+                table50.AddRow(new string[] {
+                            "userName",
+                            "bjen2"});
+                table50.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table50.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table50.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 457
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table50, "And ");
+#line hidden
+#line 465
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 466
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table51.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                table51.AddRow(new string[] {
+                            "displayName",
+                            "firstGroup"});
+                table51.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$userId$\" } ]"});
+#line 468
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table51, "And ");
+#line hidden
+#line 474
+ testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 475
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 477
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 449
+#line 478
  testRunner.Then("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 450
+#line 479
  testRunner.Then("JSON \'groups[1].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1503,7 +1603,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Add a user to two sub groups and check the user belongs to three groups (HTTP PUT" +
                     ")", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 453
+#line 482
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1523,45 +1623,6 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table50.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table50.AddRow(new string[] {
-                            "displayName",
-                            "firstGroup"});
-#line 454
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table50, "When ");
-#line hidden
-#line 459
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 460
- testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table51.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table51.AddRow(new string[] {
-                            "displayName",
-                            "secondGroup"});
-                table51.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 462
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table51, "And ");
-#line hidden
-#line 468
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 469
- testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table52 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
@@ -1570,47 +1631,36 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table52.AddRow(new string[] {
                             "displayName",
-                            "thirdGroup"});
-                table52.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 471
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table52, "And ");
+                            "firstGroup"});
+#line 483
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table52, "When ");
 #line hidden
-#line 477
+#line 488
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 478
- testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 489
+ testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table53 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table53.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
-                                "ension:enterprise:2.0:User\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table53.AddRow(new string[] {
-                            "userName",
-                            "bjen2"});
+                            "displayName",
+                            "secondGroup"});
                 table53.AddRow(new string[] {
-                            "externalId",
-                            "externalid"});
-                table53.AddRow(new string[] {
-                            "name",
-                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
-                                " }"});
-                table53.AddRow(new string[] {
-                            "employeeNumber",
-                            "number"});
-#line 480
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table53, "And ");
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 491
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table53, "And ");
 #line hidden
-#line 488
+#line 497
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 489
- testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 498
+ testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table54 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1620,65 +1670,100 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table54.AddRow(new string[] {
                             "displayName",
-                            "secondGroup"});
+                            "thirdGroup"});
                 table54.AddRow(new string[] {
                             "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 491
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table54, "And ");
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 500
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table54, "And ");
+#line hidden
+#line 506
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 507
+ testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table55 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table55.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
                 table55.AddRow(new string[] {
-                            "displayName",
-                            "thirdGroup"});
+                            "userName",
+                            "bjen2"});
                 table55.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 497
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table55, "And ");
+                            "externalId",
+                            "externalid"});
+                table55.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table55.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 509
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table55, "And ");
 #line hidden
-#line 503
- testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 504
+#line 517
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 506
+#line 518
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table56 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table56.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                table56.AddRow(new string[] {
+                            "displayName",
+                            "firstGroup"});
+                table56.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$userId$\" } ]"});
+#line 520
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table56, "And ");
+#line hidden
+#line 526
+ testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 527
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 529
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 507
+#line 530
  testRunner.And("\'groups\' length is equals to \'3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 508
+#line 531
  testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 509
+#line 532
  testRunner.And("JSON \'groups[1].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 510
- testRunner.And("JSON \'groups[2].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 533
+ testRunner.And("JSON \'groups[2].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Remove relationship between two groups and check user still belongs to three grou" +
-            "ps (HTTP PUT)")]
+        [Xunit.SkippableFactAttribute(DisplayName="Remove user from one group and check it has an indirect link to this group (HTTP " +
+            "PUT)")]
         [Xunit.TraitAttribute("FeatureTitle", "Groups")]
-        [Xunit.TraitAttribute("Description", "Remove relationship between two groups and check user still belongs to three grou" +
-            "ps (HTTP PUT)")]
-        public virtual void RemoveRelationshipBetweenTwoGroupsAndCheckUserStillBelongsToThreeGroupsHTTPPUT()
+        [Xunit.TraitAttribute("Description", "Remove user from one group and check it has an indirect link to this group (HTTP " +
+            "PUT)")]
+        public virtual void RemoveUserFromOneGroupAndCheckItHasAnIndirectLinkToThisGroupHTTPPUT()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove relationship between two groups and check user still belongs to three grou" +
-                    "ps (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 512
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove user from one group and check it has an indirect link to this group (HTTP " +
+                    "PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 535
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1698,24 +1783,6 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table56 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table56.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table56.AddRow(new string[] {
-                            "displayName",
-                            "firstGroup"});
-#line 513
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table56, "When ");
-#line hidden
-#line 518
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 519
- testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table57 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
@@ -1724,18 +1791,15 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table57.AddRow(new string[] {
                             "displayName",
-                            "secondGroup"});
-                table57.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 521
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table57, "And ");
+                            "firstGroup"});
+#line 536
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table57, "When ");
 #line hidden
-#line 527
+#line 541
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 528
- testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 542
+ testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table58 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1745,62 +1809,68 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table58.AddRow(new string[] {
                             "displayName",
-                            "thirdGroup"});
+                            "secondGroup"});
                 table58.AddRow(new string[] {
                             "members",
                             "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 530
+#line 544
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table58, "And ");
 #line hidden
-#line 536
+#line 550
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 537
- testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 551
+ testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table59 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table59.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
-                                "ension:enterprise:2.0:User\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table59.AddRow(new string[] {
-                            "userName",
-                            "bjen2"});
+                            "displayName",
+                            "thirdGroup"});
                 table59.AddRow(new string[] {
-                            "externalId",
-                            "externalid"});
-                table59.AddRow(new string[] {
-                            "name",
-                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
-                                " }"});
-                table59.AddRow(new string[] {
-                            "employeeNumber",
-                            "number"});
-#line 539
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table59, "And ");
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 553
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table59, "And ");
 #line hidden
-#line 547
+#line 559
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 548
- testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 560
+ testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table60 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table60.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
                 table60.AddRow(new string[] {
-                            "displayName",
-                            "secondGroup"});
+                            "userName",
+                            "bjen2"});
                 table60.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 550
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table60, "And ");
+                            "externalId",
+                            "externalid"});
+                table60.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table60.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 562
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table60, "And ");
+#line hidden
+#line 570
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 571
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table61 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1810,12 +1880,12 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table61.AddRow(new string[] {
                             "displayName",
-                            "thirdGroup"});
+                            "secondGroup"});
                 table61.AddRow(new string[] {
                             "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 556
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table61, "And ");
+                            "[ { \"value\": \"$userId$\" } ]"});
+#line 573
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table61, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table62 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1828,44 +1898,74 @@ this.ScenarioInitialize(scenarioInfo);
                             "secondGroup"});
                 table62.AddRow(new string[] {
                             "members",
-                            "[ { \"value\": \"$userId$\" } ]"});
-#line 562
+                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
+#line 579
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table62, "And ");
 #line hidden
-#line 568
+                TechTalk.SpecFlow.Table table63 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table63.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                table63.AddRow(new string[] {
+                            "displayName",
+                            "thirdGroup"});
+                table63.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
+#line 585
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table63, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table64 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table64.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                table64.AddRow(new string[] {
+                            "displayName",
+                            "thirdGroup"});
+                table64.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 591
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table64, "And ");
+#line hidden
+#line 597
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 569
+#line 598
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 571
+#line 600
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 572
+#line 601
  testRunner.And("\'groups\' length is equals to \'3\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 573
- testRunner.And("JSON \'groups[0].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 602
+ testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 574
+#line 603
  testRunner.And("JSON \'groups[1].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 575
- testRunner.And("JSON \'groups[2].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 604
+ testRunner.And("JSON \'groups[2].type\'=\'indirect\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Remove all relationships and check user belongs to two groups (HTTP PUT)")]
+        [Xunit.SkippableFactAttribute(DisplayName="Remove all relationships and check user belongs to one direct group (HTTP PUT)")]
         [Xunit.TraitAttribute("FeatureTitle", "Groups")]
-        [Xunit.TraitAttribute("Description", "Remove all relationships and check user belongs to two groups (HTTP PUT)")]
-        public virtual void RemoveAllRelationshipsAndCheckUserBelongsToTwoGroupsHTTPPUT()
+        [Xunit.TraitAttribute("Description", "Remove all relationships and check user belongs to one direct group (HTTP PUT)")]
+        public virtual void RemoveAllRelationshipsAndCheckUserBelongsToOneDirectGroupHTTPPUT()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove all relationships and check user belongs to two groups (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 577
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Remove all relationships and check user belongs to one direct group (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 606
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1885,45 +1985,6 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table63 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table63.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table63.AddRow(new string[] {
-                            "displayName",
-                            "firstGroup"});
-#line 578
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table63, "When ");
-#line hidden
-#line 583
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 584
- testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table64 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table64.AddRow(new string[] {
-                            "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
-                table64.AddRow(new string[] {
-                            "displayName",
-                            "secondGroup"});
-                table64.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 586
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table64, "And ");
-#line hidden
-#line 592
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 593
- testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
                 TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
@@ -1932,47 +1993,36 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table65.AddRow(new string[] {
                             "displayName",
-                            "thirdGroup"});
-                table65.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" } ]"});
-#line 595
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table65, "And ");
+                            "firstGroup"});
+#line 607
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table65, "When ");
 #line hidden
-#line 601
+#line 612
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 602
- testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 613
+ testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table66 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table66.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
-                                "ension:enterprise:2.0:User\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table66.AddRow(new string[] {
-                            "userName",
-                            "bjen2"});
+                            "displayName",
+                            "secondGroup"});
                 table66.AddRow(new string[] {
-                            "externalId",
-                            "externalid"});
-                table66.AddRow(new string[] {
-                            "name",
-                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
-                                " }"});
-                table66.AddRow(new string[] {
-                            "employeeNumber",
-                            "number"});
-#line 604
- testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table66, "And ");
+                            "members",
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 615
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table66, "And ");
 #line hidden
-#line 612
+#line 621
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 613
- testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 622
+ testRunner.And("extract \'id\' from JSON body into \'secondGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table67 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1982,27 +2032,47 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table67.AddRow(new string[] {
                             "displayName",
-                            "secondGroup"});
+                            "thirdGroup"});
                 table67.AddRow(new string[] {
                             "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 615
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table67, "And ");
+                            "[ { \"value\": \"$firstGroup$\" } ]"});
+#line 624
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table67, "And ");
+#line hidden
+#line 630
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 631
+ testRunner.And("extract \'id\' from JSON body into \'thirdGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table68 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table68.AddRow(new string[] {
                             "schemas",
-                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
                 table68.AddRow(new string[] {
-                            "displayName",
-                            "thirdGroup"});
+                            "userName",
+                            "bjen2"});
                 table68.AddRow(new string[] {
-                            "members",
-                            "[ { \"value\": \"$firstGroup$\" }, { \"value\": \"$userId$\" } ]"});
-#line 621
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table68, "And ");
+                            "externalId",
+                            "externalid"});
+                table68.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table68.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+#line 633
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table68, "And ");
+#line hidden
+#line 641
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 642
+ testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -2012,12 +2082,12 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table69.AddRow(new string[] {
                             "displayName",
-                            "secondGroup"});
+                            "firstGroup"});
                 table69.AddRow(new string[] {
                             "members",
                             "[ { \"value\": \"$userId$\" } ]"});
-#line 627
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table69, "And ");
+#line 644
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$firstGroup$\'", ((string)(null)), table69, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table70 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -2027,30 +2097,42 @@ this.ScenarioInitialize(scenarioInfo);
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
                 table70.AddRow(new string[] {
                             "displayName",
-                            "thirdGroup"});
+                            "secondGroup"});
                 table70.AddRow(new string[] {
                             "members",
-                            "[ { \"value\": \"$userId$\" } ]"});
-#line 633
- testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table70, "And ");
+                            "[ ]"});
+#line 650
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$secondGroup$\'", ((string)(null)), table70, "And ");
 #line hidden
-#line 639
+                TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table71.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                table71.AddRow(new string[] {
+                            "displayName",
+                            "thirdGroup"});
+                table71.AddRow(new string[] {
+                            "members",
+                            "[ ]"});
+#line 656
+ testRunner.And("execute HTTP PUT JSON request \'http://localhost/Groups/$thirdGroup$\'", ((string)(null)), table71, "And ");
+#line hidden
+#line 662
  testRunner.And("execute HTTP GET request \'http://localhost/Users/$userId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 640
+#line 663
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 642
+#line 665
  testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 643
- testRunner.And("\'groups\' length is equals to \'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 666
+ testRunner.And("\'groups\' length is equals to \'1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 644
+#line 667
  testRunner.And("JSON \'groups[0].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 645
- testRunner.And("JSON \'groups[1].type\'=\'direct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
