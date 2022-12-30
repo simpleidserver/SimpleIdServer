@@ -6,7 +6,6 @@ using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
-using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,6 +45,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
             result.Init(_scimDbContext.Database);
             return result;
+        }
+
+        public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter)
+        {
+            return FindSCIMRepresentationById(representationId, resourceType);
         }
 
         public Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.DTOs
 {
-    public class GetSCIMResourceParameter
+    public class GetSCIMResourceRequest
     {
         /// <summary>
         /// A multi-valued list of strings indicating the names of resource attributes to return in the response.

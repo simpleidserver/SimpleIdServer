@@ -19,6 +19,37 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
     {
         #region Build Result
 
+        public static async Task<SCIMRepresentation> BuildResult(
+            this IQueryable<SCIMRepresentation> representations,
+            SCIMDbContext dbContext,
+            IEnumerable<SCIMAttributeExpression> includedAttributes,
+            IEnumerable<SCIMAttributeExpression> excludedAttributes,
+            string id)
+        {
+            IQueryable<SCIMRepresentationAttribute> filteredAttrs = null;
+            if (includedAttributes != null && includedAttributes.Any())
+            {
+                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(includedAttributes, propertyName: "Children");
+            }
+
+            if (excludedAttributes != null && excludedAttributes.Any())
+            {
+                filteredAttrs = dbContext.SCIMRepresentationAttributeLst.Include(r => r.Children).FilterAttributes(excludedAttributes, false, "Children");
+            }
+
+            if (filteredAttrs != null)
+            {
+                filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
+                var result = await representations.FirstOrDefaultAsync(r => r.Id == id);
+                var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
+                result.FlatAttributes = filteredAttrs.ToList();
+                return result;
+            }
+
+            representations = representations.Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute);
+            return await representations.FirstOrDefaultAsync(r => r.Id == id);
+        }
+
         public static SearchSCIMRepresentationsResponse BuildResult(
             this IQueryable<SCIMRepresentation> representations,
             SCIMDbContext dbContext,

@@ -33,6 +33,13 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .FirstOrDefaultAsync(r => r.Id == representationId && r.ResourceType == resourceType);
         }
 
+        public async Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter)
+        {
+            var query = _scimDbContext.SCIMRepresentationLst
+                .Include(r => r.Schemas).ThenInclude(s => s.Attributes);
+            return await query.BuildResult(_scimDbContext, parameter.IncludedAttributes, parameter.ExcludedAttributes, representationId);
+        }
+
         public async Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter)
         {
             IQueryable<SCIMRepresentation> queryableRepresentations = _scimDbContext.SCIMRepresentationLst
