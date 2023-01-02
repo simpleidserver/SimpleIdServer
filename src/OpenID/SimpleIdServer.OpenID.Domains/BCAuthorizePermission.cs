@@ -1,15 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
 
 namespace SimpleIdServer.OpenID.Domains
 {
-    public class BCAuthorizePermission : ICloneable
+    public class BCAuthorizePermission
     {
-        private BCAuthorizePermission()
-        {
-
-        }
+        private BCAuthorizePermission() { }
 
         public string ConsentId { get; set; }
         public string Type { get; set; }
@@ -25,18 +21,6 @@ namespace SimpleIdServer.OpenID.Domains
         public void Confirm()
         {
             IsConfirmed = true;
-        }
-
-        public object Clone()
-        {
-            return new BCAuthorizePermission
-            {
-                 ConsentId = ConsentId,
-                 Type = Type,
-                 DisplayName = DisplayName,
-                 PermissionId = PermissionId,
-                 IsConfirmed = IsConfirmed
-            };
         }
     }
 }

@@ -1,24 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Jws;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
-using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using System;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,7 +21,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 {
     public interface IBCAuthorizeRequestValidator
     {
-        Task<OAuthUser> ValidateCreate(HandlerContext context, CancellationToken cancellationToken);
+        Task<User> ValidateCreate(HandlerContext context, CancellationToken cancellationToken);
         Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken);
         Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken);
     }
@@ -53,7 +48,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             _options = options.Value;
         }
 
-        public virtual async Task<OAuthUser> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
+        public virtual async Task<User> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
         {
             await CheckRequestObject(context, cancellationToken);
             var tokens = new bool[]
@@ -180,7 +175,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, BCAuthenticationRequestParameters.Request));
             }
 
-            var validationResult = await _requestObjectValidator.Validate(request, (OpenIdClient)context.Client, cancellationToken, ErrorCodes.INVALID_REQUEST);
+            var validationResult = await _requestObjectValidator.Validate(request, context.Client, cancellationToken, ErrorCodes.INVALID_REQUEST);
             var audiences = validationResult.JwsPayload.GetAudiences();
             var issuer = validationResult.JwsPayload.GetIssuer();
             var exp = validationResult.JwsPayload.GetExpirationTime();
@@ -250,7 +245,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_JTI);
             }
 
-            var openidClient = (OpenIdClient)context.Client;
+            var openidClient = context.Client;
             if (openidClient.BCAuthenticationRequestSigningAlg != validationResult.JwsHeader.Alg)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.BCAuthenticationRequestSigningAlg));
@@ -273,7 +268,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private void CheckClientNotificationToken(HandlerContext context)
         {
             var clientNotificationToken = context.Request.RequestData.GetClientNotificationToken();
-            var openidClient = (OpenIdClient)context.Client;
+            var openidClient = context.Client;
             if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping && 
                 openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Push)
             {
@@ -296,7 +291,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
         }
 
-        private async Task<OAuthUser> CheckLoginHintToken(HandlerContext context, CancellationToken cancellationToken)
+        private async Task<User> CheckLoginHintToken(HandlerContext context, CancellationToken cancellationToken)
         {
             var loginHintToken = context.Request.RequestData.GetLoginHintToken();
             if (!string.IsNullOrWhiteSpace(loginHintToken))
@@ -308,7 +303,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             return null;
         }
 
-        private async Task<OAuthUser> CheckIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
+        private async Task<User> CheckIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
         {
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(idTokenHint))
@@ -325,7 +320,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             return null;
         }
 
-        private async Task<OAuthUser> CheckLoginHint(HandlerContext context, CancellationToken cancellationToken)
+        private async Task<User> CheckLoginHint(HandlerContext context, CancellationToken cancellationToken)
         {
             var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
             if (!string.IsNullOrEmpty(loginHint))
@@ -360,7 +355,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
         }
 
-        private async Task<OAuthUser> CheckHint(JwsPayload jwsPayload, CancellationToken cancellationToken)
+        private async Task<User> CheckHint(JwsPayload jwsPayload, CancellationToken cancellationToken)
         {
             var exp = jwsPayload.GetExpirationTime();
             var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();

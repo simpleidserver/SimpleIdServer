@@ -9,9 +9,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleIdServer.Saml\SimpleIdServer.Saml.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Resources\Global.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

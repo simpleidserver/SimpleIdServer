@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenID.Api.BCAuthorize;
@@ -21,7 +20,7 @@ namespace SimpleIdServer.OpenID.Api
         }
 
 
-        [HttpPost("confirm")]
+        [HttpPost]
         public async Task<IActionResult> Confirm([FromBody] JObject jObjBody, CancellationToken cancellationToken)
         {
             var jObjHeader = Request.Headers.ToJObject();
@@ -29,7 +28,7 @@ namespace SimpleIdServer.OpenID.Api
             return await _bcAuthorizeHandler.Confirm(context, cancellationToken);
         }
 
-        [HttpPost("reject")]
+        [HttpPost]
         public async Task<IActionResult> Reject([FromBody] JObject jObjBody, CancellationToken cancellationToken)
         {
             var jObjHeader = Request.Headers.ToJObject();

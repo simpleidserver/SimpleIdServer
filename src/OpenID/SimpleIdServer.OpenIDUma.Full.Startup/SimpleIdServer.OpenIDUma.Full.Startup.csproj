@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Saml\SimpleIdServer.Saml.Sp\SimpleIdServer.Saml.Sp.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj" />

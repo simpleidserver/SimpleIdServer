@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization;
-using SimpleIdServer.OAuth.Extensions;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OpenID.Api.Authorization
 {
@@ -13,9 +13,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization
         {
             var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
             if (uiLocales.Any())
-            {
                 context.Response.Add(OAuth.DTOs.AuthorizationRequestParameters.UILocales, string.Join(" ", uiLocales));
-            }
         }
     }
 }

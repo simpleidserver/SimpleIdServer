@@ -1,20 +1,20 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 {
@@ -37,21 +37,17 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
 
         public async Task Enrich(HandlerContext context, CancellationToken cancellationToken)
         {
-            var dic = new JObject
-            {
-                { UserClaims.Subject, context.User.Id }
+            var dic = new JsonObject
+            {  
+                [JwtRegisteredClaimNames.Sub] = context.User.Id
             };
 
-            var activeSession = context.User.GetActiveSession();
+            var activeSession = context.User.ActiveSession;
             if (activeSession != null)
-            {
-                dic.Add(OAuthClaims.AuthenticationTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
-            }
+                dic.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
 
             foreach(var record in context.Request.RequestData)
-            {
                 dic.Add(record.Key, record.Value);
-            }
 
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);

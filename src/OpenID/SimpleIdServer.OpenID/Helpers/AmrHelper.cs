@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OpenID.Domains;
@@ -11,10 +12,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Helpers
 {
+    public interface IAmrHelper
+    {
+        Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, Client client, CancellationToken cancellationToken);
+        Task<AuthenticationContextClassReference> GetSupportedAcr(IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken);
+        string FetchNextAmr(AuthenticationContextClassReference acr, string currentAmr);
+    }
+
     public class AmrHelper : IAmrHelper
     {
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;

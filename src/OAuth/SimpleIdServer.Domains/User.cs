@@ -28,6 +28,13 @@ namespace SimpleIdServer.Domains
                 return OAuthUserClaims.Select(c => new Claim(c.Name, c.Value, c.Type)).ToList();
             }
         }
+        public UserSession? ActiveSession
+        {
+            get
+            {
+                return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active);
+            }
+        }
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();

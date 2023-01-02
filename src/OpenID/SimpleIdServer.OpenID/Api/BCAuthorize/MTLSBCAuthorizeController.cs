@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Extensions;
@@ -9,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.BCAuthentication
 {
-    [Route(SIDOpenIdConstants.EndPoints.MTLSBCAuthorize)]
     public class MTLSBCAuthorizeController : Controller
     {
         private readonly IBCAuthorizeHandler _bcAuthorizeHandler;
@@ -22,8 +22,8 @@ namespace SimpleIdServer.OpenID.Api.BCAuthentication
         [HttpPost]
         public async Task<IActionResult> Post(CancellationToken cancellationToken)
         {
-            var jObjBody = Request.Form.ToJObject();
-            var jObjHeader = Request.Headers.ToJObject();
+            var jObjBody = Request.Form.ToJsonObject();
+            var jObjHeader = Request.Headers.ToJsonObject();
             var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate));
             return await _bcAuthorizeHandler.Create(context, cancellationToken);

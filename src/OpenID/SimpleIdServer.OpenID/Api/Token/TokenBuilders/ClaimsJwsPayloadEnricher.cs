@@ -1,26 +1,30 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Extensions;
+using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static SimpleIdServer.Jwt.Constants;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
+    public interface IClaimsJwsPayloadEnricher
+    {
+        void EnrichWithClaimsParameter(JsonObject payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken);
+    }
+
     public class ClaimsJwsPayloadEnricher : IClaimsJwsPayloadEnricher
     {
         public ClaimsJwsPayloadEnricher()
         {
-            AllUserClaims = SimpleIdServer.Jwt.Constants.USER_CLAIMS.ToList();
+            AllUserClaims = SIDOpenIdConstants.AllUserClaims.ToList();
         }
 
         protected List<string> AllUserClaims { get; private set; }
 
-        public virtual void EnrichWithClaimsParameter(JwsPayload payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, OAuthUser user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public virtual void EnrichWithClaimsParameter(JsonObject payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
         {
             if (requestedClaims != null)
             {
@@ -28,14 +32,13 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                 {
                     if (AllUserClaims.Contains(claim.Name) && user != null)
                     {
-                        payload.AddOrReplace(user.Claims.First(c => c.Type == claim.Name));
+                        var cl = user.Claims.First(c => c.Type == claim.Name);
+                        payload.AddOrReplace(cl.Type, cl.Value);
                     }
                     else
                     {
-                        if (claim.Name == OAuthClaims.AuthenticationTime && authDateTime != null)
-                        {
-                            payload.Add(OAuthClaims.AuthenticationTime, authDateTime.Value.ConvertToUnixTimestamp());
-                        }
+                        if (claim.Name == JwtRegisteredClaimNames.AuthTime && authDateTime != null)
+                            payload.Add(JwtRegisteredClaimNames.AuthTime, authDateTime.Value.ConvertToUnixTimestamp());
                     }
                 }
             }

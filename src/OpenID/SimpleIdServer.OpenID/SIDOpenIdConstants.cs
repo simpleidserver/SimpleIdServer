@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.OAuth.Domains;
+using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.Domains;
 using System;
 using System.Collections.Generic;
 
@@ -39,36 +40,63 @@ namespace SimpleIdServer.OpenID
 
         public static class StandardClaims
         {
-            public static OAuthScopeClaim Name = new OAuthScopeClaim(Jwt.Constants.UserClaims.Name, true);
-            public static OAuthScopeClaim FamilyName = new OAuthScopeClaim(Jwt.Constants.UserClaims.FamilyName, true);
-            public static OAuthScopeClaim UniqueName = new OAuthScopeClaim(Jwt.Constants.UserClaims.UniqueName, true);
-            public static OAuthScopeClaim GivenName = new OAuthScopeClaim(Jwt.Constants.UserClaims.GivenName, true);
-            public static OAuthScopeClaim MiddleName = new OAuthScopeClaim(Jwt.Constants.UserClaims.MiddleName, true);
-            public static OAuthScopeClaim NickName = new OAuthScopeClaim(Jwt.Constants.UserClaims.NickName, true);
-            public static OAuthScopeClaim PreferredUserName = new OAuthScopeClaim(Jwt.Constants.UserClaims.PreferredUserName, true);
-            public static OAuthScopeClaim Profile = new OAuthScopeClaim(Jwt.Constants.UserClaims.Profile, true);
-            public static OAuthScopeClaim Picture = new OAuthScopeClaim(Jwt.Constants.UserClaims.Picture, true);
-            public static OAuthScopeClaim WebSite = new OAuthScopeClaim(Jwt.Constants.UserClaims.WebSite, true);
-            public static OAuthScopeClaim Gender = new OAuthScopeClaim(Jwt.Constants.UserClaims.Gender, true);
-            public static OAuthScopeClaim BirthDate = new OAuthScopeClaim(Jwt.Constants.UserClaims.BirthDate, true);
-            public static OAuthScopeClaim ZoneInfo = new OAuthScopeClaim(Jwt.Constants.UserClaims.ZoneInfo, true);
-            public static OAuthScopeClaim Locale = new OAuthScopeClaim(Jwt.Constants.UserClaims.Locale, true);
-            public static OAuthScopeClaim UpdatedAt = new OAuthScopeClaim(Jwt.Constants.UserClaims.UpdatedAt, true);
-            public static OAuthScopeClaim Email = new OAuthScopeClaim(Jwt.Constants.UserClaims.Email, true);
-            public static OAuthScopeClaim EmailVerified = new OAuthScopeClaim(Jwt.Constants.UserClaims.EmailVerified, true);
-            public static OAuthScopeClaim Address = new OAuthScopeClaim(Jwt.Constants.UserClaims.Address, true);
-            public static OAuthScopeClaim PhoneNumber = new OAuthScopeClaim(Jwt.Constants.UserClaims.PhoneNumber, true);
-            public static OAuthScopeClaim PhoneNumberVerified = new OAuthScopeClaim(Jwt.Constants.UserClaims.PhoneNumberVerified, true);
-            public static OAuthScopeClaim Role = new OAuthScopeClaim(Jwt.Constants.UserClaims.Role, true);
-            public static OAuthScopeClaim Subject = new OAuthScopeClaim(Jwt.Constants.UserClaims.Subject, true);
+            public static ScopeClaim Name = new ScopeClaim(JwtRegisteredClaimNames.Name, true);
+            public static ScopeClaim FamilyName = new ScopeClaim(JwtRegisteredClaimNames.FamilyName, true);
+            public static ScopeClaim UniqueName = new ScopeClaim(JwtRegisteredClaimNames.UniqueName, true);
+            public static ScopeClaim GivenName = new ScopeClaim(JwtRegisteredClaimNames.GivenName, true);
+            public static ScopeClaim MiddleName = new ScopeClaim(UserClaims.MiddleName, true);
+            public static ScopeClaim NickName = new ScopeClaim(UserClaims.NickName, true);
+            public static ScopeClaim PreferredUserName = new ScopeClaim(UserClaims.PreferredUserName, true);
+            public static ScopeClaim Profile = new ScopeClaim(UserClaims.Profile, true);
+            public static ScopeClaim Picture = new ScopeClaim(UserClaims.Picture, true);
+            public static ScopeClaim WebSite = new ScopeClaim(JwtRegisteredClaimNames.Website, true);
+            public static ScopeClaim Gender = new ScopeClaim(JwtRegisteredClaimNames.Gender, true);
+            public static ScopeClaim BirthDate = new ScopeClaim(UserClaims.BirthDate, true);
+            public static ScopeClaim ZoneInfo = new ScopeClaim(UserClaims.ZoneInfo, true);
+            public static ScopeClaim Locale = new ScopeClaim(UserClaims.Locale, true);
+            public static ScopeClaim UpdatedAt = new ScopeClaim(UserClaims.UpdatedAt, true);
+            public static ScopeClaim Email = new ScopeClaim(JwtRegisteredClaimNames.Email, true);
+            public static ScopeClaim EmailVerified = new ScopeClaim(UserClaims.EmailVerified, true);
+            public static ScopeClaim Address = new ScopeClaim(UserClaims.Address, true);
+            public static ScopeClaim PhoneNumber = new ScopeClaim(JwtRegisteredClaimNames.PhoneNumber, true);
+            public static ScopeClaim PhoneNumberVerified = new ScopeClaim(JwtRegisteredClaimNames.PhoneNumberVerified, true);
+            public static ScopeClaim Role = new ScopeClaim(UserClaims.Role, true);
+            public static ScopeClaim Subject = new ScopeClaim(JwtRegisteredClaimNames.Sub, true);
         }
+
+        public static class UserClaims
+        {
+            public static string MiddleName = "middle_name";
+            public static string NickName = "nickname";
+            public static string PreferredUserName = "preferred_username";
+            public static string Profile = "profile";
+            public static string Picture = "picture";
+            public static string BirthDate = "birthdate";
+            public static string ZoneInfo = "zoneinfo";
+            public static string Locale = "locale";
+            public static string UpdatedAt = "updated_at";
+            public static string EmailVerified = "email_verified";
+            public static string Address = "address";
+            public static string Role = "role";
+            public static string ScimId = "scim_id";
+            public static string ScimLocation = "scim_location";
+        }
+
+        public static ICollection<string> AllUserClaims = new List<string>
+        {
+            JwtRegisteredClaimNames.Sub, JwtRegisteredClaimNames.Name, JwtRegisteredClaimNames.GivenName, JwtRegisteredClaimNames.FamilyName, UserClaims.MiddleName,
+            UserClaims.NickName, UserClaims.PreferredUserName, UserClaims.Profile, UserClaims.Picture, JwtRegisteredClaimNames.Website,
+            JwtRegisteredClaimNames.Email, UserClaims.EmailVerified, JwtRegisteredClaimNames.Gender, UserClaims.BirthDate, UserClaims.ZoneInfo,
+            UserClaims.Locale, JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumberVerified, UserClaims.Address, UserClaims.UpdatedAt,
+            UserClaims.Role, UserClaims.ScimId, UserClaims.ScimLocation
+        };
 
         public static class StandardScopes
         {
-            public static OAuthScope Profile = new OAuthScope
+            public static Scope Profile = new Scope
             {
                 Name = "profile",
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
                     StandardClaims.Name,
                     StandardClaims.FamilyName,
@@ -91,10 +119,10 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope Email = new OAuthScope
+            public static Scope Email = new Scope
             {
                 Name = "email",
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
@@ -104,10 +132,10 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope Address = new OAuthScope
+            public static Scope Address = new Scope
             {
                 Name = "address",
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
                     StandardClaims.Address
                 },
@@ -116,10 +144,10 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope Phone = new OAuthScope
+            public static Scope Phone = new Scope
             {
                 Name = "phone",
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
@@ -129,10 +157,10 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope Role = new OAuthScope
+            public static Scope Role = new Scope
             {
                 Name = "role",
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
                     StandardClaims.Role
                 },
@@ -141,10 +169,10 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope OpenIdScope = new OAuthScope
+            public static Scope OpenIdScope = new Scope
             {
                 Name = "openid",
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
                     StandardClaims.Subject
                 },
@@ -153,7 +181,7 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope OfflineAccessScope = new OAuthScope
+            public static Scope OfflineAccessScope = new Scope
             {
                 Name = "offline_access",
                 IsExposedInConfigurationEdp = true,
@@ -161,13 +189,13 @@ namespace SimpleIdServer.OpenID
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            public static OAuthScope ScimScope = new OAuthScope
+            public static Scope ScimScope = new Scope
             {
                 Name = "scim",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<OAuthScopeClaim>
+                Claims = new List<ScopeClaim>
                 {
-                    new OAuthScopeClaim("scim_id", true)
+                    new ScopeClaim("scim_id", true)
                 },
                 IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,

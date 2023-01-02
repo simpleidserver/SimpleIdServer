@@ -63,6 +63,7 @@ namespace SimpleIdServer.OpenID
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER = "the authentication scheme {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
+        public const string UNKNOWN_JSON_WEBKEY = "Json Web Key with identifier {0} doesn't exist";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
         public const string AUTH_REQUEST_NOTIFIED = "the authentication request '{0}' has already been notified to the client";
@@ -88,5 +89,6 @@ namespace SimpleIdServer.OpenID
         public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
         public const string BAD_EXTERNAL_AUTHENTICATION = "an error occured while trying to authenticate the user";
         public const string BAD_EXTERNAL_AUTHENTICATION_USER = "the user doesn't contain a valid subject";
+        public const string BAD_ID_TOKEN_HINT_SIG = "signature of the id_token_hint is not correct";
     }
 }

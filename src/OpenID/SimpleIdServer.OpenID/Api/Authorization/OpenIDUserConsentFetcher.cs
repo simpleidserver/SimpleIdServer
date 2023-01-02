@@ -1,19 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api.Authorization;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
 using System;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OpenID.Api.Authorization
 {
     public class OpenIDUserConsentFetcher : IUserConsentFetcher
     {
-        public OAuthConsent FetchFromAuthorizationRequest(OAuthUser oauthUser, JObject queryParameters)
+        public Consent FetchFromAuthorizationRequest(User oauthUser, JsonObject queryParameters)
         {
             var clientId = queryParameters.GetClientIdFromAuthorizationRequest();
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
@@ -21,19 +19,16 @@ namespace SimpleIdServer.OpenID.Api.Authorization
             return oauthUser.GetConsent(clientId, scopes, claims, AuthorizationRequestClaimTypes.IdToken);
         }
 
-        public virtual OAuthConsent BuildFromAuthorizationRequest(JObject queryParameters)
+        public virtual Consent BuildFromAuthorizationRequest(JsonObject queryParameters)
         {
             var scopes = queryParameters.GetScopesFromAuthorizationRequest();
             var clientId = queryParameters.GetClientIdFromAuthorizationRequest();
             var claims = queryParameters.GetClaimsFromAuthorizationRequest();
-            return new OAuthConsent
+            return new Consent
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                Scopes = scopes.Select(s => new OAuthScope
-                {
-                    Name = s
-                }),
+                Scopes = scopes.ToList(),
                 Claims = claims.Select(c => c.Name)
             };
         }

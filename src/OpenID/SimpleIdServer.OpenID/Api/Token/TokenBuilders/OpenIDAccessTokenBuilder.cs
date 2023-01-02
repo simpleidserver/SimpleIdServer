@@ -1,20 +1,21 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Jws;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Helpers;
 using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.DTOs;
+using SimpleIdServer.Store;
+using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.Jwt.Constants;
 
 namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
@@ -22,8 +23,8 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
     {
         public OpenIDAccessTokenBuilder(IGrantedTokenHelper grantedTokenHelper, 
             IJwtBuilder jwtBuilder,
-            IOAuthClientRepository oauthClientRepository) : base(grantedTokenHelper, jwtBuilder, oauthClientRepository) {
-        }
+            ClientRepository clientRepository,
+            IOptions<OAuthHostOptions> options) : base(grantedTokenHelper, jwtBuilder, clientRepository, options) { }
 
         public override async Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
@@ -31,30 +32,28 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             await SetResponse(handlerContext, jwsPayload, cancellationToken);
         }
 
-        public override async Task Refresh(JObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
+        public override async Task Refresh(JsonObject previousRequest, HandlerContext currentContext, CancellationToken cancellationToken)
         {
             var scopes = previousRequest.GetScopesFromAuthorizationRequest();
             var jwsPayload = await BuildOpenIdPayload(scopes, previousRequest, currentContext, cancellationToken);
             await SetResponse(currentContext, jwsPayload, cancellationToken);
         }
 
-        protected virtual async Task<JwsPayload> BuildOpenIdPayload(IEnumerable<string> scopes, JObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
+        protected virtual async Task<SecurityTokenDescriptor> BuildOpenIdPayload(IEnumerable<string> scopes, JsonObject queryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var jwsPayload = await BuildPayload(scopes, handlerContext, cancellationToken);
+            var jwsPayload = await BuildTokenDescriptor(scopes, handlerContext, cancellationToken);            
             if (handlerContext.User != null)
             {
-                jwsPayload.Add(UserClaims.Subject, handlerContext.User.Id);
-                var activeSession = handlerContext.User.GetActiveSession();
+                jwsPayload.Claims.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Id);
+                var activeSession = handlerContext.User.ActiveSession;
                 if (activeSession != null)
-                {
-                    jwsPayload.Add(OAuthClaims.AuthenticationTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
-                }
+                    jwsPayload.Claims.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
             }
 
             if (queryParameters.ContainsKey(AuthorizationRequestParameters.Claims))
             {
-                var value = JObject.Parse(queryParameters[AuthorizationRequestParameters.Claims].ToString());
-                jwsPayload.Add(AuthorizationRequestParameters.Claims, value);
+                var value = JsonSerializer.SerializeToNode(queryParameters[AuthorizationRequestParameters.Claims].ToString()).AsObject();
+                jwsPayload.Claims.Add(AuthorizationRequestParameters.Claims, value);
             }
 
             return jwsPayload;

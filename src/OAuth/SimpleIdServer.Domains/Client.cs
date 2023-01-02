@@ -280,6 +280,16 @@ namespace SimpleIdServer.Domains
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonIgnore]
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
+        [JsonIgnore]
+        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+
+        public double? GetDoubleParameter(string name)
+        {
+            if (!Parameters.ContainsKey(name)) return null;
+            if (double.TryParse(Parameters[name], out double res)) return res;
+            return null;
+        }
+
 
         public void AddClientName(string language, string value) => 
             Translations.Add(new Translation

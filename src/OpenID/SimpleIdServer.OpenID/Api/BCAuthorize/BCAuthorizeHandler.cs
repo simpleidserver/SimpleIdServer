@@ -2,22 +2,20 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
-using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,14 +34,14 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private readonly IBCAuthorizeRequestValidator _bcAuthorizeRequestValidator;
         private readonly IBCNotificationService _bcNotificationService;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
-        private readonly OpenIDHostOptions _options;
+        private readonly OAuthHostOptions _options;
 
         public BCAuthorizeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBCAuthorizeRequestValidator bcAuthorizeRequestValidator,
             IBCNotificationService bcNotificationService,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IOptions<OpenIDHostOptions> options)
+            IOptions<OAuthHostOptions> options)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _bcAuthorizeRequestValidator = bcAuthorizeRequestValidator;
@@ -63,9 +61,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 var requestedExpiry = context.Request.RequestData.GetRequestedExpiry();
                 var interval = context.Request.RequestData.GetInterval();
                 if (requestedExpiry == null)
-                {
                     requestedExpiry = _options.AuthRequestExpirationTimeInSeconds;
-                }
 
                 var currentDateTime = DateTime.UtcNow;
                 var openidClient = oauthClient as OpenIdClient;
@@ -88,7 +84,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                     await _bcNotificationService.Notify(context, bcAuthorize.Id, grp.ToArray(), cancellationToken);
                 }
 
-                return new OkObjectResult(new JObject
+                return new OkObjectResult(new JsonObject
                 {
                     { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id },
                     { BCAuthenticationResponseParameters.ExpiresIn, requestedExpiry.Value }

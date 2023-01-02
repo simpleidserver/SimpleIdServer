@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
 
@@ -277,6 +278,19 @@ namespace System.Text.Json.Nodes
         public static string GetToken(this JsonObject jObj) => jObj.GetStr(IntrospectionRequestParameters.Token);
 
         #endregion
+
+        public static void AddOrReplace(this JsonObject jObj, string name, string value)
+        {
+            if(jObj.ContainsKey(name))
+                jObj[name] = value;
+            else jObj.Add(name, value);
+        }
+
+        public static void AddOrReplace(this JsonObject jObj, IEnumerable<Claim> claims)
+        {
+            foreach (var claim in claims)
+                jObj.AddOrReplace(claim.Type, claim.Value);
+        }
 
         public static string GetStr(this JsonObject jObj, string name)
         {

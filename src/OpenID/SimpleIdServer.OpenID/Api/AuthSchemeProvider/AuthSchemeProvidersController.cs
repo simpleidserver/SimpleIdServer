@@ -2,109 +2,96 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
-using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OpenID.Api.AuthSchemeProvider.Handlers;
-using SimpleIdServer.OpenID.Exceptions;
+using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.OpenID.Store;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.AuthSchemeProvider
 {
-    [Route(SIDOpenIdConstants.EndPoints.AuthSchemeProviders)]
+    [Authorize("ManageAuthSchemeProviders")]
     public class AuthSchemeProvidersController : Controller
     {
-        private readonly IDisableAuthSchemeProviderHandler _disableAuthSchemeProviderHandler;
-        private readonly IEnableAuthSchemeProviderHandler _enableAuthSchemeProviderHandler;
-        private readonly IGetAllAuthSchemeProvidersHandler _getAllAuthSchemeProvidersHandler;
-        private readonly IUpdateAuthSchemeProviderOptionsHandler _updateAuthSchemeProviderOptionsHandler;
-        private readonly IGetAuthSchemeProviderHandler _getAuthSchemeProviderHandler;
+        private readonly IAuthenticationSchemeProviderRepository _repository;
+        private readonly ILogger<AuthSchemeProvidersController> _logger;
 
-        public AuthSchemeProvidersController(
-            IDisableAuthSchemeProviderHandler disableAuthSchemeProviderHandler,
-            IEnableAuthSchemeProviderHandler enableAuthSchemeProviderHandler,
-            IGetAllAuthSchemeProvidersHandler getAllAuthSchemeProvidersHandler,
-            IUpdateAuthSchemeProviderOptionsHandler updateAuthSchemeProviderOptionsHandler,
-            IGetAuthSchemeProviderHandler getAuthSchemeProviderHandler)
+        public AuthSchemeProvidersController(IAuthenticationSchemeProviderRepository repository, ILogger<AuthSchemeProvidersController> logger)
         {
-            _disableAuthSchemeProviderHandler = disableAuthSchemeProviderHandler;
-            _enableAuthSchemeProviderHandler = enableAuthSchemeProviderHandler;
-            _getAllAuthSchemeProvidersHandler = getAllAuthSchemeProvidersHandler;
-            _updateAuthSchemeProviderOptionsHandler = updateAuthSchemeProviderOptionsHandler;
-            _getAuthSchemeProviderHandler = getAuthSchemeProviderHandler;
-        }
-
-        [HttpGet("{id}")]
-        [Authorize("ManageAuthSchemeProviders")]
-        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await _getAuthSchemeProviderHandler.Handle(id, cancellationToken);
-                return new OkObjectResult(result);
-            }
-            catch (UnknownAuthSchemeProviderException ex)
-            {
-                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
-            }
-        }
-
-        [HttpGet("{id}/enable")]
-        [Authorize("ManageAuthSchemeProviders")]
-        public async Task<IActionResult> Enable(string id, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await _enableAuthSchemeProviderHandler.Handle(id, cancellationToken);
-                return new NoContentResult();
-            }
-            catch(UnknownAuthSchemeProviderException ex)
-            {
-                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
-            }
-        }
-
-        [HttpGet("{id}/disable")]
-        [Authorize("ManageAuthSchemeProviders")]
-        public async Task<IActionResult> Disable(string id, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await _disableAuthSchemeProviderHandler.Handle(id, cancellationToken);
-                return new NoContentResult();
-            }
-            catch(UnknownAuthSchemeProviderException ex)
-            {
-                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
-            }
+            _repository = repository;
+            _logger = logger;
         }
 
         [HttpGet]
-        [Authorize("ManageAuthSchemeProviders")]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
         {
-            var result = await _getAllAuthSchemeProvidersHandler.Handle(cancellationToken);
+            var result = await _repository.Query().AsNoTracking().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            if (result == null) return NotFound();
             return new OkObjectResult(result);
         }
 
-        [HttpPut("{id}/options")]
-        [Authorize("ManageAuthSchemeProviders")]
-        public async Task<IActionResult> UpdateOptions(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
+        [HttpGet]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            try
+            var result = await _repository.Query().AsNoTracking().ToListAsync(cancellationToken);
+            return new OkObjectResult(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Enable(string id, CancellationToken cancellationToken)
+        {
+            var result = await _repository.Query().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            if (result == null) return NotFound();
+            result.Enable();
+            await _repository.SaveChanges(cancellationToken);
+            return new NoContentResult();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Disable(string id, CancellationToken cancellationToken)
+        {
+            var result = await _repository.Query().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            if (result == null) return NotFound();
+            result.Disable();
+            await _repository.SaveChanges(cancellationToken);
+            return new NoContentResult();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateOptions(string id, JsonObject jsonObj, CancellationToken cancellationToken)
+        {
+            var result = await _repository.Query().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            if (result == null) return NotFound();
+            var unknownProperties = GetInvalidProperties(result, jsonObj);
+            if (unknownProperties != null)
+                return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES, string.Join(",", unknownProperties)));
+
+            result.UpdateOptions(jsonObj);
+            await _repository.SaveChanges(cancellationToken);
+            return new NoContentResult();
+
+            IEnumerable<string> GetInvalidProperties(AuthenticationSchemeProvider authSchemeProvider, JsonObject jsonObj)
             {
-                await _updateAuthSchemeProviderOptionsHandler.Handle(id, jObj, cancellationToken);
-                return new NoContentResult();
-            }
-            catch (UnknownAuthSchemeProviderException ex)
-            {
-                return BaseCredentialsHandler.BuildError(HttpStatusCode.NotFound, ex.Code, ex.Message);
-            }
-            catch (OAuthException ex)
-            {
-                return BaseCredentialsHandler.BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+                var optionsType = Type.GetType(authSchemeProvider.OptionsFullQualifiedName);
+                var properties = optionsType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(s => s.Name);
+                var jsonProperties = jsonObj.Select(p => p.Key);
+                var unknownProperties = jsonProperties.Where(p => !properties.Contains(p));
+                if (unknownProperties.Any())
+                {
+                    _logger.LogError($"Properties {string.Join(",", properties)} are not correct");
+                    return unknownProperties;
+                }
+
+                return null;
             }
         }
     }

@@ -1,17 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Jwe.CEKHandlers;
-using SimpleIdServer.Jwt.Jwe.EncHandlers;
-using SimpleIdServer.Jwt.Jws.Handlers;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Persistence;
 using SimpleIdServer.OpenID.SubjectTypeBuilders;
+using SimpleIdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,7 +21,7 @@ namespace SimpleIdServer.OpenID.Api.Configuration
         private readonly IEnumerable<IEncHandler> _encHandlers;
         private readonly IEnumerable<ISignHandler> _signHandlers;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
-        private readonly IOAuthScopeRepository _oauthScopeRepository;
+        private readonly ScopeRepository _scopeRepository;
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
 
         public ConfigurationController(
@@ -35,14 +30,14 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             IEnumerable<IEncHandler> encHandlers,
             IEnumerable<ISignHandler> signHandlers,
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders,
-            IOAuthScopeRepository oauthScopeRepository,
+            ScopeRepository scopeRepository,
             IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configurationRequestHandler)
         {
             _cekHandlers = cekHandlers;
             _encHandlers = encHandlers;
             _signHandlers = signHandlers;
             _subjectTypeBuilders = subjectTypeBuilders;
-            _oauthScopeRepository = oauthScopeRepository;
+            _scopeRepository = scopeRepository;
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         }
 

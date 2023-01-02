@@ -4,14 +4,19 @@ using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Persistence;
 using System;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Api.Token.Handlers
 {
+    public interface ICIBAGrantTypeValidator
+    {
+        Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken);
+    }
+
     public class CIBAGrantTypeValidator : ICIBAGrantTypeValidator
     {
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
@@ -23,7 +28,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
         public async Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
-            var openidClient = context.Client as OpenIdClient;
+            var openidClient = context.Client;
             if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping
                 && openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Poll)
             {
@@ -32,29 +37,21 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
             var authRequestId = context.Request.RequestData.GetAuthRequestId();
             if (string.IsNullOrWhiteSpace(authRequestId))
-            {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));
-            }
 
             var authRequest = await _bcAuthorizeRepository.Get(authRequestId, cancellationToken);
             if (authRequest == null)
-            {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_AUTH_REQUEST_ID);
-            }
 
             if (authRequest.ClientId != openidClient.ClientId)
-            {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, ErrorMessages.AUTH_REQUEST_CLIENT_NOT_AUTHORIZED);
-            }
 
             var currentDateTime = DateTime.UtcNow;
             var isSlowDown = currentDateTime <= authRequest.NextFetchTime;
             if (authRequest.Status == Domains.BCAuthorizeStatus.Pending || isSlowDown)
             {
                 if (isSlowDown)
-                {
                     throw new OAuthException(OAuth.ErrorCodes.SLOW_DOWN, string.Format(ErrorMessages.TOO_MANY_AUTH_REQUEST, authRequestId));
-                }
 
                 authRequest.IncrementNextFetchTime();
                 await _bcAuthorizeRepository.Update(authRequest, cancellationToken);
@@ -63,19 +60,13 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             }
 
             if (authRequest.Status == BCAuthorizeStatus.Rejected)
-            {
                 throw new OAuthException(OAuth.ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.AUTH_REQUEST_REJECTED, authRequestId));
-            }
 
             if (authRequest.Status == BCAuthorizeStatus.Sent)
-            {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.AUTH_REQUEST_SENT, authRequestId));
-            }
 
             if (currentDateTime > authRequest.ExpirationDateTime)
-            {
                 throw new OAuthException(OAuth.ErrorCodes.EXPIRED_TOKEN, string.Format(ErrorMessages.AUTH_REQUEST_EXPIRED, authRequestId));
-            }
 
             return authRequest;
         }

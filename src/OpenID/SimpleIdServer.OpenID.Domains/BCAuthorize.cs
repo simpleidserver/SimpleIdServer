@@ -1,13 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace SimpleIdServer.OpenID.Domains
 {
-    public class BCAuthorize : ICloneable
+    public class BCAuthorize
     {
         public BCAuthorize()
         {
@@ -100,27 +97,6 @@ namespace SimpleIdServer.OpenID.Domains
                 Permissions = permissions
             };
             return result;
-        }
-
-        public object Clone()
-        {
-            return new BCAuthorize
-            {
-                Id = Id,
-                ClientId = ClientId,
-                UserId = UserId,
-                NotificationToken = NotificationToken,
-                NotificationMode = NotificationMode,
-                NotificationEdp = NotificationEdp,
-                Scopes = Scopes,
-                Status = Status,
-                ExpirationDateTime = ExpirationDateTime,
-                Permissions = Permissions.Select(p => (BCAuthorizePermission)p.Clone()).ToList(),
-                Interval = Interval,
-                NextFetchTime = NextFetchTime,
-                UpdateDateTime = UpdateDateTime,
-                RejectionSentDateTime = RejectionSentDateTime
-            };
         }
 
         private static string GenerateId()
