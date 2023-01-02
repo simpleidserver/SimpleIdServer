@@ -13,8 +13,11 @@ namespace SimpleIdServer.OpenID
         public const string INVALID_CLIENT_IDTOKENHINT = "client_id contained in the id_token_hint is invalid";
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";
         public const string INVALID_ALG_USED_TO_SIGN_IDTOKENHINT = "the alg used to sign the id_token_hint is invalid";
+        public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter cannot be decrypted";
+        public const string INVALID_JWS_REQUEST_PARAMETER = "signature of the request parameter is not valid";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
         public const string INVALID_REQUEST_URI_PARAMETER = "request uri parameter is invalid";
+        public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_SIGNATURE_ALG = "the signature algorithm is invalid";
         public const string INVALID_RESPONSE_TYPE_CLAIM = "the response type claim is invalid";
         public const string INVALID_CLIENT_ID_CLAIM = "the client identifier claim is invalid";
@@ -63,7 +66,7 @@ namespace SimpleIdServer.OpenID
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER = "the authentication scheme {0} doesn't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
-        public const string UNKNOWN_JSON_WEBKEY = "Json Web Key with identifier {0} doesn't exist";
+        public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
         public const string AUTH_REQUEST_NOTIFIED = "the authentication request '{0}' has already been notified to the client";

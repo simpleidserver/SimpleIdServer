@@ -9,4 +9,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.0" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.OpenID.Domains\SimpleIdServer.OpenID.Domains.csproj" />
+	</ItemGroup>
 </Project>

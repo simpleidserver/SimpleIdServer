@@ -1,16 +1,19 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Helpers;
+using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.OpenID.Options;
 using SimpleIdServer.OpenID.Persistence;
+using SimpleIdServer.Store;
 using System;
 using System.Linq;
 using System.Text.Json.Nodes;
@@ -28,23 +31,23 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
     public class BCAuthorizeRequestValidator: IBCAuthorizeRequestValidator
     {
-        private readonly IJwtParser _jwtParser;
-        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IRequestObjectValidator _requestObjectValidator;
+        private readonly IJwtBuilder _jwtBuilder;
         private readonly OpenIDHostOptions _options;
 
         public BCAuthorizeRequestValidator(
-            IJwtParser jwtParser,
-            IOAuthUserRepository oauthUserRepository, 
+            IUserRepository userRepository, 
             IBCAuthorizeRepository bcAuthorizeRepository,
             IRequestObjectValidator requestObjectValidator,
+            IJwtBuilder jwtBuilder,
             IOptions<OpenIDHostOptions> options)
         {
-            _jwtParser = jwtParser;
-            _oauthUserRepository = oauthUserRepository;
+            _userRepository = userRepository;
             _bcAuthorizeRepository = bcAuthorizeRepository;
             _requestObjectValidator = requestObjectValidator;
+            _jwtBuilder = jwtBuilder;
             _options = options.Value;
         }
 
@@ -175,13 +178,26 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, BCAuthenticationRequestParameters.Request));
             }
 
-            var validationResult = await _requestObjectValidator.Validate(request, context.Client, cancellationToken, ErrorCodes.INVALID_REQUEST);
-            var audiences = validationResult.JwsPayload.GetAudiences();
-            var issuer = validationResult.JwsPayload.GetIssuer();
-            var exp = validationResult.JwsPayload.GetExpirationTime();
-            var iat = validationResult.JwsPayload.GetIat();
-            var nbf = validationResult.JwsPayload.GetNbf();
-            var jti = validationResult.JwsPayload.GetJti();
+            var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(request, context.Client, cancellationToken);
+            if(jsonWebTokenResult.Error != null)
+                switch(jsonWebTokenResult.Error.Value)
+                {
+                    case JsonWebTokenErrors.INVALID_JWT:
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
+                    case JsonWebTokenErrors.CANNOT_BE_DECRYPTED:
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWE_REQUEST_PARAMETER);
+                    case JsonWebTokenErrors.UNKNOWN_JWK:
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.UNKNOWN_JSON_WEBKEY);
+                    case JsonWebTokenErrors.BAD_SIGNATURE:
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
+                }
+
+            var audiences = jsonWebTokenResult.Jwt.Audiences;
+            var issuer = jsonWebTokenResult.Jwt.Issuer;
+            var exp = jsonWebTokenResult.Jwt.ValidTo;
+            var iat = jsonWebTokenResult.Jwt.IssuedAt;
+            var nbf = jsonWebTokenResult.Jwt.ValidFrom;
+            var jti = jsonWebTokenResult.Jwt.Id;
             if (audiences == null || !audiences.Any())
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_AUDIENCE);
@@ -202,40 +218,39 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_ISSUER);
             }
 
-            if (exp == default(double))
+            if (exp == default(DateTime))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_EXPIRATION);
             }
 
-            var expirationDateTime = exp.ConvertFromUnixTimestamp();
             var currentDateTime = DateTime.UtcNow;
-            if (currentDateTime >= expirationDateTime)
+            if (currentDateTime >= exp)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_IS_EXPIRED);
             }
 
-            if (currentDateTime.AddSeconds(_options.MaxRequestLifetime) <= expirationDateTime)
+            if (currentDateTime.AddSeconds(_options.MaxRequestLifetime) <= exp)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
             }
 
-            if (iat == default(double))
+            if (iat == default(DateTime))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_IAT);
             }
 
-            if (nbf == default(double))
+            if (nbf == default(DateTime))
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_NBF);
             }
 
-            if (currentDateTime < nbf.ConvertFromUnixTimestamp())
+            if (currentDateTime < nbf)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_BAD_NBF, nbf.ConvertFromUnixTimestamp()));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_BAD_NBF, nbf));
             }
 
             var minusMaxRequestLifetime = -_options.MaxRequestLifetime;
-            if (currentDateTime.AddSeconds(minusMaxRequestLifetime) > nbf.ConvertFromUnixTimestamp())
+            if (currentDateTime.AddSeconds(minusMaxRequestLifetime) > nbf)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
             }
@@ -245,13 +260,13 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_JTI);
             }
 
-            var openidClient = context.Client;
-            if (openidClient.BCAuthenticationRequestSigningAlg != validationResult.JwsHeader.Alg)
+            Client openidClient = context.Client;
+            if (openidClient.GetBCAuthenticationRequestSigningAlg() != jsonWebTokenResult.Jwt.Alg)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.BCAuthenticationRequestSigningAlg));
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_ALG_NOT_VALID, openidClient.GetBCAuthenticationRequestSigningAlg()));
             }
 
-            context.Request.SetRequestData(JObject.FromObject(validationResult.JwsPayload));
+            context.Request.SetRequestData(jsonWebTokenResult.Jwt.GetClaimJson());
         }
 
         private void CheckScopes(HandlerContext context)
@@ -268,9 +283,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
         private void CheckClientNotificationToken(HandlerContext context)
         {
             var clientNotificationToken = context.Request.RequestData.GetClientNotificationToken();
-            var openidClient = context.Client;
-            if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping && 
-                openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Push)
+            Client openidClient = context.Client;
+            if (openidClient.GetBCTokenDeliveryMode() != SIDOpenIdConstants.StandardNotificationModes.Ping && 
+                openidClient.GetBCTokenDeliveryMode() != SIDOpenIdConstants.StandardNotificationModes.Push)
             {
                 return;
             }
@@ -285,7 +300,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024);
             }
 
-            if (System.Text.ASCIIEncoding.ASCII.GetByteCount(clientNotificationToken) * 8 < 128)
+            if (ASCII.GetByteCount(clientNotificationToken) * 8 < 128)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES);
             }
@@ -296,7 +311,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             var loginHintToken = context.Request.RequestData.GetLoginHintToken();
             if (!string.IsNullOrWhiteSpace(loginHintToken))
             {
-                var payload = await ExtractHint(loginHintToken, cancellationToken);
+                var payload = ExtractHint(loginHintToken);
                 return await CheckHint(payload, cancellationToken);
             }
 
@@ -325,11 +340,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
             if (!string.IsNullOrEmpty(loginHint))
             {
-                var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, loginHint, cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Claims).AsNoTracking().FirstOrDefaultAsync(u => u.Claims.Any(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == loginHint), cancellationToken);
                 if (user == null)
-                {
                     throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, loginHint));
-                }
 
                 return user;
             }
@@ -355,42 +368,36 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             }
         }
 
-        private async Task<User> CheckHint(JwsPayload jwsPayload, CancellationToken cancellationToken)
+        private async Task<User> CheckHint(JsonWebToken jwsPayload, CancellationToken cancellationToken)
         {
-            var exp = jwsPayload.GetExpirationTime();
-            var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();
+            var exp = jwsPayload.ValidTo;
+            var currentDateTime = DateTime.UtcNow;
             if (currentDateTime > exp)
-            {
                 throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, ErrorMessages.LOGIN_HINT_TOKEN_IS_EXPIRED);
-            }
 
-            var subject = jwsPayload.GetSub();
-            var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, subject, cancellationToken);
+            var subject = jwsPayload.Subject;
+            var user = await _userRepository.Query().Include(u => u.Claims).AsNoTracking().FirstOrDefaultAsync(u => u.Claims.Any(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == subject), cancellationToken);
             if (user == null)
-            {
                 throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
-            }
 
             return user;
         }
 
-        protected async Task<JwsPayload> ExtractHint(string tokenHint, CancellationToken cancellationToken)
+        protected JsonWebToken ExtractHint(string tokenHint, CancellationToken cancellationToken)
         {
-            if (!_jwtParser.IsJwsToken(tokenHint) && !_jwtParser.IsJweToken(tokenHint))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-            }
-
-            if (_jwtParser.IsJweToken(tokenHint))
-            {
-                tokenHint = await _jwtParser.Decrypt(tokenHint, cancellationToken);
-                if (string.IsNullOrWhiteSpace(tokenHint))
+            // TODO : Add more exception.
+            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(tokenHint);
+            if (extractionResult.Error != null)
+                switch (extractionResult.Error.Value)
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
+                    case JsonWebTokenErrors.INVALID_JWT:
+                    case JsonWebTokenErrors.CANNOT_BE_DECRYPTED:
+                    case JsonWebTokenErrors.UNKNOWN_JWK:
+                    case JsonWebTokenErrors.BAD_SIGNATURE:
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
                 }
-            }
 
-            return await _jwtParser.Unsign(tokenHint, cancellationToken);
+            return extractionResult.Jwt;
         }
     }
 }

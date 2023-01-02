@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OpenID.Domains;
@@ -28,9 +29,9 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
 
         public async Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
-            var openidClient = context.Client;
-            if (openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Ping
-                && openidClient.BCTokenDeliveryMode != SIDOpenIdConstants.StandardNotificationModes.Poll)
+            Client openidClient = context.Client;
+            if (openidClient.GetBCTokenDeliveryMode() != SIDOpenIdConstants.StandardNotificationModes.Ping
+                && openidClient.GetBCTokenDeliveryMode() != SIDOpenIdConstants.StandardNotificationModes.Poll)
             {
                 throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_PINGORPUSH_MODE_CAN_BE_USED);
             }

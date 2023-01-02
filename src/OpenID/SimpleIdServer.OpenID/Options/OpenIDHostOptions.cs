@@ -87,10 +87,6 @@ namespace SimpleIdServer.OpenID.Options
         /// </summary>
         public string FcmBody { get; set; }
         /// <summary>
-        /// Expiration time auth_req_id in seconds.
-        /// </summary>
-        public int AuthRequestExpirationTimeInSeconds { get; set; }
-        /// <summary>
         /// Time to block the job in MS.
         /// </summary>
         public int BlockThreadMS { get; set; }

@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.Store;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,14 +20,14 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
     public class BCDeviceRegistrationHandler : IBCDeviceRegistrationHandler
     {
         private readonly IBCDeviceRegistrationValidator _bcDeviceRegistrationValidator;
-        private readonly IOAuthUserRepository _oauthUserCommandRepository;
+        private readonly IUserRepository _userRepository;
 
         public BCDeviceRegistrationHandler(
             IBCDeviceRegistrationValidator bcDeviceRegistrationValidator,
-            IOAuthUserRepository oAuthUserCommandRepository)
+            IUserRepository userRepository)
         {
             _bcDeviceRegistrationValidator = bcDeviceRegistrationValidator;
-            _oauthUserCommandRepository = oAuthUserCommandRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
@@ -37,8 +37,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
                 var deviceRegistrationToken = context.Request.RequestData.GetDeviceRegistrationToken();
                 var user = await _bcDeviceRegistrationValidator.Validate(context, cancellationToken);
                 user.DeviceRegistrationToken = deviceRegistrationToken;
-                await _oauthUserCommandRepository.Update(user, cancellationToken);
-                await _oauthUserCommandRepository.SaveChanges(cancellationToken);
+                await _userRepository.SaveChanges(cancellationToken);
                 return new NoContentResult();
             }
             catch(OAuthException ex)

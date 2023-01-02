@@ -1,15 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Jws;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Domains;
 using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.Store;
 using System;
 using System.Linq;
 using System.Threading;
@@ -25,12 +21,12 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
     public class BCDeviceRegistrationValidator : IBCDeviceRegistrationValidator
     {
         private readonly IJwtParser _jwtParser;
-        private readonly IOAuthUserRepository _oauthUserRepository;
+        private readonly IUserRepository _userRepository;
 
-        public BCDeviceRegistrationValidator(IJwtParser jwtParser, IOAuthUserRepository oauthUserRepository)
+        public BCDeviceRegistrationValidator(IJwtParser jwtParser, IUserRepository userRepository)
         {
             _jwtParser = jwtParser;
-            _oauthUserRepository = oauthUserRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -53,6 +49,7 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
             }
+
             return await CheckHint(payload, cancellationToken);
         }
 

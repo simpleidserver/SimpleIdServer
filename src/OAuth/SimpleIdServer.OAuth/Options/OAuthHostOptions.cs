@@ -92,5 +92,13 @@ namespace SimpleIdServer.OAuth.Options
         /// Default code challenge method.
         /// </summary>
         public string DefaultCodeChallengeMethod { get; set; } = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
+        /// <summary>
+        /// Customizable parameters.
+        /// </summary>
+        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+
+        public int GetIntParameter(string name) => int.Parse(Parameters[name]);
+
+        public string GetStringParameter(string name) => Parameters[name];
     }
 }

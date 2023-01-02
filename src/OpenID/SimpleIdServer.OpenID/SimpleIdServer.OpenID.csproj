@@ -5,5 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj" />
+    <ProjectReference Include="..\SimpleIdServer.OpenID.Domains\SimpleIdServer.OpenID.Domains.csproj" />
+    <ProjectReference Include="..\SimpleIdServer.OpenID.Store\SimpleIdServer.OpenID.Store.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+  	<PackageReference Include="FirebaseAdmin" Version="2.3.0" />
   </ItemGroup>
 </Project>

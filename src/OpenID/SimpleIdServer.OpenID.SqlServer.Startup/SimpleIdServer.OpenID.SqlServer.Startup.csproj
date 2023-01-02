@@ -18,11 +18,9 @@
     <PackageReference Include="MassTransit.RabbitMQ" Version="7.1.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Saml\SimpleIdServer.Saml.Sp\SimpleIdServer.Saml.Sp.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.Email\SimpleIdServer.UI.Authenticate.Email.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.LoginPassword\SimpleIdServer.UI.Authenticate.LoginPassword.csproj" />
     <ProjectReference Include="..\..\UI\SimpleIdServer.UI.Authenticate.Sms\SimpleIdServer.UI.Authenticate.Sms.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.OpenID.EF\SimpleIdServer.OpenID.EF.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="first_mtlsClient_key.txt">

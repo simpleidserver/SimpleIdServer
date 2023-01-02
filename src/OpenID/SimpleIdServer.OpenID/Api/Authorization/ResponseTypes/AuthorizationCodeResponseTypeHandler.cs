@@ -53,9 +53,7 @@ namespace SimpleIdServer.OpenID.Api.Authorization.ResponseTypes
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
             var isScopeContainsOfflineAccess = context.Request.RequestData.GetScopesFromAuthorizationRequest().Contains(SIDOpenIdConstants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeContainsOfflineAccess)
-            {
                 await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(context.Request.RequestData.GetScopesFromAuthorizationRequest(), context, cancellationToken);
-            }
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.Domains;
+using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Stores;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,8 +16,23 @@ namespace SimpleIdServer.OAuth.Helpers
 
     public class RequestObjectValidator : IRequestObjectValidator
     {
+        private readonly IKeyStore _keyStore;
+
+        public RequestObjectValidator()
+        {
+
+        }
+
         public virtual async Task<RequestObjectValidatorResult> Validate(string request, Client oauthClient, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_REQUEST_OBJECT)
         {
+            var handler = new JsonWebTokenHandler();
+            if(!handler.CanReadToken(request)) throw new OAuthException(errorCode, ErrorMessages.INVALID_REQUEST_PARAMETER);
+            var jsonWebToken = handler.ReadJsonWebToken(request);
+            if(jsonWebToken.IsEncrypted)
+            {
+
+            }
+
             /*
             if (!_jwtParser.IsJwsToken(request) && !_jwtParser.IsJweToken(request)) throw new OAuthException(errorCode, ErrorMessages.INVALID_REQUEST_PARAMETER);
             var jws = request;

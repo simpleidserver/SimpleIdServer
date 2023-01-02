@@ -4,8 +4,8 @@ using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SimpleIdServer.OAuth.Api;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.Options;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,9 +19,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
     public class BCNotificationService : IBCNotificationService
     {
-        private readonly OpenIDHostOptions _options;
+        private readonly OAuthHostOptions _options;
 
-        public BCNotificationService(IOptions<OpenIDHostOptions> options)
+        public BCNotificationService(IOptions<OAuthHostOptions> options)
         {
             _options = options.Value;
         }
@@ -36,8 +36,8 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 {
                     Data = new Dictionary<string, string>
                     {
-                        { "title", _options.FcmTitle },
-                        { "body", _options.FcmBody },
+                        { "title", _options.GetFcmTitle()},
+                        { "body", _options.GetFcmBody() },
                         { "authReqId", authReqId },
                         { "permissions", JsonConvert.SerializeObject(permissions) }
                     }

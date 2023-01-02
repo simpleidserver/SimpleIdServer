@@ -290,6 +290,7 @@ namespace SimpleIdServer.Domains
             return null;
         }
 
+        public string GetStringParameter(string name) => Parameters[name];
 
         public void AddClientName(string language, string value) => 
             Translations.Add(new Translation
