@@ -25,6 +25,7 @@ namespace SimpleIdServer.Domains
         /// String containing the access token to be used at the client configuration endpoint to perform subsequent operations upon the client registration.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.RegistrationAccessToken)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? RegistrationAccessToken { get; set; } = null;
         /// <summary>
         /// Array of OAUTH2.0 grant type strings that the client can use at the token endpoint.
@@ -40,6 +41,7 @@ namespace SimpleIdServer.Domains
         /// Requested authentication method for the token endpoint.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TokenEndpointAuthMethod)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TokenEndPointAuthMethod { get; set; } = null;
         /// <summary>
         /// Array of the OAUTH2.0 response type strings that the client can use at the authorization endpoint.
@@ -50,6 +52,7 @@ namespace SimpleIdServer.Domains
         /// Readable client name.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.ClientName)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ClientName
         {
             get
@@ -61,6 +64,7 @@ namespace SimpleIdServer.Domains
         ///Readable client logo.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.LogoUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? LogoUri
         {
             get
@@ -72,6 +76,7 @@ namespace SimpleIdServer.Domains
         ///Readable client uri.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.ClientUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ClientUri
         {
             get
@@ -83,6 +88,7 @@ namespace SimpleIdServer.Domains
         ///Readable TOS uri.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TosUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TosUri
         {
             get
@@ -93,7 +99,8 @@ namespace SimpleIdServer.Domains
         /// <summary>
         ///Readable policy uri.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.TosUri)]
+        [JsonPropertyName(OAuthClientParameters.PolicyUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PolicyUri
         {
             get
@@ -105,6 +112,7 @@ namespace SimpleIdServer.Domains
         /// URI string referencing the client’s JSON Web Key (JWK) Set document, which contains the client’s public keys.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.JwksUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? JwksUri { get; set; } = null;
         /// <summary>
         /// Array of strings representing ways to contact people responsible for this client, typically email addresses.
@@ -115,42 +123,50 @@ namespace SimpleIdServer.Domains
         /// A unique identifier string assigned by the client developer or software publisher used by registration endpoints to identify the client software to be dynamically registered.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.SoftwareId)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? SoftwareId { get; set; } = null;
         /// <summary>
         /// A version identifier string for the client software identified by "software_id".
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.SoftwareVersion)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? SoftwareVersion { get; set; } = null;
         /// <summary>
         /// A string representation of the expected  subject distinguished  of the certificate that the OAuth client will use in mututal-TLS authentication.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TlsClientAuthSubjectDN)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TlsClientAuthSubjectDN { get; set; } = null;
         /// <summary>
         /// A string containing the value of an expected dNSName SAN entry in the certificate.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TlsClientAuthSanDNS)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TlsClientAuthSanDNS { get; set; } = null;
         /// <summary>
         /// A string containing the value expected uniformResourceIdentifier  SAN entry in the certificate.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TlsClientAuthSanUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TlsClientAuthSanURI { get; set; } = null;
         /// <summary>
         /// Astring representation of an IP address in either dotted decimal notation(for IPv4) or colon-delimited hexadecimal(for IPv6, as defined in [RFC5952]) 
         /// that is expected to be present as an iPAddress SAN entry in the certificate
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TlsClientAuthSanIp)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TlsClientAuthSanIP { get; set; } = null;
         /// <summary>
         ///  A string containing the value of an expected rfc822Name SAN entry in the certificate.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TlsClientAuthSanEmail)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TlsClientAuthSanEmail { get; set; } = null;
         /// <summary>
         /// Client secret expiration time.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.ClientSecretExpiresAt)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? ClientSecretExpirationTime { get; set; }
         /// <summary>
         /// Update date time.
@@ -174,13 +190,16 @@ namespace SimpleIdServer.Domains
         /// Token expiration time in seconds.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TokenExpirationTimeInSeconds)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TokenExpirationTimeInSeconds { get; set; }
         /// <summary>
         /// Refresh token expiration time in seconds.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? RefreshTokenExpirationTimeInSeconds { get; set; }
-        [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
+        [JsonPropertyName(OAuthClientParameters.Scope)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Scope
         {
             get
@@ -212,16 +231,20 @@ namespace SimpleIdServer.Domains
         /// <summary>
         /// Cryptographic algorithm used to secure the JWS access token.
         /// </summary>
-        public string? TokenSignedResponseAlg { get; set; }
+        [JsonPropertyName(OAuthClientParameters.TokenSignedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? TokenSignedResponseAlg { get; set; } = null;
         /// <summary>
         /// Cryptographic algorithm used to encrypt the JWS access token.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TokenEncryptedResponseAlg)]
-        public string? TokenEncryptedResponseAlg { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? TokenEncryptedResponseAlg { get; set; } = null;
         /// <summary>
         /// Content encryption algorithm used perform authenticated encryption on the JWS access token.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TokenEncryptedResponseEnc)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TokenEncryptedResponseEnc { get; set; } = null;
         /// <summary>
         /// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
@@ -232,6 +255,7 @@ namespace SimpleIdServer.Domains
         /// Preferred token profile.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.PreferredTokenProfile)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PreferredTokenProfile { get; set; } = null;
         /// <summary>
         /// Boolean value used to indicate the client's intention to use mutual-TLS client certificate-bound access tokens.

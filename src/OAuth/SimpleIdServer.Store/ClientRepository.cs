@@ -8,6 +8,7 @@ namespace SimpleIdServer.Store
     {
         IQueryable<Client> Query();
         void Delete(Client client);
+        void Add(Client client);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -23,6 +24,8 @@ namespace SimpleIdServer.Store
         public IQueryable<Client> Query() => _dbContext.Clients;
 
         public void Delete(Client client) => _dbContext.Clients.Remove(client);
+
+        public void Add(Client client) => _dbContext.Clients.Add(client);
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }

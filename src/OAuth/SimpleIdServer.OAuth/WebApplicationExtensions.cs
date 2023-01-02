@@ -34,9 +34,18 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute("managementClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ClientManagement,
                 defaults: new { controller = "ClientManagement", action = "Add" });
-            webApplication.MapControllerRoute("registerClient",
+            webApplication.MapControllerRoute("registerClientAdd",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration,
                 defaults: new { controller = "Registration", action = "Add" });
+            webApplication.MapControllerRoute("registerClientGet",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
+                defaults: new { controller = "Registration", action = "Get" });
+            webApplication.MapControllerRoute("registerClientDelete",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
+                defaults: new { controller = "Registration", action = "Delete" });
+            webApplication.MapControllerRoute("registerClientUpdate",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
+                defaults: new { controller = "Registration", action = "Update" });
             if (webApplication.Services.GetRequiredService<IOptions<OAuthHostOptions>>().Value.MtlsEnabled)
             {
                 webApplication.MapControllerRoute("tokenMtls",

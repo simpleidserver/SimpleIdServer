@@ -39,7 +39,7 @@ namespace SimpleIdServer.OAuth.Api.TokenIntrospection
             var client = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
             var accessToken = await _grantedTokenHelper.GetAccessToken(token, cancellationToken);
             var accessTokenClientId = string.Empty;
-            if (accessToken.TryGetClaim(OpenIdConnectParameterNames.ClientId, out Claim value)) accessTokenClientId = value.Value;
+            if (accessToken != null && accessToken.TryGetClaim(OpenIdConnectParameterNames.ClientId, out Claim value)) accessTokenClientId = value.Value;
             if(accessToken == null || accessToken.ValidTo <= DateTime.UtcNow || accessTokenClientId != client.ClientId)
             {
                 var obj = new JsonObject

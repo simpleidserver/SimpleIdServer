@@ -1,9 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.Domains;
 using SimpleIdServer.Domains.DTOs;
+using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
+using SimpleIdServer.OAuth.Api.Token.Handlers;
+using SimpleIdServer.OAuth.Options;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace SimpleIdServer.OAuth.Api.Register
 {
@@ -27,5 +34,43 @@ namespace SimpleIdServer.OAuth.Api.Register
         [BindProperty(Name = OAuthClientParameters.TokenEndpointAuthMethod)]
         [JsonPropertyName(OAuthClientParameters.TokenEndpointAuthMethod)]
         public string? TokenAuthMethod { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.ResponseTypes)]
+        [JsonPropertyName(OAuthClientParameters.ResponseTypes)]
+        public IEnumerable<string> ResponseTypes { get; set; } = new string[0];
+        [BindProperty(Name = OAuthClientParameters.TokenSignedResponseAlg)]
+        [JsonPropertyName(OAuthClientParameters.TokenSignedResponseAlg)]
+        public string? TokenSignedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.TokenEncryptedResponseAlg)]
+        [JsonPropertyName(OAuthClientParameters.TokenEncryptedResponseAlg)]
+        public string? TokenEncryptedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.TokenEncryptedResponseEnc)]
+        [JsonPropertyName(OAuthClientParameters.TokenEncryptedResponseEnc)]
+        public string? TokenEncryptedResponseEnc { get; set; } = null;
+
+        public void Apply(Client client, OAuthHostOptions options)
+        {
+            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            if (!string.IsNullOrWhiteSpace(ClientName)) client.AddClientName(language, ClientName);
+            if (GrantTypes == null || !GrantTypes.Any()) client.GrantTypes = new[] { AuthorizationCodeHandler.GRANT_TYPE };
+            else client.GrantTypes = GrantTypes.ToList();
+            if (string.IsNullOrWhiteSpace(Scope))
+                client.Scopes = options.DefaultScopes.Select(s => new ClientScope
+                {
+                    Name = s
+                }).ToList();
+            else client.Scopes = Scope.ToScopes().Select(s => new ClientScope
+            {
+                Name = s
+            }).ToList();
+            if (string.IsNullOrWhiteSpace(TokenAuthMethod)) client.TokenEndPointAuthMethod = options.DefaultTokenEndPointAuthMethod;
+            else client.TokenEndPointAuthMethod = TokenAuthMethod;
+            if (ResponseTypes == null || !ResponseTypes.Any()) client.ResponseTypes = new[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE };
+            else client.ResponseTypes = ResponseTypes;
+            if (string.IsNullOrWhiteSpace(TokenSignedResponseAlg)) client.TokenSignedResponseAlg = options.DefaultTokenSignedResponseAlg;
+            else client.TokenSignedResponseAlg = TokenSignedResponseAlg;
+            if (string.IsNullOrWhiteSpace(TokenEncryptedResponseAlg)) client.TokenEncryptedResponseAlg = options.DefaultTokenEncrypteAlg;
+            if (string.IsNullOrWhiteSpace(TokenEncryptedResponseEnc)) client.TokenEncryptedResponseEnc = options.DefaultTokenEncryptedEnc;
+            else client.TokenEncryptedResponseEnc = TokenEncryptedResponseEnc;
+        }
     }
 }

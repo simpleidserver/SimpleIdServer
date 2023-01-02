@@ -1,14 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api.Authorization;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseModes;
 using SimpleIdServer.OAuth.Api.Authorization.ResponseTypes;
 using SimpleIdServer.OAuth.Api.Authorization.Validators;
 using SimpleIdServer.OAuth.Api.Configuration;
 using SimpleIdServer.OAuth.Api.Jwks;
+using SimpleIdServer.OAuth.Api.Register;
 using SimpleIdServer.OAuth.Api.Token;
 using SimpleIdServer.OAuth.Api.Token.Handlers;
 using SimpleIdServer.OAuth.Api.Token.Helpers;
@@ -62,8 +65,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddLib()
                 .AddConfigurationApi()
                 .AddUI()
-                .AddOAuthIntrospectionTokenApi();
+                .AddOAuthIntrospectionTokenApi()
+                .AddRegisterApi();
             var authBuilder = services.AddAuthentication();
+            services.AddAuthorization();
+            services.Configure<AuthorizationOptions>(o =>
+            {
+                o.AddPolicy(Constants.Policies.Register, p => p.RequireAssertion(a => true));
+            });
             return new IdServerBuilder(services, authBuilder, services.BuildServiceProvider());
         }
 
@@ -173,6 +182,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IOTPAuthenticator, HOTPAuthenticator>();
             services.AddTransient<IOTPAuthenticator, TOTPAuthenticator>();
+            return services;
+        }
+
+        private static IServiceCollection AddRegisterApi(this IServiceCollection services)
+        {
+            services.AddTransient<IRegisterClientRequestValidator, RegisterClientRequestValidator>();
             return services;
         }
 

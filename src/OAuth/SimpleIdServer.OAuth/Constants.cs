@@ -30,6 +30,11 @@ namespace SimpleIdServer.OAuth
             public const string SubjectAlternativeName = "2.5.29.17";
         }
 
+        public class Policies
+        {
+            public const string Register = "register";
+        }
+
         public static string AuthenticationScheme = "SimpleIdServerOAuth";
         public static string AuthorizationHeaderName = "Authorization";
         public const string CertificateAuthenticationScheme = "Certificate";

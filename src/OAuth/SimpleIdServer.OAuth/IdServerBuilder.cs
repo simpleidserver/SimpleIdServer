@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
+using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OAuth.Stores;
 using SimpleIdServer.Store;
@@ -101,6 +103,15 @@ namespace Microsoft.Extensions.DependencyInjection
             _authenticationBuilder.AddCertificate(authenticationSchema, o =>
             {
                 o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
+            });
+            return this;
+        }
+
+        public IdServerBuilder SetDefaultRegistrationAuthorizationPolicy()
+        {
+            _serviceCollection.Configure<AuthorizationOptions>(o =>
+            {
+                o.AddPolicy(Constants.Policies.Register, o => o.RequireClaim("scope", Constants.ScopeNames.Register));
             });
             return this;
         }

@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table82 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table81 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/oauth-authorization-" +
-                        "server\'", ((string)(null)), table82, "When ");
+                        "server\'", ((string)(null)), table81, "When ");
 #line hidden
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
