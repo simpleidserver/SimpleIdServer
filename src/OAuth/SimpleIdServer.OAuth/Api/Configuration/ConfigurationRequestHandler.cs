@@ -68,22 +68,7 @@ namespace SimpleIdServer.OAuth.Api.Configuration
             jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JsonSerializer.SerializeToNode(_oauthResponseModes.Select(s => s.ResponseMode)));
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
-            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(new List<string>
-            {
-                SecurityAlgorithms.EcdsaSha256,
-                SecurityAlgorithms.EcdsaSha384,
-                SecurityAlgorithms.EcdsaSha512,
-                SecurityAlgorithms.HmacSha256,
-                SecurityAlgorithms.HmacSha384,
-                SecurityAlgorithms.HmacSha512,
-                SecurityAlgorithms.RsaSsaPssSha256,
-                SecurityAlgorithms.RsaSsaPssSha384,
-                SecurityAlgorithms.RsaSsaPssSha512,
-                SecurityAlgorithms.RsaSha256,
-                SecurityAlgorithms.RsaSha384,
-                SecurityAlgorithms.RsaSha512,
-                SecurityAlgorithms.None
-            }));
+            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
             if (_options.MtlsEnabled)
             {
                 jObj.Add(OAuthConfigurationNames.MtlsEndpointAliases, new JsonObject

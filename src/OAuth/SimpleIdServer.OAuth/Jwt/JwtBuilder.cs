@@ -152,21 +152,46 @@ namespace SimpleIdServer.OAuth.Jwt
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
             if(jsonWebToken.IsEncrypted)
             {
-                var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
-                try
+                // symmetric key.
+                if(jsonWebToken.Alg == Constants.AlgDir)
                 {
-                    jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
+                    try
                     {
-                        ValidateAudience = false,
-                        ValidateIssuer = false,
-                        ValidateLifetime = false,
-                        TokenDecryptionKey = encryptionSecurityKey
-                    });
-                    jsonWebToken = handler.ReadJsonWebToken(jwt);
+                        var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
+                        jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
+                        {
+                            ValidateAudience = false,
+                            ValidateIssuer = false,
+                            ValidateLifetime = false,
+                            TokenDecryptionKey = encryptionSecurityKey
+                        });
+                        jsonWebToken = handler.ReadJsonWebToken(jwt);
+                    }
+                    catch
+                    {
+                        return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.CANNOT_BE_DECRYPTED);
+                    }
                 }
-                catch
+                // asymmetric key.
+                else
                 {
-                    return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.CANNOT_BE_DECRYPTED);
+                    var jwk = await _clientHelper.ResolveJsonWebKey(client, jsonWebToken.Kid, cancellationToken);
+                    if (jwk == null) return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.UNKNOWN_JWK);
+                    try
+                    {
+                        jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
+                        {
+                            ValidateAudience = false,
+                            ValidateIssuer = false,
+                            ValidateLifetime = false,
+                            TokenDecryptionKey = jwk
+                        });
+                        jsonWebToken = handler.ReadJsonWebToken(jwt);
+                    }
+                    catch
+                    {
+                        return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.CANNOT_BE_DECRYPTED);
+                    }
                 }
             }
 

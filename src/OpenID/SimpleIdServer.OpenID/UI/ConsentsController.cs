@@ -66,7 +66,7 @@ namespace SimpleIdServer.OpenID.UI
             try
             {
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
-                var query = unprotectedUrl.GetQueries().ToJObj();
+                var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
                 query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
@@ -130,7 +130,7 @@ namespace SimpleIdServer.OpenID.UI
         public async Task Reject(RejectConsentViewModel viewModel, CancellationToken cancellationToken)
         {
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
-            var query = unprotectedUrl.GetQueries().ToJObj();
+            var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var oauthClient = await _oauthClientRepository.FindOAuthClientById(clientId, cancellationToken);
             query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
@@ -159,7 +159,7 @@ namespace SimpleIdServer.OpenID.UI
             try
             {
                 var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
-                var query = unprotectedUrl.GetQueries().ToJObj();
+                var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var nameIdentifier = GetNameIdentifier();
                 var user = await _oauthUserRepository.FindOAuthUserByLogin(nameIdentifier, token);
                 var consent = _userConsentFetcher.FetchFromAuthorizationRequest(user, query);

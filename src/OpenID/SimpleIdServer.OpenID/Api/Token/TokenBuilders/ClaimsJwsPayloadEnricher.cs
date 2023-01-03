@@ -12,7 +12,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
     public interface IClaimsJwsPayloadEnricher
     {
-        void EnrichWithClaimsParameter(JsonObject payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken);
+        void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken);
     }
 
     public class ClaimsJwsPayloadEnricher : IClaimsJwsPayloadEnricher
@@ -24,7 +24,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 
         protected List<string> AllUserClaims { get; private set; }
 
-        public virtual void EnrichWithClaimsParameter(JsonObject payload, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public virtual void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
         {
             if (requestedClaims != null)
             {
@@ -33,12 +33,12 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                     if (AllUserClaims.Contains(claim.Name) && user != null)
                     {
                         var cl = user.Claims.First(c => c.Type == claim.Name);
-                        payload.AddOrReplace(cl.Type, cl.Value);
+                        claims.AddOrReplace(cl.Type, cl.Value);
                     }
                     else
                     {
                         if (claim.Name == JwtRegisteredClaimNames.AuthTime && authDateTime != null)
-                            payload.Add(JwtRegisteredClaimNames.AuthTime, authDateTime.Value.ConvertToUnixTimestamp());
+                            claims.Add(JwtRegisteredClaimNames.AuthTime, authDateTime.Value.ConvertToUnixTimestamp());
                     }
                 }
             }

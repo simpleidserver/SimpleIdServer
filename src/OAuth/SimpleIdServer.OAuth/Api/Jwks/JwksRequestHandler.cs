@@ -24,8 +24,12 @@ namespace SimpleIdServer.OAuth.Api.Jwks
         public JwksResult Get()
         {
             var result = new JwksResult();
-            var keys = _keyStore.GetAllSigningKeys();
-            foreach(var key in keys)
+            var signingKeys = _keyStore.GetAllSigningKeys();
+            var encKeys = _keyStore.GetAllEncryptingKeys();
+            foreach(var key in signingKeys)
+                result.JsonWebKeys.Add(Convert(key));
+
+            foreach (var key in encKeys)
                 result.JsonWebKeys.Add(Convert(key));
 
             return result;
@@ -33,6 +37,12 @@ namespace SimpleIdServer.OAuth.Api.Jwks
             JsonObject Convert(SigningCredentials signingCredentials)
             {
                 var publicJwk = signingCredentials.SerializePublicJWK();
+                return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
+            }
+
+            JsonObject Convert(EncryptingCredentials encryptingCredentials)
+            {
+                var publicJwk = encryptingCredentials.SerializePublicJWK();
                 return JsonNode.Parse(JsonExtensions.SerializeToJson(publicJwk)).AsObject();
             }
         }

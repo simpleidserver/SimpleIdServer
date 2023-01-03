@@ -292,6 +292,8 @@ namespace SimpleIdServer.Domains
 
         public string GetStringParameter(string name) => Parameters[name];
 
+        public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');
+
         public void AddClientName(string language, string value) => 
             Translations.Add(new Translation
             {

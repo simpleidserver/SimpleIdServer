@@ -1,4 +1,6 @@
-﻿namespace SimpleIdServer.OAuth.Options
+﻿using System.Collections.Generic;
+
+namespace SimpleIdServer.OAuth.Options
 {
     public static class OAuthHostOptionsExtensions
     {
@@ -22,5 +24,11 @@
         /// <param name="options"></param>
         /// <returns></returns>
         public static string GetFcmBody(this OAuthHostOptions options) => options.GetStringParameter("FcmBody");
+        /// <summary>
+        /// Default acr_value.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string GetDefaultAcrValue(this OAuthHostOptions options) => options.GetStringParameter("DefaultAcrValue");
     }
 }

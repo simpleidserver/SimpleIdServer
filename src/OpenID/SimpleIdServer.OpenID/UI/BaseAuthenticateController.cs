@@ -60,7 +60,7 @@ namespace SimpleIdServer.OpenID.UI
         protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, OAuthUser user, CancellationToken token, bool rememberLogin = false)
         {
             var unprotectedUrl = Unprotect(returnUrl);
-            var query = unprotectedUrl.GetQueries().ToJObj();
+            var query = unprotectedUrl.GetQueries().ToJsonObject();
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();

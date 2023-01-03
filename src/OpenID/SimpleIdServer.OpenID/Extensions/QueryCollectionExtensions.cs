@@ -2,11 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.OpenID.Extensions
 {
@@ -15,23 +16,19 @@ namespace SimpleIdServer.OpenID.Extensions
         public static Dictionary<string, StringValues> GetQueries(this string redirectUrl)
         {
             if (string.IsNullOrWhiteSpace(redirectUrl))
-            {
                 throw new ArgumentNullException(nameof(redirectUrl));
-            }
 
             redirectUrl = WebUtility.UrlDecode(redirectUrl);
             var uri = new Uri(redirectUrl);
             if (string.IsNullOrWhiteSpace(uri.Query))
-            {
                 return null;
-            }
 
             return QueryHelpers.ParseQuery(uri.Query);
         }
 
-        public static JObject ToJObj(this Dictionary<string, StringValues> queries)
+        public static JsonObject ToJsonObject(this Dictionary<string, StringValues> queries)
         {
-            var jObj = new JObject();
+            var jObj = new JsonObject();
             foreach (var record in queries)
             {
                 jObj.Add(record.Key, GetValue(record.Value));
@@ -40,14 +37,12 @@ namespace SimpleIdServer.OpenID.Extensions
             return jObj;
         }
 
-        private static JToken GetValue(StringValues strValues)
+        private static JsonNode GetValue(StringValues strValues)
         {
             if (strValues.Count() == 1)
-            {
-                return new JValue(strValues.First());
-            }
+                return JsonSerializer.SerializeToNode(strValues.First());
 
-            return new JArray(strValues);
+            return JsonSerializer.SerializeToNode(strValues);
         }
     }
 }

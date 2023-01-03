@@ -1,18 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
-using SimpleIdServer.OAuth.Infrastructures;
-using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,23 +19,23 @@ namespace SimpleIdServer.OpenID.Jobs
 {
     public class PushNotificationHandler : IBCNotificationHandler
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly OAuth.Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly ILogger<PingNotificationHandler> _logger;
-        private readonly IOAuthUserRepository _oauthUserRepository;
-        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
 
         public PushNotificationHandler(
-            IHttpClientFactory httpClientFactory,
+            OAuth.Infrastructures.IHttpClientFactory httpClientFactory,
             ILogger<PingNotificationHandler> logger,
-            IOAuthUserRepository oauthUserRepository,
-            IOAuthClientRepository oauthClientRepository,
+            IUserRepository userRepository,
+            IClientRepository clientRepository,
             IEnumerable<ITokenBuilder> tokenBuilders)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
-            _oauthUserRepository = oauthUserRepository;
-            _oauthClientRepository = oauthClientRepository;
+            _userRepository = userRepository;
+            _clientRepository = clientRepository;
             _tokenBuilders = tokenBuilders;
         }
 
@@ -52,18 +51,16 @@ namespace SimpleIdServer.OpenID.Jobs
                 };
                 using (var httpClient = _httpClientFactory.GetHttpClient(handler))
                 {
-                    var jObjBody = new JObject();
-                    var context = new HandlerContext(new HandlerContextRequest(null, null, jObjBody, null, null, null));
-                    var user = await _oauthUserRepository.FindOAuthUserByLogin(bcAuthorize.UserId, cancellationToken);
-                    var oauthClient = await _oauthClientRepository.FindOAuthClientById(bcAuthorize.ClientId, cancellationToken);
+                    var jObjBody = new JsonObject();
+                    var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, null));
+                    var user = await _userRepository.Query().AsNoTracking().FirstOrDefaultAsync(u => u.Id == bcAuthorize.UserId, cancellationToken);
+                    var oauthClient = await _clientRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == bcAuthorize.ClientId, cancellationToken);
                     context.SetUser(user);
                     context.SetClient(oauthClient);
                     foreach(var tokenBuilder in _tokenBuilders)
-                    {
                         await tokenBuilder.Build(bcAuthorize.Scopes, context, cancellationToken);
-                    }
 
-                    var content = new JObject
+                    var content = new JsonObject
                     {
                         { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id }
                     };

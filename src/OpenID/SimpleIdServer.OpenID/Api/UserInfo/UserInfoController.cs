@@ -1,25 +1,29 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Jws;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.DTOs;
 using SimpleIdServer.OAuth.Exceptions;
 using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
 using SimpleIdServer.OpenID.Api.Token.TokenBuilders;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
-using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,32 +32,29 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
     [Route(SIDOpenIdConstants.EndPoints.UserInfo)]
     public class UserInfoController : Controller
     {
-        private readonly IJwtParser _jwtParser;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly IOAuthScopeRepository _oauthScopeRepository;
-        private readonly IOAuthUserRepository _oauthUserRepository;
-        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IScopeRepository _scopeRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IEnumerable<IClaimsSource> _claimsSources;
         private readonly ITokenRepository _tokenRepository;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
         private readonly ILogger<UserInfoController> _logger;
 
         public UserInfoController(
-            IJwtParser jwtParser,
             IJwtBuilder jwtBuilder,
-            IOAuthScopeRepository oauthScopeRepository,
-            IOAuthUserRepository oauthUserRepository,
-            IOAuthClientRepository oauthClientRepository,
+            IScopeRepository scopeRepository,
+            IUserRepository userRepository,
+            IClientRepository clientRepository,
             IEnumerable<IClaimsSource> claimsSources,
             ITokenRepository tokenRepository,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
             ILogger<UserInfoController> logger)
         {
-            _jwtParser = jwtParser;
             _jwtBuilder = jwtBuilder;
-            _oauthScopeRepository = oauthScopeRepository;
-            _oauthUserRepository = oauthUserRepository;
-            _oauthClientRepository = oauthClientRepository;
+            _scopeRepository = scopeRepository;
+            _userRepository = userRepository;
+            _clientRepository = clientRepository;
             _claimsSources = claimsSources;
             _tokenRepository = tokenRepository;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
@@ -61,25 +62,22 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
         }
 
         [HttpGet]
-        public Task<IActionResult> GetIndex(CancellationToken token)
-        {
-            return Common(null, token);
-        }
+        public Task<IActionResult> Get(CancellationToken token) => Common(null, token);
 
         [HttpPost]
-        public async Task<IActionResult> PostIndex(CancellationToken token)
+        public async Task<IActionResult> Post(CancellationToken token)
         {
             try
             {
-                var jObjBody = Request.Form?.ToJObject();
+                var jObjBody = Request.Form?.ToJsonObject();
                 return await Common(jObjBody, token);
             }
             catch(InvalidOperationException)
             {
-                var jObj = new JObject
+                var jObj = new JsonObject
                 {
-                    { ErrorResponseParameters.Error, ErrorCodes.INVALID_REQUEST },
-                    { ErrorResponseParameters.ErrorDescription, ErrorMessages.CONTENT_TYPE_NOT_SUPPORTED }
+                    [ErrorResponseParameters.Error] =  ErrorCodes.INVALID_REQUEST,
+                    [ErrorResponseParameters.ErrorDescription] = ErrorMessages.CONTENT_TYPE_NOT_SUPPORTED
                 };
                 return new ContentResult
                 {
@@ -90,49 +88,42 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             }
         }
 
-        private async Task<IActionResult> Common(JObject content, CancellationToken cancellationToken)
+        private async Task<IActionResult> Common(JsonObject content, CancellationToken cancellationToken)
         {
             try
             {
                 var accessToken = ExtractAccessToken(content);
-                var jwsPayload = await Extract(accessToken, cancellationToken);
-                if (jwsPayload == null)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.BAD_TOKEN);
-                }
+                var jwsPayload = Extract(accessToken);
+                if (jwsPayload == null) throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.BAD_TOKEN);
 
-                var subject = jwsPayload.GetSub();
-                var scopes = jwsPayload.GetScopes();
-                var audiences = jwsPayload.GetAudiences();
-                var claims = jwsPayload.GetClaimsFromAccessToken(AuthorizationRequestClaimTypes.UserInfo);
-                var authTime = jwsPayload.GetAuthTime();
-                var user = await _oauthUserRepository.FindOAuthUserByLogin(subject, cancellationToken);
-                if (user == null)
-                {
-                    return new UnauthorizedResult();
-                }
+                var subject = jwsPayload.Subject;
+                var scopes = jwsPayload.Claims.Where(c => c.Type == OpenIdConnectParameterNames.Scope).Select(c => c.Value);
+                var audiences = jwsPayload.Audiences;
+                var claims = GetClaims(jwsPayload);
+                DateTime? authTime = null;
+                if(jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))
+                    authTime = a.ConvertFromUnixTimestamp();
 
-                var filteredClients = await _oauthClientRepository.FindOAuthClientByIds(audiences, cancellationToken);
+                var user = await _userRepository.Query().AsNoTracking().FirstOrDefaultAsync(u => u.Id == subject, cancellationToken);
+                if (user == null) return new UnauthorizedResult();
+
+                var filteredClients = await _clientRepository.Query().AsNoTracking().Where(c => audiences.Contains(c.ClientId)).ToListAsync(cancellationToken);
                 if (!filteredClients.Any())
-                {
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.INVALID_AUDIENCE);
-                }
 
-                var oauthClient = (OpenIdClient)filteredClients.First();
+                Client oauthClient = filteredClients.First();
                 if (!user.HasOpenIDConsent(oauthClient.ClientId, scopes, claims, AuthorizationRequestClaimTypes.UserInfo))
-                {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
-                }
 
-                var token = await _tokenRepository.Get(accessToken, cancellationToken);
+                var token = await _tokenRepository.Query().AsNoTracking().FirstOrDefaultAsync(t => t.Id == accessToken);
                 if (token == null)
                 {
                     _logger.LogError("Cannot get user information because access token has been rejected");
                     throw new OAuthException(ErrorCodes.INVALID_TOKEN, OAuth.ErrorMessages.ACCESS_TOKEN_REJECTED);
                 }
 
-                var oauthScopes = await _oauthScopeRepository.FindOAuthScopesByNames(scopes, cancellationToken);
-                var payload = new JwsPayload();
+                var oauthScopes = await _scopeRepository.Query().AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
+                var payload = new Dictionary<string, object>();
                 IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user, subject);
                 _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);
                 foreach (var claimsSource in _claimsSources)
@@ -141,15 +132,16 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 }
 
                 string contentType = "application/json";
-                var result = JsonConvert.SerializeObject(payload).ToString();
-                if (!string.IsNullOrWhiteSpace(oauthClient.UserInfoSignedResponseAlg))
+                var result = JsonSerializer.Serialize(payload);
+                if (!string.IsNullOrWhiteSpace(oauthClient.GetUserInfoSignedResponseAlg()))
                 {
-                    payload.Add(Jwt.Constants.OAuthClaims.Issuer, Request.GetAbsoluteUriWithVirtualPath());
-                    payload.Add(Jwt.Constants.OAuthClaims.Audiences, new string[]
+                    var securityTokenDescriptor = new SecurityTokenDescriptor
                     {
-                        token.ClientId
-                    });
-                    result = await _jwtBuilder.BuildClientToken(oauthClient, payload, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
+                        Claims = payload
+                    };
+                    securityTokenDescriptor.Issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    securityTokenDescriptor.Audience = token.ClientId;
+                    result = await _jwtBuilder.BuildClientToken(oauthClient, securityTokenDescriptor, oauthClient.GetUserInfoSignedResponseAlg(), oauthClient.GetUserInfoEncryptedResponseAlg(), oauthClient.GetUserInfoEncryptedResponseEnc(), cancellationToken);
                     contentType = "application/jwt";
                 }
 
@@ -161,10 +153,10 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
             }
             catch (OAuthException ex)
             {
-                var jObj = new JObject
+                var jObj = new JsonObject
                 {
-                    { ErrorResponseParameters.Error, ex.Code },
-                    { ErrorResponseParameters.ErrorDescription, ex.Message }
+                    [ErrorResponseParameters.Error] = ex.Code,
+                    [ErrorResponseParameters.ErrorDescription] = ex.Message
                 };
                 return new ContentResult
                 {
@@ -173,27 +165,27 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                     StatusCode = (int)HttpStatusCode.BadRequest
                 };
             }
+
+            IEnumerable<AuthorizationRequestClaimParameter> GetClaims(JsonWebToken jsonWebToken)
+            {
+                if(jsonWebToken.TryGetClaim(AuthorizationRequestParameters.Claims, out Claim claim))
+                {
+                    var json = claim.Value.ToString();
+                    return JsonSerializer.Deserialize<IEnumerable<AuthorizationRequestParameters>>(json);
+                }
+
+                return new AuthorizationRequestClaimParameter[0];
+            }
         }
 
-        private async Task<JwsPayload> Extract(string accessToken, CancellationToken cancellationToken)
+        private JsonWebToken Extract(string accessToken)
         {
-            var isJwe = _jwtParser.IsJweToken(accessToken);
-            var isJws = _jwtParser.IsJwsToken(accessToken);
-            if (!isJwe && !isJws)
-            {
-                return null;
-            }
-
-            var jws = accessToken;
-            if (isJwe)
-            {
-                jws = await _jwtParser.Decrypt(accessToken, cancellationToken);
-            }
-
-            return await _jwtParser.Unsign(jws, cancellationToken);
+            var result = _jwtBuilder.ReadSelfIssuedJsonWebToken(accessToken);
+            if (result.Error != null) return null;
+            return result.Jwt;
         }
 
-        private string ExtractAccessToken(JObject jObj)
+        private string ExtractAccessToken(JsonObject jsonObject)
         {
             if (Request.Headers.ContainsKey(Constants.AuthorizationHeaderName))
             {
@@ -207,13 +199,11 @@ namespace SimpleIdServer.OpenID.Api.UserInfo
                 }
             }
 
-            if (jObj != null && jObj.ContainsKey(OAuth.DTOs.TokenResponseParameters.AccessToken))
+            if (jsonObject != null && jsonObject.ContainsKey(OAuth.DTOs.TokenResponseParameters.AccessToken))
             {
-                var at = jObj.GetValue(OAuth.DTOs.TokenResponseParameters.AccessToken) as JValue;
+                var at = jsonObject.GetStr(OAuth.DTOs.TokenResponseParameters.AccessToken);
                 if(at != null && !string.IsNullOrWhiteSpace(at.ToString()))
-                {
                     return at.ToString();
-                }
             }
 
             throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_TOKEN);

@@ -1,12 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
 using SimpleIdServer.OAuth.Jwt;
+using SimpleIdServer.OAuth.Options;
 using SimpleIdServer.OpenID.ClaimsEnrichers;
 using SimpleIdServer.OpenID.DTOs;
 using SimpleIdServer.OpenID.Helpers;
@@ -26,6 +28,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
 {
     public class IdTokenBuilder : ITokenBuilder
     {
+        private readonly OAuthHostOptions _options;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IEnumerable<IClaimsSource> _claimsSources;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
@@ -34,6 +37,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
 
         public IdTokenBuilder(
+            IOptions<OAuthHostOptions> options,
             IJwtBuilder jwtBuilder, 
             IEnumerable<IClaimsSource> claimsSources, 
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, 
@@ -41,6 +45,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             IUserRepository userRepository, 
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher)
         {
+            _options = options.Value;
             _jwtBuilder = jwtBuilder;
             _claimsSources = claimsSources;
             _subjectTypeBuilders = subjectTypeBuilders;
@@ -90,7 +95,7 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             var nonce = queryParameters.GetNonceFromAuthorizationRequest();
             var acrValues = queryParameters.GetAcrValuesFromAuthorizationRequest();
             var requestedClaims = queryParameters.GetClaimsFromAuthorizationRequest();
-            var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.SubjectType));
+            var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.GetSubjectType()) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.GetSubjectType()));
             var subject = await subjectTypeBuilder.Build(currentContext, cancellationToken);
             string accessToken, code;
             if (currentContext.Response.TryGet(OAuth.DTOs.AuthorizationResponseParameters.AccessToken, out accessToken))
@@ -121,22 +126,22 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
             if (activeSession != null)
                 claims.Add(JwtRegisteredClaimNames.Sid, activeSession.SessionId);
 
-            EnrichWithScopeParameter(result, scopes, currentContext.User, subject);
-            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(result, requestedClaims, currentContext.User, activeSession?.AuthenticationDateTime);
+            EnrichWithScopeParameter(claims, scopes, currentContext.User, subject);
+            _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(claims, requestedClaims, currentContext.User, activeSession?.AuthenticationDateTime);
             foreach (var claimsSource in _claimsSources)
-                await claimsSource.Enrich(result, openidClient, cancellationToken);
+                await claimsSource.Enrich(claims, openidClient, cancellationToken);
 
             var result = new SecurityTokenDescriptor
             {
                 Issuer = currentContext.Request.IssuerName,
                 IssuedAt = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddSeconds(openidClient.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds).ConvertToUnixTimestamp(),
+                Expires = DateTime.UtcNow.AddSeconds(openidClient.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds),
                 Claims = claims
             };
             return result;
         }
 
-        public static void EnrichWithScopeParameter(JsonObject payload, IEnumerable<Scope> scopes, User user, string subject)
+        public static void EnrichWithScopeParameter(Dictionary<string, object> claims, IEnumerable<Scope> scopes, User user, string subject)
         {
             if (scopes != null)
             {
@@ -145,13 +150,15 @@ namespace SimpleIdServer.OpenID.Api.Token.TokenBuilders
                     foreach (var scopeClaim in scope.Claims)
                     {
                         if (scopeClaim.ClaimName == JwtRegisteredClaimNames.Sub)
-                        {
-                            payload.Add(JwtRegisteredClaimNames.Sub, subject);
-                        }
+                            claims.Add(JwtRegisteredClaimNames.Sub, subject);
                         else
                         {
                             var userClaims = user.Claims.Where(c => c.Type == scopeClaim.ClaimName);
-                            payload.AddOrReplace(userClaims);
+                            foreach(var userClaim in userClaims)
+                            {
+                                if (claims.ContainsKey(userClaim.Type)) claims[userClaim.Type] = userClaim.Value;
+                                else claims.Add(userClaim.Type, userClaim.Value);
+                            }
                         }
                     }
                 }

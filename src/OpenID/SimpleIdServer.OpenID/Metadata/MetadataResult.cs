@@ -13,4 +13,18 @@ namespace SimpleIdServer.OpenID.Metadata
 
         public Dictionary<string, MetadataRecord> Content { get; set; }
     }
+
+    public class MetadataRecord
+    {
+        public MetadataRecord()
+        {
+            Children = new Dictionary<string, MetadataRecord>();
+            Translations = new List<TranslationResult>();
+            Metadata = new Dictionary<string, string>();
+        }
+
+        public Dictionary<string, MetadataRecord> Children { get; set; }
+        public ICollection<TranslationResult> Translations { get; set; }
+        public Dictionary<string, string> Metadata { get; set; }
+    }
 }

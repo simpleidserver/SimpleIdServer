@@ -12,9 +12,6 @@ namespace SimpleIdServer.OpenID.SubjectTypeBuilders
 
         public static string SUBJECT_TYPE = "public";
 
-        public Task<string> Build(HandlerContext context, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(context.User.Id);
-        }
+        public Task<string> Build(HandlerContext context, CancellationToken cancellationToken) => Task.FromResult(context.User.Id);
     }
 }

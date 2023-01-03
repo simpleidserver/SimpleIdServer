@@ -6,6 +6,7 @@ using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
 using SimpleIdServer.OAuth.Authenticate.Handlers;
 using SimpleIdServer.OAuth.Domains;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace SimpleIdServer.OAuth.Options
 {
@@ -96,9 +97,27 @@ namespace SimpleIdServer.OAuth.Options
         /// Customizable parameters.
         /// </summary>
         public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+        /// <summary>
+        /// UI cultures.
+        /// </summary>
+        public IEnumerable<UICulture> SupportedUICultures { get; set; } = new List<UICulture> { new UICulture { DisplayName = "English", Name = "en" } };
+        /// <summary>
+        /// Default culture.
+        /// </summary>
+        public string DefaultCulture { get; set; } = "en";
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 
         public string GetStringParameter(string name) => Parameters[name];
+
+        public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');
+
+        public IEnumerable<T> GetObjectArrayParameter<T>(string name) => JsonSerializer.Deserialize<IEnumerable<T>>(Parameters[name]);
+    }
+
+    public class UICulture
+    {
+        public string Name { get; set; }
+        public string DisplayName { get; set; }
     }
 }

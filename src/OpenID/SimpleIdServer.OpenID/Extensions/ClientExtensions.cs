@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using System.Collections.Generic;
+
 namespace SimpleIdServer.Domains
 {
     public static class ClientExtensions
@@ -55,5 +57,31 @@ namespace SimpleIdServer.Domains
         /// When omitted, the Client will not send signed authentication requests.
         /// </summary>
         public static string GetBCAuthenticationRequestSigningAlg(this Client client) => client.GetStringParameter("backchannel_authentication_request_signing_alg");
+        /// <summary>
+        /// subject_type requested for responses to this client. Possible values are “pairwise” or “public”.
+        /// </summary>
+        public static string GetSubjectType(this Client client) => client.GetStringParameter("subject_type");
+        /// <summary>
+        /// Required for signing UserInfo responses.
+        /// </summary>
+        public static string GetUserInfoSignedResponseAlg(this Client client) => client.GetStringParameter("userinfo_signed_response_alg");
+        /// <summary>
+        /// Required for encrypting the identity token issued to this client.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        public static string GetUserInfoEncryptedResponseAlg(this Client client) => client.GetStringParameter("userinfo_encrypted_response_alg");
+        /// <summary>
+        /// Required for encrypting the identity token issued to this client.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        public static string GetUserInfoEncryptedResponseEnc(this Client client) => client.GetStringParameter("userinfo_encrypted_response_enc");
+        /// <summary>
+        /// Default acr_values
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetDefaultAcrValues(this Client client) => client.GetStringArrayParameter("default_acr_values");
     }
 }

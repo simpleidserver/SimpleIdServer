@@ -15,8 +15,8 @@ namespace SimpleIdServer.OpenID.Api.Configuration
             {
                 new OAuthWorkflow("implicit", new string[] { Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE }),
                 new OAuthWorkflow("implicit", new string[] { Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }),
-                new OAuthWorkflow("hybrid", new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Api.Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE }),
-                new OAuthWorkflow("hybrid", new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Api.Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE })
+                new OAuthWorkflow("hybrid", new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE }),
+                new OAuthWorkflow("hybrid", new string[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE, Authorization.ResponseTypes.IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE })
             });
             return workflows;
         }

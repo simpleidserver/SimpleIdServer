@@ -1,13 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.Domains;
 using SimpleIdServer.OAuth;
 using SimpleIdServer.OAuth.Api;
 using SimpleIdServer.OAuth.Exceptions;
+using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
 using SimpleIdServer.Store;
 using System;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,40 +19,36 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
 {
     public interface IBCDeviceRegistrationValidator
     {
-        Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken);
+        Task<User> Validate(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class BCDeviceRegistrationValidator : IBCDeviceRegistrationValidator
     {
-        private readonly IJwtParser _jwtParser;
+        private readonly IJwtBuilder _jwtBuilder;
         private readonly IUserRepository _userRepository;
 
-        public BCDeviceRegistrationValidator(IJwtParser jwtParser, IUserRepository userRepository)
+        public BCDeviceRegistrationValidator(IJwtBuilder jwtBuilder, IUserRepository userRepository)
         {
-            _jwtParser = jwtParser;
+            _jwtBuilder = jwtBuilder;
             _userRepository = userRepository;
         }
 
-        public async Task<OAuthUser> Validate(HandlerContext context, CancellationToken cancellationToken)
+        public async Task<User> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             var user = await ValidateIdTokenHint(context, cancellationToken);
             ValidateDeviceRegistrationToken(context);
             return user;
         }
 
-        protected virtual async Task<OAuthUser> ValidateIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
+        protected virtual async Task<User> ValidateIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
         {
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(idTokenHint))
-            {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.IdTokenHint));
-            }
 
-            var payload = await ExtractHint(idTokenHint, cancellationToken);
-            if (!payload.GetAudiences().Contains(context.Request.IssuerName))
-            {
+            var payload = ExtractHint(idTokenHint);
+            if (!payload.Audiences.Contains(context.Request.IssuerName))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
-            }
 
             return await CheckHint(payload, cancellationToken);
         }
@@ -62,40 +62,35 @@ namespace SimpleIdServer.OpenID.Api.BCDeviceRegistration
             }
         }
 
-        protected virtual async Task<JwsPayload> ExtractHint(string tokenHint, CancellationToken cancellationToken)
+        protected virtual JsonWebToken ExtractHint(string tokenHint)
         {
-            if (!_jwtParser.IsJwsToken(tokenHint) && !_jwtParser.IsJweToken(tokenHint))
+            // TODO : Throw more exception.
+            var result = _jwtBuilder.ReadSelfIssuedJsonWebToken(tokenHint);
+            if(result.Error != null)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-            }
-
-            if (_jwtParser.IsJweToken(tokenHint))
-            {
-                tokenHint = await _jwtParser.Decrypt(tokenHint, cancellationToken);
-                if (string.IsNullOrWhiteSpace(tokenHint))
+                switch(result.Error.Value)
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
+                    case JsonWebTokenErrors.INVALID_JWT:
+                    case JsonWebTokenErrors.UNKNOWN_JWK:
+                    case JsonWebTokenErrors.BAD_SIGNATURE:
+                    case JsonWebTokenErrors.CANNOT_BE_DECRYPTED:
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
                 }
             }
 
-            return await _jwtParser.Unsign(tokenHint, cancellationToken);
+            return result.Jwt;
         }
 
-        protected virtual async Task<OAuthUser> CheckHint(JwsPayload jwsPayload, CancellationToken cancellationToken)
+        protected virtual async Task<User> CheckHint(JsonWebToken jsonWebToken, CancellationToken cancellationToken)
         {
-            var exp = jwsPayload.GetExpirationTime();
-            var currentDateTime = DateTime.UtcNow.ConvertToUnixTimestamp();
-            if (currentDateTime > exp)
-            {
+            var exp = jsonWebToken.ValidTo;
+            if (DateTime.UtcNow > exp)
                 throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, ErrorMessages.LOGIN_HINT_TOKEN_IS_EXPIRED);
-            }
 
-            var subject = jwsPayload.GetSub();
-            var user = await _oauthUserRepository.FindOAuthUserByClaim(Jwt.Constants.UserClaims.Subject, subject, cancellationToken);
+            var subject = jsonWebToken.Subject;
+            var user = await _userRepository.Query().Include(u => u.Claims).FirstOrDefaultAsync(u => u.Claims.Any(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == subject), cancellationToken);
             if (user == null)
-            {
                 throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
-            }
 
             return user;
         }

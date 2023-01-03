@@ -277,7 +277,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(OAuth.ErrorMessages.MISSING_PARAMETER, OAuth.DTOs.AuthorizationRequestParameters.Scope));
             }
 
-            ScopeHelper.Validate(requestedScopes, context.Client.AllowedScopes.Select(s => s.Name));
+            ScopeHelper.Validate(requestedScopes, context.Client.Scopes.Select(s => s.Name));
         }
 
         private void CheckClientNotificationToken(HandlerContext context)
@@ -300,7 +300,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024);
             }
 
-            if (ASCII.GetByteCount(clientNotificationToken) * 8 < 128)
+            if (System.Text.Encoding.ASCII.GetByteCount(clientNotificationToken) * 8 < 128)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES);
             }
@@ -323,11 +323,9 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = await ExtractHint(idTokenHint, cancellationToken);
-                if (!payload.GetAudiences().Contains(context.Request.IssuerName))
-                {
+                var payload = ExtractHint(idTokenHint);
+                if (!payload.Audiences.Contains(context.Request.IssuerName))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
-                }
 
                 return await CheckHint(payload, cancellationToken);
             }
@@ -383,7 +381,7 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
             return user;
         }
 
-        protected JsonWebToken ExtractHint(string tokenHint, CancellationToken cancellationToken)
+        protected JsonWebToken ExtractHint(string tokenHint)
         {
             // TODO : Add more exception.
             var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(tokenHint);

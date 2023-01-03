@@ -1,14 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Extensions;
 using SimpleIdServer.OAuth.Infrastructures;
-using SimpleIdServer.OpenID.Domains;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,18 +26,18 @@ namespace SimpleIdServer.OpenID.SubjectTypeBuilders
 
         public async Task<string> Build(HandlerContext context, CancellationToken cancellationToken)
         {
-            var openidClient = (OpenIdClient)context.Client;
+            var client = context.Client;
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var url = redirectUri;
-            var sectorIdentifierUrls = await openidClient.GetSectorIdentifierUrls(_httpClientFactory, cancellationToken);
+            var sectorIdentifierUrls = await client.GetSectorIdentifierUrls(_httpClientFactory, cancellationToken);
             if (sectorIdentifierUrls.Contains(url))
             {
-                url = openidClient.SectorIdentifierUri;
+                url = client.SectorIdentifierUri;
             }
 
             var uri = new Uri(url);
             var host = uri.Host;
-            var str = $"{host}{context.User.Id}{openidClient.PairWiseIdentifierSalt}";
+            var str = $"{host}{context.User.Id}{client.PairWiseIdentifierSalt}";
             using (var sha256 = SHA256.Create())
             {
                 return sha256.ComputeHash(Encoding.UTF8.GetBytes(str)).Base64EncodeBytes();

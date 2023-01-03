@@ -1,9 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Common;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Persistence;
+using SimpleIdServer.Domains;
+using SimpleIdServer.OAuth.Options;
+using SimpleIdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,20 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.OpenID.Metadata
 {
+    public interface IMetadataResultBuilder
+    {
+        IMetadataResultBuilder AddTranslatedEnum<T>(string name) where T : struct;
+        Task<MetadataResult> Build(string language, CancellationToken cancellationToken);
+    }
+
     public class MetadataResultBuilder : IMetadataResultBuilder
     {
         private readonly ITranslationRepository _translationRepository;
-        private readonly SimpleIdServerCommonOptions _options;
+        private readonly OAuthHostOptions _options;
         private Dictionary<string, Type> _dic;
 
         public MetadataResultBuilder(
-            IOptions<SimpleIdServerCommonOptions> options, 
+            IOptions<OAuthHostOptions> options, 
             ITranslationRepository translationRepository)
         {
             _options = options.Value;
@@ -41,35 +48,29 @@ namespace SimpleIdServer.OpenID.Metadata
             var result = new MetadataResult();
             if (_dic.Any())
             {
-                foreach(var kvp in _dic)
-                {
+                foreach(var kvp in _dic) 
                     translationCodes.AddRange(GetTranslationCodes(kvp.Value));
-                }
 
-                IEnumerable<OAuthTranslation> translations;
+                IEnumerable<Translation> translations;
                 if (languageExists)
                 {
-                    translations = await _translationRepository.GetTranslations(translationCodes, language, cancellationToken);
+                    translations = await _translationRepository.Query().AsNoTracking().Where(t => translationCodes.Contains(t.Key) && t.Language == language).ToListAsync(cancellationToken);
                     languages = new[] { language };
                 }
                 else
-                {
-                    translations = await _translationRepository.GetTranslations(translationCodes, cancellationToken);
-                }
+                    translations = await _translationRepository.Query().AsNoTracking().Where(t => translationCodes.Contains(t.Key)).ToListAsync(cancellationToken);
 
                 translations = SetDefaultValues(translationCodes, languages, translations);
                 foreach (var kvp in _dic)
-                {
                     result.Content.Add(kvp.Key, BuildMetadataRecord(kvp.Value, language, translations));
-                }
             }
 
             return result;
         }
 
-        private IEnumerable<OAuthTranslation> SetDefaultValues(List<string> translationCodes, IEnumerable<string> languages, IEnumerable<OAuthTranslation> existingTranslations)
+        private IEnumerable<Translation> SetDefaultValues(List<string> translationCodes, IEnumerable<string> languages, IEnumerable<Translation> existingTranslations)
         {
-            var result = new List<OAuthTranslation>();
+            var result = new List<Translation>();
             result.AddRange(existingTranslations);
             foreach(var lng in languages)
             {
@@ -77,7 +78,7 @@ namespace SimpleIdServer.OpenID.Metadata
                 {
                     if (!result.Any(t => t.Key == translationCode && t.Language == lng))
                     {
-                        result.Add(new OAuthTranslation
+                        result.Add(new Translation
                         {
                             Key = translationCode,
                             Language = lng,
@@ -89,7 +90,7 @@ namespace SimpleIdServer.OpenID.Metadata
             return result;
         }
 
-        private MetadataRecord BuildMetadataRecord(Type type, string defaultLanguage, IEnumerable<OAuthTranslation> translations)
+        private MetadataRecord BuildMetadataRecord(Type type, string defaultLanguage, IEnumerable<Translation> translations)
         {
             var names = Enum.GetNames(type);
             var result = new MetadataRecord();
@@ -119,14 +120,8 @@ namespace SimpleIdServer.OpenID.Metadata
             return names.Select(n => GetTranslationCode(type, n)).ToList();
         }
 
-        private static string GetTranslationCode(Type type, string name)
-        {
-            return $"{type.Name}_{name}";
-        }
+        private static string GetTranslationCode(Type type, string name) => $"{type.Name}_{name}";
 
-        private static string GetValue(Type type, string name)
-        {
-            return ((int)Enum.Parse(type, name)).ToString();
-        }
+        private static string GetValue(Type type, string name) => ((int)Enum.Parse(type, name)).ToString();
     }
 }

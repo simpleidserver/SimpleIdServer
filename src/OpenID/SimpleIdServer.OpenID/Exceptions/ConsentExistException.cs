@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Common.Exceptions;
+using System;
 
 namespace SimpleIdServer.OpenID.Exceptions
 {
-    public class ConsentExistException : BaseUIException
+    public class ConsentExistException : Exception
     {
-        public ConsentExistException() : base(string.Empty) { }
+        public ConsentExistException() { }
     }
 }

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth.Infrastructures;
 using SimpleIdServer.OpenID.Domains;
 using SimpleIdServer.OpenID.DTOs;
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,11 +14,11 @@ namespace SimpleIdServer.OpenID.Jobs
 {
     public class PingNotificationHandler : IBCNotificationHandler
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly OAuth.Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly ILogger<PingNotificationHandler> _logger;
 
         public PingNotificationHandler(
-            IHttpClientFactory httpClientFactory,
+            OAuth.Infrastructures.IHttpClientFactory httpClientFactory,
             ILogger<PingNotificationHandler> logger)
         {
             _httpClientFactory = httpClientFactory;
@@ -38,9 +37,9 @@ namespace SimpleIdServer.OpenID.Jobs
                 };
                 using (var httpClient = _httpClientFactory.GetHttpClient(handler))
                 {
-                    var content = new JObject
+                    var content = new JsonObject
                     {
-                        { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id }
+                        [BCAuthenticationResponseParameters.AuthReqId] = bcAuthorize.Id
                     };
                     var httpRequestMessage = new HttpRequestMessage
                     {
