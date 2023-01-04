@@ -114,6 +114,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Default acr value.
         /// </summary>
         public string DefaultAcrValue { get; set; } = string.Empty;
+        /// <summary>
+        /// Enable or disable realm.
+        /// </summary>
+        public bool UseRealm { get; set; } = false;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

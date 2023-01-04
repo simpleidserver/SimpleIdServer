@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAuthenticationContextClassReferenceRepository, AuthenticationContextClassReferenceRepository>();
             services.AddTransient<IAuthenticationSchemeProviderRepository, AuthenticationSchemeProviderRepository>();
             services.AddTransient<IClaimProviderRepository, ClaimProviderRepository>();
+            services.AddTransient<IBCAuthorizeRepository, BCAuthorizeRepository>();
             if (action != null) services.AddDbContext<StoreDbContext>(action);
             else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"));
             return services;

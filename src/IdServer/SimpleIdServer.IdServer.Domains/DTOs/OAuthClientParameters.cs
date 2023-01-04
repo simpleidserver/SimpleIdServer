@@ -48,5 +48,9 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string IdTokenSignedResponseAlg = "id_token_signed_response_alg";
         public const string IdTokenEncryptedResponseAlg = "id_token_encrypted_response_alg";
         public const string IdTokenEncryptedResponseEnc = "id_token_encrypted_response_enc";
+        public const string BCTokenDeliveryMode = "backchannel_token_delivery_mode";
+        public const string BCClientNotificationEndpoint = "backchannel_client_notification_endpoint";
+        public const string BCAuthenticationRequestSigningAlg = "backchannel_authentication_request_signing_alg";
+        public const string BCUserCodeParameter = "backchannel_user_code_parameter";
     }
 }

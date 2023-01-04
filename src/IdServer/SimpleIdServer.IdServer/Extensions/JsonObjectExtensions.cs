@@ -358,6 +358,14 @@ namespace System.Text.Json.Nodes
 
         #endregion
 
+        #region Back channel confirmation requests
+
+        public static string GetAuthRequestId(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.AuthReqId);
+
+        public static IEnumerable<string> GetPermissionIds(this JsonObject jObj) => jObj.GetArray(BCAuthenticationRequestParameters.PermissionIds);
+
+        #endregion
+
         public static void AddOrReplace(this JsonObject jObj, string name, string value)
         {
             if(jObj.ContainsKey(name))

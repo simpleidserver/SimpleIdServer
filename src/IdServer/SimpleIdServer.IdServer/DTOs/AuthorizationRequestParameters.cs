@@ -23,5 +23,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string Nonce = "nonce";
         public const string MaxAge = "max_age";
         public const string IdTokenHint = "id_token_hint";
+        public const string AuthReqId = "auth_req_id";
     }
 }

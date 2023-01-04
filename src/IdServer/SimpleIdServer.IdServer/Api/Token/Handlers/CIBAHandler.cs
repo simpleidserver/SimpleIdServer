@@ -1,25 +1,23 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Api.Token.Handlers;
-using SimpleIdServer.OAuth.Api.Token.Helpers;
-using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
-using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
-using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OpenID.Persistence;
-using SimpleIdServer.Store;
+using SimpleIdServer.IdServer.Api.Token.Helpers;
+using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
+using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
+using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.Api.Token.Handlers
+namespace SimpleIdServer.IdServer.Api.Token.Handlers
 {
     public class CIBAHandler : BaseCredentialsHandler
     {
@@ -37,7 +35,7 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders,
             IEnumerable<ITokenProfile> tokensProfiles,
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IOptions<OAuthHostOptions> options,
+            IOptions<IdServerHostOptions> options,
             IBCAuthorizeRepository bcAuthorizeRepository) : base(clientAuthenticationHelper, options)
         {
             _logger = logger;
@@ -69,8 +67,6 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
                     result.Add(kvp.Key, kvp.Value);
 
                 authRequest.Send();
-                await _bcAuthorizeRepository.Update(authRequest, cancellationToken);
-                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(result);
             }
             catch (OAuthUnauthorizedException ex)
@@ -81,6 +77,10 @@ namespace SimpleIdServer.OpenID.Api.Token.Handlers
             {
                 _logger.LogError(ex.ToString());
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+            }
+            finally
+            {
+                await _bcAuthorizeRepository.SaveChanges(cancellationToken);
             }
         }
     }

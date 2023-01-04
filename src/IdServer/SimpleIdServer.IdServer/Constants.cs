@@ -27,6 +27,13 @@ namespace SimpleIdServer.IdServer
             public const string MtlsToken = MtlsPrefix + "/" + Token;
         }
 
+        public static class StandardNotificationModes
+        {
+            public const string Poll = "poll";
+            public const string Ping = "ping";
+            public const string Push = "push";
+        }
+
         public static class ScopeNames
         {
             public const string Register = "register";

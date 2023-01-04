@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_RESPONSE_TYPE_CLAIM = "the response type claim is invalid";
         public const string INVALID_CLIENT_ID_CLAIM = "the client identifier claim is invalid";
         public const string INVALID_SIGNATURE_ALG = "the signature algorithm is invalid";
+        public const string INVALID_AUTH_REQUEST_ID = "auth_req_id doesn't exist";
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
@@ -107,10 +108,17 @@ namespace SimpleIdServer.IdServer
         public const string REQUEST_OBJECT_BAD_AUDIENCE = "request object has bad audience";
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
         public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
+        public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
+        public const string AUTH_REQUEST_EXPIRED = "the authentication request '{0}' is expired";
         public const string REDIRECT_URI_CONTAINS_FRAGMENT = "the redirect_uri cannot contains fragment";
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
         public const string SCOPE_ALREADY_EXISTS = "scope '{0}' already exists";
         public const string USER_ALREADY_EXISTS = "user '{0}' already exists";
         public const string NOT_SAME_REDIRECT_URI = "not the same redirect_uri";
+        public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
+        public const string AUTH_REQUEST_CLIENT_NOT_AUTHORIZED = "the client is not authorized to use the auth_req_id";
+        public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
+        public const string AUTH_REQUEST_REJECTED = "the authentication request '{0}' is rejected";
+        public const string AUTH_REQUEST_SENT = "the authentication request '{0}' is finished";
     }
 }

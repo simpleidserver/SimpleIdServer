@@ -10,8 +10,10 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class WebApplicationExtensions
     {
-        public static WebApplication UseSID(this WebApplication webApplication, bool usePrefix = false)
+        public static WebApplication UseSID(this WebApplication webApplication)
         {
+            var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
+            var usePrefix = opts.UseRealm;
             webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
             webApplication.MapControllerRoute("configuration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
@@ -66,7 +68,7 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}",
                 defaults: new { controller = "AuthSchemeProviders", action = "UpdateOptions" });
 
-            if (webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value.MtlsEnabled)
+            if (opts.MtlsEnabled)
             {
                 webApplication.MapControllerRoute("tokenMtls",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + "mtls/" + Constants.EndPoints.Token,

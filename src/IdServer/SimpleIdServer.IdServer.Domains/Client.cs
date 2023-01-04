@@ -293,6 +293,30 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.IdTokenEncryptedResponseEnc)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? IdTokenEncryptedResponseEnc { get; set; } = null;
+        /// <summary>
+        /// One of the following values: poll, ping or push.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.BCTokenDeliveryMode)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? BCTokenDeliveryMode { get; set; } = null;
+        /// <summary>
+        /// This is the endpoint to which the OP will post a notification after a successful or failed end-user authentication.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.BCClientNotificationEndpoint)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? BCClientNotificationEndpoint { get; set; } = null;
+        /// <summary>
+        /// The JWS algorithm alg value that the Client will use for signing authentication request.
+        /// When omitted, the Client will not send signed authentication requests.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.BCAuthenticationRequestSigningAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? BCAuthenticationRequestSigningAlg { get; set; }
+        /// <summary>
+        /// Boolean value specifying whether the Client supports the user_code parameter. 
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.BCUserCodeParameter)]
+        public bool BCUserCodeParameter { get; set; } = false;
         [JsonIgnore]
         /// <summary>
         /// SALT used to calculate the pairwise.

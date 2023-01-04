@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<AuthenticationContextClassReference> Acrs { get; set; }
         public DbSet<AuthenticationSchemeProvider> AuthenticationSchemeProviders { get; set; }
         public DbSet<ClaimProvider> ClaimProviders { get; set; }
+        public DbSet<BCAuthorize> BCAuthorizeLst { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,6 +39,8 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new AuthenticationContextClassReferenceConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
             builder.ApplyConfiguration(new ClaimProviderConfiguration());
+            builder.ApplyConfiguration(new BCAuthorizePermissionConfiguration());
+            builder.ApplyConfiguration(new BCAuthorizeConfiguration());
         }
     }
 }

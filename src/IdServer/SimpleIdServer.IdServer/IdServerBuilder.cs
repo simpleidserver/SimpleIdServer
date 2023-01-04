@@ -93,6 +93,19 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
+        /// <summary>
+        /// IdentityServer can be hosted in several Realm.
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder UseRealm()
+        {
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.UseRealm = true;
+            });
+            return this;
+        }
+
         public IdServerBuilder AddMutualAuthenticationSelfSigned(string authenticationSchema = Constants.CertificateAuthenticationScheme)
         {
             _serviceCollection.Configure<IdServerHostOptions>(o =>

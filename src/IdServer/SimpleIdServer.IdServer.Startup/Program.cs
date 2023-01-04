@@ -4,5 +4,5 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSIDIdentityServer();
 
-var app = builder.Build().UseSID(true);
+var app = builder.Build().UseSID();
 app.Run();
