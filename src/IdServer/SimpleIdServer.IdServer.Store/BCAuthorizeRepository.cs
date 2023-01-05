@@ -7,6 +7,7 @@ namespace SimpleIdServer.IdServer.Store
     public interface IBCAuthorizeRepository
     {
         IQueryable<BCAuthorize> Query();
+        void Add(BCAuthorize bcAuthorize);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -20,6 +21,8 @@ namespace SimpleIdServer.IdServer.Store
         }
 
         public IQueryable<BCAuthorize> Query() => _dbContext.BCAuthorizeLst;
+
+        public void Add(BCAuthorize bcAuthorize) => _dbContext.BCAuthorizeLst.Add(bcAuthorize);
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -12,11 +12,11 @@ namespace SimpleIdServer.IdServer.Api.Configuration
     /// <summary>
     /// Implementation : https://tools.ietf.org/html/draft-ietf-oauth-discovery-10
     /// </summary>
-    public class ConfigurationController : Controller
+    public class OAuthConfigurationController : Controller
     {
-        private readonly IConfigurationRequestHandler _configurationRequestHandler;
+        private readonly IOAuthConfigurationRequestHandler _configurationRequestHandler;
 
-        public ConfigurationController(IConfigurationRequestHandler configurationRequestHandler)
+        public OAuthConfigurationController(IOAuthConfigurationRequestHandler configurationRequestHandler)
         {
             _configurationRequestHandler = configurationRequestHandler;
         }

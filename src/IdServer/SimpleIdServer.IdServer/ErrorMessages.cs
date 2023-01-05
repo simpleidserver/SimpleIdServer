@@ -4,6 +4,7 @@ namespace SimpleIdServer.IdServer
 {
     public class ErrorMessages
     {
+        public const string ACCESS_REVOKED_BY_RESOURCE_OWNER = "access has been revoked by the resource owner";
         public const string OPENID_SCOPE_MISSING = "openid scope is missing";
         public const string UNKNOWN_SCOPE = "unknown scope {0}";
         public const string UNKNOWN_CLIENT = "unknown client {0}";
@@ -11,6 +12,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_AUTH_METHOD = "unknown authentication method : {0}";
         public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
+        public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string NO_CLIENT_SECRET = "no client secret";
@@ -18,6 +20,7 @@ namespace SimpleIdServer.IdServer
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
+        public const string INVALID_AUDIENCE = "invalid audiences";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
@@ -62,6 +65,7 @@ namespace SimpleIdServer.IdServer
         public const string BAD_RESPONSE_TYPE = "response type must equals to 'code'";
         public const string BAD_RESPONSE_MODE = "response mode {0} is not supported";
         public const string BAD_SELF_SIGNED_CERTIFICATE = "the certificate is not correct";
+        public const string BINDING_MESSAGE_MUST_NOT_EXCEED = "binding_message must not exceed {0} characters";
         public const string CLIENT_ASSERTION_TYPE_NOT_SUPPORTED = "client assertion type {0} is not supported";
         public const string CLIENT_ASSERTION_IS_MISSING = "client assertion is missing";
         public const string CLIENT_ASSERTION_TYPE_IS_UNEXPECTED = "unexpected client_assertion_type, must be equals to {0}";
@@ -70,7 +74,10 @@ namespace SimpleIdServer.IdServer
         public const string CLIENT_ASSERTION_CANNOT_BE_DECRYPTED = "client assertion cannot be decryted by the client secret";
         public const string CLIENT_ASSERTION_NOT_SIGNED_BY_KNOWN_JWK = "client assertion is not signed by a known Json Web Key";
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED_FROM_CLIENT_ASSERTION = "client_id cannot be extracted from client_assertion";
+        public const string CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024 = "client_notification_token must not exceed 1024 characters";
+        public const string CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES = "client_notification_token must contains at least 128 bytes";
         public const string MISSING_PARAMETER = "missing parameter {0}";
+        public const string MISSING_TOKEN = "missing token";
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";
         public const string MISSING_ACCESS_TOKEN = "access token is missing";
@@ -88,6 +95,7 @@ namespace SimpleIdServer.IdServer
         public const string NO_ESSENTIAL_ACR_IS_SUPPORTED = "no essential acr is supported";
         public const string DUPLICATE_JWKS = "jwks and jwks_uri parameters cannot be passed at the same time";
         public const string LOGIN_IS_REQUIRED = "login is required";
+        public const string LOGIN_HINT_TOKEN_IS_EXPIRED = "login_hint_token has expired";
         public const string AUTHORIZATION_CODE_ALREADY_USED = "authorization code has already been used, all tokens previously issued have been revoked";
         public const string AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT = "authorization code has not been issued by the client";
         public const string ACCESS_TOKEN_REJECTED = "access token has been rejected";
@@ -106,6 +114,7 @@ namespace SimpleIdServer.IdServer
         public const string CERTIFICATE_IS_NOT_SELF_SIGNED = "the certificate is not self signed";
         public const string REQUEST_OBJECT_IS_EXPIRED = "request object is expired";
         public const string REQUEST_OBJECT_BAD_AUDIENCE = "request object has bad audience";
+        public const string REQUESTED_EXPIRY_MUST_BE_POSITIVE = "requested_expiry must be positive";
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
         public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
         public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
@@ -116,9 +125,25 @@ namespace SimpleIdServer.IdServer
         public const string USER_ALREADY_EXISTS = "user '{0}' already exists";
         public const string NOT_SAME_REDIRECT_URI = "not the same redirect_uri";
         public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
+        public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_CLIENT_NOT_AUTHORIZED = "the client is not authorized to use the auth_req_id";
+        public const string AUTH_REQUEST_BAD_AUDIENCE = "the request doesn't contain correct audience";
+        public const string AUTH_REQUEST_NO_AUDIENCE = "the request doesn't contain audience";
+        public const string AUTH_REQUEST_NO_ISSUER = "the request doesn't contain issuer";
+        public const string AUTH_REQUEST_BAD_ISSUER = "the request doesn't contain correct issuer";
+        public const string AUTH_REQUEST_NO_EXPIRATION = "the request doesn't contain expiration time";
+        public const string AUTH_REQUEST_NO_JTI = "the request doesn't contain jti";
+        public const string AUTH_REQUEST_NO_NBF = "the request doesn't contain nbf";
+        public const string AUTH_REQUEST_BAD_NBF = "the request cannot be received before '{0}'";
+        public const string AUTH_REQUEST_NO_IAT = "the request doesn't contain iat";
+        public const string AUTH_REQUEST_MAXIMUM_LIFETIME = "the maximum lifetime of the request is '{0}' seconds";
         public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
+        public const string AUTH_REQUEST_ALG_NOT_VALID = "the request must be signed with '{0}' algorithm";
+        public const string AUTH_REQUEST_IS_EXPIRED = "the request is expired";
         public const string AUTH_REQUEST_REJECTED = "the authentication request '{0}' is rejected";
         public const string AUTH_REQUEST_SENT = "the authentication request '{0}' is finished";
+        public const string AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT = "you're not authorized to reject the authorization request";
+        public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
+        public const string NO_CONSENT = "no consent has been accepted";
     }
 }

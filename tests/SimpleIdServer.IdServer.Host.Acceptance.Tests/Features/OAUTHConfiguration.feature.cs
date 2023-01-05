@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ConfigurationFeature : object, Xunit.IClassFixture<ConfigurationFeature.FixtureData>, System.IDisposable
+    public partial class OAuthConfigurationFeature : object, Xunit.IClassFixture<OAuthConfigurationFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
 #line 1 "OAUTHConfiguration.feature"
 #line hidden
         
-        public ConfigurationFeature(ConfigurationFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public OAuthConfigurationFeature(OAuthConfigurationFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Configuration", "\tGet the OAUTHConfiguration and check its content", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "OAuthConfiguration", "\tGet the OAUTHConfiguration and check its content", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="Get the configuration")]
-        [Xunit.TraitAttribute("FeatureTitle", "Configuration")]
+        [Xunit.TraitAttribute("FeatureTitle", "OAuthConfiguration")]
         [Xunit.TraitAttribute("Description", "Get the configuration")]
         public void GetTheConfiguration()
         {
@@ -254,12 +254,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ConfigurationFeature.FeatureSetup();
+                OAuthConfigurationFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ConfigurationFeature.FeatureTearDown();
+                OAuthConfigurationFeature.FeatureTearDown();
             }
         }
     }

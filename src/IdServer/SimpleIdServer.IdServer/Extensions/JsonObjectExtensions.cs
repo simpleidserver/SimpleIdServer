@@ -34,6 +34,8 @@ namespace System.Text.Json.Nodes
 
         #region Authorization request
 
+        public static string GetLoginHintFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.LoginHint);
+
         public static string GetRequestFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.Request);
 
         public static string GetRequestUriFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.RequestUri);
@@ -355,6 +357,24 @@ namespace System.Text.Json.Nodes
         #region Introspection request
 
         public static string GetToken(this JsonObject jObj) => jObj.GetStr(IntrospectionRequestParameters.Token);
+
+        #endregion
+
+        #region Back channel authentication request
+
+        public static string GetRequest(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.Request);
+
+        public static string GetLoginHintToken(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.LoginHintToken);
+
+        public static string GetClientNotificationToken(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.ClientNotificationToken);
+
+        public static string GetBindingMessage(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.BindingMessage);
+
+        public static string GetUserCode(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.UserCode);
+
+        public static int? GetRequestedExpiry(this JsonObject jObj) => jObj.GetInt(BCAuthenticationRequestParameters.RequestedExpiry);
+
+        public static int? GetInterval(this JsonObject jObj) => jObj.GetInt(BCAuthenticationRequestParameters.Interval);
 
         #endregion
 

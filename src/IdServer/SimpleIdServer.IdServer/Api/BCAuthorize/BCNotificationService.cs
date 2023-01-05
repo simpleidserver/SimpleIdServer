@@ -1,16 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FirebaseAdmin.Messaging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Options;
-using SimpleIdServer.OpenID.Domains;
+using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.Api.BCAuthorize
+namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
     public interface IBCNotificationService
     {
@@ -19,16 +14,11 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
 
     public class BCNotificationService : IBCNotificationService
     {
-        private readonly OAuthHostOptions _options;
-
-        public BCNotificationService(IOptions<OAuthHostOptions> options)
+        public Task Notify(HandlerContext handlerContext, string authReqId, IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
         {
-            _options = options.Value;
-        }
-
-        public async Task Notify(HandlerContext handlerContext, string authReqId, IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
-        {
-            var deviceRegistrationToken = handlerContext.User.DeviceRegistrationToken;
+            // Firebase messaging...
+            /*
+             var deviceRegistrationToken = handlerContext.User.DeviceRegistrationToken;
             await FirebaseMessaging.DefaultInstance.SendAsync(new Message
             {   
                 Token = deviceRegistrationToken,
@@ -43,6 +33,8 @@ namespace SimpleIdServer.OpenID.Api.BCAuthorize
                     }
                 }
             }, cancellationToken);
+            */
+            return Task.CompletedTask;
         }
     }
 }

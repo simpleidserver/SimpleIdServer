@@ -118,6 +118,26 @@ namespace SimpleIdServer.IdServer.Options
         /// Enable or disable realm.
         /// </summary>
         public bool UseRealm { get; set; } = false;
+        /// <summary>
+        /// Set the maximum lifetime of an authorization request.
+        /// </summary>
+        public int MaxRequestLifetime { get; set; } = 60 * 5;
+        /// <summary>
+        /// Expiration time auth_req_id in seconds.
+        /// </summary>
+        public int AuthRequestExpirationTimeInSeconds { get; set; } = 120;
+        /// <summary>
+        /// Default interval in seconds.
+        /// </summary>
+        public int DefaultBCAuthorizeWaitIntervalInSeconds { get; set; } = 2;
+        /// <summary>
+        /// Enable or disable Back Channel Authentication.
+        /// </summary>
+        public bool IsBCEnabled { get; set; }
+        /// <summary>
+        /// Maximum number of characters for the "binding_message".
+        /// </summary>
+        public int MaxBindingMessageSize { get; set; } = 150;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

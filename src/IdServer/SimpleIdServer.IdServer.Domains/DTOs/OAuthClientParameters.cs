@@ -52,5 +52,8 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string BCClientNotificationEndpoint = "backchannel_client_notification_endpoint";
         public const string BCAuthenticationRequestSigningAlg = "backchannel_authentication_request_signing_alg";
         public const string BCUserCodeParameter = "backchannel_user_code_parameter";
+        public const string UserInfoSignedResponseAlg = "userinfo_signed_response_alg";
+        public const string UserInfoEncryptedResponseAlg = "userinfo_encrypted_response_alg";
+        public const string UserInfoEncryptedResponseEnc = "userinfo_encrypted_response_enc";
     }
 }

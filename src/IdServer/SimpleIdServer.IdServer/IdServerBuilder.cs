@@ -106,6 +106,19 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
+        /// <summary>
+        /// Add back channel authentication.
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder AddBackChannelAuthentication()
+        {
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.IsBCEnabled = true;
+            });
+            return this;
+        }
+
         public IdServerBuilder AddMutualAuthenticationSelfSigned(string authenticationSchema = Constants.CertificateAuthenticationScheme)
         {
             _serviceCollection.Configure<IdServerHostOptions>(o =>

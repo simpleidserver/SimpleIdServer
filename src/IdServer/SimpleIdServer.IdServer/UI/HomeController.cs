@@ -5,19 +5,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Options;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace SimpleIdServer.OpenID.UI
+namespace SimpleIdServer.IdServer.UI
 {
     public class HomeController : Controller
     {
-        private readonly OpenIDHostOptions _options;
+        private readonly IdServerHostOptions _options;
 
-        public HomeController(IOptions<OpenIDHostOptions> options)
+        public HomeController(IOptions<IdServerHostOptions> options)
         {
             _options = options.Value;
         }
@@ -49,22 +50,16 @@ namespace SimpleIdServer.OpenID.UI
         {
             var splitted = returnUrl.Split('?');
             if (splitted.Count() != 2)
-            {
                 return returnUrl;
-            }
 
             var query = splitted.Last();
             if (!string.IsNullOrWhiteSpace(query))
             {
                 var queryDictionary = HttpUtility.ParseQueryString(query);
-                if (queryDictionary.AllKeys.Contains(OAuth.DTOs.AuthorizationRequestParameters.UILocales))
-                {
-                    queryDictionary[OAuth.DTOs.AuthorizationRequestParameters.UILocales] = culture;
-                } 
+                if (queryDictionary.AllKeys.Contains(AuthorizationRequestParameters.UILocales))
+                    queryDictionary[AuthorizationRequestParameters.UILocales] = culture;
                 else
-                {
-                    queryDictionary.Add(OAuth.DTOs.AuthorizationRequestParameters.UILocales, culture);
-                }
+                    queryDictionary.Add(AuthorizationRequestParameters.UILocales, culture);
 
                 var queryStr = string.Join("&", queryDictionary.AllKeys.Select(_ => $"{_}={queryDictionary[_]}"));
                 returnUrl = $"{splitted.First()}?{queryStr}";

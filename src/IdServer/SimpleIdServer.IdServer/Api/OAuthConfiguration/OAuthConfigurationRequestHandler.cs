@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.Configuration
 {
-    public interface IConfigurationRequestHandler
+    public interface IOAuthConfigurationRequestHandler
     {
         Task Enrich(JsonObject jObj, string issuer, CancellationToken cancellationToken);
     }
 
-    public class ConfigurationRequestHandler : IConfigurationRequestHandler
+    public class OAuthConfigurationRequestHandler : IOAuthConfigurationRequestHandler
     {
         private readonly IScopeRepository _scopeRepository;
         private readonly IEnumerable<IResponseTypeHandler> _authorizationGrantTypeHandlers;
@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         private readonly IOAuthWorkflowConverter _oauthWorkflowConverter;
         private readonly IdServerHostOptions _options;
 
-        public ConfigurationRequestHandler(
+        public OAuthConfigurationRequestHandler(
             IScopeRepository scopeRepository, 
             IEnumerable<IResponseTypeHandler> authorizationGrantTypeHandlers, 
             IEnumerable<IOAuthResponseMode> oauthResponseModes,

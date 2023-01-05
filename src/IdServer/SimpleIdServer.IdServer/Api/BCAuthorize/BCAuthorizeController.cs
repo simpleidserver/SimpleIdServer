@@ -2,19 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OpenID.Api.BCAuthorize;
+using SimpleIdServer.IdServer.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.Api.BCAuthentication
+namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
-    public class MTLSBCAuthorizeController : Controller
+    public class BCAuthorizeController : Controller
     {
         private readonly IBCAuthorizeHandler _bcAuthorizeHandler;
 
-        public MTLSBCAuthorizeController(IBCAuthorizeHandler bcAuthorizeHandler)
+        public BCAuthorizeController(IBCAuthorizeHandler bcAuthorizeHandler)
         {
             _bcAuthorizeHandler = bcAuthorizeHandler;
         }

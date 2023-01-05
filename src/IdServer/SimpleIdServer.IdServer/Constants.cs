@@ -20,12 +20,24 @@ namespace SimpleIdServer.IdServer
             public const string Authorization = "authorization";
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
+            public const string OpenIDConfiguration = ".well-known/openid-configuration";
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
             public const string ClientManagement = "management/clients";
             public const string MtlsPrefix = "mtls";
             public const string MtlsToken = MtlsPrefix + "/" + Token;
+            public const string BCAuthorize = MtlsPrefix + "/bc-authorize";
+            public const string UserInfo = "userinfo";
+            public const string CheckSession = "check_session";
+            public const string EndSession = "end_session";
         }
+
+        public static List<string> AllStandardNotificationModes = new List<string>
+        {
+            StandardNotificationModes.Ping,
+            StandardNotificationModes.Poll,
+            StandardNotificationModes.Push
+        };
 
         public static class StandardNotificationModes
         {
@@ -49,6 +61,7 @@ namespace SimpleIdServer.IdServer
         {
             public const string Register = "register";
             public const string AuthSchemeProvider = "manage_authschemeprovider";
+            public const string Authenticated = "authenticated";
         }
 
         public static ICollection<string> AllSigningAlgs = new List<string>

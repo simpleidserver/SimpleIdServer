@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 {
     public interface ICIBAGrantTypeValidator
     {
-        Task<BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken);
+        Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class CIBAGrantTypeValidator : ICIBAGrantTypeValidator
@@ -26,7 +26,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _bcAuthorizeRepository = bcAuthorizeRepository;
         }
 
-        public async Task<BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken)
+        public async Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             Client openidClient = context.Client;
             if (openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Ping

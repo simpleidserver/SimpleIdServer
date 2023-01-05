@@ -313,6 +313,24 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? BCAuthenticationRequestSigningAlg { get; set; }
         /// <summary>
+        /// Required for signing UserInfo responses.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.UserInfoSignedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? UserInfoSignedResponseAlg { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.UserInfoEncryptedResponseAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// <summary>
+        /// Required for encrypting the identity token issued to this client.
+        /// </summary>
+        public string? UserInfoEncryptedResponseAlg { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.UserInfoEncryptedResponseEnc)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// <summary>
+        /// Required for encrypting the identity token issued to this client.
+        /// </summary>
+        public string? UserInfoEncryptedResponseEnc { get; set; } = null;
+        /// <summary>
         /// Boolean value specifying whether the Client supports the user_code parameter. 
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.BCUserCodeParameter)]

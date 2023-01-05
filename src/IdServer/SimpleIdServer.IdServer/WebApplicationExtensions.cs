@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
+using System;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -13,11 +14,18 @@ namespace Microsoft.AspNetCore.Builder
         public static WebApplication UseSID(this WebApplication webApplication)
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
+            if (opts.IsBCEnabled && !opts.MtlsEnabled)
+                throw new InvalidOperationException("When back channel authentication is enabled then MTLS must be enabled. Please add the instruction 'AddMutualAuthentication'");
+
             var usePrefix = opts.UseRealm;
             webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
-            webApplication.MapControllerRoute("configuration",
+            webApplication.MapControllerRoute("oauthConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
-                defaults: new { controller = "Configuration", action = "Get" });
+                defaults: new { controller = "OAuthConfiguration", action = "Get" });
+
+            webApplication.MapControllerRoute("openidConfiguration",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OpenIDConfiguration,
+                defaults: new { controller = "OpenIdConfiguration", action = "Get" });
 
             webApplication.MapControllerRoute("jwks",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Jwks,
@@ -51,7 +59,6 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Update" });
 
-
             webApplication.MapControllerRoute("authSchemeProviderGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}",
                 defaults: new { controller = "AuthSchemeProviders", action = "Get" });
@@ -68,14 +75,28 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}",
                 defaults: new { controller = "AuthSchemeProviders", action = "UpdateOptions" });
 
+            webApplication.MapControllerRoute("userInfoGet",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
+                defaults: new { controller = "UserInfo", action = "Get" });
+            webApplication.MapControllerRoute("userInfoPost",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
+                defaults: new { controller = "UserInfo", action = "Post" });
+
             if (opts.MtlsEnabled)
             {
                 webApplication.MapControllerRoute("tokenMtls",
-                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + "mtls/" + Constants.EndPoints.Token,
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.Token,
                     defaults: new { controller = "Token", action = "Post" });
                 webApplication.MapControllerRoute("tokenRevokeMtls",
-                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + "mtls/" + Constants.EndPoints.TokenRevoke,
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.TokenRevoke,
                     defaults: new { controller = "Token", action = "Revoke" });
+            }
+
+            if(opts.IsBCEnabled)
+            {
+                webApplication.MapControllerRoute("bcAuthorize",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
+                    defaults: new { controller = "BCAuthorize", action = "Post" });
             }
 
             return webApplication;

@@ -2,20 +2,20 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System.Collections.Generic;
 
-namespace SimpleIdServer.OpenID.UI.ViewModels
+namespace SimpleIdServer.IdServer.UI.ViewModels
 {
-    public class ConsentsIndexViewModel
+    public class ConsentViewModel
     {
-        public ConsentsIndexViewModel(string clientName, string returnUrl, IEnumerable<string> scopeNames, IEnumerable<string> claimNames)
+        public ConsentViewModel(string consentId, string clientName, IEnumerable<string> scopeNames, IEnumerable<string> claimNames)
         {
+            ConsentId = consentId;
             ClientName = clientName;
-            ReturnUrl = returnUrl;
             ScopeNames = scopeNames;
             ClaimNames = claimNames;
         }
 
+        public string ConsentId { get; set; }
         public string ClientName { get; set; }
-        public string ReturnUrl { get; set; }
         public IEnumerable<string> ScopeNames { get; set; }
         public IEnumerable<string> ClaimNames { get; set; }
     }

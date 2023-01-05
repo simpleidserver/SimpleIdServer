@@ -41,6 +41,12 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
 
+        public void RejectConsent(string consentId)
+        {
+            var consent = Consents.Single(c => c.Id == consentId);
+            Consents.Remove(consent);
+        }
+
         public virtual object Clone()
         {
             return new User

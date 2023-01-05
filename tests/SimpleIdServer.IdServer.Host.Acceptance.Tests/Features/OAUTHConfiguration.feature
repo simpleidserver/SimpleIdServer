@@ -1,4 +1,4 @@
-﻿Feature: Configuration
+﻿Feature: OAuthConfiguration
 	Get the OAUTHConfiguration and check its content
 
 Scenario: Get the configuration
