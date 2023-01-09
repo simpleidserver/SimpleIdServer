@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var openidClient = context.Client;
             var payload = await BuildIdToken(context, context.Request.RequestData, scopes, cancellationToken);
-            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
+            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }
 
@@ -76,7 +76,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             handlerContext.SetUser(await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == previousQueryParameters[JwtRegisteredClaimNames.Sub].ToString(), token));
             var openidClient = handlerContext.Client;
             var payload = await BuildIdToken(handlerContext, previousQueryParameters, scopes, token);
-            var idToken = await _jwtBuilder.BuildClientToken(handlerContext.Client, payload, openidClient.IdTokenSignedResponseAlg, openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, token);
+            var idToken = await _jwtBuilder.BuildClientToken(handlerContext.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, token);
             handlerContext.Response.Add(Name, idToken);
         }
 

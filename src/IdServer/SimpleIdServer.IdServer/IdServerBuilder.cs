@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
@@ -27,6 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
             _serviceCollection = serviceCollection;
             _authenticationBuilder = authenticationBuilder;
             _serviceProvider = serviceProvider;
+            AddInMemoryAcr(new List<AuthenticationContextClassReference> { Constants.StandardAcrs.FirstLevelAssurance });
         }
 
         public IServiceCollection Services => _serviceCollection;
@@ -79,6 +81,14 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
+        public IdServerBuilder AddInMemoryAcr(ICollection<AuthenticationContextClassReference> acrs)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            storeDbContext.Acrs.AddRange(acrs);
+            storeDbContext.SaveChanges();
+            return this;
+        }
+
         public IdServerBuilder AddInMemoryUsers(ICollection<User> users)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
@@ -102,6 +112,21 @@ namespace Microsoft.Extensions.DependencyInjection
             {
 
             });
+            return this;
+        }
+
+        public IdServerBuilder AddAuthentication(string externalAuthenticationScheme = Constants.ExternalAuthenticationScheme, Action<AuthBuilder> callback = null)
+        {
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.ExternalAuthenticationScheme = externalAuthenticationScheme;
+            });
+            var auth = _serviceCollection.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie()
+                .AddCookie(externalAuthenticationScheme);
+            if(callback != null)
+                callback(new AuthBuilder(auth));
+
             return this;
         }
 

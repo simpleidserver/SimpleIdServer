@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Nodes;
+using System.Web;
 
 namespace SimpleIdServer.IdServer.Api
 {
@@ -57,6 +58,9 @@ namespace SimpleIdServer.IdServer.Api
 
         public HandlerContextRequest(string issuerName, string userSubject, JsonObject data) : this(issuerName, userSubject)
         {
+            var allKeys = data.Select(r => r.Key).ToList();
+            foreach (var key in allKeys)
+                data[key] = HttpUtility.UrlDecode(data[key].GetValue<string>());
             OriginalRequestData = data;
             RequestData = data;
         }

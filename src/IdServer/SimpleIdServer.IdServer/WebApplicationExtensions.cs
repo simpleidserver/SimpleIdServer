@@ -11,13 +11,19 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class WebApplicationExtensions
     {
-        public static WebApplication UseSID(this WebApplication webApplication)
+        public static WebApplication UseSID(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             if (opts.IsBCEnabled && !opts.MtlsEnabled)
                 throw new InvalidOperationException("When back channel authentication is enabled then MTLS must be enabled. Please add the instruction 'AddMutualAuthentication'");
 
+            webApplication.UseCookiePolicy(new CookiePolicyOptions
+            {
+                Secure = Http.CookieSecurePolicy.Always
+            });
             webApplication.UseStaticFiles();
+            webApplication.UseAuthentication();
+            webApplication.UseAuthorization();
 
             var usePrefix = opts.UseRealm;
             webApplication.MapControllerRoute("oauthConfiguration",
@@ -101,6 +107,9 @@ namespace Microsoft.AspNetCore.Builder
                     defaults: new { controller = "BCAuthorize", action = "Post" });
             }
 
+            webApplication.MapControllerRoute(
+                name: "defaultWithArea",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             webApplication.MapControllerRoute(
                 name: "default",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}");

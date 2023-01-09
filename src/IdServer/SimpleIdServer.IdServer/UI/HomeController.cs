@@ -42,11 +42,16 @@ namespace SimpleIdServer.IdServer.UI
         public IActionResult Authenticate()
         {
             var scheme = "oidc";
+            var returnUrl = Url.Action(nameof(Index));
             var items = new Dictionary<string, string>
             {
-                { "scheme", scheme }
+                { "scheme", scheme },
+                { "returnUrl", returnUrl }
             };
-            var props = new AuthenticationProperties(items);
+            var props = new AuthenticationProperties(items)
+            {
+                RedirectUri = returnUrl
+            };
             return Challenge(props, scheme);
         }
 

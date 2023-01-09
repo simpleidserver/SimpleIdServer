@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 
         public virtual async Task<User> Authenticate(string login, string password, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.Query().Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Id == login, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Credentials).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == login, cancellationToken);
             if (user == null)
                 throw new BaseUIException(ErrorCodes.UNKNOWN_USER);
 

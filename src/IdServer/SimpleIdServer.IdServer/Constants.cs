@@ -262,6 +262,16 @@ namespace SimpleIdServer.IdServer
             };
         }
 
+        public static class StandardAcrs
+        {
+            public static AuthenticationContextClassReference FirstLevelAssurance = new AuthenticationContextClassReference
+            {
+                AuthenticationMethodReferences = new[] { Areas.Password },
+                Name = "sid-load-01",
+                DisplayName = "First level of assurance"
+            };
+        }
+
         public static ICollection<string> AllUserClaims = new List<string>
         {
             JwtRegisteredClaimNames.Sub, JwtRegisteredClaimNames.Name, JwtRegisteredClaimNames.GivenName, JwtRegisteredClaimNames.FamilyName, UserClaims.MiddleName,
@@ -276,11 +286,12 @@ namespace SimpleIdServer.IdServer
             public const string Password = "pwd";
         }
 
-        public static string AuthenticationScheme = "SimpleIdServerOAuth";
-        public static string MultiAccountAuthenticationScheme = "MultiAccount";
+
+        public const string SelfAuthenticationScheme = "SelfAuthenticationScheme";
+        public const string MultiAccountAuthenticationScheme = "MultiAccount";
         public const string ExternalAuthenticationScheme = "ExternalAuthentication";
-        public static string AuthorizationHeaderName = "Authorization";
         public const string CertificateAuthenticationScheme = "Certificate";
+        public static string AuthorizationHeaderName = "Authorization";
         public const string Prefix = "prefix";
         /// <summary>
         /// Direct use of a shared symmetric key as the CEK.

@@ -113,7 +113,7 @@ namespace SimpleIdServer.IdServer.Options
         /// <summary>
         /// Default acr value.
         /// </summary>
-        public string DefaultAcrValue { get; set; } = string.Empty;
+        public string DefaultAcrValue { get; set; } = Constants.StandardAcrs.FirstLevelAssurance.Name;
         /// <summary>
         /// Enable or disable realm.
         /// </summary>

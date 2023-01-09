@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class ConsentsResource {
+    public class AuthenticatePasswordResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ConsentsResource() {
+        internal AuthenticatePasswordResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.ConsentsResource", typeof(ConsentsResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AuthenticatePasswordResource", typeof(AuthenticatePasswordResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,110 +61,101 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Claims.
+        ///   Recherche une chaîne localisée semblable à External authentication.
         /// </summary>
-        public static string claims {
+        public static string external_authenticate {
             get {
-                return ResourceManager.GetString("claims", resourceCulture);
+                return ResourceManager.GetString("external_authenticate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirm.
+        ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
-        public static string confirm {
+        public static string login {
             get {
-                return ResourceManager.GetString("confirm", resourceCulture);
+                return ResourceManager.GetString("login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The client {0} would like to access to.
+        ///   Recherche une chaîne localisée semblable à Login is missing.
         /// </summary>
-        public static string consent_client_access {
+        public static string missing_login {
             get {
-                return ResourceManager.GetString("consent_client_access", resourceCulture);
+                return ResourceManager.GetString("missing_login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Manage consents.
+        ///   Recherche une chaîne localisée semblable à Password is missing.
         /// </summary>
-        public static string manage_consents {
+        public static string missing_password {
             get {
-                return ResourceManager.GetString("manage_consents", resourceCulture);
+                return ResourceManager.GetString("missing_password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Reject.
+        ///   Recherche une chaîne localisée semblable à Return url is missing.
         /// </summary>
-        public static string reject {
+        public static string missing_return_url {
             get {
-                return ResourceManager.GetString("reject", resourceCulture);
+                return ResourceManager.GetString("missing_return_url", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Access to the address.
+        ///   Recherche une chaîne localisée semblable à Password.
         /// </summary>
-        public static string scope_address {
+        public static string password {
             get {
-                return ResourceManager.GetString("scope_address", resourceCulture);
+                return ResourceManager.GetString("password", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Access to the email.
+        ///   Recherche une chaîne localisée semblable à Policy.
         /// </summary>
-        public static string scope_email {
+        public static string policy {
             get {
-                return ResourceManager.GetString("scope_email", resourceCulture);
+                return ResourceManager.GetString("policy", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Offline access.
+        ///   Recherche une chaîne localisée semblable à Remember me.
         /// </summary>
-        public static string scope_offline_access {
+        public static string remember_login {
             get {
-                return ResourceManager.GetString("scope_offline_access", resourceCulture);
+                return ResourceManager.GetString("remember_login", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Access to user identifier.
+        ///   Recherche une chaîne localisée semblable à Submit.
         /// </summary>
-        public static string scope_openid {
+        public static string submit {
             get {
-                return ResourceManager.GetString("scope_openid", resourceCulture);
+                return ResourceManager.GetString("submit", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Access to the phone.
+        ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
-        public static string scope_phone {
+        public static string title {
             get {
-                return ResourceManager.GetString("scope_phone", resourceCulture);
+                return ResourceManager.GetString("title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Access to the profile.
+        ///   Recherche une chaîne localisée semblable à Terms of service.
         /// </summary>
-        public static string scope_profile {
+        public static string tos {
             get {
-                return ResourceManager.GetString("scope_profile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scopes.
-        /// </summary>
-        public static string scopes {
-            get {
-                return ResourceManager.GetString("scopes", resourceCulture);
+                return ResourceManager.GetString("tos", resourceCulture);
             }
         }
     }

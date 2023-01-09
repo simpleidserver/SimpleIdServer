@@ -1,57 +1,37 @@
 ﻿@using SimpleIdServer.IdServer.Startup.Resources
-@model SimpleIdServer.IdServer.UI.ViewModels.ConsentsIndexViewModel
+@model IEnumerable<SimpleIdServer.IdServer.UI.ViewModels.ConsentViewModel>
 
 @{
     ViewBag.Title = LayoutResource.consents;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<form method="post" action="@Url.Action("Reject", "Consents")" id="rejectForm">
-    @Html.AntiForgeryToken()
-    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
-</form>
+<h1>@ConsentsResource.manage_consents</h1>
 
-@using (Html.BeginForm("Index", "Consents", FormMethod.Post))
+@foreach (var consent in Model)
 {
-    @Html.AntiForgeryToken()
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <ul class="list-group">
-                @foreach (var modelState in ViewData.ModelState.Values)
-                {
-                    foreach (var error in modelState.Errors)
-                    {
-                        <li class="list-group-item list-group-item-danger">@ConsentsResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                    }
-                }
-            </ul>
-        </div>
-    }
-    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
     <div class="card">
         <div class="card-header">
-            @string.Format(ConsentsResource.consent_client_access, Model.ClientName)
+            @string.Format(ConsentsResource.consent_client_access, consent.ClientName)
         </div>
         <div class="card-body">
             <h5 class="card-title">@ConsentsResource.scopes</h5>
             <ul class="list-group">
-                @foreach (var scopeName in Model.ScopeNames)
+                @foreach (var scopeName in consent.ScopeNames)
                 {
                     <li class="list-group-item">@ConsentsResource.ResourceManager.GetString($"scope_{scopeName}")</li>
                 }
             </ul>
             <h5 class="card-title">@ConsentsResource.claims</h5>
             <ul class="list-group">
-                @foreach (var claim in Model.ClaimNames)
+                @foreach (var claim in consent.ClaimNames)
                 {
                     <li class="list-group-item">@claim</li>
                 }
             </ul>
         </div>
         <div class="card-footer">
-            <button type="submit" class="btn btn-success card-link">@ConsentsResource.confirm</button>
-            <button type="submit" form="rejectForm" class="btn btn-danger">@ConsentsResource.reject</button>
+            <a href="@Url.Action("RejectConsent", "Consents", new { consentId = consent.ConsentId })" class="btn btn-danger">@ConsentsResource.reject</a>
         </div>
     </div>
 }

@@ -82,7 +82,7 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> Manage(CancellationToken cancellationToken)
         {
             var nameIdentifier = GetNameIdentifier();
-            var user = await _userRepository.Query().AsNoTracking().FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).AsNoTracking().FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
             var result = new List<ConsentViewModel>();
             var clientIds = user.Consents.Select(c => c.ClientId);
             var oauthClients = await _clientRepository.Query().AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync(cancellationToken);

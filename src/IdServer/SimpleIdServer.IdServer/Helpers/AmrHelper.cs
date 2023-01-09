@@ -52,7 +52,6 @@ namespace SimpleIdServer.IdServer.Helpers
                     acrs.AddRange(client.DefaultAcrValues);
                     acrs.Add(_options.DefaultAcrValue);
                     defaultAcr = await GetSupportedAcr(acrs, cancellationToken);
-
                 }
             }
 

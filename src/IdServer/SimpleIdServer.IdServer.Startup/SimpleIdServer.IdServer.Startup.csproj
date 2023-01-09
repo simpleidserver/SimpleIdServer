@@ -13,13 +13,17 @@
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.1" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\AccountsResource.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticatePasswordResource.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
 	  </Compile>
 	  <Compile Update="Resources\CheckSessionResource.Designer.cs">
 	    <DesignTime>True</DesignTime>
@@ -51,6 +55,10 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticatePasswordResource.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>AuthenticatePasswordResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\CheckSessionResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>

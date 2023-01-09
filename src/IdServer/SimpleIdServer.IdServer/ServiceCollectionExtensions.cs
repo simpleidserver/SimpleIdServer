@@ -77,14 +77,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddOAuthIntrospectionTokenApi()
                 .AddRegisterApi()
                 .AddBCAuthorizeApi();
-            var authBuilder = services.AddAuthentication();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
             {
                 o.AddPolicy(Constants.Policies.Register, p => p.RequireAssertion(a => true));
                 o.AddPolicy(Constants.Policies.AuthSchemeProvider, p => p.RequireAssertion(a => true));
+                o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
             });
-            return new IdServerBuilder(services, authBuilder, services.BuildServiceProvider());
+            return new IdServerBuilder(services, null /* authBuilder*/, services.BuildServiceProvider());
         }
 
         #region Private methods
@@ -161,6 +161,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITokenProfile, BearerTokenProfile>();
             services.AddTransient<ITokenProfile, MacTokenProfile>();
             services.AddTransient<ITokenBuilder, AccessTokenBuilder>();
+            services.AddTransient<ITokenBuilder, IdTokenBuilder>();
             services.AddTransient<ITokenBuilder, RefreshTokenBuilder>();
             services.AddTransient<IClaimsJwsPayloadEnricher, ClaimsJwsPayloadEnricher>();
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
