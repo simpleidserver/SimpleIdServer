@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -23,10 +24,8 @@ namespace SimpleIdServer.IdServer.UI
             _options = options.Value;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        [HttpGet]
+        public IActionResult Index() => View();
 
         [HttpPost]
         public IActionResult SwitchLanguage(string culture, string returnUrl)
@@ -39,6 +38,19 @@ namespace SimpleIdServer.IdServer.UI
             return LocalRedirect(ReplaceUILocale(culture, returnUrl));
         }
 
+        [HttpGet]
+        public IActionResult Authenticate()
+        {
+            var scheme = "oidc";
+            var items = new Dictionary<string, string>
+            {
+                { "scheme", scheme }
+            };
+            var props = new AuthenticationProperties(items);
+            return Challenge(props, scheme);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Disconnect()
         {
             Response.Cookies.Delete(_options.SessionCookieName);

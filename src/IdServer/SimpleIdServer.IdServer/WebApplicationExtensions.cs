@@ -17,8 +17,9 @@ namespace Microsoft.AspNetCore.Builder
             if (opts.IsBCEnabled && !opts.MtlsEnabled)
                 throw new InvalidOperationException("When back channel authentication is enabled then MTLS must be enabled. Please add the instruction 'AddMutualAuthentication'");
 
+            webApplication.UseStaticFiles();
+
             var usePrefix = opts.UseRealm;
-            webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
             webApplication.MapControllerRoute("oauthConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
                 defaults: new { controller = "OAuthConfiguration", action = "Get" });
@@ -84,6 +85,7 @@ namespace Microsoft.AspNetCore.Builder
 
             if (opts.MtlsEnabled)
             {
+                webApplication.UseMiddleware<MtlsAuthenticationMiddleware>();
                 webApplication.MapControllerRoute("tokenMtls",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.Token,
                     defaults: new { controller = "Token", action = "Post" });
@@ -98,6 +100,10 @@ namespace Microsoft.AspNetCore.Builder
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
                     defaults: new { controller = "BCAuthorize", action = "Post" });
             }
+
+            webApplication.MapControllerRoute(
+                name: "default",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}");
 
             return webApplication;
         }

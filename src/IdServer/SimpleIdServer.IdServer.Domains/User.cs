@@ -47,6 +47,65 @@ namespace SimpleIdServer.IdServer.Domains
             Consents.Remove(consent);
         }
 
+        public bool AddSession(DateTime expirationDateTime)
+        {
+            foreach (var session in Sessions)
+                session.State = UserSessionStates.Rejected;
+
+            Sessions.Add(new UserSession { SessionId = Guid.NewGuid().ToString(), AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationDateTime, State = UserSessionStates.Active });
+            return true;
+        }
+
+        public void UpdateClaims(ICollection<UserClaim> claims)
+        {
+            OAuthUserClaims.Clear();
+            foreach (var claim in claims)
+                OAuthUserClaims.Add(claim);
+        }
+
+        public void UpdateClaim(string key, string value)
+        {
+            var claim = OAuthUserClaims.FirstOrDefault(c => c.Name == key);
+            if (claim != null)
+                claim.Value = value;
+            else
+            {
+                OAuthUserClaims.Add(new UserClaim
+                {
+                    Name = key,
+                    Value = value
+                });
+            }
+        }
+
+        public void AddExternalAuthProvider(string scheme, string subject)
+        {
+            ExternalAuthProviders.Add(new UserExternalAuthProvider
+            {
+                CreateDateTime = DateTime.UtcNow,
+                Scheme = scheme,
+                Subject = subject
+            });
+        }
+
+        public new static User Create(string name, string sub = null)
+        {
+            if (string.IsNullOrWhiteSpace(sub))
+            {
+                sub = Guid.NewGuid().ToString();
+            }
+
+            var user = new User
+            {
+                Id = sub,
+                OAuthUserClaims = new List<UserClaim>
+                {
+                    new UserClaim(name, sub)
+                }
+            };
+            return user;
+        }
+
         public virtual object Clone()
         {
             return new User

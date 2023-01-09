@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.Store
     {
         IQueryable<User> Query();
         void Update(User user);
+        void Add(User user);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -23,13 +24,15 @@ namespace SimpleIdServer.IdServer.Store
 
         public IQueryable<User> Query() => _dbContext.Users;
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
-
         public void Update(User user)
         {
             var entry = _dbContext.Entry(user);
             if (entry.State != EntityState.Modified)
                 _dbContext.Entry(entry).State = EntityState.Modified;
         }
+
+        public void Add(User user) => _dbContext.Users.Add(user);
+
+        public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

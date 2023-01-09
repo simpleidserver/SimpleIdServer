@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer
             public const string UserInfo = "userinfo";
             public const string CheckSession = "check_session";
             public const string EndSession = "end_session";
+            public const string EndSessionCallback = "end_session_callback";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -120,6 +121,7 @@ namespace SimpleIdServer.IdServer
             public static string Role = "role";
             public static string ScimId = "scim_id";
             public static string ScimLocation = "scim_location";
+            public static string Events = "events";
         }
 
         public static class StandardClaims
@@ -269,7 +271,14 @@ namespace SimpleIdServer.IdServer
             UserClaims.Role, UserClaims.ScimId, UserClaims.ScimLocation
         };
 
+        public static class Areas
+        {
+            public const string Password = "pwd";
+        }
+
         public static string AuthenticationScheme = "SimpleIdServerOAuth";
+        public static string MultiAccountAuthenticationScheme = "MultiAccount";
+        public const string ExternalAuthenticationScheme = "ExternalAuthentication";
         public static string AuthorizationHeaderName = "Authorization";
         public const string CertificateAuthenticationScheme = "Certificate";
         public const string Prefix = "prefix";

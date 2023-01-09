@@ -335,6 +335,25 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.BCUserCodeParameter)]
         public bool BCUserCodeParameter { get; set; } = false;
+        [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// <summary>
+        /// RP URL that will cause the RP to log itself out when rendered in an iframe by the OP.
+        /// </summary>
+        public string? FrontChannelLogoutUri { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutSessionRequired)]
+        /// <summary>
+        /// Boolean value specifying whether the RP requires that iss (issuer) and sid (session id) query parameters be included to identify the RP session
+        /// with the OP when the front_channel_logout_uri is used.
+        /// </summary>
+        public bool FrontChannelLogoutSessionRequired { get; set; }
+        [JsonPropertyName(OAuthClientParameters.BackChannelLogoutSessionRequired)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// <summary>
+        /// Boolean value specifying whether the OP can pass a SID claim in the Logout token to identify the RP session with the OP.
+        /// If supported, the sid claim is also included in ID tokens issued by the OP.
+        /// </summary>
+        public bool BackChannelLogoutSessionRequired { get; set; }
         [JsonIgnore]
         /// <summary>
         /// SALT used to calculate the pairwise.
@@ -348,6 +367,12 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.TlsClientCertificateBoundAccessToken)]
         public bool TlsClientCertificateBoundAccessToken { get; set; }
+        /// <summary>
+        /// RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.BackChannelLogoutUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? BackChannelLogoutUri { get; set; } = null;
         /// <summary>
         /// Enable or disble the consent screen.
         /// </summary>

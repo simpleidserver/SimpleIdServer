@@ -4,47 +4,45 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Common.Extensions;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.Extensions;
-using SimpleIdServer.OpenID.Helpers;
-using SimpleIdServer.OpenID.Options;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Security.Claims;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.UI
+namespace SimpleIdServer.IdServer.UI
 {
     public class BaseAuthenticateController : Controller
     {
-        private readonly OpenIDHostOptions _options;
+        private readonly IdServerHostOptions _options;
         private readonly IDataProtector _dataProtector;
-        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IAmrHelper _amrHelper;
-        private readonly IOAuthUserRepository _oauthUserCommandRepository;
+        private readonly IUserRepository _userRepository;
 
         public BaseAuthenticateController(
-            IOptions<OpenIDHostOptions> options,
-            IDataProtectionProvider dataProtectionProvider, 
-            IOAuthClientRepository oauthClientRepository,
+            IOptions<IdServerHostOptions> options,
+            IDataProtectionProvider dataProtectionProvider,
+            IClientRepository clientRepository,
             IAmrHelper amrHelper,
-            IOAuthUserRepository oauthUserCommandRepository)
+            IUserRepository userRepository)
         {
             _options = options.Value;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
-            _oauthClientRepository = oauthClientRepository;
+            _clientRepository = clientRepository;
             _amrHelper = amrHelper;
-            _oauthUserCommandRepository = oauthUserCommandRepository;
+            _userRepository = userRepository;
         }
 
-        protected IOAuthClientRepository OAuthClientQueryRepository => _oauthClientRepository;
-        protected IOAuthUserRepository OauthUserRepository => _oauthUserCommandRepository;
-        protected OpenIDHostOptions Options => _options;
+        protected IClientRepository ClientRepository => _clientRepository;
+        protected IUserRepository UserRepository => _userRepository;
+        protected IdServerHostOptions Options => _options;
 
         protected string Unprotect(string returnUrl)
         {
@@ -57,14 +55,14 @@ namespace SimpleIdServer.OpenID.UI
             ViewBag.SuccessMessage = msg;
         }
 
-        protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, OAuthUser user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
             var unprotectedUrl = Unprotect(returnUrl);
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var client = (OpenIdClient)await _oauthClientRepository.FindOAuthClientById(clientId, token);
+            var client = await _clientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == clientId, token);
             var acr = await _amrHelper.FetchDefaultAcr(acrValues, requestedClaims, client, token);
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
@@ -75,18 +73,17 @@ namespace SimpleIdServer.OpenID.UI
             return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
-        protected async Task<IActionResult> Sign(string returnUrl, string currentAmr, OAuthUser user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Sign(string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
             var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-            var claims = user.ToClaims();
+            var claims = user.Claims;
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             user.AddSession(expirationDateTime);
-            await _oauthUserCommandRepository.Update(user, token);
-            await _oauthUserCommandRepository.SaveChanges(token);
-            Response.Cookies.Append(_options.SessionCookieName, user.GetActiveSession().SessionId, new CookieOptions
+            await _userRepository.SaveChanges(token);
+            Response.Cookies.Append(_options.SessionCookieName, user.ActiveSession.SessionId, new CookieOptions
             {
                 Secure = true,
                 HttpOnly = false,

@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -41,6 +42,17 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var signingCredentials = new SigningCredentials(rsa, signingAlg);
             return AddSigningKey(signingCredentials);
+        }
+
+        public IdServerBuilder AddDeveloperSigningCredentials()
+        {
+            var key = new RsaSecurityKey(new RSACryptoServiceProvider(2048))
+            {
+                KeyId = "keyid"
+            };
+            var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
+            AddSigningKey(signingCredentials);
+            return this;
         }
 
         public IdServerBuilder AddInMemoryScopes(ICollection<Scope> scopes)

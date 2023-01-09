@@ -11,4 +11,7 @@
   <ItemGroup>
   	<PackageReference Include="FirebaseAdmin" Version="2.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Api\Configuration\" />
+  </ItemGroup>
 </Project>

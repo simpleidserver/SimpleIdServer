@@ -1,0 +1,37 @@
+﻿@using SimpleIdServer.IdServer.Startup.Resources
+@model IEnumerable<SimpleIdServer.IdServer.UI.ViewModels.ConsentViewModel>
+
+@{
+    ViewBag.Title = LayoutResource.consents;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ConsentsResource.manage_consents</h1>
+
+@foreach (var consent in Model)
+{
+    <div class="card">
+        <div class="card-header">
+            @string.Format(ConsentsResource.consent_client_access, consent.ClientName)
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">@ConsentsResource.scopes</h5>
+            <ul class="list-group">
+                @foreach (var scopeName in consent.ScopeNames)
+                {
+                    <li class="list-group-item">@ConsentsResource.ResourceManager.GetString($"scope_{scopeName}")</li>
+                }
+            </ul>
+            <h5 class="card-title">@ConsentsResource.claims</h5>
+            <ul class="list-group">
+                @foreach (var claim in consent.ClaimNames)
+                {
+                    <li class="list-group-item">@claim</li>
+                }
+            </ul>
+        </div>
+        <div class="card-footer">
+            <a href="@Url.Action("RejectConsent", "Consents", new { consentId = consent.ConsentId })" class="btn btn-danger">@ConsentsResource.reject</a>
+        </div>
+    </div>
+}

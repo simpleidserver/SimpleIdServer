@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -33,6 +34,9 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.UI.AuthProviders;
+using SimpleIdServer.IdServer.UI.Infrastructures;
+using SimpleIdServer.IdServer.UI.Services;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -54,7 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
             });
-            services.AddControllers();
+            services.AddControllersWithViews();
             services.AddDataProtection();
             services.AddDistributedMemoryCache();
             services.AddStore()
@@ -216,6 +220,11 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<IOTPAuthenticator, HOTPAuthenticator>();
             services.AddTransient<IOTPAuthenticator, TOTPAuthenticator>();
+            services.AddTransient<ISessionManager, SessionManager>();
+            services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            services.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            services.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
+            services.AddTransient<IPasswordAuthService, PasswordAuthService>();
             return services;
         }
 

@@ -1,60 +1,60 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
-using SimpleIdServer.Jwt.Jws;
-using SimpleIdServer.OAuth.DTOs;
-using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Infrastructures;
-using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.Domains;
-using SimpleIdServer.OpenID.DTOs;
-using SimpleIdServer.OpenID.Extensions;
-using SimpleIdServer.OpenID.Options;
-using SimpleIdServer.OpenID.UI.ViewModels;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace SimpleIdServer.OpenID.UI
+namespace SimpleIdServer.IdServer.UI
 {
     public class CheckSessionController : Controller
     {
-        private readonly OpenIDHostOptions _options;
-        private readonly IJwtParser _jwtParser;
-        private readonly IOAuthUserRepository _oauthUserRepository;
-        private readonly IOAuthClientRepository _oauthClientRepository;
+        private readonly IdServerHostOptions _options;
+        private readonly IUserRepository _userRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
 
         public CheckSessionController(
-            IOptions<OpenIDHostOptions> options,
-            IJwtParser jwtParser,
-            IOAuthUserRepository oAuthUserRepository,
-            IOAuthClientRepository oAuthClientRepository,
+            IOptions<IdServerHostOptions> options,
+            IUserRepository userRepository,
+            IClientRepository clientRepository,
             IJwtBuilder jwtBuilder,
-            IHttpClientFactory httpClientFactory)
+            IdServer.Infrastructures.IHttpClientFactory httpClientFactory)
         {
             _options = options.Value;
-            _jwtParser = jwtParser;
-            _oauthUserRepository = oAuthUserRepository;
-            _oauthClientRepository = oAuthClientRepository;
+            _userRepository = userRepository;
+            _clientRepository = clientRepository;
             _jwtBuilder = jwtBuilder;
             _httpClientFactory = httpClientFactory;
         }
 
-        [HttpGet(SIDOpenIdConstants.EndPoints.CheckSession)]
+        [HttpGet]
         public IActionResult Index()
         {
             var newHtml = Html.Replace("{cookieName}", _options.SessionCookieName);
@@ -67,10 +67,10 @@ namespace SimpleIdServer.OpenID.UI
         }
 
         [Authorize("IsConnected")]
-        [HttpGet(SIDOpenIdConstants.EndPoints.EndSession)]
+        [HttpGet]
         public async Task<IActionResult> EndSession(CancellationToken cancellationToken)
         {
-            var url = SIDOpenIdConstants.EndPoints.EndSessionCallback;
+            var url = Constants.EndPoints.EndSessionCallback;
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
             var postLogoutRedirectUri = jObjBody.GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest();
@@ -91,7 +91,7 @@ namespace SimpleIdServer.OpenID.UI
                 var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
                 if (Request.QueryString.HasValue)
                 {
-                    url = Request.GetEncodedPathAndQuery().Replace($"/{SIDOpenIdConstants.EndPoints.EndSession}", $"/{SIDOpenIdConstants.EndPoints.EndSessionCallback}");
+                    url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
                 }
 
                 var sessionId = await GetSessionId(cancellationToken);
@@ -106,14 +106,14 @@ namespace SimpleIdServer.OpenID.UI
                     validationResult.Payload,
                     frontChannelLogout));
             }
-            catch(OAuthException ex)
+            catch (OAuthException ex)
             {
                 return BuildError(ex.Code, ex.Message);
             }
         }
 
         [Authorize("IsConnected")]
-        [HttpGet(SIDOpenIdConstants.EndPoints.EndSessionCallback)]
+        [HttpGet]
         public async Task<IActionResult> EndSessionCallback(CancellationToken cancellationToken)
         {
             var jObjBody = Request.Query.ToJObject();
@@ -140,33 +140,35 @@ namespace SimpleIdServer.OpenID.UI
             }
         }
 
-        protected async Task SendLogoutToken(OpenIdClient openIdClient, string sessionId, CancellationToken cancellationToken)
+        protected async Task SendLogoutToken(Client openIdClient, string sessionId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(openIdClient.BackChannelLogoutUri))
-            {
                 return;
-            }
 
             var currentDateTime = DateTime.UtcNow;
-            var events = new JObject
+            var events = new JsonObject
             {
-                { "http://schemas.openid.net/event/backchannel-logout", new JObject() }
+                { "http://schemas.openid.net/event/backchannel-logout", new JsonObject() }
             };
-            var jwsPayload = new JwsPayload
+            var jwsPayload = new Dictionary<string, object>
             {
-                { Jwt.Constants.OAuthClaims.Issuer, Request.GetAbsoluteUriWithVirtualPath() },
-                { Jwt.Constants.UserClaims.Subject, User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value },
-                { Jwt.Constants.OAuthClaims.Audiences, openIdClient.ClientId },
-                { Jwt.Constants.OAuthClaims.Iat, currentDateTime.ConvertToUnixTimestamp() },
-                { Jwt.Constants.OAuthClaims.Jti, Guid.NewGuid().ToString() },
-                { Jwt.Constants.OAuthClaims.Events, events }
+                { JwtRegisteredClaimNames.Sub, User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value },
+                { JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString() },
+                { Constants.UserClaims.Events, events }
             };
             if (openIdClient.BackChannelLogoutSessionRequired)
             {
-                jwsPayload.Add(Jwt.Constants.OAuthClaims.Sid, sessionId);
+                jwsPayload.Add(JwtRegisteredClaimNames.Sid, sessionId);
             }
 
-            var logoutToken = await _jwtBuilder.Sign(jwsPayload, openIdClient.TokenSignedResponseAlg, cancellationToken);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Issuer = Request.GetAbsoluteUriWithVirtualPath(),
+                Audience = openIdClient.ClientId,
+                IssuedAt = currentDateTime,
+                Claims = jwsPayload
+            };
+            var logoutToken = _jwtBuilder.Sign(tokenDescriptor, openIdClient.TokenSignedResponseAlg);
             using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var body = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
@@ -186,25 +188,23 @@ namespace SimpleIdServer.OpenID.UI
         protected async Task<string> GetSessionId(CancellationToken cancellationToken)
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _oauthUserRepository.FindOAuthUserByLogin(userId, cancellationToken);
-            return user.GetActiveSession()?.SessionId;
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            return user.ActiveSession?.SessionId;
         }
 
-        protected string BuildFrontChannelLogoutUrl(OpenIdClient client, string sessionId)
+        protected string BuildFrontChannelLogoutUrl(Client client, string sessionId)
         {
             if (string.IsNullOrWhiteSpace(client.FrontChannelLogoutUri))
-            {
                 return null;
-            }
 
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
-                url =  QueryHelpers.AddQueryString(url, new Dictionary<string, string>
+                url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
-                    { Jwt.Constants.OAuthClaims.Issuer, issuer },
-                    { Jwt.Constants.OAuthClaims.Sid, sessionId }
+                    { JwtRegisteredClaimNames.Iss, issuer },
+                    { JwtRegisteredClaimNames.Sid, sessionId }
                 });
             }
 
@@ -214,124 +214,73 @@ namespace SimpleIdServer.OpenID.UI
         protected virtual async Task<ValidationResult> Validate(string postLogoutRedirectUri, string idTokenHint, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_POST_LOGOUT_REDIRECT_URI);
-            }
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_POST_LOGOUT_REDIRECT_URI);
 
             if (string.IsNullOrWhiteSpace(idTokenHint))
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_ID_TOKEN_HINT);
-            }
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_ID_TOKEN_HINT);
 
-            string jwsHeaderAlg = null, jweHeaderAlg = null, jweHeaderEnc = null;
-            var jwsPayload = await ExtractIdTokenHint(idTokenHint, cancellationToken);
-            if (_jwtParser.IsJweToken(idTokenHint))
-            {
-                var jweHeader = _jwtParser.ExtractJweHeader(idTokenHint);
-                jweHeaderAlg = jweHeader.Alg;
-                jweHeaderEnc = jweHeader.Enc;
-            }
-            else
-            {
-                var jwsHeader = _jwtParser.ExtractJwsHeader(idTokenHint);
-                jwsHeaderAlg = jwsHeader.Alg;
-            }
-
+            var extractionResult = ExtractIdTokenHint(idTokenHint);
             var claimName = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            if (claimName != jwsPayload.GetSub())
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
-            }
+            if (claimName != extractionResult.Jwt.Subject)
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
 
-            if (!jwsPayload.GetAudiences().Contains(Request.GetAbsoluteUriWithVirtualPath()))
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
-            }
+            if (!extractionResult.Jwt.Audiences.Contains(Request.GetAbsoluteUriWithVirtualPath()))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
 
-            var openidClients = (await _oauthClientRepository.FindOAuthClientByIds(jwsPayload.GetAudiences(), cancellationToken)).Cast<OpenIdClient>();
-            if (openidClients == null || !openidClients.Any())
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_IDTOKENHINT);
-            }
+            var clients = await _clientRepository.Query().Where(c => extractionResult.Jwt.Audiences.Contains(c.ClientId)).ToListAsync(cancellationToken);
+            if (clients == null || !clients.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_IDTOKENHINT);
 
-            var openidClient = openidClients.FirstOrDefault(c => c.PostLogoutRedirectUris.Contains(postLogoutRedirectUri));
+            var openidClient = clients.FirstOrDefault(c => c.PostLogoutRedirectUris.Contains(postLogoutRedirectUri));
             if (openidClient == null)
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_POST_LOGOUT_REDIRECT_URI);
+
+            if (extractionResult.EncryptedJwt != null)
             {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_POST_LOGOUT_REDIRECT_URI);
+                if (openidClient.IdTokenEncryptedResponseAlg != extractionResult.EncryptedJwt.Alg || openidClient.IdTokenEncryptedResponseEnc != extractionResult.EncryptedJwt.Enc)
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT);
             }
 
-            if (!string.IsNullOrWhiteSpace(jweHeaderAlg))
+            if (openidClient.IdTokenSignedResponseAlg != extractionResult.Jwt.Alg)
             {
-                if (openidClient.IdTokenEncryptedResponseAlg != jweHeaderAlg || openidClient.IdTokenEncryptedResponseEnc != jweHeaderEnc)
-                {
-                    throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT);
-                }
-            }
-            else
-            {
-                if (openidClient.IdTokenSignedResponseAlg != jwsHeaderAlg)
-                {
-                    throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ALG_USED_TO_SIGN_IDTOKENHINT);
-                }
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_ALG_USED_TO_SIGN_IDTOKENHINT);
             }
 
-            return new ValidationResult(jwsPayload, openidClient);
+            return new ValidationResult(extractionResult.Jwt, openidClient);
         }
 
-        private async Task<JwsPayload> ExtractIdTokenHint(string idTokenHint, CancellationToken cancellationToken)
+        private ReadJsonWebTokenResult ExtractIdTokenHint(string idTokenHint)
         {
-            if (!_jwtParser.IsJwsToken(idTokenHint) && !_jwtParser.IsJweToken(idTokenHint))
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-            }
+            var handler = new JsonWebTokenHandler();
+            if (!handler.CanReadToken(idTokenHint))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
 
-            if (_jwtParser.IsJweToken(idTokenHint))
-            {
-                try
-                {
-                    idTokenHint = await _jwtParser.Decrypt(idTokenHint, cancellationToken);
-                }
-                catch(Exception)
-                {
-                    throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-                }
-
-                if (string.IsNullOrWhiteSpace(idTokenHint))
-                {
-                    throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-                }
-            }
-
-            try
-            {
-                return await _jwtParser.Unsign(idTokenHint, cancellationToken);
-            }
-            catch(Exception)
-            {
-                throw new OAuthException(OAuth.ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-            }
+            var validationResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idTokenHint);
+            if(validationResult.Error != null)
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
+            return validationResult;
         }
 
         private static IActionResult BuildError(string code, string message)
         {
-            var jObj = new JObject
+            var jObj = new JsonObject
             {
-                { ErrorResponseParameters.Error, code },
-                { ErrorResponseParameters.ErrorDescription, message }
+                [ErrorResponseParameters.Error] = code,
+                [ErrorResponseParameters.ErrorDescription] = message
             };
             return new BadRequestObjectResult(jObj);
         }
 
         protected class ValidationResult
         {
-            public ValidationResult(JwsPayload payload, OpenIdClient client) 
+            public ValidationResult(JsonWebToken payload, Client client)
             {
                 Payload = payload;
                 Client = client;
             }
 
-            public JwsPayload Payload { get; set; }
-            public OpenIdClient Client { get; set; }
+            public JsonWebToken Payload { get; set; }
+            public Client Client { get; set; }
         }
 
         private const string Html = @"<!DOCTYPE html>

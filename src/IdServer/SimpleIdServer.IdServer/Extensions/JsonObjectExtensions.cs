@@ -386,6 +386,16 @@ namespace System.Text.Json.Nodes
 
         #endregion
 
+        #region RP-Initiated logout
+
+        public static string GetIdTokenHintFromRpInitiatedLogoutRequest(this JsonObject jObj) => jObj.GetStr(RPInitiatedLogoutRequest.IdTokenHint);
+
+        public static string GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest(this JsonObject jObj) => jObj.GetStr(RPInitiatedLogoutRequest.PostLogoutRedirectUri);
+
+        public static string GetStateFromRpInitiatedLogoutRequest(this JsonObject jObj) => jObj.GetStr(RPInitiatedLogoutRequest.State);
+
+        #endregion
+
         public static void AddOrReplace(this JsonObject jObj, string name, string value)
         {
             if(jObj.ContainsKey(name))

@@ -138,6 +138,26 @@ namespace SimpleIdServer.IdServer.Options
         /// Maximum number of characters for the "binding_message".
         /// </summary>
         public int MaxBindingMessageSize { get; set; } = 150;
+        /// <summary>
+        /// Cookie auth expiration time in seconds.
+        /// </summary>
+        public int CookieAuthExpirationTimeInSeconds { get; set; } = 5 * 60;
+        /// <summary>
+        /// External Authentication scheme.
+        /// </summary>
+        public string ExternalAuthenticationScheme { get; set; } = Constants.ExternalAuthenticationScheme;
+        /// <summary>
+        /// Authentication scheme.
+        /// </summary>
+        public string AuthenticationScheme { get; set; } = Constants.MultiAccountAuthenticationScheme;
+        /// <summary>
+        /// Cookie name.
+        /// </summary>
+        public string CookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + Constants.MultiAccountAuthenticationScheme;
+        /// <summary>
+        /// Number of seconds the external authentication providers will be stored.
+        /// </summary>
+        public int? CacheExternalAuthProvidersInSeconds { get; set; }
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

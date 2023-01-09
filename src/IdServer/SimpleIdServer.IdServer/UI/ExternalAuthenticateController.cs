@@ -1,20 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.Common;
-using SimpleIdServer.OAuth;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.OAuth.Persistence;
-using SimpleIdServer.OpenID.ExternalEvents;
-using SimpleIdServer.OpenID.Helpers;
-using SimpleIdServer.OpenID.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +20,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.OpenID.UI
+namespace SimpleIdServer.IdServer.UI
 {
     public class ExternalAuthenticateController : BaseAuthenticateController
     {
@@ -31,32 +29,27 @@ namespace SimpleIdServer.OpenID.UI
         private readonly ILogger<ExternalAuthenticateController> _logger;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IBusControl _busControl;
 
         public ExternalAuthenticateController(
-            IOptions<OpenIDHostOptions> options,
+            IOptions<IdServerHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
-            IOAuthClientRepository oauthClientRepository,
+            IClientRepository clientRepository,
             IAmrHelper amrHelper,
-            IOAuthUserRepository oauthUserRepository,
+            IUserRepository userRepository,
             ILogger<ExternalAuthenticateController> logger,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IServiceProvider serviceProvider,
-            IBusControl busControl) : base(options, dataProtectionProvider, oauthClientRepository, amrHelper, oauthUserRepository)
+            IServiceProvider serviceProvider) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _serviceProvider = serviceProvider;
-            _busControl = busControl;
         }
 
         [HttpGet]
         public IActionResult Login(string scheme, string returnUrl)
         {
             if (string.IsNullOrWhiteSpace(scheme))
-            {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, nameof(scheme)));
-            }
 
             var items = new Dictionary<string, string>
             {
@@ -99,11 +92,11 @@ namespace SimpleIdServer.OpenID.UI
             return await Sign(returnUrl, "externalAuth", user, cancellationToken, true);
         }
 
-        private async Task<OAuthUser> JustInTimeProvision(AuthenticateResult authResult, CancellationToken cancellationToken)
+        private async Task<User> JustInTimeProvision(AuthenticateResult authResult, CancellationToken cancellationToken)
         {
             var scheme = authResult.Properties.Items[SCHEME_NAME];
             var principal = authResult.Principal;
-            var sub = GetClaim(principal, Jwt.Constants.UserClaims.Subject);
+            var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub);
             if (string.IsNullOrWhiteSpace(sub))
             {
                 sub = GetClaim(principal, ClaimTypes.NameIdentifier);
@@ -114,15 +107,14 @@ namespace SimpleIdServer.OpenID.UI
                 }
             }
 
-            var user = await OauthUserRepository.FindOAuthUserByExternalAuthProvider(scheme, sub, cancellationToken);
+            var user = await UserRepository.Query().Include(u => u.ExternalAuthProviders).Include(u => u.Sessions).FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub), cancellationToken);
             if (user == null)
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");
-                user = principal.BuildOAuthUser(scheme);
-                user.UpdateClaim(Jwt.Constants.UserClaims.Role, "visitor");
-                await OauthUserRepository.Add(user, cancellationToken);
-                await OauthUserRepository.SaveChanges(cancellationToken);
-                await _busControl.Publish(new UserAddedEvent(user.Id, 0, CommonConstants.ResourceTypes.OpenIdUser, user.OAuthUserClaims.ToDictionary(c => c.Name, c => c.Value)));
+                user = principal.BuildUser(scheme);
+                user.UpdateClaim(Constants.UserClaims.Role, "visitor");
+                UserRepository.Add(user);
+                await UserRepository.SaveChanges(cancellationToken);
                 _logger.LogInformation($"Finish to provision the user '{sub}'");
             }
 
