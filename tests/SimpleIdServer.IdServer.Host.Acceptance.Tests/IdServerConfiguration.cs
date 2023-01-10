@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
@@ -11,16 +12,12 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
     {
         public static List<Scope> Scopes => new List<Scope>
         {
-            new Scope
-            {
-                Name = "firstScope",
-                IsExposedInConfigurationEdp = true,
-            },
-            new Scope
-            {
-                Name = "secondScope",
-                IsExposedInConfigurationEdp = true
-            }
+            ScopeBuilder.Create("firstScope", true).Build(),
+            ScopeBuilder.Create("secondScope", true).Build(),
+            Constants.StandardScopes.OpenIdScope,
+            Constants.StandardScopes.Profile,
+            Constants.StandardScopes.Role,
+            Constants.StandardScopes.Email
         };
 
         public static List<Client> Clients = new List<Client>
@@ -36,44 +33,17 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("nineClient", "password", "http://localhost:8080").AddScope("secondScope").UseClientPkceAuthentication().Build(),
             ClientBuilder.BuildApiClient("elevenClient", "password").AddScope("secondScope").UseClientSelfSignedAuthentication().AddSelfSignedCertificate("elevelClientKeyId").Build(),
             ClientBuilder.BuildApiClient("twelveClient", "password").AddScope("secondScope").UseClientTlsAuthentication("cn=selfSigned").Build(),
-            ClientBuilder.BuildApiClient("thirteenClient", "password").AddScope("secondScope").SetTokenExpirationTimeInSeconds(-2).Build()
+            ClientBuilder.BuildApiClient("thirteenClient", "password").AddScope("secondScope").SetTokenExpirationTimeInSeconds(-2).Build(),
+            ClientBuilder.BuildUserAgentClient("fourteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build()
         };
 
         public static List<User> Users = new List<User>
         {
-            new User
-            {
-                Id = "user",
-                Credentials = new List<UserCredential>
-                {
-                    UserCredential.CreatePassword("password")
-                },
-                Consents = new List<Consent>
-                {
-                    new Consent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        ClientId = "thirdClient",
-                        Scopes = new [] { "secondScope" }
-                    },
-                    new Consent
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        ClientId = "nineClient",
-                        Scopes = new [] { "secondScope" }
-                    }
-                },
-                Sessions = new List<UserSession>
-                {
-                    new UserSession
-                    {
-                        AuthenticationDateTime = DateTime.UtcNow,
-                        ExpirationDateTime = DateTime.UtcNow.AddDays(2),
-                        SessionId = "sessionid",
-                        State = UserSessionStates.Active
-                    }
-                }
-            }
+            UserBuilder.Create("user", "password")
+                .AddConsent("thirdClient", "secondScope")
+                .AddConsent("nineClient", "secondScope")
+                .AddConsent("fourteenClient", "openid", "profile", "role", "email")
+                .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }
 }

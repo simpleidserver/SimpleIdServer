@@ -53,15 +53,6 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (!string.IsNullOrWhiteSpace(ClientName)) client.AddClientName(language, ClientName);
             if (GrantTypes == null || !GrantTypes.Any()) client.GrantTypes = new[] { AuthorizationCodeHandler.GRANT_TYPE };
             else client.GrantTypes = GrantTypes.ToList();
-            if (string.IsNullOrWhiteSpace(Scope))
-                client.Scopes = options.DefaultScopes.Select(s => new ClientScope
-                {
-                    Name = s
-                }).ToList();
-            else client.Scopes = Scope.ToScopes().Select(s => new ClientScope
-            {
-                Name = s
-            }).ToList();
             if (string.IsNullOrWhiteSpace(TokenAuthMethod)) client.TokenEndPointAuthMethod = options.DefaultTokenEndPointAuthMethod;
             else client.TokenEndPointAuthMethod = TokenAuthMethod;
             if (ResponseTypes == null || !ResponseTypes.Any()) client.ResponseTypes = new[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE };

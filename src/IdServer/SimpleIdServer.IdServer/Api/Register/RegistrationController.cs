@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
@@ -27,12 +28,14 @@ namespace SimpleIdServer.IdServer.Api.Register
     public class RegistrationController : Controller
     {
         private readonly IClientRepository _clientRepository;
+        private readonly IScopeRepository _scopeRepository;
         private readonly IRegisterClientRequestValidator _validator;
         private readonly IdServerHostOptions _options;
 
-        public RegistrationController(IClientRepository clientRepository, IRegisterClientRequestValidator validator, IOptions<IdServerHostOptions> options)
+        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
+            _scopeRepository = scopeRepository;
             _validator = validator;
             _options = options.Value;
         }
@@ -43,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             try
             {
                 await Validate(request, cancellationToken);
-                var client = Build(request);
+                var client = await Build(request, cancellationToken);
                 _clientRepository.Add(client);
                 await _clientRepository.SaveChanges(cancellationToken);
                 return new ContentResult
@@ -70,7 +73,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 if (existingClient != null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.CLIENT_IDENTIFIER_ALREADY_EXISTS, request.ClientId));
             }
 
-            Client Build(RegisterClientRequest request)
+            async Task<Client> Build(RegisterClientRequest request, CancellationToken cancellationToken)
             {
                 var client = new Client
                 {
@@ -81,7 +84,8 @@ namespace SimpleIdServer.IdServer.Api.Register
                     RefreshTokenExpirationTimeInSeconds = _options.DefaultRefreshTokenExpirationTimeInSeconds,
                     TokenExpirationTimeInSeconds = _options.DefaultTokenExpirationTimeInSeconds,
                     PreferredTokenProfile = _options.DefaultTokenProfile,
-                    ClientSecret = Guid.NewGuid().ToString()
+                    ClientSecret = Guid.NewGuid().ToString(),
+                    Scopes = await GetScopes(request.Scope, cancellationToken)
                 };
                 request.Apply(client, _options);
                 return client;
@@ -115,6 +119,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             try
             {
                 _validator.Validate(request);
+                res.Client.Scopes = await GetScopes(request.Scope, cancellationToken);
                 request.Apply(res.Client, _options);
                 await _clientRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
@@ -149,6 +154,12 @@ namespace SimpleIdServer.IdServer.Api.Register
             if(splittedFirstVal.Count() != 2 && splittedFirstVal.First() != "Bearer") return false;
             accessToken = splittedFirstVal.Last();
             return true;
+        }
+
+        private async Task<ICollection<Domains.Scope>> GetScopes(string scope, CancellationToken cancellationToken)
+        {
+            var scopeNames = string.IsNullOrWhiteSpace(scope) ? _options.DefaultScopes : scope.ToScopes();
+            return await _scopeRepository.Query().AsNoTracking().Where(s => scopeNames.Contains(s.Name)).ToListAsync(cancellationToken);
         }
 
         private class GetClientResult

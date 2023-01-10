@@ -96,7 +96,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
             context.SetClient(await AuthenticateClient(context.Request.RequestData, cancellationToken));
             var user = await _userRepository.Query()
-                .Include(u => u.Consents).Include(u => u.Sessions)
+                .Include(u => u.Consents)
+                .Include(u => u.Sessions)
+                .Include(u => u.OAuthUserClaims)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == context.Request.UserSubject, cancellationToken);
             context.SetUser(user);
@@ -135,7 +137,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
             }
 
-            var client = await _clientRepository.Query().Include(c => c.Scopes)
+            var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.Claims)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             if (client == null)

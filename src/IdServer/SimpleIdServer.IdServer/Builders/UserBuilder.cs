@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using System;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -29,6 +30,18 @@ namespace SimpleIdServer.IdServer.Builders
                 result._user.OAuthUserClaims.Add(new UserClaim { Value = name, Name = JwtRegisteredClaimNames.Name });
 
             return result;
+        }
+
+        public UserBuilder AddConsent(string clientId, params string[] scopes)
+        {
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes });
+            return this;
+        }
+
+        public UserBuilder AddSession(string id, DateTime expirationTime)
+        {
+            _user.Sessions.Add(new UserSession { SessionId = id, AuthenticationDateTime = DateTime.UtcNow, ExpirationDateTime = expirationTime, State = UserSessionStates.Active });
+            return this;
         }
 
         public User Build() => _user;

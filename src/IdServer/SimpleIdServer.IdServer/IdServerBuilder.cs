@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
@@ -77,7 +78,14 @@ namespace Microsoft.Extensions.DependencyInjection
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
             if (!storeDbContext.Clients.Any())
             {
-                storeDbContext.Clients.AddRange(clients);
+                var entires = storeDbContext.ChangeTracker.Entries();
+                foreach (var client in clients)
+                {
+                    var scopeNames = client.Scopes.Select(s => s.Name);
+                    client.Scopes = storeDbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToList();
+                    storeDbContext.Clients.Add(client);
+                }
+
                 storeDbContext.SaveChanges();
             }
 

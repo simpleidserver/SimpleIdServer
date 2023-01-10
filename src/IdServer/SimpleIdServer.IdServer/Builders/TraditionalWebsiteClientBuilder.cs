@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Builders
 
         public TraditionalWebsiteClientBuilder AddScope(params string[] scopes)
         {
-            foreach (var scope in scopes) _client.Scopes.Add(scope);
+            foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
             return this;
         }
 

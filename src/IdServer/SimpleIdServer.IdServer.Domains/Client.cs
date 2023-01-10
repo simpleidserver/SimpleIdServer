@@ -381,7 +381,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Scopes used by the client to control its access.
         /// </summary>
         [JsonIgnore]
-        public ICollection<ClientScope> Scopes { get; set; } = new List<ClientScope>();
+        public ICollection<Scope> Scopes { get; set; } = new List<Scope>();
         /// <summary>
         /// Client’s JSON Web Key Set document value, which contains the client’s public keys.
         /// </summary>

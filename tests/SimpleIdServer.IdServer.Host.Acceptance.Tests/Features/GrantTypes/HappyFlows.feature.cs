@@ -399,6 +399,61 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="No access token is issued then resulting claims are returned in the ID Token")]
+        [Xunit.TraitAttribute("FeatureTitle", "HappyFlows")]
+        [Xunit.TraitAttribute("Description", "No access token is issued then resulting claims are returned in the ID Token")]
+        public void NoAccessTokenIsIssuedThenResultingClaimsAreReturnedInTheIDToken()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("No access token is issued then resulting claims are returned in the ID Token", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 100
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 101
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table58 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table58.AddRow(new string[] {
+                            "response_type",
+                            "id_token"});
+                table58.AddRow(new string[] {
+                            "client_id",
+                            "fourteenClient"});
+                table58.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table58.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table58.AddRow(new string[] {
+                            "scope",
+                            "openid email role"});
+                table58.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table58.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+#line 102
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table58, "When ");
+#line hidden
+#line 112
+ testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

@@ -24,7 +24,6 @@ namespace SimpleIdServer.IdServer.Store
         {
             base.OnModelCreating(builder);
             builder.ApplyConfiguration(new ClientConfiguration());
-            builder.ApplyConfiguration(new ClientScopeConfiguration());
             builder.ApplyConfiguration(new ConsentConfiguration());
             builder.ApplyConfiguration(new ScopeClaimConfiguration());
             builder.ApplyConfiguration(new ScopeConfiguration());

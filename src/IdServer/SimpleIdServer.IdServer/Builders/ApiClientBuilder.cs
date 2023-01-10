@@ -165,7 +165,7 @@ namespace SimpleIdServer.IdServer.Builders
 
         public ApiClientBuilder AddScope(params string[] scopes)
         {
-            foreach (var scope in scopes) _client.Scopes.Add(scope);
+            foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
             return this;
         }
 

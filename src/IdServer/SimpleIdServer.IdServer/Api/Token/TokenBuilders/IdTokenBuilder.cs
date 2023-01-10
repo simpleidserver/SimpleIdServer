@@ -113,7 +113,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             IEnumerable<Scope> scopes = new Scope[1] { StandardScopes.OpenIdScope };
             var responseTypes = queryParameters.GetResponseTypesFromAuthorizationRequest();
             if (responseTypes.Count() == 1 && responseTypes.First() == AuthorizationResponseParameters.IdToken)
-                scopes = openidClient.Scopes.Where(s => requestedScopes.Contains(s.Name)).Select(s => new Scope { Name = s.Name });
+                scopes = openidClient.Scopes.Where(s => requestedScopes.Contains(s.Name));
 
             if (activeSession != null)
                 claims.Add(JwtRegisteredClaimNames.Sid, activeSession.SessionId);
