@@ -348,7 +348,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         public bool FrontChannelLogoutSessionRequired { get; set; }
         [JsonPropertyName(OAuthClientParameters.BackChannelLogoutSessionRequired)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         /// <summary>
         /// Boolean value specifying whether the OP can pass a SID claim in the Logout token to identify the RP session with the OP.
         /// If supported, the sid claim is also included in ID tokens issued by the OP.

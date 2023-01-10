@@ -11,9 +11,9 @@ builder.Services.AddSIDIdentityServer()
     .AddInMemoryClients(IdServerConfiguration.Clients)
     .AddInMemoryUsers(IdServerConfiguration.Users)
     .AddSigningKey(BuildSecurityKey())
-    .AddMutualAuthentication(callback: o =>
+    .AddAuthentication(o =>
     {
-        o.AllowedCertificateTypes = CertificateTypes.All;
+        o.AddMutualAuthentication(m => m.AllowedCertificateTypes = CertificateTypes.All);
     });
 
 var app = builder.Build().UseSID();

@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -10,10 +12,12 @@ namespace SimpleIdServer.IdServer
 {
     public class AuthBuilder
     {
+        private readonly IServiceCollection _services;
         private readonly AuthenticationBuilder _builder;
 
-        internal AuthBuilder(AuthenticationBuilder builder)
+        internal AuthBuilder(IServiceCollection services, AuthenticationBuilder builder)
         {
+            _services = services;
             _builder = builder;
         }
 
@@ -31,6 +35,32 @@ namespace SimpleIdServer.IdServer
                     }
                 };
                 if (callback != null) callback(opts);
+            });
+            return this;
+        }
+
+        public AuthBuilder AddMutualAuthentication(Action<CertificateAuthenticationOptions> callback = null)
+        {
+            _services.Configure<IdServerHostOptions>(o =>
+            {
+                o.MtlsEnabled = true;
+            });
+            _builder.AddCertificate(Constants.DefaultCertificateAuthenticationScheme, callback != null ? callback : o =>
+            {
+
+            });
+            return this;
+        }
+
+        public AuthBuilder AddMutualAuthenticationSelfSigned()
+        {
+            _services.Configure<IdServerHostOptions>(o =>
+            {
+                o.MtlsEnabled = true;
+            });
+            _builder.AddCertificate(Constants.DefaultCertificateAuthenticationScheme, o =>
+            {
+                o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
             });
             return this;
         }

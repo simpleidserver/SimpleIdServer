@@ -3,10 +3,10 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI.AuthProviders
 {
@@ -23,9 +23,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
         public async Task<IAuthenticationHandler> GetHandlerAsync(HttpContext context, string authenticationScheme)
         {
             if (_handlerMap.TryGetValue(authenticationScheme, out var value))
-            {
                 return value;
-            }
 
             var scheme = await _authenticationSchemeProvider.GetSIDSchemeAsync(authenticationScheme);
             var handlerType = scheme.AuthScheme.HandlerType;
@@ -37,13 +35,9 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 foreach (var par in ctr.GetParameters())
                 {
                     if (par.ParameterType.IsGenericType && par.ParameterType.GetGenericTypeDefinition() == typeof(IOptionsMonitor<>).GetGenericTypeDefinition())
-                    {
                         args.Add(scheme.OptionsMonitor);
-                    }
                     else
-                    {
                         args.Add(context.RequestServices.GetService(par.ParameterType));
-                    }
                 }
 
                 handler = Activator.CreateInstance(handlerType, args.ToArray()) as IAuthenticationHandler;

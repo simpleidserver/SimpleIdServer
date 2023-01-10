@@ -44,10 +44,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
         private IEnumerable<Domains.AuthenticationSchemeProvider> _cachedAuthenticationProviders;
         private DateTime? _nextExpirationTime;
 
-        public DynamicAuthenticationSchemeProvider(
-            IServiceProvider serviceProvider,
-            IOptions<IdServerHostOptions> opts,
-            IOptions<AuthenticationOptions> options) : base(options)
+        public DynamicAuthenticationSchemeProvider(IServiceProvider serviceProvider, IOptions<IdServerHostOptions> opts, IOptions<AuthenticationOptions> options) : base(options)
         {
             _serviceProvider = serviceProvider;
             _options = opts.Value;
@@ -61,9 +58,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             {
                 var newRule = Convert(scheme);
                 if (newRule == null)
-                {
                     continue;
-                }
 
                 rules.Add(newRule.AuthScheme);
             }
@@ -71,23 +66,15 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             return rules;
         }
 
-        public override Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync()
-        {
-            return GetAllSchemesAsync();
-        }
+        public override Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync() => GetAllSchemesAsync();
 
-        public override async Task<AuthenticationScheme> GetSchemeAsync(string name)
-        {
-            return (await GetSIDSchemeAsync(name)).AuthScheme;
-        }
+        public override async Task<AuthenticationScheme> GetSchemeAsync(string name) => (await GetSIDSchemeAsync(name)).AuthScheme;
 
         public async Task<SIDAuthenticationScheme> GetSIDSchemeAsync(string name)
         {
             var result = await base.GetSchemeAsync(name);
             if (result != null)
-            {
                 return new SIDAuthenticationScheme(result);
-            }
 
             var providers = await GetAuthenticationSchemeProviders();
             var provider = providers.FirstOrDefault(p => p.Name == name);
@@ -120,53 +107,45 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
         private SIDAuthenticationScheme Convert(Domains.AuthenticationSchemeProvider provider)
         {
-            if (string.IsNullOrWhiteSpace(provider.Options))
-            {
-                return null;
-            }
-
+            if (string.IsNullOrWhiteSpace(provider.SerializedOptions)) return null;
             var handlerType = Type.GetType(provider.HandlerFullQualifiedName);
             var authenticationHandlerType = GetGenericType(handlerType, typeof(AuthenticationHandler<>));
-            if (authenticationHandlerType == null)
-            {
-                return null;
-            }
+            if (authenticationHandlerType == null) return null;
+            var liteOptionType = Type.GetType(provider.OptionsFullQualifiedName);
+            if (liteOptionType == null) return null;
 
             var optionType = authenticationHandlerType.GetGenericArguments().First();
-            var option = JsonSerializer.Deserialize(provider.Options, optionType);
-            if (!string.IsNullOrWhiteSpace(provider.PostConfigureOptionsFullQualifiedName))
+            var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
+            var convert = liteOptionInterface.GetMethod("Convert");
+            var liteOptions = JsonSerializer.Deserialize(provider.SerializedOptions, liteOptionType);
+            var options = convert.Invoke(liteOptions, new object[] { });
+            PostConfigureOptions(optionType, handlerType, options);
+            var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);
+            var optionsMonitor = Activator.CreateInstance(optionsMonitorType, options);
+            return new SIDAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), optionsMonitor);
+
+            void PostConfigureOptions(Type optionType, Type handlerType, object options)
             {
-                var postConfigureOptionsType = Type.GetType(provider.PostConfigureOptionsFullQualifiedName);
+                var postConfigureOptionsType = typeof(OAuthPostConfigureOptions<,>).MakeGenericType(optionType, handlerType);
                 var constructor = postConfigureOptionsType.GetConstructors().First();
                 var args = new List<object>();
                 foreach (var parameter in constructor.GetParameters())
-                {
                     args.Add(_serviceProvider.GetRequiredService(parameter.ParameterType));
-                }
 
                 var postConfigure = postConfigureOptionsType.GetMethod("PostConfigure", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 var instance = Activator.CreateInstance(postConfigureOptionsType, args.ToArray());
-                postConfigure.Invoke(instance, new object[] { provider.Name, option });
-
+                postConfigure.Invoke(instance, new object[] { provider.Name, options });
             }
-
-            var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);
-            var optionsMonitor = Activator.CreateInstance(optionsMonitorType, option);
-            return new SIDAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), optionsMonitor);
         }
 
         public static Type GetGenericType(Type givenType, Type genericType)
         {
             if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
-            {
                 return givenType;
-            }
 
             Type baseType = givenType.BaseType;
             if (baseType == null)
-            {
                 return null;
-            }
 
             return GetGenericType(baseType, genericType);
         }

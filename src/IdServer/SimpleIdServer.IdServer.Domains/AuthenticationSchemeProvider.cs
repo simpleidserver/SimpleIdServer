@@ -14,16 +14,14 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public string? HandlerFullQualifiedName { get; set; } = null;
-        public string? JsonConverter { get; set; } = null;
         public string? OptionsFullQualifiedName { get; set; } = null;
-        public string? PostConfigureOptionsFullQualifiedName { get; set; } = null;
-        public string? Options { get; set; } = null;
+        public string? SerializedOptions { get; set; } = null;
 
         public JsonObject? JsonOptions
         {
             get
             {
-                return JsonSerializer.SerializeToNode(Options)?.AsObject();
+                return JsonSerializer.SerializeToNode(SerializedOptions)?.AsObject();
             }
         }
 
@@ -35,7 +33,7 @@ namespace SimpleIdServer.IdServer.Domains
 
         public void UpdateOptions(JsonObject jObj)
         {
-            Options = jObj.ToString();
+            SerializedOptions = jObj.ToString();
             UpdateDateTime = DateTime.UtcNow;
         }
 

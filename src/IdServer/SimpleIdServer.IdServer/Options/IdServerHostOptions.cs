@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Options
         /// <summary>
         /// Mututal TLS is enabled.
         /// </summary>
-        public bool MtlsEnabled { get; set; } = false;
+        public bool MtlsEnabled { get; internal set; } = false;
         /// <summary>
         /// JWK expiration time in seconds.
         /// </summary>
@@ -138,10 +138,6 @@ namespace SimpleIdServer.IdServer.Options
         /// Name of the cookie used to store the session id.
         /// </summary>
         public string SessionCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Session";
-        /// <summary>
-        /// Client certificate authentication scheme.
-        /// </summary>
-        public string CertificateAuthenticationScheme { get; set; } = Constants.CertificateAuthenticationScheme;
         /// <summary>
         /// Number of seconds the external authentication providers will be stored.
         /// </summary>

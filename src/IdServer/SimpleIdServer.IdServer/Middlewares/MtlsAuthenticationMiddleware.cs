@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Middlewares
 
         private async Task<AuthenticateResult> Authenticate(HttpContext context)
         {
-            var x509AuthResult = await context.AuthenticateAsync(_options.CertificateAuthenticationScheme);
+            var x509AuthResult = await context.AuthenticateAsync(Constants.DefaultCertificateAuthenticationScheme);
             if (!x509AuthResult.Succeeded)
             {
                 _logger.LogError($"MTLS authentication failed : {x509AuthResult.Failure?.Message}");

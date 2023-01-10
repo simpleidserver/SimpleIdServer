@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -11,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,11 +84,29 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
+        public IdServerBuilder EnableConfigurableAuthentication(ICollection<SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider> providers)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if(!storeDbContext.AuthenticationSchemeProviders.Any())
+            {
+                storeDbContext.AuthenticationSchemeProviders.AddRange(providers);
+                storeDbContext.SaveChanges();
+            }
+
+            _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
+            return this;
+        }
+
         public IdServerBuilder AddInMemoryAcr(ICollection<AuthenticationContextClassReference> acrs)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            storeDbContext.Acrs.AddRange(acrs);
-            storeDbContext.SaveChanges();
+            if(!storeDbContext.Acrs.Any())
+            {
+                storeDbContext.Acrs.AddRange(acrs);
+                storeDbContext.SaveChanges();
+            }
+
             return this;
         }
 
@@ -101,34 +119,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 storeDbContext.SaveChanges();
             }
 
-            return this;
-        }
-
-        public IdServerBuilder AddMutualAuthentication(string authenticationSchema = Constants.CertificateAuthenticationScheme, Action<CertificateAuthenticationOptions> callback = null)
-        {
-            _serviceCollection.Configure<IdServerHostOptions>(o =>
-            {
-                o.MtlsEnabled = true;
-                o.CertificateAuthenticationScheme = authenticationSchema;
-            });
-            _authenticationBuilder.AddCertificate(authenticationSchema, callback != null ? callback : o =>
-            {
-
-            });
-            return this;
-        }
-
-        public IdServerBuilder AddMutualAuthenticationSelfSigned(string authenticationSchema = Constants.CertificateAuthenticationScheme)
-        {
-            _serviceCollection.Configure<IdServerHostOptions>(o =>
-            {
-                o.MtlsEnabled = true;
-                o.CertificateAuthenticationScheme = authenticationSchema;
-            });
-            _authenticationBuilder.AddCertificate(authenticationSchema, o =>
-            {
-                o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
-            });
             return this;
         }
 
@@ -169,7 +159,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     };
                 });
             if(callback != null)
-                callback(new AuthBuilder(auth));
+                callback(new AuthBuilder(_serviceCollection, auth));
 
             string GetTlsTokenBinding(CookieSigningInContext context)
             {
