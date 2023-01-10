@@ -101,7 +101,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 if (jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))
                     authTime = a.ConvertFromUnixTimestamp();
 
-                var user = await _userRepository.Query().AsNoTracking().FirstOrDefaultAsync(u => u.Id == subject, cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.OAuthUserClaims).AsNoTracking().FirstOrDefaultAsync(u => u.Id == subject, cancellationToken);
                 if (user == null) return new UnauthorizedResult();
 
                 var filteredClients = await _clientRepository.Query().AsNoTracking().Where(c => audiences.Contains(c.ClientId)).ToListAsync(cancellationToken);
@@ -119,7 +119,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
                 }
 
-                var oauthScopes = await _scopeRepository.Query().AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
+                var oauthScopes = await _scopeRepository.Query().Include(s => s.Claims).AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
                 var payload = new Dictionary<string, object>();
                 IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user, subject);
                 _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);

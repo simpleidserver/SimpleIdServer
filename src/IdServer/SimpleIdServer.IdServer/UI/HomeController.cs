@@ -41,18 +41,34 @@ namespace SimpleIdServer.IdServer.UI
         [HttpGet]
         public IActionResult Authenticate()
         {
-            var scheme = "oidc";
             var returnUrl = Url.Action(nameof(Index));
             var items = new Dictionary<string, string>
             {
-                { "scheme", scheme },
+                { "scheme", Constants.DefaultOIDCAuthenticationScheme },
                 { "returnUrl", returnUrl }
             };
             var props = new AuthenticationProperties(items)
             {
                 RedirectUri = returnUrl
             };
-            return Challenge(props, scheme);
+            return Challenge(props, Constants.DefaultOIDCAuthenticationScheme);
+        }
+
+        [HttpGet]
+        public IActionResult ChooseSession()
+        {
+            var returnUrl = Url.Action(nameof(Index));
+            var items = new Dictionary<string, string>
+            {
+                { "scheme", Constants.DefaultOIDCAuthenticationScheme },
+                { "returnUrl", returnUrl },
+                { "prompt", PromptParameters.SelectAccount }
+            };
+            var props = new AuthenticationProperties(items)
+            {
+                RedirectUri = returnUrl
+            };
+            return Challenge(props, Constants.DefaultOIDCAuthenticationScheme);
         }
 
         [HttpGet]

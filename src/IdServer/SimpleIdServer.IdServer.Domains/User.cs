@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    public class User : ICloneable, IEquatable<User>
+    public class User : IEquatable<User>
     {
         public User()
         {
@@ -88,39 +88,13 @@ namespace SimpleIdServer.IdServer.Domains
             });
         }
 
-        public new static User Create(string name, string sub = null)
-        {
-            if (string.IsNullOrWhiteSpace(sub))
-            {
-                sub = Guid.NewGuid().ToString();
-            }
-
-            var user = new User
-            {
-                Id = sub,
-                OAuthUserClaims = new List<UserClaim>
-                {
-                    new UserClaim(name, sub)
-                }
-            };
-            return user;
-        }
-
-        public virtual object Clone()
+        public new static User Create(string sub)
         {
             return new User
             {
-                Id = Id,
-                Status = Status,
-                Credentials = Credentials == null ? new List<UserCredential>() : Credentials.Select(_ => (UserCredential)_.Clone()).ToList(),
-                OAuthUserClaims = Claims == null ? new List<UserClaim>() : OAuthUserClaims.Select(_ => (UserClaim)_.Clone()).ToList(),
-                DeviceRegistrationToken = DeviceRegistrationToken,
-                CreateDateTime = CreateDateTime,
-                UpdateDateTime = UpdateDateTime,
-                Sessions = Sessions.Select(s => (UserSession)s.Clone()).ToList(),
-                OTPCounter = OTPCounter,
-                OTPKey = OTPKey,
-                ExternalAuthProviders = ExternalAuthProviders.Select(e => (UserExternalAuthProvider)e.Clone()).ToList()
+                Id = sub,
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow
             };
         }
 

@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
@@ -10,6 +12,7 @@ using SimpleIdServer.IdServer.Api.Token.Validators;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +29,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly IUserRepository _userRepository;
         private readonly IdServerHostOptions _options;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
@@ -34,6 +38,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantedTokenHelper grantedTokenHelper, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders,
+            IUserRepository usrRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
             IOptions<IdServerHostOptions> options,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
@@ -42,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
+            _userRepository = usrRepository;
             _options = options.Value;
             _logger = logger;
         }
@@ -80,6 +86,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
                 var scopes = previousRequest.GetScopesFromAuthorizationRequest();
                 var result = BuildResult(context, scopes);
+                await Authenticate(previousRequest, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
                     await tokenBuilder.Refresh(previousRequest, context, cancellationToken);
@@ -101,6 +108,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             {
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
+        }
+
+        async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)
+        {
+            if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
+                return;
+            handlerContext.SetUser(await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token));
         }
     }
 }

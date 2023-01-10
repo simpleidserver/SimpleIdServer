@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
@@ -10,6 +11,7 @@ using SimpleIdServer.IdServer.Api.Token.Validators;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,6 +29,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly IUserRepository _userRepository;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -34,6 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantedTokenHelper grantedTokenHelper, 
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
+            IUserRepository userRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
@@ -42,6 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _grantedTokenHelper = grantedTokenHelper;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
+            _userRepository = userRepository;
             _logger = logger;
         }
 
@@ -108,6 +113,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
                 var scopes = jwsPayload.GetScopesFromAuthorizationRequest();
                 var result = BuildResult(context, scopes);
+                await Authenticate(jwsPayload, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
                     await tokenBuilder.Refresh(jwsPayload, context, cancellationToken);
@@ -129,6 +135,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             {
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }
+        }
+
+        async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)
+        {
+            if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
+                return;
+            handlerContext.SetUser(await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token));
         }
     }
 }

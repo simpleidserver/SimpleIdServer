@@ -26,7 +26,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IPasswordAuthService _passwordAuthService;
 
-        public AuthenticateController(IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository)
+        public AuthenticateController(IAuthenticationSchemeProvider authenticationSchemeProvider, IPasswordAuthService passwordAuthService, IOptions<IdServerHostOptions> options, IDataProtectionProvider dataProtectionProvider, IClientRepository clientRepository, IAmrHelper amrHelper, IUserRepository userRepository, IUserTransformer userTransformer) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _passwordAuthService = passwordAuthService;
@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.UI
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                var externalIdProviders = schemes.Where(s => !string.IsNullOrWhiteSpace(s.DisplayName));
+                var externalIdProviders = schemes.Where(s => !string.IsNullOrWhiteSpace(s.DisplayName) && Constants.DefaultOIDCAuthenticationScheme != s.Name);
                 return View(new AuthenticatePasswordViewModel(
                 loginHint,
                     returnUrl,

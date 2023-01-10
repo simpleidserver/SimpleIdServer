@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
@@ -25,19 +26,22 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IAmrHelper _amrHelper;
         private readonly IUserRepository _userRepository;
+        private readonly IUserTransformer _userTransformer;
 
         public BaseAuthenticateController(
             IOptions<IdServerHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
             IClientRepository clientRepository,
             IAmrHelper amrHelper,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IUserTransformer userTransformer)
         {
             _options = options.Value;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _clientRepository = clientRepository;
             _amrHelper = amrHelper;
             _userRepository = userRepository;
+            _userTransformer = userTransformer;
         }
 
         protected IClientRepository ClientRepository => _clientRepository;
@@ -75,20 +79,11 @@ namespace SimpleIdServer.IdServer.UI
 
         protected async Task<IActionResult> Sign(string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
-            var currentDateTime = DateTime.UtcNow;
-            var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+            await AddSession(user, currentAmr, token);
             var offset = DateTimeOffset.UtcNow.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
-            var claims = user.Claims;
+            var claims = _userTransformer.Transform(user);
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-            user.AddSession(expirationDateTime);
-            await _userRepository.SaveChanges(token);
-            Response.Cookies.Append(_options.SessionCookieName, user.ActiveSession.SessionId, new CookieOptions
-            {
-                Secure = true,
-                HttpOnly = false,
-                SameSite = SameSiteMode.None
-            });
             if (rememberLogin)
             {
                 await HttpContext.SignInAsync(claimsPrincipal, new AuthenticationProperties
@@ -106,6 +101,21 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             return Redirect(returnUrl);
+        }
+
+        protected async Task AddSession(User user, string currentAmr, CancellationToken cancellationToken)
+        {
+            var currentDateTime = DateTime.UtcNow;
+            var expirationDateTime = currentDateTime.AddSeconds(_options.CookieAuthExpirationTimeInSeconds);
+            var claims = user.Claims;
+            user.AddSession(expirationDateTime);
+            await _userRepository.SaveChanges(cancellationToken);
+            Response.Cookies.Append(_options.SessionCookieName, user.ActiveSession.SessionId, new CookieOptions
+            {
+                Secure = true,
+                HttpOnly = false,
+                SameSite = SameSiteMode.None
+            });
         }
     }
 }

@@ -121,13 +121,13 @@
     <value>Active sessions</value>
   </data>
   <data name="authentication_time" xml:space="preserve">
-    <value>Authentication time</value>
+    <value>Authentication time {0}</value>
   </data>
   <data name="choose_session" xml:space="preserve">
     <value>Choose session</value>
   </data>
   <data name="expiration_time" xml:space="preserve">
-    <value>Expiration time</value>
+    <value>Expiration time {0}</value>
   </data>
   <data name="revoke_session_title" xml:space="preserve">
     <value>Revoke a session</value>

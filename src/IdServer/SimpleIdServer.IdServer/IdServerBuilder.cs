@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
@@ -13,7 +14,9 @@ using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -115,18 +118,78 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
-        public IdServerBuilder AddAuthentication(string externalAuthenticationScheme = Constants.ExternalAuthenticationScheme, Action<AuthBuilder> callback = null)
+        public IdServerBuilder AddMutualAuthenticationSelfSigned(string authenticationSchema = Constants.CertificateAuthenticationScheme)
         {
             _serviceCollection.Configure<IdServerHostOptions>(o =>
             {
-                o.ExternalAuthenticationScheme = externalAuthenticationScheme;
+                o.MtlsEnabled = true;
+                o.CertificateAuthenticationScheme = authenticationSchema;
             });
+            _authenticationBuilder.AddCertificate(authenticationSchema, o =>
+            {
+                o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
+            });
+            return this;
+        }
+
+        public IdServerBuilder AddAuthentication(Action<AuthBuilder> callback = null)
+        {
             var auth = _serviceCollection.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie()
-                .AddCookie(externalAuthenticationScheme);
+                .AddCookie(opts =>
+                {
+                    opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
+                    {
+                        if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
+                        {
+                            var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
+                            var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
+                            ctx.Options.CookieManager.AppendResponseCookie(
+                                ctx.HttpContext,
+                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                cookieValue,
+                                ctx.CookieOptions);
+                        }
+
+                        return Task.CompletedTask;
+                    };
+                    opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
+                    {
+                        if (ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
+                        {
+                            var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            ctx.Options.CookieManager.DeleteCookie(
+                                ctx.HttpContext,
+                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                ctx.CookieOptions);
+                            return Task.CompletedTask;
+                        }
+
+                        return Task.CompletedTask;
+                    };
+                });
             if(callback != null)
                 callback(new AuthBuilder(auth));
 
+            string GetTlsTokenBinding(CookieSigningInContext context)
+            {
+                var binding = context.HttpContext.Features.Get<ITlsTokenBindingFeature>()?.GetProvidedTokenBindingId();
+                return binding == null ? null : Convert.ToBase64String(binding);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add back channel authentication (CIBA).
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder AddBackChannelAuthentication()
+        {
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.IsBCEnabled = true;
+            });
             return this;
         }
 
@@ -139,33 +202,6 @@ namespace Microsoft.Extensions.DependencyInjection
             _serviceCollection.Configure<IdServerHostOptions>(o =>
             {
                 o.UseRealm = true;
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// Add back channel authentication.
-        /// </summary>
-        /// <returns></returns>
-        public IdServerBuilder AddBackChannelAuthentication()
-        {
-            _serviceCollection.Configure<IdServerHostOptions>(o =>
-            {
-                o.IsBCEnabled = true;
-            });
-            return this;
-        }
-
-        public IdServerBuilder AddMutualAuthenticationSelfSigned(string authenticationSchema = Constants.CertificateAuthenticationScheme)
-        {
-            _serviceCollection.Configure<IdServerHostOptions>(o =>
-            {
-                o.MtlsEnabled = true;
-                o.CertificateAuthenticationScheme = authenticationSchema;
-            });
-            _authenticationBuilder.AddCertificate(authenticationSchema, o =>
-            {
-                o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
             });
             return this;
         }

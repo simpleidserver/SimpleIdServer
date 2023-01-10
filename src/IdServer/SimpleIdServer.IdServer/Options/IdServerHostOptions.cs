@@ -34,10 +34,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public bool MtlsEnabled { get; set; } = false;
         /// <summary>
-        /// Client certificate authentication scheme.
-        /// </summary>
-        public string CertificateAuthenticationScheme { get; set; } = Constants.CertificateAuthenticationScheme;
-        /// <summary>
         /// JWK expiration time in seconds.
         /// </summary>
         public int JWKExpirationTimeInSeconds { get; set; } = 60 * 5;
@@ -107,10 +103,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public string DefaultCulture { get; set; } = "en";
         /// <summary>
-        /// Name of the cookie used to store the session id.
-        /// </summary>
-        public string SessionCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Session";
-        /// <summary>
         /// Default acr value.
         /// </summary>
         public string DefaultAcrValue { get; set; } = Constants.StandardAcrs.FirstLevelAssurance.Name;
@@ -143,17 +135,13 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public int CookieAuthExpirationTimeInSeconds { get; set; } = 5 * 60;
         /// <summary>
-        /// External Authentication scheme.
+        /// Name of the cookie used to store the session id.
         /// </summary>
-        public string ExternalAuthenticationScheme { get; set; } = Constants.ExternalAuthenticationScheme;
+        public string SessionCookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + "Session";
         /// <summary>
-        /// Authentication scheme.
+        /// Client certificate authentication scheme.
         /// </summary>
-        public string AuthenticationScheme { get; set; } = Constants.MultiAccountAuthenticationScheme;
-        /// <summary>
-        /// Cookie name.
-        /// </summary>
-        public string CookieName { get; set; } = CookieAuthenticationDefaults.CookiePrefix + Constants.MultiAccountAuthenticationScheme;
+        public string CertificateAuthenticationScheme { get; set; } = Constants.CertificateAuthenticationScheme;
         /// <summary>
         /// Number of seconds the external authentication providers will be stored.
         /// </summary>

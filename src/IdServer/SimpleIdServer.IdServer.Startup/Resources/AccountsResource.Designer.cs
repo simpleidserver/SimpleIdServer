@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authentication time.
+        ///   Recherche une chaîne localisée semblable à Authentication time {0}.
         /// </summary>
         public static string authentication_time {
             get {
@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Expiration time.
+        ///   Recherche une chaîne localisée semblable à Expiration time {0}.
         /// </summary>
         public static string expiration_time {
             get {

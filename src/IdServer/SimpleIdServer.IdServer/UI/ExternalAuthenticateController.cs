@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ILogger<ExternalAuthenticateController> _logger;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IUserTransformer _userTransformer;
 
         public ExternalAuthenticateController(
             IOptions<IdServerHostOptions> options,
@@ -38,11 +40,13 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             ILogger<ExternalAuthenticateController> logger,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
-            IServiceProvider serviceProvider) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository)
+            IServiceProvider serviceProvider,
+            IUserTransformer userTransformer) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _serviceProvider = serviceProvider;
+            _userTransformer = userTransformer;
         }
 
         [HttpGet]
@@ -61,15 +65,15 @@ namespace SimpleIdServer.IdServer.UI
             }
             var props = new AuthenticationProperties(items)
             {
-                RedirectUri = Url.Action(nameof(Callback)),
+                RedirectUri = Url.Action(nameof(Callback), new { scheme = scheme }),
             };
             return Challenge(props, scheme);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Callback(CancellationToken cancellationToken)
+        public async Task<IActionResult> Callback(string scheme, CancellationToken cancellationToken)
         {
-            var result = await HttpContext.AuthenticateAsync(Options.ExternalAuthenticationScheme);
+            var result = await HttpContext.AuthenticateAsync(scheme);
             if (result == null || !result.Succeeded)
             {
                 if (result.Failure != null)
@@ -81,7 +85,6 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             var user = await JustInTimeProvision(result, cancellationToken);
-            await HttpContext.SignOutAsync(Options.ExternalAuthenticationScheme);
             var returnUrl = "~/";
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
             {
@@ -96,23 +99,23 @@ namespace SimpleIdServer.IdServer.UI
         {
             var scheme = authResult.Properties.Items[SCHEME_NAME];
             var principal = authResult.Principal;
-            var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub);
+            var sub = GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? GetClaim(principal, ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(sub))
             {
-                sub = GetClaim(principal, ClaimTypes.NameIdentifier);
-                if (string.IsNullOrWhiteSpace(sub))
-                {
-                    _logger.LogError("There is not valid subject");
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
-                }
+                _logger.LogError("There is not valid subject");
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER);
             }
 
-            var user = await UserRepository.Query().Include(u => u.ExternalAuthProviders).Include(u => u.Sessions).FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub), cancellationToken);
+            var user = await UserRepository.Query()
+                .Include(u => u.ExternalAuthProviders)
+                .Include(u => u.Sessions)
+                .Include(u => u.OAuthUserClaims)
+                .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub), cancellationToken);
             if (user == null)
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");
-                user = principal.BuildUser(scheme);
-                user.UpdateClaim(Constants.UserClaims.Role, "visitor");
+                user = _userTransformer.Transform(principal);
+                user.AddExternalAuthProvider(scheme, sub);
                 UserRepository.Add(user);
                 await UserRepository.SaveChanges(cancellationToken);
                 _logger.LogInformation($"Finish to provision the user '{sub}'");
@@ -125,10 +128,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             var claim = principal.Claims.FirstOrDefault(c => c.Type == claimType);
             if (claim == null || string.IsNullOrWhiteSpace(claim.Value))
-            {
                 return null;
-            }
-
             return claim.Value;
         }
     }

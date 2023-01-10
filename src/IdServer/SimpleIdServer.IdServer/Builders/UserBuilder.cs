@@ -3,7 +3,6 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
-using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -16,7 +15,7 @@ namespace SimpleIdServer.IdServer.Builders
             _user = new User();
         }
 
-        public static UserBuilder Create(string login, string password)
+        public static UserBuilder Create(string login, string password, string name = null)
         {
             var result = new UserBuilder();
             result._user.Id = login;
@@ -25,7 +24,10 @@ namespace SimpleIdServer.IdServer.Builders
                 CredentialType = "pwd",
                 Value = PasswordHelper.ComputeHash(password)
             });
-            result._user.OAuthUserClaims.Add(new UserClaim { Type = "string", Value = login, Name = ClaimTypes.NameIdentifier });
+            result._user.OAuthUserClaims.Add(new UserClaim { Value = login, Name = JwtRegisteredClaimNames.Sub });
+            if (!string.IsNullOrWhiteSpace(name))
+                result._user.OAuthUserClaims.Add(new UserClaim { Value = name, Name = JwtRegisteredClaimNames.Name });
+
             return result;
         }
 

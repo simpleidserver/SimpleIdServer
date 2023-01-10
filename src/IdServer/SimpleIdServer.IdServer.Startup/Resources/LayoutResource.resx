@@ -120,6 +120,9 @@
   <data name="authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="choose_session" xml:space="preserve">
+    <value>Choose active session</value>
+  </data>
   <data name="consents" xml:space="preserve">
     <value>Consents</value>
   </data>

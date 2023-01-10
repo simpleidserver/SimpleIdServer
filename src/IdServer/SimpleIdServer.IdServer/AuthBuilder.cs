@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer
 {
@@ -16,10 +17,24 @@ namespace SimpleIdServer.IdServer
             _builder = builder;
         }
 
-        public AuthBuilder AddSelfAuthentication(Action<OpenIdConnectOptions> callback, string selfAuthenticationScheme = Constants.SelfAuthenticationScheme)
+        public AuthBuilder AddOIDCAuthentication(Action<OpenIdConnectOptions> callback)
         {
-            _builder.AddOpenIdConnect(selfAuthenticationScheme, callback);
+            _builder.AddOpenIdConnect(Constants.DefaultOIDCAuthenticationScheme, (opts) =>
+            {
+                opts.Events = new OpenIdConnectEvents
+                {
+                    OnRedirectToIdentityProvider = context =>
+                    {
+                        if (context.Properties.Items.TryGetValue("prompt", out string prompt))
+                            context.ProtocolMessage.Prompt = prompt;
+                        return Task.CompletedTask;
+                    }
+                };
+                if (callback != null) callback(opts);
+            });
             return this;
         }
+
+        public AuthenticationBuilder Builder => _builder;
     }
 }

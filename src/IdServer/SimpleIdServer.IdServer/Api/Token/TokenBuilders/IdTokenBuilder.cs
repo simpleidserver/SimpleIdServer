@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +9,6 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
@@ -31,7 +29,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         private readonly IClaimsEnricher _claimsEnricher;
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly IAmrHelper _amrHelper;
-        private readonly IUserRepository _userRepository;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
 
         public IdTokenBuilder(
@@ -40,7 +37,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             IClaimsEnricher claimsEnricher,
             IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders,
             IAmrHelper amrHelper,
-            IUserRepository userRepository,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher)
         {
             _options = options.Value;
@@ -48,7 +44,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             _claimsEnricher = claimsEnricher;
             _subjectTypeBuilders = subjectTypeBuilders;
             _amrHelper = amrHelper;
-            _userRepository = userRepository;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
         }
 
@@ -73,7 +68,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 return;
 
             var scopes = previousQueryParameters.GetScopes();
-            handlerContext.SetUser(await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == previousQueryParameters[JwtRegisteredClaimNames.Sub].ToString(), token));
             var openidClient = handlerContext.Client;
             var payload = await BuildIdToken(handlerContext, previousQueryParameters, scopes, token);
             var idToken = await _jwtBuilder.BuildClientToken(handlerContext.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, token);

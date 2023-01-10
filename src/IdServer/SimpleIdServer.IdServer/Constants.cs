@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
@@ -286,10 +287,8 @@ namespace SimpleIdServer.IdServer
             public const string Password = "pwd";
         }
 
-
-        public const string SelfAuthenticationScheme = "SelfAuthenticationScheme";
+        public const string DefaultOIDCAuthenticationScheme = "OIDC";
         public const string MultiAccountAuthenticationScheme = "MultiAccount";
-        public const string ExternalAuthenticationScheme = "ExternalAuthentication";
         public const string CertificateAuthenticationScheme = "Certificate";
         public static string AuthorizationHeaderName = "Authorization";
         public const string Prefix = "prefix";

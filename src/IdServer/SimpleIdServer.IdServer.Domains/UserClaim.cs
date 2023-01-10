@@ -3,7 +3,7 @@
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    public class UserClaim : ICloneable
+    public class UserClaim
     {
         public UserClaim() { }
 
@@ -20,15 +20,6 @@ namespace SimpleIdServer.IdServer.Domains
 
         public string Name { get; set; } = null!;
         public string Value { get; set; } = null!;
-        public string Type { get; set; } = null!; 
-
-        public object Clone()
-        {
-            return new UserClaim
-            {
-                Name = Name,
-                Value = Value
-            };
-        }
+        public string? Type { get; set; } = null; 
     }
 }

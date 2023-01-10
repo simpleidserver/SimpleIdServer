@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Choose active session.
+        /// </summary>
+        public static string choose_session {
+            get {
+                return ResourceManager.GetString("choose_session", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Consents.
         /// </summary>
         public static string consents {
