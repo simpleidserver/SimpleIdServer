@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using BlushingPenguin.JsonPath;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Linq;
 using System.Net.Http;
@@ -89,11 +90,57 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             Assert.Equal(kid, jwt.Kid);
         }
 
+        [Then("JWT contains '(.*)'")]
+        public void ThenJWTContainsClaim(string key)
+        {
+            Assert.True(GetJWT().Claims.Any(c => c.Type == key) == true);
+        }
+
+        [Then("JWT has '(.*)'='(.*)'")]
+        public void ThenJWTHas(string key, string value)
+        {
+            Assert.True(GetJWT().Claims.Any(c => c.Type == key && c.Value == value) == true);
+        }
+
+        [Then("JWT is encrypted")]
+        public void ThenJWTIsEncrypted()
+        {
+            Assert.True(GetJWT().IsEncrypted);
+        }
+
+        [Then("JWT alg = '(.*)'")]
+        public void ThenJWTAlgEqualsTo(string alg)
+        {
+            Assert.True(GetJWT().Alg == alg);
+        }
+
+        [Then("JWT enc = '(.*)'")]
+        public void ThenJWTEncEqualsTo(string enc)
+        {
+            Assert.True(GetJWT().Enc == enc);
+        }
+
         [Then("HTTP status code equals to '(.*)'")]
         public void ThenCheckHttpStatusCode(int code)
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.Equal(code, (int)httpResponseMessage.StatusCode);
+        }
+
+        [Then("redirection url doesn't contain the parameter '(.*)'")]
+        public void ThenRedirectionUrlDoesntContain(string parameter)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
+            Assert.True(queries.ContainsKey(parameter) == false);
+        }
+
+        [Then("redirection url contains '(.*)'='(.*)'")]
+        public void ThenRedirectionUrlContains(string key, string value)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
+            Assert.True(queries.Any(q => q.Key == key && q.Value == value) == true);
         }
 
         private JsonWebToken GetAccessToken()
@@ -102,5 +149,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var handler = new JsonWebTokenHandler();
             return handler.ReadJsonWebToken(jsonHttpBody.SelectToken("$.access_token").Value.GetString());
         }
+
+        private JsonWebToken GetJWT() => _scenarioContext["jwt"] as JsonWebToken;
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
@@ -23,31 +22,54 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public class IdServerBuilder
     {
+        private readonly InMemoryKeyStore _keyStore = new InMemoryKeyStore();
         private readonly IServiceCollection _serviceCollection;
         private readonly IServiceProvider _serviceProvider;
-        private readonly AuthenticationBuilder _authenticationBuilder;
 
-        public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authenticationBuilder, IServiceProvider serviceProvider)
+        public IdServerBuilder(IServiceCollection serviceCollection, IServiceProvider serviceProvider)
         {
             _serviceCollection = serviceCollection;
-            _authenticationBuilder = authenticationBuilder;
             _serviceProvider = serviceProvider;
             AddInMemoryAcr(new List<AuthenticationContextClassReference> { Constants.StandardAcrs.FirstLevelAssurance });
+            _serviceCollection.AddSingleton<IKeyStore>(_keyStore);
         }
 
         public IServiceCollection Services => _serviceCollection;
         public IServiceProvider ServiceProvider => _serviceProvider;
 
-        public IdServerBuilder AddSigningKey(SigningCredentials signingCredentials)
+        public IdServerBuilder SetSigningKeys(params SigningCredentials[] signingCredentials)
         {
-            _serviceCollection.AddSingleton<IKeyStore>(new InMemoryKeyStore(signingCredentials));
+            return SetSigningKeys((IEnumerable<SigningCredentials>)signingCredentials);
+        }
+
+        public IdServerBuilder SetSigningKeys(IEnumerable<SigningCredentials> signingCredentials)
+        {
+            _keyStore.SetSigningCredentials(signingCredentials);
             return this;
         }
 
-        public IdServerBuilder AddSigningKey(RsaSecurityKey rsa, string signingAlg = SecurityAlgorithms.RsaSha256)
+        public IdServerBuilder SetSigningKey(RsaSecurityKey rsa, string signingAlg = SecurityAlgorithms.RsaSha256)
         {
             var signingCredentials = new SigningCredentials(rsa, signingAlg);
-            return AddSigningKey(signingCredentials);
+            return SetSigningKeys(new[] { signingCredentials });
+        }
+
+        public IdServerBuilder SetSigningKey(ECDsaSecurityKey ecdsa, string signingAlg = SecurityAlgorithms.EcdsaSha256)
+        {
+            var signingCredentials = new SigningCredentials(ecdsa, signingAlg);
+            return SetSigningKeys(new[] { signingCredentials });
+        }
+
+        public IdServerBuilder SetEncryptedKeys(params EncryptingCredentials[] encryptedCredentials)
+        {
+            SetEncryptedKeys((IEnumerable<EncryptingCredentials>)encryptedCredentials);
+            return this;
+        }
+
+        public IdServerBuilder SetEncryptedKeys(IEnumerable<EncryptingCredentials> encryptedCredentials)
+        {
+            _keyStore.SetEncryptedCredentials(encryptedCredentials);
+            return this;
         }
 
         public IdServerBuilder AddDeveloperSigningCredentials()
@@ -57,7 +79,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 KeyId = "keyid"
             };
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
-            AddSigningKey(signingCredentials);
+            SetSigningKeys(new[] { signingCredentials });
             return this;
         }
 

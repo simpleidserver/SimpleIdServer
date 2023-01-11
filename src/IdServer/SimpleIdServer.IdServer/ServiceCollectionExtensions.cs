@@ -84,7 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.AddPolicy(Constants.Policies.AuthSchemeProvider, p => p.RequireAssertion(a => true));
                 o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
             });
-            return new IdServerBuilder(services, null /* authBuilder*/, services.BuildServiceProvider());
+            return new IdServerBuilder(services, services.BuildServiceProvider());
         }
 
         #region Private methods

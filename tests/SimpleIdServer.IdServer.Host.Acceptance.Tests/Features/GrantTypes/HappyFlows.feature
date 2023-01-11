@@ -96,17 +96,3 @@ Scenario: Use 'refresh_token' grant type to get an access token
 	And JSON '$.scope'='secondScope'
 	And JSON '$.token_type'='Bearer'
 	And JSON '$.expires_in'='1800'
-
-Scenario: No access token is issued then resulting claims are returned in the ID Token
-	Given authenticate a user
-	When execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value                 |
-	| response_type | id_token              |
-	| client_id     | fourteenClient        |
-	| state         | state                 |
-	| response_mode | query                 |
-	| scope         | openid email role     |
-	| redirect_uri  | http://localhost:8080 |
-	| nonce         | nonce                 |
-	
-	And extract parameter 'id_token' from redirect url

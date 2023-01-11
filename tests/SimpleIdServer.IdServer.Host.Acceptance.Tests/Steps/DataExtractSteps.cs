@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using BlushingPenguin.JsonPath;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -43,7 +44,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("extract parameter '(.*)' from redirect url")]
-        public void GivenExtractRedirectUrlParameter(string parameter)
+        public void WhenExtractRedirectUrlParameter(string parameter)
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
@@ -52,17 +53,25 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("extract parameter '(.*)' from JSON body")]
-        public void GivenExtractParameterFromBody(string parameter)
+        public void WhenExtractParameterFromBody(string parameter)
         {
             var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
             // _scenarioContext.Set(jObj[parameter].ToString(), parameter);
         }
 
         [When("extract parameter '(.*)' from JSON body into '(.*)'")]
-        public void GivenExtractParameterFromBody(string parameter, string key)
+        public void WhenExtractParameterFromBody(string parameter, string key)
         {
             var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
             _scenarioContext.Set(jObj.SelectToken(parameter).Value.GetString(), key);
+        }
+
+        [When("extract payload from JWT '(.*)'")]
+        public void WhenExtractPayloadFromJWT(string key)
+        {
+            var str = WebApiSteps.ParseValue(_scenarioContext, key);
+            var jwt = new JsonWebTokenHandler().ReadJsonWebToken(str.ToString());
+            _scenarioContext.Set(jwt, "jwt");
         }
     }
 }

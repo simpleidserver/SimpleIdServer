@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
 {
@@ -34,15 +36,50 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("elevenClient", "password").AddScope("secondScope").UseClientSelfSignedAuthentication().AddSelfSignedCertificate("elevelClientKeyId").Build(),
             ClientBuilder.BuildApiClient("twelveClient", "password").AddScope("secondScope").UseClientTlsAuthentication("cn=selfSigned").Build(),
             ClientBuilder.BuildApiClient("thirteenClient", "password").AddScope("secondScope").SetTokenExpirationTimeInSeconds(-2).Build(),
-            ClientBuilder.BuildUserAgentClient("fourteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build()
+            ClientBuilder.BuildUserAgentClient("fourteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build(),
+            ClientBuilder.BuildUserAgentClient("fifteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").DisableIdTokenSignature().Build(),
+            ClientBuilder.BuildUserAgentClient("sixteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.EcdsaSha256).Build(),
+            ClientBuilder.BuildUserAgentClient("seventeenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.EcdsaSha384).Build(),
+            ClientBuilder.BuildUserAgentClient("eighteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.EcdsaSha512).Build(),
+            ClientBuilder.BuildUserAgentClient("nineteenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.HmacSha256).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.HmacSha384).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyOneClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.HmacSha512).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyTwoClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.RsaSha256).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyThreeClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.RsaSha384).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyFourClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenSignatureAlg(SecurityAlgorithms.RsaSha512).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyFiveClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenEncryption(SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256).AddRSAEncryptedKey("keyId", new RsaSecurityKey(new RSACryptoServiceProvider(2048)), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256).Build(),
+            ClientBuilder.BuildUserAgentClient("twentySixClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenEncryption(SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes192CbcHmacSha384).AddRSAEncryptedKey("keyId", new RsaSecurityKey(new RSACryptoServiceProvider(2048)), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes192CbcHmacSha384).Build(),
+            ClientBuilder.BuildUserAgentClient("twentySevenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenEncryption(SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes256CbcHmacSha512).AddRSAEncryptedKey("keyId", new RsaSecurityKey(new RSACryptoServiceProvider(2048)), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes256CbcHmacSha512).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyEightClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenEncryption(SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes128CbcHmacSha256).AddRSAEncryptedKey("keyId", new RsaSecurityKey(new RSACryptoServiceProvider(2048)), SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes128CbcHmacSha256).Build(),
+            ClientBuilder.BuildUserAgentClient("twentyNineClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenEncryption(SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes192CbcHmacSha384).AddRSAEncryptedKey("keyId", new RsaSecurityKey(new RSACryptoServiceProvider(2048)), SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes192CbcHmacSha384).Build(),
+            ClientBuilder.BuildUserAgentClient("thirtyClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetIdTokenEncryption(SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes256CbcHmacSha512).AddRSAEncryptedKey("keyId", new RsaSecurityKey(new RSACryptoServiceProvider(2048)), SecurityAlgorithms.RsaOAEP, SecurityAlgorithms.Aes256CbcHmacSha512).Build(),
         };
 
         public static List<User> Users = new List<User>
         {
             UserBuilder.Create("user", "password")
+                .SetEmail("email@outlook.fr")
+                .AddRole("role1")
+                .AddRole("role2")
                 .AddConsent("thirdClient", "secondScope")
                 .AddConsent("nineClient", "secondScope")
                 .AddConsent("fourteenClient", "openid", "profile", "role", "email")
+                .AddConsent("fifteenClient", "openid", "profile", "role", "email")
+                .AddConsent("sixteenClient", "openid", "profile", "role", "email")
+                .AddConsent("seventeenClient", "openid", "profile", "role", "email")
+                .AddConsent("eighteenClient", "openid", "profile", "role", "email")
+                .AddConsent("nineteenClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyOneClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyTwoClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyThreeClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyFourClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyFiveClient", "openid", "profile", "role", "email")
+                .AddConsent("twentySixClient", "openid", "profile", "role", "email")
+                .AddConsent("twentySevenClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyEightClient", "openid", "profile", "role", "email")
+                .AddConsent("twentyNineClient", "openid", "profile", "role", "email")
+                .AddConsent("thirtyClient", "openid", "profile", "role", "email")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }

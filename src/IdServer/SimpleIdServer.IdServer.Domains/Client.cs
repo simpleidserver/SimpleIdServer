@@ -416,6 +416,15 @@ namespace SimpleIdServer.IdServer.Domains
             return null;
         }
 
+        public void Add(string keyId, JsonWebKey jsonWebKey)
+        {
+            SerializedJsonWebKeys.Add(new ClientJsonWebKey
+            {
+                Kid = keyId,
+                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
+            });
+        }
+
         public string GetStringParameter(string name) => Parameters[name];
 
         public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');

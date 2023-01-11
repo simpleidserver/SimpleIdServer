@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(clientSecret));
             var handler = new JsonWebTokenHandler();
-            var jwe = handler.EncryptToken(ParseValue(jwsKey).ToString(), new EncryptingCredentials(securityKey, SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256));
+            var jwe = handler.EncryptToken(ParseValue(_scenarioContext, jwsKey).ToString(), new EncryptingCredentials(securityKey, SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256));
             _scenarioContext.Set(jwe, key);
         }
 
@@ -123,7 +123,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         [When("execute HTTP PUT JSON request '(.*)'")]
         public async Task GivenExecuteHTTPPutJSONRequest(string url, Table table)
         {
-            url = ParseValue(url).ToString();
+            url = ParseValue(_scenarioContext, url).ToString();
             var headers = ExtractHeaders(table);
             var jObj = ExtractBody(table);
             var httpRequestMessage = new HttpRequestMessage
@@ -144,7 +144,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         [When("execute HTTP POST JSON request '(.*)'")]
         public async Task GivenExecuteHTTPPostJSONRequest(string url, Table table)
         {
-            url = ParseValue(url).ToString();
+            url = ParseValue(_scenarioContext, url).ToString();
             var headers = ExtractHeaders(table);
             var jObj = ExtractBody(table);
             var httpRequestMessage = new HttpRequestMessage
@@ -171,7 +171,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = ParseValue(record["Value"]).ToString();
+                var value = ParseValue(_scenarioContext, record["Value"]).ToString();
                 if (PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;
@@ -220,11 +220,11 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
 
         private string ExtractUrl(string url, Table table)
         {
-            url = ParseValue(url).ToString();
+            url = ParseValue(_scenarioContext, url).ToString();
             foreach (var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = ParseValue(record["Value"]).ToString();
+                var value = ParseValue(_scenarioContext, record["Value"]).ToString();
                 if (PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;
@@ -242,7 +242,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = ParseValue(record["Value"]);
+                var value = ParseValue(_scenarioContext, record["Value"]);
                 if (PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;
@@ -267,7 +267,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = ParseValue(record["Value"]).ToString();
+                var value = ParseValue(_scenarioContext, record["Value"]).ToString();
                 if (!PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;
@@ -279,12 +279,12 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             return result;
         }
 
-        private object ParseValue(string val)
+        public static object ParseValue(ScenarioContext scenarioContext, string val)
         {
             if (val.StartsWith('$') && val.EndsWith('$'))
             {
                 val = val.TrimStart('$').TrimEnd('$');
-                return _scenarioContext.Get<object>(val);
+                return scenarioContext.Get<object>(val);
             }
 
             if (val.StartsWith('[') && val.EndsWith(']'))
@@ -303,7 +303,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                     return string.Empty;
                 }
 
-                return _scenarioContext.Get<string>(m.Value.TrimStart('$').TrimEnd('$'));
+                return scenarioContext.Get<string>(m.Value.TrimStart('$').TrimEnd('$'));
             });
 
             return result;

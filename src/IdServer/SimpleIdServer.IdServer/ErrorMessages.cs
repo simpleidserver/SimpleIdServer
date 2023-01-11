@@ -16,6 +16,8 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string NO_CLIENT_SECRET = "no client secret";
+        public const string NO_CONSENT = "no consent has been accepted";
+        public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
@@ -152,6 +154,5 @@ namespace SimpleIdServer.IdServer
         public const string AUTH_REQUEST_SENT = "the authentication request '{0}' is finished";
         public const string AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT = "you're not authorized to reject the authorization request";
         public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
-        public const string NO_CONSENT = "no consent has been accepted";
     }
 }

@@ -15,18 +15,19 @@ namespace SimpleIdServer.IdServer.Stores
 
     public class InMemoryKeyStore : IKeyStore
     {
-        private readonly ConcurrentBag<SigningCredentials> _signingCredentials = new ConcurrentBag<SigningCredentials>();
-        private readonly ConcurrentBag<EncryptingCredentials> _encryptedCredentials = new ConcurrentBag<EncryptingCredentials>();
+        private ConcurrentBag<SigningCredentials> _signingCredentials = new ConcurrentBag<SigningCredentials>();
+        private ConcurrentBag<EncryptingCredentials> _encryptedCredentials = new ConcurrentBag<EncryptingCredentials>();
 
         public InMemoryKeyStore() { }
-
-        public InMemoryKeyStore(SigningCredentials signingCredentials)
-        {
-            _signingCredentials.Add(signingCredentials);
-        }
 
         public IEnumerable<SigningCredentials> GetAllSigningKeys() => _signingCredentials.ToList();
 
         public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys() => _encryptedCredentials.ToList();
+
+        public void Add(SigningCredentials signingCredentials) => _signingCredentials.Add(signingCredentials);
+
+        internal void SetSigningCredentials(IEnumerable<SigningCredentials> signingCredentials) => _signingCredentials = new ConcurrentBag<SigningCredentials>(signingCredentials);
+
+        internal void SetEncryptedCredentials(IEnumerable<EncryptingCredentials> encryptedCredentials) => _encryptedCredentials = new ConcurrentBag<EncryptingCredentials>(encryptedCredentials);
     }
 }

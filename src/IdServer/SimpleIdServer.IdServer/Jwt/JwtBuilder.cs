@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -76,9 +77,11 @@ namespace SimpleIdServer.IdServer.Jwt
 
         public string Sign(SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg)
         {
-            var signingKeys = _keyStore.GetAllSigningKeys();
-            var signingKey = signingKeys.First(s => s.Algorithm == jwsAlg);
             var handler = new JsonWebTokenHandler();
+            if (jwsAlg == SecurityAlgorithms.None) return handler.CreateToken(securityTokenDescriptor);
+            var signingKeys = _keyStore.GetAllSigningKeys();
+            var signingKey = signingKeys.FirstOrDefault(s => s.Algorithm == jwsAlg);
+            if(signingKey == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.NO_JWK_WITH_ALG_SIG, jwsAlg));
             securityTokenDescriptor.SigningCredentials = signingKey;
             return handler.CreateToken(securityTokenDescriptor);
         }

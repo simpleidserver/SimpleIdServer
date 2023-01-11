@@ -145,11 +145,8 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                         else
                         {
                             var userClaims = user.Claims.Where(c => c.Type == scopeClaim.ClaimName);
-                            foreach (var userClaim in userClaims)
-                            {
-                                if (claims.ContainsKey(userClaim.Type)) claims[userClaim.Type] = userClaim.Value;
-                                else claims.Add(userClaim.Type, userClaim.Value);
-                            }
+                            if (userClaims.Count() == 1) claims.Add(userClaims.First().Type, userClaims.First().Value);
+                            else if (userClaims.Count() > 1) claims.Add(userClaims.First().Type, userClaims.Select(c => c.Value));
                         }
                     }
                 }

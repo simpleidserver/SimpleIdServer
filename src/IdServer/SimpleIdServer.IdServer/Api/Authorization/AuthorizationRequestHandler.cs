@@ -138,6 +138,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
 
             var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.Claims)
+                .Include(c => c.SerializedJsonWebKeys)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             if (client == null)

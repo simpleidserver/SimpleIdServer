@@ -78,6 +78,15 @@ namespace SimpleIdServer.IdServer.Domains
             }
         }
 
+        public void AddClaim(string key, string value)
+        {
+            OAuthUserClaims.Add(new UserClaim
+            {
+                Name = key,
+                Value = value
+            });
+        }
+
         public void AddExternalAuthProvider(string scheme, string subject)
         {
             ExternalAuthProviders.Add(new UserExternalAuthProvider

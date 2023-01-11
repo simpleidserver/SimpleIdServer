@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using System;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -30,6 +31,18 @@ namespace SimpleIdServer.IdServer.Builders
                 result._user.OAuthUserClaims.Add(new UserClaim { Value = name, Name = JwtRegisteredClaimNames.Name });
 
             return result;
+        }
+
+        public UserBuilder SetEmail(string email)
+        {
+            _user.UpdateClaim(JwtRegisteredClaimNames.Email, email);
+            return this;
+        }
+
+        public UserBuilder AddRole(string role)
+        {
+            _user.AddClaim(UserClaims.Role, role);
+            return this;
         }
 
         public UserBuilder AddConsent(string clientId, params string[] scopes)
