@@ -83,7 +83,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = ExtractIdTokenHint(idTokenHint, cancellationToken);
+                var payload = ExtractIdTokenHint(idTokenHint);
                 if (context.User.Id != payload.Subject)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
 
@@ -145,21 +145,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             return acr.AuthenticationMethodReferences.First();
         }
 
-        protected JsonWebToken ExtractIdTokenHint(string idTokenHint, CancellationToken cancellationToken)
+        protected JsonWebToken ExtractIdTokenHint(string idTokenHint)
         {
             var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idTokenHint);
             if (extractionResult.Error != null)
-                switch (extractionResult.Error.Value)
-                {
-                    case JsonWebTokenErrors.INVALID_JWT:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-                    case JsonWebTokenErrors.UNKNOWN_JWK:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.UNKNOWN_JSON_WEBKEY);
-                    case JsonWebTokenErrors.BAD_SIGNATURE:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_ID_TOKEN_HINT_SIG);
-
-                }
-
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
             return extractionResult.Jwt;
         }
     }

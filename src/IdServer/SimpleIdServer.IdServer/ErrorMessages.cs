@@ -18,6 +18,8 @@ namespace SimpleIdServer.IdServer
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";
+        public const string NO_JWK_FOUND_TO_DECRYPT = "no JWK with identifier {0} has been found to decrypt the JWT";
+        public const string NO_JWK_FOUND_TO_CHECK_SIG = "no JWK with identifier {0} has been found to check the signature of the JWT";
         public const string DUPLICATE_SCOPES = "duplicate scopes : {0}";
         public const string UNAUTHORIZED_TO_SCOPES = "unauthorized to scopes : {0}";
         public const string INVALID_CLAIMS = "claims {0} are invalid";
@@ -37,6 +39,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri parameter is invalid";
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
+        public const string INVALID_JWT = "JSON Web Token cannot be read";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";
         public const string BAD_SOFTWARE_STATEMENT_SIGNATURE = "software statement signature is invalid";
@@ -154,5 +157,10 @@ namespace SimpleIdServer.IdServer
         public const string AUTH_REQUEST_SENT = "the authentication request '{0}' is finished";
         public const string AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT = "you're not authorized to reject the authorization request";
         public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
+        public const string JWT_MUST_BE_ENCRYPTED = "JWT must be encrypted with the algorithm {0}";
+        public const string JWT_MUST_BE_SIGNED = "JWT must be signed with the algorithm {0}";
+        public const string JWT_CANNOT_BE_ENCRYPTED = "JWT cannnot be encrypted";
+        public const string JWT_CANNOT_BE_DECRYPTED = "An unexcepted error occured while trying to decrypt the JWT";
+        public const string JWT_BAD_SIGNATURE = "JWT doesn't have a correct signature";
     }
 }

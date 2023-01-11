@@ -173,17 +173,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
 
             var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(request, context.Client, cancellationToken);
             if (jsonWebTokenResult.Error != null)
-                switch (jsonWebTokenResult.Error.Value)
-                {
-                    case JsonWebTokenErrors.INVALID_JWT:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_REQUEST_PARAMETER);
-                    case JsonWebTokenErrors.CANNOT_BE_DECRYPTED:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWE_REQUEST_PARAMETER);
-                    case JsonWebTokenErrors.UNKNOWN_JWK:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.UNKNOWN_JSON_WEBKEY);
-                    case JsonWebTokenErrors.BAD_SIGNATURE:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_JWS_REQUEST_PARAMETER);
-                }
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, jsonWebTokenResult.Error);
 
             var audiences = jsonWebTokenResult.Jwt.Audiences;
             var issuer = jsonWebTokenResult.Jwt.Issuer;
@@ -345,14 +335,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             // TODO : Add more exception.
             var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(tokenHint);
             if (extractionResult.Error != null)
-                switch (extractionResult.Error.Value)
-                {
-                    case JsonWebTokenErrors.INVALID_JWT:
-                    case JsonWebTokenErrors.CANNOT_BE_DECRYPTED:
-                    case JsonWebTokenErrors.UNKNOWN_JWK:
-                    case JsonWebTokenErrors.BAD_SIGNATURE:
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
-                }
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
 
             return extractionResult.Jwt;
         }

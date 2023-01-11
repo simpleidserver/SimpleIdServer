@@ -3,11 +3,13 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +43,56 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 _scenarioContext.Set(_factory, "Factory");
                 var mock = new Mock<Infrastructures.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
+            }
+        }
+
+
+        [Given("build JWS request object for client '(.*)' and sign with the key '(.*)'")]
+        public void GivenBuildJWSRequestObject(string clientId, string keyId, Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
+                var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).First(c => c.ClientId == clientId);
+                var jsonWebKey = client.JsonWebKeys.First(j => j.KeyId == keyId);
+                var handler = new JsonWebTokenHandler();
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), row["Value"].ToString());
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg)
+                };
+                var request = handler.CreateToken(descritor);
+                _scenarioContext.Set(request, "request");
+            }
+        }
+
+        [Given("build JWE request object for client '(.*)' and sign with the key '(.*)' and encrypt with the key '(.*)'")]
+        public void GivenBuildJWERequestObject(string clientId, string sigKeyId, string encKeyId, Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
+                var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
+                var encryptedKey = keyStore.GetAllEncryptingKeys().First(k => k.Key.KeyId == encKeyId);
+                var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).First(c => c.ClientId == clientId);
+                var jsonWebKey = client.JsonWebKeys.First(j => j.KeyId == sigKeyId);
+                var handler = new JsonWebTokenHandler();
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), row["Value"].ToString());
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = new SigningCredentials(jsonWebKey, jsonWebKey.Alg)
+                };
+                var request = handler.CreateToken(descritor);
+                request = handler.EncryptToken(request, encryptedKey);
+                _scenarioContext.Set(request, "request");
             }
         }
 

@@ -43,6 +43,8 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string TlsClientCertificateBoundAccessToken = "tls_client_certificate_bound_access_token";
         public const string IsConsentDisabled = "is_consent_disabled";
         public const string RequestObjectSigningAlg = "request_object_signing_alg";
+        public const string RequestObjectEncryptionAlg = "request_object_encryption_alg";
+        public const string RequestObjectEncryptionEnc = "request_object_encryption_enc";
         public const string SubjectType = "subject_type";
         public const string SectorIdentifierUri = "sector_identifier_uri";
         public const string IdTokenSignedResponseAlg = "id_token_signed_response_alg";

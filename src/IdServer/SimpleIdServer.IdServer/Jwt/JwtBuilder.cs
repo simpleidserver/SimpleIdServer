@@ -32,21 +32,13 @@ namespace SimpleIdServer.IdServer.Jwt
     {
         private ReadJsonWebTokenResult() { }
 
-        public JsonWebTokenErrors? Error { get; private set; }
+        public string? Error { get; private set; } = null;
         public JsonWebToken Jwt { get; private set; }
         public JsonWebToken EncryptedJwt { get; private set; }
 
-        public static ReadJsonWebTokenResult BuildError(JsonWebTokenErrors error) => new ReadJsonWebTokenResult { Error = error };
+        public static ReadJsonWebTokenResult BuildError(string error) => new ReadJsonWebTokenResult { Error = error };
 
         public static ReadJsonWebTokenResult Ok(JsonWebToken jwt, JsonWebToken encryptedJwt) => new ReadJsonWebTokenResult { Error = null, Jwt = jwt, EncryptedJwt = encryptedJwt };
-    }
-
-    public enum JsonWebTokenErrors
-    {
-        INVALID_JWT = 0,
-        UNKNOWN_JWK = 1,
-        BAD_SIGNATURE = 2,
-        CANNOT_BE_DECRYPTED = 3
     }
 
     public class JwtBuilder : IJwtBuilder
@@ -115,15 +107,14 @@ namespace SimpleIdServer.IdServer.Jwt
         public ReadJsonWebTokenResult ReadSelfIssuedJsonWebToken(string jwt)
         {
             var handler = new JsonWebTokenHandler();
-            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.INVALID_JWT);
+            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(ErrorMessages.INVALID_JWT);
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
             JsonWebToken encJwt = null;
             if(jsonWebToken.IsEncrypted)
             {
                 var encryptionKeys = _keyStore.GetAllEncryptingKeys();
                 var encryptionKey = encryptionKeys.FirstOrDefault(e => jsonWebToken.Kid == e.Key.KeyId);
-                if (encryptionKey == null)
-                    return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.UNKNOWN_JWK);
+                if (encryptionKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_DECRYPT, jsonWebToken.Kid));
                 jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
                 {
                     ValidateAudience = false,
@@ -137,8 +128,7 @@ namespace SimpleIdServer.IdServer.Jwt
 
             var signKeys = _keyStore.GetAllSigningKeys();
             var sigKey = signKeys.FirstOrDefault(k => k.Kid == jsonWebToken.Kid);
-            if (sigKey == null)
-                return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.UNKNOWN_JWK);
+            if (sigKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_CHECK_SIG, jsonWebToken.Kid));
             var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -146,17 +136,23 @@ namespace SimpleIdServer.IdServer.Jwt
                 ValidateLifetime = false,
                 IssuerSigningKey = sigKey.Key
             });
-            if (!validationResult.IsValid)
-                return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.BAD_SIGNATURE);
+            if (!validationResult.IsValid) return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_BAD_SIGNATURE);
             return ReadJsonWebTokenResult.Ok(jsonWebToken, encJwt);
         }
 
         public async Task<ReadJsonWebTokenResult> ReadJsonWebToken(string jwt, Client client, CancellationToken cancellationToken)
         {
             var handler = new JsonWebTokenHandler();
-            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.INVALID_JWT);
+            if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(ErrorMessages.INVALID_JWT);
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
             JsonWebToken encJwt = null;
+            if(
+                (!string.IsNullOrWhiteSpace(client.RequestObjectEncryptionAlg) && !jsonWebToken.IsEncrypted) ||
+                (!string.IsNullOrWhiteSpace(client.RequestObjectEncryptionAlg) && jsonWebToken.IsEncrypted && jsonWebToken.Alg != client.RequestObjectEncryptionAlg)
+            ) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.JWT_MUST_BE_ENCRYPTED, client.RequestObjectEncryptionAlg));
+
+            if(string.IsNullOrWhiteSpace(client.RequestObjectEncryptionAlg) && jsonWebToken.IsEncrypted) return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_CANNOT_BE_ENCRYPTED);
+
             if (jsonWebToken.IsEncrypted)
             {
                 // symmetric key.
@@ -176,14 +172,15 @@ namespace SimpleIdServer.IdServer.Jwt
                     }
                     catch
                     {
-                        return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.CANNOT_BE_DECRYPTED);
+                        return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_CANNOT_BE_DECRYPTED);
                     }
                 }
                 // asymmetric key.
                 else
                 {
-                    var jwk = await _clientHelper.ResolveJsonWebKey(client, jsonWebToken.Kid, cancellationToken);
-                    if (jwk == null) return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.UNKNOWN_JWK);
+                    var encryptedKeys = _keyStore.GetAllEncryptingKeys();
+                    var encryptedKey = encryptedKeys.FirstOrDefault(k => k.Key.KeyId == jsonWebToken.Kid);
+                    if (encryptedKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_DECRYPT, jsonWebToken.Kid));
                     try
                     {
                         jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
@@ -191,22 +188,23 @@ namespace SimpleIdServer.IdServer.Jwt
                             ValidateAudience = false,
                             ValidateIssuer = false,
                             ValidateLifetime = false,
-                            TokenDecryptionKey = jwk
+                            TokenDecryptionKey = encryptedKey.Key
                         });
                         encJwt = handler.ReadJsonWebToken(jwt);
                     }
                     catch
                     {
-                        return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.CANNOT_BE_DECRYPTED);
+                        return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_CANNOT_BE_DECRYPTED);
                     }
                 }
 
                 jsonWebToken = encJwt;
             }
 
+            if(client.RequestObjectSigningAlg != jsonWebToken.Alg) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.JWT_MUST_BE_SIGNED, client.RequestObjectSigningAlg));
+
             var jsonWebKey = await _clientHelper.ResolveJsonWebKey(client, jsonWebToken.Kid, cancellationToken);
-            if (jsonWebToken == null)
-                return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.UNKNOWN_JWK);
+            if (jsonWebToken == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_CHECK_SIG, jsonWebToken.Kid));
             var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
             {
                 ValidateAudience = false,
@@ -214,8 +212,7 @@ namespace SimpleIdServer.IdServer.Jwt
                 ValidateLifetime = false,
                 IssuerSigningKey = jsonWebKey
             });
-            if (!validationResult.IsValid)
-                return ReadJsonWebTokenResult.BuildError(JsonWebTokenErrors.BAD_SIGNATURE);
+            if (!validationResult.IsValid) return ReadJsonWebTokenResult.BuildError(ErrorMessages.JWT_BAD_SIGNATURE);
             return ReadJsonWebTokenResult.Ok(jsonWebToken, encJwt);
         }
     }

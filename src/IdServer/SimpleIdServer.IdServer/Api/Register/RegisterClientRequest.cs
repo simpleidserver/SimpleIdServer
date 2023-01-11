@@ -1,12 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -36,7 +35,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         public string? TokenAuthMethod { get; set; } = null;
         [BindProperty(Name = OAuthClientParameters.ResponseTypes)]
         [JsonPropertyName(OAuthClientParameters.ResponseTypes)]
-        public IEnumerable<string> ResponseTypes { get; set; } = new string[0];
+        public ICollection<string> ResponseTypes { get; set; } = new string[0];
         [BindProperty(Name = OAuthClientParameters.TokenSignedResponseAlg)]
         [JsonPropertyName(OAuthClientParameters.TokenSignedResponseAlg)]
         public string? TokenSignedResponseAlg { get; set; } = null;

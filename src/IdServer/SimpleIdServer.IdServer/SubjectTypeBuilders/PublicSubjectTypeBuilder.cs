@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.SubjectTypeBuilders
 {
-    internal class PublicSubjectTypeBuilder : ISubjectTypeBuilder
+    public class PublicSubjectTypeBuilder : ISubjectTypeBuilder
     {
         public string SubjectType => SUBJECT_TYPE;
 

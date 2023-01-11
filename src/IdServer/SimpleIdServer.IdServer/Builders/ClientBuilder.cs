@@ -4,6 +4,7 @@
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -42,7 +43,7 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
-                ResponseTypes = new[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             return new TraditionalWebsiteClientBuilder(client);
@@ -63,7 +64,7 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
-                ResponseTypes = new[] { IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.GrantTypes.Add("implicit");

@@ -22,6 +22,9 @@ builder.Services.AddSIDIdentityServer()
         new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha384),
         new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha512)
     )
+    .SetEncryptedKeys(
+        new EncryptingCredentials(BuildRsaSecurityKey(), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
+    )
     .AddAuthentication(o =>
     {
         o.AddMutualAuthentication(m => m.AllowedCertificateTypes = CertificateTypes.All);

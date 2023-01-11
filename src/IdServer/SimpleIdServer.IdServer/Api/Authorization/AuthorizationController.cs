@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
                 {
                     var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
-                    _responseModeHandler.Handle(jObjBody, redirectUrlAuthorizationResponse, HttpContext);
+                    _responseModeHandler.Handle(context.Request.RequestData, redirectUrlAuthorizationResponse, HttpContext);
                     return;
                 }
 

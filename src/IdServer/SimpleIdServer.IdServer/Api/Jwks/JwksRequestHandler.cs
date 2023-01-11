@@ -26,9 +26,11 @@ namespace SimpleIdServer.IdServer.Api.Jwks
             var result = new JwksResult();
             var signingKeys = _keyStore.GetAllSigningKeys();
             var encKeys = _keyStore.GetAllEncryptingKeys();
+            // JWT signing keys : Public key pairs for signing issued JWTs that are access tokens, ID Tokens etc... Clients can download them to validate the JWTs.
             foreach(var key in signingKeys)
                 result.JsonWebKeys.Add(ConvertSigningKey(key));
 
+            // JWT encryption keys : Public keys for letting clients encrypt JWTs that are request objects.
             foreach (var key in encKeys)
                 result.JsonWebKeys.Add(ConvertEncryptionKey(key));
 

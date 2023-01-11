@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of the OAUTH2.0 response type strings that the client can use at the authorization endpoint.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.ResponseTypes)]
-        public IEnumerable<string> ResponseTypes { get; set; } = new List<string>();
+        public ICollection<string> ResponseTypes { get; set; } = new List<string>();
         /// <summary>
         /// Readable client name.
         /// </summary>
@@ -264,6 +264,18 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? RequestObjectSigningAlg { get; set; } = null;
         /// <summary>
+        /// The RP is declaring that it may use for encrypting Request Objects sent to the OP. 
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.RequestObjectEncryptionAlg)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? RequestObjectEncryptionAlg { get; set; } = null;
+        /// <summary>
+        /// The RP is declaring that it may use for encrypting Request Objects sent to the OP
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.RequestObjectEncryptionEnc)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? RequestObjectEncryptionEnc { get; set; } = null;
+        /// <summary>
         /// subject_type requested for responses to this client. Possible values are “pairwise” or “public”.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.SubjectType)]
@@ -353,11 +365,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// If supported, the sid claim is also included in ID tokens issued by the OP.
         /// </summary>
         public bool BackChannelLogoutSessionRequired { get; set; }
-        [JsonIgnore]
-        /// <summary>
-        /// SALT used to calculate the pairwise.
-        /// </summary>
-        public string? PairWiseIdentifierSalt { get; set; } = null;
         [JsonIgnore]
         public double? DefaultMaxAge { get; set; } = null;
         /// <summary>

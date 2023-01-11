@@ -37,15 +37,15 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        public UserAgentClientBuilder AddEncryptedKey(string keyId, EncryptingCredentials credentials)
+        public UserAgentClientBuilder AddEncryptedKey(EncryptingCredentials credentials)
         {
             var jsonWebKey = credentials.SerializePublicJWK();
             jsonWebKey.Alg = credentials.Alg;
-            _client.Add(keyId, jsonWebKey);
+            _client.Add(credentials.Key.KeyId, jsonWebKey);
             return this;
         }
 
-        public UserAgentClientBuilder AddRSAEncryptedKey(string keyId, RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(keyId, new EncryptingCredentials(rsa, alg, enc));
+        public UserAgentClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc));
 
         public Client Build() => _client;
     }

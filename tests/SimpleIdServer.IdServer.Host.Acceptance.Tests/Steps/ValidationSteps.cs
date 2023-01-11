@@ -135,6 +135,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             Assert.True(queries.ContainsKey(parameter) == false);
         }
 
+        [Then("redirection url contains the parameter '(.*)'")]
+        public void ThenRedirectionUrlContains(string parameter)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
+            Assert.True(queries.ContainsKey(parameter) == true);
+        }
+
         [Then("redirection url contains '(.*)'='(.*)'")]
         public void ThenRedirectionUrlContains(string key, string value)
         {
