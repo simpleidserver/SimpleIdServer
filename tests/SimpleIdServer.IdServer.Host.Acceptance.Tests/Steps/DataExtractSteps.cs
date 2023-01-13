@@ -73,5 +73,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var jwt = new JsonWebTokenHandler().ReadJsonWebToken(str.ToString());
             _scenarioContext.Set(jwt, "jwt");
         }
+
+        [When("extract payload from HTTP body")]
+        public async Task WhenExtractPayloadFromHTTPBody()
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            var json = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var jwt = new JsonWebTokenHandler().ReadJsonWebToken(json);
+            _scenarioContext.Set(jwt, "jwt");
+        }
     }
 }

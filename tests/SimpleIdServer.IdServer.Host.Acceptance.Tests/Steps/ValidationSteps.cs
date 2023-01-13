@@ -91,34 +91,19 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [Then("JWT contains '(.*)'")]
-        public void ThenJWTContainsClaim(string key)
-        {
-            Assert.True(GetJWT().Claims.Any(c => c.Type == key) == true);
-        }
+        public void ThenJWTContainsClaim(string key) => Assert.True(GetJWT().Claims.Any(c => c.Type == key) == true);
 
         [Then("JWT has '(.*)'='(.*)'")]
-        public void ThenJWTHas(string key, string value)
-        {
-            Assert.True(GetJWT().Claims.Any(c => c.Type == key && c.Value == value) == true);
-        }
+        public void ThenJWTHas(string key, string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == key && c.Value == value) == true);
 
         [Then("JWT is encrypted")]
-        public void ThenJWTIsEncrypted()
-        {
-            Assert.True(GetJWT().IsEncrypted);
-        }
+        public void ThenJWTIsEncrypted() => Assert.True(GetJWT().IsEncrypted);
 
         [Then("JWT alg = '(.*)'")]
-        public void ThenJWTAlgEqualsTo(string alg)
-        {
-            Assert.True(GetJWT().Alg == alg);
-        }
+        public void ThenJWTAlgEqualsTo(string alg) => Assert.True(GetJWT().Alg == alg);
 
         [Then("JWT enc = '(.*)'")]
-        public void ThenJWTEncEqualsTo(string enc)
-        {
-            Assert.True(GetJWT().Enc == enc);
-        }
+        public void ThenJWTEncEqualsTo(string enc) => Assert.True(GetJWT().Enc == enc);
 
         [Then("HTTP status code equals to '(.*)'")]
         public void ThenCheckHttpStatusCode(int code)
@@ -156,6 +141,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             Assert.True(httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri.Contains(baseUrl) == true);
+        }
+
+        [Then("HTTP header has '(.*)'='(.*)'")]
+        public void ThenHttpHeaderContains(string key, string value)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            Assert.True(httpResponseMessage.Content.Headers.Contains(key));
+            Assert.True(httpResponseMessage.Content.Headers.GetValues(key).Contains(value) == true);
         }
 
         private JsonWebToken GetAccessToken()

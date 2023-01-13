@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
@@ -50,7 +51,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
                 dic.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
 
             foreach (var record in context.Request.RequestData)
-                dic.Add(record.Key, record.Value.GetValue<string>());
+            {
+                if (record.Value is JsonValue)
+                    dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.GetValue<string>()));
+                else
+                    dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.ToJsonString()));
+            }
 
             CheckPKCEParameters(context);
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);

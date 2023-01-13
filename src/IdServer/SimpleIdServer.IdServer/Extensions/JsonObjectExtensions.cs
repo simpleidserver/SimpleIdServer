@@ -30,7 +30,11 @@ namespace System.Text.Json.Nodes
 
     public static class JsonObjectExtensions
     {
-        public static IEnumerable<KeyValuePair<string, string>> ToEnumerable(this JsonObject jObj) => jObj.ToDictionary(r => r.Key, r => r.Value.ToJsonString());
+        public static IEnumerable<KeyValuePair<string, string>> ToEnumerable(this JsonObject jObj) => jObj.ToDictionary(r => r.Key, r =>
+        {
+            if (r.Value is JsonValue) return r.Value.GetValue<string>();
+            else return r.Value.ToJsonString();
+        });
 
         #region Authorization request
 

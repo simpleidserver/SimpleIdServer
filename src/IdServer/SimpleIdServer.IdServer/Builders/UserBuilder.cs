@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using System;
+using System.Collections.Generic;
 using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -48,6 +49,12 @@ namespace SimpleIdServer.IdServer.Builders
         public UserBuilder AddConsent(string clientId, params string[] scopes)
         {
             _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes });
+            return this;
+        }
+
+        public UserBuilder AddConsent(string clientId, IEnumerable<string> scopes, IEnumerable<string> claims)
+        {
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims });
             return this;
         }
 

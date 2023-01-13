@@ -42,6 +42,16 @@ namespace SimpleIdServer.IdServer.Builders
 
         public TraditionalWebsiteClientBuilder AddSigningKey(RsaSecurityKey securityKey, string alg = SecurityAlgorithms.RsaSha256) => AddSigningKey(new SigningCredentials(securityKey, alg), alg);
 
+        public TraditionalWebsiteClientBuilder AddEncryptedKey(EncryptingCredentials credentials)
+        {
+            var jsonWebKey = credentials.SerializePublicJWK();
+            jsonWebKey.Alg = credentials.Alg;
+            _client.Add(credentials.Key.KeyId, jsonWebKey);
+            return this;
+        }
+
+        public TraditionalWebsiteClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc));
+
         /// <summary>
         /// Set the algorithm used to sign the request object.
         /// </summary>
@@ -109,6 +119,30 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder SetDefaultMaxAge(int defaultMaxAge)
         {
             _client.DefaultMaxAge = defaultMaxAge;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the algorithm to sign the userinfo response.
+        /// </summary>
+        /// <param name="signingAlg"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetUserInfoSignedResponseAlg(string alg = SecurityAlgorithms.RsaSha256)
+        {
+            _client.UserInfoSignedResponseAlg = alg;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the algorithm to encrypt the userinfo response.
+        /// </summary>
+        /// <param name="alg"></param>
+        /// <param name="enc"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetUserInfoEncryption(string alg = SecurityAlgorithms.RsaPKCS1, string enc = SecurityAlgorithms.Aes128CbcHmacSha256)
+        {
+            _client.UserInfoEncryptedResponseAlg= alg;
+            _client.UserInfoEncryptedResponseEnc= enc;
             return this;
         }
 

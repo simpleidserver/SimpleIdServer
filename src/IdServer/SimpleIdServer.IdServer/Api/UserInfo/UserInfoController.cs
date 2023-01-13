@@ -105,7 +105,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.OAuthUserClaims).AsNoTracking().FirstOrDefaultAsync(u => u.Id == subject, cancellationToken);
                 if (user == null) return new UnauthorizedResult();
 
-                var oauthClient = await _clientRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                var oauthClient = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
                 if (oauthClient == null)
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
@@ -163,8 +163,8 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             {
                 if (jsonWebToken.TryGetClaim(AuthorizationRequestParameters.Claims, out Claim claim))
                 {
-                    var json = claim.Value.ToString();
-                    return JsonSerializer.Deserialize<IEnumerable<AuthorizationRequestClaimParameter>>(json);
+                    var json = JsonObject.Parse(claim.Value.ToString()) as JsonObject;
+                    return json.GetOpenIdClaims();
                 }
 
                 return new AuthorizationRequestClaimParameter[0];

@@ -59,7 +59,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("thirtyThreeClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetRequestObjectSigning(SecurityAlgorithms.RsaSha256).SetRequestObjectEncryption(SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256).EnableIdTokenInResponseType().AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).SetPairwiseSubjectType("salt").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("thirtyFourClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetDefaultMaxAge(2).EnableIdTokenInResponseType().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("thirtyFiveClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").EnableIdTokenInResponseType().Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("thirtySixClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email", "offline_access").EnableOfflineAccess().Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("thirtySixClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email", "offline_access").EnableOfflineAccess().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("thirtySevenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("thirtyEightClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetUserInfoSignedResponseAlg().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("thirtyNineClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetUserInfoSignedResponseAlg().SetUserInfoEncryption().AddRSAEncryptedKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build()
         };
 
         public static List<User> Users = new List<User>
@@ -93,6 +97,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("thirtyFourClient", "openid", "profile", "role", "email")
                 .AddConsent("thirtyFiveClient", "openid", "profile", "role", "email")
                 .AddConsent("thirtySixClient", "openid", "profile", "role", "email", "offline_access")
+                .AddConsent("thirtySevenClient", "openid", "profile", "role", "email")
+                .AddConsent("thirtyEightClient", "openid", "profile", "role", "email")
+                .AddConsent("thirtyNineClient", "openid", "profile", "role", "email")
+                .AddConsent("fortyClient", new string[] { "openid", "profile", "role", "email" }, new string[] { "name", "email" })
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }

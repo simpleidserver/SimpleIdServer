@@ -32,8 +32,8 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 {
                     if (AllUserClaims.Contains(claim.Name) && user != null)
                     {
-                        var cl = user.Claims.First(c => c.Type == claim.Name);
-                        claims.AddOrReplace(cl.Type, cl.Value);
+                        var cl = user.Claims.FirstOrDefault(c => c.Type == claim.Name);
+                        if (cl != null) claims.AddOrReplace(cl.Type, cl.Value);
                     }
                     else
                     {

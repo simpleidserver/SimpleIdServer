@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,8 +67,12 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             if (queryParameters.ContainsKey(AuthorizationRequestParameters.Claims))
             {
-                var value = JsonSerializer.SerializeToNode(queryParameters[AuthorizationRequestParameters.Claims].ToString()).AsObject();
-                jwsPayload.Claims.Add(AuthorizationRequestParameters.Claims, value);
+                var claims = queryParameters.GetClaimsFromAuthorizationRequest();
+                var dic = new Dictionary<string, object>();
+                foreach (var claim in claims)
+                    claim.Serialize(dic);
+
+                jwsPayload.Claims.Add(AuthorizationRequestParameters.Claims, dic);
             }
 
             return jwsPayload;

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace Microsoft.AspNetCore.Http
@@ -197,17 +196,19 @@ namespace Microsoft.AspNetCore.Http
             return jObj;
         }
 
-        private static JsonNode GetValue(StringValues strValues)
+        public static JsonNode GetValue(params string[] strValues) => GetValue((IEnumerable<string>)strValues);
+
+        public static JsonNode GetValue(IEnumerable<string> strValues)
         {
             if (strValues.Count() == 1)
             {
                 try
                 {
-                    return JsonObject.Parse(strValues[0]).AsObject();
+                    return JsonObject.Parse(strValues.ElementAt(0)).AsObject();
                 }
                 catch
                 {
-                    return strValues[0];
+                    return strValues.ElementAt(0);
                 }
             }
 
