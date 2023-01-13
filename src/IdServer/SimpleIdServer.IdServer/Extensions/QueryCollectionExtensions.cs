@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace Microsoft.AspNetCore.Http
@@ -199,7 +200,16 @@ namespace Microsoft.AspNetCore.Http
         private static JsonNode GetValue(StringValues strValues)
         {
             if (strValues.Count() == 1)
-                return strValues.First();
+            {
+                try
+                {
+                    return JsonObject.Parse(strValues[0]).AsObject();
+                }
+                catch
+                {
+                    return strValues[0];
+                }
+            }
 
             var result = new JsonArray();
             foreach (var str in strValues) result.Add(str);

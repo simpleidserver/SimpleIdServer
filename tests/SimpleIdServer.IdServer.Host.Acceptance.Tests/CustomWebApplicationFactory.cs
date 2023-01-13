@@ -5,10 +5,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests.Middlewares;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
@@ -32,6 +41,21 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                         options.ScenarioContext = _scenarioContext;
                     });
                 s.AddSingleton<IStartupFilter>(new CertificateStartupFilter(_scenarioContext));
+                s.RemoveAll<Infrastructures.IHttpClientFactory>();
+                var mo = new Mock<Infrastructures.IHttpClientFactory>();
+                mo.Setup(m => m.GetHttpClient())
+                    .Returns(() =>
+                    {
+                        var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+                        return new HttpClient(fakeHttpMessageHandler);
+                    });
+                mo.Setup(m => m.GetHttpClient(It.IsAny<HttpClientHandler>()))
+                    .Returns(() =>
+                    {
+                        var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+                        return new HttpClient(fakeHttpMessageHandler);
+                    });
+                s.AddSingleton<Infrastructures.IHttpClientFactory>(mo.Object);
             });
         }
     }
@@ -59,6 +83,24 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 });
                 next(builder);
             };
+        }
+    }
+
+    public class FakeHttpMessageHandler : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var redirectUrls = new List<string>
+            {
+                "http://a.domain.com",
+                "http://b.domain.com"
+            };
+            var json = JsonSerializer.Serialize(redirectUrls);
+            return Task.FromResult(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            });
         }
     }
 }

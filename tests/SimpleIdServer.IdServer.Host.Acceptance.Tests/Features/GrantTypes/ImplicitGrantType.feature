@@ -40,4 +40,4 @@ Scenario: Display parameter is passed in the redirection url
 	| nonce         | nonce                 |
 	| display       | popup                 |
 	
-	Then redirection url contains 'display'='popup'
+	Then redirection url contains the parameter value 'display'='popup'

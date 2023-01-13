@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.SubjectTypeBuilders;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -66,6 +67,52 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Set the subject_type.
+        /// </summary>
+        /// <param name="subjectType"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetSubjectType(string subjectType)
+        {
+            _client.SubjectType = subjectType;
+            return this;
+        }
+
+        /// <summary>
+        /// Use pairwise subject_type.
+        /// </summary>
+        /// <param name="salt">Salt used to generate the pairwise subject.</param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetPairwiseSubjectType(string salt)
+        {
+            _client.SubjectType = PairWiseSubjectTypeBuidler.SUBJECT_TYPE;
+            _client.PairWiseIdentifierSalt = salt;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the sector_identifier_uri.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetSectorIdentifierUri(string uri)
+        {
+            _client.SectorIdentifierUri = uri;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the default Maximum Authentication Age.
+        /// Specifies that the End-User MUST be actively authenticated if the End-User was authenticated longer ago than the specified number of seconds.
+        /// </summary>
+        /// <param name="defaultMaxAge"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetDefaultMaxAge(int defaultMaxAge)
+        {
+            _client.DefaultMaxAge = defaultMaxAge;
+            return this;
+        }
+
+        /// <summary>
         /// PKCE is an extension to the Authorization Code flow to prevent CSRF and 
         /// For more information: https://oauth.net/2/pkce/
         /// </summary>
@@ -96,6 +143,19 @@ namespace SimpleIdServer.IdServer.Builders
         {
             if (!_client.ResponseTypes.Contains(IdTokenResponseTypeHandler.RESPONSE_TYPE))
                 _client.ResponseTypes.Add(IdTokenResponseTypeHandler.RESPONSE_TYPE);
+            return this;
+        }
+
+        /// <summary>
+        /// Enable offline_access.
+        /// This scope value requests that an OAUTH2.0 refresh token be issued that can be used to obtain an access token that grants access to the End-User's UserInfo Endpoint even when the End-User is not present (not logged-in).
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableOfflineAccess()
+        {
+            AddScope(Constants.StandardScopes.OfflineAccessScope.Name);
+            if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
+                _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             return this;
         }
 

@@ -96,6 +96,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var subject = jwsPayload.Subject;
                 var scopes = jwsPayload.Claims.Where(c => c.Type == OpenIdConnectParameterNames.Scope).Select(c => c.Value);
                 var audiences = jwsPayload.Audiences;
+                var clientId = jwsPayload.Claims.First(c => c.Type == OpenIdConnectParameterNames.ClientId).Value;
                 var claims = GetClaims(jwsPayload);
                 DateTime? authTime = null;
                 if (jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))
@@ -104,11 +105,10 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.OAuthUserClaims).AsNoTracking().FirstOrDefaultAsync(u => u.Id == subject, cancellationToken);
                 if (user == null) return new UnauthorizedResult();
 
-                var filteredClients = await _clientRepository.Query().AsNoTracking().Where(c => audiences.Contains(c.ClientId)).ToListAsync(cancellationToken);
-                if (!filteredClients.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, ErrorMessages.INVALID_AUDIENCE);
+                var oauthClient = await _clientRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                if (oauthClient == null)
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
-                Client oauthClient = filteredClients.First();
                 if (!user.HasOpenIDConsent(oauthClient.ClientId, scopes, claims, AuthorizationRequestClaimTypes.UserInfo))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
 

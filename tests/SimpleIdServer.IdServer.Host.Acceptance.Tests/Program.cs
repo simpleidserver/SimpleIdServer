@@ -12,9 +12,9 @@ builder.Services.AddSIDIdentityServer()
     .AddInMemoryClients(IdServerConfiguration.Clients)
     .AddInMemoryUsers(IdServerConfiguration.Users)
     .SetSigningKeys(
-        new SigningCredentials(BuildRsaSecurityKey(), SecurityAlgorithms.RsaSha256),
-        new SigningCredentials(BuildRsaSecurityKey(), SecurityAlgorithms.RsaSha384),
-        new SigningCredentials(BuildRsaSecurityKey(), SecurityAlgorithms.RsaSha512),
+        new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
+        new SigningCredentials(BuildRsaSecurityKey("keyid2"), SecurityAlgorithms.RsaSha384),
+        new SigningCredentials(BuildRsaSecurityKey("keyid3"), SecurityAlgorithms.RsaSha512),
         new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP256), SecurityAlgorithms.EcdsaSha256),
         new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP384), SecurityAlgorithms.EcdsaSha384),
         new SigningCredentials(BuildECDSaSecurityKey(ECCurve.NamedCurves.nistP521), SecurityAlgorithms.EcdsaSha512),
@@ -23,7 +23,7 @@ builder.Services.AddSIDIdentityServer()
         new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha512)
     )
     .SetEncryptedKeys(
-        new EncryptingCredentials(BuildRsaSecurityKey(), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
+        new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
     )
     .AddAuthentication(o =>
     {
@@ -33,9 +33,9 @@ builder.Services.AddSIDIdentityServer()
 var app = builder.Build().UseSID();
 app.Run();
 
-static RsaSecurityKey BuildRsaSecurityKey() => new RsaSecurityKey(new RSACryptoServiceProvider(2048))
+static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(new RSACryptoServiceProvider(2048))
 {
-    KeyId = "keyid"
+    KeyId = keyid
 };
 
 static ECDsaSecurityKey BuildECDSaSecurityKey(ECCurve curve) => new ECDsaSecurityKey(ECDsa.Create(curve))

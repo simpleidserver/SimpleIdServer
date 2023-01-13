@@ -60,7 +60,12 @@ namespace SimpleIdServer.IdServer.Api
         {
             var allKeys = data.Select(r => r.Key).ToList();
             foreach (var key in allKeys)
-                data[key] = HttpUtility.UrlDecode(data[key].GetValue<string>());
+            {
+                var val = data[key];
+                if(val is JsonValue)
+                    data[key] = HttpUtility.UrlDecode(data[key].GetValue<string>());
+            }
+
             OriginalRequestData = data;
             RequestData = data;
         }

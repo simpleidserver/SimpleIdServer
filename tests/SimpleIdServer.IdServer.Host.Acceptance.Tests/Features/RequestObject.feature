@@ -38,7 +38,7 @@ Scenario: Identity Token and authorization code are returned when passing JWS re
 
 Scenario: Identity Token and authorization code are returned when passing JWE request parameter encrypted with Public Key
 	Given authenticate a user
-	And build JWE request object for client 'thirtyTwoClient' and sign with the key 'keyId' and encrypt with the key 'keyid'
+	And build JWE request object for client 'thirtyTwoClient' and sign with the key 'keyId' and encrypt with the key 'keyid4'
 	| Key           | Value                 |
 	| iss           | thirtyTwoClient       |
 	| aud           | aud                   |

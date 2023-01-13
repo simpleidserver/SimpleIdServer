@@ -13,6 +13,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSelfSignedTlsAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientCredentialsGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\HappyFlows - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\IdTokenSignatureAndOrEncryption - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ImplicitGrantType.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\IntrospectErrors - Copier.feature.cs" />
@@ -20,6 +21,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\OAUTHConfiguration - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\PasswordGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\RegisterErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\RequestObject - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\RevokeTokenErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\TokenErrors - Copier.feature.cs" />
@@ -60,6 +62,9 @@
 	  <Compile Update="Features\ClientAuths\ClientPkceAuthenticationErrors.feature.cs">
 	    <DependentUpon>ClientPkceAuthenticationErrors.feature</DependentUpon>
 	  </Compile>
+	  <Compile Update="Features\GrantTypes\AlternativeScenarios.feature.cs">
+	    <DependentUpon>AlternativeScenarios.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\GrantTypes\ImplicitGrantType.feature.cs">
 	    <DependentUpon>ImplicitGrantType.feature</DependentUpon>
 	  </Compile>
@@ -71,6 +76,9 @@
 	  </Compile>
 	  <Compile Update="Features\GrantTypes\AuthorizationCodeGrantTypeErrors.feature.cs">
 	    <DependentUpon>AuthorizationCodeGrantTypeErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\SubjectType.feature.cs">
+	    <DependentUpon>SubjectType.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\RequestObject.feature.cs">
 	    <DependentUpon>RequestObject.feature</DependentUpon>
@@ -137,6 +145,10 @@
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\AlternativeScenarios.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\GrantTypes\ImplicitGrantType.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
@@ -150,6 +162,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\GrantTypes\AuthorizationCodeGrantTypeErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\SubjectType.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

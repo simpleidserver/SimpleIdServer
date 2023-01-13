@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +16,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -117,8 +117,22 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             _scenarioContext.Set(jwe, key);
         }
 
+
+        [Given("authenticate a user and add '(.*)' seconds to the authentication time")]
+        public async Task GivenUserIsAuthenticated(int seconds)
+        {
+            _scenarioContext.EnableUserAuthentication();
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                var user = userRepository.Query().Include(u => u.Sessions).First(u => u.Id == "user");
+                user.ActiveSession.AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
+                await userRepository.SaveChanges(CancellationToken.None);
+            }
+        }
+
         [When("execute HTTP GET request '(.*)'")]
-        public async Task GivenExecuteHTTPGetRequest(string url, Table table)
+        public async Task WhenExecuteHTTPGetRequest(string url, Table table)
         {
             url = ExtractUrl(url, table);
             var headers = ExtractHeaders(table);
@@ -135,7 +149,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("execute HTTP PUT request '(.*)'")]
-        public async Task GivenExecuteHTTPPutRequest(string url, Table table)
+        public async Task WhenExecuteHTTPPutRequest(string url, Table table)
         {
             url = ExtractUrl(url, table);
             var headers = ExtractHeaders(table);
@@ -154,7 +168,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("execute HTTP DELETE request '(.*)'")]
-        public async Task GivenExecuteHTTPDeleteRequest(string url, Table table)
+        public async Task WhenExecuteHTTPDeleteRequest(string url, Table table)
         {
             url = ExtractUrl(url, table);
             var headers = ExtractHeaders(table);
@@ -173,7 +187,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("execute HTTP PUT JSON request '(.*)'")]
-        public async Task GivenExecuteHTTPPutJSONRequest(string url, Table table)
+        public async Task WhenExecuteHTTPPutJSONRequest(string url, Table table)
         {
             url = ParseValue(_scenarioContext, url).ToString();
             var headers = ExtractHeaders(table);
@@ -194,7 +208,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("execute HTTP POST JSON request '(.*)'")]
-        public async Task GivenExecuteHTTPPostJSONRequest(string url, Table table)
+        public async Task WhenExecuteHTTPPostJSONRequest(string url, Table table)
         {
             url = ParseValue(_scenarioContext, url).ToString();
             var headers = ExtractHeaders(table);
@@ -216,7 +230,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("execute HTTP POST request '(.*)'")]
-        public async Task GivenExecuteHTTPPostRequest(string url, Table table)
+        public async Task WhenExecuteHTTPPostRequest(string url, Table table)
         {
             var jObj = new List<KeyValuePair<string, string>>();
             var headers = ExtractHeaders(table);
@@ -247,6 +261,12 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var httpClient = _factory.CreateClient();
             var httpResponseMessage = await httpClient.SendAsync(httpRequestMessage);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("disconnect the user")]
+        public async void WhenDisconnectUser()
+        {
+            _scenarioContext.DisableUserAuthentication();
         }
 
         private void BuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table, bool isExpired = false)

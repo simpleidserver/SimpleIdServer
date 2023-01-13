@@ -51,7 +51,7 @@ namespace SimpleIdServer.IdServer.Helpers
                         var json = await httpResult.Content.ReadAsStringAsync();
                         if (!string.IsNullOrWhiteSpace(json))
                         {
-                            var jArr = JsonSerializer.SerializeToNode(json).AsArray();
+                            var jArr = JsonSerializer.Deserialize<IEnumerable<string>>(json);
                             if (jArr != null)
                             {
                                 foreach (var record in jArr)

@@ -136,19 +136,26 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [Then("redirection url contains the parameter '(.*)'")]
-        public void ThenRedirectionUrlContains(string parameter)
+        public void ThenRedirectionUrlContainsQuery(string parameter)
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
             Assert.True(queries.ContainsKey(parameter) == true);
         }
 
-        [Then("redirection url contains '(.*)'='(.*)'")]
-        public void ThenRedirectionUrlContains(string key, string value)
+        [Then("redirection url contains the parameter value '(.*)'='(.*)'")]
+        public void ThenRedirectionUrlContainsQuery(string key, string value)
         {
             var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
             var queries = QueryHelpers.ParseQuery(httpResponseMessage.RequestMessage.RequestUri.Query);
             Assert.True(queries.Any(q => q.Key == key && q.Value == value) == true);
+        }
+
+        [Then("redirection url contains '(.*)'")]
+        public void ThenRedirectionUrlContains(string baseUrl)
+        {
+            var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+            Assert.True(httpResponseMessage.RequestMessage.RequestUri.AbsoluteUri.Contains(baseUrl) == true);
         }
 
         private JsonWebToken GetAccessToken()

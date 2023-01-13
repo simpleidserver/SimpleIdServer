@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class RequestObjectFeature : object, Xunit.IClassFixture<RequestObjectFeature.FixtureData>, System.IDisposable
+    public partial class SubjectTypeFeature : object, Xunit.IClassFixture<SubjectTypeFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "RequestObject.feature"
+#line 1 "SubjectType.feature"
 #line hidden
         
-        public RequestObjectFeature(RequestObjectFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public SubjectTypeFeature(SubjectTypeFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "RequestObject", "\tPass request object", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SubjectType", "\tCheck the different subject type", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,17 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Identity Token and authorization code are returned when passing JWS request param" +
-            "eter")]
-        [Xunit.TraitAttribute("FeatureTitle", "RequestObject")]
-        [Xunit.TraitAttribute("Description", "Identity Token and authorization code are returned when passing JWS request param" +
-            "eter")]
-        public void IdentityTokenAndAuthorizationCodeAreReturnedWhenPassingJWSRequestParameter()
+        [Xunit.SkippableFactAttribute(DisplayName="Get pairwise subject")]
+        [Xunit.TraitAttribute("FeatureTitle", "SubjectType")]
+        [Xunit.TraitAttribute("Description", "Get pairwise subject")]
+        public void GetPairwiseSubject()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity Token and authorization code are returned when passing JWS request param" +
-                    "eter", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get pairwise subject", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -104,209 +101,44 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table112 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table127 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table112.AddRow(new string[] {
-                            "iss",
-                            "thirtyOneClient"});
-                table112.AddRow(new string[] {
-                            "aud",
-                            "aud"});
-                table112.AddRow(new string[] {
+                table127.AddRow(new string[] {
                             "response_type",
-                            "code id_token"});
-                table112.AddRow(new string[] {
+                            "id_token"});
+                table127.AddRow(new string[] {
                             "client_id",
-                            "thirtyOneClient"});
-                table112.AddRow(new string[] {
+                            "thirtyThreeClient"});
+                table127.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table127.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table112.AddRow(new string[] {
+                table127.AddRow(new string[] {
                             "scope",
-                            "openid email"});
-                table112.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table112.AddRow(new string[] {
+                            "openid email role"});
+                table127.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
+                table127.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table127.AddRow(new string[] {
+                            "display",
+                            "popup"});
 #line 6
- testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
-                        "d\'", ((string)(null)), table112, "And ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table127, "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table113 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table113.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-                table113.AddRow(new string[] {
-                            "response_type",
-                            "code id_token"});
-                table113.AddRow(new string[] {
-                            "client_id",
-                            "thirtyOneClient"});
-                table113.AddRow(new string[] {
-                            "state",
-                            "state"});
-                table113.AddRow(new string[] {
-                            "scope",
-                            "openid email"});
 #line 17
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table113, "When ");
-#line hidden
-#line 25
  testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 26
+#line 18
  testRunner.And("extract payload from JWT \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 28
- testRunner.Then("redirection url contains the parameter \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 29
- testRunner.Then("redirection url contains the parameter \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 30
- testRunner.Then("redirection url doesn\'t contain the parameter \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 31
- testRunner.Then("JWT contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 32
- testRunner.Then("JWT contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 33
- testRunner.Then("JWT contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 34
- testRunner.Then("JWT contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 35
- testRunner.Then("JWT contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 36
- testRunner.Then("JWT contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 37
- testRunner.Then("JWT has \'sub\'=\'user\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Identity Token and authorization code are returned when passing JWE request param" +
-            "eter encrypted with Public Key")]
-        [Xunit.TraitAttribute("FeatureTitle", "RequestObject")]
-        [Xunit.TraitAttribute("Description", "Identity Token and authorization code are returned when passing JWE request param" +
-            "eter encrypted with Public Key")]
-        public void IdentityTokenAndAuthorizationCodeAreReturnedWhenPassingJWERequestParameterEncryptedWithPublicKey()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity Token and authorization code are returned when passing JWE request param" +
-                    "eter encrypted with Public Key", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 39
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 40
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table114 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table114.AddRow(new string[] {
-                            "iss",
-                            "thirtyTwoClient"});
-                table114.AddRow(new string[] {
-                            "aud",
-                            "aud"});
-                table114.AddRow(new string[] {
-                            "response_type",
-                            "code id_token"});
-                table114.AddRow(new string[] {
-                            "client_id",
-                            "thirtyTwoClient"});
-                table114.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table114.AddRow(new string[] {
-                            "scope",
-                            "openid email"});
-                table114.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table114.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-#line 41
- testRunner.And("build JWE request object for client \'thirtyTwoClient\' and sign with the key \'keyI" +
-                        "d\' and encrypt with the key \'keyid\'", ((string)(null)), table114, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table115 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table115.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-                table115.AddRow(new string[] {
-                            "response_type",
-                            "code id_token"});
-                table115.AddRow(new string[] {
-                            "client_id",
-                            "thirtyTwoClient"});
-                table115.AddRow(new string[] {
-                            "state",
-                            "state"});
-                table115.AddRow(new string[] {
-                            "scope",
-                            "openid email"});
-#line 52
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table115, "When ");
-#line hidden
-#line 60
- testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 61
- testRunner.And("extract payload from JWT \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 63
- testRunner.Then("redirection url contains the parameter \'code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 64
- testRunner.Then("redirection url contains the parameter \'id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 65
- testRunner.Then("redirection url doesn\'t contain the parameter \'access_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 66
- testRunner.Then("JWT contains \'iss\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 67
- testRunner.Then("JWT contains \'aud\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 68
- testRunner.Then("JWT contains \'exp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 69
- testRunner.Then("JWT contains \'iat\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 70
- testRunner.Then("JWT contains \'azp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 71
- testRunner.Then("JWT contains \'c_hash\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 72
- testRunner.Then("JWT has \'sub\'=\'user\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 20
+ testRunner.Then("JWT has \'sub\'=\'ayv4P9i7vUdFDHPXKEY21d2zBHryA4k4PEO80sh4AiQ\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -319,12 +151,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                RequestObjectFeature.FeatureSetup();
+                SubjectTypeFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                RequestObjectFeature.FeatureTearDown();
+                SubjectTypeFeature.FeatureTearDown();
             }
         }
     }

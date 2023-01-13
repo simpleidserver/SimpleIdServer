@@ -56,7 +56,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         public void WhenExtractParameterFromBody(string parameter)
         {
             var jObj = _scenarioContext.Get<JsonDocument>("jsonHttpBody");
-            // _scenarioContext.Set(jObj[parameter].ToString(), parameter);
+            _scenarioContext.Set(jObj.SelectToken(parameter).Value.GetString(), parameter);
         }
 
         [When("extract parameter '(.*)' from JSON body into '(.*)'")]

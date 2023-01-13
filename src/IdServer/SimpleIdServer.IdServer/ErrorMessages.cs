@@ -162,5 +162,7 @@ namespace SimpleIdServer.IdServer
         public const string JWT_CANNOT_BE_ENCRYPTED = "JWT cannnot be encrypted";
         public const string JWT_CANNOT_BE_DECRYPTED = "An unexcepted error occured while trying to decrypt the JWT";
         public const string JWT_BAD_SIGNATURE = "JWT doesn't have a correct signature";
+        public const string CANNOT_GENERATE_PAIRWISE_SUBJECT_MORE_THAN_ONE_REDIRECT_URLS = "pairwise subject cannot be generated because the sectore_identifier_uri is empty and the client contains more than one redirect_uri";
+        public const string CANNOT_GENERATE_PAIRWISE_SUBJECT_BECAUSE_NO_SECTOR_IDENTIFIER = "pairwise subject cannot be generated because the sector_identifier_uri is empty and there is no redirect_uri";
     }
 }

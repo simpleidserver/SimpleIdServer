@@ -122,7 +122,7 @@ namespace System.Text.Json.Nodes
             if (!jObj.ContainsKey(AuthorizationRequestParameters.Claims))
                 return new AuthorizationRequestClaimParameter[0];
 
-            var claimsJObj = JsonSerializer.SerializeToNode(jObj[AuthorizationRequestParameters.Claims].ToString()).AsObject();
+            var claimsJObj = jObj[AuthorizationRequestParameters.Claims] as JsonObject;
             return claimsJObj.GetOpenIdClaims();
         }
 

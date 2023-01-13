@@ -281,6 +281,11 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.SubjectType)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? SubjectType { get; set; } = null;
+        [JsonIgnore]
+        /// <summary>
+        /// SALT used to calculate the pairwise.
+        /// </summary>
+        public string? PairWiseIdentifierSalt { get; set; } = null;
         /// <summary>
         /// The value of the sector_identifier_uri MUST be a URL using the https scheme that points to a JSON file containing an array of redirect_uri values.
         /// </summary>

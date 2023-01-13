@@ -25,8 +25,8 @@ namespace SimpleIdServer.IdServer.Domains
         {
             return user.Consents.FirstOrDefault(c => c.ClientId == clientId &&
                 (scopes == null || (scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name).All(s => c.Scopes.Contains(s)))) &&
-                (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name))
-                    .All(cl => c.Claims.Any(scl => scl == cl.Name)))));
+                (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name)).All(cl => c.Claims.Any(scl => scl == cl.Name))))
+            );
         }
     }
 }
