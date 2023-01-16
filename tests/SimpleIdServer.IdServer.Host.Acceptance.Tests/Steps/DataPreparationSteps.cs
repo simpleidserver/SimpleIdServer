@@ -1,13 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using TechTalk.SpecFlow;
@@ -47,6 +43,9 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var jws = handler.CreateToken(tokenDescriptor);
             _scenarioContext.Set(jws, key);
         }
+
+        [Given("build expiration time and add '(.*)' seconds")]
+        public void GivenBuildExpirationTime(int seconds) => _scenarioContext.Set(DateTime.UtcNow.AddSeconds(seconds).ConvertToUnixTimestamp(), "exp");
 
         [Given("build random X509Certificate2 and store into '(.*)'")]
         public void GivenBuildRandomCertificate(string key)

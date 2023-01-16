@@ -171,14 +171,13 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             if (string.IsNullOrWhiteSpace(request))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, BCAuthenticationRequestParameters.Request));
 
-            var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(request, context.Client, cancellationToken);
+            var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(request, context.Client, context.Client.BCAuthenticationRequestSigningAlg, null, cancellationToken);
             if (jsonWebTokenResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, jsonWebTokenResult.Error);
 
             var audiences = jsonWebTokenResult.Jwt.Audiences;
             var issuer = jsonWebTokenResult.Jwt.Issuer;
             var exp = jsonWebTokenResult.Jwt.ValidTo;
-            var iat = jsonWebTokenResult.Jwt.IssuedAt;
             var nbf = jsonWebTokenResult.Jwt.ValidFrom;
             var jti = jsonWebTokenResult.Jwt.Id;
             if (audiences == null || !audiences.Any())
@@ -193,28 +192,16 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             if (issuer != context.Client.ClientId)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_BAD_ISSUER);
 
-            if (exp == default(DateTime))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_EXPIRATION);
-
             var currentDateTime = DateTime.UtcNow;
             if (currentDateTime >= exp)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_IS_EXPIRED);
 
-            if (currentDateTime.AddSeconds(_options.MaxRequestLifetime) <= exp)
+            var diffSeconds = (exp - nbf).TotalSeconds;
+            if (diffSeconds >= _options.MaxRequestLifetime)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
-
-            if (iat == default(DateTime))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_IAT);
-
-            if (nbf == default(DateTime))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NO_NBF);
 
             if (currentDateTime < nbf)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_BAD_NBF, nbf));
-
-            var minusMaxRequestLifetime = -_options.MaxRequestLifetime;
-            if (currentDateTime.AddSeconds(minusMaxRequestLifetime) > nbf)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.AUTH_REQUEST_MAXIMUM_LIFETIME, _options.MaxRequestLifetime));
 
             if (string.IsNullOrWhiteSpace(jti))
             {
@@ -248,9 +235,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             }
 
             if (string.IsNullOrWhiteSpace(clientNotificationToken))
-            {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, DTOs.BCAuthenticationRequestParameters.ClientNotificationToken));
-            }
 
             if (clientNotificationToken.Length > 1024)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024);

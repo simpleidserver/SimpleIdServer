@@ -96,7 +96,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var subject = jwsPayload.Subject;
                 var scopes = jwsPayload.Claims.Where(c => c.Type == OpenIdConnectParameterNames.Scope).Select(c => c.Value);
                 var audiences = jwsPayload.Audiences;
-                var clientId = jwsPayload.Claims.First(c => c.Type == OpenIdConnectParameterNames.ClientId).Value;
+                var clientId = jwsPayload.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
                 var claims = GetClaims(jwsPayload);
                 DateTime? authTime = null;
                 if (jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))

@@ -28,11 +28,11 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
-        public const string INVALID_REQUEST_URI_PARAMETER = "request uri parameter is invalid";
+        public const string INVALID_REQUEST_URI_PARAMETER = "request_uri parameter is invalid";
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";
         public const string INVALID_ALG_USED_TO_SIGN_IDTOKENHINT = "the alg used to sign the id_token_hint is invalid";
-        public const string INVALID_RESPONSE_TYPE_CLAIM = "the response type claim is invalid";
-        public const string INVALID_CLIENT_ID_CLAIM = "the client identifier claim is invalid";
+        public const string INVALID_RESPONSE_TYPE_CLAIM = "the response_type claim is invalid";
+        public const string INVALID_CLIENT_ID_CLAIM = "the client_id claim is invalid";
         public const string INVALID_SIGNATURE_ALG = "the signature algorithm is invalid";
         public const string INVALID_AUTH_REQUEST_ID = "auth_req_id doesn't exist";
         public const string INVALID_CLIENT_IDTOKENHINT = "client_id contained in the id_token_hint is invalid";
@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer
         public const string BAD_RESPONSE_TYPES_CLIENT = "response types {0} are not supported by the client";
         public const string BAD_ID_TOKEN_HINT_SIG = "signature of the id_token_hint is not correct";
         public const string BAD_ACCESS_TOKEN = "access token is not correct";
-        public const string BAD_REDIRECT_URI = "redirect uri {0} is not correct";
+        public const string BAD_REDIRECT_URI = "redirect_uri {0} is not correct";
         public const string BAD_CLIENT_URI = "client uri {0} is not correct";
         public const string BAD_LOGO_URI = "logo uri {0} is not correct";
         public const string BAD_POLICY_URI = "policy uri {0} is not correct";
@@ -95,8 +95,8 @@ namespace SimpleIdServer.IdServer
         public const string MISSING_CLIENT_ID = "missing client_id";
         public const string MISSING_POST_LOGOUT_REDIRECT_URI = "the parameter post_logout_redirect_uri is missing";
         public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
-        public const string MISSING_RESPONSE_TYPE_CLAIM = "the response type claim is missing";
-        public const string MISSING_CLIENT_ID_CLAIM = "the client identifier claim is missing";
+        public const string MISSING_RESPONSE_TYPE_CLAIM = "the response_type claim is missing";
+        public const string MISSING_CLIENT_ID_CLAIM = "the client_id claim is missing";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG = "token_encrypted_response_alg is not supported";
         public const string UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC = "token_encrypted_response_enc is not supported";
         public const string UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG = "token_signed_response_alg is not supported";

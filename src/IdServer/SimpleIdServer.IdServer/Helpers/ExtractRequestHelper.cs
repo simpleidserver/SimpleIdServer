@@ -78,7 +78,7 @@ namespace SimpleIdServer.IdServer.Helpers
         protected virtual async Task<bool> CheckRequest(HandlerContext context, string request)
         {
             var openidClient = context.Client;
-            var res = await _jwtBuilder.ReadJsonWebToken(request, context.Client, CancellationToken.None);
+            var res = await _jwtBuilder.ReadJsonWebToken(request, context.Client, context.Client.RequestObjectSigningAlg, context.Client.RequestObjectEncryptionAlg, CancellationToken.None);
             CheckRequestObject(res.Jwt, openidClient, context);
             context.Request.SetRequestData(res.Jwt.GetClaimJson());
             return true;

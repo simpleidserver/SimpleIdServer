@@ -26,6 +26,13 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\RevokeTokenErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\TokenErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfo - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfoErrors - Copier.feature.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\certificates\mtlsClient.crt" Link="mtlsClient.crt">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
@@ -80,6 +87,12 @@
 	  </Compile>
 	  <Compile Update="Features\AuthorizationErrors.feature.cs">
 	    <DependentUpon>AuthorizationErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\BCAuthorizeErrors.feature.cs">
+	    <DependentUpon>BCAuthorizeErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\UserInfoErrors.feature.cs">
+	    <DependentUpon>UserInfoErrors.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\UserInfo.feature.cs">
 	    <DependentUpon>UserInfo.feature</DependentUpon>
@@ -173,6 +186,14 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\AuthorizationErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\BCAuthorizeErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\UserInfoErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

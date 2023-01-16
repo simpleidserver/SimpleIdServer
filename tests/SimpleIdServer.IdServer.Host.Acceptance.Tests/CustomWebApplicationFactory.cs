@@ -77,12 +77,46 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 {
                     if (ctx.Request.Headers.TryGetValue("X-Testing-ClientCert", out var key))
                     {
-                        ctx.Connection.ClientCertificate = _scenarioContext.Get<X509Certificate2>(key);
+                        var certificate = _scenarioContext.Get<X509Certificate2>(key);
+                        ctx.Connection.ClientCertificate = certificate;
                     }
                     return nxt();
                 });
                 next(builder);
             };
+        }
+
+        private static X509ChainPolicy BuildChainPolicy(X509Certificate2 certificate, bool isCertificateSelfSigned)
+        {
+            // Now build the chain validation options.
+            X509RevocationFlag revocationFlag = X509RevocationFlag.EntireChain;
+            X509RevocationMode revocationMode = X509RevocationMode.NoCheck;
+
+            if (isCertificateSelfSigned)
+            {
+                // Turn off chain validation, because we have a self signed certificate.
+                revocationFlag = X509RevocationFlag.EntireChain;
+                revocationMode = X509RevocationMode.NoCheck;
+            }
+
+            var chainPolicy = new X509ChainPolicy
+            {
+                RevocationFlag = revocationFlag,
+                RevocationMode = revocationMode,
+            };
+
+            if (isCertificateSelfSigned)
+            {
+                chainPolicy.VerificationFlags |= X509VerificationFlags.AllowUnknownCertificateAuthority;
+                chainPolicy.VerificationFlags |= X509VerificationFlags.IgnoreEndRevocationUnknown;
+                chainPolicy.ExtraStore.Add(certificate);
+            }
+            else
+            {
+                chainPolicy.TrustMode = X509ChainTrustMode.System;
+            }
+
+            return chainPolicy;
         }
     }
 

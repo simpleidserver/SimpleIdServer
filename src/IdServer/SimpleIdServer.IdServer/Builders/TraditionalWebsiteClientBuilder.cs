@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -60,6 +61,17 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder SetRequestObjectSigning(string alg)
         {
             _client.RequestObjectSigningAlg = alg;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the algorithm used to sign the request object in /bc-authorize.
+        /// </summary>
+        /// <param name="alg"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetBCAuthenticationRequestSigningAlg(string alg)
+        {
+            _client.BCAuthenticationRequestSigningAlg = alg;
             return this;
         }
 
@@ -192,6 +204,66 @@ namespace SimpleIdServer.IdServer.Builders
                 _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             return this;
         }
+
+        #region Back Channel
+
+        /// <summary>
+        /// Use ping delivery mode.
+        /// https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.10.2
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UsePingDeliveryMode()
+        {
+            _client.BCTokenDeliveryMode = StandardNotificationModes.Ping;
+            return this;
+        }
+
+        /// <summary>
+        /// Use poll delivery mode
+        /// https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.5
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UsePollDeliveryMode()
+        {
+            _client.BCTokenDeliveryMode = StandardNotificationModes.Poll;
+            return this;
+        }
+
+        /// <summary>
+        /// Use push delivery mode.
+        /// https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.10.3
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UsePushDeliveryMode()
+        {
+            _client.BCTokenDeliveryMode = StandardNotificationModes.Push;
+            return this;
+        }
+
+        #endregion
+
+        #region Client authentication
+
+        /// <summary>
+        /// Use 'tls_client_auth' as authentication method.
+        /// For more information : https://oauth.net/2/mtls/
+        /// </summary>
+        /// <param name="subjectDn">Expected subject distinguished name of the certificate.</param>
+        /// <param name="sanDns">Expected dNSName SAN entry in the certificate.</param>
+        /// <param name="sanEmail">Expected rfc822Name SAN entry in the certificate.</param>
+        /// <param name="sanIp">A string representation of an IP address in either dotted decimal notation (IPV4) or colon-delimited hexadecimal (IPV6) that is expected to be present as an iPAddress SAN entry in the certificate</param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UseClientTlsAuthentication(string subjectDn, string sanDns = null, string sanEmail = null, string sanIp = null)
+        {
+            _client.TokenEndPointAuthMethod = OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD;
+            _client.TlsClientAuthSubjectDN = subjectDn;
+            _client.TlsClientAuthSanDNS = sanDns;
+            _client.TlsClientAuthSanEmail = sanEmail;
+            _client.TlsClientAuthSanIP = sanIp;
+            return this;
+        }
+
+        #endregion
 
         public Client Build() => _client;
     }

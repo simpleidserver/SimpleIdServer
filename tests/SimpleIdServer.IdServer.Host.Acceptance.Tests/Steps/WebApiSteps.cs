@@ -11,8 +11,10 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
@@ -43,6 +45,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 _scenarioContext.Set(_factory, "Factory");
                 var mock = new Mock<Infrastructures.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
+                _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "mtlsClient.crt")), "mtlsClient.crt");
             }
         }
 
@@ -58,7 +61,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 var handler = new JsonWebTokenHandler();
                 var claims = new Dictionary<string, object>();
                 foreach (var row in table.Rows)
-                    claims.Add(row["Key"].ToString(), row["Value"].ToString());
+                    claims.Add(row["Key"].ToString(), ParseValue(_scenarioContext, row["Value"].ToString()));
 
                 var descritor = new SecurityTokenDescriptor
                 {
@@ -115,6 +118,50 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var handler = new JsonWebTokenHandler();
             var jwe = handler.EncryptToken(ParseValue(_scenarioContext, jwsKey).ToString(), new EncryptingCredentials(securityKey, SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256));
             _scenarioContext.Set(jwe, key);
+        }
+
+        [Given("build JWS id_token_hint and sign with the key '(.*)'")]
+        public void GivenBuildJWSIdTokenHint(string keyId, Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
+                var signKey = keyStore.GetAllSigningKeys().First(k => k.Key.KeyId == keyId);
+                var handler = new JsonWebTokenHandler();
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), row["Value"].ToString());
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = signKey
+                };
+                var request = handler.CreateToken(descritor);
+                _scenarioContext.Set(request, "id_token_hint");
+            }
+        }
+
+        [Given("build access_token and sign with the key '(.*)'")]
+        public void GivenBuildAccessToken(string keyId, Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
+                var signKey = keyStore.GetAllSigningKeys().First(k => k.Key.KeyId == keyId);
+                var handler = new JsonWebTokenHandler();
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), row["Value"].ToString());
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = signKey
+                };
+                var request = handler.CreateToken(descritor);
+                _scenarioContext.Set(request, "access_token");
+            }
         }
 
 
@@ -264,10 +311,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         }
 
         [When("disconnect the user")]
-        public async void WhenDisconnectUser()
-        {
-            _scenarioContext.DisableUserAuthentication();
-        }
+        public void WhenDisconnectUser() => _scenarioContext.DisableUserAuthentication();
 
         private void BuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table, bool isExpired = false)
         {

@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table132 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table179 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table132, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table179, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -115,6 +115,116 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 12
  testRunner.And("JSON \'$.error_description\'=\'bad grant type\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="authorization cannot used twice")]
+        [Xunit.TraitAttribute("FeatureTitle", "TokenErrors")]
+        [Xunit.TraitAttribute("Description", "authorization cannot used twice")]
+        public void AuthorizationCannotUsedTwice()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization cannot used twice", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 14
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 15
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table180 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table180.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table180.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table180.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table180.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table180.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table180.AddRow(new string[] {
+                            "scope",
+                            "secondScope"});
+#line 16
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table180, "When ");
+#line hidden
+#line 25
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 26
+ testRunner.And("extract parameter \'state\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table181 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table181.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table181.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table181.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table181.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table181.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 28
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table181, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table182 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table182.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table182.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table182.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table182.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table182.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 36
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table182, "And ");
+#line hidden
+#line 44
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 46
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 47
+ testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 48
+ testRunner.And("JSON \'$.error_description\'=\'authorization code has already been used, all tokens " +
+                        "previously issued have been revoked\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

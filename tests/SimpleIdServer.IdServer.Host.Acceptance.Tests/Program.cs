@@ -11,6 +11,7 @@ builder.Services.AddSIDIdentityServer()
     .AddInMemoryScopes(IdServerConfiguration.Scopes)
     .AddInMemoryClients(IdServerConfiguration.Clients)
     .AddInMemoryUsers(IdServerConfiguration.Users)
+    .AddBackChannelAuthentication()
     .SetSigningKeys(
         new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
         new SigningCredentials(BuildRsaSecurityKey("keyid2"), SecurityAlgorithms.RsaSha384),
@@ -27,7 +28,11 @@ builder.Services.AddSIDIdentityServer()
     )
     .AddAuthentication(o =>
     {
-        o.AddMutualAuthentication(m => m.AllowedCertificateTypes = CertificateTypes.All);
+        o.AddMutualAuthentication(m =>
+        {
+            m.AllowedCertificateTypes = CertificateTypes.All;
+            m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
+        });
     });
 
 var app = builder.Build().UseSID();

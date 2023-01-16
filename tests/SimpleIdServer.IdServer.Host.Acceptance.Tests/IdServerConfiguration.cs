@@ -63,7 +63,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("thirtySevenClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("thirtyEightClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetUserInfoSignedResponseAlg().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("thirtyNineClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetUserInfoSignedResponseAlg().SetUserInfoEncryption().AddRSAEncryptedKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortyClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyOneClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha384).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyTwoClient", "password", "http://localhost:8080").AddScope("secondScope").SetBCAuthenticationRequestSigningAlg(SecurityAlgorithms.RsaSha256).UsePingDeliveryMode().UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build()
         };
 
         public static List<User> Users = new List<User>
@@ -74,6 +76,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddRole("role2")
                 .AddConsent("thirdClient", "secondScope")
                 .AddConsent("nineClient", "secondScope")
+                .AddConsent("fortyTwoClient", "secondScope")
                 .AddConsent("fourteenClient", "openid", "profile", "role", "email")
                 .AddConsent("fifteenClient", "openid", "profile", "role", "email")
                 .AddConsent("sixteenClient", "openid", "profile", "role", "email")
@@ -91,7 +94,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("twentyEightClient", "openid", "profile", "role", "email")
                 .AddConsent("twentyNineClient", "openid", "profile", "role", "email")
                 .AddConsent("thirtyClient", "openid", "profile", "role", "email")
-                .AddConsent("thirtyOneClient", "openid", "profile", "role", "email")
+                .AddConsent("thirtyOneClient", new [] { "openid", "profile", "role", "email" }, new [] { "sub" })
                 .AddConsent("thirtyTwoClient", "openid", "profile", "role", "email")
                 .AddConsent("thirtyThreeClient", "openid", "profile", "role", "email")
                 .AddConsent("thirtyFourClient", "openid", "profile", "role", "email")
@@ -101,6 +104,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("thirtyEightClient", "openid", "profile", "role", "email")
                 .AddConsent("thirtyNineClient", "openid", "profile", "role", "email")
                 .AddConsent("fortyClient", new string[] { "openid", "profile", "role", "email" }, new string[] { "name", "email" })
+                .AddConsent("fortyOneClient", "openid", "profile", "role", "email")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }
