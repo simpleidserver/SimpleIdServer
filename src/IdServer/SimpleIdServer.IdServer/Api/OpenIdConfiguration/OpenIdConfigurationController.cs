@@ -44,7 +44,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{Constants.EndPoints.UserInfo}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{Constants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{Constants.EndPoints.EndSession}");
-            result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{Constants.EndPoints.BCAuthorize}");
+            result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{Constants.EndPoints.MtlsBCAuthorize}");
             result.Add(OpenIDConfigurationNames.RequestParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestUriParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestObjectSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));

@@ -390,6 +390,10 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.IsConsentDisabled)]
         public bool IsConsentDisabled { get; set; }
         /// <summary>
+        /// Expiration time in seconds of auth_req_id
+        /// </summary>
+        public int AuthReqIdExpirationTimeInSeconds { get; set; } = 120;
+        /// <summary>
         /// Scopes used by the client to control its access.
         /// </summary>
         [JsonIgnore]
@@ -420,6 +424,11 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonIgnore]
         public IEnumerable<string> DefaultAcrValues { get; set; } = new List<string>();
+        /// <summary>
+        /// A JSON number with a positive integer value indicating the minimum amount of time in seconds that the client MUST wait between polling requests to the token endpoint.
+        /// </summary>
+        [JsonIgnore]
+        public int BCIntervalSeconds { get; set; } = 5;
 
         public double? GetDoubleParameter(string name)
         {

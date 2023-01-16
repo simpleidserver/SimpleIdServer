@@ -115,14 +115,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public int MaxRequestLifetime { get; set; } = 60 * 5;
         /// <summary>
-        /// Expiration time auth_req_id in seconds.
-        /// </summary>
-        public int AuthRequestExpirationTimeInSeconds { get; set; } = 120;
-        /// <summary>
-        /// Default interval in seconds.
-        /// </summary>
-        public int DefaultBCAuthorizeWaitIntervalInSeconds { get; set; } = 2;
-        /// <summary>
         /// Enable or disable Back Channel Authentication.
         /// </summary>
         public bool IsBCEnabled { get; set; }

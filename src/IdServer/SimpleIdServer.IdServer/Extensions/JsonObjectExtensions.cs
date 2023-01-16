@@ -38,6 +38,12 @@ namespace System.Text.Json.Nodes
 
         #region Authorization request
 
+        /// <summary>
+        /// Hint to the OpenId Provider regarding the end-user for whom authentication is beging requested.
+        /// The value may contain an email address, phone number, account number, subject identifier etc...
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
         public static string GetLoginHintFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.LoginHint);
 
         public static string GetRequestFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.Request);
@@ -106,6 +112,12 @@ namespace System.Text.Json.Nodes
             result = HttpUtility.UrlDecode(result);
             return result;
         }
+
+        /// <summary>
+        /// An ID token previously issued to the client by the OpenId provider being passed back as a hint to identify the end-user for whom authentication is being requested.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
         public static string GetIdTokenHintFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.IdTokenHint);
 
         public static int? GetMaxAgeFromAuthorizationRequest(this JsonObject jObj)
@@ -368,17 +380,36 @@ namespace System.Text.Json.Nodes
 
         public static string GetRequest(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.Request);
 
+        /// <summary>
+        /// A token containing information identifying the end-user for whom authentication is begin requested.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
         public static string GetLoginHintToken(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.LoginHintToken);
 
+        /// <summary>
+        /// If the client is registered to use Ping or Push modes.
+        /// If is a bearer token provided by the client that will be used by the OpenID Provider to authenticate the callback request to the client.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
         public static string GetClientNotificationToken(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.ClientNotificationToken);
 
+        /// <summary>
+        /// A human readable-identifier or message intended to be displayed on both the consumption device and the authentication device to interlock them together for the transaction by way of a visual cue for the end-user.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
         public static string GetBindingMessage(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.BindingMessage);
 
         public static string GetUserCode(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.UserCode);
 
+        /// <summary>
+        /// A positive integer allowing the client to request the expires_in value for the auth_req_id the server will return.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
         public static int? GetRequestedExpiry(this JsonObject jObj) => jObj.GetInt(BCAuthenticationRequestParameters.RequestedExpiry);
-
-        public static int? GetInterval(this JsonObject jObj) => jObj.GetInt(BCAuthenticationRequestParameters.Interval);
 
         #endregion
 

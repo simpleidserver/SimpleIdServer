@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
+    /// <summary>
+    /// Backchannel Authentication Endpoit MUST utilize TLS.
+    /// Recommendation : FAPI suggests to use "tls_client_auth" or "self_signed_tls_client_auth".
+    /// https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_backchannel_endpoint
+    /// </summary>
     public class BCAuthorizeController : Controller
     {
         private readonly IBCAuthorizeHandler _bcAuthorizeHandler;

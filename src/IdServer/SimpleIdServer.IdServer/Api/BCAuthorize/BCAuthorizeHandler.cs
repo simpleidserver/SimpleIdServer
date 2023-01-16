@@ -16,6 +16,7 @@ using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
@@ -56,18 +57,15 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
                 context.SetUser(user);
-                var requestedExpiry = context.Request.RequestData.GetRequestedExpiry();
-                var interval = context.Request.RequestData.GetInterval();
-                if (requestedExpiry == null)
-                    requestedExpiry = _options.AuthRequestExpirationTimeInSeconds;
-
+                var requestedExpiry = context.Request.RequestData.GetRequestedExpiry() ?? context.Client.AuthReqIdExpirationTimeInSeconds;
                 var currentDateTime = DateTime.UtcNow;
                 var openidClient = oauthClient;
                 var permissions = await GetPermissions(context.Client.ClientId, context.User.Id, cancellationToken);
+                var interval = oauthClient.BCIntervalSeconds;
                 var bcAuthorize = Domains.BCAuthorize.Create(
-                    currentDateTime.AddSeconds(requestedExpiry.Value),
+                    currentDateTime.AddSeconds(requestedExpiry),
                     oauthClient.ClientId,
-                    interval ?? _options.DefaultBCAuthorizeWaitIntervalInSeconds,
+                    interval,
                     openidClient.BCClientNotificationEndpoint,
                     openidClient.BCTokenDeliveryMode,
                     context.Request.RequestData.GetScopesFromAuthorizationRequest(),
@@ -80,11 +78,16 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 foreach (var grp in permissions.GroupBy(p => p.ConsentId))
                     await _bcNotificationService.Notify(context, bcAuthorize.Id, grp.ToArray(), cancellationToken);
 
-                return new OkObjectResult(new JsonObject
+                var res = new JsonObject
                 {
                     { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id },
-                    { BCAuthenticationResponseParameters.ExpiresIn, requestedExpiry.Value }
-                });
+                    { BCAuthenticationResponseParameters.ExpiresIn, requestedExpiry },
+                };
+                if (oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Ping ||
+                    oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Poll)
+                    res.Add(BCAuthenticationResponseParameters.Interval, interval);
+
+                return new OkObjectResult(res);
             }
             catch (OAuthUnauthorizedException ex)
             {

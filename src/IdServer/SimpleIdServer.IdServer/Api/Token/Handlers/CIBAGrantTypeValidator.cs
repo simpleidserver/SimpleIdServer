@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Ping
                 && openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Poll)
             {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_PINGORPUSH_MODE_CAN_BE_USED);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONLY_PINGORPOLL_MODE_CAN_BE_USED);
             }
 
             var authRequestId = context.Request.RequestData.GetAuthRequestId();

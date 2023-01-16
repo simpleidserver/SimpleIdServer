@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -56,7 +57,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             _options = options.Value;
         }
 
-        public virtual async Task<User> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
+        public async Task<User> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
         {
             await CheckRequestObject(context, cancellationToken);
             var tokens = new bool[]
@@ -67,6 +68,10 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             };
             if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
+
+            var userCode = context.Request.RequestData.GetUserCode();
+            if (context.Client.BCUserCodeParameter && string.IsNullOrWhiteSpace(userCode))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_USER_CODE);
 
             CheckScopes(context);
             CheckClientNotificationToken(context);
@@ -82,10 +87,11 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
 
             CheckBindingMessage(context);
             CheckRequestedExpiry(context);
+            CheckUserCode(user, userCode);
             return user;
         }
 
-        public virtual async Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken)
+        public async Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken)
         {
             var tokens = new bool[]
             {
@@ -128,7 +134,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             return new BCAcceptRequestValidationResult(user, authRequest);
         }
 
-        public virtual async Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken)
+        public async Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken)
         {
             var tokens = new bool[]
             {
@@ -165,11 +171,76 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             return authRequest;
         }
 
+        /// <summary>
+        /// Authorization server verifies the expiration.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected virtual async Task<User> CheckLoginHintToken(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var loginHintToken = context.Request.RequestData.GetLoginHintToken();
+            if (!string.IsNullOrWhiteSpace(loginHintToken))
+            {
+                var handler = new JsonWebTokenHandler();
+                var payload = handler.ReadJsonWebToken(loginHintToken);
+                return await CheckHint(payload, cancellationToken);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Value contains the subject of the user.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="OAuthException"></exception>
+        protected virtual async Task<User> CheckLoginHint(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
+            if (!string.IsNullOrEmpty(loginHint))
+            {
+                var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Credentials).AsNoTracking().FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.Sub && c.Value == loginHint), cancellationToken);
+                if (user == null)
+                    throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, loginHint));
+
+                return user;
+            }
+
+            return null;
+        }
+
+        protected virtual async Task<User> CheckHint(JsonWebToken jwsPayload, CancellationToken cancellationToken)
+        {
+            var exp = jwsPayload.ValidTo;
+            var currentDateTime = DateTime.UtcNow;
+            if (currentDateTime > exp)
+                throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, ErrorMessages.LOGIN_HINT_TOKEN_IS_EXPIRED);
+
+            var subject = jwsPayload.Subject;
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Credentials).AsNoTracking().FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.Sub && c.Value == subject), cancellationToken);
+            if (user == null)
+                throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
+
+            return user;
+        }
+
+        protected virtual void CheckUserCode(User user, string userCode)
+        {
+            if (string.IsNullOrWhiteSpace(userCode)) return;
+            var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password);
+            var hash = PasswordHelper.ComputeHash(userCode);
+            if (credential == null || credential.Value != PasswordHelper.ComputeHash(userCode))
+                throw new OAuthException(ErrorCodes.INVALID_CREDENTIALS, ErrorMessages.INVALID_USER_CODE);
+        }
+
         private async Task CheckRequestObject(HandlerContext context, CancellationToken cancellationToken)
         {
             var request = context.Request.RequestData.GetRequest();
             if (string.IsNullOrWhiteSpace(request))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, BCAuthenticationRequestParameters.Request));
+                return;
 
             var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(request, context.Client, context.Client.BCAuthenticationRequestSigningAlg, null, cancellationToken);
             if (jsonWebTokenResult.Error != null)
@@ -244,43 +315,26 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES);
         }
 
-        private async Task<User> CheckLoginHintToken(HandlerContext context, CancellationToken cancellationToken)
-        {
-            var loginHintToken = context.Request.RequestData.GetLoginHintToken();
-            if (!string.IsNullOrWhiteSpace(loginHintToken))
-            {
-                var payload = ExtractHint(loginHintToken);
-                return await CheckHint(payload, cancellationToken);
-            }
-
-            return null;
-        }
-
+        /// <summary>
+        /// ID Token previously issued to the client by the OpenID Provider being passed back as a hint.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// <exception cref="OAuthException"></exception>
         private async Task<User> CheckIdTokenHint(HandlerContext context, CancellationToken cancellationToken)
         {
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = ExtractHint(idTokenHint);
+                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idTokenHint);
+                if (extractionResult.Error != null)
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
+                var payload = extractionResult.Jwt;
                 if (!payload.Audiences.Contains(context.Request.IssuerName))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
 
                 return await CheckHint(payload, cancellationToken);
-            }
-
-            return null;
-        }
-
-        private async Task<User> CheckLoginHint(HandlerContext context, CancellationToken cancellationToken)
-        {
-            var loginHint = context.Request.RequestData.GetLoginHintFromAuthorizationRequest();
-            if (!string.IsNullOrEmpty(loginHint))
-            {
-                var user = await _userRepository.Query().Include(u => u.Claims).AsNoTracking().FirstOrDefaultAsync(u => u.Claims.Any(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == loginHint), cancellationToken);
-                if (user == null)
-                    throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, loginHint));
-
-                return user;
             }
 
             return null;
@@ -298,31 +352,6 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var requestedExpiry = context.Request.RequestData.GetRequestedExpiry();
             if (requestedExpiry.HasValue && requestedExpiry.Value < 0)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.REQUESTED_EXPIRY_MUST_BE_POSITIVE);
-        }
-
-        private async Task<User> CheckHint(JsonWebToken jwsPayload, CancellationToken cancellationToken)
-        {
-            var exp = jwsPayload.ValidTo;
-            var currentDateTime = DateTime.UtcNow;
-            if (currentDateTime > exp)
-                throw new OAuthException(ErrorCodes.EXPIRED_LOGIN_HINT_TOKEN, ErrorMessages.LOGIN_HINT_TOKEN_IS_EXPIRED);
-
-            var subject = jwsPayload.Subject;
-            var user = await _userRepository.Query().Include(u => u.Claims).AsNoTracking().FirstOrDefaultAsync(u => u.Claims.Any(c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == subject), cancellationToken);
-            if (user == null)
-                throw new OAuthException(ErrorCodes.UNKNOWN_USER_ID, string.Format(ErrorMessages.UNKNOWN_USER, subject));
-
-            return user;
-        }
-
-        protected JsonWebToken ExtractHint(string tokenHint)
-        {
-            // TODO : Add more exception.
-            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(tokenHint);
-            if (extractionResult.Error != null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
-
-            return extractionResult.Jwt;
         }
     }
 }

@@ -7,6 +7,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCAuthorizeCreate - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientPrivateKeyJwtAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSecretJwtAuthenticationErrors - Copier.feature.cs" />
@@ -52,6 +53,9 @@
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\BCAuthorize.feature.cs">
+	    <DependentUpon>BCAuthorize.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\ClientAuths\ClientTlsAuthenticationErrors.feature.cs">
 	    <DependentUpon>ClientTlsAuthenticationErrors.feature</DependentUpon>
 	  </Compile>
@@ -72,6 +76,9 @@
 	  </Compile>
 	  <Compile Update="Features\GrantTypes\AlternativeScenarios.feature.cs">
 	    <DependentUpon>AlternativeScenarios.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\GrantTypes\CIBAGrantTypeErrors.feature.cs">
+	    <DependentUpon>CIBAGrantTypeErrors.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\GrantTypes\ImplicitGrantType.feature.cs">
 	    <DependentUpon>ImplicitGrantType.feature</DependentUpon>
@@ -141,6 +148,10 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\BCAuthorize.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\ClientAuths\ClientTlsAuthenticationErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
@@ -166,6 +177,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\GrantTypes\AlternativeScenarios.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\CIBAGrantTypeErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

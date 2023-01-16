@@ -16,6 +16,36 @@ namespace SimpleIdServer.IdServer.Builders
 
         internal TraditionalWebsiteClientBuilder(Client client) { _client = client; }
 
+        #region Grant types
+
+        /// <summary>
+        /// Allows client to continue to have a valid access token without further interaction with the user.
+        /// </summary>
+        /// <param name="refreshTokenExpirationTimeInSeconds"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableRefreshTokenGrantType(double? refreshTokenExpirationTimeInSeconds = null)
+        {
+            _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
+            _client.RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds;
+            return this;
+        }
+
+        /// <summary>
+        /// Allows client to use CIBA grant-type.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableCIBAGrantType(string deliveryMode = StandardNotificationModes.Poll, int? interval = null)
+        {
+            _client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
+            _client.BCTokenDeliveryMode = deliveryMode;
+            _client.BCUserCodeParameter = true;
+            _client.BCAuthenticationRequestSigningAlg = SecurityAlgorithms.RsaSha256;
+            if (interval != null) _client.BCIntervalSeconds = interval.Value;
+            return this;
+        }
+
+        #endregion
+
         /// <summary>
         /// Add scope.
         /// </summary>
@@ -61,17 +91,6 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder SetRequestObjectSigning(string alg)
         {
             _client.RequestObjectSigningAlg = alg;
-            return this;
-        }
-
-        /// <summary>
-        /// Set the algorithm used to sign the request object in /bc-authorize.
-        /// </summary>
-        /// <param name="alg"></param>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder SetBCAuthenticationRequestSigningAlg(string alg)
-        {
-            _client.BCAuthenticationRequestSigningAlg = alg;
             return this;
         }
 
@@ -159,29 +178,6 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
-        /// PKCE is an extension to the Authorization Code flow to prevent CSRF and 
-        /// For more information: https://oauth.net/2/pkce/
-        /// </summary>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableClientPkceAuthentication()
-        {
-            _client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
-            return this;
-        }
-
-        /// <summary>
-        /// Allows client to continue to have a valid access token without further interaction with the user.
-        /// </summary>
-        /// <param name="refreshTokenExpirationTimeInSeconds"></param>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableRefreshTokenGrantType(double? refreshTokenExpirationTimeInSeconds = null)
-        {
-            _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
-            _client.RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds;
-            return this;
-        }
-
-        /// <summary>
         /// Response type can return 'id_token'.
         /// </summary>
         /// <returns></returns>
@@ -212,9 +208,10 @@ namespace SimpleIdServer.IdServer.Builders
         /// https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.10.2
         /// </summary>
         /// <returns></returns>
-        public TraditionalWebsiteClientBuilder UsePingDeliveryMode()
+        public TraditionalWebsiteClientBuilder UsePingDeliveryMode(int interval = 5)
         {
             _client.BCTokenDeliveryMode = StandardNotificationModes.Ping;
+            _client.BCIntervalSeconds = interval;
             return this;
         }
 
@@ -223,9 +220,10 @@ namespace SimpleIdServer.IdServer.Builders
         /// https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.5
         /// </summary>
         /// <returns></returns>
-        public TraditionalWebsiteClientBuilder UsePollDeliveryMode()
+        public TraditionalWebsiteClientBuilder UsePollDeliveryMode(int interval = 5)
         {
             _client.BCTokenDeliveryMode = StandardNotificationModes.Poll;
+            _client.BCIntervalSeconds = interval;
             return this;
         }
 
@@ -237,6 +235,27 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder UsePushDeliveryMode()
         {
             _client.BCTokenDeliveryMode = StandardNotificationModes.Push;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the algorithm used to sign the request object in /bc-authorize.
+        /// </summary>
+        /// <param name="alg"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetBCAuthenticationRequestSigningAlg(string alg = SecurityAlgorithms.RsaSha256)
+        {
+            _client.BCAuthenticationRequestSigningAlg = alg;
+            return this;
+        }
+
+        /// <summary>
+        /// A secret code is not required to authenticate the end-user.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder DisableBCUserCode()
+        {
+            _client.BCUserCodeParameter = false;
             return this;
         }
 
@@ -260,6 +279,17 @@ namespace SimpleIdServer.IdServer.Builders
             _client.TlsClientAuthSanDNS = sanDns;
             _client.TlsClientAuthSanEmail = sanEmail;
             _client.TlsClientAuthSanIP = sanIp;
+            return this;
+        }
+
+        /// <summary>
+        /// PKCE is an extension to the Authorization Code flow to prevent CSRF and 
+        /// For more information: https://oauth.net/2/pkce/
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder UseClientPkceAuthentication()
+        {
+            _client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return this;
         }
 

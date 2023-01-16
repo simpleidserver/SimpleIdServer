@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "BCAuthorizeErrors", "\tCheck errors returned by the /mtls//bc-authorize endpoint", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "BCAuthorizeErrors", "\tCheck errors returned by the /mtls/bc-authorize endpoint", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains audience")]
+        [Xunit.SkippableFactAttribute(DisplayName="at least one token hint must be passed")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "request parameter must contains audience")]
-        public void RequestParameterMustContainsAudience()
+        [Xunit.TraitAttribute("Description", "at least one token hint must be passed")]
+        public void AtLeastOneTokenHintMustBePassed()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains audience", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("at least one token hint must be passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -101,505 +101,40 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table26.AddRow(new string[] {
-                            "iss",
-                            "fortyTwoClient"});
-#line 6
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table26, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table27.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table27.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table27.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 10
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table27, "When ");
-#line hidden
-#line 16
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 18
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 19
- testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain audience\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains valid audience")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "request parameter must contains valid audience")]
-        public void RequestParameterMustContainsValidAudience()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains valid audience", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 21
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 22
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table28.AddRow(new string[] {
-                            "aud",
-                            "invalid"});
-#line 23
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table28, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table29.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table29.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table29.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 27
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table29, "When ");
-#line hidden
-#line 33
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 35
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 36
- testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain correct audience\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains issuer")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "request parameter must contains issuer")]
-        public void RequestParameterMustContainsIssuer()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains issuer", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 38
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 39
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
                 TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table30.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
-#line 40
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table30, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table31.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-                table31.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table31.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 44
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table31, "When ");
+#line 7
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table30, "When ");
 #line hidden
-#line 50
+#line 12
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 52
+#line 14
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 53
- testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain issuer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains valid issuer")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "request parameter must contains valid issuer")]
-        public void RequestParameterMustContainsValidIssuer()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains valid issuer", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 55
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 56
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table32.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
-                table32.AddRow(new string[] {
-                            "iss",
-                            "invalid"});
-#line 57
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table32, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table33.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table33.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table33.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 62
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table33, "When ");
-#line hidden
-#line 68
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 70
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 71
- testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain correct issuer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="request parameter must not be expired")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "request parameter must not be expired")]
-        public void RequestParameterMustNotBeExpired()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must not be expired", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 73
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 74
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table34.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
-                table34.AddRow(new string[] {
-                            "iss",
-                            "fortyTwoClient"});
-                table34.AddRow(new string[] {
-                            "exp",
-                            "1587492240"});
-#line 75
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table34, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table35.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table35.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table35.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 81
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table35, "When ");
-#line hidden
-#line 87
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 89
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 90
- testRunner.And("JSON \'error_description\'=\'the request is expired\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="lifetime of the request must not exceed 300 seconds")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "lifetime of the request must not exceed 300 seconds")]
-        public void LifetimeOfTheRequestMustNotExceed300Seconds()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("lifetime of the request must not exceed 300 seconds", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 92
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 93
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table36.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
-                table36.AddRow(new string[] {
-                            "iss",
-                            "fortyTwoClient"});
-                table36.AddRow(new string[] {
-                            "nbf",
-                            "1587492240"});
-                table36.AddRow(new string[] {
-                            "exp",
-                            "7267687440"});
-#line 94
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table36, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table37.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table37.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table37.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 101
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table37, "When ");
-#line hidden
-#line 107
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 109
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 110
- testRunner.And("JSON \'error_description\'=\'the maximum lifetime of the request is \'300\' seconds\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains jti")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "request parameter must contains jti")]
-        public void RequestParameterMustContainsJti()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains jti", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 112
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 113
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 114
- testRunner.And("build expiration time and add \'2\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table38.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
-                table38.AddRow(new string[] {
-                            "iss",
-                            "fortyTwoClient"});
-                table38.AddRow(new string[] {
-                            "exp",
-                            "$exp$"});
-#line 115
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table38, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table39.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table39.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table39.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 121
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table39, "When ");
-#line hidden
-#line 127
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 129
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 130
- testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain jti\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="at least one token hint must be passed")]
-        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "at least one token hint must be passed")]
-        public void AtLeastOneTokenHintMustBePassed()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("at least one token hint must be passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 132
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 133
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 134
- testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table40.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
-                table40.AddRow(new string[] {
-                            "iss",
-                            "fortyTwoClient"});
-                table40.AddRow(new string[] {
-                            "exp",
-                            "$exp$"});
-                table40.AddRow(new string[] {
-                            "jti",
-                            "jti"});
-#line 135
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table40, "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table41.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
-                table41.AddRow(new string[] {
-                            "client_id",
-                            "fortyTwoClient"});
-                table41.AddRow(new string[] {
-                            "request",
-                            "$request$"});
-#line 142
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table41, "When ");
-#line hidden
-#line 148
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 150
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 151
+#line 15
  testRunner.And("JSON \'error_description\'=\'only one hint can be passed in the request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="scope parameter is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains audience (request)")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "scope parameter is required")]
-        public void ScopeParameterIsRequired()
+        [Xunit.TraitAttribute("Description", "request parameter must contains audience (request)")]
+        public void RequestParameterMustContainsAudienceRequest()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("scope parameter is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 153
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains audience (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 17
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -609,71 +144,659 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 154
+#line 18
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 155
- testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table31.AddRow(new string[] {
+                            "iss",
+                            "fortyTwoClient"});
+#line 19
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table31, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table32.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table32.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table32.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 23
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table32, "When ");
+#line hidden
+#line 29
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 31
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 32
+ testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain audience\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains valid audience (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "request parameter must contains valid audience (request)")]
+        public void RequestParameterMustContainsValidAudienceRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains valid audience (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 34
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 35
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table33.AddRow(new string[] {
+                            "aud",
+                            "invalid"});
+#line 36
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table33, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table34.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table34.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table34.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 40
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table34, "When ");
+#line hidden
+#line 46
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 48
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 49
+ testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain correct audience\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains issuer (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "request parameter must contains issuer (request)")]
+        public void RequestParameterMustContainsIssuerRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains issuer (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 51
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 52
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table35.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+#line 53
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table35, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table36.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table36.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table36.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 57
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table36, "When ");
+#line hidden
+#line 63
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 65
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 66
+ testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain issuer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains valid issuer (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "request parameter must contains valid issuer (request)")]
+        public void RequestParameterMustContainsValidIssuerRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains valid issuer (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 68
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 69
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table37.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+                table37.AddRow(new string[] {
+                            "iss",
+                            "invalid"});
+#line 70
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table37, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table38.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table38.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table38.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 75
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table38, "When ");
+#line hidden
+#line 81
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 83
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 84
+ testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain correct issuer\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request parameter must not be expired (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "request parameter must not be expired (request)")]
+        public void RequestParameterMustNotBeExpiredRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must not be expired (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 86
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 87
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table39.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+                table39.AddRow(new string[] {
+                            "iss",
+                            "fortyTwoClient"});
+                table39.AddRow(new string[] {
+                            "exp",
+                            "1587492240"});
+#line 88
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table39, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table40.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table40.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table40.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 94
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table40, "When ");
+#line hidden
+#line 100
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 102
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 103
+ testRunner.And("JSON \'error_description\'=\'the request is expired\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="lifetime of the request must not exceed 300 seconds (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "lifetime of the request must not exceed 300 seconds (request)")]
+        public void LifetimeOfTheRequestMustNotExceed300SecondsRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("lifetime of the request must not exceed 300 seconds (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 105
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 106
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table41.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+                table41.AddRow(new string[] {
+                            "iss",
+                            "fortyTwoClient"});
+                table41.AddRow(new string[] {
+                            "nbf",
+                            "1587492240"});
+                table41.AddRow(new string[] {
+                            "exp",
+                            "7267687440"});
+#line 107
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table41, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table42.AddRow(new string[] {
-                            "aud",
-                            "https://localhost:8080"});
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
                 table42.AddRow(new string[] {
-                            "iss",
+                            "client_id",
                             "fortyTwoClient"});
                 table42.AddRow(new string[] {
-                            "exp",
-                            "$exp$"});
-                table42.AddRow(new string[] {
-                            "jti",
-                            "jti"});
-                table42.AddRow(new string[] {
-                            "id_token_hint",
-                            "idtokenhint"});
-#line 156
- testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table42, "And ");
+                            "request",
+                            "$request$"});
+#line 114
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table42, "When ");
+#line hidden
+#line 120
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 122
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 123
+ testRunner.And("JSON \'error_description\'=\'the maximum lifetime of the request is \'300\' seconds\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request parameter must contains jti (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "request parameter must contains jti (request)")]
+        public void RequestParameterMustContainsJtiRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains jti (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 125
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 126
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 127
+ testRunner.And("build expiration time and add \'2\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table43.AddRow(new string[] {
-                            "X-Testing-ClientCert",
-                            "mtlsClient.crt"});
+                            "aud",
+                            "https://localhost:8080"});
                 table43.AddRow(new string[] {
-                            "client_id",
+                            "iss",
                             "fortyTwoClient"});
                 table43.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+#line 128
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table43, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table44.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table44.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table44.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 164
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table43, "When ");
+#line 134
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table44, "When ");
 #line hidden
-#line 170
+#line 140
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 172
+#line 142
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 173
+#line 143
+ testRunner.And("JSON \'error_description\'=\'the request doesn\'t contain jti\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="at least one token hint must be passed (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "at least one token hint must be passed (request)")]
+        public void AtLeastOneTokenHintMustBePassedRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("at least one token hint must be passed (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 145
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 146
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 147
+ testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table45.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+                table45.AddRow(new string[] {
+                            "iss",
+                            "fortyTwoClient"});
+                table45.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+                table45.AddRow(new string[] {
+                            "jti",
+                            "jti"});
+#line 148
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table45, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table46.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table46.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table46.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 155
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table46, "When ");
+#line hidden
+#line 161
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 163
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 164
+ testRunner.And("JSON \'error_description\'=\'only one hint can be passed in the request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="user_code is required when backchannel_user_code_parameter is true (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "user_code is required when backchannel_user_code_parameter is true (request)")]
+        public void User_CodeIsRequiredWhenBackchannel_User_Code_ParameterIsTrueRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("user_code is required when backchannel_user_code_parameter is true (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 166
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 167
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 168
+ testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table47.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+                table47.AddRow(new string[] {
+                            "iss",
+                            "fortyTwoClient"});
+                table47.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+                table47.AddRow(new string[] {
+                            "jti",
+                            "jti"});
+                table47.AddRow(new string[] {
+                            "id_token_hint",
+                            "idtokenhint"});
+#line 169
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table47, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table48.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table48.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table48.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 177
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table48, "When ");
+#line hidden
+#line 183
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 185
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 186
+ testRunner.And("JSON \'error_description\'=\'the parameter user_code is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="scope parameter is required (request)")]
+        [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
+        [Xunit.TraitAttribute("Description", "scope parameter is required (request)")]
+        public void ScopeParameterIsRequiredRequest()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("scope parameter is required (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 188
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 189
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 190
+ testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table49.AddRow(new string[] {
+                            "aud",
+                            "https://localhost:8080"});
+                table49.AddRow(new string[] {
+                            "iss",
+                            "fortyTwoClient"});
+                table49.AddRow(new string[] {
+                            "exp",
+                            "$exp$"});
+                table49.AddRow(new string[] {
+                            "jti",
+                            "jti"});
+                table49.AddRow(new string[] {
+                            "id_token_hint",
+                            "idtokenhint"});
+                table49.AddRow(new string[] {
+                            "user_code",
+                            "code"});
+#line 191
+ testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
+                        "\'", ((string)(null)), table49, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table50.AddRow(new string[] {
+                            "X-Testing-ClientCert",
+                            "mtlsClient.crt"});
+                table50.AddRow(new string[] {
+                            "client_id",
+                            "fortyTwoClient"});
+                table50.AddRow(new string[] {
+                            "request",
+                            "$request$"});
+#line 200
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table50, "When ");
+#line hidden
+#line 206
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 208
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 209
  testRunner.And("JSON \'error_description\'=\'missing parameter scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="scope must be valid")]
+        [Xunit.SkippableFactAttribute(DisplayName="scope must be valid (request)")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "scope must be valid")]
-        public void ScopeMustBeValid()
+        [Xunit.TraitAttribute("Description", "scope must be valid (request)")]
+        public void ScopeMustBeValidRequest()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("scope must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 175
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("scope must be valid (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 211
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -683,74 +806,77 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 176
+#line 212
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 177
+#line 213
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table44.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table44.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table44.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table44.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table44.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table44.AddRow(new string[] {
+                table51.AddRow(new string[] {
                             "scope",
                             "invalid"});
-#line 178
+                table51.AddRow(new string[] {
+                            "user_code",
+                            "code"});
+#line 214
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table44, "And ");
+                        "\'", ((string)(null)), table51, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table52 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table45.AddRow(new string[] {
+                table52.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-                table45.AddRow(new string[] {
+                table52.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table45.AddRow(new string[] {
+                table52.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 187
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table45, "When ");
+#line 224
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table52, "When ");
 #line hidden
-#line 193
+#line 230
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 195
+#line 232
  testRunner.Then("JSON \'error\'=\'invalid_scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 196
+#line 233
  testRunner.And("JSON \'error_description\'=\'unauthorized to scopes : invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="client_notification_token parameter is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="client_notification_token parameter is required (request)")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "client_notification_token parameter is required")]
-        public void Client_Notification_TokenParameterIsRequired()
+        [Xunit.TraitAttribute("Description", "client_notification_token parameter is required (request)")]
+        public void Client_Notification_TokenParameterIsRequiredRequest()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client_notification_token parameter is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 198
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client_notification_token parameter is required (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 235
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -760,74 +886,77 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 199
+#line 236
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 200
+#line 237
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table53 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table46.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table46.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table46.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table46.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table46.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table46.AddRow(new string[] {
+                table53.AddRow(new string[] {
                             "scope",
                             "secondScope"});
-#line 201
+                table53.AddRow(new string[] {
+                            "user_code",
+                            "code"});
+#line 238
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table46, "And ");
+                        "\'", ((string)(null)), table53, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table54 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table47.AddRow(new string[] {
+                table54.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-                table47.AddRow(new string[] {
+                table54.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table47.AddRow(new string[] {
+                table54.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 210
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table47, "When ");
+#line 248
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table54, "When ");
 #line hidden
-#line 216
+#line 254
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 218
+#line 256
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 219
+#line 257
  testRunner.And("JSON \'error_description\'=\'missing parameter client_notification_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="client_notification_token size must be greater than 128 bits")]
+        [Xunit.SkippableFactAttribute(DisplayName="client_notification_token size must be greater than 128 bits (request)")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "client_notification_token size must be greater than 128 bits")]
-        public void Client_Notification_TokenSizeMustBeGreaterThan128Bits()
+        [Xunit.TraitAttribute("Description", "client_notification_token size must be greater than 128 bits (request)")]
+        public void Client_Notification_TokenSizeMustBeGreaterThan128BitsRequest()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client_notification_token size must be greater than 128 bits", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 221
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client_notification_token size must be greater than 128 bits (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 259
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -837,62 +966,65 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 222
+#line 260
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 223
+#line 261
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table55 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "scope",
                             "secondScope"});
-                table48.AddRow(new string[] {
+                table55.AddRow(new string[] {
                             "client_notification_token",
                             "1"});
-#line 224
+                table55.AddRow(new string[] {
+                            "user_code",
+                            "code"});
+#line 262
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table48, "And ");
+                        "\'", ((string)(null)), table55, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table56 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table49.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-                table49.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table49.AddRow(new string[] {
+                table56.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 234
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table49, "When ");
+#line 273
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table56, "When ");
 #line hidden
-#line 240
+#line 279
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 242
+#line 281
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 243
+#line 282
  testRunner.And("JSON \'error_description\'=\'client_notification_token must contains at least 128 by" +
                         "tes\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -900,15 +1032,15 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="id_token_hint must be valid")]
+        [Xunit.SkippableFactAttribute(DisplayName="id_token_hint must be valid (request)")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "id_token_hint must be valid")]
-        public void Id_Token_HintMustBeValid()
+        [Xunit.TraitAttribute("Description", "id_token_hint must be valid (request)")]
+        public void Id_Token_HintMustBeValidRequest()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("id_token_hint must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 245
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("id_token_hint must be valid (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 284
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -918,62 +1050,65 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 246
+#line 285
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 247
+#line 286
  testRunner.And("build expiration time and add \'10\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table50 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table57 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "aud",
                             "https://localhost:8080"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "iss",
                             "fortyTwoClient"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "exp",
                             "$exp$"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "jti",
                             "jti"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "id_token_hint",
                             "idtokenhint"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "scope",
                             "secondScope"});
-                table50.AddRow(new string[] {
+                table57.AddRow(new string[] {
                             "client_notification_token",
                             "04bcf708-dfba-4719-a3d3-b213322e2c38"});
-#line 248
+                table57.AddRow(new string[] {
+                            "user_code",
+                            "code"});
+#line 287
  testRunner.And("build JWS request object for client \'fortyTwoClient\' and sign with the key \'keyId" +
-                        "\'", ((string)(null)), table50, "And ");
+                        "\'", ((string)(null)), table57, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table51 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table58 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table51.AddRow(new string[] {
+                table58.AddRow(new string[] {
                             "X-Testing-ClientCert",
                             "mtlsClient.crt"});
-                table51.AddRow(new string[] {
+                table58.AddRow(new string[] {
                             "client_id",
                             "fortyTwoClient"});
-                table51.AddRow(new string[] {
+                table58.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 258
- testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table51, "When ");
+#line 298
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/mtls/bc-authorize\'", ((string)(null)), table58, "When ");
 #line hidden
-#line 264
+#line 304
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 266
+#line 306
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 267
+#line 307
  testRunner.And("JSON \'error_description\'=\'JSON Web Token cannot be read\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

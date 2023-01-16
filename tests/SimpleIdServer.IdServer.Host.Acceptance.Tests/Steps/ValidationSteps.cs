@@ -33,7 +33,15 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         public void ThenExists(string key)
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
-            // Assert.True(jsonHttpBody.ContainsKey(key));
+            Assert.True(jsonHttpBody.SelectToken(key) != null);
+        }
+
+
+        [Then("JSON doesn't exist '(.*)'")]
+        public void ThenDoesntExist(string key)
+        {
+            var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
+            Assert.True(jsonHttpBody.SelectToken(key) == null);
         }
 
         [Then("JSON '(.*)'='(.*)'")]

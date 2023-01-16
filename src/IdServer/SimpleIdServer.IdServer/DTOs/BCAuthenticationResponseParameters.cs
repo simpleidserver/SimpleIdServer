@@ -5,7 +5,7 @@ namespace SimpleIdServer.IdServer.DTOs
     public class BCAuthenticationResponseParameters
     {
         /// <summary>
-        /// his is a unique identifier to identify the authentication request made by the Client.
+        /// This is a unique identifier to identify the authentication request made by the Client.
         /// </summary>
         public const string AuthReqId = "auth_req_id";
         /// <summary>

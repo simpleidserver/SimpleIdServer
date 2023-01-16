@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
-using System;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -14,9 +13,6 @@ namespace Microsoft.AspNetCore.Builder
         public static WebApplication UseSID(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
-            if (opts.IsBCEnabled && !opts.MtlsEnabled)
-                throw new InvalidOperationException("When back channel authentication is enabled then MTLS must be enabled. Please add the instruction 'AddMutualAuthentication'");
-
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -98,14 +94,18 @@ namespace Microsoft.AspNetCore.Builder
                 webApplication.MapControllerRoute("tokenRevokeMtls",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.TokenRevoke,
                     defaults: new { controller = "Token", action = "Revoke" });
+
+                if(opts.IsBCEnabled)
+                {
+                    webApplication.MapControllerRoute("bcAuthorizeMtls",
+                        pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsBCAuthorize,
+                        defaults: new { controller = "BCAuthorize", action = "Post" });
+                }
             }
 
-            if(opts.IsBCEnabled)
-            {
-                webApplication.MapControllerRoute("bcAuthorize",
-                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
-                    defaults: new { controller = "BCAuthorize", action = "Post" });
-            }
+            webApplication.MapControllerRoute("bcAuthorize",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
+                defaults: new { controller = "BCAuthorize", action = "Post" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

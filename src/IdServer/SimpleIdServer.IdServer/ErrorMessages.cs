@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_CLAIMS = "claims {0} are invalid";
         public const string INVALID_IDTOKENHINT = "id_token_hint is invalid";
         public const string INVALID_AUDIENCE = "invalid audiences";
+        public const string INVALID_USER_CODE = "the user_code is not valid";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
@@ -34,7 +35,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_RESPONSE_TYPE_CLAIM = "the response_type claim is invalid";
         public const string INVALID_CLIENT_ID_CLAIM = "the client_id claim is invalid";
         public const string INVALID_SIGNATURE_ALG = "the signature algorithm is invalid";
-        public const string INVALID_AUTH_REQUEST_ID = "auth_req_id doesn't exist";
+        public const string INVALID_AUTH_REQUEST_ID = "authorization request doesn't exist";
         public const string INVALID_CLIENT_IDTOKENHINT = "client_id contained in the id_token_hint is invalid";
         public const string INVALID_POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri parameter is invalid";
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
@@ -92,6 +93,7 @@ namespace SimpleIdServer.IdServer
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";
         public const string MISSING_ACCESS_TOKEN = "access token is missing";
+        public const string MISSING_USER_CODE = "the parameter user_code is missing";
         public const string MISSING_CLIENT_ID = "missing client_id";
         public const string MISSING_POST_LOGOUT_REDIRECT_URI = "the parameter post_logout_redirect_uri is missing";
         public const string MISSING_ID_TOKEN_HINT = "id_token_hint parameter is missing";
@@ -137,7 +139,7 @@ namespace SimpleIdServer.IdServer
         public const string SCOPE_ALREADY_EXISTS = "scope '{0}' already exists";
         public const string USER_ALREADY_EXISTS = "user '{0}' already exists";
         public const string NOT_SAME_REDIRECT_URI = "not the same redirect_uri";
-        public const string ONLY_PINGORPUSH_MODE_CAN_BE_USED = "only ping or push mode can be used to get tokens";
+        public const string ONLY_PINGORPOLL_MODE_CAN_BE_USED = "only ping or poll mode can be used to get tokens";
         public const string ONE_HINT_MUST_BE_PASSED = "only one hint can be passed in the request";
         public const string AUTH_REQUEST_CLIENT_NOT_AUTHORIZED = "the client is not authorized to use the auth_req_id";
         public const string AUTH_REQUEST_BAD_AUDIENCE = "the request doesn't contain correct audience";

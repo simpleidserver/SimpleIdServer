@@ -7,13 +7,13 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public class BCAuthorize
     {
-        public string Id { get; set; }
-        public string ClientId { get; set; }
-        public string UserId { get; set; }
-        public string NotificationToken { get; set; }
-        public string NotificationMode { get; set; }
-        public string NotificationEdp { get; set; }
-        public int Interval { get; set; }
+        public string Id { get; set; } = null!;
+        public string? ClientId { get; set; } = null;
+        public string? UserId { get; set; } = null;
+        public string? NotificationToken { get; set; } = null;
+        public string? NotificationMode { get; set; } = null;
+        public string? NotificationEdp { get; set; } = null;
+        public int? Interval { get; set; } = null;
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public BCAuthorizeStatus Status { get; set; }
         public DateTime ExpirationDateTime { get; set; }
@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.Domains
                 NextFetchTime = DateTime.UtcNow;
             }
 
-            NextFetchTime = NextFetchTime.Value.AddSeconds(Interval);
+            NextFetchTime = NextFetchTime.Value.AddSeconds(Interval.Value);
             UpdateDateTime = DateTime.UtcNow;
         }
 

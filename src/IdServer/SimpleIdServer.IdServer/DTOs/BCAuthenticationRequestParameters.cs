@@ -28,10 +28,6 @@ namespace SimpleIdServer.IdServer.DTOs
         /// </summary>
         public const string LoginHintToken = "login_hint_token";
         /// <summary>
-        ///  JSON number with a positive integer value indicating the minimum amount of time in seconds that the Client MUST wait between polling requests to the token endpoint.
-        /// </summary>
-        public const string Interval = "interval";
-        /// <summary>
         /// Signed authentication request.
         /// </summary>
         public const string Request = "request";

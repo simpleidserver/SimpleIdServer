@@ -24,9 +24,10 @@ namespace SimpleIdServer.IdServer
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
             public const string ClientManagement = "management/clients";
+            public const string BCAuthorize = "bc-authorize";
             public const string MtlsPrefix = "mtls";
             public const string MtlsToken = MtlsPrefix + "/" + Token;
-            public const string BCAuthorize = MtlsPrefix + "/bc-authorize";
+            public const string MtlsBCAuthorize = MtlsPrefix + "/" + BCAuthorize;
             public const string UserInfo = "userinfo";
             public const string CheckSession = "check_session";
             public const string EndSession = "end_session";
