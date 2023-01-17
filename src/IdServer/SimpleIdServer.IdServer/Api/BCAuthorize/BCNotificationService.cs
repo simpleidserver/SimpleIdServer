@@ -16,6 +16,9 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     {
         public Task Notify(HandlerContext handlerContext, string authReqId, IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
         {
+            // A user can have a fake authentication device.
+            // poll...
+            // continue...
             // Firebase messaging...
             /*
              var deviceRegistrationToken = handlerContext.User.DeviceRegistrationToken;

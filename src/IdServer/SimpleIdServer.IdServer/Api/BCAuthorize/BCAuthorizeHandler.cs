@@ -132,17 +132,36 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             }
         }
 
+        /// <summary>
+        /// Get permissions.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="subject"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected virtual Task<IEnumerable<BCAuthorizePermission>> GetPermissions(string clientId, string subject, CancellationToken cancellationToken)
         {
             IEnumerable<BCAuthorizePermission> result = new List<BCAuthorizePermission>();
             return Task.FromResult(result);
         }
 
+        /// <summary>
+        /// Confirm permissions.
+        /// </summary>
+        /// <param name="permissions"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected virtual Task ConfirmPermissions(IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Reject permissions.
+        /// </summary>
+        /// <param name="permissions"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected virtual Task RejectPermissions(IEnumerable<BCAuthorizePermission> permissions, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;

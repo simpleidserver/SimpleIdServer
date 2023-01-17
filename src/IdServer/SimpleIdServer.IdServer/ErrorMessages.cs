@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
+        public const string UNKNOWN_DEVICE_TYPE = "the device {0} is not supported";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string NO_CLIENT_SECRET = "no client secret";
@@ -166,5 +167,7 @@ namespace SimpleIdServer.IdServer
         public const string JWT_BAD_SIGNATURE = "JWT doesn't have a correct signature";
         public const string CANNOT_GENERATE_PAIRWISE_SUBJECT_MORE_THAN_ONE_REDIRECT_URLS = "pairwise subject cannot be generated because the sectore_identifier_uri is empty and the client contains more than one redirect_uri";
         public const string CANNOT_GENERATE_PAIRWISE_SUBJECT_BECAUSE_NO_SECTOR_IDENTIFIER = "pairwise subject cannot be generated because the sector_identifier_uri is empty and there is no redirect_uri";
+        public const string POLLING_DEVICE_ALREADY_REGISTERED = "only one polling device can be registrered";
+        public const string POLLING_DEVICE_NOT_REGISTERED = "polling device is not registered";
     }
 }

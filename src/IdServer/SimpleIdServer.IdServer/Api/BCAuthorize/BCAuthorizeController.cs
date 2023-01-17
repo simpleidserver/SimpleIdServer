@@ -31,5 +31,15 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, jObjHeader, null, clientCertificate));
             return await _bcAuthorizeHandler.Create(context, cancellationToken);
         }
+
+        public async Task<IActionResult> Confirm(CancellationToken cancellationToken)
+        {
+            return null;
+        }
+
+        public async Task<IActionResult> Reject(CancellationToken cancellationToken)
+        {
+            return null;
+        }
     }
 }

@@ -40,6 +40,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
+        public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
 
         public void RejectConsent(string consentId)
         {

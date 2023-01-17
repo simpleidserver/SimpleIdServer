@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
 using SimpleIdServer.IdServer.Api.BCAuthorize;
+using SimpleIdServer.IdServer.Api.BCDeviceRegistration;
 using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.Api.Jwks;
 using SimpleIdServer.IdServer.Api.Register;
@@ -76,7 +77,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddClaimsEnricher()
                 .AddOAuthIntrospectionTokenApi()
                 .AddRegisterApi()
-                .AddBCAuthorizeApi();
+                .AddBCAuthorizeApi()
+                .AddBCDeviceApi();
             services.AddAuthorization();
             services.Configure<AuthorizationOptions>(o =>
             {
@@ -195,6 +197,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
             services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
             services.AddTransient<IBCNotificationService, BCNotificationService>();
+            return services;
+        }
+
+        private static IServiceCollection AddBCDeviceApi(this IServiceCollection services)
+        {
+            services.AddTransient<IDevice, PollingDevice>();
             return services;
         }
 
