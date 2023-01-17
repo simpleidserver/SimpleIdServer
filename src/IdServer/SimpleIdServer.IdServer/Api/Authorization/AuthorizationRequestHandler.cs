@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
@@ -34,6 +35,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IAudienceHelper _audienceHelper;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
@@ -42,6 +44,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IClientRepository clientRepository,
             IUserRepository userRepository,
+            IAudienceHelper audienceHelper,
             IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
@@ -50,6 +53,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _clientRepository = clientRepository;
             _userRepository = userRepository;
+            _audienceHelper = audienceHelper;
             _options = options.Value;
         }
 
@@ -120,9 +124,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 redirectUri = context.Client.RedirectionUrls.First();
             }
 
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
+            var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
             foreach (var responseTypeHandler in responseTypeHandlers)
             {
-                await responseTypeHandler.Enrich(context, cancellationToken);
+                await responseTypeHandler.Enrich(extractionResult.Scopes, extractionResult.Audiences, context.Request.RequestData.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
             }
 
             _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);

@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
         public int Order => 1;
         public static string RESPONSE_TYPE = "code";
 
-        public async Task Enrich(HandlerContext context, CancellationToken cancellationToken)
+        public async Task Enrich(IEnumerable<string> scopes, IEnumerable<string> audiences, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext context, CancellationToken cancellationToken)
         {
             var activeSession = context.User.ActiveSession;
             var dic = new JsonObject
@@ -61,9 +61,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             CheckPKCEParameters(context);
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, _options.AuthorizationCodeExpirationInSeconds, cancellationToken);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
-            var isScopeContainsOfflineAccess = context.Request.RequestData.GetScopesFromAuthorizationRequest().Contains(Constants.StandardScopes.OfflineAccessScope.Name);
+            var isScopeContainsOfflineAccess = scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name);
             if (isScopeContainsOfflineAccess)
-                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(context.Request.RequestData.GetScopesFromAuthorizationRequest(), context, cancellationToken);
+                await _tokenBuilders.First(t => t.Name == TokenResponseParameters.RefreshToken).Build(scopes, audiences, claims, context, cancellationToken);
         }
 
         protected virtual void CheckPKCEParameters(HandlerContext handlerContext)

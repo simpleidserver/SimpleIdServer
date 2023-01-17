@@ -98,6 +98,20 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             Assert.Equal(kid, jwt.Kid);
         }
 
+        [Then("access_token contains the claim '(.*)'='(.*)'")]
+        public void ThenAccessTokenContainsTheClaim(string key, string value)
+        {
+            var jwt = GetAccessToken();
+            Assert.True(jwt.Claims.Any(c => c.Type == key && c.Value == value) == true);
+        }
+
+        [Then("access_token doesn't contain the claim '(.*)'='(.*)'")]
+        public void ThenAccessTokenDoesntContainTheClaim(string key, string value)
+        {
+            var jwt = GetAccessToken();
+            Assert.True(jwt.Claims.Any(c => c.Type == key && c.Value == value) == false);
+        }
+
         [Then("JWT contains '(.*)'")]
         public void ThenJWTContainsClaim(string key) => Assert.True(GetJWT().Claims.Any(c => c.Type == key) == true);
 

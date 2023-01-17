@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
+        private readonly IAudienceHelper _audienceHelper;
         private readonly IdServerHostOptions _options;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
@@ -40,6 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders,
             IUserRepository usrRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
+            IAudienceHelper audienceHelper,
             IOptions<IdServerHostOptions> options,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -48,6 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = usrRepository;
+            _audienceHelper = audienceHelper;
             _options = options.Value;
             _logger = logger;
         }
@@ -81,16 +84,18 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                 var previousClientId = previousRequest.GetClientId();
                 var previousRedirectUrl = previousRequest.GetRedirectUri();
+                var claims = previousRequest.GetClaimsFromAuthorizationRequest();
                 if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.AUTHORIZATION_CODE_NOT_ISSUED_BY_CLIENT);
                 if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, ErrorMessages.NOT_SAME_REDIRECT_URI);
                 await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
-                var scopes = previousRequest.GetScopesFromAuthorizationRequest();
-                var result = BuildResult(context, scopes);
+
+                var scopes = GetScopes(previousRequest, context);
+                var resources = GetResources(previousRequest, context);
+                var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+                var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(previousRequest, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)
-                {
-                    await tokenBuilder.Refresh(previousRequest, context, cancellationToken);
-                }
+                    await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, claims, context, cancellationToken);
 
                 _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)

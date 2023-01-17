@@ -16,6 +16,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_DEVICE_TYPE = "the device {0} is not supported";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
+        public const string UKNOWN_RESOURCE = "following resources {0} doesn't exist";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
         public const string NO_JWK_WITH_ALG_SIG = "no JWK with algorithm {0} has been found to sign the JWT";
@@ -90,6 +91,7 @@ namespace SimpleIdServer.IdServer
         public const string CLIENT_NOTIFICATION_TOKEN_MUST_NOT_EXCEED_1024 = "client_notification_token must not exceed 1024 characters";
         public const string CLIENT_NOTIFICATION_TOKEN_MUST_CONTAIN_AT_LEAST_128_BYTES = "client_notification_token must contains at least 128 bytes";
         public const string MISSING_PARAMETER = "missing parameter {0}";
+        public const string MISSING_PARAMETERS = "missing parameters {0}";
         public const string MISSING_TOKEN = "missing token";
         public const string MISSING_RESPONSE_TYPES = "missing response types {0}";
         public const string MISSING_RESPONSE_TYPE = "valid response type must be passed for the grant type {0}";

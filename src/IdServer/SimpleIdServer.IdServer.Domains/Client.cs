@@ -390,6 +390,10 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.IsConsentDisabled)]
         public bool IsConsentDisabled { get; set; }
         /// <summary>
+        /// 'resource' parameter can be required or not.
+        /// </summary>
+        public bool IsResourceParameterRequired { get; set; } = false;
+        /// <summary>
         /// Expiration time in seconds of auth_req_id
         /// </summary>
         public int AuthReqIdExpirationTimeInSeconds { get; set; } = 120;

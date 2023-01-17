@@ -26,6 +26,7 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ScopeClaim> Claims { get; set; }= new List<ScopeClaim>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         public ICollection<Client> Clients { get; set; } = new List<Client>();
+        public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
 
         public static Scope Create(string scopeName)
         {

@@ -39,6 +39,23 @@ namespace System.Text.Json.Nodes
         #region Authorization request
 
         /// <summary>
+        /// Indicates the target service or resource to which access is being requested. 
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetResourcesFromAuthorizationRequest(this JsonObject jObj)
+        {
+            var result = jObj.GetToken(AuthorizationRequestParameters.Resource);
+            if (result == null) return new string[0];
+            if (result is JsonValue) return new string[1] { result.GetValue<string>() };
+            var lst = new List<string>();
+            foreach (var record in result.AsArray())
+                lst.Add(record.ToString());
+
+            return lst;
+        }
+
+        /// <summary>
         /// Hint to the OpenId Provider regarding the end-user for whom authentication is beging requested.
         /// The value may contain an email address, phone number, account number, subject identifier etc...
         /// </summary>

@@ -100,12 +100,29 @@ namespace Microsoft.Extensions.DependencyInjection
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
             if (!storeDbContext.Clients.Any())
             {
-                var entires = storeDbContext.ChangeTracker.Entries();
                 foreach (var client in clients)
                 {
                     var scopeNames = client.Scopes.Select(s => s.Name);
                     client.Scopes = storeDbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToList();
                     storeDbContext.Clients.Add(client);
+                }
+
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerBuilder AddInMemoryApiResources(ICollection<ApiResource> apiResources)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.ApiResources.Any())
+            {
+                foreach (var apiResource in apiResources)
+                {
+                    var scopeNames = apiResource.Scopes.Select(s => s.Name);
+                    apiResource.Scopes = storeDbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToList();
+                    storeDbContext.ApiResources.Add(apiResource);
                 }
 
                 storeDbContext.SaveChanges();

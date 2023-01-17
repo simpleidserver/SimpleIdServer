@@ -15,6 +15,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string? NotificationEdp { get; set; } = null;
         public int? Interval { get; set; } = null;
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
+        public IEnumerable<string> Resources { get; set; } = new List<string>();
         public BCAuthorizeStatus Status { get; set; }
         public DateTime ExpirationDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }

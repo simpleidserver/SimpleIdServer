@@ -77,6 +77,9 @@
 	  <Compile Update="Features\GrantTypes\AlternativeScenarios.feature.cs">
 	    <DependentUpon>AlternativeScenarios.feature</DependentUpon>
 	  </Compile>
+	  <Compile Update="Features\GrantTypes\AuthorizationCodeGrantType.feature.cs">
+	    <DependentUpon>AuthorizationCodeGrantType.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\GrantTypes\CIBAGrantTypeErrors.feature.cs">
 	    <DependentUpon>CIBAGrantTypeErrors.feature</DependentUpon>
 	  </Compile>
@@ -177,6 +180,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\GrantTypes\AlternativeScenarios.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\AuthorizationCodeGrantType.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

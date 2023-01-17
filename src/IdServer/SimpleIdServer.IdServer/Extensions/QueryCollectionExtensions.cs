@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.Http
             {
                 try
                 {
-                    return JsonObject.Parse(strValues.ElementAt(0)).AsObject();
+                    return JsonNode.Parse(strValues.ElementAt(0));
                 }
                 catch
                 {

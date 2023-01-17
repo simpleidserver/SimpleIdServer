@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.BCDeviceRegistration;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
@@ -33,26 +32,35 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private readonly IBCAuthorizeRequestValidator _bcAuthorizeRequestValidator;
         private readonly IBCNotificationService _bcNotificationService;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
-        private readonly IdServerHostOptions _options;
+        private readonly IEnumerable<IDevice> _devices;
 
         public BCAuthorizeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBCAuthorizeRequestValidator bcAuthorizeRequestValidator,
             IBCNotificationService bcNotificationService,
             IBCAuthorizeRepository bcAuthorizeRepository,
-            IOptions<IdServerHostOptions> options)
+            IEnumerable<IDevice> devices)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _bcAuthorizeRequestValidator = bcAuthorizeRequestValidator;
             _bcNotificationService = bcNotificationService;
             _bcAuthorizeRepository = bcAuthorizeRepository;
-            _options = options.Value;
+            _devices = devices;
         }
 
         public async Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken)
         {
             try
             {
+                // https://www.authlete.com/developers/grant_management/
+                // Réfléchir à comment gérer les grants
+                // https://danielfett.de/download/fapi-evolution.pdf
+                // https://www.openbanking.org.uk/wp-content/uploads/Customer-Experience-Guidelines.pdf
+                // COMPRENDRE POUR L AUTHENTIFICATION !!!!
+                // IL FAUT IMPLEMENTATER IETF-OAUTH-RAR....
+                // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-rar-04#name-request-parameter-authoriza
+                // https://danielfett.de/download/fapi-evolution.pdf
+                // https://bitbucket.org/openid/fapi/src/master/fapi-grant-management.md
                 Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken, ErrorCodes.INVALID_REQUEST);
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);

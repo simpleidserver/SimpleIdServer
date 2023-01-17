@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -60,12 +61,21 @@ namespace SimpleIdServer.IdServer.Api.BCDevice
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string deviceType, double? lastView = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var bearerToken = ExtractBearerToken();
-            var user = await GetUser(bearerToken);
-            // Get latest unread message.
-            return null;
+            try
+            {
+                var device = _devices.SingleOrDefault(d => d.Type == deviceType);
+                if (device == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_DEVICE_TYPE, deviceType));
+                var bearerToken = ExtractBearerToken();
+                var user = await GetUser(bearerToken);
+                var result = await device.GetLastUnreadMessages(user, lastView, cancellationToken);
+                return new OkObjectResult(result);
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
         }
 
         private ContentResult BuildError(OAuthException ex) => new ContentResult
@@ -108,11 +118,23 @@ namespace SimpleIdServer.IdServer.Api.BCDevice
 
     public class DeviceMessageResult
     {
+        [BindProperty(Name = DeviceMessageResultParameters.DeviceId)]
+        [JsonPropertyName(DeviceMessageResultParameters.DeviceId)]
         public string DeviceId { get; set; } = null!;
+        [BindProperty(Name = DeviceMessageResultParameters.AuthReqId)]
+        [JsonPropertyName(DeviceMessageResultParameters.AuthReqId)]
         public string AuthReqId { get; set; } = null!;
-        public string? ClientId { get; set; } = null!;
+        [BindProperty(Name = DeviceMessageResultParameters.ClientId)]
+        [JsonPropertyName(DeviceMessageResultParameters.ClientId)]
+        public string? ClientId { get; set; } = null;
+        [BindProperty(Name = DeviceMessageResultParameters.BindingMessage)]
+        [JsonPropertyName(DeviceMessageResultParameters.BindingMessage)]
         public string? BindingMessage { get; set; } = null;
-        public DateTime ReceptionDateTime { get; set; }
+        [BindProperty(Name = DeviceMessageResultParameters.ReceptionDateTime)]
+        [JsonPropertyName(DeviceMessageResultParameters.ReceptionDateTime)]
+        public double ReceptionDateTime { get; set; }
+        [BindProperty(Name = DeviceMessageResultParameters.Permissions)]
+        [JsonPropertyName(DeviceMessageResultParameters.Permissions)]
         public IEnumerable<BCAuthorizePermission> Permissions { get; set; }
     }
 }

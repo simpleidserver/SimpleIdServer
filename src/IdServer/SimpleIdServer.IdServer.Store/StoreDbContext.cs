@@ -20,6 +20,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<ClaimProvider> ClaimProviders { get; set; }
         public DbSet<BCAuthorize> BCAuthorizeLst { get; set; }
         public DbSet<PollingDeviceMessage> PollingDeviceMessages { get; set; }
+        public DbSet<ApiResource> ApiResources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -43,6 +44,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new BCAuthorizeConfiguration());
             builder.ApplyConfiguration(new UserDeviceConfiguration());
             builder.ApplyConfiguration(new PollingDeviceMessageConfiguration());
+            builder.ApplyConfiguration(new ApiResourceConfiguration());
         }
     }
 }

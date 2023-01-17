@@ -46,6 +46,34 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        #region Response type
+
+        /// <summary>
+        /// Response type can return 'id_token'.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableIdTokenInResponseType()
+        {
+            if (!_client.ResponseTypes.Contains(IdTokenResponseTypeHandler.RESPONSE_TYPE))
+                _client.ResponseTypes.Add(IdTokenResponseTypeHandler.RESPONSE_TYPE);
+            return this;
+        }
+
+        /// <summary>
+        /// Response type can return 'token'.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableTokenInResponseType()
+        {
+            if (!_client.ResponseTypes.Contains(TokenResponseTypeHandler.RESPONSE_TYPE))
+                _client.ResponseTypes.Add(TokenResponseTypeHandler.RESPONSE_TYPE);
+            return this;
+        }
+
+        #endregion
+
+        #region Scopes
+
         /// <summary>
         /// Add scope.
         /// </summary>
@@ -56,6 +84,23 @@ namespace SimpleIdServer.IdServer.Builders
             foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
             return this;
         }
+
+        /// <summary>
+        /// Enable offline_access.
+        /// This scope value requests that an OAUTH2.0 refresh token be issued that can be used to obtain an access token that grants access to the End-User's UserInfo Endpoint even when the End-User is not present (not logged-in).
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableOfflineAccess()
+        {
+            AddScope(Constants.StandardScopes.OfflineAccessScope.Name);
+            if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
+                _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
+            return this;
+        }
+
+        #endregion
+
+        #region Signing Key
 
         /// <summary>
         /// Add signing key used to check the 'request' parameter.
@@ -73,6 +118,10 @@ namespace SimpleIdServer.IdServer.Builders
 
         public TraditionalWebsiteClientBuilder AddSigningKey(RsaSecurityKey securityKey, string alg = SecurityAlgorithms.RsaSha256) => AddSigningKey(new SigningCredentials(securityKey, alg), alg);
 
+        #endregion
+
+        #region Encryption Key
+
         public TraditionalWebsiteClientBuilder AddEncryptedKey(EncryptingCredentials credentials)
         {
             var jsonWebKey = credentials.SerializePublicJWK();
@@ -82,6 +131,10 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         public TraditionalWebsiteClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc));
+
+        #endregion
+
+        #region Request object
 
         /// <summary>
         /// Set the algorithm used to sign the request object.
@@ -107,6 +160,10 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        #endregion
+
+        #region Subject type
+
         /// <summary>
         /// Set the subject_type.
         /// </summary>
@@ -130,28 +187,9 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        /// <summary>
-        /// Set the sector_identifier_uri.
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder SetSectorIdentifierUri(string uri)
-        {
-            _client.SectorIdentifierUri = uri;
-            return this;
-        }
+        #endregion
 
-        /// <summary>
-        /// Set the default Maximum Authentication Age.
-        /// Specifies that the End-User MUST be actively authenticated if the End-User was authenticated longer ago than the specified number of seconds.
-        /// </summary>
-        /// <param name="defaultMaxAge"></param>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder SetDefaultMaxAge(int defaultMaxAge)
-        {
-            _client.DefaultMaxAge = defaultMaxAge;
-            return this;
-        }
+        #region User info
 
         /// <summary>
         /// Set the algorithm to sign the userinfo response.
@@ -177,29 +215,7 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        /// <summary>
-        /// Response type can return 'id_token'.
-        /// </summary>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableIdTokenInResponseType()
-        {
-            if (!_client.ResponseTypes.Contains(IdTokenResponseTypeHandler.RESPONSE_TYPE))
-                _client.ResponseTypes.Add(IdTokenResponseTypeHandler.RESPONSE_TYPE);
-            return this;
-        }
-
-        /// <summary>
-        /// Enable offline_access.
-        /// This scope value requests that an OAUTH2.0 refresh token be issued that can be used to obtain an access token that grants access to the End-User's UserInfo Endpoint even when the End-User is not present (not logged-in).
-        /// </summary>
-        /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableOfflineAccess()
-        {
-            AddScope(Constants.StandardScopes.OfflineAccessScope.Name);
-            if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
-                _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
-            return this;
-        }
+        #endregion
 
         #region Back Channel
 
@@ -290,6 +306,43 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder UseClientPkceAuthentication()
         {
             _client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
+            return this;
+        }
+
+        #endregion
+
+        #region Other parameters
+
+        /// <summary>
+        /// Set the sector_identifier_uri.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetSectorIdentifierUri(string uri)
+        {
+            _client.SectorIdentifierUri = uri;
+            return this;
+        }
+
+        /// <summary>
+        /// Set the default Maximum Authentication Age.
+        /// Specifies that the End-User MUST be actively authenticated if the End-User was authenticated longer ago than the specified number of seconds.
+        /// </summary>
+        /// <param name="defaultMaxAge"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetDefaultMaxAge(int defaultMaxAge)
+        {
+            _client.DefaultMaxAge = defaultMaxAge;
+            return this;
+        }
+
+        /// <summary>
+        /// resource parameter must be required
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder ResourceParameterIsRequired()
+        {
+            _client.IsResourceParameterRequired = true;
             return this;
         }
 

@@ -171,6 +171,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClientHelper, OAuthClientHelper>();
             services.AddTransient<IAmrHelper, AmrHelper>();
             services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
+            services.AddTransient<IAudienceHelper, AudienceHelper>();
             return services;
         }
 

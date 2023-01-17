@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string AuthReqId { get; set; } = null!;
         public string? ClientId { get; set; } = null!;
         public string? BindingMessage { get; set; } = null;
-        public DateTime ReceptionDateTime { get; set; }
+        public double ReceptionDateTime { get; set; }
         public IEnumerable<BCAuthorizePermission> Permissions
         {
             get

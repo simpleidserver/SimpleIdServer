@@ -112,12 +112,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                 await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
                 var scopes = jwsPayload.GetScopesFromAuthorizationRequest();
+                var audiences = jwsPayload.GetResourcesFromAuthorizationRequest();
                 var result = BuildResult(context, scopes);
                 await Authenticate(jwsPayload, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)
-                {
-                    await tokenBuilder.Refresh(jwsPayload, context, cancellationToken);
-                }
+                    await tokenBuilder.Build(scopes, audiences, jwsPayload.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
                 
                 _tokenProfiles.First(t => t.Profile == ( context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)

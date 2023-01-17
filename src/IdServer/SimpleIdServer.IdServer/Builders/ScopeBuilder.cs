@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.Builders
             _scope = scope;
         }
 
-        public static ScopeBuilder Create(string name, bool isExposed = false)
+        public static ScopeBuilder CreateApiScope(string name, bool isExposed = false)
         {
             return new ScopeBuilder(new Scope { Name = name, IsExposedInConfigurationEdp = isExposed });
         }

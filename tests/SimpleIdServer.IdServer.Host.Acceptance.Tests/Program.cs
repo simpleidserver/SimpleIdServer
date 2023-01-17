@@ -11,6 +11,7 @@ builder.Services.AddSIDIdentityServer()
     .AddInMemoryScopes(IdServerConfiguration.Scopes)
     .AddInMemoryClients(IdServerConfiguration.Clients)
     .AddInMemoryUsers(IdServerConfiguration.Users)
+    .AddInMemoryApiResources(IdServerConfiguration.ApiResources)
     .AddBackChannelAuthentication()
     .SetSigningKeys(
         new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),

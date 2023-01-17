@@ -27,5 +27,6 @@ namespace SimpleIdServer.IdServer
         public const string SLOW_DOWN = "slow_down";
         public const string UNKNOWN_USER = "unknown_user";
         public const string INVALID_CREDENTIALS = "invalid_credentials";
+        public const string INVALID_TARGET = "invalid_target";
     }
 }

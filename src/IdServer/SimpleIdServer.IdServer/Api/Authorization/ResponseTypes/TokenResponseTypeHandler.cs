@@ -4,7 +4,6 @@ using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.DTOs;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,9 +24,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
         public string ResponseType => RESPONSE_TYPE;
         public int Order => 2;
 
-        public Task Enrich(HandlerContext context, CancellationToken cancellationToken)
+        public Task Enrich(IEnumerable<string> scopes, IEnumerable<string> audiences, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext context, CancellationToken cancellationToken)
         {
-            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(context.Request.RequestData.GetScopesFromAuthorizationRequest(), context, cancellationToken);
+            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(scopes, audiences, claims, context, cancellationToken);
         }
     }
 }

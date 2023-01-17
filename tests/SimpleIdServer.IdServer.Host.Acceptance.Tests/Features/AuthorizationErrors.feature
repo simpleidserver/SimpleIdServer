@@ -21,7 +21,7 @@ Scenario: Check redirect_uri is valid
 	Then JSON 'error_description'='redirect_uri http://localhost:8081 is not correct'
 	Then JSON 'state'='state'
 
-Scenario: Scope is required
+Scenario: Scope or resource parameter are required
 	Given authenticate a user
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |
@@ -34,7 +34,7 @@ Scenario: Scope is required
 	| display       | popup                 |	
 	
 	Then redirection url contains the parameter value 'error'='invalid_request'
-	Then redirection url contains the parameter value 'error_description'='missing parameter scope'
+	Then redirection url contains the parameter value 'error_description'='missing parameters scope,resource'
 
 Scenario: Scope must be supported
 	Given authenticate a user
@@ -348,3 +348,38 @@ Scenario: the acr value passed in the claims parameter must be valid
 	
 	Then redirection url contains the parameter value 'error'='access_denied'
 	Then redirection url contains the parameter value 'error_description'='no essential acr is supported'
+
+Scenario: resource parameter is required when the client is excepting to receive this parameter
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value                                                                                 |
+	| response_type | code                                                                                  |
+	| client_id     | fortySixClient                                                                        |
+	| state         | state                                                                                 |
+	| response_mode | query                                                                                 |
+	| redirect_uri  | http://localhost:8080                                                                 |
+	| nonce         | nonce                                                                                 |
+	| claims        | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } |
+	| scope         | admin                                                                                 |
+	
+	Then redirection url contains the parameter value 'error'='invalid_target'
+	Then redirection url contains the parameter value 'error_description'='missing parameter resource'
+
+Scenario: resource parameter must be valid
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key           | Value                                                                                 |
+	| response_type | code token                                                                            |
+	| client_id     | fortySixClient                                                                        |
+	| state         | state                                                                                 |
+	| response_mode | query                                                                                 |
+	| redirect_uri  | http://localhost:8080                                                                 |
+	| nonce         | nonce                                                                                 |
+	| claims        | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } |
+	| resource      | invalid                                                                               |
+	| resource      | sinvalid                                                                              |
+	
+	Then redirection url contains the parameter value 'error'='invalid_target'
+	Then redirection url contains the parameter value 'error_description'='following resources invalid,sinvalid doesn't exist'

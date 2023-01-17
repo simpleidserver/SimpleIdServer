@@ -15,8 +15,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
     {
         public static List<Scope> Scopes => new List<Scope>
         {
-            ScopeBuilder.Create("firstScope", true).Build(),
-            ScopeBuilder.Create("secondScope", true).Build(),
+            ScopeBuilder.CreateApiScope("firstScope", true).Build(),
+            ScopeBuilder.CreateApiScope("secondScope", true).Build(),
+            ScopeBuilder.CreateApiScope("admin", true).Build(),
+            ScopeBuilder.CreateApiScope("calendar", true).Build(),
             Constants.StandardScopes.OpenIdScope,
             Constants.StandardScopes.Profile,
             Constants.StandardScopes.Role,
@@ -68,7 +70,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fortyOneClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha384).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyTwoClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Ping).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyThreeClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Push).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortyFourClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Poll).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyFourClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Poll).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortySixClient", "password", "http://localhost:8080").EnableTokenInResponseType().ResourceParameterIsRequired().AddScope("admin", "calendar").Build()
         };
 
         public static List<User> Users = new List<User>
@@ -108,7 +111,14 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("thirtyNineClient", "openid", "profile", "role", "email")
                 .AddConsent("fortyClient", new string[] { "openid", "profile", "role", "email" }, new string[] { "name", "email" })
                 .AddConsent("fortyOneClient", "openid", "profile", "role", "email")
+                .AddConsent("fortySixClient", "admin", "calendar")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
+        };
+
+        public static List<ApiResource> ApiResources = new List<ApiResource>
+        {
+            ApiResourceBuilder.Create("https://cal.example.com", "description", "admin", "calendar").Build(),
+            ApiResourceBuilder.Create("https://contacts.example.com", "description", "admin", "calendar").Build()
         };
     }
 }

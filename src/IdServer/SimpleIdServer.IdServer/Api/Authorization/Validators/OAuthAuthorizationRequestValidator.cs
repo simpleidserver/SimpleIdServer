@@ -41,8 +41,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
             var prompt = context.Request.RequestData.GetPromptFromAuthorizationRequest();
             var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
-            if (!scopes.Any())
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Scope));
+            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
+            if (!scopes.Any() && !resources.Any())
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource}"));
 
             var unsupportedScopes = scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
@@ -91,6 +92,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
             }
 
+            if (context.Client.IsResourceParameterRequired && !resources.Any())
+                throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Resource));
+
             switch (prompt)
             {
                 case PromptParameters.Login:
@@ -115,6 +119,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
             }
         }
+
         protected virtual void RedirectToConsentView(HandlerContext context)
         {
             if (context.Client.IsConsentDisabled) return;

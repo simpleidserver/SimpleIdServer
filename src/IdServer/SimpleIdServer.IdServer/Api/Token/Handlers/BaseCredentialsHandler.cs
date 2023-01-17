@@ -12,6 +12,7 @@ using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SimpleIdServer.IdServer.Api.Token.Handlers
 {
@@ -35,6 +36,22 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken);
             if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.BAD_CLIENT_GRANT_TYPE, GrantType));
             return oauthClient;
+        }
+
+        protected IEnumerable<string> GetScopes(JsonObject previousRequest, HandlerContext context)
+        {
+            var result = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            if (result == null || !result.Any())
+                result = previousRequest.GetScopesFromAuthorizationRequest();
+            return result;
+        }
+
+        protected IEnumerable<string> GetResources(JsonObject previousRequest, HandlerContext context)
+        {
+            var result = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
+            if (result == null || !result.Any())
+                result = previousRequest.GetResourcesFromAuthorizationRequest();
+            return result;
         }
 
         protected JsonObject BuildResult(HandlerContext context, IEnumerable<string> scopes)

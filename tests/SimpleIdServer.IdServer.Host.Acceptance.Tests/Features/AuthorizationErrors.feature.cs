@@ -150,14 +150,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Scope is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="Scope or resource parameter are required")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
-        [Xunit.TraitAttribute("Description", "Scope is required")]
-        public void ScopeIsRequired()
+        [Xunit.TraitAttribute("Description", "Scope or resource parameter are required")]
+        public void ScopeOrResourceParameterAreRequired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scope is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scope or resource parameter are required", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 24
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -203,7 +203,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 37
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'missing paramet" +
-                        "er scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+                        "ers scope,resource\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -1354,6 +1354,138 @@ this.ScenarioInitialize(scenarioInfo);
 #line 350
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'no essential ac" +
                         "r is supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="resource parameter is required when the client is excepting to receive this param" +
+            "eter")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "resource parameter is required when the client is excepting to receive this param" +
+            "eter")]
+        public void ResourceParameterIsRequiredWhenTheClientIsExceptingToReceiveThisParameter()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("resource parameter is required when the client is excepting to receive this param" +
+                    "eter", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 352
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 353
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table26.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table26.AddRow(new string[] {
+                            "client_id",
+                            "fortySixClient"});
+                table26.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table26.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table26.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table26.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table26.AddRow(new string[] {
+                            "claims",
+                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
+                                " } }"});
+                table26.AddRow(new string[] {
+                            "scope",
+                            "admin"});
+#line 355
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table26, "When ");
+#line hidden
+#line 366
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 367
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'missing paramet" +
+                        "er resource\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="resource parameter must be valid")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "resource parameter must be valid")]
+        public void ResourceParameterMustBeValid()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("resource parameter must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 369
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 370
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table27.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table27.AddRow(new string[] {
+                            "client_id",
+                            "fortySixClient"});
+                table27.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table27.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table27.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table27.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table27.AddRow(new string[] {
+                            "claims",
+                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
+                                " } }"});
+                table27.AddRow(new string[] {
+                            "resource",
+                            "invalid"});
+                table27.AddRow(new string[] {
+                            "resource",
+                            "sinvalid"});
+#line 372
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table27, "When ");
+#line hidden
+#line 384
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 385
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'following resou" +
+                        "rces invalid,sinvalid doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

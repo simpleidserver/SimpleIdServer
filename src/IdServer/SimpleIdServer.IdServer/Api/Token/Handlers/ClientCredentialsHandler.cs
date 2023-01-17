@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IClientCredentialsGrantTypeValidator _clientCredentialsGrantTypeValidator;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly IAudienceHelper _audienceHelper;
         private readonly IdServerHostOptions _options;
 
         public ClientCredentialsHandler(
@@ -30,11 +32,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
+            IAudienceHelper audienceHelper,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _clientCredentialsGrantTypeValidator = clientCredentialsGrantTypeValidator;
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
+            _audienceHelper = audienceHelper;
             _options = options.Value;
         }
 
@@ -49,11 +53,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
-                var result = BuildResult(context, scopes);
+                var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
+                var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+                var result = BuildResult(context, extractionResult.Scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
-                {
-                    await tokenBuilder.Build(scopes, context, cancellationToken);
-                }
+                    await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, new List<AuthorizationRequestClaimParameter>(), context, cancellationToken);
 
                 _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)

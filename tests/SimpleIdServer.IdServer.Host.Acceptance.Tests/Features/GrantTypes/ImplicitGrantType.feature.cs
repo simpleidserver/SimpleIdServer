@@ -101,32 +101,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table126 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table132 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "response_type",
                             "id_token"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "client_id",
                             "fourteenClient"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "state",
                             "state"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "scope",
                             "openid email role"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table126.AddRow(new string[] {
+                table132.AddRow(new string[] {
                             "nonce",
                             "nonce"});
 #line 6
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table126, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table132, "When ");
 #line hidden
 #line 16
  testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -189,38 +189,118 @@ this.ScenarioInitialize(scenarioInfo);
 #line 31
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table127 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table133 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "response_type",
                             "id_token"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "client_id",
                             "fourteenClient"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "state",
                             "state"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "scope",
                             "openid email role"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table127.AddRow(new string[] {
+                table133.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 32
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table127, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table133, "When ");
 #line hidden
 #line 43
  testRunner.Then("redirection url contains the parameter value \'display\'=\'popup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="scopes \'admin\' and \'calendar\' and valid audiences are returned in the access toke" +
+            "n when resource parameter is specified with no scope")]
+        [Xunit.TraitAttribute("FeatureTitle", "ImplicitGrantType")]
+        [Xunit.TraitAttribute("Description", "scopes \'admin\' and \'calendar\' and valid audiences are returned in the access toke" +
+            "n when resource parameter is specified with no scope")]
+        public void ScopesAdminAndCalendarAndValidAudiencesAreReturnedInTheAccessTokenWhenResourceParameterIsSpecifiedWithNoScope()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("scopes \'admin\' and \'calendar\' and valid audiences are returned in the access toke" +
+                    "n when resource parameter is specified with no scope", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 45
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 46
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table134 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table134.AddRow(new string[] {
+                            "response_type",
+                            "code token"});
+                table134.AddRow(new string[] {
+                            "client_id",
+                            "fortySixClient"});
+                table134.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table134.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table134.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table134.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table134.AddRow(new string[] {
+                            "claims",
+                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
+                                " } }"});
+                table134.AddRow(new string[] {
+                            "resource",
+                            "https://cal.example.com"});
+                table134.AddRow(new string[] {
+                            "resource",
+                            "https://contacts.example.com"});
+#line 48
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table134, "When ");
+#line hidden
+#line 60
+ testRunner.And("extract parameter \'access_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 61
+ testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 63
+ testRunner.Then("JWT has \'aud\'=\'https://cal.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 64
+ testRunner.Then("JWT has \'aud\'=\'https://contacts.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 65
+ testRunner.Then("JWT has \'scope\'=\'admin\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 66
+ testRunner.Then("JWT has \'scope\'=\'calendar\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

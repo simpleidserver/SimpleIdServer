@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.DTOs;
@@ -26,17 +27,15 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
         public string Name => TokenResponseParameters.RefreshToken;
 
-        public virtual Task Build(IEnumerable<string> scopes, HandlerContext handlerContext, CancellationToken cancellationToken)
-        {
-            return Build(scopes, new Dictionary<string, object>(), handlerContext, cancellationToken);
-        }
-
-        public virtual async Task Build(IEnumerable<string> scopes, Dictionary<string, object> claims, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task Build(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JsonObject();
             if (handlerContext.Request.RequestData != null)
                 foreach (var record in handlerContext.Request.RequestData)
-                    dic.Add(record.Key, record.Value.GetValue<string>());
+                    if (record.Value is JsonValue)
+                        dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.GetValue<string>()));
+                    else
+                        dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.ToJsonString()));
 
             if (handlerContext.User != null)
                 dic.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Id);
@@ -44,14 +43,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
             var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, cancellationToken);
-            handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
-        }
-
-        public virtual async Task Refresh(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken cancellationToken)
-        {
-            var authorizationCode = string.Empty;
-            handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
-            var refreshToken = await  _grantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, previousQueryParameters, (handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds), cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
     }

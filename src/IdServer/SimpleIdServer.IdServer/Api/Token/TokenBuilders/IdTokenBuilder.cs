@@ -49,32 +49,18 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.IdToken;
 
-        public virtual Task Build(IEnumerable<string> scopes, HandlerContext context, CancellationToken cancellationToken) => Build(scopes, new Dictionary<string, object>(), context, cancellationToken);
-
-        public async Task Build(IEnumerable<string> scopes, Dictionary<string, object> claims, HandlerContext context, CancellationToken cancellationToken)
+        public virtual async Task Build(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext context, CancellationToken cancellationToken)
         {
             if (!scopes.Contains(StandardScopes.OpenIdScope.Name) || context.User == null)
                 return;
 
             var openidClient = context.Client;
-            var payload = await BuildIdToken(context, context.Request.RequestData, scopes, cancellationToken);
+            var payload = await BuildIdToken(context, context.Request.RequestData, scopes, claims, cancellationToken);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }
 
-        public async Task Refresh(JsonObject previousQueryParameters, HandlerContext handlerContext, CancellationToken token)
-        {
-            if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
-                return;
-
-            var scopes = previousQueryParameters.GetScopes();
-            var openidClient = handlerContext.Client;
-            var payload = await BuildIdToken(handlerContext, previousQueryParameters, scopes, token);
-            var idToken = await _jwtBuilder.BuildClientToken(handlerContext.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, token);
-            handlerContext.Response.Add(Name, idToken);
-        }
-
-        protected virtual async Task<SecurityTokenDescriptor> BuildIdToken(HandlerContext currentContext, JsonObject queryParameters, IEnumerable<string> requestedScopes, CancellationToken cancellationToken)
+        protected virtual async Task<SecurityTokenDescriptor> BuildIdToken(HandlerContext currentContext, JsonObject queryParameters, IEnumerable<string> requestedScopes, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, CancellationToken cancellationToken)
         {
             var openidClient = currentContext.Client;
             var claims = new Dictionary<string, object>
@@ -86,7 +72,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             var maxAge = queryParameters.GetMaxAgeFromAuthorizationRequest();
             var nonce = queryParameters.GetNonceFromAuthorizationRequest();
             var acrValues = queryParameters.GetAcrValuesFromAuthorizationRequest();
-            var requestedClaims = queryParameters.GetClaimsFromAuthorizationRequest();
             var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.SubjectType));
             var subject = await subjectTypeBuilder.Build(currentContext, cancellationToken);
             string accessToken, code;

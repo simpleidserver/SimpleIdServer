@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Web;
 
@@ -61,9 +62,12 @@ namespace SimpleIdServer.IdServer.Api
             var allKeys = data.Select(r => r.Key).ToList();
             foreach (var key in allKeys)
             {
-                var val = data[key];
-                if(val is JsonValue)
-                    data[key] = HttpUtility.UrlDecode(data[key].GetValue<string>());
+                var val = data[key] as JsonValue;
+                if(val != null)
+                {
+                    if (val.TryGetValue<string>(out string v))
+                        data[key] = HttpUtility.UrlDecode(v);
+                }
             }
 
             OriginalRequestData = data;

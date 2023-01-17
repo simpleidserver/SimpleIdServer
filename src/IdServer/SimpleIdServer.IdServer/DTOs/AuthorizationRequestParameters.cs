@@ -25,5 +25,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string IdTokenHint = "id_token_hint";
         public const string AuthReqId = "auth_req_id";
         public const string LoginHint = "login_hint";
+        public const string Resource = "resource";
     }
 }
