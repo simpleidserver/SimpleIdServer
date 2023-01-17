@@ -94,14 +94,17 @@ namespace SimpleIdServer.Scim.Helpers
 
                 var parentIds = resolvedParents.Select(p => p.Id).ToList();
                 if (purgeIndirectReferences)
-                    await PurgeIndirectReferences(kvp, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, idsToBeRemoved, parentIds);
+                    await PurgeIndirectReferences(result, kvp, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, idsToBeRemoved, parentIds, location);
                 else
                 {
                     var attrMapping = kvp.FirstOrDefault(r => r.Mode == Mode.PROPAGATE_INHERITANCE);
                     if (attrMapping != null)
                     {
-                        await PropagateIndirectReferences(attrMapping, targetSchemas, newScimRepresentations, newSourceScimRepresentation.Id, resolvedParents);
-                        await PropagateIndirectReferences(attrMapping, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, resolvedParents);
+                        var sch = targetSchemas.First(s => s.ResourceType == attrMapping.TargetResourceType);
+                        var parentAttr = sch.GetAttributeById(attrMapping.TargetAttributeId);
+                        var valueAttr = sch.GetChildren(parentAttr).First(a => a.Name == "value");
+                        await PropagateIndirectReferences(result, attrMapping, targetSchemas, newScimRepresentations, newSourceScimRepresentation.Id, resolvedParents, location);
+                        await PropagateIndirectReferences(result, attrMapping, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, resolvedParents, location);
                     }
                 }
             }
@@ -165,14 +168,14 @@ namespace SimpleIdServer.Scim.Helpers
 
                 var parentIds = resolvedParents.Select(p => p.Id).ToList();
 				if (purgeIndirectReferences)
-					await PurgeIndirectReferences(kvp, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, idsToBeRemoved, parentIds);
+					await PurgeIndirectReferences(result, kvp, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, idsToBeRemoved, parentIds, location);
 				else
 				{
                     var attrMapping = kvp.FirstOrDefault(r => r.Mode == Mode.PROPAGATE_INHERITANCE);
 					if(attrMapping != null)
-					{
-                        await PropagateIndirectReferences(attrMapping, targetSchemas, newScimRepresentations, newSourceScimRepresentation.Id, resolvedParents);
-                        await PropagateIndirectReferences(attrMapping, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, resolvedParents);
+                    {
+                        await PropagateIndirectReferences(result, attrMapping, targetSchemas, newScimRepresentations, newSourceScimRepresentation.Id, resolvedParents, location);
+                        await PropagateIndirectReferences(result, attrMapping, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, resolvedParents, location);
                     }
                 }
             }
@@ -222,13 +225,14 @@ namespace SimpleIdServer.Scim.Helpers
                 await ResolveParents(parent, selfReferenceAttribute, lst);
         }
 
-		protected virtual async Task PurgeIndirectReferences(IEnumerable<SCIMAttributeMapping> mappings, IEnumerable<SCIMSchema> schemas, IEnumerable<SCIMRepresentation> children, string representationId, IEnumerable<string> removedIds, IEnumerable<string> resolvedParentIds)
+		protected virtual async Task PurgeIndirectReferences(RepresentationSyncResult res, IEnumerable<SCIMAttributeMapping> mappings, IEnumerable<SCIMSchema> schemas, IEnumerable<SCIMRepresentation> children, string representationId, IEnumerable<string> removedIds, IEnumerable<string> resolvedParentIds, string location)
         {
             var attributeMappingToBePurged = mappings.FirstOrDefault(r => r.Mode == Mode.PROPAGATE_INHERITANCE);
             if (attributeMappingToBePurged == null) return;
             var sch = schemas.First(s => s.ResourceType == attributeMappingToBePurged.TargetResourceType);
             var parentAttr = sch.GetAttributeById(attributeMappingToBePurged.TargetAttributeId);
-            var fullPath = sch.GetChildren(parentAttr).First(a => a.Name == "value").FullPath;
+			var valueAttr = sch.GetChildren(parentAttr).First(a => a.Name == "value");
+            var fullPath = valueAttr.FullPath;
             foreach (var child in children)
             {
                 foreach (var resolvedParentId in resolvedParentIds)
@@ -236,22 +240,25 @@ namespace SimpleIdServer.Scim.Helpers
                     var parent = child.GetAttributesByPath(fullPath).FirstOrDefault(a => a.ValueString == resolvedParentId);
                     child.RemoveIndirectReference(resolvedParentId, attributeMappingToBePurged.TargetAttributeId);
                     if (child.IndirectReferences.Any(r => r.TargetAttributeId == attributeMappingToBePurged.TargetAttributeId && r.TargetReferenceId == resolvedParentId && r.NbReferences <= 0))
+					{
+                        res.RemoveReferenceAttr(child, attributeMappingToBePurged.TargetAttributeId, parentAttr.FullPath, resolvedParentId, location);
                         child.RemoveAttributesById(new string[] { parent.ParentAttributeId });
+                    }
                 }
             }
         }
 
-		protected virtual async Task PropagateIndirectReferences(SCIMAttributeMapping mapping, IEnumerable<SCIMSchema> schemas, string representationId, IEnumerable<SCIMRepresentation> resolvedParents, IEnumerable<string> excludedAttributeIds)
+		protected virtual async Task PropagateIndirectReferences(RepresentationSyncResult result, SCIMAttributeMapping mapping, IEnumerable<SCIMSchema> schemas, string representationId, IEnumerable<SCIMRepresentation> resolvedParents, IEnumerable<string> excludedAttributeIds, string location)
 		{
             var sch = schemas.First(s => s.ResourceType == mapping.TargetResourceType);
             var parentAttr = sch.GetAttributeById(mapping.TargetAttributeId);
-            var fullPath = sch.GetChildren(parentAttr).First(a => a.Name == "value").FullPath;
-            var children = await _scimRepresentationCommandRepository.FindSCIMRepresentationsByAttributeFullPath(fullPath, new List<string> { representationId }, mapping.TargetResourceType);
+            var valueAttr = sch.GetChildren(parentAttr).First(a => a.Name == "value");
+            var children = await _scimRepresentationCommandRepository.FindSCIMRepresentationsByAttributeFullPath(valueAttr.FullPath, new List<string> { representationId }, mapping.TargetResourceType);
 			children = children.Where(c => !excludedAttributeIds.Contains(c.Id));
-			await PropagateIndirectReferences(mapping, schemas, children, representationId, resolvedParents);
+			await PropagateIndirectReferences(result, mapping, schemas, children, representationId, resolvedParents, location);
         }
 
-		protected virtual async Task PropagateIndirectReferences(SCIMAttributeMapping attributeMapping, IEnumerable<SCIMSchema> schemas, IEnumerable<SCIMRepresentation> children, string representationId, IEnumerable<SCIMRepresentation> resolvedParents)
+		protected virtual async Task PropagateIndirectReferences(RepresentationSyncResult result, SCIMAttributeMapping attributeMapping, IEnumerable<SCIMSchema> schemas, IEnumerable<SCIMRepresentation> children, string representationId, IEnumerable<SCIMRepresentation> resolvedParents, string location)
 		{
             foreach (var child in children)
             {
@@ -260,9 +267,11 @@ namespace SimpleIdServer.Scim.Helpers
                     var parentAttrs = child.GetAttributesByAttrSchemaId(attributeMapping.TargetAttributeId);
                     child.AddIndirectReference(resolvedParent.Id, attributeMapping.TargetAttributeId);
                     if (parentAttrs.Any(p => child.GetChildren(p).Any(c => c.SchemaAttribute.Name == "value" && c.ValueString == resolvedParent.Id))) continue;
+                    var schema = schemas.First(s => s.ResourceType == child.ResourceType);
+                    result.AddReferenceAttr(child, attributeMapping.TargetAttributeId, schema.GetAttributeById(attributeMapping.TargetAttributeId).FullPath, resolvedParent.Id, location);
                     BuildScimRepresentationAttribute(attributeMapping.TargetAttributeId,
                         child, resolvedParent, Mode.PROPAGATE_INHERITANCE,
-                        attributeMapping.SourceResourceType, schemas.First(s => s.ResourceType == child.ResourceType), false);
+                        attributeMapping.SourceResourceType, schema, false);
                 }
             }
         }
