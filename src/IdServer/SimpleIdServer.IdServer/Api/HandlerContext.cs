@@ -156,6 +156,7 @@ namespace SimpleIdServer.IdServer.Api
         public User User { get; private set; }
         public Client Client { get; private set; }
         public HandlerContextRequest Request { get; private set; }
+        public JsonObject OriginalRequest { get; private set; }
         public HandlerContextResponse Response { get; private set; }
 
         public void SetClient(Client client) => Client = client;
@@ -165,5 +166,7 @@ namespace SimpleIdServer.IdServer.Api
         public void SetResponse(HandlerContextResponse response) => Response = response;
 
         public void SetRequest(HandlerContextRequest request) => Request = request;
+
+        public void SetOriginalRequest(JsonObject request) => OriginalRequest = request;
     }
 }

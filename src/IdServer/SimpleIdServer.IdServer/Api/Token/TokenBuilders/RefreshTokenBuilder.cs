@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
-            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, cancellationToken);
+            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.OriginalRequest, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
     }

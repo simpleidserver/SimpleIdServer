@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string TokenType { get; set; } = null!;
         public bool IsRegistrationAccessToken { get; set; }
         public string? Data { get; set; } = null;
+        public string? OriginalData { get; set; } = null;
         public string? AuthorizationCode { get; set; } = null;
         public DateTime? ExpirationTime { get; set; }
         public DateTime CreateDateTime { get; set; }

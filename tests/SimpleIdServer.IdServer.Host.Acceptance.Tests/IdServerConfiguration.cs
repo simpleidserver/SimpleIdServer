@@ -71,7 +71,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fortyTwoClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Ping).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyThreeClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Push).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyFourClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Poll).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortySixClient", "password", "http://localhost:8080").EnableTokenInResponseType().ResourceParameterIsRequired().AddScope("admin", "calendar").Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fortySixClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().ResourceParameterIsRequired().AddScope("admin", "calendar").Build()
         };
 
         public static List<User> Users = new List<User>

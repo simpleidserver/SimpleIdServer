@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table193 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table198 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table193, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table198, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -138,17 +138,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table194 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table199 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table194.AddRow(new string[] {
+                table199.AddRow(new string[] {
                             "token",
                             "token"});
-                table194.AddRow(new string[] {
+                table199.AddRow(new string[] {
                             "token_type_hint",
                             "bad"});
 #line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table194, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token/revoke\'", ((string)(null)), table199, "When ");
 #line hidden
 #line 20
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

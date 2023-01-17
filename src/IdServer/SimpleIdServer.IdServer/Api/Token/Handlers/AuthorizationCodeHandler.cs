@@ -94,6 +94,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
                 var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(previousRequest, context, cancellationToken);
+                context.SetOriginalRequest(previousRequest);
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, claims, context, cancellationToken);
 

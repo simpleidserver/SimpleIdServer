@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
+        private readonly IAudienceHelper _audienceHelper;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -39,6 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IUserRepository userRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
+            IAudienceHelper audienceHelper,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -47,6 +49,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenProfiles = tokenProfiles;
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
+            _audienceHelper = audienceHelper;
             _logger = logger;
         }
 
@@ -57,6 +60,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             try
             {
+                // TODO : Il faut prendre comment source l'auth request !!!!!
                 _refreshTokenGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
@@ -76,6 +80,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 }
 
                 var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
+                var originalJwsPayload = tokenResult.OriginalData == null ? null : JsonObject.Parse(tokenResult.OriginalData).AsObject();
                 var clientId = jwsPayload.GetClientIdFromAuthorizationRequest();
                 if (string.IsNullOrWhiteSpace(clientId))
                 {
@@ -111,12 +116,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 }
 
                 await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
-                var scopes = jwsPayload.GetScopesFromAuthorizationRequest();
-                var audiences = jwsPayload.GetResourcesFromAuthorizationRequest();
-                var result = BuildResult(context, scopes);
+                var scopes = GetScopes(originalJwsPayload, jwsPayload);
+                var resources = GetResources(originalJwsPayload, jwsPayload);
+                var extractionResult = await _audienceHelper.Extract(clientId, scopes, resources, cancellationToken);
+                var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(jwsPayload, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(scopes, audiences, jwsPayload.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
+                    await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, jwsPayload.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
                 
                 _tokenProfiles.First(t => t.Profile == ( context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)

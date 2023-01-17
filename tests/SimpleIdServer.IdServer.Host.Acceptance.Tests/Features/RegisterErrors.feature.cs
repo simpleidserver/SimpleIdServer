@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table181 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table186 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/register\'", ((string)(null)), table181, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/register\'", ((string)(null)), table186, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -138,14 +138,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table182 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table187 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table182.AddRow(new string[] {
+                table187.AddRow(new string[] {
                             "client_id",
                             "firstClient"});
 #line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/register\'", ((string)(null)), table182, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/register\'", ((string)(null)), table187, "When ");
 #line hidden
 #line 19
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -184,11 +184,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table183 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table188 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 26
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table183, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table188, "When ");
 #line hidden
 #line 29
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -215,11 +215,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table184 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table189 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 32
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table184, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table189, "When ");
 #line hidden
 #line 35
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -246,14 +246,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table185 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table190 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table185.AddRow(new string[] {
+                table190.AddRow(new string[] {
                             "Authorization",
                             "accesstoken"});
 #line 38
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table185, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table190, "When ");
 #line hidden
 #line 42
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -280,14 +280,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table186 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table191 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table186.AddRow(new string[] {
+                table191.AddRow(new string[] {
                             "Authorization",
                             "Bearer accesstoken"});
 #line 45
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table186, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table191, "When ");
 #line hidden
 #line 49
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

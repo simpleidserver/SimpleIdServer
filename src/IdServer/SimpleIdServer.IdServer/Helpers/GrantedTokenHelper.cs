@@ -30,7 +30,7 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken);
         Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
-        Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject jwsPayload, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject currentRequest, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<Token> GetRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task RemoveRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken);
@@ -150,7 +150,7 @@ namespace SimpleIdServer.IdServer.Helpers
             return cache;
         }
 
-        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
             var refreshToken = Guid.NewGuid().ToString();
             _tokenRepository.Add(new Token
@@ -159,6 +159,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 TokenType = DTOs.TokenResponseParameters.RefreshToken,
                 ClientId = clientId,
                 Data = request.ToString(),
+                OriginalData = originalRequest?.ToString(),
                 AuthorizationCode = authorizationCode,
                 ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
                 CreateDateTime = DateTime.UtcNow,

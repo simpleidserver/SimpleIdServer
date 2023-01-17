@@ -38,18 +38,22 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             return oauthClient;
         }
 
-        protected IEnumerable<string> GetScopes(JsonObject previousRequest, HandlerContext context)
+        protected IEnumerable<string> GetScopes(JsonObject previousRequest, HandlerContext context) => GetScopes(previousRequest, context.Request.RequestData);
+
+        protected IEnumerable<string> GetScopes(JsonObject previousRequest, JsonObject newRequest)
         {
-            var result = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            if (result == null || !result.Any())
+            var result = newRequest.GetScopesFromAuthorizationRequest();
+            if ((result == null || !result.Any()) && previousRequest != null)
                 result = previousRequest.GetScopesFromAuthorizationRequest();
             return result;
         }
 
-        protected IEnumerable<string> GetResources(JsonObject previousRequest, HandlerContext context)
+        protected IEnumerable<string> GetResources(JsonObject previousRequest, HandlerContext context) => GetResources(previousRequest, context.Request.RequestData);
+
+        protected IEnumerable<string> GetResources(JsonObject previousRequest, JsonObject newRequest)
         {
-            var result = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            if (result == null || !result.Any())
+            var result = newRequest.GetResourcesFromAuthorizationRequest();
+            if ((result == null || !result.Any()) && previousRequest != null)
                 result = previousRequest.GetResourcesFromAuthorizationRequest();
             return result;
         }
