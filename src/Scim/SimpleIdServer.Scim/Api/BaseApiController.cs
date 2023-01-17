@@ -432,7 +432,7 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -467,7 +467,7 @@ namespace SimpleIdServer.Scim.Api
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -507,7 +507,7 @@ namespace SimpleIdServer.Scim.Api
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -533,7 +533,7 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -586,7 +586,7 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -649,7 +649,7 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
