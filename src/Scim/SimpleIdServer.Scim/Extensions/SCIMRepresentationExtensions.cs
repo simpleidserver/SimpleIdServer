@@ -241,6 +241,8 @@ namespace SimpleIdServer.Scim.Domain
                                 {
                                     foreach (var parentAttribute in parentAttributes)
                                     {
+                                        var attr = parentAttribute.CachedChildren.FirstOrDefault(c => c.SchemaAttributeId == newAttribute.SchemaAttributeId);
+                                        if (attr != null) representation.FlatAttributes.Remove(attr);
                                         representation.AddAttribute(parentAttribute, newAttribute);
                                     }
                                 }
