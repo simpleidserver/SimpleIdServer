@@ -30,5 +30,8 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string FrontChannelLogoutSessionSupported = "frontchannel_logout_session_supported";
         public const string BackchannelLogoutSupported = "backchannel_logout_supported";
         public const string BackchannelLogoutSessionSupported = "backchannel_logout_session_supported";
+        public const string GrantManagementActionRequired = "grant_management_action_required";
+        public const string GrantManagementEndpoint = "grant_management_endpoint";
+        public const string GrantManagementActionsSupported = "grant_management_actions_supported";
     }
 }

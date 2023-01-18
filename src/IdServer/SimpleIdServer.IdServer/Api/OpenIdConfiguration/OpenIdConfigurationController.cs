@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
@@ -20,12 +22,14 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly IScopeRepository _scopeRepository;
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
+        private readonly IdServerHostOptions _options;
 
-        public OpenIdConfigurationController(IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IScopeRepository scopeRepository, IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IOAuthConfigurationRequestHandler configurationRequestHandler) : base(configurationRequestHandler)
+        public OpenIdConfigurationController(IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders, IScopeRepository scopeRepository, IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, IOptions<IdServerHostOptions> options, IOAuthConfigurationRequestHandler configurationRequestHandler) : base(configurationRequestHandler)
         {
             _subjectTypeBuilders = subjectTypeBuilders;
             _scopeRepository = scopeRepository;
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
+            _options = options.Value;
         }
 
         [HttpGet]
@@ -67,6 +71,9 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.FrontChannelLogoutSessionSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelLogoutSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelLogoutSessionSupported, true);
+            result.Add(OpenIDConfigurationNames.GrantManagementActionRequired, _options.GrantManagementActionRequired);
+            result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{Constants.EndPoints.GrantManagement}");
+            result.Add(OpenIDConfigurationNames.GrantManagementActionsSupported, JsonSerializer.SerializeToNode(Constants.AllStandardGrantManagementActions));
             return new OkObjectResult(result);
         }
     }

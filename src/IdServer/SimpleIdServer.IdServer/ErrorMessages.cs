@@ -42,6 +42,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_POST_LOGOUT_REDIRECT_URI = "post_logout_redirect_uri parameter is invalid";
         public const string INVALID_SUBJECT_IDTOKENHINT = "subject contained in id_token_hint is invalid";
         public const string INVALID_AUDIENCE_IDTOKENHINT = "audience contained in id_token_hint is invalid";
+        public const string INVALID_GRANT_MANAGEMENT_ACTION = "the grant_management_action {0} is not valid";
         public const string INVALID_JWT = "JSON Web Token cannot be read";
         public const string BAD_CODE_VERIFIER = "code_verifier is invalid";
         public const string BAD_CODE_CHALLENGE_METHOD = "transform algorithm {0} is not supported";
@@ -171,5 +172,6 @@ namespace SimpleIdServer.IdServer
         public const string CANNOT_GENERATE_PAIRWISE_SUBJECT_BECAUSE_NO_SECTOR_IDENTIFIER = "pairwise subject cannot be generated because the sector_identifier_uri is empty and there is no redirect_uri";
         public const string POLLING_DEVICE_ALREADY_REGISTERED = "only one polling device can be registrered";
         public const string POLLING_DEVICE_NOT_REGISTERED = "polling device is not registered";
+        public const string GRANT_ID_CANNOT_BE_SPECIFIED = "grant_id cannot be specified because the grant_management_action is equals to create";
     }
 }

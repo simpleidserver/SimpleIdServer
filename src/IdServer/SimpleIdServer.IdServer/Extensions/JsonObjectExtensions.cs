@@ -137,6 +137,21 @@ namespace System.Text.Json.Nodes
         /// <returns></returns>
         public static string GetIdTokenHintFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.IdTokenHint);
 
+        /// <summary>
+        /// String value identifying an individual grant managed by a particular authorization server for a certain client and a certain resource owner. 
+        /// he grant_id value must have been issued by the respective authorization server and the respective client must be authorized to use the particular grant id.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetGrantIdFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.GrantId);
+
+        /// <summary>
+        /// String value controlling the way the authorization server shall handle the grant when processing an authorization request.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetGrantManagementActionFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.GrantManagementAction);
+
         public static int? GetMaxAgeFromAuthorizationRequest(this JsonObject jObj)
         {
             var str = jObj.GetStr(AuthorizationRequestParameters.MaxAge);

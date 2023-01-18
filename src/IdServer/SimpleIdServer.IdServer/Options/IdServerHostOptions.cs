@@ -134,6 +134,11 @@ namespace SimpleIdServer.IdServer.Options
         /// Number of seconds the external authentication providers will be stored.
         /// </summary>
         public int? CacheExternalAuthProvidersInSeconds { get; set; }
+        /// <summary>
+        ///  If true, all authorization requests must specify a grant_management_action.
+        ///  Default value is false.
+        /// </summary>
+        public bool GrantManagementActionRequired { get; set; } = false;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

@@ -107,33 +107,44 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 .FirstOrDefaultAsync(u => u.Id == context.Request.UserSubject, cancellationToken);
             context.SetUser(user);
             foreach (var validator in _authorizationRequestValidators)
-            {
                 await validator.Validate(context, cancellationToken);
-            }
 
             var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(state))
-            {
                 context.Response.Add(AuthorizationResponseParameters.State, state);
-            }
 
             _authorizationRequestEnricher.Enrich(context);
             if (!context.Client.RedirectionUrls.Contains(redirectUri))
-            {
                 redirectUri = context.Client.RedirectionUrls.First();
-            }
 
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
             var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
             foreach (var responseTypeHandler in responseTypeHandlers)
-            {
                 await responseTypeHandler.Enrich(extractionResult.Scopes, extractionResult.Audiences, context.Request.RequestData.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
-            }
 
             _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
+        }
+
+        protected async Task Grant(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var grantId = context.Request.RequestData.GetGrantIdFromAuthorizationRequest();
+            var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
+            if(string.IsNullOrWhiteSpace(grantId)) return;
+            switch(grantManagementAction)
+            {
+                case Constants.StandardGrantManagementActions.Create:
+
+                    break;
+                case Constants.StandardGrantManagementActions.Replace:
+
+                    break;
+                case Constants.StandardGrantManagementActions.Merge:
+
+                    break;
+            }
         }
 
         private async Task<Client> AuthenticateClient(JsonObject jObj, CancellationToken cancellationToken)

@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer
             public const string CheckSession = "check_session";
             public const string EndSession = "end_session";
             public const string EndSessionCallback = "end_session_callback";
+            public const string GrantManagement = "grants";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -40,6 +41,20 @@ namespace SimpleIdServer.IdServer
             StandardNotificationModes.Poll,
             StandardNotificationModes.Push
         };
+
+        public static List<string> AllStandardGrantManagementActions = new List<string>
+        {
+            StandardGrantManagementActions.Create,
+            StandardGrantManagementActions.Merge,
+            StandardGrantManagementActions.Replace
+        };
+
+        public static class StandardGrantManagementActions
+        {
+            public const string Create = "create";
+            public const string Merge = "merge";
+            public const string Replace = "replace";
+        }
 
         public static class StandardNotificationModes
         {

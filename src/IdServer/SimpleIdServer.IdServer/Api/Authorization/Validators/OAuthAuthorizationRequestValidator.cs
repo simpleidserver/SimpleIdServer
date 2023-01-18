@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,15 +24,17 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
         private readonly IClientHelper _clientHelper;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IdServerHostOptions _options;
 
         public OAuthAuthorizationRequestValidator(IAmrHelper amrHelper, 
-            IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder)
+            IExtractRequestHelper extractRequestHelper, IEnumerable<IOAuthResponseMode> oauthResponseModes, IClientHelper clientHelper, IJwtBuilder jwtBuilder, IOptions<IdServerHostOptions> options)
         {
             _amrHelper = amrHelper;
             _extractRequestHelper = extractRequestHelper;
             _oauthResponseModes = oauthResponseModes;
             _clientHelper = clientHelper;
             _jwtBuilder = jwtBuilder;
+            _options = options.Value;
         }
 
         public virtual async Task Validate(HandlerContext context, CancellationToken cancellationToken)
@@ -94,6 +98,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
             if (context.Client.IsResourceParameterRequired && !resources.Any())
                 throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.Resource));
+            CheckGrantIdAndAction(context);
 
             switch (prompt)
             {
@@ -118,6 +123,23 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (invalidClaims.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
             }
+        }
+
+        protected void CheckGrantIdAndAction(HandlerContext context)
+        {
+            var grantId = context.Request.RequestData.GetGrantIdFromAuthorizationRequest();
+            var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
+            if (_options.GrantManagementActionRequired && string.IsNullOrWhiteSpace(grantManagementAction))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
+
+            if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_GRANT_MANAGEMENT_ACTION, grantManagementAction));
+
+            if (!string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_ID_CANNOT_BE_SPECIFIED);
+
+            if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.GrantManagementAction));
         }
 
         protected virtual void RedirectToConsentView(HandlerContext context)
