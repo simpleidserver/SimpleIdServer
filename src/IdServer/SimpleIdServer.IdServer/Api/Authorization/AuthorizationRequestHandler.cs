@@ -1,4 +1,5 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+﻿
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -114,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             context.SetUser(user);
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            var grantRequest = await _grantHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+            var grantRequest = await _grantHelper.Extract(scopes, resources, cancellationToken);
 
             foreach (var validator in _authorizationRequestValidators)
                 await validator.Validate(grantRequest, context, cancellationToken);
@@ -142,7 +143,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
             if(string.IsNullOrWhiteSpace(grantManagementAction)) return null;
             var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
-            var allClaims = claims.SelectMany(c => c.Values).Distinct().ToList();
+            var allClaims = claims.Select(c => c.Name).Distinct().ToList();
             Grant grant = null;
             switch (grantManagementAction)
             {
@@ -157,7 +158,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 // change the grant to be ONLY the permissions requested by the client and consented by the resource owner.
                 case Constants.StandardGrantManagementActions.Replace:
                     {
-                        grant = await _grantRepository.Query().Include(g => g.Claims).Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
+                        grant = await _grantRepository.Query().Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
                         if (grant == null)
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
                         await RevokeTokens(grant.Id, cancellationToken);
@@ -169,7 +170,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 // merge the permissions consented by the resource owner in the actual request with those which already exist within the grant and shall invalidate existing refresh tokens associated with the updated grant
                 case Constants.StandardGrantManagementActions.Merge:
                     {
-                        grant = await _grantRepository.Query().Include(g => g.Claims).Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
+                        grant = await _grantRepository.Query().Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
                         if (grant == null)
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
                         grant.Merge(allClaims, extractionResult.Authorizations);

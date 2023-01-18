@@ -54,7 +54,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 context.SetClient(oauthClient);
                 var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                 var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-                var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+                var extractionResult = await _audienceHelper.Extract(scopes, resources, cancellationToken);
                 var result = BuildResult(context, extractionResult.Scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(new BuildTokenParameter { Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes }, context, cancellationToken);

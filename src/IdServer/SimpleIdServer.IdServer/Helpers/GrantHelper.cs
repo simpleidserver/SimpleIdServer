@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,15 +14,14 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public interface IGrantHelper
     {
-        Task<GrantRequest> Extract(string clientId, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken);
+        Task<GrantRequest> Extract(IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken);
     }
 
     public class GrantRequest
     {
-        public GrantRequest(ICollection<AuthorizedScope> authorizations, GrantRequestTypes type)
+        public GrantRequest(ICollection<AuthorizedScope> authorizations)
         {
             Authorizations = authorizations;
-            Type = type;
         }
 
         public IEnumerable<string> Scopes
@@ -40,22 +40,7 @@ namespace SimpleIdServer.IdServer.Helpers
             }
         }
 
-        public IEnumerable<string> Resources
-        {
-            get
-            {
-                return Type == GrantRequestTypes.IDENTITY ? new List<string>() : Audiences;
-            }
-        }
-
         public ICollection<AuthorizedScope> Authorizations { get; private set; }
-        public GrantRequestTypes Type { get; private set; }
-    }
-
-    public enum GrantRequestTypes
-    {
-        IDENTITY = 0,
-        API = 1
     }
 
     public class GrantHelper : IGrantHelper
@@ -69,14 +54,18 @@ namespace SimpleIdServer.IdServer.Helpers
             _clientRepository = clientRepository;
         }
 
-        public async Task<GrantRequest> Extract(string clientId, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)
+        public async Task<GrantRequest> Extract(IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)
         {
+            var authResults = new List<AuthorizedScope>();
+            // TODO : refactor this part???
             if (resources.Any())
-                return await ProcessResourceParameter(resources, scopes, cancellationToken);
-             return await ProcessScopeParameter(clientId, scopes, cancellationToken);
+                authResults.AddRange(await ProcessResourceParameter(resources, scopes, cancellationToken));
 
+            var unknownScopes = scopes.Where(s => !authResults.Any(a => a.Scope == s));
+            authResults.AddRange(await ProcessScopeParameter(scopes, cancellationToken));
+            return new GrantRequest(authResults);
 
-            async Task<GrantRequest> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> scopes, CancellationToken cancellationToken)
+            async Task<List<AuthorizedScope>> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> scopes, CancellationToken cancellationToken)
             {
                 var authResults = new List<AuthorizedScope>();
                 var apiResources = await _apiResourceRepository.Query().Include(r => r.Scopes).Where(r => resources.Contains(r.Name)).ToListAsync(cancellationToken);
@@ -84,34 +73,32 @@ namespace SimpleIdServer.IdServer.Helpers
                 if (unsupportedResources.Any())
                     throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UKNOWN_RESOURCE, string.Join(",", unsupportedResources)));
                 var allApiResourceScopes = apiResources.SelectMany(c => c.Scopes).GroupBy(s => s.Name).Select(k => k.Key);
-                var unsupportedScopes = scopes.Where(s => !allApiResourceScopes.Contains(s));
-                if (unsupportedScopes.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes))));
-                if (!scopes.Any())
-                    scopes = allApiResourceScopes;
+                var supportedScopes = scopes.Where(s => apiResources.Any(r => r.Scopes.Any(sc => sc.Name == s)));
+                if (!supportedScopes.Any())
+                    supportedScopes = allApiResourceScopes;
                 var result = new List<AuthorizedScope>();
-                foreach(var scope in scopes)
+                foreach(var scope in supportedScopes)
                     result.Add(new AuthorizedScope
                     {
                         Scope = scope,
                         Resources = apiResources.Where(r => r.Scopes.Any(s => s.Name == scope)).Select(r => r.Name).ToList()
                     });
 
-                return new GrantRequest(result, GrantRequestTypes.API);
+                return result;
             }
 
-            async Task<GrantRequest> ProcessScopeParameter(string clientId, IEnumerable<string> scopes, CancellationToken cancellationToken)
+            async Task<List<AuthorizedScope>> ProcessScopeParameter(IEnumerable<string> scopes, CancellationToken cancellationToken)
             {
-                var clients = await _clientRepository.Query().Include(c => c.Scopes).Where(c => c.Scopes.Any(s => scopes.Contains(s.Name))).ToListAsync(cancellationToken);
+                var apiResources = await _apiResourceRepository.Query().Include(r => r.Scopes).Where(r => r.Scopes.Any(s => scopes.Contains(s.Name))).ToListAsync(cancellationToken);
                 var result = new List<AuthorizedScope>();
                 foreach (var scope in scopes)
                     result.Add(new AuthorizedScope
                     {
                         Scope = scope,
-                        Resources = clients.Where(c => c.Scope == scope).Select(c => c.ClientId).ToList()
+                        Resources = apiResources.Where(r => r.Scopes.Any(s => s.Name == scope)).Select(r => r.Name).ToList()
                     });
 
-                return new GrantRequest(result, GrantRequestTypes.IDENTITY);
+                return result;
             }
         }
     }

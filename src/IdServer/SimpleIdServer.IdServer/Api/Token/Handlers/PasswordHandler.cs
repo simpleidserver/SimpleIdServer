@@ -60,7 +60,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 context.SetClient(oauthClient);
                 var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                 var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-                var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+                var extractionResult = await _audienceHelper.Extract(scopes, resources, cancellationToken);
                 var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                 var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
                 var user = await _userRepository.Query().Include(u=> u.Credentials).AsNoTracking().FirstOrDefaultAsync(u => u.Id == userName && u.Credentials.Any(c => c.CredentialType == UserCredential.PWD && c.Value == PasswordHelper.ComputeHash(password)), cancellationToken);

@@ -71,7 +71,6 @@ namespace SimpleIdServer.IdServer.Domains
                 { GrantParameters.Claims, Claims }
             };
             var scopes = new List<Dictionary<string, object>>();
-
             foreach(var scope in Scopes)
             {
                 var d = new Dictionary<string, object>
@@ -79,10 +78,11 @@ namespace SimpleIdServer.IdServer.Domains
                     { GrantParameters.Scope, scope }
                 };
                 if(scope.Resources != null && scope.Resources.Any())
-                    d.Add(GrantParameters.Scope, scope.Resources);
+                    d.Add(GrantParameters.Resources, scope.Resources);
                 scopes.Add(d);
             }
 
+            res.Add(GrantParameters.Scopes, scopes);
             return res;
         }
 

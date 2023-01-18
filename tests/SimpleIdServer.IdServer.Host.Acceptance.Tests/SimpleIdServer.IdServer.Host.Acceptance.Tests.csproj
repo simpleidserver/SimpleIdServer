@@ -7,6 +7,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\BCAuthorizeCreate - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientPrivateKeyJwtAuthenticationErrors - Copier.feature.cs" />
@@ -54,6 +55,9 @@
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\Grants.feature.cs">
+	    <DependentUpon>Grants.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\BCAuthorize.feature.cs">
 	    <DependentUpon>BCAuthorize.feature</DependentUpon>
 	  </Compile>
@@ -155,6 +159,10 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\Grants.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\BCAuthorize.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

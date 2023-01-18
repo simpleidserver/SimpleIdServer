@@ -120,7 +120,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 var scopes = GetScopes(originalJwsPayload, jwsPayload);
                 var resources = GetResources(originalJwsPayload, jwsPayload);
                 var claims = GetClaims(originalJwsPayload, jwsPayload);
-                var extractionResult = await _audienceHelper.Extract(clientId, scopes, resources, cancellationToken);
+                var extractionResult = await _audienceHelper.Extract(scopes, resources, cancellationToken);
                 var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(jwsPayload, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)

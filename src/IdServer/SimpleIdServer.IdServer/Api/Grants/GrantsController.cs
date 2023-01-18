@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
             try
             {
                 var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Query().Include(g => g.Claims).Include(g => g.Scopes).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+                var grant = await _grantRepository.Query().Include(g => g.Scopes).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_GRANT, id));
                 if (grant.Status == Domains.GrantTypeStatus.REVOKED) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_IS_REVOKED);
 
@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
             try
             {
                 var bearerToken = ExtractBearerToken();
-                var grant = await _grantRepository.Query().Include(g => g.Claims).Include(g => g.Scopes).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
+                var grant = await _grantRepository.Query().FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
                 if (grant == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UNKNOWN_GRANT, id));
                 if (grant.Status == Domains.GrantTypeStatus.REVOKED) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.GRANT_IS_ALREADY_REVOKED);
 

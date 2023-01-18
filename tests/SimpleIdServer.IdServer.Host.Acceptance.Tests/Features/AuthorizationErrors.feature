@@ -383,3 +383,77 @@ Scenario: resource parameter must be valid
 	
 	Then redirection url contains the parameter value 'error'='invalid_target'
 	Then redirection url contains the parameter value 'error_description'='following resources invalid,sinvalid doesn't exist'
+
+Scenario: grant_management_action parameter must be valid
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code token                                                                            |
+	| client_id               | fortySixClient                                                                        |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| grant_management_action | invalid                                                                               |
+	
+	Then redirection url contains the parameter value 'error'='invalid_request'
+	Then redirection url contains the parameter value 'error_description'='the grant_management_action invalid is not valid'
+
+Scenario: grant_id cannot be specified when grant_management_action is equals to create
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code token                                                                            |
+	| client_id               | fortySixClient                                                                        |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| grant_management_action | create                                                                                |
+	| grant_id                | id                                                                                    |
+	
+	Then redirection url contains the parameter value 'error'='invalid_request'
+	Then redirection url contains the parameter value 'error_description'='grant_id cannot be specified because the grant_management_action is equals to create'
+
+Scenario: grant_management_action must be specified when grant_id is present
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code token                                                                            |
+	| client_id               | fortySixClient                                                                        |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| grant_id                | id                                                                                    |
+	
+	Then redirection url contains the parameter value 'error'='invalid_request'
+	Then redirection url contains the parameter value 'error_description'='missing parameter grant_management_action'
+
+Scenario: grant_id must exists
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code token                                                                            |
+	| client_id               | fortySixClient                                                                        |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| grant_id                | invalid                                                                               |
+	| grant_management_action | replace                                                                               |
+	
+	Then redirection url contains the parameter value 'error'='invalid_grant'
+	Then redirection url contains the parameter value 'error_description'='the grant invalid doesn't exist'

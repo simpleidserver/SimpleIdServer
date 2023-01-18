@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using System.Linq;
 using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -82,6 +83,21 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder AddScope(params string[] scopes)
         {
             foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
+            return this;
+        }
+
+        /// <summary>
+        /// Enable the access to the grants token.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableAccessToGrantsApi()
+        {
+            if (!_client.Scopes.Any(s => s.Name == StandardScopes.GrantManagementQuery.Name))
+                _client.Scopes.Add(new Scope { Name = StandardScopes.GrantManagementQuery.Name });
+
+            if (!_client.Scopes.Any(s => s.Name == StandardScopes.GrantManagementRevoke.Name))
+                _client.Scopes.Add(new Scope { Name = StandardScopes.GrantManagementRevoke.Name });
+
             return this;
         }
 
