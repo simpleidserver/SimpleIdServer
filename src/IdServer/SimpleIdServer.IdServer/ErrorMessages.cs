@@ -14,8 +14,11 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
         public const string UNKNOWN_DEVICE_TYPE = "the device {0} is not supported";
+        public const string UNKNOWN_GRANT = "the grant {0} doesn't exist";
+        public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
+        public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
         public const string UKNOWN_RESOURCE = "following resources {0} doesn't exist";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
@@ -30,6 +33,8 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_USER_CODE = "the user_code is not valid";
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
+        public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
+        public const string INVALID_ACCESS_TOKEN_CLIENTID = "the client is not authorized to access to this operation";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
         public const string INVALID_REQUEST_URI_PARAMETER = "request_uri parameter is invalid";
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";
@@ -173,5 +178,7 @@ namespace SimpleIdServer.IdServer
         public const string POLLING_DEVICE_ALREADY_REGISTERED = "only one polling device can be registrered";
         public const string POLLING_DEVICE_NOT_REGISTERED = "polling device is not registered";
         public const string GRANT_ID_CANNOT_BE_SPECIFIED = "grant_id cannot be specified because the grant_management_action is equals to create";
+        public const string GRANT_IS_REVOKED = "grant is revoked";
+        public const string GRANT_IS_ALREADY_REVOKED = "grant is already revoked";
     }
 }

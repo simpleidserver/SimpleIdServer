@@ -24,9 +24,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
         public string ResponseType => RESPONSE_TYPE;
         public int Order => 2;
 
-        public Task Enrich(IEnumerable<string> scopes, IEnumerable<string> audiences, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext context, CancellationToken cancellationToken)
+        public Task Enrich(EnrichParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
-            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(scopes, audiences, claims, context, cancellationToken);
+            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.AccessToken).Build(new BuildTokenParameter { Scopes = parameter.Scopes, Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
         }
     }
 }

@@ -14,14 +14,13 @@ namespace SimpleIdServer.IdServer.Domains
         public string? NotificationMode { get; set; } = null;
         public string? NotificationEdp { get; set; } = null;
         public int? Interval { get; set; } = null;
-        public IEnumerable<string> Scopes { get; set; } = new List<string>();
-        public IEnumerable<string> Resources { get; set; } = new List<string>();
         public BCAuthorizeStatus Status { get; set; }
         public DateTime ExpirationDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public DateTime? RejectionSentDateTime { get; set; }
         public DateTime? NextFetchTime { get; set; }
         public IEnumerable<BCAuthorizePermission> Permissions { get; set; } = new List<BCAuthorizePermission>();
+        public IEnumerable<string> Scopes { get; set; } = new List<string>();
 
         public void Confirm(IEnumerable<string> permissionIds)
         {

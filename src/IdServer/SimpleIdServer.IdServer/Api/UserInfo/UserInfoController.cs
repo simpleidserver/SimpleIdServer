@@ -109,7 +109,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 if (oauthClient == null)
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
-                if (!user.HasOpenIDConsent(oauthClient.ClientId, scopes, claims, AuthorizationRequestClaimTypes.UserInfo))
+                if (user.GetConsent(oauthClient.ClientId, scopes, claims, AuthorizationClaimTypes.UserInfo) == null)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.NO_CONSENT);
 
                 var token = await _tokenRepository.Query().AsNoTracking().FirstOrDefaultAsync(t => t.Id == accessToken);
@@ -122,7 +122,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var oauthScopes = await _scopeRepository.Query().Include(s => s.Claims).AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
                 var payload = new Dictionary<string, object>();
                 IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user, subject);
-                _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationRequestClaimTypes.UserInfo);
+                _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationClaimTypes.UserInfo);
                 await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);
                 string contentType = "application/json";
                 var result = JsonSerializer.Serialize(payload);
@@ -159,7 +159,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 };
             }
 
-            IEnumerable<AuthorizationRequestClaimParameter> GetClaims(JsonWebToken jsonWebToken)
+            IEnumerable<AuthorizedClaim> GetClaims(JsonWebToken jsonWebToken)
             {
                 if (jsonWebToken.TryGetClaim(AuthorizationRequestParameters.Claims, out Claim claim))
                 {
@@ -167,7 +167,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     return json.GetOpenIdClaims();
                 }
 
-                return new AuthorizationRequestClaimParameter[0];
+                return new AuthorizedClaim[0];
             }
         }
 

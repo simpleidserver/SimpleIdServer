@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,16 +28,22 @@ namespace SimpleIdServer.IdServer.Helpers
         Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken);
         SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName);
         SecurityTokenDescriptor BuildAccessToken(string clientId,IEnumerable<string> audiences, IEnumerable<string> scopes, string issuerName, double validityPeriodsInSeconds);
-        Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken);
+        Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken);
         Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken);
-        Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject currentRequest, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject currentRequest, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken);
         Task<Token> GetRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task RemoveRefreshToken(string refreshToken, CancellationToken cancellationToken);
         Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken);
-        Task<string> AddAuthorizationCode(JsonObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken);
-        Task<JsonObject> GetAuthorizationCode(string code, CancellationToken cancellationToken);
+        Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<AuthCode> GetAuthorizationCode(string code, CancellationToken cancellationToken);
         Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken);
+    }
+
+    public class AuthCode
+    {
+        public JsonObject OriginalRequest { get; set; }
+        public string GrantId { get; set; }
     }
 
     public class GrantedTokenHelper : IGrantedTokenHelper
@@ -107,7 +114,7 @@ namespace SimpleIdServer.IdServer.Helpers
             return descriptor;
         }
 
-        public async Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, CancellationToken cancellationToken)
+        public async Task<bool> AddAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken)
         {
             _tokenRepository.Add(new Token
             {
@@ -115,7 +122,8 @@ namespace SimpleIdServer.IdServer.Helpers
                 ClientId = clientId,
                 CreateDateTime = DateTime.UtcNow,
                 TokenType = DTOs.TokenResponseParameters.AccessToken,
-                AuthorizationCode = authorizationCode
+                AuthorizationCode = authorizationCode,
+                GrantId = grantId
             });
             await _tokenRepository.SaveChanges(cancellationToken);
             return true;
@@ -150,7 +158,7 @@ namespace SimpleIdServer.IdServer.Helpers
             return cache;
         }
 
-        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
             var refreshToken = Guid.NewGuid().ToString();
             _tokenRepository.Add(new Token
@@ -163,6 +171,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 AuthorizationCode = authorizationCode,
                 ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
                 CreateDateTime = DateTime.UtcNow,
+                GrantId = grantId
             });
             await _tokenRepository.SaveChanges(cancellationToken);
             return refreshToken;
@@ -195,17 +204,22 @@ namespace SimpleIdServer.IdServer.Helpers
 
         #region Authorization code
 
-        public async Task<JsonObject> GetAuthorizationCode(string code, CancellationToken token)
+        public async Task<AuthCode> GetAuthorizationCode(string code, CancellationToken token)
         {
             var cache = await _distributedCache.GetAsync(code, token);
             if (cache == null) return null;
-            return JsonObject.Parse(Encoding.UTF8.GetString(cache)).AsObject();
+            return JsonSerializer.Deserialize<AuthCode>(Encoding.UTF8.GetString(cache));
         }
 
-        public async Task<string> AddAuthorizationCode(JsonObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        public async Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
             var code = Guid.NewGuid().ToString();
-            await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(request.ToString()), new DistributedCacheEntryOptions
+            var serializedAuthCode = JsonSerializer.Serialize(new AuthCode
+            {
+                GrantId = grantId,
+                OriginalRequest = originalRequest
+            });
+            await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(serializedAuthCode), new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
             }, cancellationToken);

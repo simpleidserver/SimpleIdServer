@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Data { get; set; } = null;
         public string? OriginalData { get; set; } = null;
         public string? AuthorizationCode { get; set; } = null;
+        public string? GrantId { get; set; } = null;
         public DateTime? ExpirationTime { get; set; }
         public DateTime CreateDateTime { get; set; }
     }

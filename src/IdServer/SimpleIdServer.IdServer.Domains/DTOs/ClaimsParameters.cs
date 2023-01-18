@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-namespace SimpleIdServer.IdServer.DTOs
+namespace SimpleIdServer.IdServer.Domains.DTOs
 {
-    public static class ClaimsParameter
+    public static class ClaimsParameters
     {
         public const string Essential = "essential";
         public const string Value = "value";

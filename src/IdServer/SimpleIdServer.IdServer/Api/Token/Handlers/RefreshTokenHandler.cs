@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -30,7 +31,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
-        private readonly IAudienceHelper _audienceHelper;
+        private readonly IGrantHelper _audienceHelper;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -40,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IUserRepository userRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IAudienceHelper audienceHelper,
+            IGrantHelper audienceHelper,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -118,17 +119,21 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
                 var scopes = GetScopes(originalJwsPayload, jwsPayload);
                 var resources = GetResources(originalJwsPayload, jwsPayload);
+                var claims = GetClaims(originalJwsPayload, jwsPayload);
                 var extractionResult = await _audienceHelper.Extract(clientId, scopes, resources, cancellationToken);
                 var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(jwsPayload, context, cancellationToken);
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, jwsPayload.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
+                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = tokenResult.GrantId }, context, cancellationToken);
                 
                 _tokenProfiles.First(t => t.Profile == ( context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)
                 {
                     result.Add(kvp.Key, kvp.Value);
                 }
+
+                if (!string.IsNullOrWhiteSpace(tokenResult.GrantId))
+                    result.Add(TokenResponseParameters.GrantId, tokenResult.GrantId);
 
                 return new OkObjectResult(result);
             }

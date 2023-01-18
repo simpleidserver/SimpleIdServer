@@ -53,11 +53,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             try
             {
                 // https://www.authlete.com/developers/grant_management/
-                // Réfléchir à comment gérer les grants
                 // https://danielfett.de/download/fapi-evolution.pdf
                 // https://www.openbanking.org.uk/wp-content/uploads/Customer-Experience-Guidelines.pdf
-                // COMPRENDRE POUR L AUTHENTIFICATION !!!!
-                // IL FAUT IMPLEMENTATER IETF-OAUTH-RAR....
                 // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-rar-04#name-request-parameter-authoriza
                 // https://danielfett.de/download/fapi-evolution.pdf
                 // https://bitbucket.org/openid/fapi/src/master/fapi-grant-management.md

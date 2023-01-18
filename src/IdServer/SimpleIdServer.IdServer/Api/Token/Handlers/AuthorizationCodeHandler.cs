@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -30,7 +31,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
-        private readonly IAudienceHelper _audienceHelper;
+        private readonly IGrantHelper _audienceHelper;
         private readonly IdServerHostOptions _options;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
@@ -41,7 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenBuilder> tokenBuilders,
             IUserRepository usrRepository,
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IAudienceHelper audienceHelper,
+            IGrantHelper audienceHelper,
             IOptions<IdServerHostOptions> options,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, options)
         {
@@ -67,7 +68,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 context.SetClient(oauthClient);
                 var code = context.Request.RequestData.GetAuthorizationCode();
                 var redirectUri = context.Request.RequestData.GetRedirectUri();
-                var previousRequest = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
+                var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
+                var previousRequest = authCode?.OriginalRequest;
                 if (previousRequest == null)
                 {
                     // https://tools.ietf.org/html/rfc6749#section-4.1.2
@@ -96,13 +98,16 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 await Authenticate(previousRequest, context, cancellationToken);
                 context.SetOriginalRequest(previousRequest);
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, claims, context, cancellationToken);
+                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken);
 
                 _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)
                 {
                     result.Add(kvp.Key, kvp.Value);
                 }
+
+                if (!string.IsNullOrWhiteSpace(authCode.GrantId))
+                    result.Add(TokenResponseParameters.GrantId, authCode.GrantId);
 
                 return new OkObjectResult(result);
             }

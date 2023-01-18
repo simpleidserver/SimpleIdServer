@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
-using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +26,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
         public string Name => TokenResponseParameters.RefreshToken;
 
-        public virtual async Task Build(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
             var dic = new JsonObject();
             if (handlerContext.Request.RequestData != null)
@@ -42,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
-            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, dic, handlerContext.OriginalRequest, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, cancellationToken);
+            var refreshToken = await GrantedTokenHelper.AddRefreshToken(handlerContext.Client.ClientId, authorizationCode, parameter.GrantId, dic, handlerContext.OriginalRequest, handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
         }
     }

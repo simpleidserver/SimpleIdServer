@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public interface IAmrHelper
     {
-        Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, Client client, CancellationToken cancellationToken);
+        Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken);
         Task<AuthenticationContextClassReference> GetSupportedAcr(IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken);
         string FetchNextAmr(AuthenticationContextClassReference acr, string currentAmr);
     }
@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Helpers
             _options = options.Value;
         }
 
-        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, Client client, CancellationToken cancellationToken)
+        public async Task<AuthenticationContextClassReference> FetchDefaultAcr(IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken)
         {
             var defaultAcr = await GetSupportedAcr(requestedAcrValues, cancellationToken);
             if (defaultAcr == null)

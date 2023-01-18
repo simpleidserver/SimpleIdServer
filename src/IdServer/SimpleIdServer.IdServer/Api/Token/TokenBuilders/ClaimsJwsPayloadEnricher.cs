@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 {
     public interface IClaimsJwsPayloadEnricher
     {
-        void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken);
+        void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizedClaim> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken);
     }
 
     public class ClaimsJwsPayloadEnricher : IClaimsJwsPayloadEnricher
@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         protected List<string> AllUserClaims { get; private set; }
 
-        public virtual void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public virtual void EnrichWithClaimsParameter(Dictionary<string, object> claims, IEnumerable<AuthorizedClaim> requestedClaims, User user = null, DateTime? authDateTime = null, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
             if (requestedClaims != null)
             {

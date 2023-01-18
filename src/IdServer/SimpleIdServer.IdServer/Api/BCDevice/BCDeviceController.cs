@@ -9,7 +9,6 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Store;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.BCDevice
 {
-    public class BCDeviceController : Controller
+    public class BCDeviceController : BaseController
     {
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IUserRepository _userRepository;
@@ -76,34 +75,6 @@ namespace SimpleIdServer.IdServer.Api.BCDevice
             {
                 return BuildError(ex);
             }
-        }
-
-        private ContentResult BuildError(OAuthException ex) => new ContentResult
-        {
-            StatusCode = (int)HttpStatusCode.BadRequest,
-            Content = new JsonObject
-            {
-                [ErrorResponseParameters.Error] = ex.Code,
-                [ErrorResponseParameters.ErrorDescription] = ex.Message
-            }.ToJsonString(),
-            ContentType = "application/json"
-        };
-
-        private string ExtractBearerToken()
-        {
-            if(Request.Headers.ContainsKey(Constants.AuthorizationHeaderName))
-            {
-                foreach (var authorizationValue in Request.Headers[Constants.AuthorizationHeaderName])
-                {
-                    var at = authorizationValue.ExtractAuthorizationValue(new string[] { AutenticationSchemes.Bearer });
-                    if (!string.IsNullOrWhiteSpace(at))
-                    {
-                        return at;
-                    }
-                }
-            }
-
-            throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
         }
 
         private async Task<User> GetUser(string bearerToken)

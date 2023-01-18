@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +11,9 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public static byte[] GetOTPKey(this User user) => user.OTPKey.ConvertToBase32();
 
-        public static bool HasOpenIDConsent(this User user, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claims, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public static bool HasOpenIDConsent(this User user, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
-            return user.GetConsent(clientId, scopes, claims, claimType) != null;
+            return user.GetConsent(clientId, request, claims, claimType) != null;
         }
 
         public static bool HasOpenIDConsent(this User user, string consentId)
@@ -21,7 +21,10 @@ namespace SimpleIdServer.IdServer.Domains
             return user.Consents.SingleOrDefault(c => c.Id == consentId) != null;
         }
 
-        public static Consent GetConsent(this User user, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizationRequestClaimParameter> claims, AuthorizationRequestClaimTypes claimType = AuthorizationRequestClaimTypes.IdToken)
+        public static Consent GetConsent(this User user, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
+            => GetConsent(user, clientId, request.Scopes, claims, claimType);
+
+        public static Consent GetConsent(this User user, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
             return user.Consents.FirstOrDefault(c => c.ClientId == clientId &&
                 (scopes == null || (scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name).All(s => c.Scopes.Contains(s)))) &&

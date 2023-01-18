@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -60,7 +58,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == authRequest.UserId, cancellationToken);
                 context.SetUser(user);
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(authRequest.Scopes, authRequest.Resources, new List<AuthorizationRequestClaimParameter>(), context, cancellationToken);
+                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes }, context, cancellationToken);
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
                 var result = BuildResult(context, authRequest.Scopes);

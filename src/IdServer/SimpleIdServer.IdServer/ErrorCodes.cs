@@ -28,5 +28,6 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_USER = "unknown_user";
         public const string INVALID_CREDENTIALS = "invalid_credentials";
         public const string INVALID_TARGET = "invalid_target";
+        public const string INVALID_GRANT_ID = "invalid_grant_id";
     }
 }

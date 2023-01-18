@@ -2,17 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace SimpleIdServer.IdServer.Api.Token.Handlers
 {
@@ -55,6 +55,16 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             var result = newRequest.GetResourcesFromAuthorizationRequest();
             if ((result == null || !result.Any()) && previousRequest != null)
                 result = previousRequest.GetResourcesFromAuthorizationRequest();
+            return result;
+        }
+
+        protected IEnumerable<AuthorizedClaim> GetClaims(JsonObject previousRequest, HandlerContext context) => GetClaims(previousRequest, context.Request.RequestData);
+
+        protected IEnumerable<AuthorizedClaim> GetClaims(JsonObject previousRequest, JsonObject newRequest)
+        {
+            var result = newRequest.GetClaimsFromAuthorizationRequest();
+            if ((result == null || !result.Any()) && previousRequest != null)
+                result = previousRequest.GetClaimsFromAuthorizationRequest();
             return result;
         }
 

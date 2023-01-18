@@ -6,15 +6,15 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class BCAuthorizeConfiguration : IEntityTypeConfiguration<BCAuthorize>
+    public class GrantConfiguration : IEntityTypeConfiguration<Grant>
     {
-        public void Configure(EntityTypeBuilder<BCAuthorize> builder)
+        public void Configure(EntityTypeBuilder<Grant> builder)
         {
-            builder.HasKey(bc => bc.Id);
-            builder.HasMany(bc => bc.Permissions).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.Property(a => a.Scopes).HasConversion(
+            builder.HasKey(g => g.Id);
+            builder.Property(a => a.Claims).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None));
+            builder.HasMany(g => g.Scopes).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

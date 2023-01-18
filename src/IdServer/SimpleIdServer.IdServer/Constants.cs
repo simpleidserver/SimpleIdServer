@@ -276,6 +276,22 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope GrantManagementQuery = new Scope
+            {
+                Name = "grant_management_query",
+                IsExposedInConfigurationEdp = false,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope GrantManagementRevoke = new Scope
+            {
+                Name = "grant_management_revoke",
+                IsExposedInConfigurationEdp = false,
+                IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
         }
 
         public static class StandardAcrs

@@ -107,6 +107,13 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
                 defaults: new { controller = "BCAuthorize", action = "Post" });
 
+            webApplication.MapControllerRoute("getGrant",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.GrantManagement + "/{id}",
+                defaults: new { controller = "Grants", action = "Get" });
+            webApplication.MapControllerRoute("revokeGrant",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.GrantManagement + "/{id}",
+                defaults: new { controller = "Grants", action = "Delete" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");

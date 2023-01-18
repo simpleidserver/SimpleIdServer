@@ -49,18 +49,18 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.IdToken;
 
-        public virtual async Task Build(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext context, CancellationToken cancellationToken)
+        public virtual async Task Build(BuildTokenParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
-            if (!scopes.Contains(StandardScopes.OpenIdScope.Name) || context.User == null)
+            if (!parameter.Scopes.Contains(StandardScopes.OpenIdScope.Name) || context.User == null)
                 return;
 
             var openidClient = context.Client;
-            var payload = await BuildIdToken(context, context.Request.RequestData, scopes, claims, cancellationToken);
+            var payload = await BuildIdToken(context, context.Request.RequestData, parameter.Scopes, parameter.Claims, cancellationToken);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }
 
-        protected virtual async Task<SecurityTokenDescriptor> BuildIdToken(HandlerContext currentContext, JsonObject queryParameters, IEnumerable<string> requestedScopes, IEnumerable<AuthorizationRequestClaimParameter> requestedClaims, CancellationToken cancellationToken)
+        protected virtual async Task<SecurityTokenDescriptor> BuildIdToken(HandlerContext currentContext, JsonObject queryParameters, IEnumerable<string> requestedScopes, IEnumerable<AuthorizedClaim> requestedClaims, CancellationToken cancellationToken)
         {
             var openidClient = currentContext.Client;
             var claims = new Dictionary<string, object>

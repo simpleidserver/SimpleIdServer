@@ -10,5 +10,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string ExpiresIn = "expires_in";
         public const string Scope = "scope";
         public const string IdToken = "id_token";
+        public const string GrantId = "grant_id";
     }
 }

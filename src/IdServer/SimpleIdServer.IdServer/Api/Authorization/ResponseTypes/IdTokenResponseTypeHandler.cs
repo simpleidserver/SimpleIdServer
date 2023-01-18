@@ -2,10 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,9 +26,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
         public int Order => 3;
         public static string RESPONSE_TYPE = "id_token";
 
-        public Task Enrich(IEnumerable<string> scopes, IEnumerable<string> audiences, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext context, CancellationToken cancellationToken)
+        public Task Enrich(EnrichParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
-            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(scopes, audiences, claims, context, cancellationToken);
+            return _tokenBuilders.First(t => t.Name == AuthorizationResponseParameters.IdToken).Build(new BuildTokenParameter { Scopes = parameter.Scopes, Audiences = parameter.Audiences, Claims = parameter.Claims, GrantId = parameter.GrantId }, context, cancellationToken);
         }
     }
 }

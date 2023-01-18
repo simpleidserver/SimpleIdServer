@@ -39,7 +39,8 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             var code = authenticateInstruction.RequestData.GetAuthorizationCode();
             if (code == null) return false;
 
-            var previousRequest = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
+            var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
+            var previousRequest = authCode?.OriginalRequest;
             if (previousRequest == null) return false;
 
             var codeChallenge = previousRequest.GetCodeChallengeFromAuthorizationRequest();

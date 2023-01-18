@@ -6,13 +6,13 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class BCAuthorizeConfiguration : IEntityTypeConfiguration<BCAuthorize>
+    public class AuthorizedScopeConfiguration : IEntityTypeConfiguration<AuthorizedScope>
     {
-        public void Configure(EntityTypeBuilder<BCAuthorize> builder)
+        public void Configure(EntityTypeBuilder<AuthorizedScope> builder)
         {
-            builder.HasKey(bc => bc.Id);
-            builder.HasMany(bc => bc.Permissions).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.Property(a => a.Scopes).HasConversion(
+            builder.Property<int>("Id").ValueGeneratedOnAdd();
+            builder.HasKey("Id");
+            builder.Property(a => a.Resources).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None));
         }

@@ -35,7 +35,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IAudienceHelper _audienceHelper;
+        private readonly IGrantHelper _grantHelper;
+        private readonly IGrantRepository _grantRepository;
+        private readonly ITokenRepository _tokenRepository;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
@@ -44,7 +46,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IClientRepository clientRepository,
             IUserRepository userRepository,
-            IAudienceHelper audienceHelper,
+            IGrantHelper grantHelper,
+            IGrantRepository grantRepository,
+            ITokenRepository tokenRepository,
             IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
@@ -53,7 +57,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _clientRepository = clientRepository;
             _userRepository = userRepository;
-            _audienceHelper = audienceHelper;
+            _grantHelper = grantHelper;
+            _grantRepository = grantRepository;
+            _tokenRepository = tokenRepository;
             _options = options.Value;
         }
 
@@ -106,8 +112,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == context.Request.UserSubject, cancellationToken);
             context.SetUser(user);
+            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
+            var grantRequest = await _grantHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+
             foreach (var validator in _authorizationRequestValidators)
-                await validator.Validate(context, cancellationToken);
+                await validator.Validate(grantRequest, context, cancellationToken);
 
             var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
@@ -118,32 +128,64 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             if (!context.Client.RedirectionUrls.Contains(redirectUri))
                 redirectUri = context.Client.RedirectionUrls.First();
 
-            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            var extractionResult = await _audienceHelper.Extract(context.Client.ClientId, scopes, resources, cancellationToken);
+            var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
             foreach (var responseTypeHandler in responseTypeHandlers)
-                await responseTypeHandler.Enrich(extractionResult.Scopes, extractionResult.Audiences, context.Request.RequestData.GetClaimsFromAuthorizationRequest(), context, cancellationToken);
+                await responseTypeHandler.Enrich(new EnrichParameter { Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
 
             _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
             return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
         }
 
-        protected async Task Grant(HandlerContext context, CancellationToken cancellationToken)
+        protected async Task<Grant> ExecuteGrantManagementAction(GrantRequest extractionResult, HandlerContext context, CancellationToken cancellationToken)
         {
             var grantId = context.Request.RequestData.GetGrantIdFromAuthorizationRequest();
             var grantManagementAction = context.Request.RequestData.GetGrantManagementActionFromAuthorizationRequest();
-            if(string.IsNullOrWhiteSpace(grantId)) return;
-            switch(grantManagementAction)
+            if(string.IsNullOrWhiteSpace(grantManagementAction)) return null;
+            var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
+            var allClaims = claims.SelectMany(c => c.Values).Distinct().ToList();
+            Grant grant = null;
+            switch (grantManagementAction)
             {
+                // create a fresh grant.
                 case Constants.StandardGrantManagementActions.Create:
-
+                    {
+                        grant = Grant.Create(context.Client.ClientId, allClaims, extractionResult.Authorizations);
+                        _grantRepository.Add(grant);
+                        await _grantRepository.SaveChanges(cancellationToken);
+                    }
                     break;
+                // change the grant to be ONLY the permissions requested by the client and consented by the resource owner.
                 case Constants.StandardGrantManagementActions.Replace:
-
+                    {
+                        grant = await _grantRepository.Query().Include(g => g.Claims).Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
+                        if (grant == null)
+                            throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
+                        await RevokeTokens(grant.Id, cancellationToken);
+                        grant.Claims = allClaims;
+                        grant.Scopes = extractionResult.Authorizations;
+                        await _grantRepository.SaveChanges(cancellationToken);
+                    }
                     break;
+                // merge the permissions consented by the resource owner in the actual request with those which already exist within the grant and shall invalidate existing refresh tokens associated with the updated grant
                 case Constants.StandardGrantManagementActions.Merge:
-
+                    {
+                        grant = await _grantRepository.Query().Include(g => g.Claims).Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
+                        if (grant == null)
+                            throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
+                        grant.Merge(allClaims, extractionResult.Authorizations);
+                        await _grantRepository.SaveChanges(cancellationToken);
+                    }
                     break;
+            }
+
+            return grant;
+
+            async Task RevokeTokens(string grantId, CancellationToken cancellationToken)
+            {
+                var tokens = await _tokenRepository.Query().Where(t => t.GrantId == grantId).ToListAsync(cancellationToken);
+                foreach (var t in tokens)
+                    _tokenRepository.Remove(t);
+                await _tokenRepository.SaveChanges(cancellationToken);
             }
         }
 

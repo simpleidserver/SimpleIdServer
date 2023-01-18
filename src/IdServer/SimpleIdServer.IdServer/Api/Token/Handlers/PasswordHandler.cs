@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IUserRepository _userRepository;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
-        private readonly IAudienceHelper _audienceHelper;
+        private readonly IGrantHelper _audienceHelper;
         private readonly IdServerHostOptions _options;
 
         public PasswordHandler(
@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<ITokenProfile> tokenProfiles,
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IClientAuthenticationHelper clientAuthenticationHelper,
-            IAudienceHelper audienceHelper,
+            IGrantHelper audienceHelper,
             IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
             _passwordGrantTypeValidator = passwordGrantTypeValidator;
@@ -68,7 +68,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 context.SetUser(user);
                 var result = BuildResult(context, extractionResult.Scopes);
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(extractionResult.Scopes, extractionResult.Audiences, new List<AuthorizationRequestClaimParameter>(), context, cancellationToken);
+                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences }, context, cancellationToken);
 
                 _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)    

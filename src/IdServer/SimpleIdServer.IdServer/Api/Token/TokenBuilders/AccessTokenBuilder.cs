@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
@@ -33,13 +34,13 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.AccessToken;
 
-        public async virtual Task Build(IEnumerable<string> scopes, IEnumerable<string> audiences, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public async virtual Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken)
         {
-            var tokenDescriptor = BuildOpenIdPayload(scopes, audiences, claims, handlerContext);
-            await SetResponse(handlerContext, tokenDescriptor, cancellationToken);
+            var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, handlerContext);
+            await SetResponse(parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
         }
         
-        protected virtual SecurityTokenDescriptor BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizationRequestClaimParameter> claims, HandlerContext handlerContext)
+        protected virtual SecurityTokenDescriptor BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizedClaim> claims, HandlerContext handlerContext)
         {
             var jwsPayload = BuildTokenDescriptor(scopes, resources, handlerContext);
             if (handlerContext.User != null)
@@ -77,14 +78,14 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             return tokenDescriptor;
         }
 
-        protected async Task SetResponse(HandlerContext handlerContext, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken)
+        protected async Task SetResponse(string grantId, HandlerContext handlerContext, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken)
         {
             var authorizationCode = string.Empty;
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
 
             var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, securityTokenDescriptor, cancellationToken);
-            await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, cancellationToken);
+            await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, grantId, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }
 

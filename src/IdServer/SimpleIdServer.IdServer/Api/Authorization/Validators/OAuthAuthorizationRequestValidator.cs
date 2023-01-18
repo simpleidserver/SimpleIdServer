@@ -37,16 +37,16 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             _options = options.Value;
         }
 
-        public virtual async Task Validate(HandlerContext context, CancellationToken cancellationToken)
+        public virtual async Task Validate(GrantRequest request, HandlerContext context, CancellationToken cancellationToken)
         {
             var openidClient = context.Client;
             var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
-            var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
+            var scopes = request.Scopes;
             var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
             var prompt = context.Request.RequestData.GetPromptFromAuthorizationRequest();
             var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            if (!scopes.Any() && !resources.Any())
+            if (!request.Scopes.Any() && !request.Audiences.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETERS, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource}"));
 
             var unsupportedScopes = scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
@@ -111,14 +111,14 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     throw new OAuthSelectAccountRequiredException();
             }
 
-            if (!context.User.HasOpenIDConsent(clientId, scopes, claims))
+            if (!context.User.HasOpenIDConsent(clientId, request, claims))
             {
                 RedirectToConsentView(context);
             }
 
             if (claims != null)
             {
-                var idtokenClaims = claims.Where(cl => cl.Type == AuthorizationRequestClaimTypes.IdToken && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name));
+                var idtokenClaims = claims.Where(cl => cl.Type == AuthorizationClaimTypes.IdToken && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name));
                 var invalidClaims = idtokenClaims.Where(icl => !context.User.Claims.Any(cl => cl.Type == icl.Name && (icl.Values == null || !icl.Values.Any() || icl.Values.Contains(cl.Value))));
                 if (invalidClaims.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.INVALID_CLAIMS, string.Join(",", invalidClaims.Select(i => i.Name))));
@@ -163,7 +163,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
         }
 
-        protected async Task<string> GetFirstAmr(IEnumerable<string> acrValues, IEnumerable<AuthorizationRequestClaimParameter> claims, Client client, CancellationToken cancellationToken)
+        protected async Task<string> GetFirstAmr(IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)
         {
             var acr = await _amrHelper.FetchDefaultAcr(acrValues, claims, client, cancellationToken);
             if (acr == null)

@@ -165,33 +165,33 @@ namespace System.Text.Json.Nodes
             return null;
         }
 
-        public static IEnumerable<AuthorizationRequestClaimParameter> GetClaimsFromAuthorizationRequest(this JsonObject jObj)
+        public static IEnumerable<AuthorizedClaim> GetClaimsFromAuthorizationRequest(this JsonObject jObj)
         {
             if (!jObj.ContainsKey(AuthorizationRequestParameters.Claims))
-                return new AuthorizationRequestClaimParameter[0];
+                return new AuthorizedClaim[0];
 
             var claimsJObj = jObj[AuthorizationRequestParameters.Claims] as JsonObject;
             return claimsJObj.GetOpenIdClaims();
         }
 
-        public static IEnumerable<AuthorizationRequestClaimParameter> GetOpenIdClaims(this JsonObject claimsJObj)
+        public static IEnumerable<AuthorizedClaim> GetOpenIdClaims(this JsonObject claimsJObj)
         {
-            var result = new List<AuthorizationRequestClaimParameter>();
+            var result = new List<AuthorizedClaim>();
             if (claimsJObj.ContainsKey("userinfo"))
-                result.AddRange(ExtractClaims(claimsJObj["userinfo"] as JsonObject, AuthorizationRequestClaimTypes.UserInfo));
+                result.AddRange(ExtractClaims(claimsJObj["userinfo"] as JsonObject, AuthorizationClaimTypes.UserInfo));
 
             if (claimsJObj.ContainsKey("id_token"))
-                result.AddRange(ExtractClaims(claimsJObj["id_token"] as JsonObject, AuthorizationRequestClaimTypes.IdToken));
+                result.AddRange(ExtractClaims(claimsJObj["id_token"] as JsonObject, AuthorizationClaimTypes.IdToken));
 
             return result;
         }
 
-        public static IEnumerable<AuthorizationRequestClaimParameter> ExtractClaims(this JsonObject jObj, AuthorizationRequestClaimTypes type)
+        public static IEnumerable<AuthorizedClaim> ExtractClaims(this JsonObject jObj, AuthorizationClaimTypes type)
         {
             if (jObj == null)
-                return new AuthorizationRequestClaimParameter[0];
+                return new AuthorizedClaim[0];
 
-            var result = new List<AuthorizationRequestClaimParameter>();
+            var result = new List<AuthorizedClaim>();
             foreach (var rec in jObj)
             {
                 var claimName = rec.Key;
@@ -199,13 +199,13 @@ namespace System.Text.Json.Nodes
                 if (child != null)
                 {
                     IEnumerable<string> values = null;
-                    if (child.ContainsKey(ClaimsParameter.Value))
-                        values = new[] { child.GetStr(ClaimsParameter.Value) };
+                    if (child.ContainsKey(ClaimsParameters.Value))
+                        values = new[] { child.GetStr(ClaimsParameters.Value) };
 
-                    if (child.ContainsKey(ClaimsParameter.Values))
-                        values = child.GetArray(ClaimsParameter.Values);
+                    if (child.ContainsKey(ClaimsParameters.Values))
+                        values = child.GetArray(ClaimsParameters.Values);
 
-                    result.Add(new AuthorizationRequestClaimParameter(claimName, values, child.GetBoolean(ClaimsParameter.Essential), type));
+                    result.Add(new AuthorizedClaim(claimName, values, child.GetBoolean(ClaimsParameters.Essential), type));
                 }
             }
 
