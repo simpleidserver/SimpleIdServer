@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,6 +159,7 @@ namespace SimpleIdServer.IdServer.Api
         public HandlerContextRequest Request { get; private set; }
         public JsonObject OriginalRequest { get; private set; }
         public HandlerContextResponse Response { get; private set; }
+        public IUrlHelper UrlHelper { get; private set; }
 
         public void SetClient(Client client) => Client = client;
 
@@ -168,5 +170,7 @@ namespace SimpleIdServer.IdServer.Api
         public void SetRequest(HandlerContextRequest request) => Request = request;
 
         public void SetOriginalRequest(JsonObject request) => OriginalRequest = request;
+
+        public void SetUrlHelper(IUrlHelper urlHelper) => UrlHelper = urlHelper;
     }
 }

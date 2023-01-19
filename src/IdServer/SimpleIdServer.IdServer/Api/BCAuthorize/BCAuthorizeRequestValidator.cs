@@ -22,8 +22,6 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     public interface IBCAuthorizeRequestValidator
     {
         Task<User> ValidateCreate(HandlerContext context, CancellationToken cancellationToken);
-        Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken);
-        Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken);
     }
 
     public class BCAcceptRequestValidationResult
@@ -89,86 +87,6 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             CheckRequestedExpiry(context);
             CheckUserCode(user, userCode);
             return user;
-        }
-
-        public async Task<BCAcceptRequestValidationResult> ValidateConfirm(HandlerContext context, CancellationToken cancellationToken)
-        {
-            var tokens = new bool[]
-            {
-                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintToken()),
-                string.IsNullOrWhiteSpace(context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest()),
-                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintFromAuthorizationRequest())
-            };
-            if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
-            }
-
-            var user = await CheckLoginHintToken(context, cancellationToken);
-            if (user == null)
-            {
-                user = await CheckIdTokenHint(context, cancellationToken);
-                if (user == null)
-                {
-                    user = await CheckLoginHint(context, cancellationToken);
-                }
-            }
-
-            var authRequestId = context.Request.RequestData.GetAuthRequestId();
-            if (string.IsNullOrWhiteSpace(authRequestId))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));
-            }
-
-            var authRequest = await _bcAuthorizeRepository.Query().Include(b => b.Permissions).AsNoTracking().FirstOrDefaultAsync(a => a.Id == authRequestId, cancellationToken);
-            if (authRequest == null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
-
-            var permissionIds = context.Request.RequestData.GetPermissionIds();
-            var unknownPermissionIds = permissionIds.Where(pid => !authRequest.Permissions.Any(p => p.PermissionId == pid));
-            if (unknownPermissionIds.Any())
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_PERMISSIONS, string.Join(",", unknownPermissionIds)));
-            }
-
-            return new BCAcceptRequestValidationResult(user, authRequest);
-        }
-
-        public async Task<Domains.BCAuthorize> ValidateReject(HandlerContext context, CancellationToken cancellationToken)
-        {
-            var tokens = new bool[]
-            {
-                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintToken()),
-                string.IsNullOrWhiteSpace(context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest()),
-                string.IsNullOrWhiteSpace(context.Request.RequestData.GetLoginHintFromAuthorizationRequest())
-            };
-            if (tokens.All(_ => _) || (tokens.Where(_ => !_).Count() > 1))
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.ONE_HINT_MUST_BE_PASSED);
-
-            var user = await CheckLoginHintToken(context, cancellationToken);
-            if (user == null)
-            {
-                user = await CheckIdTokenHint(context, cancellationToken);
-                if (user == null)
-                {
-                    user = await CheckLoginHint(context, cancellationToken);
-                }
-            }
-
-            var authReqId = context.Request.RequestData.GetAuthRequestId();
-            if (string.IsNullOrWhiteSpace(authReqId))
-            {
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));
-            }
-
-            var authRequest = await _bcAuthorizeRepository.Query().Include(b => b.Permissions).FirstOrDefaultAsync(bc => bc.Id == authReqId, cancellationToken);
-            if (authRequest == null)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUTH_REQUEST_ID);
-
-            if (authRequest.UserId != user.Id)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT);
-
-            return authRequest;
         }
 
         /// <summary>

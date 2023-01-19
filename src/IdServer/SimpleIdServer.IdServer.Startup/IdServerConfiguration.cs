@@ -23,7 +23,8 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
-            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:60001/signin-oidc").AddScope("openid", "profile").Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:60001/signin-oidc").AddScope("openid", "profile").Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("bankWebsite", "password", "http://localhost:60001/signin-oidc").AddScope("openid", "profile").EnableCIBAGrantType().Build()
         };
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>

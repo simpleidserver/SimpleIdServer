@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.UI
             try
             {
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
-                var query = Unprotect(returnUrl).GetQueries().ToJsonObject();
+                var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();

@@ -19,7 +19,6 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<AuthenticationSchemeProvider> AuthenticationSchemeProviders { get; set; }
         public DbSet<ClaimProvider> ClaimProviders { get; set; }
         public DbSet<BCAuthorize> BCAuthorizeLst { get; set; }
-        public DbSet<PollingDeviceMessage> PollingDeviceMessages { get; set; }
         public DbSet<ApiResource> ApiResources { get; set; }
         public DbSet<Grant> Grants { get; set; }
 
@@ -41,10 +40,8 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new AuthenticationContextClassReferenceConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
             builder.ApplyConfiguration(new ClaimProviderConfiguration());
-            builder.ApplyConfiguration(new BCAuthorizePermissionConfiguration());
             builder.ApplyConfiguration(new BCAuthorizeConfiguration());
             builder.ApplyConfiguration(new UserDeviceConfiguration());
-            builder.ApplyConfiguration(new PollingDeviceMessageConfiguration());
             builder.ApplyConfiguration(new ApiResourceConfiguration());
             builder.ApplyConfiguration(new GrantConfiguration());
             builder.ApplyConfiguration(new AuthorizedScopeConfiguration());

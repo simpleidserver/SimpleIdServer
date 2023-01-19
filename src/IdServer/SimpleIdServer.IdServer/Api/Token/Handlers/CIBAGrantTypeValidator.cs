@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (string.IsNullOrWhiteSpace(authRequestId))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));
 
-            var authRequest = await _bcAuthorizeRepository.Query().Include(bc => bc.Permissions).FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
+            var authRequest = await _bcAuthorizeRepository.Query().FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
             if (authRequest == null)
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_AUTH_REQUEST_ID);
 

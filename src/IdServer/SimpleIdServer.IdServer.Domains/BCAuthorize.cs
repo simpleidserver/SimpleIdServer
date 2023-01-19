@@ -19,18 +19,12 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime UpdateDateTime { get; set; }
         public DateTime? RejectionSentDateTime { get; set; }
         public DateTime? NextFetchTime { get; set; }
-        public IEnumerable<BCAuthorizePermission> Permissions { get; set; } = new List<BCAuthorizePermission>();
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
 
         public void Confirm(IEnumerable<string> permissionIds)
         {
             Status = BCAuthorizeStatus.Confirmed;
             UpdateDateTime = DateTime.UtcNow;
-            var permissionsToConfirm = Permissions.Where(p => permissionIds.Contains(p.PermissionId));
-            foreach (var permission in permissionsToConfirm)
-            {
-                permission.Confirm();
-            }
         }
 
         public void Pong()
@@ -75,8 +69,7 @@ namespace SimpleIdServer.IdServer.Domains
             string notificationMode,
             IEnumerable<string> scopes,
             string userId,
-            string notificationToken,
-            IEnumerable<BCAuthorizePermission> permissions)
+            string notificationToken)
         {
             var result = new BCAuthorize
             {
@@ -89,8 +82,7 @@ namespace SimpleIdServer.IdServer.Domains
                 Status = BCAuthorizeStatus.Pending,
                 Scopes = scopes,
                 UserId = userId,
-                NotificationToken = notificationToken,
-                Permissions = permissions
+                NotificationToken = notificationToken
             };
             return result;
         }

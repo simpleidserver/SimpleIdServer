@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.BackchannelLogoutSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelLogoutSessionSupported, true);
             result.Add(OpenIDConfigurationNames.GrantManagementActionRequired, _options.GrantManagementActionRequired);
-            result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{Constants.EndPoints.GrantManagement}");
+            result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{Constants.EndPoints.Grants}");
             result.Add(OpenIDConfigurationNames.GrantManagementActionsSupported, JsonSerializer.SerializeToNode(Constants.AllStandardGrantManagementActions));
             return new OkObjectResult(result);
         }

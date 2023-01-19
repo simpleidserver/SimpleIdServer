@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer
             public const string AuthSchemeProviders = "authschemeproviders";
             public const string ClientManagement = "management/clients";
             public const string BCAuthorize = "bc-authorize";
+            public const string BCAuthorizeCallback = "bc-authorize/callback";
             public const string MtlsPrefix = "mtls";
             public const string MtlsToken = MtlsPrefix + "/" + Token;
             public const string MtlsBCAuthorize = MtlsPrefix + "/" + BCAuthorize;
@@ -32,7 +33,7 @@ namespace SimpleIdServer.IdServer
             public const string CheckSession = "check_session";
             public const string EndSession = "end_session";
             public const string EndSessionCallback = "end_session_callback";
-            public const string GrantManagement = "grants";
+            public const string Grants = "grants";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

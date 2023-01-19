@@ -48,6 +48,15 @@ namespace SimpleIdServer.IdServer.UI
         protected IUserRepository UserRepository => _userRepository;
         protected IdServerHostOptions Options => _options;
 
+        protected JsonObject ExtractQuery(string returnUrl)
+        {
+            var query = Unprotect(returnUrl).GetQueries().ToJsonObject();
+            if (query.ContainsKey("returnUrl"))
+                return ExtractQuery(query["returnUrl"].GetValue<string>());
+
+            return query;
+        }
+
         protected string Unprotect(string returnUrl)
         {
             var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
@@ -62,7 +71,7 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
             var unprotectedUrl = Unprotect(returnUrl);
-            var query = unprotectedUrl.GetQueries().ToJsonObject();
+            var query = ExtractQuery(returnUrl);
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
