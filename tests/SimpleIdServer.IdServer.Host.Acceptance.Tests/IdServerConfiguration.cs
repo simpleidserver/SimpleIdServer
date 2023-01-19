@@ -31,7 +31,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         public static List<ApiResource> ApiResources = new List<ApiResource>
         {
             ApiResourceBuilder.Create("https://cal.example.com", "description", "admin", "calendar").Build(),
-            ApiResourceBuilder.Create("https://contacts.example.com", "description", "admin", "calendar").Build()
+            ApiResourceBuilder.Create("https://contacts.example.com", "description", "admin", "calendar").Build(),
+            ApiResourceBuilder.Create("firstClient", "First API", "firstScope").Build(),
+            ApiResourceBuilder.Create("secondClient", "Second API", "firstScope").Build(),
         };
 
         public static List<Client> Clients = new List<Client>
@@ -80,7 +82,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fortyThreeClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Push).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyFourClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Poll).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortySixClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().ResourceParameterIsRequired().AddScope("admin", "calendar").Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortySevenClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().ResourceParameterIsRequired().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fortySevenClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyEightClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build()
         };
 
         public static List<User> Users = new List<User>
@@ -121,7 +124,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("fortyClient", new string[] { "openid", "profile", "role", "email" }, new string[] { "name", "email" })
                 .AddConsent("fortyOneClient", "openid", "profile", "role", "email")
                 .AddConsent("fortySixClient", "admin", "calendar")
-                .AddConsent("fortySevenClient", "admin", "calendar", "grant_management_query")
+                .AddConsent("fortySevenClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
+                .AddConsent("fortyEightClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }

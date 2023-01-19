@@ -1761,6 +1761,145 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="only the same client can perform operations on the grant")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "only the same client can perform operations on the grant")]
+        public void OnlyTheSameClientCanPerformOperationsOnTheGrant()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("only the same client can perform operations on the grant", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 461
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 462
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table32.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table32.AddRow(new string[] {
+                            "client_id",
+                            "fortySevenClient"});
+                table32.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table32.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table32.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table32.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table32.AddRow(new string[] {
+                            "claims",
+                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
+                                " } }"});
+                table32.AddRow(new string[] {
+                            "resource",
+                            "https://cal.example.com"});
+                table32.AddRow(new string[] {
+                            "grant_management_action",
+                            "create"});
+                table32.AddRow(new string[] {
+                            "scope",
+                            "grant_management_revoke"});
+#line 464
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table32, "When ");
+#line hidden
+#line 477
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table33.AddRow(new string[] {
+                            "client_id",
+                            "fortySevenClient"});
+                table33.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table33.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table33.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table33.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 479
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table33, "And ");
+#line hidden
+#line 487
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 488
+ testRunner.And("extract parameter \'$.grant_id\' from JSON body into \'grantId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table34.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table34.AddRow(new string[] {
+                            "client_id",
+                            "fortyEightClient"});
+                table34.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table34.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table34.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table34.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table34.AddRow(new string[] {
+                            "claims",
+                            "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
+                                " } }"});
+                table34.AddRow(new string[] {
+                            "resource",
+                            "https://cal.example.com"});
+                table34.AddRow(new string[] {
+                            "grant_management_action",
+                            "replace"});
+                table34.AddRow(new string[] {
+                            "scope",
+                            "grant_management_query"});
+                table34.AddRow(new string[] {
+                            "grant_id",
+                            "$grantId$"});
+#line 490
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table34, "And ");
+#line hidden
+#line 504
+ testRunner.Then("redirection url contains the parameter value \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 505
+ testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the client fort" +
+                        "yEightClient is not authorized to access to perform operations on the grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

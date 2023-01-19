@@ -457,3 +457,49 @@ Scenario: grant_id must exists
 	
 	Then redirection url contains the parameter value 'error'='invalid_grant'
 	Then redirection url contains the parameter value 'error_description'='the grant invalid doesn't exist'
+
+Scenario: only the same client can perform operations on the grant
+	Given authenticate a user
+	
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code                                                                                  |
+	| client_id               | fortySevenClient                                                                      |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| grant_management_action | create                                                                                |
+	| scope                   | grant_management_revoke                                                               |
+
+	And extract parameter 'code' from redirect url
+	
+	And execute HTTP POST request 'https://localhost:8080/token'
+	| Key           | Value        			|
+	| client_id     | fortySevenClient      |
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|	
+	| redirect_uri  | http://localhost:8080	|
+	
+	And extract JSON from body
+	And extract parameter '$.grant_id' from JSON body into 'grantId'
+	
+	And execute HTTP GET request 'http://localhost/authorization'
+	| Key                     | Value                                                                                 |
+	| response_type           | code                                                                                  |
+	| client_id               | fortyEightClient                                                                      |
+	| state                   | state                                                                                 |
+	| response_mode           | query                                                                                 |
+	| redirect_uri            | http://localhost:8080                                                                 |
+	| nonce                   | nonce                                                                                 |
+	| claims                  | { "id_token": { "acr": { "essential" : true, "value": "urn:openbanking:psd2:ca" } } } | 
+	| resource                | https://cal.example.com                                                               |
+	| grant_management_action | replace                                                                               |
+	| scope                   | grant_management_query                                                                |	
+	| grant_id                | $grantId$                                                                             |
+	
+	Then redirection url contains the parameter value 'error'='access_denied'
+	Then redirection url contains the parameter value 'error_description'='the client fortyEightClient is not authorized to access to perform operations on the grant'

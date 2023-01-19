@@ -19,6 +19,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_AUTH_SCHEME_PROVIDER_PROPERTIES = "the authentication scheme provider cannot be updated because the following properties are unknown : {0}";
         public const string UNAUTHORIZED_CLIENT = "unauthorized client";
         public const string UNAUTHORIZED_ACCESSTOKEN = "the access token is not authorized to access to the operation";
+        public const string UNAUTHORIZED_CLIENT_ACCESS_GRANT = "the client {0} is not authorized to access to perform operations on the grant";
         public const string UKNOWN_RESOURCE = "following resources {0} doesn't exist";
         public const string NO_CLIENT_SECRET = "no client secret";
         public const string NO_CONSENT = "no consent has been accepted";
@@ -34,7 +35,6 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_REQUEST_PARAMETER = "request parameter is invalid";
         public const string INVALID_JWE_REQUEST_PARAMETER = "request parameter is not a valid JWE token";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
-        public const string INVALID_ACCESS_TOKEN_CLIENTID = "the client is not authorized to access to this operation";
         public const string INVALID_JWS_REQUEST_PARAMETER = "request parameter is not a valid JWS token";
         public const string INVALID_REQUEST_URI_PARAMETER = "request_uri parameter is invalid";
         public const string INVALID_ENC_OR_ALG_USED_TO_ENCRYPT_IDTOKENHINT = "the alg / enc used to encrypt the id_token_hint is invalid";

@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey("Id");
             builder.Property(a => a.Resources).HasConversion(
                 v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None));
+                v => v.Split(',', StringSplitOptions.None).ToList());
         }
     }
 }

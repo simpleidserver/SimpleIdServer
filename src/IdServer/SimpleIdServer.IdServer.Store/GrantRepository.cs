@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.Store
     {
         IQueryable<Grant> Query();
         void Add(Grant grant);
+        void Update(Grant grant);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -24,6 +25,13 @@ namespace SimpleIdServer.IdServer.Store
         public void Add(Grant grant) => _dbContext.Grants.Add(grant);
 
         public IQueryable<Grant> Query() => _dbContext.Grants;
+
+        public void Update(Grant grant)
+        {
+            _dbContext.Grants.Update(grant);
+            foreach (var scope in grant.Scopes)
+                _dbContext.Update(scope);
+        }
 
         public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }

@@ -13,10 +13,10 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey(c => c.Id);
             builder.Property(c => c.Claims).HasConversion(
                 c => string.Join(',', c),
-                c => c.Split(',', StringSplitOptions.None));
+                c => c.Split(',', StringSplitOptions.None).ToList());
             builder.Property(c => c.Scopes).HasConversion(
                 c => string.Join(',', c),
-                c => c.Split(',', StringSplitOptions.None));
+                c => c.Split(',', StringSplitOptions.None).ToList());
         }
     }
 }

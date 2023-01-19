@@ -112,7 +112,7 @@ namespace Microsoft.AspNetCore.Builder
                 defaults: new { controller = "Grants", action = "Get" });
             webApplication.MapControllerRoute("revokeGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.GrantManagement + "/{id}",
-                defaults: new { controller = "Grants", action = "Delete" });
+                defaults: new { controller = "Grants", action = "Revoke" });
 
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",

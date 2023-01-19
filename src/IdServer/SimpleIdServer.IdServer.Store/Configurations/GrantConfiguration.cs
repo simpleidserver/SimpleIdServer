@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey(g => g.Id);
             builder.Property(a => a.Claims).HasConversion(
                 v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None));
+                v => v.Split(',', StringSplitOptions.None).ToList());
             builder.HasMany(g => g.Scopes).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }

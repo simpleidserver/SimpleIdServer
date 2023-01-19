@@ -14,6 +14,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSecretJwtAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientAuths\ClientSelfSignedTlsAuthenticationErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientCredentialsGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Grants - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\HappyFlows - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\RefreshTokenGrantTypeErrors - Copier.feature.cs" />
@@ -55,6 +56,9 @@
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\GrantErrors.feature.cs">
+	    <DependentUpon>GrantErrors.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\Grants.feature.cs">
 	    <DependentUpon>Grants.feature</DependentUpon>
 	  </Compile>
@@ -159,6 +163,10 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\GrantErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\Grants.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

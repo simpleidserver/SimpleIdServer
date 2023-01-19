@@ -61,7 +61,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             try
             {
-                // TODO : Il faut prendre comment source l'auth request !!!!!
                 _refreshTokenGrantTypeValidator.Validate(context);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);

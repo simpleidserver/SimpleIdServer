@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey(c => c.Name);
             builder.Property(a => a.AuthenticationMethodReferences).HasConversion(
                 v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None));
+                v => v.Split(',', StringSplitOptions.None).ToList());
         }
     }
 }

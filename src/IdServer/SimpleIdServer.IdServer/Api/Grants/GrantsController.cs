@@ -41,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
                 if(!scopes.Contains(Constants.StandardScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_SCOPE);
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
-                if(grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_CLIENTID);
+                if(grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, clientId));
 
                 return new OkObjectResult(grant);
             }
@@ -64,9 +64,9 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
                 if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.UNKNOWN_ACCESS_TOKEN);
                 var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
-                if (!scopes.Contains(Constants.StandardScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_SCOPE);
+                if (!scopes.Contains(Constants.StandardScopes.GrantManagementRevoke.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_SCOPE);
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
-                if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_CLIENTID);
+                if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, clientId));
 
                 grant.Revoke();
                 var tokens = await _tokenRepository.Query().Where(t => t.GrantId == id).ToListAsync(cancellationToken);

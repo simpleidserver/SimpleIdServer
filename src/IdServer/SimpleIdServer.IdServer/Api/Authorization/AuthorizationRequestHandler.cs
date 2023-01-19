@@ -161,6 +161,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                         grant = await _grantRepository.Query().Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
                         if (grant == null)
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
+                        if (grant.ClientId != context.Client.ClientId)
+                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
+
                         await RevokeTokens(grant.Id, cancellationToken);
                         grant.Claims = allClaims;
                         grant.Scopes = extractionResult.Authorizations;
@@ -173,7 +176,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                         grant = await _grantRepository.Query().Include(g => g.Scopes).FirstOrDefaultAsync(g => g.Id == grantId);
                         if (grant == null)
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.UNKNOWN_GRANT, grantId));
+                        if (grant.ClientId != context.Client.ClientId)
+                            throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.UNAUTHORIZED_CLIENT_ACCESS_GRANT, context.Client.ClientId));
+
                         grant.Merge(allClaims, extractionResult.Authorizations);
+                        _grantRepository.Update(grant);
                         await _grantRepository.SaveChanges(cancellationToken);
                     }
                     break;

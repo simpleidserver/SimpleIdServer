@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains.DTOs;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -43,7 +41,7 @@ namespace SimpleIdServer.IdServer.Domains
 
             void MergeScopes()
             {
-                var unknownScopes = scopes.Where(s => !Scopes.Any(sc => sc.Scope != s.Scope));
+                var unknownScopes = scopes.Where(s => !Scopes.Any(sc => sc.Scope == s.Scope));
                 foreach (var unknownScope in unknownScopes)
                     Scopes.Add(unknownScope);
                 foreach (var existingScope in Scopes)
@@ -51,18 +49,23 @@ namespace SimpleIdServer.IdServer.Domains
                     var newScope = scopes.FirstOrDefault(s => s.Scope == existingScope.Scope);
                     if (newScope == null) continue;
                     var unknownResources = newScope.Resources.Where(r => !existingScope.Resources.Contains(r));
+                    var resources = existingScope.Resources;
                     foreach (var unknownResource in unknownResources)
-                        existingScope.Resources.Add(unknownResource);
+                        resources.Add(unknownResource);
+                    existingScope.Resources = resources;
                 }
             }
 
             void MergeClaims()
             {
+                var cls = Claims;
                 foreach(var cl in claims)
                 {
-                    if (Claims.Contains(cl)) continue;
-                    Claims.Add(cl);
+                    if (cls.Contains(cl)) continue;
+                    cls.Add(cl);
                 }
+
+                Claims = cls;
             }
         }
 
