@@ -192,7 +192,6 @@ namespace SimpleIdServer.Scim.Domain
                             {
                                 representation.ExternalId = externalId;
                                 result.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
-                                continue;
                             }
 
                             if (schemaAttributes == null || !schemaAttributes.Any())
@@ -280,7 +279,6 @@ namespace SimpleIdServer.Scim.Domain
                             {
                                 representation.ExternalId = externalId;
                                 result.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
-                                continue;
                             }
 
                             if (schemaAttributes == null || !schemaAttributes.Any())
