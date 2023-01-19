@@ -36,3 +36,7 @@ Scenario: grant can be returned
 	| Authorization | Bearer $accessToken$ |
 
 	And extract JSON from body
+
+	Then JSON '$.claims[0]'='acr'
+	And JSON '$.scopes[0].scope'='admin'
+	And JSON '$.scopes[1].scope'='calendar'

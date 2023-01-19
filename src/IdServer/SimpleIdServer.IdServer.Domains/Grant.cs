@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -13,16 +15,22 @@ namespace SimpleIdServer.IdServer.Domains
 
     public class Grant
     {
+        [JsonIgnore]
         public string Id { get; set; } = null!;
         [JsonIgnore]
         public string ClientId { get; set; } = null!;
+        [JsonIgnore]
         public DateTime CreateDateTime { get; set; }
+        [JsonIgnore]
         public DateTime UpdateDateTime { get; set; }
+        [JsonIgnore]
         public GrantTypeStatus Status { get; set; }
+        [JsonPropertyName(GrantParameters.Claims)]
         /// <summary>
         /// JSON array containing the names of all OpenID Connect claims.
         /// </summary>
         public ICollection<string> Claims { get; set; } = new List<string>();
+        [JsonPropertyName(GrantParameters.Scopes)]
         /// <summary>
         ///  JSON array where every entry contains a scope field and may contain one or more resource fields.
         /// </summary>
@@ -62,28 +70,6 @@ namespace SimpleIdServer.IdServer.Domains
         {
             UpdateDateTime = DateTime.UtcNow;
             Status = GrantTypeStatus.REVOKED;
-        }
-
-        public Dictionary<string, object> Serialize()
-        {
-            var res = new Dictionary<string, object>
-            {
-                { GrantParameters.Claims, Claims }
-            };
-            var scopes = new List<Dictionary<string, object>>();
-            foreach(var scope in Scopes)
-            {
-                var d = new Dictionary<string, object>
-                {
-                    { GrantParameters.Scope, scope }
-                };
-                if(scope.Resources != null && scope.Resources.Any())
-                    d.Add(GrantParameters.Resources, scope.Resources);
-                scopes.Add(d);
-            }
-
-            res.Add(GrantParameters.Scopes, scopes);
-            return res;
         }
 
         public static Grant Create(string clientId, ICollection<string> claims, ICollection<AuthorizedScope> scopes)

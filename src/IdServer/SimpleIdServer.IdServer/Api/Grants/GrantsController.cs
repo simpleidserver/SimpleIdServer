@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
                 if(grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, ErrorMessages.INVALID_ACCESS_TOKEN_CLIENTID);
 
-                return new OkObjectResult(grant.Serialize());
+                return new OkObjectResult(grant);
             }
             catch (OAuthException ex)
             {
