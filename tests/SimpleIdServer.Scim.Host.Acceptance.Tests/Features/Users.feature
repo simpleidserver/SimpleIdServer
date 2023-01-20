@@ -951,3 +951,49 @@ Scenario: Check employeeNumber and externalId can be updated (HTTP PATCH)
 	Then HTTP status code equals to '200'
 	Then JSON 'employeeNumber'='newEmployeeNumber'
 	Then JSON 'externalId'='newExternalId'
+
+Scenario: Check external id can be updated (HTTP PATCH replace)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]					|
+	| Operations | [ { "op": "replace", "value" : { "externalId": "newExternalId" } } ] |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'externalId'='newExternalId'
+
+Scenario: Check external id can be updated (HTTP PATCH add)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]					|
+	| Operations | [ { "op": "add", "value" : { "externalId": "newExternalId" } } ]     |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'externalId'='newExternalId'

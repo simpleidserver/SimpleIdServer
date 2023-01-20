@@ -361,7 +361,7 @@ namespace SimpleIdServer.Scim.Domain
             var result = new List<SCIMPatchResult>();
             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
             newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
-            if (IsExactlySimilar(attributes, newAttributes)) return result;
+            if (!newAttributes.Any() || IsExactlySimilar(attributes, newAttributes)) return result;
             var newHierarchicalAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newAttributes);
             var fullPath = newHierarchicalAttributes.First().FullPath;
             var existingAttributesToRemove = attributes.Where(a => a.FullPath == fullPath && !newHierarchicalAttributes.Any(na => na.IsSimilar(a, true)));

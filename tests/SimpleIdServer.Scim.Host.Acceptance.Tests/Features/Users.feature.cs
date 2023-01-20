@@ -3639,6 +3639,176 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="Check external id can be updated (HTTP PATCH replace)")]
+        [Xunit.TraitAttribute("FeatureTitle", "Users")]
+        [Xunit.TraitAttribute("Description", "Check external id can be updated (HTTP PATCH replace)")]
+        public virtual void CheckExternalIdCanBeUpdatedHTTPPATCHReplace()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check external id can be updated (HTTP PATCH replace)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 955
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table165 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table165.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
+                table165.AddRow(new string[] {
+                            "userName",
+                            "bjen"});
+                table165.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table165.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table165.AddRow(new string[] {
+                            "employeeNumber",
+                            "\"number\""});
+#line 956
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table165, "When ");
+#line hidden
+#line 964
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 965
+ testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table166 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table166.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table166.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"replace\", \"value\" : { \"externalId\": \"newExternalId\" } } ]"});
+#line 967
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table166, "And ");
+#line hidden
+#line 972
+ testRunner.And("execute HTTP GET request \'http://localhost/Users/$id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 973
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 975
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 976
+ testRunner.Then("JSON \'externalId\'=\'newExternalId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Check external id can be updated (HTTP PATCH add)")]
+        [Xunit.TraitAttribute("FeatureTitle", "Users")]
+        [Xunit.TraitAttribute("Description", "Check external id can be updated (HTTP PATCH add)")]
+        public virtual void CheckExternalIdCanBeUpdatedHTTPPATCHAdd()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check external id can be updated (HTTP PATCH add)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 978
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table167 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table167.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
+                table167.AddRow(new string[] {
+                            "userName",
+                            "bjen"});
+                table167.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table167.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table167.AddRow(new string[] {
+                            "employeeNumber",
+                            "\"number\""});
+#line 979
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table167, "When ");
+#line hidden
+#line 987
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 988
+ testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table168 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table168.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table168.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"add\", \"value\" : { \"externalId\": \"newExternalId\" } } ]"});
+#line 990
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table168, "And ");
+#line hidden
+#line 995
+ testRunner.And("execute HTTP GET request \'http://localhost/Users/$id$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 996
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 998
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 999
+ testRunner.Then("JSON \'externalId\'=\'newExternalId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.7.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable
