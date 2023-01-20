@@ -49,13 +49,13 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.IdToken;
 
-        public virtual async Task Build(BuildTokenParameter parameter, HandlerContext context, CancellationToken cancellationToken)
+        public virtual async Task Build(BuildTokenParameter parameter, HandlerContext context, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
             if (!parameter.Scopes.Contains(StandardScopes.OpenIdScope.Name) || context.User == null)
                 return;
 
             var openidClient = context.Client;
-            var payload = await BuildIdToken(context, context.Request.RequestData, parameter.Scopes, parameter.Claims, cancellationToken);
+            var payload = await BuildIdToken(context, useOriginalRequest ? context.OriginalRequest : context.Request.RequestData, parameter.Scopes, parameter.Claims, cancellationToken);
             var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }

@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         /// <param name="audiences"></param>
         /// <param name="handlerContext"></param>
         /// <returns></returns>
-        Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken);
+        Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false);
     }
 
     public class BuildTokenParameter

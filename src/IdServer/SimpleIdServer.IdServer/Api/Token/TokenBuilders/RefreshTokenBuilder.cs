@@ -26,7 +26,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         protected IGrantedTokenHelper GrantedTokenHelper => _grantedTokenHelper;
         public string Name => TokenResponseParameters.RefreshToken;
 
-        public virtual async Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public virtual async Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
             var dic = new JsonObject();
             if (handlerContext.Request.RequestData != null)

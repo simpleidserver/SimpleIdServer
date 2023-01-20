@@ -97,8 +97,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(previousRequest, context, cancellationToken);
                 context.SetOriginalRequest(previousRequest);
+
                 foreach (var tokenBuilder in _tokenBuilders)
-                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken);
+                    await tokenBuilder.Build(new BuildTokenParameter { Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId }, context, cancellationToken, true);
 
                 _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)

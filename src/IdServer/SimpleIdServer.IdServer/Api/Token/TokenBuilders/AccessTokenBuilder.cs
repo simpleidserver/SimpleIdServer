@@ -34,7 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public string Name => TokenResponseParameters.AccessToken;
 
-        public async virtual Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken)
+        public async virtual Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
             var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, handlerContext);
             await SetResponse(parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
