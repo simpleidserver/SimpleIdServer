@@ -410,6 +410,8 @@ namespace System.Text.Json.Nodes
 
         #region Back channel authentication request
 
+        public static string GetAuthReqId(this JsonObject jObj) => jObj.GetStr(BCAuthenticationResponseParameters.AuthReqId);
+
         public static string GetRequest(this JsonObject jObj) => jObj.GetStr(BCAuthenticationRequestParameters.Request);
 
         /// <summary>

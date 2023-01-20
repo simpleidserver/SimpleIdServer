@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer
         public const string UNKNOWN_TOKEN_TYPE_HINT = "unknown token type hint : {0}";
         public const string UNKNOWN_JSON_WEBKEY = "Json Web Key doesn't exist";
         public const string UNKNOWN_PERMISSIONS = "the permissions {0} don't exist";
+        public const string UNKNOWN_BC_AUTHORIZE = "the back channel authorization {0} doesn't exist";
         public const string UNKNOWN_DEVICE_TYPE = "the device {0} is not supported";
         public const string UNKNOWN_GRANT = "the grant {0} doesn't exist";
         public const string UNKNOWN_ACCESS_TOKEN = "either the access token has been revoked or is invalid";
@@ -180,5 +181,6 @@ namespace SimpleIdServer.IdServer
         public const string GRANT_ID_CANNOT_BE_SPECIFIED = "grant_id cannot be specified because the grant_management_action is equals to create";
         public const string GRANT_IS_REVOKED = "grant is revoked";
         public const string GRANT_IS_ALREADY_REVOKED = "grant is already revoked";
+        public const string BC_AUTHORIZE_NOT_PENDING = "the back channel authorization is not in pending";
     }
 }

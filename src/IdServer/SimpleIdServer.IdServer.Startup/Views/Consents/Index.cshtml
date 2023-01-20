@@ -38,7 +38,7 @@
             <ul class="list-group">
                 @foreach (var scopeName in Model.ScopeNames)
                 {
-                    <li class="list-group-item">@ConsentsResource.ResourceManager.GetString($"scope_{scopeName}")</li>
+                    <li class="list-group-item">@ScopesResource.ResourceManager.GetString(scopeName)</li>
                 }
             </ul>
             <h5 class="card-title">@ConsentsResource.claims</h5>

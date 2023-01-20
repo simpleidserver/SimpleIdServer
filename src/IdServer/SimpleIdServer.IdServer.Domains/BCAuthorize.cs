@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime? NextFetchTime { get; set; }
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
 
-        public void Confirm(IEnumerable<string> permissionIds)
+        public void Confirm()
         {
             Status = BCAuthorizeStatus.Confirmed;
             UpdateDateTime = DateTime.UtcNow;

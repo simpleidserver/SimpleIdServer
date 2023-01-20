@@ -1,7 +1,55 @@
 ﻿@using SimpleIdServer.IdServer.Startup.Resources
-@model SimpleIdServer.IdServer.UI.ViewModels.ConsentsIndexViewModel
+@model SimpleIdServer.IdServer.UI.ViewModels.BCConsentsIndexViewModel
 
 @{
     ViewBag.Title = LayoutResource.consents;
     Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" action="@Url.Action("Reject", "BackChannelConsents")" id="rejectForm">
+    @Html.AntiForgeryToken()
+    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
+    <input name="IsRejected" type="hidden" value="true" />
+</form>
+
+@using (Html.BeginForm("Index", "BackChannelConsents", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul class="list-group">
+                @foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        <li class="list-group-item list-group-item-danger">@BCConsentsResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+    <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+    <input name="IsRejected" type="hidden" value="false" />
+    <div class="card">
+        <div class="card-header">
+            @string.Format(BCConsentsResource.consent_client_access, Model.ClientName)
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">@BCConsentsResource.message</h5>
+            <p>@Model.BindingMessage</p>
+            <h5 class="card-title">@BCConsentsResource.scopes</h5>
+             <ul class="list-group">
+             @foreach (var scopeName in Model.Scopes)
+             {
+                 <li class="list-group-item">@ScopesResource.ResourceManager.GetString(scopeName)</li>
+             }
+             </ul>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-success card-link">@BCConsentsResource.confirm</button>
+            <button type="submit" form="rejectForm" class="btn btn-danger">@BCConsentsResource.reject</button>
+        </div>
+    </div>
 }

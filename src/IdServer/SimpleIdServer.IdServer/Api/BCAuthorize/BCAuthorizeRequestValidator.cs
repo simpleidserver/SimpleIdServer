@@ -39,18 +39,15 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     public class BCAuthorizeRequestValidator : IBCAuthorizeRequestValidator
     {
         private readonly IUserRepository _userRepository;
-        private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IdServerHostOptions _options;
 
         public BCAuthorizeRequestValidator(
             IUserRepository userRepository,
-            IBCAuthorizeRepository bcAuthorizeRepository,
             IJwtBuilder jwtBuilder,
             IOptions<IdServerHostOptions> options)
         {
             _userRepository = userRepository;
-            _bcAuthorizeRepository = bcAuthorizeRepository;
             _jwtBuilder = jwtBuilder;
             _options = options.Value;
         }

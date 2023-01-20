@@ -25,7 +25,7 @@ namespace SimpleIdServer.IdServer
             public const string AuthSchemeProviders = "authschemeproviders";
             public const string ClientManagement = "management/clients";
             public const string BCAuthorize = "bc-authorize";
-            public const string BCAuthorizeCallback = "bc-authorize/callback";
+            public const string BCCallback = "bc-callback";
             public const string MtlsPrefix = "mtls";
             public const string MtlsToken = MtlsPrefix + "/" + Token;
             public const string MtlsBCAuthorize = MtlsPrefix + "/" + BCAuthorize;

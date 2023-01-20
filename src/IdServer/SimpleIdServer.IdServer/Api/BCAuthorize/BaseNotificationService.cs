@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
@@ -20,7 +19,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var queries = message.Serialize();
             var queryCollection = new QueryBuilder(queries);
-            var returnUrl = $"{issuer}/{Constants.EndPoints.BCAuthorizeCallback}{queryCollection.ToQueryString()}";
+            var returnUrl = $"{issuer}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
             return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl)

@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class ConsentsResource {
+    public class ScopesResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ConsentsResource() {
+        internal ScopesResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.ConsentsResource", typeof(ConsentsResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.ScopesResource", typeof(ScopesResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,56 +61,56 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Claims.
+        ///   Recherche une chaîne localisée semblable à Access to the address.
         /// </summary>
-        public static string claims {
+        public static string address {
             get {
-                return ResourceManager.GetString("claims", resourceCulture);
+                return ResourceManager.GetString("address", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Confirm.
+        ///   Recherche une chaîne localisée semblable à Access to the email.
         /// </summary>
-        public static string confirm {
+        public static string email {
             get {
-                return ResourceManager.GetString("confirm", resourceCulture);
+                return ResourceManager.GetString("email", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The client {0} would like to access to.
+        ///   Recherche une chaîne localisée semblable à Offline access.
         /// </summary>
-        public static string consent_client_access {
+        public static string offline_access {
             get {
-                return ResourceManager.GetString("consent_client_access", resourceCulture);
+                return ResourceManager.GetString("offline_access", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Manage consents.
+        ///   Recherche une chaîne localisée semblable à Access to user identifier.
         /// </summary>
-        public static string manage_consents {
+        public static string openid {
             get {
-                return ResourceManager.GetString("manage_consents", resourceCulture);
+                return ResourceManager.GetString("openid", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Reject.
+        ///   Recherche une chaîne localisée semblable à Access to the phone.
         /// </summary>
-        public static string reject {
+        public static string phone {
             get {
-                return ResourceManager.GetString("reject", resourceCulture);
+                return ResourceManager.GetString("phone", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scopes.
+        ///   Recherche une chaîne localisée semblable à Access to the profile.
         /// </summary>
-        public static string scopes {
+        public static string profile {
             get {
-                return ResourceManager.GetString("scopes", resourceCulture);
+                return ResourceManager.GetString("profile", resourceCulture);
             }
         }
     }

@@ -117,17 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="claims" xml:space="preserve">
-    <value>Claims</value>
+  <data name="cannot_confirm_or_reject" xml:space="preserve">
+    <value>Exception occured while trying to confirm or reject the consent</value>
   </data>
   <data name="confirm" xml:space="preserve">
     <value>Confirm</value>
   </data>
   <data name="consent_client_access" xml:space="preserve">
-    <value>The client {0} would like to access to</value>
+    <value>The client {0} would like to access</value>
   </data>
-  <data name="manage_consents" xml:space="preserve">
-    <value>Manage consents</value>
+  <data name="cryptography_error" xml:space="preserve">
+    <value>Exception occured while trying to decrypt the redirection url</value>
+  </data>
+  <data name="message" xml:space="preserve">
+    <value>Message</value>
   </data>
   <data name="reject" xml:space="preserve">
     <value>Reject</value>

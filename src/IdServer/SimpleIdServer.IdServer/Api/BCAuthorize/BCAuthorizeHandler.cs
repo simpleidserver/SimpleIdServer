@@ -6,8 +6,11 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -27,17 +30,20 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private readonly IBCAuthorizeRequestValidator _bcAuthorizeRequestValidator;
         private readonly IBCNotificationService _bcNotificationService;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
+        private readonly IAmrHelper _amrHelper;
 
         public BCAuthorizeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
             IBCAuthorizeRequestValidator bcAuthorizeRequestValidator,
             IBCNotificationService bcNotificationService,
-            IBCAuthorizeRepository bcAuthorizeRepository)
+            IBCAuthorizeRepository bcAuthorizeRepository,
+            IAmrHelper amrHelper)
         {
             _clientAuthenticationHelper = clientAuthenticationHelper;
             _bcAuthorizeRequestValidator = bcAuthorizeRequestValidator;
             _bcNotificationService = bcNotificationService;
             _bcAuthorizeRepository = bcAuthorizeRepository;
+            _amrHelper = amrHelper;
         }
 
         public async Task<IActionResult> Create(HandlerContext context, CancellationToken cancellationToken)
@@ -66,7 +72,18 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
 
                 var bindingMessage = context.Request.RequestData.GetBindingMessage();
-                await _bcNotificationService.Notify(context, new BCNotificationMessage { ClientId = context.Client.ClientId, AuthReqId = bcAuthorize.Id, BindingMessage = bindingMessage, Scopes = bcAuthorize.Scopes }, cancellationToken);
+                var acrLst = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
+                var acr = await _amrHelper.FetchDefaultAcr(acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
+                var amr = acr.AuthenticationMethodReferences.First();
+                await _bcNotificationService.Notify(context, new BCNotificationMessage 
+                { 
+                    ClientId = context.Client.ClientId, 
+                    AuthReqId = bcAuthorize.Id, 
+                    BindingMessage = bindingMessage, 
+                    Scopes = bcAuthorize.Scopes,
+                    AcrLst = acrLst,
+                    Amr = amr
+                }, cancellationToken);
 
                 var res = new JsonObject
                 {

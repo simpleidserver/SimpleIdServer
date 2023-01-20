@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class ConsentsResource {
+    public class BCConsentsResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ConsentsResource() {
+        internal BCConsentsResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.ConsentsResource", typeof(ConsentsResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.BCConsentsResource", typeof(BCConsentsResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,11 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Claims.
+        ///   Recherche une chaîne localisée semblable à Exception occured while trying to confirm or reject the consent.
         /// </summary>
-        public static string claims {
+        public static string cannot_confirm_or_reject {
             get {
-                return ResourceManager.GetString("claims", resourceCulture);
+                return ResourceManager.GetString("cannot_confirm_or_reject", resourceCulture);
             }
         }
         
@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The client {0} would like to access to.
+        ///   Recherche une chaîne localisée semblable à The client {0} would like to access.
         /// </summary>
         public static string consent_client_access {
             get {
@@ -88,11 +88,20 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Manage consents.
+        ///   Recherche une chaîne localisée semblable à Exception occured while trying to decrypt the redirection url.
         /// </summary>
-        public static string manage_consents {
+        public static string cryptography_error {
             get {
-                return ResourceManager.GetString("manage_consents", resourceCulture);
+                return ResourceManager.GetString("cryptography_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Message.
+        /// </summary>
+        public static string message {
+            get {
+                return ResourceManager.GetString("message", resourceCulture);
             }
         }
         

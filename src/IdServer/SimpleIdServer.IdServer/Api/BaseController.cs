@@ -13,6 +13,13 @@ namespace SimpleIdServer.IdServer.Api
     {
         protected string ExtractBearerToken()
         {
+            if (TryExtractBearerToken(out string result)) return result;
+            throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
+        }
+
+        protected bool TryExtractBearerToken(out string bearerToken)
+        {
+            bearerToken = null;
             if (Request.Headers.ContainsKey(Constants.AuthorizationHeaderName))
             {
                 foreach (var authorizationValue in Request.Headers[Constants.AuthorizationHeaderName])
@@ -20,12 +27,13 @@ namespace SimpleIdServer.IdServer.Api
                     var at = authorizationValue.ExtractAuthorizationValue(new string[] { AutenticationSchemes.Bearer });
                     if (!string.IsNullOrWhiteSpace(at))
                     {
-                        return at;
+                        bearerToken = at;
+                        return true;
                     }
                 }
             }
 
-            throw new OAuthException(ErrorCodes.ACCESS_DENIED, ErrorMessages.MISSING_TOKEN);
+            return false;
         }
 
         protected ContentResult BuildError(OAuthException ex) => BuildError(HttpStatusCode.InternalServerError, ex.Code, ex.Message);

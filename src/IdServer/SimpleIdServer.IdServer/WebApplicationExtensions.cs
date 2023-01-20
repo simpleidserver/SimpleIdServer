@@ -107,6 +107,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
                 defaults: new { controller = "BCAuthorize", action = "Post" });
 
+            webApplication.MapControllerRoute("bcCallback",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCCallback,
+                defaults: new { controller = "BCCallback", action = "Post" });
+
             webApplication.MapControllerRoute("getGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
                 defaults: new { controller = "Grants", action = "Get" });

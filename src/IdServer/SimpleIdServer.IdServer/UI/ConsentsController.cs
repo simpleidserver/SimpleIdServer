@@ -85,7 +85,7 @@ namespace SimpleIdServer.IdServer.UI
             var user = await _userRepository.Query().Include(u => u.Consents).AsNoTracking().FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
             var result = new List<ConsentViewModel>();
             var clientIds = user.Consents.Select(c => c.ClientId);
-            var oauthClients = await _clientRepository.Query().AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync(cancellationToken);
+            var oauthClients = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync(cancellationToken);
             foreach (var consent in user.Consents)
             {
                 var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);

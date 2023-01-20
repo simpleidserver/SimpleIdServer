@@ -26,10 +26,20 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\ScopesResource.Designer.cs">
+	    <DependentUpon>ScopesResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
 	  <Compile Update="Resources\CheckSessionResource.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>CheckSessionResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\BCConsentsResource.Designer.cs">
+	    <DependentUpon>BCConsentsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
 	  </Compile>
 	  <Compile Update="Resources\ConsentsResource.Designer.cs">
 	    <DesignTime>True</DesignTime>
@@ -61,9 +71,17 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AuthenticatePasswordResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\ScopesResource.resx">
+	    <LastGenOutput>ScopesResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\CheckSessionResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>CheckSessionResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\BCConsentsResource.resx">
+	    <LastGenOutput>BCConsentsResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\ConsentsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
