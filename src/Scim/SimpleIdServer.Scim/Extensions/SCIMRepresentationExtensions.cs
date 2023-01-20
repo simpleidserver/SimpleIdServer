@@ -188,13 +188,14 @@ namespace SimpleIdServer.Scim.Domain
                 {
                     case SCIMPatchOperations.ADD:
                         {
-                            if (TryGetExternalId(patch, out string externalId))
+                            bool hasExternalId = false;
+                            if ((hasExternalId = TryGetExternalId(patch, out string externalId)))
                             {
                                 representation.ExternalId = externalId;
                                 result.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
                             }
 
-                            if (schemaAttributes == null || !schemaAttributes.Any())
+                            if (!hasExternalId && (schemaAttributes == null || !schemaAttributes.Any()))
                             {
                                 throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
                             }
@@ -275,13 +276,14 @@ namespace SimpleIdServer.Scim.Domain
                         break;
                     case SCIMPatchOperations.REPLACE:
                         {
-                            if (TryGetExternalId(patch, out string externalId))
+                            bool hasExternalId = false;
+                            if ((hasExternalId = TryGetExternalId(patch, out string externalId)))
                             {
                                 representation.ExternalId = externalId;
                                 result.Add(new SCIMPatchResult { Attr = new SCIMRepresentationAttribute(), Operation = SCIMPatchOperations.ADD, Path = StandardSCIMRepresentationAttributes.ExternalId });
                             }
 
-                            if (schemaAttributes == null || !schemaAttributes.Any())
+                            if (!hasExternalId && (schemaAttributes == null || !schemaAttributes.Any()))
                             {
                                 throw new SCIMNoTargetException(string.Format(Global.AttributeIsNotRecognirzed, patch.Path));
                             }
