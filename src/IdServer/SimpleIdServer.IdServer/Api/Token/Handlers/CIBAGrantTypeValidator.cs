@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (string.IsNullOrWhiteSpace(authRequestId))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.AuthReqId));
 
-            var authRequest = await _bcAuthorizeRepository.Query().FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
+            var authRequest = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
             if (authRequest == null)
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_AUTH_REQUEST_ID);
 
@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
             var currentDateTime = DateTime.UtcNow;
             var isSlowDown = currentDateTime <= authRequest.NextFetchTime;
-            if (authRequest.Status == BCAuthorizeStatus.Pending || isSlowDown)
+            if (authRequest.LastStatus == BCAuthorizeStatus.Pending || isSlowDown)
             {
                 if (isSlowDown)
                     throw new OAuthException(ErrorCodes.SLOW_DOWN, string.Format(ErrorMessages.TOO_MANY_AUTH_REQUEST, authRequestId));
@@ -57,10 +57,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 throw new OAuthException(ErrorCodes.AUTHORIZATION_PENDING, string.Format(ErrorMessages.AUTH_REQUEST_NOT_CONFIRMED, authRequestId));
             }
 
-            if (authRequest.Status == BCAuthorizeStatus.Rejected)
+            if (authRequest.LastStatus == BCAuthorizeStatus.Rejected)
                 throw new OAuthException(ErrorCodes.ACCESS_DENIED, string.Format(ErrorMessages.AUTH_REQUEST_REJECTED, authRequestId));
 
-            if (authRequest.Status == BCAuthorizeStatus.Sent)
+            if (authRequest.LastStatus == BCAuthorizeStatus.Sent)
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(ErrorMessages.AUTH_REQUEST_SENT, authRequestId));
 
             if (currentDateTime > authRequest.ExpirationDateTime)

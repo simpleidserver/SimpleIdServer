@@ -11,6 +11,7 @@ builder.Services.AddSIDIdentityServer()
     .AddInMemoryScopes(IdServerConfiguration.Scopes)
     .AddInMemoryClients(IdServerConfiguration.Clients)
     .AddDeveloperSigningCredentials()
+    .AddBackChannelAuthentication()
     // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
     .AddAuthentication(callback: (a) =>
     {

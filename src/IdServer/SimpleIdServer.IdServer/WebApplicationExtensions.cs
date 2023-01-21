@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
 
@@ -103,13 +105,19 @@ namespace Microsoft.AspNetCore.Builder
                 }
             }
 
-            webApplication.MapControllerRoute("bcAuthorize",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
-                defaults: new { controller = "BCAuthorize", action = "Post" });
+            if(opts.IsBCEnabled)
+            {
+                var reccuringJobManager = webApplication.Services.GetRequiredService<IRecurringJobManager>();
+                // Occurs every 15 seconds.
+                reccuringJobManager.AddOrUpdate<BCNotificationJob>(nameof(BCNotificationJob), j => webApplication.Services.GetRequiredService<BCNotificationJob>().Execute(), "*/15 * * * * *");
+                webApplication.MapControllerRoute("bcAuthorize",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCAuthorize,
+                    defaults: new { controller = "BCAuthorize", action = "Post" });
 
-            webApplication.MapControllerRoute("bcCallback",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCCallback,
-                defaults: new { controller = "BCCallback", action = "Post" });
+                webApplication.MapControllerRoute("bcCallback",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.BCCallback,
+                    defaults: new { controller = "BCCallback", action = "Post" });
+            }
 
             webApplication.MapControllerRoute("getGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",

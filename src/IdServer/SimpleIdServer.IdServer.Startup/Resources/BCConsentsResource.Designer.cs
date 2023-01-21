@@ -88,6 +88,24 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The consent is confirmed.
+        /// </summary>
+        public static string consent_confirmed {
+            get {
+                return ResourceManager.GetString("consent_confirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The consent is rejected.
+        /// </summary>
+        public static string consent_rejected {
+            get {
+                return ResourceManager.GetString("consent_rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Exception occured while trying to decrypt the redirection url.
         /// </summary>
         public static string cryptography_error {

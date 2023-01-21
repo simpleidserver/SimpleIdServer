@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using System.Data;
 using System.Text;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -10,40 +11,42 @@ namespace SimpleIdServer.IdServer.Domains
         public string Id { get; set; } = null!;
         public string? ClientId { get; set; } = null;
         public string? UserId { get; set; } = null;
+        /// <summary>
+        /// If the client is registered to use PING or PUSH modes. If is a bearer token provided by the client that will be used by the OPENID provider to authenticate the callback request to the client.
+        /// </summary>
         public string? NotificationToken { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
         public string? NotificationEdp { get; set; } = null;
         public int? Interval { get; set; } = null;
-        public BCAuthorizeStatus Status { get; set; }
+        public bool IsActive
+        {
+            get
+            {
+                return DateTime.UtcNow < ExpirationDateTime;
+            }
+        }
+        public BCAuthorizeStatus LastStatus { get; set; }
+        public BCAuthorizeHistory? LastHistory
+        {
+            get
+            {
+                return Histories.Where(h => h.EndDateTime == null).OrderByDescending(h => h.StartDateTime).FirstOrDefault();
+            }
+        }
         public DateTime ExpirationDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public DateTime? RejectionSentDateTime { get; set; }
         public DateTime? NextFetchTime { get; set; }
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
+        public ICollection<BCAuthorizeHistory> Histories { get; set; } = new List<BCAuthorizeHistory>();
 
-        public void Confirm()
-        {
-            Status = BCAuthorizeStatus.Confirmed;
-            UpdateDateTime = DateTime.UtcNow;
-        }
+        public void Confirm() => UpdateStatus(BCAuthorizeStatus.Confirmed);
 
-        public void Pong()
-        {
-            Status = BCAuthorizeStatus.Pong;
-            UpdateDateTime = DateTime.UtcNow;
-        }
+        public void Pong() => UpdateStatus(BCAuthorizeStatus.Pong);
 
-        public void Send()
-        {
-            Status = BCAuthorizeStatus.Sent;
-            UpdateDateTime = DateTime.UtcNow;
-        }
+        public void Send() => UpdateStatus(BCAuthorizeStatus.Sent);
 
-        public void Reject()
-        {
-            Status = BCAuthorizeStatus.Rejected;
-            UpdateDateTime = DateTime.UtcNow;
-        }
+        public void Reject() => UpdateStatus(BCAuthorizeStatus.Rejected);
 
         public void NotifyRejection()
         {
@@ -79,12 +82,21 @@ namespace SimpleIdServer.IdServer.Domains
                 Interval = interval,
                 NotificationEdp = notificationEdp,
                 NotificationMode = notificationMode,
-                Status = BCAuthorizeStatus.Pending,
                 Scopes = scopes,
                 UserId = userId,
                 NotificationToken = notificationToken
             };
+            result.UpdateStatus(BCAuthorizeStatus.Pending);
             return result;
+        }
+
+        private void UpdateStatus(BCAuthorizeStatus newStatus, string msg = null)
+        {
+            if (LastHistory != null)
+                LastHistory.EndDateTime = DateTime.UtcNow;
+            Histories.Add(new BCAuthorizeHistory { StartDateTime = DateTime.UtcNow, Status = newStatus, Message = msg });
+            LastStatus = newStatus;
+            UpdateDateTime = DateTime.UtcNow;
         }
 
         private static string GenerateId()

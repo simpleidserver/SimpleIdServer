@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Helpers
             var defaultAcr = await GetSupportedAcr(requestedAcrValues, cancellationToken);
             if (defaultAcr == null)
             {
-                var acrClaim = requestedClaims.FirstOrDefault(r => r.Name == JwtRegisteredClaimNames.Acr);
+                var acrClaim = requestedClaims?.FirstOrDefault(r => r.Name == JwtRegisteredClaimNames.Acr);
                 if (acrClaim != null)
                 {
                     defaultAcr = await GetSupportedAcr(acrClaim.Values, cancellationToken);

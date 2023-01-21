@@ -128,6 +128,8 @@ namespace SimpleIdServer.IdServer.UI
                     }
                 }
 
+                viewModel.IsConfirmed = true;
+                viewModel.ConfirmationStatus = confirmConsentsViewModel.IsRejected ? ConfirmationStatus.REJECTED : ConfirmationStatus.CONFIRMED;
                 return View(viewModel);
             }
             catch (CryptographicException)

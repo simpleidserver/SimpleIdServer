@@ -43,9 +43,9 @@ namespace SimpleIdServer.IdServer.Authenticate
             if (!TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(errorCode, ErrorMessages.MISSING_CLIENT_ID);
 
             var client = await _clientRepository.Query()
-                .AsNoTracking()
                 .Include(c => c.SerializedJsonWebKeys)
                 .Include(c => c.Scopes)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
             if (client == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             if (isAuthorizationCodeGrantType) return client;

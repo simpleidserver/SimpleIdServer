@@ -11,9 +11,12 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<BCAuthorize> builder)
         {
             builder.HasKey(bc => bc.Id);
+            builder.Ignore(bc => bc.IsActive);
+            builder.Ignore(bc => bc.LastHistory);
             builder.Property(a => a.Scopes).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());
+            builder.HasMany(a => a.Histories).WithOne().OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

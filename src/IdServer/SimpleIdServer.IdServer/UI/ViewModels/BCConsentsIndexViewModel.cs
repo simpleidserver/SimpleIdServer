@@ -13,5 +13,13 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string BindingMessage { get; set; }
         public string ReturnUrl { get; set; }
         public IEnumerable<string> Scopes { get; set; }
+        public bool IsConfirmed { get; set; }
+        public ConfirmationStatus ConfirmationStatus{ get; set; }
+    }
+
+    public enum ConfirmationStatus
+    {
+        REJECTED = 0,
+        CONFIRMED = 1
     }
 }

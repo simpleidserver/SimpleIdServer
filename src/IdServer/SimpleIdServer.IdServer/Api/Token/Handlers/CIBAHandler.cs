@@ -55,12 +55,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
-                var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == authRequest.UserId, cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == authRequest.UserId, cancellationToken);
                 context.SetUser(user);
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(new BuildTokenParameter { Scopes = authRequest.Scopes }, context, cancellationToken);
 
-                _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
+                _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                 var result = BuildResult(context, authRequest.Scopes);
                 foreach (var kvp in context.Response.Parameters)
                     result.Add(kvp.Key, kvp.Value);

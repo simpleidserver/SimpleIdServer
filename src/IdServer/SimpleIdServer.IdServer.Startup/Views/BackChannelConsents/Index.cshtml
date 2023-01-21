@@ -1,4 +1,5 @@
 ﻿@using SimpleIdServer.IdServer.Startup.Resources
+@using SimpleIdServer.IdServer.UI.ViewModels
 @model SimpleIdServer.IdServer.UI.ViewModels.BCConsentsIndexViewModel
 
 @{
@@ -6,18 +7,25 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<form method="post" action="@Url.Action("Reject", "BackChannelConsents")" id="rejectForm">
-    @Html.AntiForgeryToken()
-    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
-    <input name="IsRejected" type="hidden" value="true" />
-</form>
-
-@using (Html.BeginForm("Index", "BackChannelConsents", FormMethod.Post))
+@if(Model.IsConfirmed)
 {
-    @Html.AntiForgeryToken()
-    @if (!ViewData.ModelState.IsValid)
+    <div class="alert alert-success">
+        @(Model.ConfirmationStatus == ConfirmationStatus.CONFIRMED ? BCConsentsResource.consent_confirmed : BCConsentsResource.consent_rejected)
+    </div>
+}
+else
+{
+    <form method="post" action="@Url.Action("Reject", "BackChannelConsents")" id="rejectForm">
+        @Html.AntiForgeryToken()
+        <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
+        <input name="IsRejected" type="hidden" value="true" />
+    </form>
+
+    @using (Html.BeginForm("Index", "BackChannelConsents", FormMethod.Post))
     {
-        <div class="alert alert-danger">
+        @Html.AntiForgeryToken()
+        @if (!ViewData.ModelState.IsValid)
+        {
             <ul class="list-group">
                 @foreach (var modelState in ViewData.ModelState.Values)
                 {
@@ -27,29 +35,29 @@
                     }
                 }
             </ul>
-        </div>
-    }
+        }
 
-    <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
-    <input name="IsRejected" type="hidden" value="false" />
-    <div class="card">
-        <div class="card-header">
-            @string.Format(BCConsentsResource.consent_client_access, Model.ClientName)
+        <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+        <input name="IsRejected" type="hidden" value="false" />
+        <div class="card">
+            <div class="card-header">
+                @string.Format(BCConsentsResource.consent_client_access, Model.ClientName)
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">@BCConsentsResource.message</h5>
+                <p>@Model.BindingMessage</p>
+                <h5 class="card-title">@BCConsentsResource.scopes</h5>
+                <ul class="list-group">
+                    @foreach (var scopeName in Model.Scopes)
+                    {
+                        <li class="list-group-item">@ScopesResource.ResourceManager.GetString(scopeName)</li>
+                    }
+                </ul>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-success card-link">@BCConsentsResource.confirm</button>
+                <button type="submit" form="rejectForm" class="btn btn-danger">@BCConsentsResource.reject</button>
+            </div>
         </div>
-        <div class="card-body">
-            <h5 class="card-title">@BCConsentsResource.message</h5>
-            <p>@Model.BindingMessage</p>
-            <h5 class="card-title">@BCConsentsResource.scopes</h5>
-             <ul class="list-group">
-             @foreach (var scopeName in Model.Scopes)
-             {
-                 <li class="list-group-item">@ScopesResource.ResourceManager.GetString(scopeName)</li>
-             }
-             </ul>
-        </div>
-        <div class="card-footer">
-            <button type="submit" class="btn btn-success card-link">@BCConsentsResource.confirm</button>
-            <button type="submit" form="rejectForm" class="btn btn-danger">@BCConsentsResource.reject</button>
-        </div>
-    </div>
+    }    
 }

@@ -41,6 +41,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
             builder.ApplyConfiguration(new ClaimProviderConfiguration());
             builder.ApplyConfiguration(new BCAuthorizeConfiguration());
+            builder.ApplyConfiguration(new BCAuthorizeHistoryConfiguration());
             builder.ApplyConfiguration(new UserDeviceConfiguration());
             builder.ApplyConfiguration(new ApiResourceConfiguration());
             builder.ApplyConfiguration(new GrantConfiguration());

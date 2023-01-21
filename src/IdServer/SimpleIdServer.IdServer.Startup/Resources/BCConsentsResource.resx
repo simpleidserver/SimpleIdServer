@@ -126,6 +126,12 @@
   <data name="consent_client_access" xml:space="preserve">
     <value>The client {0} would like to access</value>
   </data>
+  <data name="consent_confirmed" xml:space="preserve">
+    <value>The consent is confirmed</value>
+  </data>
+  <data name="consent_rejected" xml:space="preserve">
+    <value>The consent is rejected</value>
+  </data>
   <data name="cryptography_error" xml:space="preserve">
     <value>Exception occured while trying to decrypt the redirection url</value>
   </data>

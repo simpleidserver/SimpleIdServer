@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
@@ -24,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private readonly InMemoryKeyStore _keyStore = new InMemoryKeyStore();
         private readonly IServiceCollection _serviceCollection;
-        private readonly IServiceProvider _serviceProvider;
+        private IServiceProvider _serviceProvider;
 
         public IdServerBuilder(IServiceCollection serviceCollection, IServiceProvider serviceProvider)
         {
@@ -54,6 +56,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return SetSigningKeys(new[] { signingCredentials });
         }
 
+        #region Encryption and signing Keys
+
         public IdServerBuilder SetSigningKey(ECDsaSecurityKey ecdsa, string signingAlg = SecurityAlgorithms.EcdsaSha256)
         {
             var signingCredentials = new SigningCredentials(ecdsa, signingAlg);
@@ -82,6 +86,10 @@ namespace Microsoft.Extensions.DependencyInjection
             SetSigningKeys(new[] { signingCredentials });
             return this;
         }
+
+        #endregion
+
+        #region Dataset
 
         public IdServerBuilder AddInMemoryScopes(ICollection<Scope> scopes)
         {
@@ -131,24 +139,10 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
-        public IdServerBuilder EnableConfigurableAuthentication(ICollection<SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider> providers)
-        {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if(!storeDbContext.AuthenticationSchemeProviders.Any())
-            {
-                storeDbContext.AuthenticationSchemeProviders.AddRange(providers);
-                storeDbContext.SaveChanges();
-            }
-
-            _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
-            return this;
-        }
-
         public IdServerBuilder AddInMemoryAcr(ICollection<AuthenticationContextClassReference> acrs)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if(!storeDbContext.Acrs.Any())
+            if (!storeDbContext.Acrs.Any())
             {
                 storeDbContext.Acrs.AddRange(acrs);
                 storeDbContext.SaveChanges();
@@ -166,6 +160,24 @@ namespace Microsoft.Extensions.DependencyInjection
                 storeDbContext.SaveChanges();
             }
 
+            return this;
+        }
+
+        #endregion
+
+        #region Authentication & Authorization
+
+        public IdServerBuilder EnableConfigurableAuthentication(ICollection<SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider> providers)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if(!storeDbContext.AuthenticationSchemeProviders.Any())
+            {
+                storeDbContext.AuthenticationSchemeProviders.AddRange(providers);
+                storeDbContext.SaveChanges();
+            }
+
+            _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
             return this;
         }
 
@@ -217,32 +229,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
-        /// <summary>
-        /// Add back channel authentication (CIBA).
-        /// </summary>
-        /// <returns></returns>
-        public IdServerBuilder AddBackChannelAuthentication()
-        {
-            _serviceCollection.Configure<IdServerHostOptions>(o =>
-            {
-                o.IsBCEnabled = true;
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// IdentityServer can be hosted in several Realm.
-        /// </summary>
-        /// <returns></returns>
-        public IdServerBuilder UseRealm()
-        {
-            _serviceCollection.Configure<IdServerHostOptions>(o =>
-            {
-                o.UseRealm = true;
-            });
-            return this;
-        }
-
         public IdServerBuilder SetDefaultRegistrationAuthorizationPolicy()
         {
             _serviceCollection.Configure<AuthorizationOptions>(o =>
@@ -260,5 +246,47 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             return this;
         }
+
+        #endregion
+
+        #region CIBA
+
+        /// <summary>
+        /// Add back channel authentication (CIBA).
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder AddBackChannelAuthentication(Action<IGlobalConfiguration> callback = null)
+        {
+            _serviceCollection.AddTransient<BCNotificationJob>();
+            _serviceCollection.AddHangfire(callback == null ? (o => {
+                o.UseIgnoredAssemblyVersionTypeResolver();
+                o.UseInMemoryStorage();
+            }) : callback);
+            _serviceCollection.AddHangfireServer();
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.IsBCEnabled = true;
+            });
+            return this;
+        }
+
+        #endregion
+
+        #region Other
+
+        /// <summary>
+        /// IdentityServer can be hosted in several Realm.
+        /// </summary>
+        /// <returns></returns>
+        public IdServerBuilder UseRealm()
+        {
+            _serviceCollection.Configure<IdServerHostOptions>(o =>
+            {
+                o.UseRealm = true;
+            });
+            return this;
+        }
+
+        #endregion
     }
 }
