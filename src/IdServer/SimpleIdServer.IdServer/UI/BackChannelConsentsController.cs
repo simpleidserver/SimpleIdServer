@@ -93,7 +93,7 @@ namespace SimpleIdServer.IdServer.UI
                 viewModel = await BuildViewModel(queries, viewModel.ReturnUrl, cancellationToken);
                 var parameter = new BCCallbackParameter
                 {
-                    Action = confirmConsentsViewModel.IsRejected ? BCCallbackActions.REJECT : BCCallbackActions.CONFIRM,
+                    ActionEnum = confirmConsentsViewModel.IsRejected ? BCCallbackActions.REJECT : BCCallbackActions.CONFIRM,
                     AuthReqId = viewModel.AuthReqId
                 };
                 var sub = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;

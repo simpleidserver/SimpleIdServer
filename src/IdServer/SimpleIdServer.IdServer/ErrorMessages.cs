@@ -142,8 +142,8 @@ namespace SimpleIdServer.IdServer
         public const string REQUESTED_EXPIRY_MUST_BE_POSITIVE = "requested_expiry must be positive";
         public const string ONLY_HYBRID_WORKFLOWS_ARE_SUPPORTED = "only hybrid workflow are supported";
         public const string UNKNOWN_JSON_WEB_KEY = "unknown json web key '{0}'";
-        public const string TOO_MANY_AUTH_REQUEST = "too many authentication request : {0}";
-        public const string AUTH_REQUEST_EXPIRED = "the authentication request '{0}' is expired";
+        public const string TOO_MANY_AUTH_REQUEST = "you tried too many times to get a token";
+        public const string AUTH_REQUEST_EXPIRED = "the authorization request is expired";
         public const string REDIRECT_URI_CONTAINS_FRAGMENT = "the redirect_uri cannot contains fragment";
         public const string CLIENT_ID_CANNOT_BE_EXTRACTED = "client identifier cannot be extracted from the initial request";
         public const string SCOPE_ALREADY_EXISTS = "scope '{0}' already exists";
@@ -162,11 +162,11 @@ namespace SimpleIdServer.IdServer
         public const string AUTH_REQUEST_BAD_NBF = "the request cannot be received before '{0}'";
         public const string AUTH_REQUEST_NO_IAT = "the request doesn't contain iat";
         public const string AUTH_REQUEST_MAXIMUM_LIFETIME = "the maximum lifetime of the request is '{0}' seconds";
-        public const string AUTH_REQUEST_NOT_CONFIRMED = "the authentication request '{0}' has not been confirmed";
+        public const string AUTH_REQUEST_NOT_CONFIRMED = "the authorization request has not been confirmed";
         public const string AUTH_REQUEST_ALG_NOT_VALID = "the request must be signed with '{0}' algorithm";
         public const string AUTH_REQUEST_IS_EXPIRED = "the request is expired";
-        public const string AUTH_REQUEST_REJECTED = "the authentication request '{0}' is rejected";
-        public const string AUTH_REQUEST_SENT = "the authentication request '{0}' is finished";
+        public const string AUTH_REQUEST_REJECTED = "the authorization request has been rejected";
+        public const string AUTH_REQUEST_SENT = "the authorization request is finished";
         public const string AUTH_REQUEST_NOT_AUTHORIZED_TO_REJECT = "you're not authorized to reject the authorization request";
         public const string CONTENT_TYPE_NOT_SUPPORTED = "the content-type is not correct";
         public const string JWT_MUST_BE_ENCRYPTED = "JWT must be encrypted with the algorithm {0}";

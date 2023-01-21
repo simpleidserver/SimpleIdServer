@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 var userSubject = extractionResult.Jwt.Subject;
                 var bcAuthorize = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);
                 if (bcAuthorize == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.UNKNOWN_BC_AUTHORIZE, parameter.AuthReqId));
-                switch(parameter.Action)
+                switch(parameter.ActionEnum)
                 {
                     case BCCallbackActions.CONFIRM:
                         {

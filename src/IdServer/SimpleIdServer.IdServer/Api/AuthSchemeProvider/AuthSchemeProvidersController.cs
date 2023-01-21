@@ -66,7 +66,7 @@ namespace SimpleIdServer.IdServer.Api.AuthSchemeProvider
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateOptions(string id, JsonObject jsonObj, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateOptions(string id, [FromBody] JsonObject jsonObj, CancellationToken cancellationToken)
         {
             var result = await _repository.Query().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
             if (result == null) return NotFound();

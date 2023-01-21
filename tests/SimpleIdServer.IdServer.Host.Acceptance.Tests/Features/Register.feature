@@ -2,7 +2,7 @@
 	Check client can be registered
 
 Scenario: Register a client
-	When execute HTTP POST request 'https://localhost:8080/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key       | Value     |
 	| client_id | newClient |
 	
@@ -11,7 +11,7 @@ Scenario: Register a client
 	Then HTTP status code equals to '201'
 
 Scenario: Get a client
-	When execute HTTP POST request 'https://localhost:8080/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key       | Value      |
 	| client_id | newClient2 |
 
@@ -25,7 +25,7 @@ Scenario: Get a client
 	Then HTTP status code equals to '200'
 
 Scenario: Update a client
-	When execute HTTP POST request 'https://localhost:8080/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key       | Value      |
 	| client_id | newClient3 |
 

@@ -83,7 +83,9 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fortyFourClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Poll).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortySixClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().ResourceParameterIsRequired().AddScope("admin", "calendar").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortySevenClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortyEightClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyEightClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyNineClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Poll, interval: 0).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Poll).Build()
         };
 
         public static List<User> Users = new List<User>
@@ -126,6 +128,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("fortySixClient", "admin", "calendar")
                 .AddConsent("fortySevenClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
                 .AddConsent("fortyEightClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
+                .AddConsent("fortyNineClient", "admin", "calendar")
+                .AddConsent("fiftyClient", "admin", "calendar")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }

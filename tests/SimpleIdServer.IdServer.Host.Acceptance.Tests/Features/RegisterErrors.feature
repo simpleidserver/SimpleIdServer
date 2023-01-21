@@ -2,7 +2,7 @@
 	Check errors returned during client registration
 
 Scenario: Error is returned when client_id is missing
-	When execute HTTP POST request 'https://localhost:8080/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key | Value |
 	
 	And extract JSON from body
@@ -12,7 +12,7 @@ Scenario: Error is returned when client_id is missing
 	And JSON '$.error_description'='missing parameter client_id'
 
 Scenario: Error is returned when client_id already exists
-	When execute HTTP POST request 'https://localhost:8080/register'
+	When execute HTTP POST JSON request 'https://localhost:8080/register'
 	| Key       | Value       |
 	| client_id | firstClient |
 	

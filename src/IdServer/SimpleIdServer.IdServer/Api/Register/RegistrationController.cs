@@ -41,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(RegisterClientRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Add([FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
         {
             try
             {

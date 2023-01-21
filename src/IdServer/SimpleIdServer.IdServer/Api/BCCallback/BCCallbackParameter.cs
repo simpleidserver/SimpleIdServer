@@ -11,7 +11,19 @@ namespace SimpleIdServer.IdServer.Api.BCCallback
         public string AuthReqId { get; set; }
         [BindProperty(Name = "action")]
         [JsonPropertyName("action")]
-        public BCCallbackActions Action { get; set; }
+        public int Action { get; set; }
+        [JsonIgnore]
+        public BCCallbackActions ActionEnum
+        {
+            get
+            {
+                return (BCCallbackActions)Action;
+            }
+            set
+            {
+                Action = (int)value;   
+            }
+        }
     }
 
     public enum BCCallbackActions
