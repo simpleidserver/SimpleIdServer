@@ -1,5 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Scim.Domains;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace SimpleIdServer.Scim.Parser.Expressions
 {
     public class SCIMComplexAttributeExpression : SCIMAttributeExpression
@@ -16,6 +20,20 @@ namespace SimpleIdServer.Scim.Parser.Expressions
         public override object Clone()
         {
             return new SCIMComplexAttributeExpression(Name, (SCIMExpression)GroupingFilter.Clone(), (SCIMAttributeExpression)Child.Clone());
+        }
+
+        protected override ICollection<SCIMRepresentationAttribute> InternalBuildEmptyAttributes()
+        {
+            var result = base.InternalBuildEmptyAttributes();
+            var first = result.First();
+            var groupingAttrs = GroupingFilter.BuildEmptyAttributes();
+            foreach (var child in groupingAttrs)
+            {
+                first.Children.Add(child);
+                child.ParentAttributeId = first.Id;
+            }
+
+            return result;
         }
     }
 }

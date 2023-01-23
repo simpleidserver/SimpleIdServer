@@ -1043,3 +1043,32 @@ Scenario: Check externalId can be updated when using path parameter (HTTP PATCH 
 	
 	Then HTTP status code equals to '200'
 	Then JSON 'externalId'='newExternalId'
+
+Scenario: If the target location does not exist the attribute and value are added (HTTP PATCH add)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber											 | "number"																										  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                              |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]					              |
+	| Operations | [ { "op": "add", "path" : "emails[type eq work].primary",  "value" : "true" } ]    |
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                              |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]					              |
+	| Operations | [ { "op": "add", "path" : "phones.phoneNumber",  "value" : "Phone" } ]    |
+	
+	And execute HTTP GET request 'http://localhost/Users/$id$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'emails[0].primary'='true'
+	Then JSON 'phones[0].phoneNumber'='Phone'

@@ -46,6 +46,8 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                {
                    opt.AddStringAttribute("value");
                    opt.AddStringAttribute("display");
+                   opt.AddBooleanAttribute("primary");
+                   opt.AddStringAttribute("type");
                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE)
                .AddStringAttribute("immutable", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE)
                .AddComplexAttribute("groups", opt =>
