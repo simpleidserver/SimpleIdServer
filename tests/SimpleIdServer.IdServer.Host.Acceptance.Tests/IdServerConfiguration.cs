@@ -78,14 +78,16 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("thirtyNineClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetUserInfoSignedResponseAlg().SetUserInfoEncryption().AddRSAEncryptedKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyOneClient", "password", "http://localhost:8080").AddScope("openid", "role", "profile", "email").SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha384).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortyTwoClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Ping).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fortyThreeClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Push).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyTwoClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Ping, "http://localhost/notificationedp").UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fortyThreeClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Push, "http://localhost/notificationedp").UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyFourClient", "password", "http://localhost:8080").AddScope("secondScope").EnableCIBAGrantType(StandardNotificationModes.Poll).UseClientTlsAuthentication("CN=firstMtlsClient").AddSigningKey(new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortySixClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().ResourceParameterIsRequired().AddScope("admin", "calendar").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortySevenClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyEightClient", "password", "http://localhost:8080").EnableTokenInResponseType().EnableRefreshTokenGrantType().AddScope("admin", "calendar").EnableAccessToGrantsApi().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fortyNineClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Poll, interval: 0).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fiftyClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Poll).Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Poll).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyOneClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Push, "http://localhost/notificationedp").Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyTwoClient", "password", "http://localhost:8080").AddScope("admin", "calendar").EnableCIBAGrantType(StandardNotificationModes.Ping, "http://localhost/notificationedp", 0).Build(),
         };
 
         public static List<User> Users = new List<User>
@@ -130,6 +132,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("fortyEightClient", "admin", "calendar", "grant_management_query", "grant_management_revoke")
                 .AddConsent("fortyNineClient", "admin", "calendar")
                 .AddConsent("fiftyClient", "admin", "calendar")
+                .AddConsent("fiftyOneClient", "admin", "calendar")
+                .AddConsent("fiftyTwoClient", "admin", "calendar")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
         };
     }

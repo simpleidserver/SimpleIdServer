@@ -13,11 +13,11 @@ using System.Threading;
 
 namespace SimpleIdServer.IdServer.Api.Register
 {
+    [JsonConverter(typeof(RegisterClientRequestConverter))]
     public class RegisterClientRequest
     {
-        [BindProperty(Name = OAuthClientParameters.ClientId)]
-        [JsonPropertyName(OAuthClientParameters.ClientId)]
-        public string ClientId { get; set; }
+        [BindProperty(Name = OAuthClientParameters.ApplicationType)]
+        public string? ApplicationType { get; set; }
         [BindProperty(Name = OAuthClientParameters.SoftwareStatement)]
         [JsonPropertyName(OAuthClientParameters.SoftwareStatement)]
         public string? SoftwareStatement { get; set; } = null;
@@ -42,9 +42,62 @@ namespace SimpleIdServer.IdServer.Api.Register
         [BindProperty(Name = OAuthClientParameters.TokenEncryptedResponseAlg)]
         [JsonPropertyName(OAuthClientParameters.TokenEncryptedResponseAlg)]
         public string? TokenEncryptedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.IdTokenSignedResponseAlg)]
+        [JsonPropertyName(OAuthClientParameters.IdTokenSignedResponseAlg)]
+        public string? IdTokenSignedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.IdTokenEncryptedResponseEnc)]
+        [JsonPropertyName(OAuthClientParameters.IdTokenEncryptedResponseEnc)]
+        public string? IdTokenEncryptedResponseEnc { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.IdTokenEncryptedResponseAlg)]
+        [JsonPropertyName(OAuthClientParameters.IdTokenEncryptedResponseAlg)]
+        public string? IdTokenEncryptedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.UserInfoSignedResponseAlg)]
+        [JsonPropertyName(OAuthClientParameters.UserInfoSignedResponseAlg)]
+        public string? UserInfoSignedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.UserInfoEncryptedResponseAlg)]
+        [JsonPropertyName(OAuthClientParameters.UserInfoEncryptedResponseAlg)]
+        public string? UserInfoEncryptedResponseAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.UserInfoEncryptedResponseEnc)]
+        [JsonPropertyName(OAuthClientParameters.UserInfoEncryptedResponseEnc)]
+        public string? UserInfoEncryptedResponseEnc { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.RequestObjectSigningAlg)]
+        [JsonPropertyName(OAuthClientParameters.RequestObjectSigningAlg)]
+        public string? RequestObjectSigningAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.RequestObjectEncryptionEnc)]
+        [JsonPropertyName(OAuthClientParameters.RequestObjectEncryptionEnc)]
+        public string? RequestObjectEncryptionEnc { get; set; }
+        [BindProperty(Name = OAuthClientParameters.RequestObjectEncryptionAlg)]
+        [JsonPropertyName(OAuthClientParameters.RequestObjectEncryptionAlg)]
+        public string? RequestObjectEncryptionAlg { get; set; } = null;
         [BindProperty(Name = OAuthClientParameters.TokenEncryptedResponseEnc)]
         [JsonPropertyName(OAuthClientParameters.TokenEncryptedResponseEnc)]
         public string? TokenEncryptedResponseEnc { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.RedirectUris)]
+        [JsonPropertyName(OAuthClientParameters.RedirectUris)]
+        public IEnumerable<string> RedirectUris { get; set; } = new List<string>();
+        [BindProperty(Name = OAuthClientParameters.JwksUri)]
+        [JsonPropertyName(OAuthClientParameters.JwksUri)]
+        public string? JwksUri { get; set; }
+        [BindProperty(Name = OAuthClientParameters.SectorIdentifierUri)]
+        [JsonPropertyName(OAuthClientParameters.SectorIdentifierUri)]
+        public string? SectorIdentifierUri { get; set; }
+        [BindProperty(Name = OAuthClientParameters.InitiateLoginUri)]
+        [JsonPropertyName(OAuthClientParameters.InitiateLoginUri)]
+        public string? InitiateLoginUri { get; set; }
+        [BindProperty(Name = OAuthClientParameters.SubjectType)]
+        [JsonPropertyName(OAuthClientParameters.SubjectType)]
+        public string? SubjectType { get; set; }
+        [BindProperty(Name = OAuthClientParameters.BCTokenDeliveryMode)]
+        [JsonPropertyName(OAuthClientParameters.BCTokenDeliveryMode)]
+        public string? BCTokenDeliveryMode { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.BCClientNotificationEndpoint)]
+        [JsonPropertyName(OAuthClientParameters.BCClientNotificationEndpoint)]
+        public string? BCClientNotificationEndpoint { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.BCAuthenticationRequestSigningAlg)]
+        [JsonPropertyName(OAuthClientParameters.BCAuthenticationRequestSigningAlg)]
+        public string? BCAuthenticationRequestSigningAlg { get; set; } = null;
+        [JsonIgnore]
+        public ICollection<RegisterTranslation> Translations = new List<RegisterTranslation>();
 
         public void Apply(Client client, IdServerHostOptions options)
         {
@@ -62,5 +115,12 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (string.IsNullOrWhiteSpace(TokenEncryptedResponseEnc)) client.TokenEncryptedResponseEnc = options.DefaultTokenEncryptedEnc;
             else client.TokenEncryptedResponseEnc = TokenEncryptedResponseEnc;
         }
+    }
+
+    public class RegisterTranslation
+    {
+        public string Language { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 }

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -312,6 +313,20 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
 
         [When("disconnect the user")]
         public void WhenDisconnectUser() => _scenarioContext.DisableUserAuthentication();
+
+        [When("polls until notification is received")]
+        public void WhenPollsUntilNotificationIsReceived()
+        {
+            if(!_scenarioContext.ContainsKey("notificationResponse"))
+            {
+                Thread.Sleep(200);
+                WhenPollsUntilNotificationIsReceived();
+            }
+            else
+            {
+                _scenarioContext.Set(JsonDocument.Parse(_scenarioContext.Get<string>("notificationResponse")), "jsonHttpBody");
+            }
+        }
 
         private void BuildJwsByUsingClientJwk(string keyid, string clientId, string key, Table table, bool isExpired = false)
         {

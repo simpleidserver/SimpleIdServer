@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using System;
 using System.Linq;
 using static SimpleIdServer.IdServer.Constants;
 
@@ -35,11 +36,13 @@ namespace SimpleIdServer.IdServer.Builders
         /// Allows client to use CIBA grant-type.
         /// </summary>
         /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableCIBAGrantType(string deliveryMode = StandardNotificationModes.Poll, int? interval = null)
+        public TraditionalWebsiteClientBuilder EnableCIBAGrantType(string deliveryMode = StandardNotificationModes.Poll, string notificationEdp = null, int? interval = null)
         {
+            if (deliveryMode != StandardNotificationModes.Poll && string.IsNullOrWhiteSpace(notificationEdp)) throw new ArgumentException("the notification endpoint must be specified");
             _client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
             _client.BCTokenDeliveryMode = deliveryMode;
             _client.BCUserCodeParameter = true;
+            _client.BCClientNotificationEndpoint = notificationEdp;
             _client.BCAuthenticationRequestSigningAlg = SecurityAlgorithms.RsaSha256;
             if (interval != null) _client.BCIntervalSeconds = interval.Value;
             return this;

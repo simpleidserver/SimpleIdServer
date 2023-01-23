@@ -46,13 +46,13 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 mo.Setup(m => m.GetHttpClient())
                     .Returns(() =>
                     {
-                        var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+                        var fakeHttpMessageHandler = new FakeHttpMessageHandler(_scenarioContext);
                         return new HttpClient(fakeHttpMessageHandler);
                     });
                 mo.Setup(m => m.GetHttpClient(It.IsAny<HttpClientHandler>()))
                     .Returns(() =>
                     {
-                        var fakeHttpMessageHandler = new FakeHttpMessageHandler();
+                        var fakeHttpMessageHandler = new FakeHttpMessageHandler(_scenarioContext);
                         return new HttpClient(fakeHttpMessageHandler);
                     });
                 s.AddSingleton<Infrastructures.IHttpClientFactory>(mo.Object);
@@ -85,56 +85,42 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 next(builder);
             };
         }
-
-        private static X509ChainPolicy BuildChainPolicy(X509Certificate2 certificate, bool isCertificateSelfSigned)
-        {
-            // Now build the chain validation options.
-            X509RevocationFlag revocationFlag = X509RevocationFlag.EntireChain;
-            X509RevocationMode revocationMode = X509RevocationMode.NoCheck;
-
-            if (isCertificateSelfSigned)
-            {
-                // Turn off chain validation, because we have a self signed certificate.
-                revocationFlag = X509RevocationFlag.EntireChain;
-                revocationMode = X509RevocationMode.NoCheck;
-            }
-
-            var chainPolicy = new X509ChainPolicy
-            {
-                RevocationFlag = revocationFlag,
-                RevocationMode = revocationMode,
-            };
-
-            if (isCertificateSelfSigned)
-            {
-                chainPolicy.VerificationFlags |= X509VerificationFlags.AllowUnknownCertificateAuthority;
-                chainPolicy.VerificationFlags |= X509VerificationFlags.IgnoreEndRevocationUnknown;
-                chainPolicy.ExtraStore.Add(certificate);
-            }
-            else
-            {
-                chainPolicy.TrustMode = X509ChainTrustMode.System;
-            }
-
-            return chainPolicy;
-        }
     }
 
     public class FakeHttpMessageHandler : DelegatingHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        private readonly ScenarioContext _scenarioContext;
+
+        public FakeHttpMessageHandler(ScenarioContext scenarioContext)
         {
+            _scenarioContext = scenarioContext;
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var uri = request.RequestUri.AbsoluteUri;
+            if(uri == "http://localhost/notificationedp")
+            {
+                var j = await request.Content.ReadAsStringAsync();
+                _scenarioContext.Set(j, "notificationResponse");
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("{}", Encoding.UTF8, "application/json")
+                };
+            }
+
             var redirectUrls = new List<string>
             {
                 "http://a.domain.com",
                 "http://b.domain.com"
             };
             var json = JsonSerializer.Serialize(redirectUrls);
-            return Task.FromResult(new HttpResponseMessage
+            return new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
-            });
+            };
         }
     }
 }

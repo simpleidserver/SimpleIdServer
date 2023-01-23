@@ -487,6 +487,113 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="authorization code cannot be used twice")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationCodeGrantTypeErrors")]
+        [Xunit.TraitAttribute("Description", "authorization code cannot be used twice")]
+        public void AuthorizationCodeCannotBeUsedTwice()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization code cannot be used twice", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 113
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 114
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table166 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table166.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table166.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table166.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table166.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table166.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table166.AddRow(new string[] {
+                            "scope",
+                            "secondScope"});
+#line 115
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table166, "When ");
+#line hidden
+#line 124
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table167 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table167.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table167.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table167.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table167.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table167.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 126
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table167, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table168 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table168.AddRow(new string[] {
+                            "client_id",
+                            "thirdClient"});
+                table168.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table168.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table168.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table168.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 134
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table168, "And ");
+#line hidden
+#line 142
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 143
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 144
+ testRunner.Then("JSON \'error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 145
+ testRunner.Then("JSON \'error_description\'=\'authorization code has already been used, all tokens pr" +
+                        "eviously issued have been revoked\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

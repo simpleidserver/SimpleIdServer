@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             try
             {
-                await Validate(request, cancellationToken);
+                await _validator.Validate(request, cancellationToken);
                 var client = await Build(request, cancellationToken);
                 _clientRepository.Add(client);
                 await _clientRepository.SaveChanges(cancellationToken);
@@ -66,18 +66,11 @@ namespace SimpleIdServer.IdServer.Api.Register
                 return new BadRequestObjectResult(jObj);
             }
 
-            async Task Validate(RegisterClientRequest request, CancellationToken cancellationToken)
-            {
-                _validator.Validate(request);
-                var existingClient = await _clientRepository.Query().AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == request.ClientId, cancellationToken);
-                if (existingClient != null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.CLIENT_IDENTIFIER_ALREADY_EXISTS, request.ClientId));
-            }
-
             async Task<Client> Build(RegisterClientRequest request, CancellationToken cancellationToken)
             {
                 var client = new Client
                 {
-                    ClientId = request.ClientId,
+                    ClientId = Guid.NewGuid().ToString(),
                     RegistrationAccessToken = Guid.NewGuid().ToString(),
                     CreateDateTime = DateTime.UtcNow,
                     UpdateDateTime = DateTime.UtcNow,
@@ -118,7 +111,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (res.HasError) return res.ErrorResult;
             try
             {
-                _validator.Validate(request);
+                await _validator.Validate(request, cancellationToken);
                 res.Client.Scopes = await GetScopes(request.Scope, cancellationToken);
                 request.Apply(res.Client, _options);
                 await _clientRepository.SaveChanges(cancellationToken);

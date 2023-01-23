@@ -84,6 +84,13 @@ namespace SimpleIdServer.IdServer.Domains
                 return Translate("client_uri");
             }
         }
+        public ICollection<Translation> ClientUris
+        {
+            get
+            {
+
+            }
+        }
         /// <summary>
         ///Readable TOS uri.
         /// </summary>
@@ -384,6 +391,12 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.BackChannelLogoutUri)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? BackChannelLogoutUri { get; set; } = null;
+        /// <summary>
+        /// Kind of the application. The default, if omitted is web.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.ApplicationType)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ApplicationType { get; set; } = null;
         /// <summary>
         /// Enable or disble the consent screen.
         /// </summary>
