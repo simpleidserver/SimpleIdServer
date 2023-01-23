@@ -50,12 +50,6 @@
     <Compile Update="Features\BCAuthorize.feature.cs">
       <DependentUpon>BCAuthorize.feature</DependentUpon>
     </Compile>
-    <Compile Update="Features\BCDeviceRegistration.feature.cs">
-      <DependentUpon>BCDeviceRegistration.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\BCAuthorizeErrors.feature.cs">
-      <DependentUpon>BCAuthorizeErrors.feature</DependentUpon>
-    </Compile>
     <Compile Update="Features\Configuration.feature.cs">
       <DependentUpon>Configuration.feature</DependentUpon>
     </Compile>
@@ -69,25 +63,6 @@
       <DependentUpon>TokenErrors.feature</DependentUpon>
       <LastGenOutput>Token.feature.feature.cs</LastGenOutput>
       <Generator>SpecFlowSingleFileGenerator</Generator>
-    </Compile>
-    <Compile Update="Features\Token.feature.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-      <LastGenOutput>Token.feature.feature.cs</LastGenOutput>
-      <Generator>SpecFlowSingleFileGenerator</Generator>
-    </Compile>
-    <Compile Update="Features\BCDeviceRegistrationErrors.feature.cs">
-      <DependentUpon>BCDeviceRegistrationErrors.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\UserInfo.feature.cs">
-      <DependentUpon>UserInfo.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\UserInfoErrors.feature.cs">
-      <DependentUpon>UserInfoErrors.feature</DependentUpon>
-    </Compile>
-    <Compile Update="Features\Authorization.feature.cs">
-      <DependentUpon>Authorization.feature</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Update="Features\AuthorizationErrors.feature.cs">
       <DesignTime>True</DesignTime>
