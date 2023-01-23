@@ -119,7 +119,7 @@ namespace SimpleIdServer.Scim.Helpers
                     var direct = attr.CachedChildren.First(c => c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type).ValueString;
 					var isDirect = direct == "direct";
                     UpdateScimRepresentation(indirectChild, newSourceScimRepresentation, mode, propagatedAttribute.TargetAttributeId, propagatedAttribute.SourceResourceType, targetSchema, isDirect, out bool isAttrUpdated);
-                    result.UpdateReferenceAttr(indirectChild, propagatedAttribute.TargetAttributeId, targetSchema.GetAttributeById(propagatedAttribute.TargetAttributeId).FullPath, newSourceScimRepresentation.Id, location);
+                    result.AddReferenceAttr(indirectChild, propagatedAttribute.TargetAttributeId, targetSchema.GetAttributeById(propagatedAttribute.TargetAttributeId).FullPath, newSourceScimRepresentation.Id, location);
                     indirectChild.SetUpdated(DateTime.UtcNow);
                 }
 
@@ -204,7 +204,7 @@ namespace SimpleIdServer.Scim.Helpers
 					var direct = attr.CachedChildren.First(c => c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type).ValueString;
 					var isDirect = direct == "direct";
                     UpdateScimRepresentation(indirectChild, newSourceScimRepresentation, mode, propagatedAttribute.TargetAttributeId, propagatedAttribute.SourceResourceType, targetSchema, isDirect, out bool isAttrUpdated);
-					result.UpdateReferenceAttr(indirectChild, propagatedAttribute.TargetAttributeId, targetSchema.GetAttributeById(propagatedAttribute.TargetAttributeId).FullPath, newSourceScimRepresentation.Id, location);
+					result.AddReferenceAttr(indirectChild, propagatedAttribute.TargetAttributeId, targetSchema.GetAttributeById(propagatedAttribute.TargetAttributeId).FullPath, newSourceScimRepresentation.Id, location);
 					indirectChild.SetUpdated(DateTime.UtcNow);
 				}
 
