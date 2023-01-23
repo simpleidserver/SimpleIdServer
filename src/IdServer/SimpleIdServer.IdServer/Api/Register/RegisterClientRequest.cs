@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
@@ -9,13 +10,13 @@ using SimpleIdServer.IdServer.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading;
 
 namespace SimpleIdServer.IdServer.Api.Register
 {
     [JsonConverter(typeof(RegisterClientRequestConverter))]
     public class RegisterClientRequest
     {
+        [JsonPropertyName(OAuthClientParameters.ApplicationType)]
         [BindProperty(Name = OAuthClientParameters.ApplicationType)]
         public string? ApplicationType { get; set; }
         [BindProperty(Name = OAuthClientParameters.SoftwareStatement)]
@@ -96,24 +97,97 @@ namespace SimpleIdServer.IdServer.Api.Register
         [BindProperty(Name = OAuthClientParameters.BCAuthenticationRequestSigningAlg)]
         [JsonPropertyName(OAuthClientParameters.BCAuthenticationRequestSigningAlg)]
         public string? BCAuthenticationRequestSigningAlg { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.DefaultMaxAge)]
+        [JsonPropertyName(OAuthClientParameters.DefaultMaxAge)]
+        public double? DefaultMaxAge { get; set; }
+        [BindProperty(Name = OAuthClientParameters.BCUserCodeParameter)]
+        [JsonPropertyName(OAuthClientParameters.BCUserCodeParameter)]
+        public bool BCUserCodeParameter { get; set; } = false;
+        [BindProperty(Name = OAuthClientParameters.FrontChannelLogoutUri)]
+        [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutUri)]
+        public string? FrontChannelLogoutUri { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.FrontChannelLogoutSessionRequired)]
+        [JsonPropertyName(OAuthClientParameters.FrontChannelLogoutSessionRequired)]
+        public bool FrontChannelLogoutSessionRequired { get; set; } = false;
+        [BindProperty(Name = OAuthClientParameters.BackChannelLogoutUri)]
+        [JsonPropertyName(OAuthClientParameters.BackChannelLogoutUri)]
+        public string? BackChannelLogoutUri { get; set; } = null;
+        [BindProperty(Name = OAuthClientParameters.BackChannelLogoutSessionRequired)]
+        [JsonPropertyName(OAuthClientParameters.BackChannelLogoutSessionRequired)]
+        public bool BackChannelLogoutSessionRequired { get; set; } = false;
+        [BindProperty(Name = OAuthClientParameters.DefaultAcrValues)]
+        [JsonPropertyName(OAuthClientParameters.DefaultAcrValues)]
+        public IEnumerable<string> DefaultAcrValues { get; set; } = new string[0];
+        [BindProperty(Name = OAuthClientParameters.PostLogoutRedirectUris)]
+        [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
+        public IEnumerable<string> PostLogoutRedirectUris { get; set; } = new string[0];
         [JsonIgnore]
         public ICollection<RegisterTranslation> Translations = new List<RegisterTranslation>();
 
         public void Apply(Client client, IdServerHostOptions options)
         {
-            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            if (!string.IsNullOrWhiteSpace(ClientName)) client.AddClientName(language, ClientName);
+            client.RedirectionUrls = RedirectUris;
+            client.SectorIdentifierUri = SectorIdentifierUri;
+            client.DefaultAcrValues = DefaultAcrValues;
+            client.PostLogoutRedirectUris = PostLogoutRedirectUris;
             if (GrantTypes == null || !GrantTypes.Any()) client.GrantTypes = new[] { AuthorizationCodeHandler.GRANT_TYPE };
             else client.GrantTypes = GrantTypes.ToList();
+
             if (string.IsNullOrWhiteSpace(TokenAuthMethod)) client.TokenEndPointAuthMethod = options.DefaultTokenEndPointAuthMethod;
             else client.TokenEndPointAuthMethod = TokenAuthMethod;
+
             if (ResponseTypes == null || !ResponseTypes.Any()) client.ResponseTypes = new[] { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE };
             else client.ResponseTypes = ResponseTypes;
+
             if (string.IsNullOrWhiteSpace(TokenSignedResponseAlg)) client.TokenSignedResponseAlg = options.DefaultTokenSignedResponseAlg;
             else client.TokenSignedResponseAlg = TokenSignedResponseAlg;
+
             if (string.IsNullOrWhiteSpace(TokenEncryptedResponseAlg)) client.TokenEncryptedResponseAlg = options.DefaultTokenEncrypteAlg;
+            else client.TokenEncryptedResponseAlg= TokenEncryptedResponseAlg;
+
             if (string.IsNullOrWhiteSpace(TokenEncryptedResponseEnc)) client.TokenEncryptedResponseEnc = options.DefaultTokenEncryptedEnc;
             else client.TokenEncryptedResponseEnc = TokenEncryptedResponseEnc;
+
+            if (string.IsNullOrWhiteSpace(ApplicationType)) client.ApplicationType = "web";
+            else client.ApplicationType = ApplicationType;
+
+            if (string.IsNullOrWhiteSpace(SubjectType)) client.SubjectType = options.DefaultSubjectType;
+            else client.SubjectType = SubjectType;
+
+            if (string.IsNullOrWhiteSpace(IdTokenSignedResponseAlg)) client.IdTokenSignedResponseAlg = SecurityAlgorithms.RsaSha256;
+            else client.IdTokenSignedResponseAlg = IdTokenSignedResponseAlg;
+
+            if (DefaultMaxAge == null) client.DefaultMaxAge = options.DefaultMaxAge;
+            else client.DefaultMaxAge = DefaultMaxAge;
+
+            client.IdTokenEncryptedResponseAlg = IdTokenEncryptedResponseAlg;
+            client.IdTokenEncryptedResponseEnc = IdTokenEncryptedResponseEnc;
+            if (!string.IsNullOrWhiteSpace(client.IdTokenEncryptedResponseAlg) && string.IsNullOrWhiteSpace(IdTokenEncryptedResponseEnc)) client.IdTokenEncryptedResponseEnc = SecurityAlgorithms.Aes128CbcHmacSha256;
+
+            client.UserInfoSignedResponseAlg= UserInfoSignedResponseAlg;
+            client.UserInfoEncryptedResponseAlg = UserInfoEncryptedResponseAlg;
+            client.UserInfoEncryptedResponseEnc = UserInfoEncryptedResponseEnc;
+            if (!string.IsNullOrWhiteSpace(client.UserInfoEncryptedResponseAlg) && string.IsNullOrWhiteSpace(UserInfoEncryptedResponseAlg)) client.UserInfoEncryptedResponseEnc = SecurityAlgorithms.Aes128CbcHmacSha256;
+
+            client.RequestObjectSigningAlg = RequestObjectSigningAlg;
+            client.RequestObjectEncryptionAlg = RequestObjectEncryptionAlg;
+            client.RequestObjectEncryptionEnc = RequestObjectEncryptionEnc;
+            if (!string.IsNullOrWhiteSpace(client.RequestObjectEncryptionAlg) && string.IsNullOrWhiteSpace(RequestObjectEncryptionEnc)) client.RequestObjectEncryptionEnc = SecurityAlgorithms.Aes128CbcHmacSha256;
+
+            if (!string.IsNullOrWhiteSpace(RequestObjectEncryptionEnc)) client.RequestObjectEncryptionEnc = RequestObjectEncryptionEnc;
+
+            client.BCTokenDeliveryMode = BCTokenDeliveryMode;
+            client.BCClientNotificationEndpoint = BCClientNotificationEndpoint;
+            client.BCAuthenticationRequestSigningAlg = BCAuthenticationRequestSigningAlg;
+            client.BCUserCodeParameter = BCUserCodeParameter;
+
+            client.FrontChannelLogoutUri = FrontChannelLogoutUri;
+            client.FrontChannelLogoutSessionRequired = FrontChannelLogoutSessionRequired;
+
+            client.BackChannelLogoutUri = BackChannelLogoutUri;
+            client.BackChannelLogoutSessionRequired = BackChannelLogoutSessionRequired;
+
+            client.InitiateLoginUri = InitiateLoginUri;
         }
     }
 

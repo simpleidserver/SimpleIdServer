@@ -63,5 +63,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string BackChannelLogoutUri = "backchannel_logout_uri";
         public const string ApplicationType = "application_type";
         public const string InitiateLoginUri = "initiate_login_uri";
+        public const string DefaultMaxAge = "default_max_age";
+        public const string DefaultAcrValues = "default_acr_values";
     }
 }

@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -87,9 +88,17 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public string DefaultTokenEncryptedEnc { get; set; } = SecurityAlgorithms.Aes128CbcHmacSha256;
         /// <summary>
+        /// Default subject type.
+        /// </summary>
+        public string DefaultSubjectType { get; set; } = PublicSubjectTypeBuilder.SUBJECT_TYPE;
+        /// <summary>
         /// Default code challenge method.
         /// </summary>
         public string DefaultCodeChallengeMethod { get; set; } = PlainCodeChallengeMethodHandler.DEFAULT_NAME;
+        /// <summary>
+        /// Default max_age.
+        /// </summary>
+        public double? DefaultMaxAge { get; set; } = null;
         /// <summary>
         /// Customizable parameters.
         /// </summary>

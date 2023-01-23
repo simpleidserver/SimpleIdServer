@@ -80,89 +80,6 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_id is missing")]
-        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_id is missing")]
-        public void ErrorIsReturnedWhenClient_IdIsMissing()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_id is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 4
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table255 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-#line 5
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table255, "When ");
-#line hidden
-#line 8
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 10
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 11
- testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 12
- testRunner.And("JSON \'$.error_description\'=\'missing parameter client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when client_id already exists")]
-        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when client_id already exists")]
-        public void ErrorIsReturnedWhenClient_IdAlreadyExists()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when client_id already exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 14
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table256 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table256.AddRow(new string[] {
-                            "client_id",
-                            "firstClient"});
-#line 15
- testRunner.When("execute HTTP POST JSON request \'https://localhost:8080/register\'", ((string)(null)), table256, "When ");
-#line hidden
-#line 19
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 21
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 22
- testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 23
- testRunner.And("JSON \'$.error_description\'=\'client identifier firstClient already exists\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
         [Xunit.SkippableFactAttribute(DisplayName="Error is returned when trying to get a client and authorization header is missing" +
             "")]
         [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
@@ -174,7 +91,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to get a client and authorization header is missing" +
                     "", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 25
+#line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -184,13 +101,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table257 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table250 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-#line 26
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table257, "When ");
+#line 5
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table250, "When ");
 #line hidden
-#line 29
+#line 8
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -205,7 +122,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when authorization header is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 31
+#line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -215,13 +132,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table258 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table251 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-#line 32
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table258, "When ");
+#line 11
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table251, "When ");
 #line hidden
-#line 35
+#line 14
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -236,7 +153,281 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when access token is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 37
+#line 16
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table252 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table252.AddRow(new string[] {
+                            "Authorization",
+                            "accesstoken"});
+#line 17
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table252, "When ");
+#line hidden
+#line 21
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="application_type must be correct")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "application_type must be correct")]
+        public void Application_TypeMustBeCorrect()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("application_type must be correct", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 23
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table253 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table253.AddRow(new string[] {
+                            "application_type",
+                            "unknown"});
+#line 24
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table253, "When ");
+#line hidden
+#line 28
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 30
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 31
+ testRunner.Then("JSON \'error_description\'=\'application type is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="sectore_identifier_uri must be correct")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "sectore_identifier_uri must be correct")]
+        public void Sectore_Identifier_UriMustBeCorrect()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("sectore_identifier_uri must be correct", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 33
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table254 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table254.AddRow(new string[] {
+                            "sector_identifier_uri",
+                            "unknown"});
+#line 34
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table254, "When ");
+#line hidden
+#line 38
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 40
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 41
+ testRunner.Then("JSON \'error_description\'=\'sector_identifier_uri is not a valid URI\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="sectore_identifier_uri must contain HTTPS scheme")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "sectore_identifier_uri must contain HTTPS scheme")]
+        public void Sectore_Identifier_UriMustContainHTTPSScheme()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("sectore_identifier_uri must contain HTTPS scheme", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 43
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table255 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table255.AddRow(new string[] {
+                            "sector_identifier_uri",
+                            "http://localhost"});
+#line 44
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table255, "When ");
+#line hidden
+#line 48
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 50
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 51
+ testRunner.Then("JSON \'error_description\'=\'sector_identifier_uri doesn\'t contain https scheme\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="initiate_login_uri must be correct")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "initiate_login_uri must be correct")]
+        public void Initiate_Login_UriMustBeCorrect()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("initiate_login_uri must be correct", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 53
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table256 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table256.AddRow(new string[] {
+                            "initiate_login_uri",
+                            "unknown"});
+#line 54
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table256, "When ");
+#line hidden
+#line 58
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 60
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 61
+ testRunner.Then("JSON \'error_description\'=\'initiate_login_uri is not a valid URI\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="initiate_login_uri must contains HTTPS scheme")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "initiate_login_uri must contains HTTPS scheme")]
+        public void Initiate_Login_UriMustContainsHTTPSScheme()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("initiate_login_uri must contains HTTPS scheme", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 63
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table257 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table257.AddRow(new string[] {
+                            "initiate_login_uri",
+                            "http://localhost"});
+#line 64
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table257, "When ");
+#line hidden
+#line 68
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 70
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 71
+ testRunner.Then("JSON \'error_description\'=\'initiate_login_uri doesn\'t contain https scheme\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="subject_type must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "subject_type must be supported")]
+        public void Subject_TypeMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("subject_type must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 73
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table258 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table258.AddRow(new string[] {
+                            "subject_type",
+                            "unknow"});
+#line 74
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table258, "When ");
+#line hidden
+#line 78
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 80
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 81
+ testRunner.Then("JSON \'error_description\'=\'subject_type is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="id_token_signed_response_alg must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "id_token_signed_response_alg must be supported")]
+        public void Id_Token_Signed_Response_AlgMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("id_token_signed_response_alg must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 83
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -250,27 +441,33 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
                 table259.AddRow(new string[] {
-                            "Authorization",
-                            "accesstoken"});
-#line 38
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table259, "When ");
+                            "id_token_signed_response_alg",
+                            "unknow"});
+#line 84
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table259, "When ");
 #line hidden
-#line 42
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 88
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 90
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 91
+ testRunner.Then("JSON \'error_description\'=\'id_token_signed_response_alg is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when clientId doesn\'t exist")]
+        [Xunit.SkippableFactAttribute(DisplayName="id_token_encrypted_response_alg must be supported")]
         [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when clientId doesn\'t exist")]
-        public void ErrorIsReturnedWhenClientIdDoesntExist()
+        [Xunit.TraitAttribute("Description", "id_token_encrypted_response_alg must be supported")]
+        public void Id_Token_Encrypted_Response_AlgMustBeSupported()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when clientId doesn\'t exist", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 44
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("id_token_encrypted_response_alg must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 93
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -284,13 +481,637 @@ this.ScenarioInitialize(scenarioInfo);
                             "Key",
                             "Value"});
                 table260.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer accesstoken"});
-#line 45
- testRunner.When("execute HTTP GET request \'https://localhost:8080/register/clientid\'", ((string)(null)), table260, "When ");
+                            "id_token_encrypted_response_alg",
+                            "unknown"});
+#line 94
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table260, "When ");
 #line hidden
-#line 49
- testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 98
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 100
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 101
+ testRunner.Then("JSON \'error_description\'=\'id_token_encrypted_response_alg is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="id_token_encrypted_response_enc must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "id_token_encrypted_response_enc must be supported")]
+        public void Id_Token_Encrypted_Response_EncMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("id_token_encrypted_response_enc must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 103
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table261 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table261.AddRow(new string[] {
+                            "id_token_encrypted_response_enc",
+                            "unknown"});
+#line 104
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table261, "When ");
+#line hidden
+#line 108
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 110
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 111
+ testRunner.Then("JSON \'error_description\'=\'id_token_encrypted_response_enc is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="id_token_encrypted_response_alg is required when id_token_encrypted_response_enc " +
+            "is specified")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "id_token_encrypted_response_alg is required when id_token_encrypted_response_enc " +
+            "is specified")]
+        public void Id_Token_Encrypted_Response_AlgIsRequiredWhenId_Token_Encrypted_Response_EncIsSpecified()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("id_token_encrypted_response_alg is required when id_token_encrypted_response_enc " +
+                    "is specified", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 113
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table262 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table262.AddRow(new string[] {
+                            "id_token_encrypted_response_enc",
+                            "A128CBC-HS256"});
+#line 114
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table262, "When ");
+#line hidden
+#line 118
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 120
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 121
+ testRunner.Then("JSON \'error_description\'=\'missing parameter id_token_encrypted_response_alg\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="userinfo_signed_response_alg must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "userinfo_signed_response_alg must be supported")]
+        public void Userinfo_Signed_Response_AlgMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("userinfo_signed_response_alg must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 123
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table263 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table263.AddRow(new string[] {
+                            "userinfo_signed_response_alg",
+                            "unknown"});
+#line 124
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table263, "When ");
+#line hidden
+#line 128
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 130
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 131
+ testRunner.Then("JSON \'error_description\'=\'userinfo_signed_response_alg is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="userinfo_encrypted_response_alg must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "userinfo_encrypted_response_alg must be supported")]
+        public void Userinfo_Encrypted_Response_AlgMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("userinfo_encrypted_response_alg must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 133
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table264 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table264.AddRow(new string[] {
+                            "userinfo_encrypted_response_alg",
+                            "unknown"});
+#line 134
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table264, "When ");
+#line hidden
+#line 138
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 140
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 141
+ testRunner.Then("JSON \'error_description\'=\'userinfo_encrypted_response_alg is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="userinfo_encrypted_response_enc must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "userinfo_encrypted_response_enc must be supported")]
+        public void Userinfo_Encrypted_Response_EncMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("userinfo_encrypted_response_enc must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 143
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table265 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table265.AddRow(new string[] {
+                            "userinfo_encrypted_response_enc",
+                            "unknown"});
+#line 144
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table265, "When ");
+#line hidden
+#line 148
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 150
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 151
+ testRunner.Then("JSON \'error_description\'=\'userinfo_encrypted_response_enc is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="userinfo_encrypted_response_alg is required when userinfo_encrypted_response_enc " +
+            "is specified")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "userinfo_encrypted_response_alg is required when userinfo_encrypted_response_enc " +
+            "is specified")]
+        public void Userinfo_Encrypted_Response_AlgIsRequiredWhenUserinfo_Encrypted_Response_EncIsSpecified()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("userinfo_encrypted_response_alg is required when userinfo_encrypted_response_enc " +
+                    "is specified", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 153
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table266 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table266.AddRow(new string[] {
+                            "userinfo_encrypted_response_enc",
+                            "A128CBC-HS256"});
+#line 154
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table266, "When ");
+#line hidden
+#line 158
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 160
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 161
+ testRunner.Then("JSON \'error_description\'=\'missing parameter userinfo_encrypted_response_alg\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request_object_signing_alg must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "request_object_signing_alg must be supported")]
+        public void Request_Object_Signing_AlgMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request_object_signing_alg must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 164
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table267 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table267.AddRow(new string[] {
+                            "request_object_signing_alg",
+                            "unknown"});
+#line 165
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table267, "When ");
+#line hidden
+#line 169
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 171
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 172
+ testRunner.Then("JSON \'error_description\'=\'request_object_signing_alg is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request_object_encryption_alg must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "request_object_encryption_alg must be supported")]
+        public void Request_Object_Encryption_AlgMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request_object_encryption_alg must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 174
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table268 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table268.AddRow(new string[] {
+                            "request_object_encryption_alg",
+                            "unknown"});
+#line 175
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table268, "When ");
+#line hidden
+#line 179
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 181
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 182
+ testRunner.Then("JSON \'error_description\'=\'request_object_encryption_alg is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request_object_encryption_enc must be supported")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "request_object_encryption_enc must be supported")]
+        public void Request_Object_Encryption_EncMustBeSupported()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request_object_encryption_enc must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 185
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table269 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table269.AddRow(new string[] {
+                            "request_object_encryption_enc",
+                            "unknown"});
+#line 186
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table269, "When ");
+#line hidden
+#line 190
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 192
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 193
+ testRunner.Then("JSON \'error_description\'=\'request_object_encryption_enc is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="request_object_encryption_alg is required when request_object_encryption_enc is s" +
+            "pecified")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "request_object_encryption_alg is required when request_object_encryption_enc is s" +
+            "pecified")]
+        public void Request_Object_Encryption_AlgIsRequiredWhenRequest_Object_Encryption_EncIsSpecified()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request_object_encryption_alg is required when request_object_encryption_enc is s" +
+                    "pecified", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 196
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table270 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table270.AddRow(new string[] {
+                            "request_object_encryption_enc",
+                            "A128CBC-HS256"});
+#line 197
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table270, "When ");
+#line hidden
+#line 201
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 203
+ testRunner.Then("JSON \'error\'=\'invalid_client_metadata\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 204
+ testRunner.Then("JSON \'error_description\'=\'missing parameter request_object_encryption_alg\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="web client must have a valid redirect_uri")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "web client must have a valid redirect_uri")]
+        public void WebClientMustHaveAValidRedirect_Uri()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("web client must have a valid redirect_uri", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 206
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table271 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table271.AddRow(new string[] {
+                            "redirect_uris",
+                            "[invalid]"});
+                table271.AddRow(new string[] {
+                            "application_type",
+                            "web"});
+#line 207
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table271, "When ");
+#line hidden
+#line 212
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 214
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 215
+ testRunner.Then("JSON \'error_description\'=\'redirect_uri invalid is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="redirect_uri cannot contains fragment")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "redirect_uri cannot contains fragment")]
+        public void Redirect_UriCannotContainsFragment()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect_uri cannot contains fragment", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 217
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table272 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table272.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost#foobar]"});
+                table272.AddRow(new string[] {
+                            "application_type",
+                            "web"});
+#line 218
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table272, "When ");
+#line hidden
+#line 223
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 225
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 226
+ testRunner.Then("JSON \'error_description\'=\'the redirect_uri cannot contains fragment\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="native client must have a valid redirect_uri")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "native client must have a valid redirect_uri")]
+        public void NativeClientMustHaveAValidRedirect_Uri()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("native client must have a valid redirect_uri", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 228
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table273 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table273.AddRow(new string[] {
+                            "redirect_uris",
+                            "[invalid]"});
+                table273.AddRow(new string[] {
+                            "application_type",
+                            "native"});
+#line 229
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table273, "When ");
+#line hidden
+#line 234
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 236
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 237
+ testRunner.Then("JSON \'error_description\'=\'redirect_uri invalid is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="redirect_uri must have https scheme")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "redirect_uri must have https scheme")]
+        public void Redirect_UriMustHaveHttpsScheme()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect_uri must have https scheme", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 239
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table274 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table274.AddRow(new string[] {
+                            "redirect_uris",
+                            "[http://localhost]"});
+#line 240
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table274, "When ");
+#line hidden
+#line 244
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 246
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 247
+ testRunner.Then("JSON \'error_description\'=\'redirect_uri does not contain https scheme\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="web client cannot have redirect_uri pointing to localhost")]
+        [Xunit.TraitAttribute("FeatureTitle", "RegisterErrors")]
+        [Xunit.TraitAttribute("Description", "web client cannot have redirect_uri pointing to localhost")]
+        public void WebClientCannotHaveRedirect_UriPointingToLocalhost()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("web client cannot have redirect_uri pointing to localhost", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 249
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table275 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table275.AddRow(new string[] {
+                            "redirect_uris",
+                            "[https://localhost]"});
+#line 250
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table275, "When ");
+#line hidden
+#line 254
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 256
+ testRunner.Then("JSON \'error\'=\'invalid_redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 257
+ testRunner.Then("JSON \'error_description\'=\'redirect_uri must not contain localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

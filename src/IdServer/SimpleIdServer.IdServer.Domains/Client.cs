@@ -84,13 +84,6 @@ namespace SimpleIdServer.IdServer.Domains
                 return Translate("client_uri");
             }
         }
-        public ICollection<Translation> ClientUris
-        {
-            get
-            {
-
-            }
-        }
         /// <summary>
         ///Readable TOS uri.
         /// </summary>
@@ -398,6 +391,12 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ApplicationType { get; set; } = null;
         /// <summary>
+        /// URI using the https scheme that a third party can use to initiate a login by the RP.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.InitiateLoginUri)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? InitiateLoginUri { get; set; }
+        /// <summary>
         /// Enable or disble the consent screen.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.IsConsentDisabled)]
@@ -405,10 +404,12 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// 'resource' parameter can be required or not.
         /// </summary>
+        [JsonIgnore]
         public bool IsResourceParameterRequired { get; set; } = false;
         /// <summary>
         /// Expiration time in seconds of auth_req_id
         /// </summary>
+        [JsonIgnore]
         public int AuthReqIdExpirationTimeInSeconds { get; set; } = 120;
         /// <summary>
         /// Scopes used by the client to control its access.
@@ -439,7 +440,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// Default acr values.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.DefaultAcrValues)]
         public IEnumerable<string> DefaultAcrValues { get; set; } = new List<string>();
         /// <summary>
         /// A JSON number with a positive integer value indicating the minimum amount of time in seconds that the client MUST wait between polling requests to the token endpoint.
@@ -466,14 +467,6 @@ namespace SimpleIdServer.IdServer.Domains
         public string GetStringParameter(string name) => Parameters[name];
 
         public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');
-
-        public void AddClientName(string language, string value) => 
-            Translations.Add(new Translation
-            {
-                Key = $"{ClientId}_client_name",
-                Value = value,
-                Language = language
-            });
 
         private string? Translate(string key)
         {

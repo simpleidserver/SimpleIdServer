@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Store;
@@ -18,7 +19,7 @@ namespace SimpleIdServer.IdServer.Api.Register
 {
     public interface IRegisterClientRequestValidator
     {
-        Task Validate(RegisterClientRequest request, CancellationToken cancellationToken);
+        Task Validate(Client request, CancellationToken cancellationToken);
     }
 
     public class RegisterClientRequestValidator : IRegisterClientRequestValidator
@@ -40,72 +41,61 @@ namespace SimpleIdServer.IdServer.Api.Register
             _subjectTypeBuilders = subjectTypeBuilders;
         }
 
-        public async Task Validate(RegisterClientRequest request, CancellationToken cancellationToken)
+        public async Task Validate(Client client, CancellationToken cancellationToken)
         {
             var authGrantTypes = _responseTypeHandlers.Select(r => r.GrantType);
             var supportedGrantTypes = _grantTypeHandlers.Select(g => g.GrantType).Union(authGrantTypes).Distinct();
-            var notSupportedGrantTypes = request.GrantTypes.Where(gt => !supportedGrantTypes.Any(sgt => sgt == gt));
+            var notSupportedGrantTypes = client.GrantTypes.Where(gt => !supportedGrantTypes.Any(sgt => sgt == gt));
             if (notSupportedGrantTypes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_GRANT_TYPES, string.Join(",", notSupportedGrantTypes)));
 
-            if (!string.IsNullOrWhiteSpace(request.TokenAuthMethod) && !_oauthClientAuthenticationHandlers.Any(o => o.AuthMethod == request.TokenAuthMethod))
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, request.TokenAuthMethod));
+            if (!string.IsNullOrWhiteSpace(client.TokenEndPointAuthMethod) && !_oauthClientAuthenticationHandlers.Any(o => o.AuthMethod == client.TokenEndPointAuthMethod))
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNKNOWN_AUTH_METHOD, client.TokenEndPointAuthMethod));
 
-            if (!string.IsNullOrWhiteSpace(request.ApplicationType) && request.ApplicationType != "web" && request.ApplicationType != "native")
+            if (!string.IsNullOrWhiteSpace(client.ApplicationType) && client.ApplicationType != "web" && client.ApplicationType != "native")
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_APPLICATION_TYPE);
 
-            if (!string.IsNullOrWhiteSpace(request.SectorIdentifierUri))
+            if (!string.IsNullOrWhiteSpace(client.SectorIdentifierUri))
             {
-                if (!Uri.IsWellFormedUriString(request.SectorIdentifierUri, UriKind.Absolute))
+                if (!Uri.IsWellFormedUriString(client.SectorIdentifierUri, UriKind.Absolute))
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SECTOR_IDENTIFIER_URI);
 
-                var uri = new Uri(request.SectorIdentifierUri);
+                var uri = new Uri(client.SectorIdentifierUri);
                 if (uri.Scheme != "https")
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_SECTOR_IDENTIFIER_URI);
             }
 
-            if (!string.IsNullOrWhiteSpace(request.SubjectType) && !_subjectTypeBuilders.Any(s => s.SubjectType == request.SubjectType))
+            if (!string.IsNullOrWhiteSpace(client.SubjectType) && !_subjectTypeBuilders.Any(s => s.SubjectType == client.SubjectType))
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_SUBJECT_TYPE);
 
-            if (!string.IsNullOrWhiteSpace(request.InitiateLoginUri))
+            if (!string.IsNullOrWhiteSpace(client.InitiateLoginUri))
             {
-                if (!Uri.IsWellFormedUriString(request.InitiateLoginUri, UriKind.Absolute))
+                if (!Uri.IsWellFormedUriString(client.InitiateLoginUri, UriKind.Absolute))
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_INITIATE_LOGIN_URI);
 
-                var uri = new Uri(request.InitiateLoginUri);
+                var uri = new Uri(client.InitiateLoginUri);
                 if (uri.Scheme != "https")
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, ErrorMessages.INVALID_HTTPS_INITIATE_LOGIN_URI);
             }
 
-            var supportedResponseTypeHandlers = _responseTypeHandlers.Where(r => request.GrantTypes.Contains(r.GrantType));
+            var supportedResponseTypeHandlers = _responseTypeHandlers.Where(r => client.GrantTypes.Contains(r.GrantType));
             if (supportedResponseTypeHandlers.Any())
             {
                 var supportedResponseTypes = supportedResponseTypeHandlers.Select(s => s.ResponseType);
-                var unSupportedResponseTypes = request.ResponseTypes.Where(r => !supportedResponseTypes.Contains(r));
+                var unSupportedResponseTypes = client.ResponseTypes.Where(r => !supportedResponseTypes.Contains(r));
                 if (unSupportedResponseTypes.Any())
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.BAD_RESPONSE_TYPES, string.Join(",", unSupportedResponseTypes)));
             }
 
             foreach (var kvp in supportedResponseTypeHandlers.GroupBy(k => k.GrantType))
             {
-                if (!kvp.Any(k => request.ResponseTypes.Contains(k.ResponseType)))
+                if (!kvp.Any(k => client.ResponseTypes.Contains(k.ResponseType)))
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_RESPONSE_TYPE, kvp.Key));
             }
 
-            if (supportedResponseTypeHandlers.Any())
+            if (!string.IsNullOrWhiteSpace(client.Scope))
             {
-                if (request.RedirectUris == null || !request.RedirectUris.Any())
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_PARAMETER, OAuthClientParameters.RedirectUris));
-
-                foreach (var redirectUrl in request.RedirectUris)
-                {
-                    CheckRedirectUrl(redirectUrl);
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Scope))
-            {
-                var scopes = request.Scope.ToScopes();
+                var scopes = client.Scope.ToScopes();
                 var existingScopes = await _scopeRepository.Query().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
                 var existingScopeNames = existingScopes.Select(s => s.Name);
                 var unsupportedScopes = scopes.Except(existingScopeNames);
@@ -113,26 +103,35 @@ namespace SimpleIdServer.IdServer.Api.Register
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.UNSUPPORTED_SCOPES, string.Join(",", unsupportedScopes)));
             }
 
-            CheckUri(request.JwksUri, ErrorMessages.BAD_JWKS_URI);
-            CheckUris(request.Translations, OAuthClientParameters.ClientUri, ErrorMessages.BAD_CLIENT_URI);
-            CheckUris(request.Translations, OAuthClientParameters.LogoUri, ErrorMessages.BAD_LOGO_URI);
-            CheckUris(request.Translations, OAuthClientParameters.TosUri, ErrorMessages.BAD_TOS_URI);
-            CheckUris(request.Translations, OAuthClientParameters.PolicyUri, ErrorMessages.BAD_POLICY_URI);
-            CheckSignature(request.TokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG);
-            CheckEncryption(request.TokenEncryptedResponseAlg, request.TokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.TokenEncryptedResponseAlg);
+            CheckUri(client.JwksUri, ErrorMessages.BAD_JWKS_URI);
+            CheckUris(client.Translations, OAuthClientParameters.ClientUri, ErrorMessages.BAD_CLIENT_URI);
+            CheckUris(client.Translations, OAuthClientParameters.LogoUri, ErrorMessages.BAD_LOGO_URI);
+            CheckUris(client.Translations, OAuthClientParameters.TosUri, ErrorMessages.BAD_TOS_URI);
+            CheckUris(client.Translations, OAuthClientParameters.PolicyUri, ErrorMessages.BAD_POLICY_URI);
+            CheckSignature(client.TokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_TOKEN_SIGNED_RESPONSE_ALG);
+            CheckEncryption(client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_TOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.TokenEncryptedResponseAlg);  
             
+            CheckSignature(client.IdTokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG); CheckEncryption(client.IdTokenEncryptedResponseAlg, client.IdTokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.IdTokenEncryptedResponseAlg);
+            CheckSignature(client.UserInfoSignedResponseAlg, ErrorMessages.UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG);
+            CheckEncryption(client.UserInfoEncryptedResponseAlg, client.UserInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.UserInfoEncryptedResponseAlg);
+            CheckSignature(client.RequestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);
+            CheckEncryption(client.RequestObjectEncryptionAlg, client.RequestObjectEncryptionEnc, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC, OAuthClientParameters.RequestObjectEncryptionAlg);
 
-            
-            CheckSignature(request.IdTokenSignedResponseAlg, ErrorMessages.UNSUPPORTED_IDTOKEN_SIGNED_RESPONSE_ALG); CheckEncryption(request.IdTokenEncryptedResponseAlg, request.IdTokenEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_IDTOKEN_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.IdTokenEncryptedResponseAlg);
-            CheckSignature(request.UserInfoSignedResponseAlg, ErrorMessages.UNSUPPORTED_USERINFO_SIGNED_RESPONSE_ALG);
-            CheckEncryption(request.UserInfoEncryptedResponseAlg, request.UserInfoEncryptedResponseEnc, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ALG, ErrorMessages.UNSUPPORTED_USERINFO_ENCRYPTED_RESPONSE_ENC, OAuthClientParameters.UserInfoEncryptedResponseAlg);
-            CheckSignature(request.RequestObjectSigningAlg, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_SIGNING_ALG);
-            CheckEncryption(request.RequestObjectEncryptionAlg, request.RequestObjectEncryptionEnc, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ALG, ErrorMessages.UNSUPPORTED_REQUEST_OBJECT_ENCRYPTION_ENC, OAuthClientParameters.RequestObjectEncryptionAlg);
+            if (supportedResponseTypeHandlers.Any())
+            {
+                if (client.RedirectionUrls == null || !client.RedirectionUrls.Any())
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(ErrorMessages.MISSING_PARAMETER, OAuthClientParameters.RedirectUris));
+
+                foreach (var redirectUrl in client.RedirectionUrls)
+                {
+                    CheckRedirectUrl(client, redirectUrl);
+                }
+            }
         }
 
-        protected static void CheckUris(ICollection<RegisterTranslation> translations, string name, string errorMessage)
+        protected static void CheckUris(ICollection<Translation> translations, string name, string errorMessage)
         {
-            var filteredTranslations = translations.Where(s => s.Name == name);
+            var filteredTranslations = translations.Where(s => s.Key == name);
             if (!filteredTranslations.Any())
                 return;
 
@@ -149,7 +148,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(errorMessage, url));
         }
 
-        protected virtual void CheckRedirectUrl(string redirectUrl)
+        protected virtual void CheckRedirectUrl(Client client, string redirectUrl)
         {
             if (!Uri.IsWellFormedUriString(redirectUrl, UriKind.Absolute))
                 throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, string.Format(ErrorMessages.BAD_REDIRECT_URI, redirectUrl));
@@ -157,6 +156,17 @@ namespace SimpleIdServer.IdServer.Api.Register
             Uri.TryCreate(redirectUrl, UriKind.Absolute, out Uri uri);
             if (!string.IsNullOrWhiteSpace(uri.Fragment))
                 throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.REDIRECT_URI_CONTAINS_FRAGMENT);
+
+            if (client.ApplicationType == "web")
+            {
+                if (uri.Scheme.ToLowerInvariant() != "https")
+                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_HTTPS_REDIRECT_URI);
+
+                if (uri.Host.ToLowerInvariant() == "localhost")
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_REDIRECT_URI, ErrorMessages.INVALID_LOCALHOST_REDIRECT_URI);
+                }
+            }
         }
 
         protected void CheckSignature(string alg, string errorMessage)

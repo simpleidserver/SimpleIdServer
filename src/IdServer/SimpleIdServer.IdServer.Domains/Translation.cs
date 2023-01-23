@@ -16,14 +16,10 @@ namespace SimpleIdServer.IdServer.Domains
         public string Key { get; set; } = null!;
         public string? Value { get; set; } = null!;
         public string Language { get; set; } = null!;
-        public string Type { get; set; } = null!;
 
         public object Clone()
         {
-            return new Translation(Key, Value, Language)
-            {
-                Type = Type
-            };
+            return new Translation(Key, Value, Language);
         }
     }
 }

@@ -45,8 +45,8 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             try
             {
-                await _validator.Validate(request, cancellationToken);
                 var client = await Build(request, cancellationToken);
+                await _validator.Validate(client, cancellationToken);
                 _clientRepository.Add(client);
                 await _clientRepository.SaveChanges(cancellationToken);
                 return new ContentResult
@@ -68,6 +68,10 @@ namespace SimpleIdServer.IdServer.Api.Register
 
             async Task<Client> Build(RegisterClientRequest request, CancellationToken cancellationToken)
             {
+                DateTime? expirationDateTime = null;
+                if (_options.ClientSecretExpirationInSeconds != null)
+                    expirationDateTime = DateTime.UtcNow.AddSeconds(_options.ClientSecretExpirationInSeconds.Value);
+
                 var client = new Client
                 {
                     ClientId = Guid.NewGuid().ToString(),
@@ -78,10 +82,29 @@ namespace SimpleIdServer.IdServer.Api.Register
                     TokenExpirationTimeInSeconds = _options.DefaultTokenExpirationTimeInSeconds,
                     PreferredTokenProfile = _options.DefaultTokenProfile,
                     ClientSecret = Guid.NewGuid().ToString(),
+                    ClientSecretExpirationTime = expirationDateTime,
                     Scopes = await GetScopes(request.Scope, cancellationToken)
                 };
+                AddTranslations(client, request, "client_name");
+                AddTranslations(client, request, "logo_uri");
+                AddTranslations(client, request, "client_uri");
+                AddTranslations(client, request, "tos_uri");
+                AddTranslations(client, request, "policy_uri");
                 request.Apply(client, _options);
                 return client;
+            }
+
+            void AddTranslations(Client client, RegisterClientRequest request, string key)
+            {
+                foreach(var translation in request.Translations.Where(t => t.Name == key))
+                {
+                    client.Translations.Add(new Translation
+                    {
+                        Key = key,
+                        Language = translation.Language,
+                        Value = translation.Value
+                    });
+                }
             }
         }
 
@@ -111,9 +134,9 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (res.HasError) return res.ErrorResult;
             try
             {
-                await _validator.Validate(request, cancellationToken);
                 res.Client.Scopes = await GetScopes(request.Scope, cancellationToken);
                 request.Apply(res.Client, _options);
+                await _validator.Validate(res.Client, cancellationToken);
                 await _clientRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
             }

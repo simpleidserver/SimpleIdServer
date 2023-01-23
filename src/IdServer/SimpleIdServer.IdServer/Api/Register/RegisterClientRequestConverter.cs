@@ -35,12 +35,19 @@ namespace SimpleIdServer.IdServer.Api.Register
                         {
                             var prop = props.FirstOrDefault(p => p.Name == propertyName);
                             if(prop.p != null)
-                                prop.p.SetValue(result, reader.GetString());
+                            {
+                                if(prop.p.PropertyType == typeof(double?))
+                                    prop.p.SetValue(result, double.Parse(reader.GetString()));
+                                else if(prop.p.PropertyType == typeof(bool))
+                                    prop.p.SetValue(result, bool.Parse(reader.GetString()));
+                                else
+                                    prop.p.SetValue(result, reader.GetString());
+                            }
                             else
                             {
                                 var splitted = propertyName.Split('#');
                                 var name = splitted[0];
-                                var language = splitted.Count() == 1 ? splitted[1] : null;
+                                var language = splitted.Count() == 2 ? splitted[1] : null;
                                 result.Translations.Add(new RegisterTranslation
                                 {
                                     Language = language,

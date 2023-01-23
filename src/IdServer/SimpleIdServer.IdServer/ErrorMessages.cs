@@ -35,6 +35,8 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_AUDIENCE = "invalid audiences";
         public const string INVALID_INITIATE_LOGIN_URI = "initiate_login_uri is not a valid URI";
         public const string INVALID_USER_CODE = "the user_code is not valid";
+        public const string INVALID_HTTPS_REDIRECT_URI = "redirect_uri does not contain https scheme";
+        public const string INVALID_LOCALHOST_REDIRECT_URI = "redirect_uri must not contain localhost";
         public const string INVALID_SUBJECT_TYPE = "subject_type is invalid";
         public const string INVALID_BC_DELIVERY_MODE = "invalid back channel delivery mode";
         public const string INVALID_BC_CLIENT_NOTIFICATION_EDP = "invalid back channel client notification endpoint";
