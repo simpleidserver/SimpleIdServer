@@ -64,7 +64,8 @@ namespace SimpleIdServer.Scim.Helpers
             var evt = evts.FirstOrDefault(e => e.RepresentationAggregateId == representation.Id && e.SchemaAttributeId == schemaAttributeId);
             if (evt != null)
             {
-                evt.Values.Add(value);
+                if (!evt.Values.Contains(value))
+                    evt.Values.Add(value);
                 return;
             }
 

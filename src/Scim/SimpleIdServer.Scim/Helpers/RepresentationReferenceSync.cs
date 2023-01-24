@@ -296,10 +296,10 @@ namespace SimpleIdServer.Scim.Helpers
                     child.AddIndirectReference(resolvedParent.Id, attributeMapping.TargetAttributeId);
                     if (parentAttrs.Any(p => child.GetChildren(p).Any(c => c.SchemaAttribute.Name == "value" && c.ValueString == resolvedParent.Id))) continue;
                     var schema = schemas.First(s => s.ResourceType == child.ResourceType);
-                    result.AddReferenceAttr(child, attributeMapping.TargetAttributeId, schema.GetAttributeById(attributeMapping.TargetAttributeId).FullPath, resolvedParent.Id, location);
                     BuildScimRepresentationAttribute(attributeMapping.TargetAttributeId,
                         child, resolvedParent, Mode.PROPAGATE_INHERITANCE,
                         attributeMapping.SourceResourceType, schema, false);
+                    result.AddReferenceAttr(child, attributeMapping.TargetAttributeId, schema.GetAttributeById(attributeMapping.TargetAttributeId).FullPath, resolvedParent.Id, location);
                 }
             }
         }
