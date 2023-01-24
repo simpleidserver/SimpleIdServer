@@ -115,7 +115,8 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     var targetSchema = targetSchemas.First(s => s.ResourceType == propagatedAttribute.TargetResourceType);
                     var attrs = indirectChild.HierarchicalAttributes.Where(a => a.SchemaAttributeId == propagatedAttribute.TargetAttributeId);
-                    var attr = attrs.Single(a => a.CachedChildren.Any(c => c.ValueString == newSourceScimRepresentation.Id && c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value));
+                    var attr = attrs.SingleOrDefault(a => a.CachedChildren.Any(c => c.ValueString == newSourceScimRepresentation.Id && c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value));
+					if (attr == null) continue;
                     var direct = attr.CachedChildren.First(c => c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type).ValueString;
 					var isDirect = direct == "direct";
                     UpdateScimRepresentation(indirectChild, newSourceScimRepresentation, mode, propagatedAttribute.TargetAttributeId, propagatedAttribute.SourceResourceType, targetSchema, isDirect, out bool isAttrUpdated);
@@ -200,7 +201,8 @@ namespace SimpleIdServer.Scim.Helpers
 				{
 					var targetSchema = targetSchemas.First(s => s.ResourceType == propagatedAttribute.TargetResourceType);
 					var attrs = indirectChild.HierarchicalAttributes.Where(a => a.SchemaAttributeId == propagatedAttribute.TargetAttributeId);
-					var attr = attrs.Single(a => a.CachedChildren.Any(c => c.ValueString == newSourceScimRepresentation.Id && c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value));
+					var attr = attrs.SingleOrDefault(a => a.CachedChildren.Any(c => c.ValueString == newSourceScimRepresentation.Id && c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value));
+					if (attr == null) continue;
 					var direct = attr.CachedChildren.First(c => c.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Type).ValueString;
 					var isDirect = direct == "direct";
                     UpdateScimRepresentation(indirectChild, newSourceScimRepresentation, mode, propagatedAttribute.TargetAttributeId, propagatedAttribute.SourceResourceType, targetSchema, isDirect, out bool isAttrUpdated);
@@ -269,8 +271,8 @@ namespace SimpleIdServer.Scim.Helpers
                     child.RemoveIndirectReference(resolvedParentId, attributeMappingToBePurged.TargetAttributeId);
                     if (child.IndirectReferences.Any(r => r.TargetAttributeId == attributeMappingToBePurged.TargetAttributeId && r.TargetReferenceId == resolvedParentId && r.NbReferences <= 0))
 					{
-                        res.RemoveReferenceAttr(child, attributeMappingToBePurged.TargetAttributeId, parentAttr.FullPath, resolvedParentId, location);
                         child.RemoveAttributesById(new string[] { parent.ParentAttributeId });
+                        res.RemoveReferenceAttr(child, attributeMappingToBePurged.TargetAttributeId, parentAttr.FullPath, resolvedParentId, location);
                     }
                 }
             }

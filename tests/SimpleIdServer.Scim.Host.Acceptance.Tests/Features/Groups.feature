@@ -666,6 +666,91 @@ Scenario: Remove all relationships and check user belongs to one direct group (H
 	And 'groups' length is equals to '1'
 	And JSON 'groups[0].type'='direct'	
 
+Scenario: Remove the nested group from the parent group and check user only has one group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                   |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]     |
+	| Operations | [ { "op": "remove", "path": "members" } ]               |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '1'
+	And JSON 'groups[0].type'='direct'	
+
+Scenario: Remove the nested group from the parent group and check user only has one group (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+
+	And extract JSON from bodyFindRootSCIMSchemaByResourceType
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+	
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ ]                                               |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '1'
+	And JSON 'groups[0].type'='direct'	
+
 Scenario: When parent's group 'displayName' is updated then user information must be updated (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |
