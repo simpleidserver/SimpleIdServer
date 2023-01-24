@@ -2211,7 +2211,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "members",
                             "[ { \"value\": \"$userId$\" } ]"});
 #line 681
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table73, "When ");
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table73, "And ");
 #line hidden
 #line 687
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -2344,10 +2344,10 @@ this.ScenarioInitialize(scenarioInfo);
                             "members",
                             "[ { \"value\": \"$userId$\" } ]"});
 #line 723
- testRunner.When("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table77, "When ");
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table77, "And ");
 #line hidden
 #line 729
- testRunner.And("extract JSON from bodyFindRootSCIMSchemaByResourceType", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 730
  testRunner.And("extract \'id\' from JSON body into \'firstGroup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

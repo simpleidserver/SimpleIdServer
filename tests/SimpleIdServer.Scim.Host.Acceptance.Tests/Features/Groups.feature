@@ -678,7 +678,7 @@ Scenario: Remove the nested group from the parent group and check user only has 
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 
-	When execute HTTP POST JSON request 'http://localhost/Groups'
+	And execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |
 	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
 	| displayName | firstGroup                                        |
@@ -720,13 +720,13 @@ Scenario: Remove the nested group from the parent group and check user only has 
 	And extract JSON from body
 	And extract 'id' from JSON body into 'userId'
 
-	When execute HTTP POST JSON request 'http://localhost/Groups'
+	And execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |
 	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
 	| displayName | firstGroup                                        |
 	| members     | [ { "value": "$userId$" } ]                       |
-
-	And extract JSON from bodyFindRootSCIMSchemaByResourceType
+	
+	And extract JSON from body
 	And extract 'id' from JSON body into 'firstGroup'
 
 	And execute HTTP POST JSON request 'http://localhost/Groups'
