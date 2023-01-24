@@ -208,7 +208,8 @@ namespace SimpleIdServer.Scim.Domain
                             newAttributes = FilterDuplicate(attributes, newAttributes);
                             if(newAttributes.Any()) removeCallback(attributes.Where(a => !a.SchemaAttribute.MultiValued && a.FullPath == fullPath).ToList());
                             var isAttributeExits = !string.IsNullOrWhiteSpace(fullPath) && attributes.Any(a => a.FullPath == fullPath);
-                            if(newAttributes.Any(a => a.GetLevel() == 1) || attributes.Any())
+                            var parentExists = representation.FlatAttributes.Any(fa => fa.SchemaAttribute.Id == emptyParent?.SchemaAttribute?.Id);
+                            if(newAttributes.Any(a => a.GetLevel() == 1) || attributes.Any() || parentExists)
                                 foreach (var newAttribute in newAttributes.OrderBy(a => a.GetLevel()))
                                 {
                                     var path = newAttribute.FullPath;
