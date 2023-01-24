@@ -50,7 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IdServerBuilder AddSIDIdentityServer(this IServiceCollection services, Action<IdServerHostOptions> callback = null)
+        public static IdServerStoreChooser AddSIDIdentityServer(this IServiceCollection services, Action<IdServerHostOptions>? callback = null)
         {
             if (callback != null) services.Configure(callback);
             else services.Configure<IdServerHostOptions>(o => { });
@@ -61,8 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddControllersWithViews();
             services.AddDataProtection();
             services.AddDistributedMemoryCache();
-            services.AddStore()
-                .AddResponseModeHandlers()
+            services.AddResponseModeHandlers()
                 .AddOAuthClientAuthentication()
                 .AddClientAssertionParsers()
                 .AddOAuthJwksApi()
@@ -84,7 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.AddPolicy(Constants.Policies.AuthSchemeProvider, p => p.RequireAssertion(a => true));
                 o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
             });
-            return new IdServerBuilder(services, services.BuildServiceProvider());
+            return new IdServerStoreChooser(services);
         }
 
         #region Private methods

@@ -57,7 +57,6 @@ namespace SimpleIdServer.IdServer.Helpers
         public async Task<GrantRequest> Extract(IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)
         {
             var authResults = new List<AuthorizedScope>();
-            // TODO : refactor this part???
             if (resources.Any())
                 authResults.AddRange(await ProcessResourceParameter(resources, scopes, cancellationToken));
 

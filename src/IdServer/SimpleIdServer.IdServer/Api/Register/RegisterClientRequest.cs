@@ -22,9 +22,6 @@ namespace SimpleIdServer.IdServer.Api.Register
         [BindProperty(Name = OAuthClientParameters.SoftwareStatement)]
         [JsonPropertyName(OAuthClientParameters.SoftwareStatement)]
         public string? SoftwareStatement { get; set; } = null;
-        [BindProperty(Name = OAuthClientParameters.ClientName)]
-        [JsonPropertyName(OAuthClientParameters.ClientName)]
-        public string? ClientName { get; set; } = null;
         [BindProperty(Name = OAuthClientParameters.GrantTypes)]
         [JsonPropertyName(OAuthClientParameters.GrantTypes)]
         public IEnumerable<string> GrantTypes { get; set; } = new string[0];
@@ -121,6 +118,9 @@ namespace SimpleIdServer.IdServer.Api.Register
         [BindProperty(Name = OAuthClientParameters.PostLogoutRedirectUris)]
         [JsonPropertyName(OAuthClientParameters.PostLogoutRedirectUris)]
         public IEnumerable<string> PostLogoutRedirectUris { get; set; } = new string[0];
+        [BindProperty(Name = OAuthClientParameters.RequireAuthTime)]
+        [JsonPropertyName(OAuthClientParameters.RequireAuthTime)]
+        public bool RequireAuthTime { get; set; } = false;
         [JsonIgnore]
         public ICollection<RegisterTranslation> Translations = new List<RegisterTranslation>();
 
@@ -130,6 +130,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             client.SectorIdentifierUri = SectorIdentifierUri;
             client.DefaultAcrValues = DefaultAcrValues;
             client.PostLogoutRedirectUris = PostLogoutRedirectUris;
+            client.RequireAuthTime = RequireAuthTime;
             if (GrantTypes == null || !GrantTypes.Any()) client.GrantTypes = new[] { AuthorizationCodeHandler.GRANT_TYPE };
             else client.GrantTypes = GrantTypes.ToList();
 

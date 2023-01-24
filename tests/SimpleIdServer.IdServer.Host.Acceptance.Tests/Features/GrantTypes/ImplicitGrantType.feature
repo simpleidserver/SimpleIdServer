@@ -26,6 +26,7 @@ Scenario: No access token is issued then resulting claims are returned in the ID
 	Then JWT has 'email'='email@outlook.fr'
 	Then JWT has 'role'='role1'
 	Then JWT has 'role'='role2'
+	Then JWT has 'nonce'='nonce'
 
 Scenario: Display parameter is passed in the redirection url
 	Given authenticate a user

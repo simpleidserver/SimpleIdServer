@@ -165,6 +165,9 @@ this.ScenarioInitialize(scenarioInfo);
 #line 28
  testRunner.Then("JWT has \'role\'=\'role2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
+#line 29
+ testRunner.Then("JWT has \'nonce\'=\'nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
             }
             this.ScenarioCleanup();
         }
@@ -177,7 +180,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Display parameter is passed in the redirection url", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 30
+#line 31
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -187,7 +190,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 31
+#line 32
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table203 = new TechTalk.SpecFlow.Table(new string[] {
@@ -217,10 +220,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table203.AddRow(new string[] {
                             "display",
                             "popup"});
-#line 32
+#line 33
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table203, "When ");
 #line hidden
-#line 43
+#line 44
  testRunner.Then("redirection url contains the parameter value \'display\'=\'popup\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -238,7 +241,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("scopes \'admin\' and \'calendar\' and valid audiences are returned in the access toke" +
                     "n when resource parameter is specified with no scope", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 45
+#line 46
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -248,7 +251,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 46
+#line 47
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table204 = new TechTalk.SpecFlow.Table(new string[] {
@@ -282,25 +285,25 @@ this.ScenarioInitialize(scenarioInfo);
                 table204.AddRow(new string[] {
                             "resource",
                             "https://contacts.example.com"});
-#line 48
+#line 49
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table204, "When ");
 #line hidden
-#line 60
+#line 61
  testRunner.And("extract parameter \'access_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 62
  testRunner.And("extract payload from JWT \'$access_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 63
+#line 64
  testRunner.Then("JWT has \'aud\'=\'https://cal.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 64
+#line 65
  testRunner.Then("JWT has \'aud\'=\'https://contacts.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 65
+#line 66
  testRunner.Then("JWT has \'scope\'=\'admin\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 66
+#line 67
  testRunner.Then("JWT has \'scope\'=\'calendar\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

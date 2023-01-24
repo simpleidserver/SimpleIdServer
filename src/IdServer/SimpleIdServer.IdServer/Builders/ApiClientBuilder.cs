@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Domains;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -163,9 +163,9 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        public ApiClientBuilder AddScope(params string[] scopes)
+        public ApiClientBuilder AddScope(params Scope[] scopes)
         {
-            foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
+            foreach (var scope in scopes) _client.Scopes.Add(scope);
             return this;
         }
 

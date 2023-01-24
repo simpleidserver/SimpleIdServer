@@ -7,10 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
@@ -26,18 +24,12 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private readonly InMemoryKeyStore _keyStore = new InMemoryKeyStore();
         private readonly IServiceCollection _serviceCollection;
-        private IServiceProvider _serviceProvider;
 
-        public IdServerBuilder(IServiceCollection serviceCollection, IServiceProvider serviceProvider)
+        public IdServerBuilder(IServiceCollection serviceCollection)
         {
             _serviceCollection = serviceCollection;
-            _serviceProvider = serviceProvider;
-            AddInMemoryAcr(new List<AuthenticationContextClassReference> { Constants.StandardAcrs.FirstLevelAssurance });
             _serviceCollection.AddSingleton<IKeyStore>(_keyStore);
         }
-
-        public IServiceCollection Services => _serviceCollection;
-        public IServiceProvider ServiceProvider => _serviceProvider;
 
         public IdServerBuilder SetSigningKeys(params SigningCredentials[] signingCredentials)
         {
@@ -89,93 +81,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
         #endregion
 
-        #region Dataset
-
-        public IdServerBuilder AddInMemoryScopes(ICollection<Scope> scopes)
-        {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if (!storeDbContext.Scopes.Any())
-            {
-                storeDbContext.Scopes.AddRange(scopes);
-                storeDbContext.SaveChanges();
-            }
-
-            return this;
-        }
-
-        public IdServerBuilder AddInMemoryClients(ICollection<Client> clients)
-        {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if (!storeDbContext.Clients.Any())
-            {
-                foreach (var client in clients)
-                {
-                    var scopeNames = client.Scopes.Select(s => s.Name);
-                    client.Scopes = storeDbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToList();
-                    storeDbContext.Clients.Add(client);
-                }
-
-                storeDbContext.SaveChanges();
-            }
-
-            return this;
-        }
-
-        public IdServerBuilder AddInMemoryApiResources(ICollection<ApiResource> apiResources)
-        {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if (!storeDbContext.ApiResources.Any())
-            {
-                foreach (var apiResource in apiResources)
-                {
-                    var scopeNames = apiResource.Scopes.Select(s => s.Name);
-                    apiResource.Scopes = storeDbContext.Scopes.Where(s => scopeNames.Contains(s.Name)).ToList();
-                    storeDbContext.ApiResources.Add(apiResource);
-                }
-
-                storeDbContext.SaveChanges();
-            }
-
-            return this;
-        }
-
-        public IdServerBuilder AddInMemoryAcr(ICollection<AuthenticationContextClassReference> acrs)
-        {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if (!storeDbContext.Acrs.Any())
-            {
-                storeDbContext.Acrs.AddRange(acrs);
-                storeDbContext.SaveChanges();
-            }
-
-            return this;
-        }
-
-        public IdServerBuilder AddInMemoryUsers(ICollection<User> users)
-        {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if (!storeDbContext.Users.Any())
-            {
-                storeDbContext.Users.AddRange(users);
-                storeDbContext.SaveChanges();
-            }
-
-            return this;
-        }
-
-        #endregion
-
         #region Authentication & Authorization
 
-        public IdServerBuilder EnableConfigurableAuthentication(ICollection<SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider> providers)
+        public IdServerBuilder EnableConfigurableAuthentication()
         {
-            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
-            if(!storeDbContext.AuthenticationSchemeProviders.Any())
-            {
-                storeDbContext.AuthenticationSchemeProviders.AddRange(providers);
-                storeDbContext.SaveChanges();
-            }
-
             _serviceCollection.AddTransient<ISIDAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
             _serviceCollection.AddTransient<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
             return this;

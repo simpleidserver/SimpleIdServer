@@ -83,9 +83,9 @@ namespace SimpleIdServer.IdServer.Builders
         /// </summary>
         /// <param name="scopes"></param>
         /// <returns></returns>
-        public TraditionalWebsiteClientBuilder AddScope(params string[] scopes)
+        public TraditionalWebsiteClientBuilder AddScope(params Scope[] scopes)
         {
-            foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
+            foreach (var scope in scopes) _client.Scopes.Add(scope);
             return this;
         }
 
@@ -96,10 +96,10 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder EnableAccessToGrantsApi()
         {
             if (!_client.Scopes.Any(s => s.Name == StandardScopes.GrantManagementQuery.Name))
-                _client.Scopes.Add(new Scope { Name = StandardScopes.GrantManagementQuery.Name });
+                _client.Scopes.Add(StandardScopes.GrantManagementQuery);
 
             if (!_client.Scopes.Any(s => s.Name == StandardScopes.GrantManagementRevoke.Name))
-                _client.Scopes.Add(new Scope { Name = StandardScopes.GrantManagementRevoke.Name });
+                _client.Scopes.Add(StandardScopes.GrantManagementRevoke);
 
             return this;
         }
@@ -111,7 +111,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public TraditionalWebsiteClientBuilder EnableOfflineAccess()
         {
-            AddScope(Constants.StandardScopes.OfflineAccessScope.Name);
+            AddScope(Constants.StandardScopes.OfflineAccessScope);
             if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
                 _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             return this;

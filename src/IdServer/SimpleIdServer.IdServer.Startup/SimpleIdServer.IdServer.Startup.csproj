@@ -4,16 +4,18 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Resources\AccountsResource.resx~RF7db798.TMP" />
-	  <None Remove="Resources\cguvbljs.huk~" />
-	</ItemGroup>
-	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\AccountsResource.Designer.cs">

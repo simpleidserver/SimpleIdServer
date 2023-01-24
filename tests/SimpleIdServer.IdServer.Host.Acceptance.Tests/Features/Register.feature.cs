@@ -228,7 +228,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'id_token_signed_response_alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 50
- testRunner.Then("JSON \'id_token_encrypted_response_alg\'=\'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'id_token_encrypted_response_alg\'=\'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 51
  testRunner.Then("JSON \'id_token_encrypted_response_enc\'=\'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -237,7 +237,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'userinfo_signed_response_alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 53
- testRunner.Then("JSON \'userinfo_encrypted_response_alg\'=\'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'userinfo_encrypted_response_alg\'=\'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 54
  testRunner.Then("JSON \'userinfo_encrypted_response_enc\'=\'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -246,7 +246,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'request_object_signing_alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 56
- testRunner.Then("JSON \'request_object_encryption_alg\'=\'RSA-OAEP-256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'request_object_encryption_alg\'=\'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 57
  testRunner.Then("JSON \'request_object_encryption_enc\'=\'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -255,9 +255,211 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'default_max_age\'=\'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 59
- testRunner.Then("JSON \'require_auth_time\'=True", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("JSON \'require_auth_time\'=\'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 60
+ testRunner.Then("JSON \'initiate_login_uri\'=\'https://localhost/loginuri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Get a client")]
+        [Xunit.TraitAttribute("FeatureTitle", "Register")]
+        [Xunit.TraitAttribute("Description", "Get a client")]
+        public void GetAClient()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get a client", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 62
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table250 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table250.AddRow(new string[] {
+                            "redirect_uris",
+                            "[https://web.com]"});
+                table250.AddRow(new string[] {
+                            "response_types",
+                            "[token]"});
+                table250.AddRow(new string[] {
+                            "grant_types",
+                            "[implicit]"});
+                table250.AddRow(new string[] {
+                            "client_name",
+                            "name"});
+                table250.AddRow(new string[] {
+                            "client_name#fr",
+                            "nom"});
+                table250.AddRow(new string[] {
+                            "client_name#en",
+                            "name"});
+                table250.AddRow(new string[] {
+                            "application_type",
+                            "web"});
+                table250.AddRow(new string[] {
+                            "token_endpoint_auth_method",
+                            "client_secret_jwt"});
+                table250.AddRow(new string[] {
+                            "sector_identifier_uri",
+                            "https://localhost/sector"});
+                table250.AddRow(new string[] {
+                            "subject_type",
+                            "public"});
+                table250.AddRow(new string[] {
+                            "id_token_signed_response_alg",
+                            "RS256"});
+                table250.AddRow(new string[] {
+                            "id_token_encrypted_response_alg",
+                            "RSA-OAEP"});
+                table250.AddRow(new string[] {
+                            "id_token_encrypted_response_enc",
+                            "A256CBC-HS512"});
+                table250.AddRow(new string[] {
+                            "userinfo_signed_response_alg",
+                            "RS256"});
+                table250.AddRow(new string[] {
+                            "userinfo_encrypted_response_alg",
+                            "RSA-OAEP"});
+                table250.AddRow(new string[] {
+                            "userinfo_encrypted_response_enc",
+                            "A256CBC-HS512"});
+                table250.AddRow(new string[] {
+                            "request_object_signing_alg",
+                            "RS256"});
+                table250.AddRow(new string[] {
+                            "request_object_encryption_alg",
+                            "RSA-OAEP"});
+                table250.AddRow(new string[] {
+                            "request_object_encryption_enc",
+                            "A256CBC-HS512"});
+                table250.AddRow(new string[] {
+                            "default_max_age",
+                            "2"});
+                table250.AddRow(new string[] {
+                            "require_auth_time",
+                            "true"});
+                table250.AddRow(new string[] {
+                            "default_acr_values",
+                            "[a,b]"});
+                table250.AddRow(new string[] {
+                            "post_logout_redirect_uris",
+                            "[http://localhost/logout]"});
+                table250.AddRow(new string[] {
+                            "initiate_login_uri",
+                            "https://localhost/loginuri"});
+#line 63
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/register\'", ((string)(null)), table250, "When ");
+#line hidden
+#line 90
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 91
+ testRunner.And("extract parameter \'client_id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 92
+ testRunner.And("extract parameter \'registration_access_token\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table251 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table251.AddRow(new string[] {
+                            "Authorization",
+                            "Bearer $registration_access_token$"});
+#line 93
+ testRunner.And("execute HTTP GET request \'http://localhost/register/$client_id$\'", ((string)(null)), table251, "And ");
+#line hidden
+#line 97
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 99
+ testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 100
+ testRunner.Then("JSON exists \'client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 101
+ testRunner.Then("JSON exists \'client_secret\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 102
+ testRunner.Then("JSON exists \'client_id_issued_at\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 103
+ testRunner.Then("JSON exists \'grant_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 104
+ testRunner.Then("JSON exists \'redirect_uris\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 105
+ testRunner.Then("JSON exists \'response_types\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 106
+ testRunner.Then("JSON exists \'default_acr_values\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 107
+ testRunner.Then("JSON exists \'post_logout_redirect_uris\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 108
+ testRunner.Then("JSON \'token_endpoint_auth_method\'=\'client_secret_jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 109
+ testRunner.Then("JSON \'client_name\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 110
+ testRunner.Then("JSON \'client_name#fr\'=\'nom\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 111
+ testRunner.Then("JSON \'client_name#en\'=\'name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 112
+ testRunner.Then("JSON \'application_type\'=\'web\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 113
+ testRunner.Then("JSON \'subject_type\'=\'public\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 114
+ testRunner.Then("JSON \'id_token_signed_response_alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 115
+ testRunner.Then("JSON \'id_token_encrypted_response_alg\'=\'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 116
+ testRunner.Then("JSON \'id_token_encrypted_response_enc\'=\'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 117
+ testRunner.Then("JSON \'userinfo_signed_response_alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 118
+ testRunner.Then("JSON \'userinfo_encrypted_response_alg\'=\'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 119
+ testRunner.Then("JSON \'userinfo_encrypted_response_enc\'=\'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 120
+ testRunner.Then("JSON \'request_object_signing_alg\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 121
+ testRunner.Then("JSON \'request_object_encryption_alg\'=\'RSA-OAEP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 122
+ testRunner.Then("JSON \'request_object_encryption_enc\'=\'A256CBC-HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 123
+ testRunner.Then("JSON \'default_max_age\'=\'2\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 124
+ testRunner.Then("JSON \'require_auth_time\'=\'true\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 125
  testRunner.Then("JSON \'initiate_login_uri\'=\'https://localhost/loginuri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

@@ -155,7 +155,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             string accessToken;
             if (!TryExtractAccessToken(out accessToken)) return GetClientResult.Error(Unauthorized());
-            var client = await _clientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == id, cancellationToken);
+            var client = await _clientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == id, cancellationToken);
             if (client == null) return GetClientResult.Error(NotFound());
             if (client.RegistrationAccessToken != accessToken) return GetClientResult.Error(Unauthorized());
             return GetClientResult.Ok(client);

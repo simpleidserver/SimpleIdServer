@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
+    [JsonConverter(typeof(ClientConverter))]
     public class Client : IEquatable<Client>
     {
         /// <summary>
@@ -51,8 +52,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         /// Readable client name.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.ClientName)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ClientName
         {
             get
@@ -63,8 +62,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         ///Readable client logo.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.LogoUri)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? LogoUri
         {
             get
@@ -75,8 +72,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         ///Readable client uri.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.ClientUri)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? ClientUri
         {
             get
@@ -87,8 +82,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         ///Readable TOS uri.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.TosUri)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TosUri
         {
             get
@@ -99,8 +92,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// <summary>
         ///Readable policy uri.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.PolicyUri)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PolicyUri
         {
             get
@@ -370,7 +361,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// If supported, the sid claim is also included in ID tokens issued by the OP.
         /// </summary>
         public bool BackChannelLogoutSessionRequired { get; set; }
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.DefaultMaxAge)]
         public double? DefaultMaxAge { get; set; } = null;
         /// <summary>
         /// Boolean value used to indicate the client's intention to use mutual-TLS client certificate-bound access tokens.
@@ -396,6 +387,12 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.InitiateLoginUri)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? InitiateLoginUri { get; set; }
+        /// <summary>
+        /// Boolean value specifying whether the auth_time Claim in the ID Token is REQUIRED.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.RequireAuthTime)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool RequireAuthTime { get; set; } = false;
         /// <summary>
         /// Enable or disble the consent screen.
         /// </summary>

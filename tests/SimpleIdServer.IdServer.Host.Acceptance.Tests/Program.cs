@@ -8,10 +8,13 @@ using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSIDIdentityServer()
-    .AddInMemoryScopes(IdServerConfiguration.Scopes)
-    .AddInMemoryClients(IdServerConfiguration.Clients)
-    .AddInMemoryUsers(IdServerConfiguration.Users)
-    .AddInMemoryApiResources(IdServerConfiguration.ApiResources)
+    .UseInMemoryStore(o =>
+    {
+        o.AddInMemoryScopes(IdServerConfiguration.Scopes);
+        o.AddInMemoryClients(IdServerConfiguration.Clients);
+        o.AddInMemoryUsers(IdServerConfiguration.Users);
+        o.AddInMemoryApiResources(IdServerConfiguration.ApiResources);
+    })
     .AddBackChannelAuthentication()
     .SetSigningKeys(
         new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),

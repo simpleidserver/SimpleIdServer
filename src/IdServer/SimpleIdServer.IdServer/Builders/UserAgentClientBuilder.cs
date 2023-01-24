@@ -12,9 +12,9 @@ namespace SimpleIdServer.IdServer.Builders
 
         internal UserAgentClientBuilder(Client client) { _client = client; }
 
-        public UserAgentClientBuilder AddScope(params string[] scopes)
+        public UserAgentClientBuilder AddScope(params Scope[] scopes)
         {
-            foreach (var scope in scopes) _client.Scopes.Add(new Scope { Name = scope });
+            foreach (var scope in scopes) _client.Scopes.Add(scope);
             return this;
         }
 
