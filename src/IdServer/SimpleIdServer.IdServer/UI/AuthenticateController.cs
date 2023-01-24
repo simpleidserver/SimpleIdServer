@@ -44,7 +44,7 @@ namespace SimpleIdServer.IdServer.UI
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var client = await ClientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
                 var externalIdProviders = schemes.Where(s => !string.IsNullOrWhiteSpace(s.DisplayName) && Constants.DefaultOIDCAuthenticationScheme != s.Name);
                 return View(new AuthenticatePasswordViewModel(

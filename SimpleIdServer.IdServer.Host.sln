@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Sta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Host.Acceptance.Tests", "tests\SimpleIdServer.IdServer.Host.Acceptance.Tests\SimpleIdServer.IdServer.Host.Acceptance.Tests.csproj", "{2A0AB899-B02E-449F-B0EA-8BEA4D2FB18A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Email", "src\IdServer\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj", "{CE9CED43-D3D4-4711-A8C1-D0E35D4EB2BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{2A0AB899-B02E-449F-B0EA-8BEA4D2FB18A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A0AB899-B02E-449F-B0EA-8BEA4D2FB18A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A0AB899-B02E-449F-B0EA-8BEA4D2FB18A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE9CED43-D3D4-4711-A8C1-D0E35D4EB2BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE9CED43-D3D4-4711-A8C1-D0E35D4EB2BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE9CED43-D3D4-4711-A8C1-D0E35D4EB2BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE9CED43-D3D4-4711-A8C1-D0E35D4EB2BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 		{2A73A8B6-2D69-4526-B9C2-736EDC9AAC04} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{39E93279-300A-400A-A8A4-A05426773C8E} = {68306EFF-55D9-497B-9482-FEB81C485914}
 		{2A0AB899-B02E-449F-B0EA-8BEA4D2FB18A} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
+		{CE9CED43-D3D4-4711-A8C1-D0E35D4EB2BD} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}
