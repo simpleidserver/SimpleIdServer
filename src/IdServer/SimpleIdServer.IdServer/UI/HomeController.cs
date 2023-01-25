@@ -1,15 +1,26 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using QRCoder;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -18,14 +29,69 @@ namespace SimpleIdServer.IdServer.UI
     public class HomeController : Controller
     {
         private readonly IdServerHostOptions _options;
+        private readonly IUserRepository _userRepository;
 
-        public HomeController(IOptions<IdServerHostOptions> options)
+        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository)
         {
             _options = options.Value;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
         public IActionResult Index() => View();
+
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> Profile(CancellationToken cancellationToken)
+        {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            return View(new ProfileViewModel
+            {
+                Id = user.Id,
+                HasOtpKey = !string.IsNullOrWhiteSpace(user.OTPKey)
+            });
+        }
+
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> GetOTP(CancellationToken cancellationToken)
+        {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            if (string.IsNullOrWhiteSpace(user.OTPKey)) return new NoContentResult();
+            var alg = Enum.GetName(typeof(OTPAlgs), _options.OTPAlg).ToLowerInvariant();
+            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Id}?secret={user.OTPKey}&issuer={_options.OTPIssuer}&algorithm=SHA1";
+            if (_options.OTPAlg == OTPAlgs.HOTP)
+                url = $"{url}&counter={user.OTPCounter}";
+            if(_options.OTPAlg == OTPAlgs.TOTP)
+            {
+                url = $"{url}&period={_options.TOTPStep}";
+            }
+
+            var bitmap = GetQRCode();
+            return GetImage(bitmap);
+
+            Bitmap GetQRCode()
+            {
+                var qrGenerator = new QRCodeGenerator();
+                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new QRCode(qrCodeData);
+                return qrCode.GetGraphic(20);
+            }
+
+            IActionResult GetImage(Bitmap result)
+            {
+                byte[] payload = null;
+                using (var stream = new MemoryStream())
+                {
+                    result.Save(stream, ImageFormat.Png);
+                    payload = stream.ToArray();
+                }
+
+                return File(payload, "image/png");
+            }
+        }
 
         [HttpPost]
         public IActionResult SwitchLanguage(string culture, string returnUrl)

@@ -4,6 +4,8 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
@@ -22,6 +24,21 @@
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AccountsResource.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\ProfileResource.Designer.cs">
+	    <DependentUpon>ProfileResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateSmsResource.Designer.cs">
+	    <DependentUpon>AuthenticateSmsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateEmailResource.Designer.cs">
+	    <DependentUpon>AuthenticateEmailResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
 	  </Compile>
 	  <Compile Update="Resources\AuthenticatePasswordResource.Designer.cs">
 	    <DesignTime>True</DesignTime>
@@ -68,6 +85,18 @@
 	  <EmbeddedResource Update="Resources\AccountsResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AccountsResource.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\ProfileResource.resx">
+	    <LastGenOutput>ProfileResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticateSmsResource.resx">
+	    <LastGenOutput>AuthenticateSmsResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\AuthenticateEmailResource.resx">
+	    <LastGenOutput>AuthenticateEmailResource.Designer.cs</LastGenOutput>
+	    <Generator>PublicResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	  <EmbeddedResource Update="Resources\AuthenticatePasswordResource.resx">
 	    <Generator>PublicResXFileCodeGenerator</Generator>

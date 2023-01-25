@@ -4,34 +4,34 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Email.UI.Services;
-using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Sms.UI.Services;
+using SimpleIdServer.IdServer.Sms.UI.ViewModels;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 
-namespace SimpleIdServer.IdServer.Email.UI
+namespace SimpleIdServer.IdServer.Sms.UI
 {
     [Area(Constants.AMR)]
     public class AuthenticateController : BaseAuthenticateController
     {
-        private readonly IEmailAuthService _emailAuthService;
+        private readonly ISmsAuthService _smsAuthService;
 
         public AuthenticateController(
-            IEmailAuthService emailAuthService, 
-            IOptions<IdServerHostOptions> options, 
-            IDataProtectionProvider dataProtectionProvider, 
-            IClientRepository clientRepository, 
+            ISmsAuthService smsAuthService,
+            IOptions<IdServerHostOptions> options,
+            IDataProtectionProvider dataProtectionProvider,
+            IClientRepository clientRepository,
             IAmrHelper amrHelper,
-            IUserRepository userRepository, 
+            IUserRepository userRepository,
             IUserTransformer userTransformer) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
         {
-            _emailAuthService = emailAuthService;
+            _smsAuthService = smsAuthService;
         }
 
         [HttpGet]
@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Email.UI
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                return View(new AuthenticateEmailViewModel(returnUrl,
+                return View(new AuthenticateSmsViewModel(returnUrl,
                     loginHint,
                     client.ClientName,
                     client.LogoUri,
@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Email.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(AuthenticateEmailViewModel viewModel, CancellationToken token)
+        public async Task<IActionResult> Index(AuthenticateSmsViewModel viewModel, CancellationToken token)
         {
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.Email.UI
 
                     try
                     {
-                        await _emailAuthService.SendCode(viewModel.Email, token);
+                        await _smsAuthService.SendCode(viewModel.PhoneNumber, token);
                         SetSuccessMessage("confirmationcode_sent");
                         return View(viewModel);
                     }
@@ -92,7 +92,7 @@ namespace SimpleIdServer.IdServer.Email.UI
 
                     try
                     {
-                        var user = await _emailAuthService.Authenticate(viewModel.Email, viewModel.OTPCode.Value, token);
+                        var user = await _smsAuthService.Authenticate(viewModel.PhoneNumber, viewModel.OTPCode.Value, token);
                         return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
                     }
                     catch (CryptographicException)

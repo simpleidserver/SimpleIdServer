@@ -1,0 +1,29 @@
+﻿@using SimpleIdServer.IdServer.Startup.Resources
+@model SimpleIdServer.IdServer.UI.ViewModels.ProfileViewModel
+
+@{
+    ViewBag.Title = ProfileResource.title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ProfileResource.title</h1>
+
+<!-- Subject -->
+<div class="row mt-2 pt-2 pb-2 pl-1 pr-1" style="background-color: var(--bs-light)">
+    <div class="col-3 fw-bold">@ProfileResource.subject</div>
+    <div class="col">@Model.Id</div>
+</div>
+<!-- OTP Image -->
+<div class="row mt-2 pt-2 pb-2 pl-1 pr-1">
+    <div class="col-3 fw-bold">@ProfileResource.qrcode_otp</div>
+    <div class="col">
+        @if(!Model.HasOtpKey)
+        {
+            <div class="alert alert-warning">@ProfileResource.no_otp</div>
+        }
+        else
+        {
+            <img src="@Url.Action("GetOTP", "Home")" width="200px" />
+        }
+    </div>
+</div>

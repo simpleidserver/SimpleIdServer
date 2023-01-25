@@ -31,6 +31,8 @@ namespace Microsoft.Extensions.DependencyInjection
             _serviceCollection.AddSingleton<IKeyStore>(_keyStore);
         }
 
+        public IServiceCollection Services => _serviceCollection;
+
         public IdServerBuilder SetSigningKeys(params SigningCredentials[] signingCredentials)
         {
             return SetSigningKeys((IEnumerable<SigningCredentials>)signingCredentials);

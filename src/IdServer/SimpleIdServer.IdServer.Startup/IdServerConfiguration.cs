@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").Build()
+            UserBuilder.Create("administrator", "password", "Administrator").GenerateRandomOTPKey().Build()
         };
 
         public static ICollection<Client> Clients => new List<Client>

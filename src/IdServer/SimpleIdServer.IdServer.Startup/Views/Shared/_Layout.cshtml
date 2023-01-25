@@ -39,7 +39,7 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">
-                            <a class="nav-link">
+                            <a class="nav-link" href="@Url.Action("Profile", "Home")">
                                 Welcome @User.Identity.Name
                             </a>
                         </li>

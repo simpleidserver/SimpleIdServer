@@ -64,6 +64,13 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public UserBuilder GenerateRandomOTPKey()
+        {
+            var key = KeyGeneration.GenerateRandomKey(20);
+            _user.OTPKey = key.ConvertFromBase32();
+            return this;
+        }
+
         public User Build() => _user;
     }
 }

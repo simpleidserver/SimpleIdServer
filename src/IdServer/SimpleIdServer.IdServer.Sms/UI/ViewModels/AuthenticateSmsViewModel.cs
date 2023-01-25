@@ -3,16 +3,16 @@
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace SimpleIdServer.IdServer.Email.UI.ViewModels
+namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
 {
-    public class AuthenticateEmailViewModel
+    public class AuthenticateSmsViewModel
     {
-        public AuthenticateEmailViewModel() { }
+        public AuthenticateSmsViewModel() { }
 
-        public AuthenticateEmailViewModel(string returnUrl, string email, string clientName, string logoUri, string tosUri, string policyUri)
+        public AuthenticateSmsViewModel(string returnUrl, string phoneNumber, string clientName, string logoUri, string tosUri, string policyUri)
         {
             ReturnUrl = returnUrl;
-            Email = email;
+            PhoneNumber = phoneNumber;
             ClientName = clientName;
             LogoUri = logoUri;
             TosUri = tosUri;
@@ -20,7 +20,7 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
         }
 
         public string ReturnUrl { get; set; }
-        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public string ClientName { get; set; }
         public string LogoUri { get; set; }
         public string TosUri { get; set; }
@@ -34,8 +34,8 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
             if (string.IsNullOrWhiteSpace(ReturnUrl))
                 modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");
 
-            if (string.IsNullOrWhiteSpace(Email))
-                modelStateDictionary.AddModelError("missing_phonenumber", "missing_email");
+            if (string.IsNullOrWhiteSpace(PhoneNumber))
+                modelStateDictionary.AddModelError("missing_phonenumber", "missing_phonenumber");
         }
 
         public void CheckConfirmationCode(ModelStateDictionary modelStateDictionary)

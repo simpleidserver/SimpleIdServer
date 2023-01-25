@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
 using System.Linq;
@@ -28,6 +29,8 @@ void RunInMemoryIdServer(IServiceCollection services)
         })
         .AddDeveloperSigningCredentials()
         .AddBackChannelAuthentication()
+        .AddEmailAuthentication()
+        .AddSmsAuthentication()
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
@@ -65,6 +68,8 @@ void RunSqlServerIdServer(IServiceCollection services)
         })
         .AddDeveloperSigningCredentials()
         .AddBackChannelAuthentication()
+        .AddEmailAuthentication()
+        .AddSmsAuthentication()
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
@@ -113,7 +118,27 @@ void SeedData(WebApplication application)
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
 
             if (!dbContext.Acrs.Any())
+            {
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
+                dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
+                {
+                    Name = "email",
+                    AuthenticationMethodReferences = new[] { "email" },
+                    DisplayName = "Email authentication"
+                });
+                dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
+                {
+                    Name = "sms",
+                    AuthenticationMethodReferences = new[] { "sms" },
+                    DisplayName = "Sms authentication"
+                });
+                dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
+                {
+                    Name = "pwd-email",
+                    AuthenticationMethodReferences = new[] { "pwd", "email" },
+                    DisplayName = "Password and email authentication"
+                });
+            }
 
             dbContext.SaveChanges();
         }

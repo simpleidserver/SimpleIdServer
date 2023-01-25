@@ -1,9 +1,0 @@
-﻿@{
-    ViewBag.Title = "Error";
-}
-
-@model SimpleIdServer.OpenID.UI.ViewModels.ErrorViewModel
-
-<div class="alert alert-danger" role="alert">
-    @SimpleIdServer.OpenID.Startup.Resources.OpenIdGlobal.ResourceManager.GetString(Model.Code)
-</div>

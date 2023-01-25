@@ -52,12 +52,15 @@ namespace SimpleIdServer.IdServer.Options
         public int HOTPWindow { get; set; } = 5;
         /// <summary>
         /// Calculate time windows.
+        /// Defines a period that a TOTP code will be valid for in seconds.
+        /// The default value is 30.
         /// </summary>
         public int TOTPStep { get; set; } = 30;
         /// <summary>
         /// Default OTP algorithm.
+        /// Default value is TOPT.
         /// </summary>
-        public OTPAlgs OTPAlg { get; set; }
+        public OTPAlgs OTPAlg { get; set; } = OTPAlgs.TOTP;
         /// <summary>
         /// Default OTP issuer.
         /// </summary>
@@ -148,6 +151,10 @@ namespace SimpleIdServer.IdServer.Options
         ///  Default value is false.
         /// </summary>
         public bool GrantManagementActionRequired { get; set; } = false;
+        /// <summary>
+        /// Default OTP algorithm used.
+        /// </summary>
+        public OTPAlgs DefaultOTPAlg { get; set; } = OTPAlgs.TOTP;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 
