@@ -26,6 +26,7 @@ using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimsEnricher;
+using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jwt;
@@ -154,6 +155,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantTypeHandler, PasswordHandler>();
             services.AddTransient<IGrantTypeHandler, AuthorizationCodeHandler>();
             services.AddTransient<IGrantTypeHandler, CIBAHandler>();
+            services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
             services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
             services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
             services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();
@@ -167,8 +169,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
             services.AddTransient<IClientHelper, OAuthClientHelper>();
             services.AddTransient<IAmrHelper, AmrHelper>();
+            services.AddTransient<IUmaPermissionTicketHelper, UMAPermissionTicketHelper>();
             services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
             services.AddTransient<IGrantHelper, GrantHelper>();
+            services.AddTransient<IClaimTokenFormat, OpenIDClaimTokenFormat>();
+            services.AddTransient<IUmaTicketGrantTypeValidator, UmaTicketGrantTypeValidator>();
             return services;
         }
 

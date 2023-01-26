@@ -9,8 +9,8 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    [JsonConverter(typeof(ClientConverter))]
-    public class Client : IEquatable<Client>
+    [JsonConverter(typeof(TranslatableConverter<Client>))]
+    public class Client : ITranslatable, IEquatable<Client>
     {
         /// <summary>
         /// Client identifier.

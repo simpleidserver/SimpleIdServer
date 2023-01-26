@@ -21,6 +21,8 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<BCAuthorize> BCAuthorizeLst { get; set; }
         public DbSet<ApiResource> ApiResources { get; set; }
         public DbSet<Grant> Grants { get; set; }
+        public DbSet<UMAResource> UmaResources { get; set; }
+        public DbSet<UMAPendingRequest> UmaPendingRequest { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -46,6 +48,12 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new ApiResourceConfiguration());
             builder.ApplyConfiguration(new GrantConfiguration());
             builder.ApplyConfiguration(new AuthorizedScopeConfiguration());
+            builder.ApplyConfiguration(new UMAPendingRequestConfiguration());
+            builder.ApplyConfiguration(new UMAPermissionTicketConfiguration());
+            builder.ApplyConfiguration(new UMAPermissionTicketRecordConfiguration());
+            builder.ApplyConfiguration(new UmaResourceConfiguration());
+            builder.ApplyConfiguration(new UMAResourcePermissionClaimConfiguration());
+            builder.ApplyConfiguration(new UMAResourcePermissionConfiguration());
         }
     }
 }

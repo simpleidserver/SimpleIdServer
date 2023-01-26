@@ -57,6 +57,12 @@
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\UMAPermissionsErrors.feature.cs">
+	    <Visible>true</Visible>
+	    <DependentUpon>UMAPermissionsErrors.feature</DependentUpon>
+	    <DesignTime>true</DesignTime>
+	    <AutoGen>true</AutoGen>
+	  </Compile>
 	  <Compile Update="Features\BCCallbackErrors.feature.cs">
 	    <DependentUpon>BCCallbackErrors.feature</DependentUpon>
 	  </Compile>
@@ -167,6 +173,10 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\UMAPermissionsErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\BCCallbackErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

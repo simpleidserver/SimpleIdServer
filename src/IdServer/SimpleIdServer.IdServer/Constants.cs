@@ -21,6 +21,7 @@ namespace SimpleIdServer.IdServer
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
+            public const string UMAConfiguration = ".well-known/uma2-configuration";
             public const string Form = "form";
             public const string AuthSchemeProviders = "authschemeproviders";
             public const string ClientManagement = "management/clients";
@@ -34,6 +35,8 @@ namespace SimpleIdServer.IdServer
             public const string EndSession = "end_session";
             public const string EndSessionCallback = "end_session_callback";
             public const string Grants = "grants";
+            public const string UMAPermissions = "perm";
+            public const string UMAResources = "rreguri";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -290,6 +293,13 @@ namespace SimpleIdServer.IdServer
                 Name = "grant_management_revoke",
                 IsExposedInConfigurationEdp = false,
                 IsStandardScope = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope UmaProtection = new Scope
+            {
+                Name = "uma_protection",
+                IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };

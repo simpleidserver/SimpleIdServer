@@ -36,6 +36,30 @@ namespace System.Text.Json.Nodes
             else return r.Value.ToJsonString();
         });
 
+        #region UMA resource request
+
+        public static IEnumerable<string> GetUMAScopesFromRequest(this JsonObject jsonObj) => jsonObj.GetArray(UMAResourceNames.ResourceScopes);
+
+        public static Dictionary<string, string> GetUMADescriptionFromRequest(this JsonObject jsonObj) => jsonObj.GetTranslations(UMAResourceNames.Description);
+
+        public static string GetUMAIconURIFromRequest(this JsonObject jsonObj) => jsonObj.GetStr(UMAResourceNames.IconUri);
+
+        public static Dictionary<string, string> GetUMANameFromRequest(this JsonObject jsonObj) => jsonObj.GetTranslations(UMAResourceNames.Name);
+
+        public static string GetUMATypeFromRequest(this JsonObject jsonObj) => jsonObj.GetStr(UMAResourceNames.Type);
+
+        public static string GetUMASubjectFromRequest(this JsonObject jsonObj) => jsonObj.GetStr(UMAResourceNames.Subject);
+
+        #endregion
+
+        #region Ticket request
+
+        public static string GetResourceId(this JsonObject jsonObj) => jsonObj.GetStr(UMAPermissionNames.ResourceId);
+
+        public static IEnumerable<string> GetResourceScopes(this JsonObject jsonObj) => jsonObj.GetArray(UMAPermissionNames.ResourceScopes);
+
+        #endregion
+
         #region Authorization request
 
         /// <summary>
@@ -215,6 +239,16 @@ namespace System.Text.Json.Nodes
         #endregion
 
         #region Token request
+
+        public static string GetTicket(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.Ticket);
+
+        public static string GetClaimToken(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ClaimToken);
+
+        public static string GetClaimTokenFormat(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.ClaimTokenFormat);
+
+        public static string GetPct(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.Pct);
+
+        public static string GetRpt(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.Rpt);
 
         public static string GetGrantType(this JsonObject jObj) => jObj.GetStr(TokenRequestParameters.GrantType);
 

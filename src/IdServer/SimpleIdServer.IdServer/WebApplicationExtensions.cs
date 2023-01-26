@@ -119,6 +119,45 @@ namespace Microsoft.AspNetCore.Builder
                     defaults: new { controller = "BCCallback", action = "Post" });
             }
 
+            if(opts.IsUMAEnabled)
+            {
+                webApplication.MapControllerRoute("umaConfiguration",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAConfiguration,
+                    defaults: new { controller = "UMAConfiguration", action = "Get" });
+
+                webApplication.MapControllerRoute("umaPermissionsAddOne",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAPermissions,
+                    defaults: new { controller = "UMAPermissions", action = "Add" });
+                webApplication.MapControllerRoute("umaPermissionsAddMultiple",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAPermissions,
+                    defaults: new { controller = "UMAPermissions", action = "AddList" });
+
+                webApplication.MapControllerRoute("umaResourcesGetAll",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources,
+                    defaults: new { controller = "UMAResources", action = "Get" });
+                webApplication.MapControllerRoute("umaResourcesGetOne",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}",
+                    defaults: new { controller = "UMAResources", action = "GetOne" });
+                webApplication.MapControllerRoute("umaResourcesAdd",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources,
+                    defaults: new { controller = "UMAResources", action = "Add" });
+                webApplication.MapControllerRoute("umaResourcesUpdate",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}",
+                    defaults: new { controller = "UMAResources", action = "Update" });
+                webApplication.MapControllerRoute("umaResourcesDelete",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}",
+                    defaults: new { controller = "UMAResources", action = "Delete" });
+                webApplication.MapControllerRoute("umaResourcesAddPermissions",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
+                    defaults: new { controller = "UMAResources", action = "AddPermissions" });
+                webApplication.MapControllerRoute("umaResourcesGetPermissions",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
+                    defaults: new { controller = "UMAResources", action = "GetPermissions" });
+                webApplication.MapControllerRoute("umaResourcesDeletePermissions",
+                    pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
+                    defaults: new { controller = "UMAResources", action = "DeletePermissions" });
+            }
+
             webApplication.MapControllerRoute("getGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
                 defaults: new { controller = "Grants", action = "Get" });

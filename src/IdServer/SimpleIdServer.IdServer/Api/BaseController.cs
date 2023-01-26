@@ -3,7 +3,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Jwt;
 using System;
+using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
 
@@ -34,6 +36,16 @@ namespace SimpleIdServer.IdServer.Api
             }
 
             return false;
+        }
+
+        protected void CheckHasPAT(IJwtBuilder jwtBuilder)
+        {
+            var bearerToken = ExtractBearerToken();
+            var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(bearerToken);
+            if (extractionResult.Error != null)
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
+            if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == Constants.StandardScopes.UmaProtection.Name))
+                throw new OAuthException(ErrorCodes.REQUEST_DENIED, ErrorMessages.UNAUTHORIZED_ACCESS_PERMISSION_API);
         }
 
         protected ContentResult BuildError(OAuthException ex) => BuildError(HttpStatusCode.InternalServerError, ex.Code, ex.Message);

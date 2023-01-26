@@ -48,6 +48,16 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        /// <summary>
+        /// Allows the client to use UMA grant-type.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableUMAGrantType()
+        {
+            _client.GrantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+            return null;
+        }
+
         #endregion
 
         #region Response type

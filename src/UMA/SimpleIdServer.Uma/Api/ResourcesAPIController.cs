@@ -1,12 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth;
-using SimpleIdServer.OAuth.Domains;
-using SimpleIdServer.OAuth.Jwt;
 using SimpleIdServer.Uma.Domains;
 using SimpleIdServer.Uma.DTOs;
 using SimpleIdServer.Uma.Exceptions;
@@ -37,18 +33,6 @@ namespace SimpleIdServer.Uma.Api
 
         #region Operations
 
-        [HttpGet]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            var result = await _umaResourceRepository.GetAll(cancellationToken);
-            return new OkObjectResult(result.Select(r => r.Id));
-        }
-
         [HttpGet(".search/me")]
         public Task<IActionResult> SearchMe(CancellationToken cancellationToken)
         {
@@ -56,23 +40,6 @@ namespace SimpleIdServer.Uma.Api
             {
                 return InternalSearch(cancellationToken, sub);                
             });
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            var result = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
-            if (result == null)
-            {
-                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
-            }
-
-            return new OkObjectResult(Serialize(result));
         }
 
         [HttpGet("me/{id}")]
@@ -88,186 +55,6 @@ namespace SimpleIdServer.Uma.Api
 
                 return new OkObjectResult(Serialize(result));
             });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Add([FromBody] JObject jObj, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            try
-            {
-                var umaResource = BuildUMAResource(jObj, true);
-                await _umaResourceRepository.Add(umaResource, cancellationToken);
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                var result = new JObject
-                {
-                    { UMAResourceNames.Id, umaResource.Id },
-                    { UserAccessPolicyUri, Url.Action("Edit", "Resources", new { id = umaResource.Id }) }
-                };
-                return new ContentResult
-                {
-                    ContentType = "application/json",
-                    Content = result.ToString(),
-                    StatusCode = (int)HttpStatusCode.Created
-                };
-            }
-            catch(UMAInvalidRequestException ex)
-            {
-                return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ex.Message);
-            }
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            try
-            {
-                var receivedUmaResource = BuildUMAResource(jObj);
-                var actualUmaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
-                if (actualUmaResource == null)
-                {
-                    return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
-                }
-
-                actualUmaResource.IconUri = receivedUmaResource.IconUri;
-                if (receivedUmaResource.Names != null)
-                {
-                    actualUmaResource.ClearNames();
-                    foreach(var name in receivedUmaResource.Names)
-                    {
-                        actualUmaResource.AddName(name);
-                    }
-                }
-
-                if (receivedUmaResource.Descriptions != null)
-                {
-                    actualUmaResource.ClearDescriptions();
-                    foreach(var description in receivedUmaResource.Descriptions)
-                    {
-                        actualUmaResource.AddDescription(description);
-                    }
-                }
-
-                actualUmaResource.Scopes = receivedUmaResource.Scopes;
-                actualUmaResource.Type = receivedUmaResource.Type;
-                await _umaResourceRepository.Update(actualUmaResource, cancellationToken);
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                var result = new JObject
-                {
-                    { UMAResourceNames.Id, actualUmaResource.Id }
-                };
-                return new ContentResult
-                {
-                    ContentType = "application/json",
-                    Content = result.ToString(),
-                    StatusCode = (int)HttpStatusCode.OK
-                };
-            }
-            catch (UMAInvalidRequestException ex)
-            {
-                return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ex.Message);
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            var actualUmaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
-            if (actualUmaResource == null)
-            {
-                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
-            }
-
-            await _umaResourceRepository.Delete(actualUmaResource, cancellationToken);
-            await _umaResourceRepository.SaveChanges(cancellationToken);
-            return new NoContentResult();
-        }
-
-        [HttpPut("{id}/permissions")]
-        public async Task<IActionResult> AddPermissions(string id, [FromBody] JObject jObj, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            try
-            {
-                var permissions = BuildUMAResourcePermissions(jObj);
-                var umaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
-                if (umaResource == null)
-                {
-                    return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
-                }
-
-                umaResource.ReplacePermissions(permissions);
-                umaResource.CreateDateTime = DateTime.UtcNow;
-                await _umaResourceRepository.Update(umaResource, cancellationToken);
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                var result = new JObject
-                {
-                    { UMAResourceNames.Id, umaResource.Id }
-                };
-                return new ContentResult
-                {
-                    ContentType = "application/json",
-                    Content = result.ToString(),
-                    StatusCode = (int)HttpStatusCode.OK
-                };
-            }
-            catch (UMAInvalidRequestException ex)
-            {
-                return this.BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ex.Message);
-            }
-        }
-
-        [HttpGet("{id}/permissions")]
-        public async Task<IActionResult> GetPermissions(string id, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            var umaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
-            if (umaResource == null)
-            {
-                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
-            }
-
-            return new OkObjectResult(Serialize(umaResource.Permissions));
-        }
-
-        [HttpDelete("{id}/permissions")]
-        public async Task<IActionResult> DeletePermissions(string id, CancellationToken cancellationToken)
-        {
-            if (!await IsPATAuthorized(cancellationToken))
-            {
-                return new UnauthorizedResult();
-            }
-
-            var umaResource = await _umaResourceRepository.FindByIdentifier(id, cancellationToken);
-            if (umaResource == null)
-            {
-                return this.BuildError(HttpStatusCode.NotFound, UMAErrorCodes.NOT_FOUND);
-            }
-
-            umaResource.Permissions = new List<UMAResourcePermission>();
-            return new NoContentResult();
         }
 
         #endregion
@@ -350,10 +137,12 @@ namespace SimpleIdServer.Uma.Api
             var id = Guid.NewGuid().ToString();
             var result = new UMAResource(id, DateTime.UtcNow);
             var scopes = jObj.GetUMAScopesFromRequest();
-            var descriptions = jObj.GetUMADescriptionFromRequest();
             var iconUri = jObj.GetUMAIconURIFromRequest();
-            var names = jObj.GetUMANameFromRequest();
             var type = jObj.GetUMATypeFromRequest();
+
+            var names = jObj.GetUMANameFromRequest();
+            var descriptions = jObj.GetUMADescriptionFromRequest();
+
             if (!scopes.Any())
             {
                 throw new UMAInvalidRequestException(string.Format(UMAErrorMessages.MISSING_PARAMETER, UMAPermissionNames.ResourceScopes));

@@ -47,8 +47,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("secondClient", "password").AddScope(FirstScope).UseOnlyPasswordGrantType().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("thirdClient", "password", "http://localhost:8080").AddScope(SecondScope).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fourthClient", "password", "http://localhost:9080").AddScope(SecondScope).Build(),
-            ClientBuilder.BuildApiClient("fifthClient", "password").AddScope(SecondScope).AddRefreshTokenGrantType(-1).Build(),
-            ClientBuilder.BuildApiClient("sixClient", "password").AddScope(SecondScope).AddRefreshTokenGrantType().Build(),
+            ClientBuilder.BuildApiClient("fifthClient", "password").AddScope(SecondScope).EnableRefreshTokenGrantType(-1).Build(),
+            ClientBuilder.BuildApiClient("sixClient", "password").AddScope(SecondScope).EnableRefreshTokenGrantType().Build(),
             ClientBuilder.BuildApiClient("sevenClient", "password").AddScope(SecondScope).UsePrivateKeyJwtAuthentication(JsonWebKeyBuilder.BuildRSA("seventClientKeyId")).Build(),
             ClientBuilder.BuildApiClient("eightClient", "ProEMLh5e_qnzdNU").AddScope(SecondScope).UseClientSecretJwtAuthentication(JsonWebKeyBuilder.BuildRSA("eightClientKeyId")).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("nineClient", "password", "http://localhost:8080").AddScope(SecondScope).UseClientPkceAuthentication().Build(),
@@ -92,7 +92,8 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fortyNineClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Poll, interval: 0).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Poll).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyOneClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Push, "http://localhost/notificationedp").Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("fiftyTwoClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Ping, "http://localhost/notificationedp", 0).Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("fiftyTwoClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Ping, "http://localhost/notificationedp", 0).Build(),
+            ClientBuilder.BuildApiClient("fiftyThreeClient", "password").ActAsUMAResourceServer().Build()
         };
 
         public static List<User> Users = new List<User>

@@ -17,5 +17,10 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string ClientAssertionType = "client_assertion_type";
         public const string ClientId = "client_id";
         public const string ClientSecret = "client_secret";
+        public const string Ticket = "ticket";
+        public const string ClaimToken = "claim_token";
+        public const string ClaimTokenFormat = "claim_token_format";
+        public const string Pct = "pct";
+        public const string Rpt = "rpt";
     }
 }

@@ -26,5 +26,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         public IEnumerable<string> Audiences { get; set; }
         public IEnumerable<AuthorizedClaim> Claims { get; set; }
         public string GrantId { get; set; }
+        public Dictionary<string, object> AdditionalClaims { get; set; }
     }
 }

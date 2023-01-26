@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
@@ -155,6 +156,22 @@ namespace SimpleIdServer.IdServer.Options
         /// Default OTP algorithm used.
         /// </summary>
         public OTPAlgs DefaultOTPAlg { get; set; } = OTPAlgs.TOTP;
+        /// <summary>
+        /// Get the default token claim format.
+        /// </summary>
+        public string DefaultClaimTokenFormat { get; set; } = OpenIDClaimTokenFormat.NAME;
+        /// <summary>
+        /// Validity of permission ticket in seconds.
+        /// </summary>
+        public double ValidityPeriodPermissionTicketInSeconds { get; set; } = 5 * 60;
+        /// <summary>
+        /// The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint. 
+        /// </summary>
+        public int RequestSubmittedInterval { get; set; } = 5;
+        /// <summary>
+        /// Enable or disable UMA.
+        /// </summary>
+        public bool IsUMAEnabled { get; set; } = true;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

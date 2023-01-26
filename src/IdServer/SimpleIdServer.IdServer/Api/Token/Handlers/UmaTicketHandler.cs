@@ -1,62 +1,55 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth;
-using SimpleIdServer.OAuth.Api;
-using SimpleIdServer.OAuth.Api.Token.Handlers;
-using SimpleIdServer.OAuth.Api.Token.Helpers;
-using SimpleIdServer.OAuth.Api.Token.TokenBuilders;
-using SimpleIdServer.OAuth.Api.Token.TokenProfiles;
-using SimpleIdServer.OAuth.Exceptions;
-using SimpleIdServer.OAuth.Extensions;
-using SimpleIdServer.Uma.Api.Token.Fetchers;
-using SimpleIdServer.Uma.Api.Token.Validators;
-using SimpleIdServer.Uma.Domains;
-using SimpleIdServer.Uma.DTOs;
-using SimpleIdServer.Uma.Extensions;
-using SimpleIdServer.Uma.Helpers;
-using SimpleIdServer.Uma.Persistence;
+using SimpleIdServer.IdServer.Api.Token.Helpers;
+using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
+using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
+using SimpleIdServer.IdServer.Api.Token.Validators;
+using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Domains.DTOs;
+using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Uma.Api.Token.Handlers
+namespace SimpleIdServer.IdServer.Api.Token.Handlers
 {
     public class UmaTicketHandler : BaseCredentialsHandler
     {
-        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IUmaTicketGrantTypeValidator _umaTicketGrantTypeValidator;
-        private readonly IEnumerable<IClaimTokenFormat> _claimTokenFormatFetchers;
-        private readonly IUMAPermissionTicketHelper _umaPermissionTicketHelper;
-        private readonly IUMAResourceRepository _umaResourceRepository;
-        private readonly IUMAPendingRequestRepository _umaPendingRequestRepository;
-        private readonly UMAHostOptions _umaHostOptions;
+        private readonly IUmaPermissionTicketHelper _umaPermissionTicketHelper;
+        private readonly IEnumerable<IClaimTokenFormat> _claimTokenFormats;
+        private readonly IUmaResourceRepository _umaResourceRepository;
+        private readonly IUmaPendingRequestRepository _umaPendingRequestRepository;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+        private readonly IEnumerable<ITokenProfile> _tokenProfiles;
 
-        public UmaTicketHandler(
-            IEnumerable<ITokenProfile>  tokenProfiles, 
-            IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, 
-            IEnumerable<IClaimTokenFormat> claimTokenFormatFetchers, 
-            IUMAPermissionTicketHelper umaPermissionTicketHelper,
-            IUMAResourceRepository umaResourceRepository, 
-            IUMAPendingRequestRepository umaPendingRequestRepository, 
-            IEnumerable<ITokenBuilder> tokenBuilders, 
-            IOptions<UMAHostOptions> umaHostOptions,
-            IClientAuthenticationHelper clientAuthenticationHelper) : base(clientAuthenticationHelper)
+        public UmaTicketHandler(IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, IUmaPermissionTicketHelper umaPermissionTicketHelper, 
+            IEnumerable<IClaimTokenFormat> claimTokenFormats, IUmaResourceRepository umaResourceRepository,
+            IUmaPendingRequestRepository umaPendingRequestRepository, IEnumerable<ITokenBuilder> tokenBuilders,
+            IEnumerable<ITokenProfile> tokenProfiles, IClientAuthenticationHelper clientAuthenticationHelper, 
+            IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, options)
         {
-            _tokenProfiles = tokenProfiles;
             _umaTicketGrantTypeValidator = umaTicketGrantTypeValidator;
-            _claimTokenFormatFetchers = claimTokenFormatFetchers;
             _umaPermissionTicketHelper = umaPermissionTicketHelper;
+            _claimTokenFormats = claimTokenFormats;
             _umaResourceRepository = umaResourceRepository;
             _umaPendingRequestRepository = umaPendingRequestRepository;
-            _umaHostOptions = umaHostOptions.Value;
             _tokenBuilders = tokenBuilders;
+            _tokenProfiles = tokenProfiles;
         }
 
         public const string GRANT_TYPE = "urn:ietf:params:oauth:grant-type:uma-ticket";
@@ -73,40 +66,35 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                 var claimTokenFormat = context.Request.RequestData.GetClaimTokenFormat();
                 if (string.IsNullOrWhiteSpace(claimTokenFormat))
                 {
-                    claimTokenFormat = _umaHostOptions.DefaultClaimTokenFormat;
+                    claimTokenFormat = Options.DefaultClaimTokenFormat;
                 }
 
                 var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
                 var permissionTicket = await _umaPermissionTicketHelper.GetTicket(ticket);
                 if (permissionTicket == null)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_GRANT, UMAErrorMessages.INVALID_TICKET);
-                }
+                    throw new OAuthException(ErrorCodes.INVALID_GRANT, ErrorMessages.INVALID_TICKET);
 
                 ClaimTokenFormatFetcherResult claimTokenFormatFetcherResult = null;
                 if (!string.IsNullOrWhiteSpace(claimTokenFormat))
                 {
-                    var claimTokenFormatFetcher = _claimTokenFormatFetchers.FirstOrDefault(c => c.Name == claimTokenFormat);
+                    var claimTokenFormatFetcher = _claimTokenFormats.SingleOrDefault(c => c.Name == claimTokenFormat);
                     if (claimTokenFormatFetcher == null)
                     {
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(UMAErrorMessages.BAD_TOKEN_FORMAT, claimTokenFormat));
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_TOKEN_FORMAT, claimTokenFormat));
                     }
 
-                    claimTokenFormatFetcherResult = await claimTokenFormatFetcher.Fetch(context);
+                    claimTokenFormatFetcherResult = await claimTokenFormatFetcher.Fetch(context.Request.RequestData.GetClaimToken(), cancellationToken);
                 }
 
                 if (claimTokenFormatFetcherResult == null)
-                {
-                    return BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED, UMAErrorMessages.REQUEST_DENIED);
-                }
+                    return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.REQUEST_DENIED);
 
                 var invalidScopes = permissionTicket.Records.Any(rec => !scopes.All(sc => rec.Scopes.Contains(sc)));
                 if (invalidScopes)
-                {
-                    throw new OAuthException(ErrorCodes.INVALID_SCOPE, UMAErrorMessages.INVALID_SCOPE);
-                }
+                    throw new OAuthException(ErrorCodes.INVALID_SCOPE, ErrorMessages.INVALID_SCOPE);
 
-                var umaResources = await _umaResourceRepository.FindByIdentifiers(permissionTicket.Records.Select(r => r.ResourceId), cancellationToken);
+                var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
+                var umaResources = await _umaResourceRepository.Query().Include(r => r.Permissions).Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
                 var requiredClaims = new List<UMAResourcePermissionClaim>();
                 foreach (var umaResource in umaResources)
                 {
@@ -114,7 +102,7 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                     {
                         if (permission.Scopes.Any(sc => scopes.Contains(sc)))
                         {
-                            var unknownClaims = permission.Claims.Where(cl => !claimTokenFormatFetcherResult.Payload.Any(c => c.Key == cl.Name));
+                            var unknownClaims = permission.Claims.Where(cl => !claimTokenFormatFetcherResult.Claims.Any(c => c.Type == cl.Name));
                             requiredClaims.AddRange(unknownClaims);
                         }
                     }
@@ -122,19 +110,22 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
 
                 if (requiredClaims.Any())
                 {
-                    var needInfoResult = new JObject
-                    {
-                        { "need_info",  new JObject
-                        {
-                            { UMATokenRequestParameters.Ticket, permissionTicket.Id },
-                            { "required_claims", new JArray(requiredClaims.Select(rc => new JObject
+                    var rcs = new JsonArray();
+                    foreach (var requiredClaim in requiredClaims)
+                        rcs.Add(new JsonObject
                             {
-                                { UMAResourcePermissionNames.ClaimTokenFormat, _umaHostOptions.DefaultClaimTokenFormat },
-                                { UMAResourcePermissionNames.ClaimType, rc.ClaimType },
-                                { UMAResourcePermissionNames.ClaimFriendlyName, rc.FriendlyName },
-                                { UMAResourcePermissionNames.ClaimName, rc.Name }
-                            })) },
-                            { "redirect_uri", _umaHostOptions.OpenIdRedirectUrl }
+                                { TokenRequestParameters.ClaimTokenFormat, Options.DefaultClaimTokenFormat },
+                                { UMAResourcePermissionNames.ClaimType, requiredClaim.ClaimType },
+                                { UMAResourcePermissionNames.ClaimFriendlyName, requiredClaim.FriendlyName },
+                                { UMAResourcePermissionNames.ClaimName, requiredClaim.Name }
+                            });
+                    var needInfoResult = new JsonObject
+                    {
+                        { "need_info",  new JsonObject
+                        {
+                            { TokenRequestParameters.Ticket, permissionTicket.Id },
+                            { "required_claims", rcs },
+                            { "redirect_uri", context.Request.IssuerName }
                         }}
                     };
                     return new ContentResult
@@ -146,25 +137,23 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                 }
 
                 var isNotAuthorized = umaResources.Any(ua => ua.Permissions.Where(p => p.Scopes.Any(sc => scopes.Contains(sc)))
-                    .All(pr => pr.Claims.All(cl => claimTokenFormatFetcherResult.Payload.Any(c => c.Key == cl.Name && !c.Value.ToString().Equals(cl.Value, StringComparison.InvariantCultureIgnoreCase)))));
+                    .All(pr => pr.Claims.All(cl => claimTokenFormatFetcherResult.Claims.Any(c => c.Type == cl.Name && !c.Value.ToString().Equals(cl.Value, StringComparison.InvariantCultureIgnoreCase)))));
                 if (isNotAuthorized)
                 {
-                    var pendingRequests = await _umaPendingRequestRepository.FindByTicketIdentifier(permissionTicket.Id, cancellationToken);
+                    var pendingRequests = await _umaPendingRequestRepository.Query().Where(r => r.TicketId == permissionTicket.Id).ToListAsync(cancellationToken);
                     if (pendingRequests.Any())
-                    {
-                        return BuildError(HttpStatusCode.Unauthorized, UMAErrorCodes.REQUEST_DENIED, UMAErrorMessages.REQUEST_DENIED);
-                    }
+                        return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, ErrorMessages.REQUEST_DENIED);
 
-                    foreach(var umaResource in umaResources)
+                    foreach (var umaResource in umaResources)
                     {
                         var permissionTicketRecord = permissionTicket.Records.First(r => r.ResourceId == umaResource.Id);
                         var umaPendingRequest = new UMAPendingRequest(permissionTicket.Id, umaResource.Subject, DateTime.UtcNow)
                         {
-                            Requester = claimTokenFormatFetcherResult.Subject,
+                            Requester = claimTokenFormatFetcherResult.UserNameIdentifier,
                             Scopes = umaResource.Scopes,
                             Resource = umaResource
                         };
-                        await _umaPendingRequestRepository.Add(umaPendingRequest, cancellationToken);
+                        _umaPendingRequestRepository.Add(umaPendingRequest);
                     }
 
                     await _umaPendingRequestRepository.SaveChanges(cancellationToken);
@@ -176,31 +165,34 @@ namespace SimpleIdServer.Uma.Api.Token.Handlers
                         {
                             { "request_submitted", new JObject
                             {
-                                { UMATokenRequestParameters.Ticket, permissionTicket.Id },
-                                { "interval", _umaHostOptions.RequestSubmittedInterval }
+                                { TokenRequestParameters.Ticket, permissionTicket.Id },
+                                { "interval", Options.RequestSubmittedInterval }
                             } }
                         }.ToString()
                     };
                 }
 
-                var jArr = new JArray();
+                var permissionClaims = new List<Dictionary<string, object>>();
                 foreach (var permission in permissionTicket.Records)
                 {
-                    jArr.Add(new JObject()
+                    permissionClaims.Add(new Dictionary<string, object>
                     {
                         { UMAPermissionNames.ResourceId, permission.ResourceId },
-                        { UMAPermissionNames.ResourceScopes, new JArray(permission.Scopes) }
+                        { UMAPermissionNames.ResourceScopes, permission.Scopes }
                     });
                 }
 
                 var result = BuildResult(context, scopes);
-                foreach (var tokenBuilder in _tokenBuilders)
+                var parameter = new BuildTokenParameter
                 {
-                    await tokenBuilder.Build(scopes, new JObject
+                    Scopes = scopes,
+                    AdditionalClaims = new Dictionary<string, object>
                     {
-                        { "permissions", jArr }
-                    }, context, cancellationToken);
-                }
+                        { "permissions", permissionClaims }
+                    }
+                };
+                foreach (var tokenBuilder in _tokenBuilders)
+                    await tokenBuilder.Build(parameter, context, cancellationToken);
 
                 _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)

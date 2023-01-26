@@ -7,25 +7,25 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Api.Register
+namespace SimpleIdServer.IdServer.Api
 {
-    public class RegisterClientRequestConverter : JsonConverter<RegisterClientRequest>
+    public class TranslatableRequestConverter<T> : JsonConverter<T> where T : class
     {
-        public override RegisterClientRequest Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var result = new RegisterClientRequest();
-            var properties = typeof(RegisterClientRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var result = Activator.CreateInstance(typeToConvert);
+            var properties = typeToConvert.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var props = properties.Select(p =>
             {
                 var attr = p.GetCustomAttribute<JsonPropertyNameAttribute>();
-                return attr == null ? (p, null): (p, attr.Name);
+                return attr == null ? (p, null) : (p, attr.Name);
             }).Where(kvp => kvp.Name != null);
             var propertyName = string.Empty;
             var arr = new List<string>();
             bool isArray = false;
-            while(reader.Read())
+            while (reader.Read())
             {
-                switch(reader.TokenType)
+                switch (reader.TokenType)
                 {
                     case JsonTokenType.PropertyName:
                         propertyName = reader.GetString();
@@ -34,11 +34,11 @@ namespace SimpleIdServer.IdServer.Api.Register
                         if (!isArray)
                         {
                             var prop = props.FirstOrDefault(p => p.Name == propertyName);
-                            if(prop.p != null)
+                            if (prop.p != null)
                             {
-                                if(prop.p.PropertyType == typeof(double?))
+                                if (prop.p.PropertyType == typeof(double?))
                                     prop.p.SetValue(result, double.Parse(reader.GetString()));
-                                else if(prop.p.PropertyType == typeof(bool))
+                                else if (prop.p.PropertyType == typeof(bool))
                                     prop.p.SetValue(result, bool.Parse(reader.GetString()));
                                 else
                                     prop.p.SetValue(result, reader.GetString());
@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                                 var splitted = propertyName.Split('#');
                                 var name = splitted[0];
                                 var language = splitted.Count() == 2 ? splitted[1] : null;
-                                result.Translations.Add(new RegisterTranslation
+                                ((ITranslatableRequest)result).Translations.Add(new TranslationRequest
                                 {
                                     Language = language,
                                     Name = name,
@@ -75,10 +75,10 @@ namespace SimpleIdServer.IdServer.Api.Register
                 }
             }
 
-            return result;
+            return (T)result;
         }
 
-        public override void Write(Utf8JsonWriter writer, RegisterClientRequest value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
 
         }

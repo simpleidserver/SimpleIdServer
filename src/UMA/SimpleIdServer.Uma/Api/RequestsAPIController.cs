@@ -3,9 +3,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using SimpleIdServer.OAuth;
-using SimpleIdServer.OAuth.Jwt;
-using SimpleIdServer.Uma.Api.Token.Fetchers;
 using SimpleIdServer.Uma.Domains;
 using SimpleIdServer.Uma.Extensions;
 using SimpleIdServer.Uma.Persistence;

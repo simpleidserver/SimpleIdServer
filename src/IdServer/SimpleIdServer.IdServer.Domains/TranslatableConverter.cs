@@ -7,16 +7,16 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
-    public class ClientConverter : JsonConverter<Client>
+    public class TranslatableConverter<T> : JsonConverter<T> where T : class
     {
-        public override Client? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
         }
 
-        public override void Write(Utf8JsonWriter writer, Client value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
-            var properties = typeof(Client).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var properties = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var props = properties.Select(p =>
             {
                 var attr = p.GetCustomAttribute<JsonPropertyNameAttribute>();
@@ -51,8 +51,10 @@ namespace SimpleIdServer.IdServer.Domains
                 }
             }
 
-            if(value.Translations != null)
-                foreach(var translation in value.Translations)
+            var translationsProperty = typeof(T).GetProperty("Translations", BindingFlags.Instance | BindingFlags.Public);
+            var translations = translationsProperty.GetValue(value) as ICollection<Translation>;
+            if(translations != null)
+                foreach(var translation in translations)
                 {
                     var key = translation.Key;
                     if (!string.IsNullOrWhiteSpace(translation.Language)) key = $"{key}#{translation.Language}";

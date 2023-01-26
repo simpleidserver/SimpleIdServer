@@ -13,8 +13,8 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Api.Register
 {
-    [JsonConverter(typeof(RegisterClientRequestConverter))]
-    public class RegisterClientRequest
+    [JsonConverter(typeof(TranslatableRequestConverter<RegisterClientRequest>))]
+    public class RegisterClientRequest : ITranslatableRequest
     {
         [JsonPropertyName(OAuthClientParameters.ApplicationType)]
         [BindProperty(Name = OAuthClientParameters.ApplicationType)]
@@ -122,7 +122,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         [JsonPropertyName(OAuthClientParameters.RequireAuthTime)]
         public bool RequireAuthTime { get; set; } = false;
         [JsonIgnore]
-        public ICollection<RegisterTranslation> Translations = new List<RegisterTranslation>();
+        public ICollection<TranslationRequest> Translations { get; set; } = new List<TranslationRequest>();
 
         public void Apply(Client client, IdServerHostOptions options)
         {
@@ -190,12 +190,5 @@ namespace SimpleIdServer.IdServer.Api.Register
 
             client.InitiateLoginUri = InitiateLoginUri;
         }
-    }
-
-    public class RegisterTranslation
-    {
-        public string Language { get; set; }
-        public string Name { get; set; }
-        public string Value { get; set; }
     }
 }

@@ -21,13 +21,25 @@ namespace SimpleIdServer.IdServer.Builders
             _client = client;
         }
 
+        #region Grant-types
+
+        /// <summary>
+        /// Allows the client to use UMA grant-type.
+        /// </summary>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder EnableUMAGrantType()
+        {
+            _client.GrantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+            return null;
+        }
+
         /// <summary>
         /// Add password grant-type.
         /// Exchange user's credentials for an access token.
         /// </summary>
         /// <returns></returns>
 
-        public ApiClientBuilder AddPasswordGrantType()
+        public ApiClientBuilder EnablePasswordGrantType()
         {
             _client.GrantTypes.Add(PasswordHandler.GRANT_TYPE);
             return this;
@@ -41,7 +53,7 @@ namespace SimpleIdServer.IdServer.Builders
         public ApiClientBuilder UseOnlyPasswordGrantType()
         {
             _client.GrantTypes.Clear();
-            return AddPasswordGrantType();
+            return EnablePasswordGrantType();
         }
 
         /// <summary>
@@ -49,12 +61,16 @@ namespace SimpleIdServer.IdServer.Builders
         /// </summary>
         /// <param name="refreshTokenExpirationTimeInSeconds"></param>
         /// <returns></returns>
-        public ApiClientBuilder AddRefreshTokenGrantType(double? refreshTokenExpirationTimeInSeconds = null)
+        public ApiClientBuilder EnableRefreshTokenGrantType(double? refreshTokenExpirationTimeInSeconds = null)
         {
             _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             _client.RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds;
             return this;
         }
+
+        #endregion
+
+        #region Client Authentication methods
 
         /// <summary>
         /// Use 'private_key_jwt' as authentication method.
@@ -130,6 +146,21 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        #endregion
+
+        #region Others
+
+        /// <summary>
+        /// Set the token expiration time in seconds.
+        /// </summary>
+        /// <param name="tokenExpirationTimeInSeconds"></param>
+        /// <returns></returns>
+        public ApiClientBuilder SetTokenExpirationTimeInSeconds(double tokenExpirationTimeInSeconds)
+        {
+            _client.TokenExpirationTimeInSeconds = tokenExpirationTimeInSeconds;
+            return this;
+        }
+
         /// <summary>
         /// Add a self signed certificate into the Json Web Key (JWK).
         /// </summary>
@@ -152,22 +183,28 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        /// <summary>
-        /// Set the token expiration time in seconds.
-        /// </summary>
-        /// <param name="tokenExpirationTimeInSeconds"></param>
-        /// <returns></returns>
-        public ApiClientBuilder SetTokenExpirationTimeInSeconds(double tokenExpirationTimeInSeconds)
-        {
-            _client.TokenExpirationTimeInSeconds = tokenExpirationTimeInSeconds;
-            return this;
-        }
+        #endregion
+
+        #region Scopes
 
         public ApiClientBuilder AddScope(params Scope[] scopes)
         {
             foreach (var scope in scopes) _client.Scopes.Add(scope);
             return this;
         }
+
+        /// <summary>
+        /// Client will act as a UMA resource server.
+        /// Grant access to the scope uma_protection.
+        /// </summary>
+        /// <returns></returns>
+        public ApiClientBuilder ActAsUMAResourceServer()
+        {
+            AddScope(Constants.StandardScopes.UmaProtection);
+            return this;
+        }
+
+        #endregion
 
         public Client Build() => _client;
     }
