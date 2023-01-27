@@ -93,7 +93,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Poll).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyOneClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Push, "http://localhost/notificationedp").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("fiftyTwoClient", "password", "http://localhost:8080").AddScope(AdminScope, CalendarScope).EnableCIBAGrantType(StandardNotificationModes.Ping, "http://localhost/notificationedp", 0).Build(),
-            ClientBuilder.BuildApiClient("fiftyThreeClient", "password").ActAsUMAResourceServer().Build()
+            ClientBuilder.BuildApiClient("fiftyThreeClient", "password").EnableUMAGrantType().ActAsUMAResourceServer().Build()
         };
 
         public static List<User> Users = new List<User>
@@ -141,6 +141,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .AddConsent("fiftyOneClient", "admin", "calendar")
                 .AddConsent("fiftyTwoClient", "admin", "calendar")
                 .AddSession("sessionId", DateTime.UtcNow.AddDays(2)).Build()
+        };
+
+        public static List<UMAResource> UmaResources = new List<UMAResource>
+        {
+            UMAResourceBuilder.Create("id", "read", "write").Build()
         };
     }
 }

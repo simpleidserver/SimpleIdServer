@@ -373,7 +373,16 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             foreach(var record in table.Rows)
             {
                 var key = record["Key"];
-                var value = ParseValue(_scenarioContext, record["Value"]);
+                object value = record["Value"];
+                try
+                {
+                    value = JsonNode.Parse(value.ToString());
+                }
+                catch
+                {
+                    value = ParseValue(_scenarioContext, record["Value"]);
+                }
+
                 if (PARAMETERS_IN_HEADER.Contains(key))
                 {
                     continue;

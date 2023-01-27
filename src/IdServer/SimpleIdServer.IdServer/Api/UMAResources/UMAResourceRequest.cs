@@ -8,7 +8,8 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Api.UMAResources
 {
-    public class UMAResourceRequest
+    [JsonConverter(typeof(TranslatableRequestConverter<UMAResourceRequest>))]
+    public class UMAResourceRequest : ITranslatableRequest
     {
         [JsonPropertyName(UMAResourceNames.ResourceScopes)]
         [BindProperty(Name = UMAResourceNames.ResourceScopes)]
@@ -23,13 +24,6 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         [BindProperty(Name = UMAResourceNames.Subject)]
         public string? Subject { get; set; } = null;
         [JsonIgnore]
-        public ICollection<UMAResourceTranslation> Translations = new List<UMAResourceTranslation>();
-    }
-
-    public class UMAResourceTranslation
-    {
-        public string Language { get; set; }
-        public string Name { get; set; }
-        public string Value { get; set; }
+        public ICollection<TranslationRequest> Translations { get; set; } = new List<TranslationRequest>();
     }
 }

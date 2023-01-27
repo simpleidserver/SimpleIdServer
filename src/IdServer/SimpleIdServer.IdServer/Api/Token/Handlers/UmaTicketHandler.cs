@@ -94,7 +94,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     throw new OAuthException(ErrorCodes.INVALID_SCOPE, ErrorMessages.INVALID_SCOPE);
 
                 var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
-                var umaResources = await _umaResourceRepository.Query().Include(r => r.Permissions).Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
+                var umaResources = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
                 var requiredClaims = new List<UMAResourcePermissionClaim>();
                 foreach (var umaResource in umaResources)
                 {
@@ -194,7 +194,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(parameter, context, cancellationToken);
 
-                _tokenProfiles.First(t => t.Profile == context.Client.PreferredTokenProfile).Enrich(context);
+                _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? Options.DefaultTokenProfile)).Enrich(context);
                 foreach (var kvp in context.Response.Parameters)
                 {
                     result.Add(kvp.Key, kvp.Value);

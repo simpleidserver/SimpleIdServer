@@ -48,13 +48,13 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetOne(string id, CancellationToken cancellationToken)
         {
             try
             {
                 CheckHasPAT(_jwtBuilder);
-                var result = _umaResourceRepository.Query().AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+                var result = await _umaResourceRepository.Query().Include(r => r.Translations).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
                 return new OkObjectResult(result);
             }
@@ -103,7 +103,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<IActionResult> Update(string id, [FromBody] UMAResourceRequest request, CancellationToken cancellationToken)
         {
             try
@@ -139,7 +139,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
         {
             try
@@ -160,7 +160,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             }
         }
 
-        [HttpPut("{id}/permissions")]
+        [HttpPut]
         public async Task<IActionResult> AddPermissions(string id, [FromBody] UMAResourcePermissionsRequest request, CancellationToken cancellationToken)
         {
             try
@@ -205,8 +205,8 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             }
         }
 
-        [HttpGet("{id}/permissions")]
-        public async Task<IActionResult> GetPermissions(string id, [FromBody] UMAResourcePermissionsRequest request, CancellationToken cancellationToken)
+        [HttpGet]
+        public async Task<IActionResult> GetPermissions(string id, CancellationToken cancellationToken)
         {
             try
             {
@@ -223,7 +223,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             }
         }
 
-        [HttpDelete("{id}/permissions")]
+        [HttpDelete]
         public async Task<IActionResult> DeletePermissions(string id, CancellationToken cancellationToken)
         {
             try

@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public UMAPendingRequest() { }
 
-        public UMAPendingRequest(string ticketId, string owner, DateTime createDateTime)
+        public UMAPendingRequest(string ticketId, string? owner, DateTime createDateTime)
         {
             TicketId = ticketId;
             Owner = owner;
@@ -25,7 +25,7 @@ namespace SimpleIdServer.IdServer.Domains
 
         public string TicketId { get; set; } = null!;
         public string? Requester { get; set; } = null;
-        public string Owner { get; set; } = null!;
+        public string? Owner { get; set; } = null!;
         public DateTime CreateDateTime { get; set; }
         public UMAPendingRequestStatus Status { get; set; }
         public UMAResource Resource { get; set; }

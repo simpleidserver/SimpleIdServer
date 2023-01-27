@@ -6,4 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\OAuth\SimpleIdServer.OAuth\SimpleIdServer.OAuth.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Api\Token\" />
+  </ItemGroup>
 </Project>

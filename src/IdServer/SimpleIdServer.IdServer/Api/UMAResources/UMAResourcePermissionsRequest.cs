@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
     {
         [JsonPropertyName(UMAResourcePermissionNames.Permissions)]
         [BindProperty(Name = UMAResourcePermissionNames.Permissions)]
-        public ICollection<UMAResourcePermissionRequest> Permissions { get; set; }
+        public IEnumerable<UMAResourcePermissionRequest> Permissions { get; set; }
     }
 
     public class UMAResourcePermissionRequest
@@ -35,9 +35,9 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         public string ClaimValue { get; set; }
         [JsonPropertyName(UMAResourcePermissionNames.ClaimType)]
         [BindProperty(Name = UMAResourcePermissionNames.ClaimType)]
-        public string ClaimType { get; set; }
+        public string? ClaimType { get; set; } = null;
         [JsonPropertyName(UMAResourcePermissionNames.ClaimFriendlyName)]
         [BindProperty(Name = UMAResourcePermissionNames.ClaimFriendlyName)]
-        public string ClaimFriendlyName { get; set; }
+        public string? ClaimFriendlyName { get; set; } = null;
     }
 }

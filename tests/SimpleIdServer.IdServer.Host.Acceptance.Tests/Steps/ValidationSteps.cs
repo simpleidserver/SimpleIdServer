@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -49,6 +50,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             var jsonHttpBody = _scenarioContext["jsonHttpBody"] as JsonDocument;
             var value = GetValue(jsonHttpBody);
+            expectedValue = WebApiSteps.ParseValue(_scenarioContext, expectedValue).ToString();
             Assert.Equal(expectedValue, value);
 
             string GetValue(JsonDocument elt)
@@ -103,6 +105,25 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         {
             var jwt = GetAccessToken();
             Assert.True(jwt.Claims.Any(c => c.Type == key && c.Value == value) == true);
+        }
+
+        [Then("access_token has permission to access to the resource id '(.*)'")]
+        public void ThenAccessTokenHasPermissionToAccessToResourceId(string value)
+        {
+            value = WebApiSteps.ParseValue(_scenarioContext, value).ToString();
+            var jwt = GetAccessToken();
+            var str = JsonArray.Parse(jwt.GetClaim("permissions").Value)[0];
+            Assert.Equal(value, str["resource_id"].GetValue<string>());
+        }
+
+        [Then("access_token has permission to access to the scope '(.*)'")]
+        public void ThenAccessTokenHasPermissionToAccessToScope(string value)
+        {
+            value = WebApiSteps.ParseValue(_scenarioContext, value).ToString();
+            var jwt = GetAccessToken();
+            var str = JsonArray.Parse(jwt.GetClaim("permissions").Value)[0];
+            var scopes = (str["resource_scopes"] as JsonArray).Select(s => s.GetValue<string>());
+            Assert.True(scopes.Contains(value) == true);
         }
 
         [Then("access_token doesn't contain the claim '(.*)'='(.*)'")]

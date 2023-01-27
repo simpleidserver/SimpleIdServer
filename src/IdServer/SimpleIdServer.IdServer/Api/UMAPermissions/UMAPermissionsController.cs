@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
                 if (request.Scopes == null || !request.Scopes.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAPermissionNames.ResourceScopes));
 
-                records.Add(new UMAPermissionTicketRecord(Guid.NewGuid().ToString(), request.Scopes.ToList()));
+                records.Add(new UMAPermissionTicketRecord(request.ResourceId, request.Scopes.ToList()));
             }
 
             return new UMAPermissionTicket(Guid.NewGuid().ToString(), records);

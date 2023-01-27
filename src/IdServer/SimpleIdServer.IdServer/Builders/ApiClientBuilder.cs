@@ -27,10 +27,10 @@ namespace SimpleIdServer.IdServer.Builders
         /// Allows the client to use UMA grant-type.
         /// </summary>
         /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableUMAGrantType()
+        public ApiClientBuilder EnableUMAGrantType()
         {
             _client.GrantTypes.Add(UmaTicketHandler.GRANT_TYPE);
-            return null;
+            return this;
         }
 
         /// <summary>

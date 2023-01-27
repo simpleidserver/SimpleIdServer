@@ -223,3 +223,68 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	And extract JSON from body
 	Then HTTP status code equals to '200'
 	And JSON exists 'access_token'	
+	
+Scenario: Use 'urn:ietf:params:oauth:grant-type:uma-ticket' grant type to get an access token
+	Given build JWS id_token_hint and sign with the key 'keyid'
+	| Key   | Value           |
+	| sub   | user            |
+	| email | user@hotmail.fr |
+
+	When execute HTTP POST request 'http://localhost/token'
+	| Key           | Value              |
+	| client_id     | fiftyThreeClient   |
+	| client_secret | password           |
+	| scope         | uma_protection     |
+	| grant_type    | client_credentials |	
+	
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body	
+
+	And execute HTTP POST JSON request 'http://localhost/rreguri'
+	| Key             | Value                 |
+	| resource_scopes | [scope1,scope2]       |
+	| subject         | user1                 |
+	| icon_uri        | icon                  |
+	| name#fr         | nom                   |
+	| name#en         | name                  |
+	| description#fr  | descriptionFR         |
+	| description#en  | descriptionEN         |
+	| type            | type                  |
+	| Authorization   | Bearer $access_token$ |	
+	
+	And extract JSON from body
+	And extract parameter '_id' from JSON body	
+
+	And execute HTTP PUT JSON request 'http://localhost/rreguri/$_id$/permissions'
+	| Key           | Value                                                                                                                                            |
+	| permissions   | [ { "claims": [ { "name": "sub", "value": "user" }, { "name": "email", "value": "user@hotmail.com" } ], "scopes": [ "scope1", "scope2" ] } ]     |
+	| Authorization | Bearer $access_token$                                                                                                                            |
+
+	And execute HTTP POST JSON request 'http://localhost/perm'
+	| Key             | Value                 |
+	| resource_id     | $_id$                 |
+	| resource_scopes | [scope1,scope2]       |
+	| Authorization   | Bearer $access_token$ |
+	
+	And extract JSON from body
+	And extract parameter 'ticket' from JSON body	
+	
+	And execute HTTP POST request 'http://localhost/token'
+	| Key                | Value                                                        |
+	| client_id          | fiftyThreeClient                                             |
+	| client_secret      | password                                                     |
+	| grant_type         | urn:ietf:params:oauth:grant-type:uma-ticket                  |
+	| ticket             | $ticket$                                                     |
+	| claim_token        | $id_token_hint$                                              |
+	| claim_token_format | http://openid.net/specs/openid-connect-core-1_0.html#IDToken |
+	| scope              | scope1 scope2                                                |
+
+	And extract JSON from body
+	And extract parameter 'access_token' from JSON body	
+
+	Then HTTP status code equals to '200'
+	And JSON exists 'access_token'
+	And JSON exists 'refresh_token'
+	And access_token has permission to access to the resource id '$_id$'
+	And access_token has permission to access to the scope 'scope1'
+	And access_token has permission to access to the scope 'scope2'

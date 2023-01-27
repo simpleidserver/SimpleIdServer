@@ -17,6 +17,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\ClientCredentialsGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Grants - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\AuthorizationCodeGrantTypeErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\CIBAGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\HappyFlows - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\GrantTypes\RefreshTokenGrantTypeErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\IdTokenSignatureAndOrEncryption - Copier.feature.cs" />
@@ -31,6 +32,8 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\RevokeTokenErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Token - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\TokenErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UMAPermissionsErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UMAResourceErrors - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfo - Copier.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\UserInfoErrors - Copier.feature.cs" />
 	</ItemGroup>
@@ -57,6 +60,18 @@
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\GrantTypes\UMAGrantTypeErrors.feature.cs">
+	    <DependentUpon>UMAGrantTypeErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\UMAPermissions.feature.cs">
+	    <DependentUpon>UMAPermissions.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\UMAResource.feature.cs">
+	    <DependentUpon>UMAResource.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\UMAResourceErrors.feature.cs">
+	    <DependentUpon>UMAResourceErrors.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\UMAPermissionsErrors.feature.cs">
 	    <Visible>true</Visible>
 	    <DependentUpon>UMAPermissionsErrors.feature</DependentUpon>
@@ -173,6 +188,22 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\GrantTypes\UMAGrantTypeErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\UMAPermissions.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\UMAResource.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\UMAResourceErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\UMAPermissionsErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

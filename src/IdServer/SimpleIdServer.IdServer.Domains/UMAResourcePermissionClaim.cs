@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.Domains
         public UMAResourcePermissionClaim() { }
 
         [JsonPropertyName(UMAResourcePermissionNames.ClaimType)]
-        public string ClaimType { get; set; } = null!;
+        public string? ClaimType { get; set; } = null!;
         [JsonPropertyName(UMAResourcePermissionNames.ClaimFriendlyName)]
         public string? FriendlyName { get; set; } = null;
         [JsonPropertyName(UMAResourcePermissionNames.ClaimName)]

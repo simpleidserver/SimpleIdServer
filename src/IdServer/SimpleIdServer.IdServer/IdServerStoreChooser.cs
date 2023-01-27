@@ -8,7 +8,6 @@ using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer
 {
@@ -112,6 +111,18 @@ namespace SimpleIdServer.IdServer
             if (!storeDbContext.AuthenticationSchemeProviders.Any())
             {
                 storeDbContext.AuthenticationSchemeProviders.AddRange(providers);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryUMAResources(ICollection<UMAResource> umaResources)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if(!storeDbContext.UmaResources.Any())
+            {
+                storeDbContext.UmaResources.AddRange(umaResources);
                 storeDbContext.SaveChanges();
             }
 

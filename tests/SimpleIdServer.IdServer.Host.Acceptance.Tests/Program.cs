@@ -14,6 +14,7 @@ builder.Services.AddSIDIdentityServer()
         o.AddInMemoryClients(IdServerConfiguration.Clients);
         o.AddInMemoryUsers(IdServerConfiguration.Users);
         o.AddInMemoryApiResources(IdServerConfiguration.ApiResources);
+        o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
     })
     .AddBackChannelAuthentication()
     .SetSigningKeys(
