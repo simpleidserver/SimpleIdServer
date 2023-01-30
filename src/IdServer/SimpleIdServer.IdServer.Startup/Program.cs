@@ -10,6 +10,8 @@ using SimpleIdServer.IdServer.Store;
 using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddRazorPages()
+    .AddRazorRuntimeCompilation();
 // RunInMemoryIdServer(builder.Services);
 RunSqlServerIdServer(builder.Services);
 

@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             {
                 CheckHasPAT(_jwtBuilder);
                 var result = await _umaResourceRepository.Query().Include(r => r.Translations).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
+                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
                 return new OkObjectResult(result);
             }
             catch (OAuthException ex)

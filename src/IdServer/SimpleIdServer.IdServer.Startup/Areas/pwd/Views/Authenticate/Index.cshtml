@@ -5,6 +5,25 @@
     ViewBag.Title = AuthenticatePasswordResource.title;
 }
 
+<div class="card">
+    <div class="card-body">
+        <h3>@AuthenticatePasswordResource.title</h3>
+        <!-- Login -->
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Login">
+        </div>
+        <!-- Password -->
+        <div class="input-group mb-3">
+          <input type="password" class="form-control" placeholder="Password">
+        </div>
+        <div>
+            <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
+            <label>@AuthenticatePasswordResource.remember_login</label>
+        </div>
+        <h5>OR</h5>
+    </div>
+</div>
+
 <div>
     <div class="row">
         <div class="col-9">

@@ -12,6 +12,7 @@
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.1" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
@@ -130,5 +131,8 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="wwwroot\logos\" />
 	</ItemGroup>
 </Project>
