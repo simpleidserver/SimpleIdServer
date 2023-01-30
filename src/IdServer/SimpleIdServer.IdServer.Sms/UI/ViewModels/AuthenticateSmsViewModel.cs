@@ -2,10 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
 {
-    public class AuthenticateSmsViewModel
+    public class AuthenticateSmsViewModel : BaseAuthenticateViewModel
     {
         public AuthenticateSmsViewModel() { }
 
@@ -19,15 +20,9 @@ namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
             PolicyUri = policyUri;
         }
 
-        public string ReturnUrl { get; set; }
         public string PhoneNumber { get; set; }
-        public string ClientName { get; set; }
-        public string LogoUri { get; set; }
-        public string TosUri { get; set; }
-        public string PolicyUri { get; set; }
         public string Action { get; set; }
         public long? OTPCode { get; set; }
-        public bool RememberLogin { get; set; }
 
         public void CheckRequiredFields(ModelStateDictionary modelStateDictionary)
         {

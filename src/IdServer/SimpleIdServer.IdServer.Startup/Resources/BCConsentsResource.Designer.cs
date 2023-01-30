@@ -79,7 +79,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The client {0} would like to access.
+        ///   Recherche une chaîne localisée semblable à The Client App &apos;{0}&apos; is requesting the following permissions.
         /// </summary>
         public static string consent_client_access {
             get {

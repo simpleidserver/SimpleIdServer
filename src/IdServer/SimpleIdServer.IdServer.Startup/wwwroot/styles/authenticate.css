@@ -1,0 +1,53 @@
+﻿.login .divider {
+    display: flex;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.login .clientinfo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login .clientinfo img {
+    max-width: 300px;
+}
+
+.login .modal-content {
+    padding: 20px;
+}
+
+.login .divider:before,
+.login .divider:after {
+    content: "";
+    height: 1px;
+    background: var(--sid-separator-bg);
+    flex: 1;
+}
+
+.login .divider .text {
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-bottom: 0px;
+    color: var(--bs-gray);
+}
+
+.login .extauth {
+    list-style: none;
+    padding-left: 0px;
+}
+
+.login .extauth > li {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.login .extauth > li > a,
+.login button[type='submit'] {
+    width: 100%;
+}
+
+.login .footer {
+    border-top: 1px solid #eee;
+
+}

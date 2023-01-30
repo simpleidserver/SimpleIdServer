@@ -124,7 +124,7 @@
     <value>Confirm</value>
   </data>
   <data name="consent_client_access" xml:space="preserve">
-    <value>The client {0} would like to access to</value>
+    <value>The client '{0}' is requesting access to your account</value>
   </data>
   <data name="manage_consents" xml:space="preserve">
     <value>Manage consents</value>

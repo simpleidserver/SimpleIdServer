@@ -6,16 +6,18 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 {
     public class ConsentsIndexViewModel
     {
-        public ConsentsIndexViewModel(string clientName, string returnUrl, IEnumerable<string> scopeNames, IEnumerable<string> claimNames)
+        public ConsentsIndexViewModel(string clientName, string returnUrl, string pictureUri, IEnumerable<string> scopeNames, IEnumerable<string> claimNames)
         {
             ClientName = clientName;
             ReturnUrl = returnUrl;
+            PictureUri = pictureUri;
             ScopeNames = scopeNames;
             ClaimNames = claimNames;
         }
 
         public string ClientName { get; set; }
         public string ReturnUrl { get; set; }
+        public string PictureUri { get; set; }
         public IEnumerable<string> ScopeNames { get; set; }
         public IEnumerable<string> ClaimNames { get; set; }
     }

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Helpers;
@@ -59,7 +58,7 @@ namespace SimpleIdServer.IdServer.UI
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Scopes).AsNoTracking().FirstAsync(c => c.ClientId == clientId, cancellationToken);
+                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).AsNoTracking().FirstAsync(c => c.ClientId == clientId, cancellationToken);
                 query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
@@ -70,6 +69,7 @@ namespace SimpleIdServer.IdServer.UI
                 return View(new ConsentsIndexViewModel(
                     oauthClient.ClientName,
                     returnUrl,
+                    oauthClient.LogoUri,
                     oauthClient.Scopes.Where(c => scopes.Contains(c.Name)).Select(s => s.Name),
                     claimDescriptions));
             }
@@ -78,39 +78,6 @@ namespace SimpleIdServer.IdServer.UI
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}" });
             }
         }
-
-        public async Task<IActionResult> Manage(CancellationToken cancellationToken)
-        {
-            var nameIdentifier = GetNameIdentifier();
-            var user = await _userRepository.Query().Include(u => u.Consents).AsNoTracking().FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
-            var result = new List<ConsentViewModel>();
-            var clientIds = user.Consents.Select(c => c.ClientId);
-            var oauthClients = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync(cancellationToken);
-            foreach (var consent in user.Consents)
-            {
-                var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
-                result.Add(new ConsentViewModel(
-                    consent.Id,
-                    oauthClient.ClientName,
-                    consent.Scopes,
-                    consent.Claims));
-            }
-
-            return View(result);
-        }
-
-        public async Task<IActionResult> RejectConsent(string consentId, CancellationToken cancellationToken)
-        {
-            var nameIdentifier = GetNameIdentifier();
-            var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
-            if (!user.HasOpenIDConsent(consentId))
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
-
-            user.RejectConsent(consentId);
-            await _userRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Manage");
-        }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

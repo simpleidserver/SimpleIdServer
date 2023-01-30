@@ -4,6 +4,7 @@
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -24,6 +25,34 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var result = new UMAResourceBuilder(id, scopes);
             return result;
+        }
+
+        public UMAResourceBuilder SetName(string name, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            _umaResource.Translations.Add(new Translation
+            {
+                Key = "name",
+                Value = name,
+                Language = language
+            });
+            return this;
+        }
+
+        public UMAResourceBuilder SetDescription(string description, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            _umaResource.Translations.Add(new Translation
+            {
+                Key = "description",
+                Value = description,
+                Language = language
+            });
+            return this;
         }
 
         public UMAResource Build() => _umaResource;

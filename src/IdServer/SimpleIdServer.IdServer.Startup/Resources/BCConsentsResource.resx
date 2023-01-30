@@ -124,7 +124,7 @@
     <value>Confirm</value>
   </data>
   <data name="consent_client_access" xml:space="preserve">
-    <value>The client {0} would like to access</value>
+    <value>The Client App '{0}' is requesting the following permissions</value>
   </data>
   <data name="consent_confirmed" xml:space="preserve">
     <value>The consent is confirmed</value>

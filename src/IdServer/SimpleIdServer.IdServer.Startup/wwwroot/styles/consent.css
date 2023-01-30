@@ -1,0 +1,29 @@
+﻿.consent .modal-content {
+    padding: 20px;
+}
+
+.consent .consentinfo {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.consent .consentinfo .img {
+    margin: 0px 5px 0px 5px;
+}
+
+.consent .consentinfo .separator {
+    flex: 1;
+    height: 1px;
+    background-color: var(--sid-separator-bg);
+}
+
+.consent .consentinfo img {
+    width: 60px;
+}
+
+.consent button[type='submit'] {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

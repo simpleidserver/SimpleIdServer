@@ -37,6 +37,22 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
         [JsonIgnore]
         public ICollection<UMAResourcePermission> Permissions { get; set; } = new List<UMAResourcePermission>();
+        [JsonIgnore]
+        public string? Description
+        {
+            get
+            {
+                return Translate("description");
+            }
+        }
+        [JsonIgnore]
+        public string? Name
+        {
+            get
+            {
+                return Translate("name");
+            }
+        }
 
         public void UpdateTranslations(IEnumerable<Translation> translations)
         {
@@ -63,15 +79,10 @@ namespace SimpleIdServer.IdServer.Domains
 
         public override int GetHashCode() => Id.GetHashCode();
 
-        private void ClearTranslations(string type)
+        private string? Translate(string key)
         {
-            int length = Translations.Count;
-            for (int i = length - 1; i >= 0; i--)
-            {
-                var translation = Translations.ElementAt(i);
-                if (translation.Key== type)
-                    Translations.Remove(translation);
-            }
+            var translation = Translations.FirstOrDefault(t => t.Key == key && t.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
+            return translation?.Value;
         }
     }
 }

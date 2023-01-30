@@ -128,5 +128,17 @@ namespace SimpleIdServer.IdServer
 
             return this;
         }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryUMAPendingRequests(ICollection<UMAPendingRequest> umaPendingRequests)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.UmaPendingRequest.Any())
+            {
+                storeDbContext.UmaPendingRequest.AddRange(umaPendingRequests);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
+        }
     }
 }

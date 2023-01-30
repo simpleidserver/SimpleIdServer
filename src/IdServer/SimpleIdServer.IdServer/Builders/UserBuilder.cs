@@ -34,9 +34,17 @@ namespace SimpleIdServer.IdServer.Builders
             return result;
         }
 
+        #region Claims
+
         public UserBuilder SetEmail(string email)
         {
             _user.UpdateClaim(JwtRegisteredClaimNames.Email, email);
+            return this;
+        }
+
+        public UserBuilder SetPicture(string picture)
+        {
+            _user.UpdateClaim(UserClaims.Picture, picture);
             return this;
         }
 
@@ -45,6 +53,10 @@ namespace SimpleIdServer.IdServer.Builders
             _user.AddClaim(UserClaims.Role, role);
             return this;
         }
+
+        #endregion
+
+        #region Consents
 
         public UserBuilder AddConsent(string clientId, params string[] scopes)
         {
@@ -57,6 +69,8 @@ namespace SimpleIdServer.IdServer.Builders
             _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims });
             return this;
         }
+
+        #endregion
 
         public UserBuilder AddSession(string id, DateTime expirationTime)
         {

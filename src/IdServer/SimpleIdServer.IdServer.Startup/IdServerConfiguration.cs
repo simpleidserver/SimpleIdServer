@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Authentication.Facebook;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Startup.Converters;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.IdServer.Startup
 {
     public class IdServerConfiguration
     {
+
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             Constants.StandardScopes.OpenIdScope,
@@ -18,13 +21,24 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").GenerateRandomOTPKey().Build()
+            UserBuilder.Create("administrator", "password", "Administrator").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").GenerateRandomOTPKey().Build(),
+            UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 
         public static ICollection<Client> Clients => new List<Client>
         {
-            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:60001/signin-oidc").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("bankWebsite", "password", "http://localhost:60001/signin-oidc").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).EnableCIBAGrantType().Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:60001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("bankWebsite", "password", "http://localhost:60001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).EnableCIBAGrantType().Build()
+        };
+
+        public static ICollection<UMAResource> Resources = new List<UMAResource>
+        {
+            UMAResourceBuilder.Create("picture", "read", "write").SetName("Picture").Build()
+        };
+
+        public static ICollection<UMAPendingRequest> PendingRequests = new List<UMAPendingRequest>
+        {
+            UMAPendingRequestBuilder.Create(Guid.NewGuid().ToString(), "user", "administrator", Resources.First()).Build()
         };
 
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>

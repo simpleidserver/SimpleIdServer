@@ -30,11 +30,15 @@ namespace SimpleIdServer.IdServer.UI
     {
         private readonly IdServerHostOptions _options;
         private readonly IUserRepository _userRepository;
+        private readonly IClientRepository _clientRepository;
+        private readonly IUmaPendingRequestRepository _pendingRequestRepository;
 
-        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository)
+        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, IUmaPendingRequestRepository pendingRequestRepository)
         {
             _options = options.Value;
             _userRepository = userRepository;
+            _clientRepository = clientRepository;
+            _pendingRequestRepository = pendingRequestRepository;
         }
 
         [HttpGet]
@@ -45,12 +49,73 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var consents = await GetConsents();
+            var pendingRequests = await GetPendingRequest();
             return View(new ProfileViewModel
             {
                 Id = user.Id,
-                HasOtpKey = !string.IsNullOrWhiteSpace(user.OTPKey)
+                HasOtpKey = !string.IsNullOrWhiteSpace(user.OTPKey),
+                Consents = consents,
+                PendingRequests = pendingRequests
             });
+
+            async Task<List<ConsentViewModel>> GetConsents()
+            {
+                var consents = new List<ConsentViewModel>(); 
+                var clientIds = user.Consents.Select(c => c.ClientId);
+                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync(cancellationToken);
+                foreach (var consent in user.Consents)
+                {
+                    var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
+                    consents.Add(new ConsentViewModel(
+                        consent.Id,
+                        oauthClient.ClientName,
+                        oauthClient.ClientUri,
+                        consent.Scopes,
+                        consent.Claims));
+                }
+
+                return consents;
+            }
+
+            async Task<List<PendingRequestViewModel>> GetPendingRequest()
+            {
+                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => r.Owner == nameIdentifier || r.Requester == nameIdentifier).ToListAsync(cancellationToken);
+                var result = new List<PendingRequestViewModel>();
+                foreach(var pendingRequest in pendingRequestLst)
+                {
+                    result.Add(new PendingRequestViewModel
+                    {
+                        TicketId = pendingRequest.TicketId,
+                        CreateDateTime = pendingRequest.CreateDateTime,
+                        Requester = pendingRequest.Requester,
+                        ResourceDescription = pendingRequest.Resource.Description,
+                        ResourceName = pendingRequest.Resource.Name,
+                        Scopes = pendingRequest.Scopes,
+                        Owner = pendingRequest.Owner
+                    });
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<IActionResult> RejectConsent(string consentId, CancellationToken cancellationToken)
+        {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
+            if (!user.HasOpenIDConsent(consentId))
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
+
+            user.RejectConsent(consentId);
+            await _userRepository.SaveChanges(cancellationToken);
+            return RedirectToAction("Profile");
+        }
+
+        public Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         [HttpGet]

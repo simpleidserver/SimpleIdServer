@@ -61,6 +61,60 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click &quot;Revoke Access&quot;.
+        /// </summary>
+        public static string approved_apps_description {
+            get {
+                return ResourceManager.GetString("approved_apps_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Approved applications.
+        /// </summary>
+        public static string approved_apps_title {
+            get {
+                return ResourceManager.GetString("approved_apps_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Claims.
+        /// </summary>
+        public static string claims {
+            get {
+                return ResourceManager.GetString("claims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client.
+        /// </summary>
+        public static string client {
+            get {
+                return ResourceManager.GetString("client", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Grant datetime.
+        /// </summary>
+        public static string grant_time {
+            get {
+                return ResourceManager.GetString("grant_time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name.
+        /// </summary>
+        public static string name {
+            get {
+                return ResourceManager.GetString("name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à One Time Password is not configured.
         /// </summary>
         public static string no_otp {
@@ -70,11 +124,29 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à One Time Password QR Code.
+        ///   Recherche une chaîne localisée semblable à One Time Password.
         /// </summary>
         public static string qrcode_otp {
             get {
                 return ResourceManager.GetString("qrcode_otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Revoke access.
+        /// </summary>
+        public static string revoke_access {
+            get {
+                return ResourceManager.GetString("revoke_access", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scopes.
+        /// </summary>
+        public static string scopes {
+            get {
+                return ResourceManager.GetString("scopes", resourceCulture);
             }
         }
         

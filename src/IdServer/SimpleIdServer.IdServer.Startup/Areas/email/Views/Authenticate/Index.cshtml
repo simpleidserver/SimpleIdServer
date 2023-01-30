@@ -9,83 +9,73 @@
     ViewBag.Title = AuthenticateEmailResource.title;
 }
 
-<div class="card">
-    <div class="card-header">@AuthenticateEmailResource.title</div>
-    <div class="card-body">
-            @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
             {
-                <img class="card-img-top rounded mx-auto d-block" src="@Model.LogoUri" style="max-width: 300px" />
+                <li class="list-group-item list-group-item-danger">@AuthenticateEmailResource.ResourceManager.GetString(error.ErrorMessage)</li>
             }
+        }
+    </ul>
+}
 
-            <h5 class="card-title">@Model.ClientName</h5>
-            <div class="alert alert-info">
-                @string.Format(AuthenticateEmailResource.code_validity, configuration.Value.TOTPStep)
-            </div>
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <ul class="list-group">
-                    @foreach (var modelState in ViewData.ModelState.Values)
-                    {
-                        foreach (var error in modelState.Errors)
-                        {
-                            <li class="list-group-item list-group-item-danger">@AuthenticateEmailResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                        }
-                    }
-                </ul>
-            }
-            <div class="row">
-                <div class="col-md-6">
-                    @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-                    {
-                        <div class="alert alert-success">@AuthenticateEmailResource.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
-                    }
-                    @using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="ReturnUrl" />
-                        <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
-                        <div class="form-group">
-                            <label asp-for="Email">@AuthenticateEmailResource.email</label>
-                            <input asp-for="Email" type="text" class="form-control" />
-                        </div>
-                        <button type="submit" class="btn btn-primary card-link">@AuthenticateEmailResource.sendconfirmationcode</button>
-                    }
-                </div>
-                <div class="col-md-6">
-                    @using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="ReturnUrl" />
-                        <input type="hidden" name="Action" value="AUTHENTICATE" />
-                        <div class="form-group">
-                            <label asp-for="Email">@AuthenticateEmailResource.email</label>
-                            <input asp-for="Email" type="text" class="form-control" />
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="OTPCode">@AuthenticateEmailResource.confirmationcode</label>
-                            <input asp-for="OTPCode" type="password" class="form-control" />
-                        </div>
-                        <div>
-                            <input type="checkbox" asp-for="RememberLogin " />
-                            <label>@AuthenticateEmailResource.remember_login</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary card-link">@AuthenticateEmailResource.authenticate</button>
-                    }
-
-                </div>
-            </div>
-        </div>
-    <div class="card-footer">
-        <div style="float: right">
-            @if (!string.IsNullOrWhiteSpace(Model.TosUri))
-            {
-                <a href="@Model.TosUri" target="_blank">@AuthenticateEmailResource.tos</a>
-            }
-
-            @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
-            {
-                <a href="@Model.PolicyUri" target="_blank">@AuthenticateEmailResource.policy</a>
-            }
-        </div>
-    </div>
+<div class="alert alert-info">
+    @string.Format(AuthenticateEmailResource.code_validity, configuration.Value.TOTPStep)
 </div>
+
+<!-- Login form -->
+@using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ReturnUrl" />
+    <input type="hidden" name="Action" value="AUTHENTICATE" />
+    <!-- Email -->
+    <div class="input-group mb-3">
+        <input asp-for="Email" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
+    </div>
+    <!-- Confirmation code -->
+    <div class="input-group mb-3">
+        <input asp-for="OTPCode" placeholder="@AuthenticateEmailResource.confirmationcode" type="password" class="form-control" />
+    </div>
+    <div>
+        <input type="checkbox" asp-for="RememberLogin " />
+        <label>@AuthenticateEmailResource.remember_login</label>
+    </div>
+    <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.authenticate</button>
+}
+
+<div class="divider">
+    <p class="fw-bold text">OR</p>
+</div>
+
+<!-- Send confirmation code -->
+<div>
+    @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+    {
+        <div class="alert alert-success">@AuthenticateEmailResource.ResourceManager.GetString(ViewBag.SuccessMessage)</div>
+    }
+
+    @using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+        <div class="input-group mb-3">
+            <input asp-for="Email" type="text" class="form-control" placeholder="@AuthenticateEmailResource.email" />
+        </div>
+        <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.sendconfirmationcode</button>
+    }
+</div>
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}

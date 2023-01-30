@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -8,6 +9,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Linq;
+using System.Threading;
 using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -372,6 +374,44 @@ namespace SimpleIdServer.IdServer.Builders
         public TraditionalWebsiteClientBuilder ResourceParameterIsRequired()
         {
             _client.IsResourceParameterRequired = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Set client name.
+        /// </summary>
+        /// <param name="clientName"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetClientName(string clientName, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            _client.Translations.Add(new Translation
+            {
+                Key = "client_name",
+                Value = clientName,
+                Language = language
+            });
+            return this;
+        }
+
+        /// <summary>
+        /// Set the logo uri.
+        /// </summary>
+        /// <param name="logoUri"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetClientLogoUri(string logoUri, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            _client.Translations.Add(new Translation
+            {
+                Key = "logo_uri",
+                Value = logoUri,
+                Language = language
+            });
             return this;
         }
 

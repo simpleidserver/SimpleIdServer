@@ -1,0 +1,39 @@
+﻿.profile .info {
+    padding: 5px 0px 5px 0px;
+    overflow: hidden;
+}
+
+
+.profile .info ul li,
+.profile .info .picture {
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.profile .info .picture {
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.profile .info .picture > img {
+    max-width: 150px;
+}
+
+.profile .info ul {
+    list-style: none;
+    padding: 0px;
+}
+
+.profile .info ul li {
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+.profile .info ul li h6 {
+    margin-bottom: 0px;
+}
+
+.profile .table img{
+    width: 70px;
+}

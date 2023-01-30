@@ -1,9 +1,0 @@
-﻿.blue {
-    --bs-primary-rgb: 13, 71, 161;
-    --bs-primary: #0d47a1;
-}
-
-.blue .navbar-nav {
-    --bs-nav-link-color: #e7e2e2;
-    --bs-nav-link-hover-color: white;
-}

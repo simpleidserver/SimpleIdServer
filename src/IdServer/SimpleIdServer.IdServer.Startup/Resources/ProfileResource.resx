@@ -117,11 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="approved_apps_description" xml:space="preserve">
+    <value>These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click "Revoke Access"</value>
+  </data>
+  <data name="approved_apps_title" xml:space="preserve">
+    <value>Approved applications</value>
+  </data>
+  <data name="claims" xml:space="preserve">
+    <value>Claims</value>
+  </data>
+  <data name="client" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="grant_time" xml:space="preserve">
+    <value>Grant datetime</value>
+  </data>
+  <data name="name" xml:space="preserve">
+    <value>Name</value>
+  </data>
   <data name="no_otp" xml:space="preserve">
     <value>One Time Password is not configured</value>
   </data>
   <data name="qrcode_otp" xml:space="preserve">
-    <value>One Time Password QR Code</value>
+    <value>One Time Password</value>
+  </data>
+  <data name="revoke_access" xml:space="preserve">
+    <value>Revoke access</value>
+  </data>
+  <data name="scopes" xml:space="preserve">
+    <value>Scopes</value>
   </data>
   <data name="subject" xml:space="preserve">
     <value>Identifier</value>

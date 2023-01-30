@@ -12,11 +12,11 @@ using System.Linq;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
-// RunInMemoryIdServer(builder.Services);
-RunSqlServerIdServer(builder.Services);
+RunInMemoryIdServer(builder.Services);
+// RunSqlServerIdServer(builder.Services);
 
 var app = builder.Build();
-SeedData(app);
+// SeedData(app);
 app.UseSID();
 app.Run();
 
@@ -28,6 +28,8 @@ void RunInMemoryIdServer(IServiceCollection services)
             o.AddInMemoryUsers(IdServerConfiguration.Users);
             o.AddInMemoryScopes(IdServerConfiguration.Scopes);
             o.AddInMemoryClients(IdServerConfiguration.Clients);
+            o.AddInMemoryUMAResources(IdServerConfiguration.Resources);
+            o.AddInMemoryUMAPendingRequests(IdServerConfiguration.PendingRequests);
         })
         .AddDeveloperSigningCredentials()
         .AddBackChannelAuthentication()

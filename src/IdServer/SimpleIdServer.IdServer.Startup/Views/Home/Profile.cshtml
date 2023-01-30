@@ -1,29 +1,138 @@
-﻿@using SimpleIdServer.IdServer.Startup.Resources
+﻿@using SimpleIdServer.IdServer.Domains;
+@using SimpleIdServer.IdServer.Startup.Resources
+@using System.Security.Claims;
 @model SimpleIdServer.IdServer.UI.ViewModels.ProfileViewModel
 
 @{
     ViewBag.Title = ProfileResource.title;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    Func<string, string> getClaim = (str) =>
+    {
+        var cl = User.Claims.FirstOrDefault(c => c.Type == str);
+        if (cl == null) return "-";
+        return cl.Value;
+    };
 }
 
-<h1>@ProfileResource.title</h1>
-
-<!-- Subject -->
-<div class="row mt-2 pt-2 pb-2 pl-1 pr-1" style="background-color: var(--bs-light)">
-    <div class="col-3 fw-bold">@ProfileResource.subject</div>
-    <div class="col">@Model.Id</div>
-</div>
-<!-- OTP Image -->
-<div class="row mt-2 pt-2 pb-2 pl-1 pr-1">
-    <div class="col-3 fw-bold">@ProfileResource.qrcode_otp</div>
+<div class="row profile">
+    <!-- User Information -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body info">
+                <div class="picture">
+                    @Html.UserPicture(User)
+                </div>
+                <ul>
+                    <!-- Name identifier -->
+                    <li>
+                        <h6>@ProfileResource.subject</h6>
+                        <span class="text-muted">@getClaim(ClaimTypes.NameIdentifier)</span>
+                    </li>
+                    <!-- Name -->
+                    <li>
+                        <h6>@ProfileResource.name</h6>
+                        <span class="text-muted">@User.Identity.Name</span>
+                    </li>
+                    <!-- OTP Key -->
+                    <li>
+                        <h6>@ProfileResource.qrcode_otp</h6>
+                        @if (!Model.HasOtpKey)
+                        {
+                            <div class="alert alert-warning">@ProfileResource.no_otp</div>
+                        }
+                        else
+                        {
+                            <div>
+                                <img src="@Url.Action("GetOTP", "Home")" width="200px" />
+                            </div>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="col">
-        @if(!Model.HasOtpKey)
-        {
-            <div class="alert alert-warning">@ProfileResource.no_otp</div>
-        }
-        else
-        {
-            <img src="@Url.Action("GetOTP", "Home")" width="200px" />
-        }
+        <div class="row">
+            <!-- OPENID Consents -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>@ProfileResource.approved_apps_title</h5>
+                        <p>@ProfileResource.approved_apps_description</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>@ProfileResource.client</th>
+                                    <th>@ProfileResource.scopes</th>
+                                    <th>@ProfileResource.claims</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var consent in Model.Consents.OrderBy(c => c.ClientName))
+                                {
+                                    <tr>
+                                        <td>@Html.ClientPicture(consent.ClientUri)</td>
+                                        <td class="align-middle">@(string.IsNullOrWhiteSpace(consent.ClientName) ? '-' : consent.ClientName)</td>
+                                        <td class="align-middle">@string.Join(",", consent.ScopeNames)</td>
+                                        <td class="align-middle">@string.Join(",", consent.ClaimNames)</td>
+                                        <td class="align-middle">
+                                            <a href="@Url.Action("RejectConsent", "Home", new { consentId = consent.ConsentId })" class="btn btn-danger">@ProfileResource.revoke_access</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Pending requests -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Pending requests</h5>
+                        <p>Users asks to have access to some of your resources. To prevent them from future access, click "Revoke Access"</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Scopes</th>
+                                    <th>Requester</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var consent in Model.PendingRequests.Where(p => p.Owner == getClaim(ClaimTypes.NameIdentifier)).OrderByDescending(u => u.CreateDateTime))
+                                {
+                                    <tr>
+                                        <td>@(string.IsNullOrWhiteSpace(consent.ResourceName) ? '-' : consent.ResourceName)</td>
+                                        <td>@(string.IsNullOrWhiteSpace(consent.ResourceDescription) ? '-' : consent.ResourceDescription)</td>
+                                        <td>@string.Join(",", consent.Scopes)</td>
+                                        <td>@consent.Requester</td>
+                                        <td>@Enum.GetName(typeof(UMAPendingRequestStatus), consent.Status)</td>
+                                        <td>
+                                            @if (consent.Status == UMAPendingRequestStatus.TOBECONFIRMED)
+                                            {
+                                                <a href="@Url.Action("RejectUmaPendingRequest", "Home", new { ticketId = consent.TicketId})" class="btn btn-danger">@ProfileResource.revoke_access</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Your requests -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

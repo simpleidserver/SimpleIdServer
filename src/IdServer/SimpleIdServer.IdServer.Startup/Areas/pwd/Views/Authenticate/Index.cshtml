@@ -5,112 +5,42 @@
     ViewBag.Title = AuthenticatePasswordResource.title;
 }
 
-<div class="card">
-    <div class="card-body">
-        <h3>@AuthenticatePasswordResource.title</h3>
-        <!-- Login -->
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Login">
-        </div>
-        <!-- Password -->
-        <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Password">
-        </div>
-        <div>
-            <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-            <label>@AuthenticatePasswordResource.remember_login</label>
-        </div>
-        <h5>OR</h5>
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticatePasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+}
+
+@using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+    <!-- Login -->
+    <div class="input-group mb-3">
+        <input type="text" value="@Model.Login" name="Login" class="form-control" placeholder="@AuthenticatePasswordResource.login">
     </div>
-</div>
-
-<div>
-    <div class="row">
-        <div class="col-9">
-            <div class="card" id="loginpwd-card">
-                <div class="card-header">@AuthenticatePasswordResource.title</div>
-                @using (Html.BeginForm("Index", "Authenticate", new { area = "pwd", returnUrl = Model.ReturnUrl }, FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    <div class="card-body">
-                        @if (!string.IsNullOrWhiteSpace(Model.LogoUri))
-                        {
-                            <img class="card-img-top rounded mx-auto d-block" src="@Model.LogoUri" style="max-width: 300px" />
-                        }
-                        <h5 class="card-title">@Model.ClientName</h5>
-                        @if (!ViewData.ModelState.IsValid)
-                        {
-                            <div class="alert alert-danger">
-                                <ul class="list-group">
-                                    @foreach (var modelState in ViewData.ModelState.Values)
-                                    {
-                                        foreach (var error in modelState.Errors)
-                                        {
-                                            <li class="list-group-item list-group-item-danger">@AuthenticatePasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                                        }
-                                    }
-                                </ul>
-                            </div>
-                        }
-                        <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
-                        <div class="mb-3">
-                            <label class="form-label">@AuthenticatePasswordResource.login</label>
-                            <input type="text" value="@Model.Login" name="Login" class="form-control" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">@AuthenticatePasswordResource.password</label>
-                            <input type="password" value="@Model.Password" name="Password" class="form-control" />
-                        </div>
-                        <div>
-                            <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
-                            <label>@AuthenticatePasswordResource.remember_login</label>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary card-link">@AuthenticatePasswordResource.submit</button>
-                        <div style="float: right">
-                            @if (!string.IsNullOrWhiteSpace(Model.TosUri))
-                            {
-                                <a href="@Model.TosUri" target="_blank">@AuthenticatePasswordResource.tos</a>
-                            }
-
-                            @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
-                            {
-                                <a href="@Model.PolicyUri" target="_blank">@AuthenticatePasswordResource.policy</a>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-
-        </div>
-        <div class="col-3">
-            <div class="card">
-                <div class="card-header">@AuthenticatePasswordResource.external_authenticate</div>
-                <div class="card-body">
-                    <ul class="list-inline">
-                        @foreach (var extProvider in Model.ExternalIdsProviders)
-                        {
-                            <li class="list-inline-item" style="margin-top: 4px">
-                                <a class="btn btn-secondary"
-                               asp-controller="ExternalAuthenticate"
-                               asp-area=""
-                               asp-action="Login"
-                               asp-route-scheme="@extProvider.AuthenticationScheme"
-                               asp-route-returnUrl="@Model.ReturnUrl">@extProvider.DisplayName</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <!-- Password -->
+    <div class="input-group mb-3">
+        <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
     </div>
-</div>
+    <div>
+        <input type="checkbox" value="@Model.RememberLogin" name="RememberLogin" />
+        <label>@AuthenticatePasswordResource.remember_login</label>
+    </div>
+    <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
+}
 
-@section Scripts {
+@section SubScripts {
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#loginpwd-card form input[name='RememberLogin']").change(function (e) {
+            $(".login input[name='RememberLogin']").change(function (e) {
                 $(this).val($(this).is(':checked'));
             });
         });
