@@ -59,5 +59,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Invalid request.
+        /// </summary>
+        public static string invalid_request {
+            get {
+                return ResourceManager.GetString("invalid_request", resourceCulture);
+            }
+        }
     }
 }

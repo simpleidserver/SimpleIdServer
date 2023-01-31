@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Accept.
+        /// </summary>
+        public static string accept_access {
+            get {
+                return ResourceManager.GetString("accept_access", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click &quot;Revoke Access&quot;.
         /// </summary>
         public static string approved_apps_description {
@@ -97,6 +106,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Description.
+        /// </summary>
+        public static string description {
+            get {
+                return ResourceManager.GetString("description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Grant datetime.
         /// </summary>
         public static string grant_time {
@@ -124,11 +142,47 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Users ask access to some of your resources. Click on &quot;Revoke Access&quot; to revoke pending request.
+        /// </summary>
+        public static string pending_request_description {
+            get {
+                return ResourceManager.GetString("pending_request_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Pending requests.
+        /// </summary>
+        public static string pending_request_title {
+            get {
+                return ResourceManager.GetString("pending_request_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à One Time Password.
         /// </summary>
         public static string qrcode_otp {
             get {
                 return ResourceManager.GetString("qrcode_otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Requester.
+        /// </summary>
+        public static string requester {
+            get {
+                return ResourceManager.GetString("requester", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource.
+        /// </summary>
+        public static string resource {
+            get {
+                return ResourceManager.GetString("resource", resourceCulture);
             }
         }
         

@@ -93,7 +93,8 @@ namespace SimpleIdServer.IdServer.UI
                         ResourceDescription = pendingRequest.Resource.Description,
                         ResourceName = pendingRequest.Resource.Name,
                         Scopes = pendingRequest.Scopes,
-                        Owner = pendingRequest.Owner
+                        Owner = pendingRequest.Owner,
+                        Status = pendingRequest.Status
                     });
                 }
 
@@ -101,6 +102,8 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
         public async Task<IActionResult> RejectConsent(string consentId, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -113,9 +116,44 @@ namespace SimpleIdServer.IdServer.UI
             return RedirectToAction("Profile");
         }
 
-        public Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
+            if (pendingRequest == null)
+                return NotFound();
+
+            if (pendingRequest.Owner != nameIdentifier)
+                return Unauthorized();
+
+            if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be rejected" });
+
+            pendingRequest.Reject();
+            await _pendingRequestRepository.SaveChanges(cancellationToken);
+            return RedirectToAction("Profile");
+        }
+
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
+        {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
+            if (pendingRequest == null)
+                return NotFound();
+
+            if (pendingRequest.Owner != nameIdentifier)
+                return Unauthorized();
+
+            if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be confirmed" });
+
+            pendingRequest.Confirm();
+            await _pendingRequestRepository.SaveChanges(cancellationToken);
+            return RedirectToAction("Profile");
         }
 
         [HttpGet]

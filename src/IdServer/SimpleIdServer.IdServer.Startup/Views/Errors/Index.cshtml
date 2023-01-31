@@ -7,5 +7,9 @@
 }
 
 <div class="alert alert-danger" role="alert">
-    @SimpleIdServer.IdServer.Startup.Resources.ErrorsResource.ResourceManager.GetString(Model.Code)
+    <b>@SimpleIdServer.IdServer.Startup.Resources.ErrorsResource.ResourceManager.GetString(Model.Code)</b>
+    @if(!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <p>@Model.Message</p>
+    }
 </div>
