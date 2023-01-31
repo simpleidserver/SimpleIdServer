@@ -7,5 +7,6 @@ namespace SimpleIdServer.IdServer.WsFederation
     {
         public const string UNKNOWN_RP = "the relying party doesn't exist";
         public const string WSFEDERATION_NOT_ENABLED = "ws-federation is not enabled";
+        public const string UNSUPPORTED_TOKENTYPE = "the token type is not supported";
     }
 }

@@ -1,11 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -38,6 +35,7 @@ void RunInMemoryIdServer(IServiceCollection services)
             o.AddInMemoryUMAPendingRequests(IdServerConfiguration.PendingRequests);
         })
         .AddDeveloperSigningCredentials()
+        .AddWsFederationSigningCredentials()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
@@ -66,18 +64,12 @@ void RunInMemoryIdServer(IServiceCollection services)
                 o.AppId = "569242033233529";
                 o.AppSecret = "12e0f33817634c0a650c0121d05e53eb";
             });
-            a.Builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<WsFederationOptions>, WsFederationPostConfigureOptions>());
-            a.Builder.AddRemoteScheme<WsFederationOptions, CustomWsFederationHandler>(WsFederationDefaults.AuthenticationScheme, WsFederationDefaults.DisplayName, o =>
-            {
-                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
-                o.Wtrealm = "api://sid";
-                o.RequireHttpsMetadata = false;
-            });
-            /*
             a.Builder.AddWsFederation(o =>
             {
+                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.Wtrealm = "website";
+                o.RequireHttpsMetadata = false;
             });
-            */
         })
         .AddWsFederation();
 }

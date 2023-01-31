@@ -7,6 +7,14 @@ namespace SimpleIdServer.IdServer.WsFederation
         /// <summary>
         /// Default JSON Web Key used to sign the response.
         /// </summary>
-        public string? DefaultKid { get; set; } = null;
+        public string DefaultKid { get; set; } = "wsFedKid";
+        /// <summary>
+        /// Default type of token.
+        /// </summary>
+        public string DefaultTokenType { get; set; } = WsFederationConstants.TokenTypes.Saml2TokenProfile11;
+        /// <summary>
+        /// Default identifier format.
+        /// </summary>
+        public string DefaultNameIdentifierFormat { get; set; } = WsFederationConstants.SamlNameIdentifierFormats.UnspecifiedString;
     }
 }

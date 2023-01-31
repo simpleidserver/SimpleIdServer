@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.WsFederation;
+using Microsoft.IdentityModel.Xml;
 using SimpleIdServer.IdServer.Extensions;
 using SimpleIdServer.IdServer.Stores;
 using System.Net;
@@ -29,7 +30,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 TokenEndpoint = $"{issuer}/{WsFederationConstants.EndPoints.SSO}"
             };
             foreach (var sigKey in sigKeys)
-                configuration.SigningKeys.Add(sigKey.Key);
+                configuration.KeyInfos.Add(new KeyInfo(sigKey.Key));
 
             configuration.SigningCredentials = GetSigningCredentials(sigKeys);
 

@@ -3,121 +3,90 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml;
 using Microsoft.IdentityModel.Tokens.Saml2;
-using Microsoft.IdentityModel.Xml;
+using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.WsFederation.Extensions;
-using System.Globalization;
 using System.Net;
 using System.Security.Claims;
-using System.Text;
-using System.Xml;
 
 namespace SimpleIdServer.IdServer.WsFederation.Api
 {
     public class SSOController : BaseWsFederationController
     {
         private readonly IClientRepository _clientRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserTransformer _userTransformer;
         private readonly IDataProtector _dataProtector;
+        private readonly IdServerHostOptions _options;
 
-        public SSOController(IClientRepository clientRepository, IDataProtectionProvider dataProtectionProvider, IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore) : base(options, keyStore)
+        public SSOController(IClientRepository clientRepository, IUserRepository userRepository, IUserTransformer userTransformer, IDataProtectionProvider dataProtectionProvider, IOptions<IdServerHostOptions> opts, IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore) : base(options, keyStore)
         {
             _clientRepository = clientRepository;
+            _userRepository = userRepository;
+            _userTransformer = userTransformer;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _options = opts.Value;
         }
 
-        public Task<IActionResult> Login()
+        public async Task<IActionResult> Login(CancellationToken cancellationToken)
         {
             var queryStr = Request.QueryString.Value;
             var federationMessage = WsFederationMessage.FromQueryString(queryStr);
-            if (federationMessage.IsSignInMessage)
-                return SignIn(federationMessage);
+            try
+            {
+                if (federationMessage.IsSignInMessage)
+                    return await SignIn(federationMessage, cancellationToken);
 
-            return null;
+                throw new NotImplementedException();
+            }
+            catch(OAuthException ex)
+            {
+                return RedirectToAction("Index", "Errors", new { code = ex.Code, message = ex.Message });
+            }
         }
 
-        private async Task<IActionResult> SignIn(WsFederationMessage message)
+        private async Task<IActionResult> SignIn(WsFederationMessage message, CancellationToken cancellationToken)
         {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var client = await Validate();
+            if (User == null || User.Identity == null || User.Identity.IsAuthenticated == false)
+                return RedirectToLoginPage();
 
-            async Task Validate()
+            var tokenType = GetTokenType(client);
+            var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().FirstAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var subject = BuildSubject();
+            return BuildResponse();
+
+            async Task<Domains.Client> Validate()
             {
-                var client = await _clientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm);
+                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.Claims).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm, cancellationToken);
                 if (client == null)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.UNKNOWN_RP);
 
                 if (!client.IsWsFederationEnabled())
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.WSFEDERATION_NOT_ENABLED);
 
+                var tokenType = GetTokenType(client);
+                if (tokenType != WsFederationConstants.TokenTypes.Saml2TokenProfile11 && tokenType != WsFederationConstants.TokenTypes.Saml11TokenProfile11)
+                    throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.UNSUPPORTED_TOKENTYPE);
 
+                return client;
             }
 
-            var descriptor = new SecurityTokenDescriptor
-            {
-                Audience = "coucou",
-                IssuedAt = DateTime.UtcNow,
-                NotBefore= DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddSeconds(10),
-                Subject = new System.Security.Claims.ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, "user"),
-                    new Claim(ClaimTypes.Email, "user@hotmail.fr")
-                }),
-                Issuer = "http://localhost"
-            };
-            var handler = new Saml2SecurityTokenHandler();
-            var securityToken = handler.CreateToken(descriptor);
-
-            var response = new RequestSecurityTokenResponse
-            {
-                CreatedAt = securityToken.ValidFrom,
-                ExpiresAt = securityToken.ValidTo,
-                AppliesTo = "coucou",
-                Context = message.Wctx,
-                RequestedSecurityToken = securityToken,
-                SecurityTokenHandler = handler
-            };
-            var responseMessage = new WsFederationMessage
-            {
-                IssuerAddress = message.Wreply,
-                Wresult = response.Serialize(),
-                Wctx = message.Wctx,
-                PostTitle = message.PostTitle,
-                Script = message.Script,
-                ScriptButtonText = message.ScriptButtonText,
-                ScriptDisabledText = message.ScriptDisabledText,
-            };
-
-            if (!string.IsNullOrWhiteSpace(message.Script))
-            {
-                var content = responseMessage.BuildFormPost();
-                return new ContentResult
-                {
-                    ContentType = "text/html",
-                    StatusCode = (int)HttpStatusCode.OK,
-                    Content = responseMessage.BuildFormPost()
-                };
-            }
-
-            return Redirect(responseMessage.BuildRedirectUrl());
-            /*
-            var client = await _clientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm);
-            if (client == null)
-            {
-                message.Wres
-                message.Wresult
-                var response = new SignInResponseMessage();
-            }
-                return null;
-
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            if (User == null || User.Identity == null || User.Identity.IsAuthenticated == false)
+            IActionResult RedirectToLoginPage()
             {
                 var queryStr = Request.QueryString.Value;
                 var returnUrl = $"{issuer}/{WsFederationConstants.EndPoints.SSO}{queryStr}&{AuthorizationRequestParameters.ClientId}={message.Wtrealm}";
@@ -129,76 +98,84 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 return Redirect(url);
             }
 
-
-            return null;
-            */
-        }
-
-        private class RequestSecurityTokenResponse
-        {
-            public DateTime CreatedAt { get; set; }
-            public DateTime ExpiresAt { get; set; }
-            public string AppliesTo { get; set; }
-            public string Context { get; set; }
-            public string ReplyTo { get; set; }
-            public SecurityToken RequestedSecurityToken { get; set; }
-            public SecurityTokenHandler SecurityTokenHandler { get; set; }
-
-            public string Serialize()
+            ClaimsIdentity BuildSubject()
             {
-                using var ms = new MemoryStream();
-                using var writer = XmlDictionaryWriter.CreateTextWriter(ms, Encoding.UTF8, false);
-                // <t:RequestSecurityTokenResponseCollection>
-                writer.WriteStartElement(WsTrustConstants_1_3.PreferredPrefix, Microsoft.IdentityModel.Xml.WsTrustConstants.Elements.RequestSecurityTokenResponseCollection, WsTrustConstants.Namespaces.WsTrust1_3);
-                // <t:RequestSecurityTokenResponse>
-                writer.WriteStartElement(WsTrustConstants_1_3.PreferredPrefix, Microsoft.IdentityModel.Xml.WsTrustConstants.Elements.RequestSecurityTokenResponse, WsTrustConstants.Namespaces.WsTrust1_3);
-                // @Context
-                writer.WriteAttributeString("Context", Context);
+                var claims = new Dictionary<string, object>();
+                IdTokenBuilder.EnrichWithScopeParameter(claims, client.Scopes, user, user.Id);
+                var transformedClaims = _userTransformer.ConvertToIdentityClaims(claims).ToList();
+                if (!transformedClaims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+                    transformedClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
 
-                // <t:Lifetime>
-                writer.WriteStartElement(WsTrustConstants.Elements.Lifetime, WsTrustConstants.Namespaces.WsTrust1_3);
+                var format = Microsoft.IdentityModel.Tokens.Saml2.ClaimProperties.SamlNameIdentifierFormat;
+                if (tokenType == WsFederationConstants.TokenTypes.Saml11TokenProfile11)
+                    format = Microsoft.IdentityModel.Tokens.Saml.ClaimProperties.SamlNameIdentifierFormat;
 
-                // <wsu:Created></wsu:Created>
-                writer.WriteElementString(WsUtility.PreferredPrefix, WsUtility.Elements.Created, WsUtility.Namespace, CreatedAt.ToString(SamlConstants.GeneratedDateTimeFormat, DateTimeFormatInfo.InvariantInfo));
-                // <wsu:Expires></wsu:Expires>
-                writer.WriteElementString(WsUtility.PreferredPrefix, WsUtility.Elements.Expires, WsUtility.Namespace, ExpiresAt.ToString(SamlConstants.GeneratedDateTimeFormat, DateTimeFormatInfo.InvariantInfo));
+                foreach (var cl in transformedClaims)
+                {
+                    if (cl.Type == ClaimTypes.NameIdentifier)
+                        cl.Properties[format] = Options.DefaultNameIdentifierFormat;
+                }
 
-                // </t:Lifetime>
-                writer.WriteEndElement();
+                return new ClaimsIdentity(transformedClaims, "idserver");
+            }
 
-                // <wsp:AppliesTo>
-                writer.WriteStartElement(WsPolicy.PreferredPrefix, WsPolicy.Elements.AppliesTo, WsPolicy.Namespace);
+            IActionResult BuildResponse()
+            {
+                var descriptor = new SecurityTokenDescriptor
+                {
+                    Audience = client.ClientId,
+                    IssuedAt = DateTime.UtcNow,
+                    NotBefore = DateTime.UtcNow,
+                    Expires = DateTime.UtcNow.AddSeconds(client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds),
+                    Subject = subject,
+                    Issuer = issuer,
+                    SigningCredentials = GetSigningCredentials()
+                };
+                SecurityTokenHandler handler;
+                if (tokenType == WsFederationConstants.TokenTypes.Saml2TokenProfile11)
+                    handler = new Saml2SecurityTokenHandler();
+                else
+                    handler = new SamlSecurityTokenHandler();
 
-                // <wsa:EndpointReference>
-                writer.WriteStartElement(WsAddressing.PreferredPrefix, WsAddressing.Elements.EndpointReference, WsAddressing.Namespace);
+                var securityToken = handler.CreateToken(descriptor);
 
-                // <wsa:Address></wsa:Address>
-                writer.WriteElementString(WsAddressing.PreferredPrefix, WsAddressing.Elements.Address, WsAddressing.Namespace, AppliesTo);
+                var response = new RequestSecurityTokenResponse
+                {
+                    CreatedAt = securityToken.ValidFrom,
+                    ExpiresAt = securityToken.ValidTo,
+                    AppliesTo = client.ClientId,
+                    Context = message.Wctx,
+                    RequestedSecurityToken = securityToken,
+                    SecurityTokenHandler = handler
+                };
 
-                writer.WriteEndElement();
-                // </wsa:EndpointReference>
+                var responseMessage = new WsFederationMessage
+                {
+                    IssuerAddress = message.Wreply,
+                    Wresult = response.Serialize(),
+                    Wctx = message.Wctx,
+                    PostTitle = message.PostTitle,
+                    Script = message.Script,
+                    ScriptButtonText = message.ScriptButtonText,
+                    ScriptDisabledText = message.ScriptDisabledText,
+                    Wa = Microsoft.IdentityModel.Protocols.WsFederation.WsFederationConstants.WsFederationActions.SignIn
+                };
 
-                writer.WriteEndElement();
-                // </wsp:AppliesTo>
+                if (!string.IsNullOrWhiteSpace(message.Script))
+                {
+                    var content = responseMessage.BuildFormPost();
+                    return new ContentResult
+                    {
+                        ContentType = "text/html",
+                        StatusCode = (int)HttpStatusCode.OK,
+                        Content = responseMessage.BuildFormPost()
+                    };
+                }
 
-                // <t:RequestedSecurityToken>
-                writer.WriteStartElement(WsTrustConstants_1_3.PreferredPrefix, WsTrustConstants.Elements.RequestedSecurityToken, WsTrustConstants.Namespaces.WsTrust1_3);
-
-                // write assertion
-                SecurityTokenHandler.WriteToken(writer, RequestedSecurityToken);
-
-                // </t:RequestedSecurityToken>
-                writer.WriteEndElement();
-
-                // </t:RequestSecurityTokenResponse>
-                writer.WriteEndElement();
-
-                // <t:RequestSecurityTokenResponseCollection>
-                writer.WriteEndElement();
-
-                writer.Flush();
-                return Encoding.UTF8.GetString(ms.ToArray());
+                return Redirect(responseMessage.BuildRedirectUrl());
             }
         }
+
+        private string GetTokenType(Client client) => client.GetWsTokenType() ?? Options.DefaultTokenType;
     }
 }

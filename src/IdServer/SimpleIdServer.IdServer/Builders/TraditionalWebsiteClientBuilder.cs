@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -19,6 +18,8 @@ namespace SimpleIdServer.IdServer.Builders
         private readonly Client _client;
 
         internal TraditionalWebsiteClientBuilder(Client client) { _client = client; }
+
+        public Client Client => _client;
 
         #region Grant types
 

@@ -32,6 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         public IServiceCollection Services => _serviceCollection;
+        public InMemoryKeyStore KeyStore => _keyStore;
 
         public IdServerBuilder SetSigningKeys(params SigningCredentials[] signingCredentials)
         {

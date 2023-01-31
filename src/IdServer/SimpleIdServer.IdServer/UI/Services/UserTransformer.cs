@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 {
     public interface IUserTransformer
     {
+        IEnumerable<Claim> ConvertToIdentityClaims(Dictionary<string, object> claims);
         User Transform(ClaimsPrincipal principal);
         ICollection<Claim> Transform(User user);
     }
@@ -26,6 +27,22 @@ namespace SimpleIdServer.IdServer.UI.Services
             { ClaimTypes.Gender, JwtRegisteredClaimNames.Gender },
             { ClaimTypes.GivenName, JwtRegisteredClaimNames.GivenName }
         };
+
+        public IEnumerable<Claim> ConvertToIdentityClaims(Dictionary<string, object> claims)
+        {
+            var result = new List<Claim>();
+            var values = CLAIM_MAPPINGS.Values;
+            foreach(var cl in claims)
+            {
+                if (!values.Contains(cl.Key))
+                    continue;
+
+                var rec = CLAIM_MAPPINGS.First(kvp => kvp.Value == cl.Key);
+                result.Add(new Claim(rec.Key, cl.Value.ToString()));
+            }
+
+            return result;
+        }
 
         public User Transform(ClaimsPrincipal principal)
         {
