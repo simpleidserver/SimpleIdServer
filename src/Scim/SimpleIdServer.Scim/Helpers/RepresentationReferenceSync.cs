@@ -101,9 +101,6 @@ namespace SimpleIdServer.Scim.Helpers
                     var attrMapping = kvp.FirstOrDefault(r => r.Mode == Mode.PROPAGATE_INHERITANCE);
                     if (attrMapping != null)
                     {
-                        var sch = targetSchemas.First(s => s.ResourceType == attrMapping.TargetResourceType);
-                        var parentAttr = sch.GetAttributeById(attrMapping.TargetAttributeId);
-                        var valueAttr = sch.GetChildren(parentAttr).First(a => a.Name == "value");
                         await PropagateIndirectReferences(result, attrMapping, targetSchemas, newScimRepresentations, newSourceScimRepresentation.Id, resolvedParents, location);
                         await PropagateIndirectReferences(result, attrMapping, targetSchemas, resolvedIndirectChildren, newSourceScimRepresentation.Id, resolvedParents, location);
                     }
@@ -228,7 +225,7 @@ namespace SimpleIdServer.Scim.Helpers
             var children = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(ids, selfAttributeMapping.SourceResourceType);
             foreach (var child in children)
             {
-                var indirectChildren = child.HierarchicalAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId).Select(a => a.CachedChildren.First(c => c.SchemaAttribute.Name == "value").ValueString);
+                var indirectChildren = child.HierarchicalAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId && a.CachedChildren.Any(c => c.SchemaAttribute?.Name == "value")).Select(a => a.CachedChildren.First(c => c.SchemaAttribute.Name == "value").ValueString);
                 lst.AddRange(await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(indirectChildren, attributeMapping.TargetResourceType));
                 await ResolveIndirectChildren(child, selfAttributeMapping, attributeMapping, lst);
             }
@@ -236,11 +233,11 @@ namespace SimpleIdServer.Scim.Helpers
 
         protected virtual async Task ResolveIndirectChildren(SCIMRepresentation scimRepresentation, SCIMAttributeMapping selfAttributeMapping, SCIMAttributeMapping attributeMapping, List<SCIMRepresentation> lst)
         {
-			var childrenIds = scimRepresentation.HierarchicalAttributes.Where(a => a.SchemaAttributeId == selfAttributeMapping.SourceAttributeId && a.CachedChildren.Any()).Select(a => a.CachedChildren.First(c => c.SchemaAttribute.Name == "value").ValueString);
+			var childrenIds = scimRepresentation.HierarchicalAttributes.Where(a => a.SchemaAttributeId == selfAttributeMapping.SourceAttributeId && a.CachedChildren.Any(c => c.SchemaAttribute?.Name == "value")).Select(a => a.CachedChildren.First(c => c.SchemaAttribute.Name == "value").ValueString);
 			var children = await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(childrenIds, selfAttributeMapping.SourceResourceType);
 			foreach(var child in children)
 			{
-				var indirectChildren = child.HierarchicalAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId).Select(a => a.CachedChildren.First(c => c.SchemaAttribute.Name == "value").ValueString);
+				var indirectChildren = child.HierarchicalAttributes.Where(a => a.SchemaAttributeId == attributeMapping.SourceAttributeId && a.CachedChildren.Any(c => c.SchemaAttribute?.Name == "value")).Select(a => a.CachedChildren.First(c => c.SchemaAttribute.Name == "value").ValueString);
 				lst.AddRange(await _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(indirectChildren, attributeMapping.TargetResourceType));
 				await ResolveIndirectChildren(child, selfAttributeMapping, attributeMapping, lst);
             }
@@ -261,7 +258,8 @@ namespace SimpleIdServer.Scim.Helpers
             if (attributeMappingToBePurged == null) return;
             var sch = schemas.First(s => s.ResourceType == attributeMappingToBePurged.TargetResourceType);
             var parentAttr = sch.GetAttributeById(attributeMappingToBePurged.TargetAttributeId);
-			var valueAttr = sch.GetChildren(parentAttr).First(a => a.Name == "value");
+			var valueAttr = sch.GetChildren(parentAttr).FirstOrDefault(a => a.Name == "value");
+			if (valueAttr == null) return;
             var fullPath = valueAttr.FullPath;
             foreach (var child in children)
             {
@@ -282,7 +280,8 @@ namespace SimpleIdServer.Scim.Helpers
 		{
             var sch = schemas.First(s => s.ResourceType == mapping.TargetResourceType);
             var parentAttr = sch.GetAttributeById(mapping.TargetAttributeId);
-            var valueAttr = sch.GetChildren(parentAttr).First(a => a.Name == "value");
+            var valueAttr = sch.GetChildren(parentAttr).FirstOrDefault(a => a.Name == "value");
+			if (valueAttr == null) return;
             var children = await _scimRepresentationCommandRepository.FindSCIMRepresentationsByAttributeFullPath(valueAttr.FullPath, new List<string> { representationId }, mapping.TargetResourceType);
 			children = children.Where(c => !excludedAttributeIds.Contains(c.Id));
 			await PropagateIndirectReferences(result, mapping, schemas, children, representationId, resolvedParents, location);
