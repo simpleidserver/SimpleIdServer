@@ -1,0 +1,72 @@
+﻿@inject Radzen.DialogService dialogService
+
+<div class="row gy-4">
+    @foreach (var appType in ApplicationTypes) {
+        <div class="col-md-6">
+            <RadzenCard @onclick="() => SelectApplication(appType)">
+                <div class="row">
+                    <div class="col-md-3">
+                        PICTURE
+                    </div>
+                    <div class="col">
+                        <h5>@appType.Name</h5>
+                        <p class="text-muted">@appType.ShortDescription</p>
+                    </div>
+                </div>
+            </RadzenCard>
+        </div>
+    }
+    <!--
+    <div class="col-md-6">
+        <RadzenCard>
+            WEB APP
+        </RadzenCard>
+    </div>
+    <div class="col-md-6">
+        NATIVE
+    </div>
+    <div class="col-md-6">
+        MACHINE
+    </div>
+    <div class="col-md-6">
+        DEVICE
+    </div>
+    <div class="col-md-6">
+        WS-FED RELYING PARTY
+        </div>-->
+</div>
+
+<p>DIVIDER</p>
+
+@if(SelectedApplicationType != null)
+{
+    <p>@SelectedApplicationType.Description</p>
+}
+
+<div class="row">
+    <div class="col-md-12 text-end">
+        <RadzenButton Click="@((args) => dialogService.Close(false))" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Text="Cancel" Style="width: 120px" Class="me-1" />
+    </div>
+</div>
+
+@code {
+    record ApplicationType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public string Type { get; set; } = null!;
+    }
+
+    ICollection<ApplicationType> ApplicationTypes { get; set; } = new List<ApplicationType>
+    {
+        new ApplicationType { Name = "Single Page Application", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = "SPA" }
+    };
+
+    ApplicationType? SelectedApplicationType { get; set; } = null;
+
+    void SelectApplication(ApplicationType appType)
+    {
+        SelectedApplicationType = appType;
+    }
+}

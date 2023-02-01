@@ -15,7 +15,6 @@
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.*">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

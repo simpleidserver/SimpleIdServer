@@ -1,0 +1,34 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>SimpleIdServer</PageTitle>
+
+<RadzenDialog />
+
+<RadzenLayout class="rz-shadow-3">
+    <RadzenHeader>
+        <div class="d-flex align-items-center">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            <RadzenLabel Text="SimpleIdServer" />
+        </div>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Clients" Icon="box" Path="/clients" />
+        </RadzenPanelMenu>
+        <div class="p-2">
+            Sidebar
+        </div>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="p-2">
+            @Body
+        </div>
+    </RadzenBody>
+    <RadzenFooter>
+        Footer
+    </RadzenFooter>
+</RadzenLayout>
+
+@code {
+    bool sidebarExpanded = true;
+}

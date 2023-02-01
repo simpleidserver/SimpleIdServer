@@ -1,0 +1,63 @@
+﻿@page "/clients"
+@inject IState<ClientState> clientState
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+
+<PageTitle>Clients</PageTitle>
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@clientState.Value.IsLoading"
+        Count="@clientState.Value.Count"
+        Data="@clientState.Value.Clients"
+        LoadData="@LoadData"
+        TItem="Client" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="Client" Property="LogoUri" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenButton Click="@(args => AddClient())" Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenImage Path="@GetPicture(data)" Style="width: 60px" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Client" Property="ClientId" Filterable="false" Sortable="true" Title="Identifier" Width="80px" />
+        <RadzenDataGridColumn TItem="Client" Property="ClientName" Filterable="false" Sortable="false" Title="Name" Width="80px" />
+        <!-- Display the protocols -->
+        <RadzenDataGridColumn TItem="Client" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="Update datetime" Width="80px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchClientsAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+    string GetPicture(Client client)
+    {
+        if (string.IsNullOrWhiteSpace(client.LogoUri)) return "images/DefaultClient.png";
+        return client.LogoUri;
+    }
+
+    async void AddClient() 
+    {
+        await dialogService.OpenAsync<AddClientDialog>("Add client", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height ="512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}
