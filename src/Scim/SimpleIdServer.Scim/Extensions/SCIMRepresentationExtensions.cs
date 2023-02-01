@@ -10,7 +10,6 @@ using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Resources;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -371,6 +370,7 @@ namespace SimpleIdServer.Scim.Domain
                             }
                             else
                             {
+                                representation.RefreshHierarchicalAttributesCache();
                                 result.AddRange(ReplaceComplexMultiValuedAttribute(representation, attributes, schemaAttributes, patch, attributeMappings, ignoreUnsupportedCanonicalValues));
                             }
                         }
@@ -392,23 +392,39 @@ namespace SimpleIdServer.Scim.Domain
             var result = new List<SCIMPatchResult>();
             var newAttributes = ExtractRepresentationAttributesFromJSON(representation.Schemas, schemaAttributes.ToList(), patch.Value, ignoreUnsupportedCanonicalValues);
             newAttributes = RemoveStandardReferenceProperties(newAttributes, attributeMappings);
-            if (!newAttributes.Any() || IsExactlySimilar(attributes, newAttributes)) return result;
             var newHierarchicalAttributes = SCIMRepresentation.BuildHierarchicalAttributes(newAttributes);
-            var fullPath = newHierarchicalAttributes.First().FullPath;
-            var existingAttributesToRemove = attributes.Where(a => a.FullPath == fullPath && !newHierarchicalAttributes.Any(na => na.IsSimilar(a, true)));
-            foreach(var existingAttributeToRemove in existingAttributesToRemove)
+            var allFullPath = newHierarchicalAttributes.Select(h => h.FullPath);
+            var flatAttrs = attributes.SelectMany(a => a.ToFlat()).ToList();
+            var targetedAttrs = flatAttrs.Where(a => allFullPath.Contains(a.FullPath)).ToList();
+            if (!newHierarchicalAttributes.Any() || IsExactlySimilar(targetedAttrs, newHierarchicalAttributes)) return result;
+
+            var existingAttributesToRemove = targetedAttrs.Where(a => !newHierarchicalAttributes.Any(nha => nha.FullPath == a.FullPath && nha.IsSimilar(a, true)));
+            foreach (var existingAttributeToRemove in existingAttributesToRemove)
             {
                 representation.RemoveAttributeById(existingAttributeToRemove);
                 foreach (var flatAttr in existingAttributeToRemove.ToFlat()) result.Add(new SCIMPatchResult { Attr = flatAttr, Operation = SCIMPatchOperations.REMOVE, Path = flatAttr.FullPath });
             }
 
-            var newAttributesToAdd = newHierarchicalAttributes.Where(na => !attributes.Any(a => a.FullPath == fullPath && na.IsSimilar(a, true)));
+            var newAttributesToAdd = newHierarchicalAttributes.Where(na => !targetedAttrs.Any(a => a.FullPath == na.FullPath && na.IsSimilar(a, true)));
             foreach (var newAttributeToAdd in newAttributesToAdd)
             {
-                foreach (var newFlatAttr in newAttributeToAdd.ToFlat())
+                IEnumerable<SCIMRepresentationAttribute> parents = null;
+                if(newAttributeToAdd.GetLevel() > 1)
+                    parents = representation.GetAttributesByPath(newAttributeToAdd.GetParentFullPath()).ToList();
+
+                if(parents != null)
                 {
-                    representation.AddAttribute(newFlatAttr);
-                    result.Add(new SCIMPatchResult { Attr = newFlatAttr, Operation = SCIMPatchOperations.ADD, Path = newFlatAttr.FullPath });
+                    foreach(var parent in parents)
+                        representation.AddAttribute(parent, newAttributeToAdd);
+                    result.Add(new SCIMPatchResult { Attr = newAttributeToAdd, Operation = SCIMPatchOperations.ADD, Path = newAttributeToAdd.FullPath });
+                }
+                else
+                {
+                    foreach (var newFlatAttr in newAttributeToAdd.ToFlat())
+                    {
+                        representation.AddAttribute(newFlatAttr);
+                        result.Add(new SCIMPatchResult { Attr = newFlatAttr, Operation = SCIMPatchOperations.ADD, Path = newFlatAttr.FullPath });
+                    }
                 }
             }
 
