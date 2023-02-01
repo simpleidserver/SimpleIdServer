@@ -213,6 +213,34 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UMAPermissionTicket",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UMAPermissionTicket", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UmaResources",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IconUri = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UmaResources", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -384,6 +412,72 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UMAPermissionTicketRecord",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ResourceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UMAPermissionTicketId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UMAPermissionTicketRecord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UMAPermissionTicketRecord_UMAPermissionTicket_UMAPermissionTicketId",
+                        column: x => x.UMAPermissionTicketId,
+                        principalTable: "UMAPermissionTicket",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UmaPendingRequest",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TicketId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Requester = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Owner = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ResourceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UmaPendingRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UmaPendingRequest_UmaResources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "UmaResources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UMAResourcePermission",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UMAResourceId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UMAResourcePermission", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UMAResourcePermission_UmaResources_UMAResourceId",
+                        column: x => x.UMAResourceId,
+                        principalTable: "UmaResources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Consent",
                 columns: table => new
                 {
@@ -516,6 +610,53 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TranslationUMAResource",
+                columns: table => new
+                {
+                    TranslationsId = table.Column<int>(type: "int", nullable: false),
+                    UMAResourceId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TranslationUMAResource", x => new { x.TranslationsId, x.UMAResourceId });
+                    table.ForeignKey(
+                        name: "FK_TranslationUMAResource_Translations_TranslationsId",
+                        column: x => x.TranslationsId,
+                        principalTable: "Translations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TranslationUMAResource_UmaResources_UMAResourceId",
+                        column: x => x.UMAResourceId,
+                        principalTable: "UmaResources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UMAResourcePermissionClaim",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FriendlyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UMAResourcePermissionId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UMAResourcePermissionClaim", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UMAResourcePermissionClaim_UMAResourcePermission_UMAResourcePermissionId",
+                        column: x => x.UMAResourcePermissionId,
+                        principalTable: "UMAResourcePermission",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiResourceScope_ScopesName",
                 table: "ApiResourceScope",
@@ -566,6 +707,31 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "IX_Translations_ClientId",
                 table: "Translations",
                 column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TranslationUMAResource_UMAResourceId",
+                table: "TranslationUMAResource",
+                column: "UMAResourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UmaPendingRequest_ResourceId",
+                table: "UmaPendingRequest",
+                column: "ResourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UMAPermissionTicketRecord_UMAPermissionTicketId",
+                table: "UMAPermissionTicketRecord",
+                column: "UMAPermissionTicketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UMAResourcePermission_UMAResourceId",
+                table: "UMAResourcePermission",
+                column: "UMAResourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UMAResourcePermissionClaim_UMAResourcePermissionId",
+                table: "UMAResourcePermissionClaim",
+                column: "UMAResourcePermissionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaim_UserId",
@@ -630,7 +796,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Tokens");
 
             migrationBuilder.DropTable(
-                name: "Translations");
+                name: "TranslationUMAResource");
+
+            migrationBuilder.DropTable(
+                name: "UmaPendingRequest");
+
+            migrationBuilder.DropTable(
+                name: "UMAPermissionTicketRecord");
+
+            migrationBuilder.DropTable(
+                name: "UMAResourcePermissionClaim");
 
             migrationBuilder.DropTable(
                 name: "UserClaim");
@@ -660,10 +835,22 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Scopes");
 
             migrationBuilder.DropTable(
-                name: "Clients");
+                name: "Translations");
+
+            migrationBuilder.DropTable(
+                name: "UMAPermissionTicket");
+
+            migrationBuilder.DropTable(
+                name: "UMAResourcePermission");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "UmaResources");
         }
     }
 }

@@ -691,6 +691,176 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("Translations");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPendingRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Owner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Requester")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResourceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Scopes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TicketId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResourceId");
+
+                    b.ToTable("UmaPendingRequest");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicket", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UMAPermissionTicket");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicketRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ResourceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Scopes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UMAPermissionTicketId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UMAPermissionTicketId");
+
+                    b.ToTable("UMAPermissionTicketRecord");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResource", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "_id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
+
+                    b.Property<string>("IconUri")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "icon_uri");
+
+                    b.Property<string>("Scopes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "resource_scopes");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "type");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UmaResources");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResourcePermission", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Scopes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "scopes");
+
+                    b.Property<string>("UMAResourceId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UMAResourceId");
+
+                    b.ToTable("UMAResourcePermission");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResourcePermissionClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "claim_type");
+
+                    b.Property<string>("FriendlyName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "friendly_name");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("UMAResourcePermissionId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UMAResourcePermissionId");
+
+                    b.ToTable("UMAResourcePermissionClaim");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "claims");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.User", b =>
                 {
                     b.Property<string>("Id")
@@ -849,6 +1019,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("UserSession");
                 });
 
+            modelBuilder.Entity("TranslationUMAResource", b =>
+                {
+                    b.Property<int>("TranslationsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UMAResourceId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("TranslationsId", "UMAResourceId");
+
+                    b.HasIndex("UMAResourceId");
+
+                    b.ToTable("TranslationUMAResource");
+                });
+
             modelBuilder.Entity("ApiResourceScope", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.ApiResource", null)
@@ -929,6 +1114,41 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasForeignKey("ClientId");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPendingRequest", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.UMAResource", "Resource")
+                        .WithMany()
+                        .HasForeignKey("ResourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Resource");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicketRecord", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.UMAPermissionTicket", null)
+                        .WithMany("Records")
+                        .HasForeignKey("UMAPermissionTicketId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResourcePermission", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.UMAResource", null)
+                        .WithMany("Permissions")
+                        .HasForeignKey("UMAResourceId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResourcePermissionClaim", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.UMAResourcePermission", null)
+                        .WithMany("Claims")
+                        .HasForeignKey("UMAResourcePermissionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserClaim", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
@@ -969,6 +1189,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("TranslationUMAResource", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Translation", null)
+                        .WithMany()
+                        .HasForeignKey("TranslationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SimpleIdServer.IdServer.Domains.UMAResource", null)
+                        .WithMany()
+                        .HasForeignKey("UMAResourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>
                 {
                     b.Navigation("Histories");
@@ -991,6 +1226,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("Claims");
 
                     b.Navigation("Consents");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicket", b =>
+                {
+                    b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResource", b =>
+                {
+                    b.Navigation("Permissions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResourcePermission", b =>
+                {
+                    b.Navigation("Claims");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.User", b =>

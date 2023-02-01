@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -13,11 +12,11 @@ using System.Linq;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
-RunInMemoryIdServer(builder.Services);
-// RunSqlServerIdServer(builder.Services);
+// RunInMemoryIdServer(builder.Services);
+RunSqlServerIdServer(builder.Services);
 
 var app = builder.Build();
-// SeedData(app);
+SeedData(app);
 app.UseSID()
     .UseWsFederation();
 app.Run();
@@ -83,12 +82,20 @@ void RunSqlServerIdServer(IServiceCollection services)
             o.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True", o => o.MigrationsAssembly("SimpleIdServer.IdServer.Startup"));
         })
         .AddDeveloperSigningCredentials()
+        .AddWsFederationSigningCredentials()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
+            a.AddWsAuthentication(o =>
+            {
+                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.Wtrealm = "urn:website";
+                o.RequireHttpsMetadata = false;
+            });
+            /*
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";
@@ -106,6 +113,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
+            */
             a.Builder.AddFacebook(o =>
             {
                 o.AppId = "569242033233529";
