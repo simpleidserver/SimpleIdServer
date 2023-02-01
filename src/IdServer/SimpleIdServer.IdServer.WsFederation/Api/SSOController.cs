@@ -49,7 +49,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 if (federationMessage.IsSignInMessage)
                     return await SignIn(federationMessage, cancellationToken);
 
-                throw new NotImplementedException();
+                return RedirectToAction("EndSession", "CheckSession");
             }
             catch(OAuthException ex)
             {
@@ -103,6 +103,9 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 var claims = new Dictionary<string, object>();
                 IdTokenBuilder.EnrichWithScopeParameter(claims, client.Scopes, user, user.Id);
                 var transformedClaims = _userTransformer.ConvertToIdentityClaims(claims).ToList();
+                if (transformedClaims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
+                    throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);
+
                 if (!transformedClaims.Any(c => c.Type == ClaimTypes.NameIdentifier))
                     transformedClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
 

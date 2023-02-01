@@ -28,7 +28,8 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<Client> Clients => new List<Client>
         {
             ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:60001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).EnableWsFederationProtocol().Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("bankWebsite", "password", "http://localhost:60001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).EnableCIBAGrantType().Build()
+            ClientBuilder.BuildTraditionalWebsiteClient("bankWebsite", "password", "http://localhost:60001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).EnableCIBAGrantType().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("urn:website", "password").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).SetClientName("Name").EnableWsFederationProtocol().Build()
         };
 
         public static ICollection<UMAResource> Resources = new List<UMAResource>

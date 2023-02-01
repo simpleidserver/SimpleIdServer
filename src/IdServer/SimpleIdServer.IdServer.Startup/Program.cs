@@ -4,12 +4,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
 using System.Linq;
-
-// Check();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages()
@@ -42,6 +41,13 @@ void RunInMemoryIdServer(IServiceCollection services)
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
+            a.AddWsAuthentication(o =>
+            {
+                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.Wtrealm = "urn:website";
+                o.RequireHttpsMetadata = false;
+            });
+            /*
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";
@@ -59,16 +65,11 @@ void RunInMemoryIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
+            */
             a.Builder.AddFacebook(o =>
             {
                 o.AppId = "569242033233529";
                 o.AppSecret = "12e0f33817634c0a650c0121d05e53eb";
-            });
-            a.Builder.AddWsFederation(o =>
-            {
-                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
-                o.Wtrealm = "website";
-                o.RequireHttpsMetadata = false;
             });
         })
         .AddWsFederation();
@@ -128,6 +129,12 @@ void SeedData(WebApplication application)
 
             if (!dbContext.Clients.Any())
                 dbContext.Clients.AddRange(IdServerConfiguration.Clients);
+
+            if (!dbContext.UmaPendingRequest.Any())
+                dbContext.UmaPendingRequest.AddRange(IdServerConfiguration.PendingRequests);
+
+            if (!dbContext.UmaResources.Any())
+                dbContext.UmaResources.AddRange(IdServerConfiguration.Resources);
 
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);

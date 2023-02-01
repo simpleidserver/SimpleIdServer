@@ -66,7 +66,7 @@ namespace SimpleIdServer.IdServer.UI
             };
         }
 
-        [Authorize("IsConnected")]
+        [Authorize(Constants.Policies.Authenticated)]
         [HttpGet]
         public async Task<IActionResult> EndSession(CancellationToken cancellationToken)
         {
@@ -112,7 +112,7 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        [Authorize("IsConnected")]
+        [Authorize(Constants.Policies.Authenticated)]
         [HttpGet]
         public async Task<IActionResult> EndSessionCallback(CancellationToken cancellationToken)
         {

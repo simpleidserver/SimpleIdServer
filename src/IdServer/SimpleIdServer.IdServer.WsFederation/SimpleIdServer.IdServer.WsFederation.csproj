@@ -7,6 +7,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.IdentityModel.Protocols.WsFederation" Version="6.26.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="7.0.2" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />

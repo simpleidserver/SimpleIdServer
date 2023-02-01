@@ -5,11 +5,11 @@ namespace SimpleIdServer.IdServer.WsFederation
     public class IdServerWsFederationOptions
     {
         /// <summary>
-        /// Default JSON Web Key used to sign the response.
+        /// Default JWK Identifier used to sign the response.
         /// </summary>
         public string DefaultKid { get; set; } = "wsFedKid";
         /// <summary>
-        /// Default type of token.
+        /// Default token type.
         /// </summary>
         public string DefaultTokenType { get; set; } = WsFederationConstants.TokenTypes.Saml2TokenProfile11;
         /// <summary>

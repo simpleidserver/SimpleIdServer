@@ -165,6 +165,16 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
                 defaults: new { controller = "Grants", action = "Revoke" });
 
+            webApplication.MapControllerRoute("checkSession",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.CheckSession,
+                defaults: new { controller = "CheckSession", action = "Index" });
+            webApplication.MapControllerRoute("endSession",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSession,
+                defaults: new { controller = "CheckSession", action = "EndSession" });
+            webApplication.MapControllerRoute("endSessionCallback",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.EndSessionCallback,
+                defaults: new { controller = "CheckSession", action = "EndSessionCallback" });
+
             webApplication.MapControllerRoute(
                 name: "defaultWithArea",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");
