@@ -4,6 +4,7 @@
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using System;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -64,6 +65,8 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);

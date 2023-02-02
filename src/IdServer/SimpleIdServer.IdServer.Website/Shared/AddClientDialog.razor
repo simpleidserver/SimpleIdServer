@@ -1,53 +1,99 @@
-﻿@inject Radzen.DialogService dialogService
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddClientState> addClientState
+@inject IDispatcher dispatcher
 
-<div class="row gy-4">
-    @foreach (var appType in ApplicationTypes) {
-        <div class="col-md-6">
-            <RadzenCard @onclick="() => SelectApplication(appType)">
-                <div class="row">
-                    <div class="col-md-3">
-                        PICTURE
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Application type">
+            <div class="row gy-4">
+                @foreach (var appType in ApplicationTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectApplication(appType)" class="@(SelectedApplicationType != null && SelectedApplicationType.Name == appType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@appType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@appType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(appType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
                     </div>
-                    <div class="col">
-                        <h5>@appType.Name</h5>
-                        <p class="text-muted">@appType.ShortDescription</p>
-                    </div>
+                }
+                <!--
+                <div class="col-md-6">
+                    <RadzenCard>
+                        WEB APP
+                    </RadzenCard>
                 </div>
-            </RadzenCard>
-        </div>
-    }
-    <!--
-    <div class="col-md-6">
-        <RadzenCard>
-            WEB APP
-        </RadzenCard>
-    </div>
-    <div class="col-md-6">
-        NATIVE
-    </div>
-    <div class="col-md-6">
-        MACHINE
-    </div>
-    <div class="col-md-6">
-        DEVICE
-    </div>
-    <div class="col-md-6">
-        WS-FED RELYING PARTY
-        </div>-->
-</div>
+                <div class="col-md-6">
+                    NATIVE
+                </div>
+                <div class="col-md-6">
+                    MACHINE
+                </div>
+                <div class="col-md-6">
+                    DEVICE
+                </div>
+                <div class="col-md-6">
+                    WS-FED RELYING PARTY
+                    </div>
+                -->
+            </div>
 
-<p>DIVIDER</p>
+            <hr class="hr" />
 
-@if(SelectedApplicationType != null)
-{
-    <p>@SelectedApplicationType.Description</p>
-}
-
-<div class="row">
-    <div class="col-md-12 text-end">
-        <RadzenButton Click="@((args) => dialogService.Close(false))" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Text="Cancel" Style="width: 120px" Class="me-1" />
-    </div>
-</div>
+            @if (SelectedApplicationType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedApplicationType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedApplicationType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedApplicationType == null)">
+            @if(SelectedApplicationType != null)
+            {
+                switch(SelectedApplicationType.Type)
+                {
+                    // SPA application
+                    case AppTypes.SPA:
+                        <RadzenTemplateForm Submit=@AddSpaApplication TItem="SpaApplication" Data=@spaApplication>
+                            @if(!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@spaApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier id required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@spaApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenTextBox Name="RedirectionUris" @bind-Value="@spaApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">
+                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
+                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                </p>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                }
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
 
 @code {
     record ApplicationType
@@ -55,12 +101,43 @@
         public string Name { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public string Type { get; set; } = null!;
+        public AppTypes Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record SpaApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+        public string RedirectionUris { get; set; } = null!;
+    }
+
+    SpaApplication spaApplication = new SpaApplication();
+
+    enum AppTypes
+    {
+        SPA = 0
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<AddClientSuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ClientAdded, act.ClientId) });
+            StateHasChanged();
+        });
     }
 
     ICollection<ApplicationType> ApplicationTypes { get; set; } = new List<ApplicationType>
     {
-        new ApplicationType { Name = "Single Page Application", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = "SPA" }
+        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser. <br/> Client secret and/or refresh tokens cannot be stored by these applications because <b>there is a security risk</b>. <br/> <b>Examples</b> of User-Agent-Based application : Angular, EmberJS, VueJS.", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "Single Page Application2", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "Single Page Application3", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "Single Page Application4", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "Single Page Application5", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "Single Page Application6", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" }
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;
@@ -68,5 +145,10 @@
     void SelectApplication(ApplicationType appType)
     {
         SelectedApplicationType = appType;
+    }
+
+    void AddSpaApplication(SpaApplication spaApplication)
+    {
+        dispatcher.Dispatch(new AddSpaClientAction { ClientId = spaApplication.ClientIdentifier, ClientName = spaApplication.ClientName, RedirectionUrls = spaApplication.RedirectionUris.Split(';') });
     }
 }

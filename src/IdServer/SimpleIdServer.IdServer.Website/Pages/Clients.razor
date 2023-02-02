@@ -1,5 +1,5 @@
 ﻿@page "/clients"
-@inject IState<ClientState> clientState
+@inject IState<SearchClientsState> clientState
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
@@ -19,21 +19,22 @@
         Count="@clientState.Value.Count"
         Data="@clientState.Value.Clients"
         LoadData="@LoadData"
-        TItem="Client" 
+        RowRender="@RowRender"
+        TItem="SelectableClient" 
         ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="Client" Property="LogoUri" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.LogoUri" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenButton Click="@(args => AddClient())" Icon="add" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                <RadzenButton Click="@(args => AddClient())" Icon="add" Text="Add client" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
             </HeaderTemplate>
             <Template Context="data">
                 <RadzenImage Path="@GetPicture(data)" Style="width: 60px" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Client" Property="ClientId" Filterable="false" Sortable="true" Title="Identifier" Width="80px" />
-        <RadzenDataGridColumn TItem="Client" Property="ClientName" Filterable="false" Sortable="false" Title="Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientId" Filterable="false" Sortable="true" Title="Identifier" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="Name" Width="80px" />
         <!-- Display the protocols -->
-        <RadzenDataGridColumn TItem="Client" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
     </Columns>
 </RadzenDataGrid>
 
@@ -42,12 +43,19 @@
     {
         var act = new SearchClientsAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
         dispatcher.Dispatch(act);
+    }    
+
+    void RowRender(RowRenderEventArgs<SelectableClient> row)
+    {
+        if (row.Data.IsNew)
+            row.Attributes.Add("class", "new");
+        
     }
 
-    string GetPicture(Client client)
+    string GetPicture(SelectableClient client)
     {
-        if (string.IsNullOrWhiteSpace(client.LogoUri)) return "images/DefaultClient.png";
-        return client.LogoUri;
+        if (string.IsNullOrWhiteSpace(client.Value.LogoUri)) return "images/DefaultClient.png";
+        return client.Value.LogoUri;
     }
 
     async void AddClient() 

@@ -1,0 +1,21 @@
+﻿.rz-card.selected,
+.rz-grid-table .new {
+    background-color: #d3f0d3;
+}
+
+.rz-card.selected {
+    border: 1px solid green !important;
+}
+
+.rz-card.selectable {
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.rz-dialog-content .rz-widget-content {
+    padding: 5px;
+}
+
+.rz-grid-table .active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
