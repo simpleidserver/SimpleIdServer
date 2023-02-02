@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.Store
         IQueryable<Client> Query();
         void Delete(Client client);
         void Add(Client client);
+        void DeleteRange(IEnumerable<Client> clients);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -24,6 +25,8 @@ namespace SimpleIdServer.IdServer.Store
         public IQueryable<Client> Query() => _dbContext.Clients;
 
         public void Delete(Client client) => _dbContext.Clients.Remove(client);
+
+        public void DeleteRange(IEnumerable<Client> clients) => _dbContext.Clients.RemoveRange(clients);
 
         public void Add(Client client) => _dbContext.Clients.Add(client);
 

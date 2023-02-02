@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
     public static class ClientReducers
     {
-        #region Search clients
+        #region SearchClientsState
 
         [ReducerMethod]
         public static SearchClientsState ReduceSearchClientsAction(SearchClientsState state, SearchClientsAction act) => new(isLoading: true, clients: new List<Client>());
@@ -43,9 +43,41 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchClientsState ReduceRemoveSelectedClientsAction(SearchClientsState state, RemoveSelectedClientsAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static SearchClientsState ReduceRemoveSelectedClientsSuccessAction(SearchClientsState state, RemoveSelectedClientsSuccessAction act)
+        {
+            var clients = state.Clients?.ToList();
+            if (clients == null) return state;
+            clients = clients.Where(c => !act.ClientIds.Contains(c.Value.ClientId)).ToList();
+            return state with
+            {
+                Clients = clients,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchClientsState ReduceToggleClientSelectionAction(SearchClientsState state, ToggleClientSelectionAction act)
+        {
+            var clients = state.Clients?.ToList();
+            if (clients == null) return state;
+            var selectedClient = clients.Single(c => c.Value.ClientId == act.ClientId);
+            selectedClient.IsSelected = act.IsSelected;
+            return state with
+            {
+                Clients = clients
+            };
+        }
+
         #endregion
 
-        #region Add client
+        #region AddClientState
 
         [ReducerMethod]
         public static AddClientState ReduceAddSpaClientAction(AddClientState state, AddSpaClientAction act) => new(isAdding: true, errorMessage: null);

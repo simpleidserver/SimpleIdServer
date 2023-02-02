@@ -53,6 +53,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language });
         }
 
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedClientsAction action, IDispatcher dispatcher)
+        {
+            var clients = await _clientRepository.Query().Where(c => action.ClientIds.Contains(c.ClientId)).ToListAsync(CancellationToken.None);
+            _clientRepository.DeleteRange(clients);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedClientsSuccessAction { ClientIds = action.ClientIds });
+        }
 
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
@@ -125,5 +133,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientId { get; set; } = null!;
         public string? ClientName { get; set; } = null;
         public string? Language { get; set; } = null;
+    }
+
+    public class RemoveSelectedClientsAction 
+    {
+        public IEnumerable<string> ClientIds { get; set; } = new List<string>();
+    }
+
+    public class RemoveSelectedClientsSuccessAction
+    {
+        public IEnumerable<string> ClientIds { get; set; } = new List<string>();
+    }
+
+    public class ToggleClientSelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+        public string ClientId { get; set; } = null!;
     }
 }

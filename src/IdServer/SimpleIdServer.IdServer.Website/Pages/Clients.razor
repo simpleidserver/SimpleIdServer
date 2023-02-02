@@ -1,8 +1,10 @@
 ﻿@page "/clients"
 @inject IState<SearchClientsState> clientState
 @inject IDispatcher dispatcher
+@inject NotificationService notificationService 
 @inject DialogService dialogService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 
 <PageTitle>Clients</PageTitle>
@@ -26,8 +28,10 @@
         <RadzenDataGridColumn TItem="SelectableClient" Property="Value.LogoUri" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
                 <RadzenButton Click="@(args => AddClient())" Icon="add" Text="Add client" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                <RadzenButton Disabled="@(!clientState.Value.HasLeastOneClientIsSelected)" Click="@(args => RemoveSelectedClients())" Icon="remove" Text="Remove selected clients" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Medium"></RadzenButton>
             </HeaderTemplate>
             <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                 <RadzenImage Path="@GetPicture(data)" Style="width: 60px" />
             </Template>
         </RadzenDataGridColumn>
@@ -39,17 +43,45 @@
 </RadzenDataGrid>
 
 @code {
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<RemoveSelectedClientsSuccessAction>((act) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientsRemoved });
+            StateHasChanged();
+        });
+    }
+
     void LoadData(LoadDataArgs args)
     {
         var act = new SearchClientsAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
         dispatcher.Dispatch(act);
     }    
 
+    void RemoveSelectedClients()
+    {
+        var clientIds = clientState.Value.Clients?.Where(c => c.IsSelected).Select(c => c.Value.ClientId);
+        if (clientIds == null) return;
+        var act = new RemoveSelectedClientsAction { ClientIds = clientIds };      
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableClient client)
+    {
+        var act = new ToggleClientSelectionAction { IsSelected = isSelected, ClientId = client.Value.ClientId };
+        dispatcher.Dispatch(act);
+    }
+
     void RowRender(RowRenderEventArgs<SelectableClient> row)
     {
+        const string className = "class";
         if (row.Data.IsNew)
-            row.Attributes.Add("class", "new");
-        
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
     }
 
     string GetPicture(SelectableClient client)

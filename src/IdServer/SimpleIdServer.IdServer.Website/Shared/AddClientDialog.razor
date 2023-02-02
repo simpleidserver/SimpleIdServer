@@ -27,25 +27,6 @@
                         </RadzenCard>
                     </div>
                 }
-                <!--
-                <div class="col-md-6">
-                    <RadzenCard>
-                        WEB APP
-                    </RadzenCard>
-                </div>
-                <div class="col-md-6">
-                    NATIVE
-                </div>
-                <div class="col-md-6">
-                    MACHINE
-                </div>
-                <div class="col-md-6">
-                    DEVICE
-                </div>
-                <div class="col-md-6">
-                    WS-FED RELYING PARTY
-                    </div>
-                -->
             </div>
 
             <hr class="hr" />
@@ -132,12 +113,7 @@
 
     ICollection<ApplicationType> ApplicationTypes { get; set; } = new List<ApplicationType>
     {
-        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser. <br/> Client secret and/or refresh tokens cannot be stored by these applications because <b>there is a security risk</b>. <br/> <b>Examples</b> of User-Agent-Based application : Angular, EmberJS, VueJS.", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
-        new ApplicationType { Name = "Single Page Application2", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
-        new ApplicationType { Name = "Single Page Application3", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
-        new ApplicationType { Name = "Single Page Application4", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
-        new ApplicationType { Name = "Single Page Application5", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" },
-        new ApplicationType { Name = "Single Page Application6", ShortDescription = "Authorization code + PKCE", Description = "Javascript...", Type = AppTypes.SPA, PictureUrl = "images/angular.png" }
+        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser. <br/> Client secret and/or refresh tokens cannot be stored by these applications because <b>there is a security risk</b>. <br/> <b>Examples</b> of User-Agent-Based application : Angular, EmberJS, VueJS.", Type = AppTypes.SPA, PictureUrl = "images/angular.png" }
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;

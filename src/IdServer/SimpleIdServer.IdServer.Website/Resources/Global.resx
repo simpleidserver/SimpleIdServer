@@ -129,4 +129,7 @@
   <data name="RedirectUriContainsFragment" xml:space="preserve">
     <value>Redirection url '{0}' cannot contains fragment (#)</value>
   </data>
+  <data name="SelectedClientsRemoved" xml:space="preserve">
+    <value>Selected clients have been removed</value>
+  </data>
 </root>

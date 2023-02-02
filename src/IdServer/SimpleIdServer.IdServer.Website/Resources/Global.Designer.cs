@@ -95,5 +95,14 @@ namespace SimpleIdServer.IdServer.Website.Resources {
                 return ResourceManager.GetString("RedirectUriContainsFragment", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected clients have been removed.
+        /// </summary>
+        public static string SelectedClientsRemoved {
+            get {
+                return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
     }
 }
