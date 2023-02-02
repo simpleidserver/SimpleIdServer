@@ -20,13 +20,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public IEnumerable<SelectableClient>? Clients { get; set; } = null;
         public int Count { get; set; } = 0;
         public bool IsLoading { get; set; } = false;
-        public bool HasLeastOneClientIsSelected
-        {
-            get
-            {
-                return Clients == null ? false : Clients.Any(c => c.IsSelected);
-            }
-        }
     }
 
     public class SelectableClient

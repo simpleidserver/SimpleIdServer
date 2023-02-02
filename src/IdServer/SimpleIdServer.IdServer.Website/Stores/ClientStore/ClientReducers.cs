@@ -75,6 +75,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchClientsState ReduceToggleAllClientSelectionAction(SearchClientsState state, ToggleAllClientSelectionAction act)
+        {
+            var clients = state.Clients?.ToList();
+            if (clients == null) return state;
+            foreach (var client in clients) client.IsSelected = act.IsSelected;
+            return state with
+            {
+                Clients = clients
+            };
+        }
+
         #endregion
 
         #region AddClientState

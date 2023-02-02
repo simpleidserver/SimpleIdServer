@@ -1,4 +1,8 @@
-﻿.rz-card.selected,
+﻿.blue {
+    
+}
+
+.rz-card.selected,
 .rz-grid-table .new {
     background-color: #d3f0d3;
 }

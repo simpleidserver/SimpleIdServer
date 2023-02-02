@@ -4,17 +4,20 @@
 
 <RadzenDialog />
 <RadzenNotification />
+<RadzenContextMenu />
 
 <RadzenLayout class="rz-shadow-3">
     <RadzenHeader>
         <div class="d-flex align-items-center">
             <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-            <RadzenLabel Text="SimpleIdServer" />
+            <RadzenImage Path="images/SIDLogo.svg" Style="width: 40px" />
+            <RadzenText class="ml-1" Text="SimpleIdServer" TextStyle="TextStyle.DisplayH6" />
         </div>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
         <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Clients" Icon="box" Path="/clients" />
+            <RadzenPanelMenuItem Text="Clients" Icon="apps" Path="/clients" />
+            <RadzenPanelMenuItem Text="Users" Icon="person" Path="/users" />
         </RadzenPanelMenu>
         <div class="p-2">
             Sidebar

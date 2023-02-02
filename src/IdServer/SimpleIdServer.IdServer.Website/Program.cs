@@ -23,6 +23,7 @@ builder.Services.AddStore(o =>
 
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<ContextMenuService>();
 
 var app = builder.Build();
 

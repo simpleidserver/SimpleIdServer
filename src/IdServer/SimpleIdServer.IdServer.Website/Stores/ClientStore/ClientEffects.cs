@@ -150,4 +150,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsSelected { get; set; } = false;
         public string ClientId { get; set; } = null!;
     }
+
+    public class ToggleAllClientSelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+    }
 }

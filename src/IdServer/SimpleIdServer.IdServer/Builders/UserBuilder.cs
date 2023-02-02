@@ -27,6 +27,8 @@ namespace SimpleIdServer.IdServer.Builders
                 CredentialType = "pwd",
                 Value = PasswordHelper.ComputeHash(password)
             });
+            result._user.CreateDateTime = DateTime.UtcNow;
+            result._user.UpdateDateTime = DateTime.UtcNow;
             result._user.OAuthUserClaims.Add(new UserClaim { Value = login, Name = JwtRegisteredClaimNames.Sub });
             if (!string.IsNullOrWhiteSpace(name))
                 result._user.OAuthUserClaims.Add(new UserClaim { Value = name, Name = JwtRegisteredClaimNames.Name });

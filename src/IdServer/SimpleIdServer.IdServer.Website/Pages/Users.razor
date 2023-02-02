@@ -1,0 +1,104 @@
+﻿@page "/users"
+@inject IState<SearchUsersState> userState
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService 
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+
+<PageTitle>Users</PageTitle>
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@userState.Value.IsLoading"
+        Count="@userState.Value.Count"
+        Data="@userState.Value.Users"
+        LoadData="@LoadData"
+        RowRender="@RowRender"
+        TItem="SelectableUser" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="true" Title="Login" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.Id" Path="@($"/users/{data.Value.Id}/settings")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Email" Filterable="false" Sortable="false" Title="Email" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="false" Sortable="false" Title="First name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="false" Sortable="false" Title="Last name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">                
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchUsersAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }    
+
+    void ShowMoreContextMenu(SelectableUser user, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) => {
+            if(a.Value.Equals(1)) {
+                contextMenuService.Close();
+            }
+        });
+    }
+
+
+    void ToggleChanged(bool isSelected, SelectableUser user)
+    {
+        var act = new ToggleUserSelectionAction { IsSelected = isSelected, UserId = user.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllUserSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableUser> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+}

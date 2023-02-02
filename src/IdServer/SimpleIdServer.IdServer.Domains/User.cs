@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -33,6 +34,27 @@ namespace SimpleIdServer.IdServer.Domains
             get
             {
                 return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active);
+            }
+        }
+        public string? Email
+        {
+            get
+            {
+                return OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.Email)?.Value;
+            }
+        }
+        public string? Name
+        {
+            get
+            {
+                return OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.Name)?.Value;
+            }
+        }
+        public string? FamilyName
+        {
+            get
+            {
+                return OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.FamilyName)?.Value;
             }
         }
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
