@@ -1,0 +1,74 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UserState> userState
+@inject IState<UpdateUserState> updateUserState
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@updateUserState.Value.IsUpdating"
+        Count="@User.Consents.Count"
+        Data="@User.Consents"
+        TItem="Consent" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="Client" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="Consent" Title="Scopes" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @foreach(var scope in data.Scopes)
+                {
+                    <RadzenBadge Text="@scope" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Consent" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+        <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.User User { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<RevokeUserConsentSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserConsentRejected });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ShowMoreContextMenu(Consent consent, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Revoke", Value = 1 }
+        }, (a) => {
+            if (a.Value.Equals(1))
+            {
+                var act = new RevokeUserConsentAction { UserId = User.Id, ConsentId = consent.Id };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+        
+    }
+}

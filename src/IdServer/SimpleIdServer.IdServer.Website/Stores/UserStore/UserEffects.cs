@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
             if (user == null) {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
@@ -57,6 +57,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             user.UpdateDateTime = DateTime.UtcNow;
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RevokeUserConsentAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Consents).SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var consent = user.Consents.Single(c => c.Id == action.ConsentId);
+            user.Consents.Remove(consent);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RevokeUserConsentSuccessAction { ConsentId = action.ConsentId, UserId = action.UserId });
         }
     }
 
@@ -114,5 +124,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
+    }
+
+    public class RevokeUserConsentAction
+    {
+        public string UserId { get; set; } = null!;
+        public string ConsentId { get; set; } = null!;
+    }
+
+    public class RevokeUserConsentSuccessAction
+    {
+        public string UserId { get; set; } = null!;
+        public string ConsentId { get; set; } = null!;
     }
 }

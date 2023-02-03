@@ -62,13 +62,13 @@ namespace SimpleIdServer.IdServer.Builders
 
         public UserBuilder AddConsent(string clientId, params string[] scopes)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes });
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), ClientId = clientId, Scopes = scopes, CreateDateTime = DateTime.UtcNow });
             return this;
         }
 
         public UserBuilder AddConsent(string clientId, IEnumerable<string> scopes, IEnumerable<string> claims)
         {
-            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims });
+            _user.Consents.Add(new Consent { Id = Guid.NewGuid().ToString(), Scopes = scopes, ClientId = clientId, Claims = claims, CreateDateTime = DateTime.UtcNow });
             return this;
         }
 

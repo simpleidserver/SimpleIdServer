@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             User = user;
         }
 
-        public User? User { get; set; } = null;
+        public User? User { get; set; } = new User();
         public bool IsLoading { get; set; } = false;
     }
 }

@@ -8,8 +8,6 @@
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 
-<PageTitle>Clients</PageTitle>
-
 <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="Add client" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true" 
@@ -50,14 +48,15 @@
 @code {
     bool selectAll = false;
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnAfterRender(bool firstRender)
     {
-        await base.OnInitializedAsync();
-        SubscribeToAction<RemoveSelectedClientsSuccessAction>((act) =>
-        {
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientsRemoved });
-            StateHasChanged();
-        });
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+            SubscribeToAction<RemoveSelectedClientsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientsRemoved });
+                StateHasChanged();
+            });
     }
 
     void LoadData(LoadDataArgs args)

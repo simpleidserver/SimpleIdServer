@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -40,13 +41,14 @@ void RunInMemoryIdServer(IServiceCollection services)
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
+            /*
             a.AddWsAuthentication(o =>
             {
                 o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
-            /*
+            */
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";
@@ -64,12 +66,28 @@ void RunInMemoryIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
-            */
             a.Builder.AddFacebook(o =>
             {
                 o.AppId = "569242033233529";
                 o.AppSecret = "12e0f33817634c0a650c0121d05e53eb";
             });
+            /*
+            a.Builder.AddOpenIdConnect(opts =>
+            {
+                opts.Authority = "http://localhost:8080/realms/master";
+                opts.MetadataAddress = "http://localhost:8080/realms/master/.well-known/openid-configuration";
+                opts.ClientId = "Sid";
+                opts.ClientSecret = "yEoAQuAlubllnxBmdmXOBmS3GRKIr7bA";
+                opts.ResponseType = "code";
+                opts.UsePkce = true;
+                opts.ResponseMode = "query";
+                opts.SaveTokens = true;
+                opts.GetClaimsFromUserInfoEndpoint = true;
+                opts.RequireHttpsMetadata = false;
+                opts.Scope.Add("openid");
+                opts.Scope.Add("profile");
+            });
+            */
         })
         .AddWsFederation();
 }
@@ -89,13 +107,14 @@ void RunSqlServerIdServer(IServiceCollection services)
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
+            /*
             a.AddWsAuthentication(o =>
             {
                 o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
-            /*
+            */
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";
@@ -113,12 +132,28 @@ void RunSqlServerIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
-            */
             a.Builder.AddFacebook(o =>
             {
                 o.AppId = "569242033233529";
                 o.AppSecret = "12e0f33817634c0a650c0121d05e53eb";
             });
+            /*
+            a.Builder.AddOpenIdConnect("KeyCloak", "KeyCloak", opts =>
+            {
+                opts.Authority = "http://localhost:8080/realms/master";
+                opts.MetadataAddress = "http://localhost:8080/realms/master/.well-known/openid-configuration";
+                opts.ClientId = "Sid";
+                opts.ClientSecret = "yEoAQuAlubllnxBmdmXOBmS3GRKIr7bA";
+                opts.ResponseType = "code";
+                opts.UsePkce = true;
+                opts.ResponseMode = "query";
+                opts.SaveTokens = true;
+                opts.GetClaimsFromUserInfoEndpoint = true;
+                opts.RequireHttpsMetadata = false;
+                opts.Scope.Add("openid");
+                opts.Scope.Add("profile");
+            });
+            */
         });
 }
 

@@ -2,6 +2,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NotificationService notificationService
+@inject NavigationManager navigationManager
 @layout MainLayout
 @inject IState<UserState> userState
 @inject IDispatcher dispatcher
@@ -12,7 +13,6 @@
 }
 else
 {
-
     <RadzenBreadCrumb>
         <RadzenBreadCrumbItem Path="/users" Text="Users" />
         <RadzenBreadCrumbItem Text="User details" />
@@ -20,32 +20,49 @@ else
 
     <RadzenText class="mt-3 mb-3" Text="@userState.Value.User?.Id" TextStyle="TextStyle.DisplayH6" />
 
-    <RadzenTabs @bind-SelectedIndex="selectedIndex">
+    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
         <Tabs>
             <RadzenTabsItem Text="Details">
                 <UserSettings User="@userState.Value.User"></UserSettings>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Consents" >
+                <UserConsents User="@userState.Value.User"></UserConsents>
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 }
 
 @code {
+    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "settings", 0 },
+        { "consents", 1 }
+    };
     [Parameter]
     public string id { get; set; } = null!;
 
     [Parameter]
-    public string action { get; set; } = null;
+    public string? action { get; set; } = null;
 
     int selectedIndex = 0;
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
-        await base.OnInitializedAsync();
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(id)) return;
+        if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
+            selectedIndex = mappingActionNameToIndex[action];
         SubscribeToAction<GetUserFailureAction>((act) =>
         {
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
             StateHasChanged();
         });
         dispatcher.Dispatch(new GetUserAction { UserId = id });
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo($"/users/{id}/{rec.Key}");
     }
 }

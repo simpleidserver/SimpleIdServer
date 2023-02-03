@@ -3,9 +3,8 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
 @inject IState<UserState> userState
+@inject IState<UpdateUserState> updateUserState
 @inject NotificationService notificationService
-
-<PageTitle>User</PageTitle>
 
 <RadzenTemplateForm Submit=@UpdateUserSettings TItem="UpdateUserSettingsParameter" Data=@updateUserSettings>
     <!-- Login -->
@@ -39,7 +38,7 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Last name</RadzenText>
         <RadzenTextBox Name="Lastname" @bind-Value="@updateUserSettings.Lastname" Class="w-100"></RadzenTextBox>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateUserState.Value.IsUpdating />
 </RadzenTemplateForm>
 @code {
     [Parameter]

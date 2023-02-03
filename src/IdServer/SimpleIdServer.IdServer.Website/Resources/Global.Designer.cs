@@ -115,6 +115,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à User consent has been rejected.
+        /// </summary>
+        public static string UserConsentRejected {
+            get {
+                return ResourceManager.GetString("UserConsentRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User details have been updated.
         /// </summary>
         public static string UserDetailsUpdated {

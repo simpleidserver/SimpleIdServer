@@ -96,6 +96,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state;
         }
 
+        [ReducerMethod]
+        public static UserState ReduceRevokeUserConsentSuccessAction(UserState state, RevokeUserConsentSuccessAction act)
+        {
+            var consent = state.User.Consents.Single(c => c.Id == act.ConsentId);
+            state.User.Consents.Remove(consent);
+            return state;
+        }
+
         #endregion
 
         #region UpdateUserState
@@ -105,6 +113,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         [ReducerMethod]
         public static UpdateUserState ReduceUpdateUserDetailsAction(UpdateUserState state, UpdateUserDetailsSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceRevokeUserConsentAction(UpdateUserState state, RevokeUserConsentAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceRevokeUserConsentSuccessAction(UpdateUserState state, RevokeUserConsentSuccessAction act) => new(false);
 
         #endregion
     }

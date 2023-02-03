@@ -25,7 +25,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 Scopes = scopes.ToList(),
-                Claims = claims.Select(c => c.Name)
+                Claims = claims.Select(c => c.Name),
+                CreateDateTime = DateTime.UtcNow
             };
         }
 
