@@ -1,0 +1,51 @@
+﻿@page "/users/{id}/{action}"
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject NotificationService notificationService
+@layout MainLayout
+@inject IState<UserState> userState
+@inject IDispatcher dispatcher
+
+@if(userState.Value.IsLoading)
+{    
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+}
+else
+{
+
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/users" Text="Users" />
+        <RadzenBreadCrumbItem Text="User details" />
+    </RadzenBreadCrumb>
+
+    <RadzenText class="mt-3 mb-3" Text="@userState.Value.User?.Id" TextStyle="TextStyle.DisplayH6" />
+
+    <RadzenTabs @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="Details">
+                <UserSettings User="@userState.Value.User"></UserSettings>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+}
+
+@code {
+    [Parameter]
+    public string id { get; set; } = null!;
+
+    [Parameter]
+    public string action { get; set; } = null;
+
+    int selectedIndex = 0;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<GetUserFailureAction>((act) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+            StateHasChanged();
+        });
+        dispatcher.Dispatch(new GetUserAction { UserId = id });
+    }
+}

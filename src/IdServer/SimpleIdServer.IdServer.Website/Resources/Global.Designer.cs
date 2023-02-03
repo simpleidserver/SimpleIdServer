@@ -104,5 +104,23 @@ namespace SimpleIdServer.IdServer.Website.Resources {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user &apos;{0}&apos; doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownUser {
+            get {
+                return ResourceManager.GetString("UnknownUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User details have been updated.
+        /// </summary>
+        public static string UserDetailsUpdated {
+            get {
+                return ResourceManager.GetString("UserDetailsUpdated", resourceCulture);
+            }
+        }
     }
 }

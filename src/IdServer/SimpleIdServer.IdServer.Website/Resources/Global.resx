@@ -132,4 +132,10 @@
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
   </data>
+  <data name="UnknownUser" xml:space="preserve">
+    <value>The user '{0}' doesn't exist</value>
+  </data>
+  <data name="UserDetailsUpdated" xml:space="preserve">
+    <value>User details have been updated</value>
+  </data>
 </root>

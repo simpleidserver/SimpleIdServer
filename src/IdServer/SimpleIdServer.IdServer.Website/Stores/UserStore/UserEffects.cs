@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Radzen;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Website.Resources;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -33,6 +34,30 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
             string SanitizeExpression(string expression) => expression.Replace("Value.", "");
         }
+
+        [EffectMethod]
+        public async Task Handle(GetUserAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
+            if (user == null) {
+                dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
+                return;
+            }
+
+            dispatcher.Dispatch(new GetUserSuccessAction { User = user });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateUserDetailsAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).SingleOrDefaultAsync(a => a.Id == action.UserId);
+            user.UpdateEmail(action.Email);
+            user.UpdateName(action.Firstname);
+            user.UpdateLastname(action.Lastname);
+            user.UpdateDateTime = DateTime.UtcNow;
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId });
+        }
     }
 
     public class SearchUsersAction
@@ -57,5 +82,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class ToggleAllUserSelectionAction
     {
         public bool IsSelected { get; set; } = false;
+    }
+
+    public class GetUserAction
+    {
+        public string UserId { get; set; } = null!;
+    }
+
+    public class GetUserSuccessAction
+    {
+        public User User { get; set; } = null!;
+    }
+
+    public class GetUserFailureAction
+    {
+        public string UserId { get; set; } = null!;
+        public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class UpdateUserDetailsAction
+    {
+        public string UserId { get; set; } = null!;
+        public string? Email { get; set; } = null;
+        public string? Firstname { get; set; } = null;
+        public string? Lastname { get; set; } = null;
+    }
+
+    public class UpdateUserDetailsSuccessAction
+    {
+        public string UserId { get; set; } = null!;
+        public string? Email { get; set; } = null;
+        public string? Firstname { get; set; } = null;
+        public string? Lastname { get; set; } = null;
     }
 }

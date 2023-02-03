@@ -86,8 +86,15 @@ namespace SimpleIdServer.IdServer.Domains
                 OAuthUserClaims.Add(claim);
         }
 
+        public void UpdateEmail(string value) => UpdateClaim(JwtRegisteredClaimNames.Email, value);
+
+        public void UpdateName(string value) => UpdateClaim(JwtRegisteredClaimNames.Name, value);
+
+        public void UpdateLastname(string value) => UpdateClaim(JwtRegisteredClaimNames.FamilyName, value);
+
         public void UpdateClaim(string key, string value)
         {
+            if (string.IsNullOrWhiteSpace(value)) return;
             var claim = OAuthUserClaims.FirstOrDefault(c => c.Name == key);
             if (claim != null)
                 claim.Value = value;

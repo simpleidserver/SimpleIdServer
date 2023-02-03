@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -47,6 +48,63 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 Users = users
             };
         }
+
+        [ReducerMethod]
+        public static SearchUsersState ReduceUpdateUserDetailsAction(SearchUsersState state, UpdateUserDetailsSuccessAction act)
+        {
+            var users = state.Users?.ToList();
+            if (users == null) return state;
+            var selectedUser = users.Single(u => u.Value.Id == act.UserId);
+            selectedUser.Value.UpdateName(act.Firstname);
+            selectedUser.Value.UpdateLastname(act.Lastname);
+            selectedUser.Value.UpdateEmail(act.Email);
+            selectedUser.Value.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                Users = users
+            };
+        }
+
+        #endregion
+
+        #region UserState
+
+        [ReducerMethod]
+        public static UserState ReduceGetUserAction(UserState state, GetUserAction act) => new(isLoading: true, user: null);
+
+        [ReducerMethod]
+        public static UserState ReduceGetUserSuccessAction(UserState state, GetUserSuccessAction act) => state with
+        {
+            IsLoading = false,
+            User = act.User
+        };
+
+        [ReducerMethod]
+        public static UserState ReduceGetUserFailureAction(UserState state, GetUserFailureAction act) => state with
+        {
+            IsLoading = false,
+            User = null
+        };
+
+        [ReducerMethod]
+        public static UserState ReduceUpdateUserDetailsAction(UserState state, UpdateUserDetailsSuccessAction act)
+        {
+            state.User.UpdateEmail(act.Email);
+            state.User.UpdateName(act.Firstname);
+            state.User.UpdateLastname(act.Lastname);
+            state.User.UpdateDateTime = DateTime.UtcNow;
+            return state;
+        }
+
+        #endregion
+
+        #region UpdateUserState
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceUpdateUserDetailsAction(UpdateUserState state, UpdateUserDetailsAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceUpdateUserDetailsAction(UpdateUserState state, UpdateUserDetailsSuccessAction act) => new(false);
 
         #endregion
     }
