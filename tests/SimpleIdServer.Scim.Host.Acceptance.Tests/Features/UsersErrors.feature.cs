@@ -1272,6 +1272,9 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 263
+ testRunner.Then("JSON \'scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 264
  testRunner.Then("JSON \'detail\'=\'resource 1 not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1286,7 +1289,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to remove an unknown user (HTTP DELETE)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 265
+#line 266
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1306,22 +1309,22 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 266
+#line 267
  testRunner.When("execute HTTP DELETE request \'http://localhost/Users/1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 268
+#line 269
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 270
+#line 271
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 271
+#line 272
  testRunner.Then("JSON \'status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 272
+#line 273
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 273
+#line 274
  testRunner.Then("JSON \'detail\'=\'resource 1 not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1336,7 +1339,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when schemas attribute is missing (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 275
+#line 276
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1359,25 +1362,25 @@ this.ScenarioInitialize(scenarioInfo);
                 TechTalk.SpecFlow.Table table202 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-#line 276
+#line 277
  testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table202, "When ");
 #line hidden
-#line 279
+#line 280
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 281
+#line 282
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 282
+#line 283
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 283
+#line 284
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 284
+#line 285
  testRunner.Then("JSON \'scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 285
+#line 286
  testRunner.Then("JSON \'detail\'=\'schemas attribute is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1392,7 +1395,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when schema is not valid (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 287
+#line 288
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1418,25 +1421,25 @@ this.ScenarioInitialize(scenarioInfo);
                 table203.AddRow(new string[] {
                             "schemas",
                             "[ \"invalidschema\" ]"});
-#line 288
+#line 289
  testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table203, "When ");
 #line hidden
-#line 292
+#line 293
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 294
+#line 295
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 295
+#line 296
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 296
+#line 297
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 297
+#line 298
  testRunner.Then("JSON \'scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 298
+#line 299
  testRunner.Then("JSON \'detail\'=\'the schemas invalidschema are unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1451,7 +1454,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to update an unknown resource (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 300
+#line 301
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1478,25 +1481,25 @@ this.ScenarioInitialize(scenarioInfo);
                             "schemas",
                             "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
                                 "ension:enterprise:2.0:User\" ]"});
-#line 301
+#line 302
  testRunner.When("execute HTTP PUT JSON request \'http://localhost/Users/id\'", ((string)(null)), table204, "When ");
 #line hidden
-#line 305
+#line 306
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 307
+#line 308
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 308
+#line 309
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 309
+#line 310
  testRunner.Then("JSON \'status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 310
+#line 311
  testRunner.Then("JSON \'scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 311
+#line 312
  testRunner.Then("JSON \'detail\'=\'resource id not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1511,7 +1514,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when update and required attribute is missing (HTTP PUT)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 313
+#line 314
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1548,13 +1551,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table205.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-#line 314
+#line 315
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table205, "When ");
 #line hidden
-#line 321
+#line 322
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 322
+#line 323
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table206 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1566,22 +1569,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table206.AddRow(new string[] {
                             "employeeNumber",
                             "01"});
-#line 323
+#line 324
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table206, "And ");
 #line hidden
-#line 328
+#line 329
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 330
+#line 331
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 331
+#line 332
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 332
+#line 333
  testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 333
+#line 334
  testRunner.Then("JSON \'detail\'=\'required attributes urn:ietf:params:scim:schemas:core:2.0:User:use" +
                         "rName are missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1597,7 +1600,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check immutable attribute cannot be updated with a different value", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 336
+#line 337
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1637,13 +1640,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table207.AddRow(new string[] {
                             "immutable",
                             "str"});
-#line 337
+#line 338
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table207, "When ");
 #line hidden
-#line 345
+#line 346
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 346
+#line 347
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table208 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1662,22 +1665,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table208.AddRow(new string[] {
                             "immutable",
                             "str2"});
-#line 347
+#line 348
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table208, "And ");
 #line hidden
-#line 354
+#line 355
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 356
+#line 357
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 357
+#line 358
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 358
+#line 359
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 359
+#line 360
  testRunner.Then("JSON \'scimType\'=\'mutability\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1692,7 +1695,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check complex immutable attribute cannot be updated with a different value", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 362
+#line 363
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1732,13 +1735,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table209.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"immutable\", \"type\": \"type\" } ]"});
-#line 363
+#line 364
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table209, "When ");
 #line hidden
-#line 371
+#line 372
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 372
+#line 373
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table210 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1757,22 +1760,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table210.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"immutable\", \"type\": \"invalidType\" } ]"});
-#line 373
+#line 374
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table210, "And ");
 #line hidden
-#line 380
+#line 381
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 382
+#line 383
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 383
+#line 384
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 384
+#line 385
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 385
+#line 386
  testRunner.Then("JSON \'scimType\'=\'mutability\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1787,7 +1790,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check record cannot be added when one immutable record is missing", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 387
+#line 388
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1833,13 +1836,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table211.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"value\" } ]"});
-#line 388
+#line 389
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table211, "When ");
 #line hidden
-#line 398
+#line 399
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 399
+#line 400
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table212 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1854,22 +1857,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table212.AddRow(new string[] {
                             "subImmutableComplex",
                             "[ { \"value\": \"secondValue\" }, { \"value\": \"thirdValue\" } ]"});
-#line 400
+#line 401
  testRunner.And("execute HTTP PUT JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table212, "And ");
 #line hidden
-#line 406
+#line 407
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 408
+#line 409
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 409
+#line 410
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 410
+#line 411
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 411
+#line 412
  testRunner.Then("JSON \'scimType\'=\'mutability\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1884,7 +1887,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when schemas attribute is missing (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 413
+#line 414
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1907,25 +1910,25 @@ this.ScenarioInitialize(scenarioInfo);
                 TechTalk.SpecFlow.Table table213 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-#line 414
+#line 415
  testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table213, "When ");
 #line hidden
-#line 417
+#line 418
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 419
+#line 420
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 420
+#line 421
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 421
+#line 422
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 422
+#line 423
  testRunner.Then("JSON \'scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 423
+#line 424
  testRunner.Then("JSON \'detail\'=\'schemas attribute is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1940,7 +1943,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when schema is not valid (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 426
+#line 427
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -1966,25 +1969,25 @@ this.ScenarioInitialize(scenarioInfo);
                 table214.AddRow(new string[] {
                             "schemas",
                             "[ \"invalidschema\" ]"});
-#line 427
+#line 428
  testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table214, "When ");
 #line hidden
-#line 431
+#line 432
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 433
+#line 434
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 434
+#line 435
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 435
+#line 436
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 436
+#line 437
  testRunner.Then("JSON \'scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 437
+#line 438
  testRunner.Then("JSON \'detail\'=\'some schemas are not recognized by the endpoint\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1999,7 +2002,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to patch an unknown resource (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 439
+#line 440
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2028,25 +2031,25 @@ this.ScenarioInitialize(scenarioInfo);
                 table215.AddRow(new string[] {
                             "Operations",
                             "[ ]"});
-#line 440
+#line 441
  testRunner.When("execute HTTP PATCH JSON request \'http://localhost/Users/id\'", ((string)(null)), table215, "When ");
 #line hidden
-#line 445
+#line 446
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 447
+#line 448
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 448
+#line 449
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 449
+#line 450
  testRunner.Then("JSON \'status\'=\'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 450
+#line 451
  testRunner.Then("JSON \'scimType\'=\'unknown\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 451
+#line 452
  testRunner.Then("JSON \'detail\'=\'resource id not found\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2064,7 +2067,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to remove attribute and path is not specified (HTTP" +
                     " PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 453
+#line 454
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2111,13 +2114,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table216.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
-#line 454
+#line 455
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table216, "When ");
 #line hidden
-#line 464
+#line 465
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 465
+#line 466
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table217 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2129,22 +2132,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table217.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"remove\" } ]"});
-#line 466
+#line 467
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table217, "And ");
 #line hidden
-#line 471
+#line 472
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 472
+#line 473
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 473
+#line 474
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 474
+#line 475
  testRunner.Then("JSON \'scimType\'=\'noTarget\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 475
+#line 476
  testRunner.Then("JSON \'detail\'=\'path  is not valid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2162,7 +2165,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add attribute and path is not valid (HTTP PATCH)" +
                     "", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 477
+#line 478
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2209,13 +2212,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table218.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
-#line 478
+#line 479
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table218, "When ");
 #line hidden
-#line 488
+#line 489
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 489
+#line 490
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table219 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2227,22 +2230,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table219.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"add\", \"path\": \"fakepath\" } ]"});
-#line 490
+#line 491
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table219, "And ");
 #line hidden
-#line 494
+#line 495
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 496
+#line 497
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 497
+#line 498
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 498
+#line 499
  testRunner.Then("JSON \'scimType\'=\'noTarget\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 499
+#line 500
  testRunner.Then("JSON \'detail\'=\'attribute fakepath is not recognized by the SCIM schema\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2257,7 +2260,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to PATCH and there is no match (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 502
+#line 503
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2304,13 +2307,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table220.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
-#line 503
+#line 504
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table220, "When ");
 #line hidden
-#line 513
+#line 514
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 514
+#line 515
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table221 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2322,22 +2325,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table221.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"replace\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
-#line 515
+#line 516
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table221, "And ");
 #line hidden
-#line 520
+#line 521
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 521
+#line 522
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 522
+#line 523
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 523
+#line 524
  testRunner.Then("JSON \'scimType\'=\'noTarget\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 524
+#line 525
  testRunner.Then("JSON \'detail\'=\'PATCH can be applied only on existing attributes\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2352,7 +2355,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when \"op\" value is invalid (HTTP PATCH)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 526
+#line 527
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2399,13 +2402,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table222.AddRow(new string[] {
                             "roles",
                             "[ \"role1\", \"role2\" ]"});
-#line 527
+#line 528
   testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table222, "When ");
 #line hidden
-#line 537
+#line 538
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 538
+#line 539
  testRunner.And("extract \'id\' from JSON body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table223 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2417,22 +2420,22 @@ this.ScenarioInitialize(scenarioInfo);
                 table223.AddRow(new string[] {
                             "Operations",
                             "[ { \"op\" : \"invalid-op\", \"path\": \"phones[phoneNumber eq 03]\" } ]"});
-#line 539
+#line 540
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$id$\'", ((string)(null)), table223, "And ");
 #line hidden
-#line 544
+#line 545
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 545
+#line 546
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 546
+#line 547
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 547
+#line 548
  testRunner.Then("JSON \'scimType\'=\'invalidSyntax\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 548
+#line 549
  testRunner.Then("JSON \'detail\'=\'\'PATCH\' request is not well-formatted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2447,7 +2450,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when trying to add a none canonical value (HTTP POST)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 550
+#line 551
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2486,25 +2489,25 @@ this.ScenarioInitialize(scenarioInfo);
                 table224.AddRow(new string[] {
                             "employeeNumber",
                             "number"});
-#line 551
+#line 552
  testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table224, "When ");
 #line hidden
-#line 559
+#line 560
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 561
+#line 562
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 562
+#line 563
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 563
+#line 564
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 564
+#line 565
  testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 565
+#line 566
  testRunner.Then("JSON \'detail\'=\'property type is not a valid canonical value\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2519,7 +2522,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when entitlment is added twice", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 567
+#line 568
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2548,13 +2551,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table225.AddRow(new string[] {
                             "userName",
                             "userName"});
-#line 568
+#line 569
  testRunner.When("execute HTTP POST JSON request \'http://localhost/CustomUsers\'", ((string)(null)), table225, "When ");
 #line hidden
-#line 573
+#line 574
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 574
+#line 575
  testRunner.And("extract \'id\' from JSON body into \'userId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table226 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2566,13 +2569,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table226.AddRow(new string[] {
                             "displayName",
                             "firstEntitlement"});
-#line 576
+#line 577
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Entitlements\'", ((string)(null)), table226, "And ");
 #line hidden
-#line 581
+#line 582
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 582
+#line 583
  testRunner.And("extract \'id\' from JSON body into \'firstEntitlement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table227 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2584,13 +2587,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table227.AddRow(new string[] {
                             "displayName",
                             "secondEntitlement"});
-#line 584
+#line 585
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Entitlements\'", ((string)(null)), table227, "And ");
 #line hidden
-#line 589
+#line 590
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 590
+#line 591
  testRunner.And("extract \'id\' from JSON body into \'secondEntitlement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table228 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2603,7 +2606,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Operations",
                             "[ { \"op\": \"add\", \"path\": \"entitlements\", \"value\" : [ { \"value\": \"$firstEntitlemen" +
                                 "t$\" }, { \"value\": \"$secondEntitlement$\" } ] } ]"});
-#line 592
+#line 593
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/CustomUsers/$userId$\'", ((string)(null)), table228, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table229 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2616,13 +2619,13 @@ this.ScenarioInitialize(scenarioInfo);
                             "Operations",
                             "[ { \"op\": \"add\", \"path\": \"entitlements\", \"value\" : [ { \"value\": \"$firstEntitlemen" +
                                 "t$\" }, { \"value\": \"$secondEntitlement$\" } ] } ]"});
-#line 597
+#line 598
  testRunner.And("execute HTTP PATCH JSON request \'http://localhost/CustomUsers/$userId$\'", ((string)(null)), table229, "And ");
 #line hidden
-#line 602
+#line 603
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 604
+#line 605
  testRunner.Then("HTTP status code equals to \'204\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2637,7 +2640,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when emails.value is not passed", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 606
+#line 607
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -2669,25 +2672,25 @@ this.ScenarioInitialize(scenarioInfo);
                 table230.AddRow(new string[] {
                             "emails",
                             "[ { \"primary\" : \"true\" } ]"});
-#line 607
+#line 608
  testRunner.When("execute HTTP POST JSON request \'http://localhost/CustomUsers\'", ((string)(null)), table230, "When ");
 #line hidden
-#line 613
+#line 614
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 615
+#line 616
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 616
+#line 617
  testRunner.Then("JSON \'schemas[0]\'=\'urn:ietf:params:scim:api:messages:2.0:Error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 617
+#line 618
  testRunner.Then("JSON \'status\'=\'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 618
+#line 619
  testRunner.Then("JSON \'scimType\'=\'invalidValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 619
+#line 620
  testRunner.Then("JSON \'detail\'=\'required attributes urn:customuser:emails.value are missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

@@ -457,7 +457,7 @@ namespace SimpleIdServer.Scim.Api
                 if (representation == null)
                 {
                     _logger.LogError(string.Format(Global.ResourceNotFound, id));
-                    return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
+                    return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id), SCIMConstants.ErrorSCIMTypes.Unknown);
                 }
 
                 representation.ApplyEmptyArray();

@@ -260,6 +260,7 @@ Scenario: Error is returned when the user doesn't exist (HTTP GET)
 	Then HTTP status code equals to '404'
 	Then JSON 'status'='404'
 	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'scimType'='unknown'
 	Then JSON 'detail'='resource 1 not found'
 
 Scenario: Error is returned when trying to remove an unknown user (HTTP DELETE)
