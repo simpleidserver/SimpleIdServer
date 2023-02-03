@@ -77,7 +77,7 @@ namespace SimpleIdServer.IdServer
         public const string BAD_ISSUER_SOFTWARE_STATEMENT = "software statement issuer is not trusted";
         public const string BAD_USER_CREDENTIAL = "bad user credential";
         public const string BAD_CLIENT_CREDENTIAL = "bad client credential";
-        public const string BAD_EXTERNAL_AUTHENTICATION_USER = "the user doesn't contain a valid subject";
+        public const string BAD_EXTERNAL_AUTHENTICATION_USER = "no identifier can be extracted from the external authentication provider";
         public const string BAD_CLIENT_GRANT_TYPE = "grant type {0} is not supported by the client";
         public const string BAD_CLIENT_ASSERTION_JWT = "client_assertion is not a valid JWT token";
         public const string BAD_CLIENT_ASSERTION_ENCRYPTED = "client_assertion cannot be encrypted (JWE)";

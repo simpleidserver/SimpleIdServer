@@ -120,6 +120,12 @@
   <data name="accept_access" xml:space="preserve">
     <value>Accept</value>
   </data>
+  <data name="account_login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="account_name" xml:space="preserve">
+    <value>Name</value>
+  </data>
   <data name="approved_apps_description" xml:space="preserve">
     <value>These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click "Revoke Access"</value>
   </data>
@@ -132,8 +138,17 @@
   <data name="client" xml:space="preserve">
     <value>Client</value>
   </data>
+  <data name="created_at" xml:space="preserve">
+    <value>Created at</value>
+  </data>
   <data name="description" xml:space="preserve">
     <value>Description</value>
+  </data>
+  <data name="external_accounts_description" xml:space="preserve">
+    <value>Link one or more external accounts to your profile</value>
+  </data>
+  <data name="external_accounts_title" xml:space="preserve">
+    <value>External accounts</value>
   </data>
   <data name="grant_time" xml:space="preserve">
     <value>Grant datetime</value>
@@ -170,5 +185,8 @@
   </data>
   <data name="title" xml:space="preserve">
     <value>Profile</value>
+  </data>
+  <data name="unlink" xml:space="preserve">
+    <value>Unlink</value>
   </data>
 </root>

@@ -122,6 +122,53 @@
                     </div>
                 </div>
             </div>
+            <!-- External accounts -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5>@ProfileResource.external_accounts_title</h5>
+                        <p>@ProfileResource.external_accounts_description</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>@ProfileResource.account_name</th>
+                                    <th>@ProfileResource.account_login</th>
+                                    <th>@ProfileResource.created_at</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var externalAccount in Model.Profiles)
+                                {
+                                    <tr>
+                                        <td>@externalAccount.Scheme</td>
+                                        <td>@externalAccount.Subject</td>
+                                        <td>@externalAccount.CreateDateTime.ToString("dd/M/yyyy HH:mm:ss")</td>
+                                        <td>
+
+                                            @using (Html.BeginForm("Unlink", "Home", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" value="@externalAccount.Subject" name="Subject" />
+                                                <input type="hidden" value="@externalAccount.Scheme" name="Scheme" />
+                                                <button type="submit" class="btn btn-danger">@ProfileResource.unlink</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div>
+                            @foreach(var extProvider in Model.ExternalIdProviders)
+                            {
+                                <a class="btn btn-secondary me-1" href="@Url.Action("Link", "Home", new { scheme = extProvider.AuthenticationScheme })">
+                                    @extProvider.DisplayName
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

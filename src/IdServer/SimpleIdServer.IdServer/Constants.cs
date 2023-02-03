@@ -330,6 +330,7 @@ namespace SimpleIdServer.IdServer
         }
 
         public const string DefaultOIDCAuthenticationScheme = "OIDC";
+        public const string DefaultExternalCookieAuthenticationScheme = "ExternalCookies";
         public const string DefaultCertificateAuthenticationScheme = "Certificate";
         public static string AuthorizationHeaderName = "Authorization";
         public const string Prefix = "prefix";

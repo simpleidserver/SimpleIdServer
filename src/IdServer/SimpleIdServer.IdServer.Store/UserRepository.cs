@@ -24,12 +24,7 @@ namespace SimpleIdServer.IdServer.Store
 
         public IQueryable<User> Query() => _dbContext.Users;
 
-        public void Update(User user)
-        {
-            var entry = _dbContext.Entry(user);
-            if (entry.State != EntityState.Modified)
-                _dbContext.Entry(entry).State = EntityState.Modified;
-        }
+        public void Update(User user) => _dbContext.Users.Update(user);
 
         public void Add(User user) => _dbContext.Users.Add(user);
 

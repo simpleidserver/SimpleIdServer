@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string Id { get; set; } = null!;
         public string ClientId { get; set; } = null!;
         public DateTime CreateDateTime { get; set; }
+        public User User { get; set; }
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public IEnumerable<string> Claims { get; set; } = new List<string>();
     }

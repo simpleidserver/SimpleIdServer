@@ -70,6 +70,24 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Login.
+        /// </summary>
+        public static string account_login {
+            get {
+                return ResourceManager.GetString("account_login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name.
+        /// </summary>
+        public static string account_name {
+            get {
+                return ResourceManager.GetString("account_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à These apps have been granted access to interact with your SimpleIdServer account. To prevent them from future access, click &quot;Revoke Access&quot;.
         /// </summary>
         public static string approved_apps_description {
@@ -106,11 +124,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Created at.
+        /// </summary>
+        public static string created_at {
+            get {
+                return ResourceManager.GetString("created_at", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Description.
         /// </summary>
         public static string description {
             get {
                 return ResourceManager.GetString("description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Link one or more external accounts to your profile.
+        /// </summary>
+        public static string external_accounts_description {
+            get {
+                return ResourceManager.GetString("external_accounts_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à External accounts.
+        /// </summary>
+        public static string external_accounts_title {
+            get {
+                return ResourceManager.GetString("external_accounts_title", resourceCulture);
             }
         }
         
@@ -219,6 +264,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string title {
             get {
                 return ResourceManager.GetString("title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unlink.
+        /// </summary>
+        public static string unlink {
+            get {
+                return ResourceManager.GetString("unlink", resourceCulture);
             }
         }
     }

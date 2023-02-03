@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,6 +9,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Linq;
@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.UI
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                var externalIdProviders = schemes.Where(s => !string.IsNullOrWhiteSpace(s.DisplayName) && Constants.DefaultOIDCAuthenticationScheme != s.Name);
+                var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 return View(new AuthenticatePasswordViewModel(
                 loginHint,
                     returnUrl,

@@ -8,5 +8,6 @@ namespace SimpleIdServer.IdServer.Domains
         public string Id { get; set; } = null!;
         public string Type { get; set; } = null!;
         public string? SerializedOptions { get; set; } = null;
+        public User User { get; set; }
     }
 }

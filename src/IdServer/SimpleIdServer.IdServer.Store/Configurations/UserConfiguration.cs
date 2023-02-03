@@ -12,12 +12,12 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         {
             builder.HasKey(u => u.Id);
             builder.Ignore(u => u.Claims);
-            builder.HasMany(u => u.Sessions).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(u => u.OAuthUserClaims).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(u => u.Credentials).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(u => u.ExternalAuthProviders).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(u => u.Consents).WithOne().OnDelete(DeleteBehavior.Cascade);
-            builder.HasMany(u => u.Devices).WithOne().OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.Sessions).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.OAuthUserClaims).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.Credentials).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.ExternalAuthProviders).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.Consents).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(u => u.Devices).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.Ignore(u => u.Email);
             builder.Ignore(u => u.Name);
             builder.Ignore(u => u.FamilyName);

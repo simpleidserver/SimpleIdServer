@@ -68,6 +68,7 @@ void RunInMemoryIdServer(IServiceCollection services)
             });
             a.Builder.AddFacebook(o =>
             {
+                o.SignInScheme = SimpleIdServer.IdServer.Constants.DefaultExternalCookieAuthenticationScheme;
                 o.AppId = "569242033233529";
                 o.AppSecret = "12e0f33817634c0a650c0121d05e53eb";
             });
@@ -134,6 +135,7 @@ void RunSqlServerIdServer(IServiceCollection services)
             });
             a.Builder.AddFacebook(o =>
             {
+                o.SignInScheme = SimpleIdServer.IdServer.Constants.DefaultExternalCookieAuthenticationScheme;
                 o.AppId = "569242033233529";
                 o.AppSecret = "12e0f33817634c0a650c0121d05e53eb";
             });

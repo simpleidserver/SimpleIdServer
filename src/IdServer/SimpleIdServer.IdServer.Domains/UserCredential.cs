@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Domains
 
         public string CredentialType { get; set; } = null!;
         public string Value { get; set; } = null!;
+        public User User { get; set; }
 
         public object Clone()
         {

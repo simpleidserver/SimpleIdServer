@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
@@ -35,10 +37,12 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using SimpleIdServer.IdServer.UI;
-using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -84,7 +88,48 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.AddPolicy(Constants.Policies.AuthSchemeProvider, p => p.RequireAssertion(a => true));
                 o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
             });
-            return new IdServerStoreChooser(services);
+            var authBuilder = services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
+                {
+                    opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
+                    {
+                        if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
+                        {
+                            var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
+                            var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
+                            ctx.Options.CookieManager.AppendResponseCookie(
+                                ctx.HttpContext,
+                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                cookieValue,
+                                ctx.CookieOptions);
+                        }
+
+                        return Task.CompletedTask;
+                    };
+                    opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
+                    {
+                        if (ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
+                        {
+                            var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                            ctx.Options.CookieManager.DeleteCookie(
+                                ctx.HttpContext,
+                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                ctx.CookieOptions);
+                            return Task.CompletedTask;
+                        }
+
+                        return Task.CompletedTask;
+                    };
+                });
+            return new IdServerStoreChooser(services, authBuilder);
+
+            string GetTlsTokenBinding(CookieSigningInContext context)
+            {
+                var binding = context.HttpContext.Features.Get<ITlsTokenBindingFeature>()?.GetProvidedTokenBindingId();
+                return binding == null ? null : Convert.ToBase64String(binding);
+            }
         }
 
         #region Private methods

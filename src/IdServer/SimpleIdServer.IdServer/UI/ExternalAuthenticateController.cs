@@ -25,8 +25,8 @@ namespace SimpleIdServer.IdServer.UI
 {
     public class ExternalAuthenticateController : BaseAuthenticateController
     {
-        private const string SCHEME_NAME = "scheme";
-        private const string RETURN_URL_NAME = "returnUrl";
+        public const string SCHEME_NAME = "scheme";
+        public const string RETURN_URL_NAME = "returnUrl";
         private readonly ILogger<ExternalAuthenticateController> _logger;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IServiceProvider _serviceProvider;
@@ -65,15 +65,15 @@ namespace SimpleIdServer.IdServer.UI
             }
             var props = new AuthenticationProperties(items)
             {
-                RedirectUri = Url.Action(nameof(Callback), new { scheme = scheme }),
+                RedirectUri = Url.Action(nameof(Callback)),
             };
             return Challenge(props, scheme);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Callback(string scheme, CancellationToken cancellationToken)
+        public async Task<IActionResult> Callback(CancellationToken cancellationToken)
         {
-            var result = await HttpContext.AuthenticateAsync(scheme);
+            var result = await HttpContext.AuthenticateAsync(Constants.DefaultExternalCookieAuthenticationScheme);
             if (result == null || !result.Succeeded)
             {
                 if (result.Failure != null)
@@ -85,6 +85,7 @@ namespace SimpleIdServer.IdServer.UI
             }
 
             var user = await JustInTimeProvision(result, cancellationToken);
+            await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
             var returnUrl = "~/";
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
             {
@@ -124,7 +125,7 @@ namespace SimpleIdServer.IdServer.UI
             return user;
         }
 
-        private static string GetClaim(ClaimsPrincipal principal, string claimType)
+        public static string GetClaim(ClaimsPrincipal principal, string claimType)
         {
             var claim = principal.Claims.FirstOrDefault(c => c.Type == claimType);
             if (claim == null || string.IsNullOrWhiteSpace(claim.Value))

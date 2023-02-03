@@ -6,12 +6,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using QRCoder;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -32,13 +35,19 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
+        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, IUmaPendingRequestRepository pendingRequestRepository)
+        public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, 
+            IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
+            ILogger<HomeController> logger)
         {
             _options = options.Value;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _pendingRequestRepository = pendingRequestRepository;
+            _authenticationSchemeProvider = authenticationSchemeProvider;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -48,16 +57,24 @@ namespace SimpleIdServer.IdServer.UI
         [Authorize(Constants.Policies.Authenticated)]
         public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
+            var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.ExternalAuthProviders).FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
+            var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
             return View(new ProfileViewModel
             {
                 Id = user.Id,
                 HasOtpKey = !string.IsNullOrWhiteSpace(user.OTPKey),
                 Consents = consents,
-                PendingRequests = pendingRequests
+                PendingRequests = pendingRequests,
+                Profiles = GetProfiles(),
+                ExternalIdProviders = externalIdProviders.Select(e => new ExternalIdProvider
+                {
+                    AuthenticationScheme = e.Name,
+                    DisplayName = e.DisplayName
+                })
             });
 
             async Task<List<ConsentViewModel>> GetConsents()
@@ -99,6 +116,16 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 return result;
+            }
+
+            IEnumerable<ExternalAuthProviderViewModel> GetProfiles()
+            {
+                return user.ExternalAuthProviders.Select(a => new ExternalAuthProviderViewModel
+                {
+                    CreateDateTime = a.CreateDateTime,
+                    Scheme = a.Scheme,
+                    Subject = a.Subject
+                });
             }
         }
 
@@ -155,6 +182,100 @@ namespace SimpleIdServer.IdServer.UI
             await _pendingRequestRepository.SaveChanges(cancellationToken);
             return RedirectToAction("Profile");
         }
+
+        #region Account Linking
+
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public IActionResult Link(string scheme)
+        {
+            if(string.IsNullOrWhiteSpace(scheme))
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Authentication Scheme is missing" });
+
+            var items = new Dictionary<string, string>
+            {
+                { ExternalAuthenticateController.SCHEME_NAME, scheme }
+            };
+            var props = new AuthenticationProperties(items)
+            {
+                RedirectUri = Url.Action(nameof(LinkCallback)),
+            };
+            return Challenge(props, scheme);
+        }
+
+        [HttpGet]
+        [Authorize(Constants.Policies.Authenticated)]
+        public async Task<IActionResult> LinkCallback(CancellationToken cancellationToken)
+        {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var result = await HttpContext.AuthenticateAsync(Constants.DefaultExternalCookieAuthenticationScheme);
+            if (result == null || !result.Succeeded)
+            {
+                if (result.Failure != null)
+                    _logger.LogError(result.Failure.ToString());
+
+                return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = ErrorMessages.BAD_EXTERNAL_AUTHENTICATION });
+            }
+
+            return await LinkProfile(result, cancellationToken);
+
+            async Task<IActionResult> LinkProfile(AuthenticateResult authResult, CancellationToken cancellationToken)
+            {
+                var scheme = authResult.Properties.Items[ExternalAuthenticateController.SCHEME_NAME];
+                var principal = authResult.Principal;
+                var sub = ExternalAuthenticateController.GetClaim(principal, JwtRegisteredClaimNames.Sub) ?? ExternalAuthenticateController.GetClaim(principal, ClaimTypes.NameIdentifier);
+                if (string.IsNullOrWhiteSpace(sub))
+                {
+                    _logger.LogError("no subject can be extracted from the external authentication provider {authProviderScheme}", scheme);
+                    await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
+                    return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = ErrorMessages.BAD_EXTERNAL_AUTHENTICATION_USER });
+                }
+
+                if (await _userRepository.Query().Include(u => u.ExternalAuthProviders).AnyAsync(u => u.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme), cancellationToken))
+                {
+                    _logger.LogError("a local account has already been linked to the external authentication provider {authProviderScheme}", scheme);
+                    await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
+                    return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = "a local account has already been linked to the external authentication provider" });
+                }
+
+                var user = await _userRepository.Query()
+                    .Include(u => u.ExternalAuthProviders)
+                    .FirstAsync(u => u.Id == nameIdentifier, cancellationToken);
+                if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
+                {
+                    user.AddExternalAuthProvider(scheme, sub);
+                    await _userRepository.SaveChanges(cancellationToken);
+                    _logger.LogInformation("user account {userId} has been linked to the external account {authProviderScheme} with external subject {authProviderSubject}", nameIdentifier, scheme, sub);
+                }
+
+                await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
+                return RedirectToAction("Profile", "Home");
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Constants.Policies.Authenticated)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unlink(UnlinkProfileViewModel viewModel, CancellationToken cancellationToken)
+        {
+            if (viewModel == null)
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Request cannot be empty" });
+
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepository.Query()
+                .Include(u => u.ExternalAuthProviders)
+                .FirstAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
+            if(externalAuthProvider == null)
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
+
+            user.ExternalAuthProviders.Remove(externalAuthProvider);
+            _userRepository.Update(user);
+            await _userRepository.SaveChanges(cancellationToken);
+            return RedirectToAction("Profile", "Home");
+        }
+
+        #endregion
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]

@@ -11,6 +11,7 @@ namespace SimpleIdServer.IdServer
         {
             authBuilder.Builder.AddWsFederation(Constants.DefaultOIDCAuthenticationScheme, configureOptions == null ? (o) =>
             {
+                o.SignInScheme = Constants.DefaultCertificateAuthenticationScheme;
                 o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;

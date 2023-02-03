@@ -13,17 +13,17 @@ namespace SimpleIdServer.IdServer
     public class AuthBuilder
     {
         private readonly IServiceCollection _services;
-        private readonly AuthenticationBuilder _builder;
+        private readonly AuthenticationBuilder _authBuilder;
 
-        internal AuthBuilder(IServiceCollection services, AuthenticationBuilder builder)
+        internal AuthBuilder(IServiceCollection services, AuthenticationBuilder authBuilder)
         {
             _services = services;
-            _builder = builder;
+            _authBuilder = authBuilder;
         }
 
         public AuthBuilder AddOIDCAuthentication(Action<OpenIdConnectOptions> callback)
         {
-            _builder.AddOpenIdConnect(Constants.DefaultOIDCAuthenticationScheme, (opts) =>
+            _authBuilder.AddOpenIdConnect(Constants.DefaultOIDCAuthenticationScheme, (opts) =>
             {
                 opts.Events = new OpenIdConnectEvents
                 {
@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer
             {
                 o.MtlsEnabled = true;
             });
-            _builder.AddCertificate(Constants.DefaultCertificateAuthenticationScheme, callback != null ? callback : o =>
+            _authBuilder.AddCertificate(Constants.DefaultCertificateAuthenticationScheme, callback != null ? callback : o =>
             {
 
             });
@@ -58,13 +58,13 @@ namespace SimpleIdServer.IdServer
             {
                 o.MtlsEnabled = true;
             });
-            _builder.AddCertificate(Constants.DefaultCertificateAuthenticationScheme, o =>
+            _authBuilder.AddCertificate(Constants.DefaultCertificateAuthenticationScheme, o =>
             {
                 o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
             });
             return this;
         }
 
-        public AuthenticationBuilder Builder => _builder;
+        public AuthenticationBuilder Builder => _authBuilder;
     }
 }

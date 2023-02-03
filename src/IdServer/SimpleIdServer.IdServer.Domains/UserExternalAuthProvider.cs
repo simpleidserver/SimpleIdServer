@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer.Domains
         public string Scheme { get; set; } = null!;
         public string Subject { get; set; } = null!;
         public DateTime CreateDateTime { get; set; }
+        public User User { get; set; }
 
         public object Clone()
         {

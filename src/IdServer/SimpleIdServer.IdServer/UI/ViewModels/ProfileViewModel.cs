@@ -10,5 +10,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool HasOtpKey { get; set; }
         public IEnumerable<ConsentViewModel> Consents { get; set; }
         public IEnumerable<PendingRequestViewModel> PendingRequests { get; set; }
+        public IEnumerable<ExternalAuthProviderViewModel> Profiles { get; set; }
+        public IEnumerable<ExternalIdProvider> ExternalIdProviders { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Domains;
@@ -14,16 +15,18 @@ namespace SimpleIdServer.IdServer
     public class IdServerStoreChooser
     {
         private readonly IServiceCollection _services;
+        private readonly AuthenticationBuilder _authBuilder;
 
-        public IdServerStoreChooser(IServiceCollection services) 
+        public IdServerStoreChooser(IServiceCollection services, AuthenticationBuilder authBuilder) 
         {
             _services = services;
+            _authBuilder = authBuilder;
         }
 
         public IdServerBuilder UseEFStore(Action<DbContextOptionsBuilder> dbCallback)
         {
             _services.AddStore(dbCallback);
-            return new IdServerBuilder(_services);
+            return new IdServerBuilder(_services, _authBuilder);
         }
 
         public IdServerBuilder UseInMemoryStore(Action<IdServerInMemoryStoreBuilder> callback)
@@ -31,7 +34,7 @@ namespace SimpleIdServer.IdServer
             _services.AddStore();
             var serviceProvider = _services.BuildServiceProvider();
             callback(new IdServerInMemoryStoreBuilder(serviceProvider));
-            return new IdServerBuilder(_services);
+            return new IdServerBuilder(_services, _authBuilder);
         }
     }
 
@@ -105,7 +108,7 @@ namespace SimpleIdServer.IdServer
             return this;
         }
 
-        public IdServerInMemoryStoreBuilder AddInMemoryAuthenticationSchemeProviders(ICollection<AuthenticationSchemeProvider> providers)
+        public IdServerInMemoryStoreBuilder AddInMemoryAuthenticationSchemeProviders(ICollection<Domains.AuthenticationSchemeProvider> providers)
         {
             var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
             if (!storeDbContext.AuthenticationSchemeProviders.Any())
