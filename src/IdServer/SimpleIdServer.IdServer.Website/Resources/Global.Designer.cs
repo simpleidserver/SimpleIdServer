@@ -140,5 +140,14 @@ namespace SimpleIdServer.IdServer.Website.Resources {
                 return ResourceManager.GetString("UserDetailsUpdated", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User session has been rejected.
+        /// </summary>
+        public static string UserSessionRejected {
+            get {
+                return ResourceManager.GetString("UserSessionRejected", resourceCulture);
+            }
+        }
     }
 }

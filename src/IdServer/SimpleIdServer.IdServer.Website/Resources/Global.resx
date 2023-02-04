@@ -144,4 +144,7 @@
   <data name="UserDetailsUpdated" xml:space="preserve">
     <value>User details have been updated</value>
   </data>
+  <data name="UserSessionRejected" xml:space="preserve">
+    <value>User session has been rejected</value>
+  </data>
 </root>

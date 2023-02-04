@@ -1,0 +1,86 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UserState> userState
+@inject IState<UpdateUserState> updateUserState
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+
+<p class="text-muted">List of active / inactive sessions of the user.</p>
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@updateUserState.Value.IsUpdating"
+        Count="@User.Sessions.Count"
+        Data="@User.Sessions"
+        TItem="UserSession" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="Authentication time" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
+        <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="Expiration time" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="UserSession" Title="State" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @if(data.State == UserSessionStates.Rejected)
+                {
+                    <RadzenBadge Text="Rejected" IsPill="true" BadgeStyle="BadgeStyle.Danger" />
+                }
+                else if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
+                {
+                    <RadzenBadge Text="Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
+                }
+                else
+                {
+                    <RadzenBadge Text="Expired" IsPill="true" BadgeStyle="BadgeStyle.Danger"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="UserSession" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                @if(data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
+                {
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.User User { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<RevokeUserSessionSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserSessionRejected });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ShowMoreContextMenu(UserSession session, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Reject", Value = 1 }
+        }, (a) => {
+            if (a.Value.Equals(1))
+            {
+                var act = new RevokeUserSessionAction { UserId = User.Id, SessionId = session.SessionId };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+}

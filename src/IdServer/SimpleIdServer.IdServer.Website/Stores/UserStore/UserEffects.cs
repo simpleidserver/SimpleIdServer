@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.Sessions).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
             if (user == null) {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
@@ -77,6 +77,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             user.ExternalAuthProviders.Remove(externalAuthProvider);
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RevokeUserSessionAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Sessions).SingleAsync(a => a.Id == action.UserId);
+            var session = user.Sessions.Single(s => s.SessionId == action.SessionId);
+            session.State = UserSessionStates.Rejected;
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RevokeUserSessionSuccessAction { SessionId = action.SessionId, UserId = action.UserId });
         }
     }
 
@@ -160,5 +170,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string UserId { get; set; } = null!;
         public string Subject { get; set; } = null!;
         public string Scheme { get; set; } = null!;
+    }
+
+    public class RevokeUserSessionAction
+    {
+        public string UserId { get; set; } = null!;
+        public string SessionId { get; set; } = null!;
+    }
+
+    public class RevokeUserSessionSuccessAction
+    {
+        public string UserId { get; set; } = null!;
+        public string SessionId { get; set; } = null!;
     }
 }
