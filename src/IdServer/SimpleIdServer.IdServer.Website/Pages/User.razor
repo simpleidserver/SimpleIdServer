@@ -28,6 +28,9 @@ else
             <RadzenTabsItem Text="Consents" >
                 <UserConsents User="@userState.Value.User"></UserConsents>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="External Identity Providers">
+                <UserProfiles User="@userState.Value.User"></UserProfiles>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 }
@@ -36,7 +39,8 @@ else
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
         { "settings", 0 },
-        { "consents", 1 }
+        { "consents", 1 },
+        { "profiles", 2 }
     };
     [Parameter]
     public string id { get; set; } = null!;

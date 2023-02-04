@@ -17,17 +17,6 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Watch": {
-      "commandName": "Executable",
-      "launchBrowser": true,
-      "workingDirectory": "$(ProjectDir)",
-      "launchUrl": "http://localhost:5000/",
-      "commandLineArgs": "watch run debug",
-      "executablePath": "dotnet",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,

@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active);
+                return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime);
             }
         }
         public string? Email

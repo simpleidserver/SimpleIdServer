@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
             if (user == null) {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
@@ -62,11 +62,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(RevokeUserConsentAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Consents).SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var user = await _userRepository.Query().Include(u => u.Consents).SingleAsync(a => a.Id == action.UserId);
             var consent = user.Consents.Single(c => c.Id == action.ConsentId);
             user.Consents.Remove(consent);
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new RevokeUserConsentSuccessAction { ConsentId = action.ConsentId, UserId = action.UserId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UnlinkExternalAuthProviderAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId);
+            var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject) ;
+            user.ExternalAuthProviders.Remove(externalAuthProvider);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UnlinkExternalAuthProviderSuccessAction { Scheme = action.Scheme, Subject = action.Subject, UserId = action.UserId });
         }
     }
 
@@ -136,5 +146,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public string UserId { get; set; } = null!;
         public string ConsentId { get; set; } = null!;
+    }
+
+    public class UnlinkExternalAuthProviderAction
+    {
+        public string UserId { get; set; } = null!;
+        public string Subject { get; set; } = null!;
+        public string Scheme { get; set; } = null!;
+    }
+
+    public class UnlinkExternalAuthProviderSuccessAction
+    {
+        public string UserId { get; set; } = null!;
+        public string Subject { get; set; } = null!;
+        public string Scheme { get; set; } = null!;
     }
 }

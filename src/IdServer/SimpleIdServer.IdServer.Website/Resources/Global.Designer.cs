@@ -79,6 +79,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à External authentication provider has been unlinked.
+        /// </summary>
+        public static string ExternalAuthProviderUnlinked {
+            get {
+                return ResourceManager.GetString("ExternalAuthProviderUnlinked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Redirection url &apos;{0}&apos; is not valid.
         /// </summary>
         public static string InvalidRedirectUrl {

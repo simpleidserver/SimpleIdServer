@@ -104,6 +104,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state;
         }
 
+        [ReducerMethod]
+        public static UserState ReduceUnlinkExternalAuthProviderSuccessAction(UserState state, UnlinkExternalAuthProviderSuccessAction act)
+        {
+            var externalAuthProvider = state.User.ExternalAuthProviders.Single(c => c.Subject == act.Subject && c.Scheme == act.Scheme);
+            state.User.ExternalAuthProviders.Remove(externalAuthProvider);
+            return state;
+        }
+
         #endregion
 
         #region UpdateUserState
@@ -119,6 +127,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         [ReducerMethod]
         public static UpdateUserState ReduceRevokeUserConsentSuccessAction(UpdateUserState state, RevokeUserConsentSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceUnlinkExternalAuthProviderAction(UpdateUserState state, UnlinkExternalAuthProviderAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceUnlinkExternalAuthProviderSuccessAction(UpdateUserState state, UnlinkExternalAuthProviderSuccessAction act) => new(false);
 
         #endregion
     }

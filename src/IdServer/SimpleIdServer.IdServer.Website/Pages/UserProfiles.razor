@@ -1,0 +1,67 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<UserState> userState
+@inject IState<UpdateUserState> updateUserState
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@updateUserState.Value.IsUpdating"
+        Count="@User.ExternalAuthProviders.Count"
+        Data="@User.ExternalAuthProviders"
+        TItem="UserExternalAuthProvider" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="Name" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="Login" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Created at" Width="80px" />
+        <RadzenDataGridColumn TItem="UserExternalAuthProvider" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.User User { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {            
+            SubscribeToAction<UnlinkExternalAuthProviderSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ExternalAuthProviderUnlinked });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ShowMoreContextMenu(UserExternalAuthProvider authProvider, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Unlink", Value = 1 }
+        }, (a) =>
+    {
+        if (a.Value.Equals(1))
+        {
+            var act = new UnlinkExternalAuthProviderAction { UserId = User.Id, Subject = authProvider.Subject, Scheme = authProvider.Scheme };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
+    }
+}
