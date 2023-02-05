@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.SubjectTypeBuilders
             var uri = new Uri(url);
             var host = uri.Host;
             // SHA256(sector_id |local_sub|salt)
-            var str = $"{host}|{context.User.Id}|{client.PairWiseIdentifierSalt}";
+            var str = $"{host}|{context.User.Name}|{client.PairWiseIdentifierSalt}";
             using (var sha256 = SHA256.Create())
                 return Task.FromResult(sha256.ComputeHash(Encoding.UTF8.GetBytes(str)).Base64EncodeBytes());
         }

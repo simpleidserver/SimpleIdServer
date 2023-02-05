@@ -95,7 +95,10 @@ void RunInMemoryIdServer(IServiceCollection services)
 
 void RunSqlServerIdServer(IServiceCollection services)
 {
-    services.AddSIDIdentityServer()
+    services.AddSIDIdentityServer(o =>
+    {
+        o.IsEmailUsedDuringAuthentication = true;
+    })
         .UseEFStore(o =>
         {
             o.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True", o => o.MigrationsAssembly("SimpleIdServer.IdServer.Startup"));
@@ -108,14 +111,13 @@ void RunSqlServerIdServer(IServiceCollection services)
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
-            /*
             a.AddWsAuthentication(o =>
             {
                 o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
-            */
+            /*
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";
@@ -133,6 +135,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
+            */
             a.Builder.AddFacebook(o =>
             {
                 o.SignInScheme = SimpleIdServer.IdServer.Constants.DefaultExternalCookieAuthenticationScheme;

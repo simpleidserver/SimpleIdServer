@@ -7,6 +7,11 @@
 @inject NotificationService notificationService
 
 <RadzenTemplateForm Submit=@UpdateUserSettings TItem="UpdateUserSettingsParameter" Data=@updateUserSettings>
+    <!-- Identifier -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+        <RadzenTextBox Name="Id" @bind-Value="@updateUserSettings.Id" Class="w-100" Disabled=true></RadzenTextBox>
+    </div>
     <!-- Login -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Login</RadzenText>
@@ -48,6 +53,7 @@
 
     class UpdateUserSettingsParameter
     {
+        public string Id { get; set; } = null!;
         public string Login { get; set; } = null!;
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
@@ -75,12 +81,13 @@
         if (this.User == null) return;
         updateUserSettings = new UpdateUserSettingsParameter
         {
-            Login = this.User.Id,
+            Id = this.User.Id,
+            Login = this.User.Name,
             CreateDateTime = this.User.CreateDateTime,
             UpdateDateTime = this.User.UpdateDateTime,
             Email = this.User.Email,
             Firstname = this.User.Name,
-            Lastname = this.User.FamilyName
+            Lastname = this.User.Lastname
         };
     }
 

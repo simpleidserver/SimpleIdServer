@@ -30,7 +30,6 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
         public async Task<AggregatedClaimsExtractionResult> ExtractAggregatedClaims(User user, string connectionString, CancellationToken cancellationToken)
         {
             var httpClaimsExtractorConn = new ClaimsExtractorConnectionStringSerializer().Deserialize<HttpClaimsExtractorConnectionString>(connectionString);
-            var subject = user.Id;
             using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var url = GetUrl(httpClaimsExtractorConn.Url, user);
@@ -62,7 +61,6 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
         public async Task<DistributedClaimsExtractionResult> ExtractDistributedClaims(User user, string connectionString, CancellationToken cancellationToken)
         {
             var httpClaimsExtractorConn = new ClaimsExtractorConnectionStringSerializer().Deserialize<HttpClaimsExtractorConnectionString>(connectionString);
-            var subject = user.Id;
             using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var url = GetUrl(httpClaimsExtractorConn.Url, user);
@@ -90,7 +88,7 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
             }
         }
 
-        private static string GetUrl(string url, User user) => url.Replace("{0}", user.Id);
+        private static string GetUrl(string url, User user) => url.Replace("{0}", user.Name);
     }
 
     public class HttpClaimsExtractorConnectionString

@@ -59,13 +59,13 @@ namespace SimpleIdServer.IdServer.UI
         {
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.ExternalAuthProviders).FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.ExternalAuthProviders).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             var consents = await GetConsents();
             var pendingRequests = await GetPendingRequest();
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
             return View(new ProfileViewModel
             {
-                Id = user.Id,
+                Name = user.Name,
                 HasOtpKey = !string.IsNullOrWhiteSpace(user.OTPKey),
                 Consents = consents,
                 PendingRequests = pendingRequests,
@@ -134,7 +134,7 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> RejectConsent(string consentId, CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier, cancellationToken);
             if (!user.HasOpenIDConsent(consentId))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
@@ -240,7 +240,7 @@ namespace SimpleIdServer.IdServer.UI
 
                 var user = await _userRepository.Query()
                     .Include(u => u.ExternalAuthProviders)
-                    .FirstAsync(u => u.Id == nameIdentifier, cancellationToken);
+                    .FirstAsync(u => u.Name == nameIdentifier, cancellationToken);
                 if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
                 {
                     user.AddExternalAuthProvider(scheme, sub);
@@ -264,7 +264,7 @@ namespace SimpleIdServer.IdServer.UI
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query()
                 .Include(u => u.ExternalAuthProviders)
-                .FirstAsync(u => u.Id == nameIdentifier, cancellationToken);
+                .FirstAsync(u => u.Name == nameIdentifier, cancellationToken);
             var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
             if(externalAuthProvider == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
@@ -282,10 +282,10 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> GetOTP(CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             if (string.IsNullOrWhiteSpace(user.OTPKey)) return new NoContentResult();
             var alg = Enum.GetName(typeof(OTPAlgs), _options.OTPAlg).ToLowerInvariant();
-            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Id}?secret={user.OTPKey}&issuer={_options.OTPIssuer}&algorithm=SHA1";
+            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={user.OTPKey}&issuer={_options.OTPIssuer}&algorithm=SHA1";
             if (_options.OTPAlg == OTPAlgs.HOTP)
                 url = $"{url}&counter={user.OTPCounter}";
             if(_options.OTPAlg == OTPAlgs.TOTP)

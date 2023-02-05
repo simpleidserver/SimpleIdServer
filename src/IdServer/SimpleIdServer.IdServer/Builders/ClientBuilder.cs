@@ -23,7 +23,9 @@ namespace SimpleIdServer.IdServer.Builders
             var client = new Client
             {
                 ClientId = clientId,
-                ClientSecret = clientSecret
+                ClientSecret = clientSecret,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
             };
             client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
             return new ApiClientBuilder(client);
@@ -44,6 +46,8 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);

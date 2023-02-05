@@ -188,7 +188,7 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<string> GetSessionId(CancellationToken cancellationToken)
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId, cancellationToken);
             return user.ActiveSession?.SessionId;
         }
 

@@ -219,6 +219,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantHelper, GrantHelper>();
             services.AddTransient<IClaimTokenFormat, OpenIDClaimTokenFormat>();
             services.AddTransient<IUmaTicketGrantTypeValidator, UmaTicketGrantTypeValidator>();
+            services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
             return services;
         }
 

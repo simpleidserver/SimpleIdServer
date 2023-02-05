@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extensions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
@@ -66,7 +67,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
             var tokenType = GetTokenType(client);
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().FirstAsync(u => u.Id == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             var subject = BuildSubject();
             return BuildResponse();
 
@@ -101,13 +102,13 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             ClaimsIdentity BuildSubject()
             {
                 var claims = new Dictionary<string, object>();
-                IdTokenBuilder.EnrichWithScopeParameter(claims, client.Scopes, user, user.Id);
+                IdTokenBuilder.EnrichWithScopeParameter(claims, client.Scopes, user);
                 var transformedClaims = _userTransformer.ConvertToIdentityClaims(claims).ToList();
                 if (transformedClaims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);
 
                 if (!transformedClaims.Any(c => c.Type == ClaimTypes.NameIdentifier))
-                    transformedClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                    transformedClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));
 
                 var format = Microsoft.IdentityModel.Tokens.Saml2.ClaimProperties.SamlNameIdentifierFormat;
                 if (tokenType == WsFederationConstants.TokenTypes.Saml11TokenProfile11)

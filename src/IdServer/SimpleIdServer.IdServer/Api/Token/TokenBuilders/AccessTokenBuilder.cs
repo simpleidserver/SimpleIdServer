@@ -49,7 +49,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             var jwsPayload = BuildTokenDescriptor(scopes, resources, handlerContext);
             if (handlerContext.User != null)
             {
-                jwsPayload.Claims.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Id);
+                jwsPayload.Claims.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
                 var activeSession = handlerContext.User.ActiveSession;
                 if (activeSession != null)
                     jwsPayload.Claims.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());

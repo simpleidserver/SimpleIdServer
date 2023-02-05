@@ -102,7 +102,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 if (jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))
                     authTime = a.ConvertFromUnixTimestamp();
 
-                var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.OAuthUserClaims).AsNoTracking().FirstOrDefaultAsync(u => u.Id == subject, cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.OAuthUserClaims).AsNoTracking().FirstOrDefaultAsync(u => u.Name == subject, cancellationToken);
                 if (user == null) return new UnauthorizedResult();
 
                 var oauthClient = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);

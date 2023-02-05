@@ -18,9 +18,6 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasMany(u => u.ExternalAuthProviders).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.Consents).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(u => u.Devices).WithOne(u => u.User).OnDelete(DeleteBehavior.Cascade);
-            builder.Ignore(u => u.Email);
-            builder.Ignore(u => u.Name);
-            builder.Ignore(u => u.FamilyName);
         }
     }
 }

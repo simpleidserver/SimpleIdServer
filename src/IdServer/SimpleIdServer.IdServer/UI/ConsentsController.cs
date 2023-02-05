@@ -115,7 +115,7 @@ namespace SimpleIdServer.IdServer.UI
                 var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var nameIdentifier = GetNameIdentifier();
-                var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Id == nameIdentifier, cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier, cancellationToken);
                 var consent = _userConsentFetcher.FetchFromAuthorizationRequest(user, query);
                 if (consent == null)
                 {

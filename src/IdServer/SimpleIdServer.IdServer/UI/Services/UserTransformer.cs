@@ -53,12 +53,14 @@ namespace SimpleIdServer.IdServer.UI.Services
             }).ToList();
             var sub = claims.Single(c => c.Name == ClaimTypes.NameIdentifier);
             var user = User.Create(sub.Value);
-            user.UpdateClaims(claims.Select(c =>
+            foreach(var claim in claims)
             {
-                if (CLAIM_MAPPINGS.ContainsKey(c.Name))
-                    c.Name = CLAIM_MAPPINGS[c.Name];
-                return c;
-            }).ToList());
+                if (CLAIM_MAPPINGS.ContainsKey(claim.Name))
+                {
+                    user.UpdateClaim(CLAIM_MAPPINGS[claim.Name], claim.Value);
+                }
+            }
+
             return user;
         }
 

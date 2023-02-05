@@ -18,7 +18,7 @@ else
         <RadzenBreadCrumbItem Text="User details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@userState.Value.User?.Id" TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="@userState.Value.User?.Name" TextStyle="TextStyle.DisplayH6" />
 
     <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
         <Tabs>

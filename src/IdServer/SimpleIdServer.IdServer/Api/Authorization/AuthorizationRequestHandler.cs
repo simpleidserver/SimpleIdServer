@@ -14,6 +14,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,6 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IGrantHelper _grantHelper;
         private readonly IGrantRepository _grantRepository;
         private readonly ITokenRepository _tokenRepository;
+        private readonly IAuthenticationHelper _userHelper;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IEnumerable<IResponseTypeHandler> responseTypeHandlers,
@@ -50,6 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IGrantHelper grantHelper,
             IGrantRepository grantRepository,
             ITokenRepository tokenRepository,
+            IAuthenticationHelper userHelper,
             IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
@@ -61,6 +64,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _grantHelper = grantHelper;
             _grantRepository = grantRepository;
             _tokenRepository = tokenRepository;
+            _userHelper = userHelper;
             _options = options.Value;
         }
 
@@ -111,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 .Include(u => u.Sessions)
                 .Include(u => u.OAuthUserClaims)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == context.Request.UserSubject, cancellationToken);
+                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject, cancellationToken);
             context.SetUser(user);
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();

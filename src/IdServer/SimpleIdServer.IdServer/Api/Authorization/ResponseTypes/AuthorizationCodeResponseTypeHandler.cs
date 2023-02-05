@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             var activeSession = context.User.ActiveSession;
             var dic = new JsonObject
             {
-                [JwtRegisteredClaimNames.Sub] = context.User.Id
+                [JwtRegisteredClaimNames.Sub] = context.User.Name
             };
             if (activeSession != null)
                 dic.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());

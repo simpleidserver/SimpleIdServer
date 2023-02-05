@@ -158,5 +158,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
                 return ResourceManager.GetString("tos", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user doesn&apos;t exist.
+        /// </summary>
+        public static string unknown_user {
+            get {
+                return ResourceManager.GetString("unknown_user", resourceCulture);
+            }
+        }
     }
 }

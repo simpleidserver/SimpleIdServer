@@ -126,7 +126,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
                 return;
-            handlerContext.SetUser(await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Id == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token));
+            handlerContext.SetUser(await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), token));
         }
     }
 }

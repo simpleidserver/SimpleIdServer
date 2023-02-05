@@ -89,7 +89,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
                 var payload = ExtractIdTokenHint(idTokenHint);
-                if (context.User.Id != payload.Subject)
+                if (context.User.Name != payload.Subject)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
 
                 if (!payload.Audiences.Contains(context.Request.IssuerName))

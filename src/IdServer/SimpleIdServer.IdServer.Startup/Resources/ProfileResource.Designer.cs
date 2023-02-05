@@ -250,7 +250,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Identifier.
+        ///   Recherche une chaîne localisée semblable à Subject.
         /// </summary>
         public static string subject {
             get {

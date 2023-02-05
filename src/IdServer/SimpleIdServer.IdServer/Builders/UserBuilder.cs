@@ -21,7 +21,8 @@ namespace SimpleIdServer.IdServer.Builders
         public static UserBuilder Create(string login, string password, string name = null)
         {
             var result = new UserBuilder();
-            result._user.Id = login;
+            result._user.Id = Guid.NewGuid().ToString();
+            result._user.Name = login;
             result._user.Credentials.Add(new UserCredential
             {
                 CredentialType = "pwd",
@@ -36,13 +37,35 @@ namespace SimpleIdServer.IdServer.Builders
             return result;
         }
 
-        #region Claims
+        #region User claims
+
+        public UserBuilder SetFirstname(string firstName)
+        {
+            _user.Firstname = firstName;
+            return this;
+        }
+
+        public UserBuilder SetLastname(string lastName)
+        {
+            _user.Lastname = lastName;
+            return this;
+        }
 
         public UserBuilder SetEmail(string email)
         {
-            _user.UpdateClaim(JwtRegisteredClaimNames.Email, email);
+            _user.Email = email;
             return this;
         }
+
+        public UserBuilder SetEmailVerified(bool emailVerified)
+        {
+            _user.EmailVerified = emailVerified;
+            return this;
+        }
+
+        #endregion
+
+        #region Claims
 
         public UserBuilder SetPicture(string picture)
         {

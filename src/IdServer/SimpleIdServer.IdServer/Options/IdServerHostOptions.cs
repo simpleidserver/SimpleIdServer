@@ -172,6 +172,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Enable or disable UMA.
         /// </summary>
         public bool IsUMAEnabled { get; set; } = true;
+        /// <summary>
+        /// Use the email during the authentication.
+        /// </summary>
+        public bool IsEmailUsedDuringAuthentication { get; set; } = false;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

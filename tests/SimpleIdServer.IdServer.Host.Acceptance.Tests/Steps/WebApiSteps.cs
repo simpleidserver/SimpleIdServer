@@ -173,7 +173,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             using (var scope = _factory.Services.CreateScope())
             {
                 var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
-                var user = userRepository.Query().Include(u => u.Sessions).First(u => u.Id == "user");
+                var user = userRepository.Query().Include(u => u.Sessions).First(u => u.Name == "user");
                 user.ActiveSession.AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
                 await userRepository.SaveChanges(CancellationToken.None);
             }

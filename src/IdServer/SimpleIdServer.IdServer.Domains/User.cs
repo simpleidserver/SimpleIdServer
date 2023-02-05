@@ -7,6 +7,15 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public class User : IEquatable<User>
     {
+        private static Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>> _userClaims = new Dictionary<string, KeyValuePair<Action<User, string>, Func<User, object>>>
+        {
+            {  JwtRegisteredClaimNames.Sub, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Name = str, (u) => u.Name) },
+            {  JwtRegisteredClaimNames.Name, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Firstname = str, (u) => u.Firstname) },
+            {  JwtRegisteredClaimNames.FamilyName, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Lastname = str, (u) => u.Lastname) },
+            {  JwtRegisteredClaimNames.Email, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Email = str, (u) => u.Email) },
+            { "email_verified", new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.EmailVerified = bool.Parse(str), (u) => u.EmailVerified) }
+        };
+
         public User()
         {
             Sessions = new List<UserSession>();
@@ -16,6 +25,11 @@ namespace SimpleIdServer.IdServer.Domains
         }
 
         public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string? Firstname { get; set; } = null;
+        public string? Lastname { get; set; } = null;
+        public string? Email { get; set; } = null;
+        public bool EmailVerified { get; set; } = false;
         public string? DeviceRegistrationToken { get; set; }
         public UserStatus Status { get; set; }
         public DateTime CreateDateTime { get; set; }
@@ -26,7 +40,15 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return OAuthUserClaims.Select(c => new Claim(c.Name, c.Value, c.Type)).ToList();
+                var properties = OAuthUserClaims.Select(c => new Claim(c.Name, c.Value, c.Type)).ToList();
+                foreach (var kvp in _userClaims)
+                {
+                    var val = kvp.Value.Value(this);
+                    if (val == null) continue;
+                    properties.Add(new Claim(kvp.Key, val.ToString()));
+                }
+
+                return properties;
             }
         }
         public UserSession? ActiveSession
@@ -36,33 +58,29 @@ namespace SimpleIdServer.IdServer.Domains
                 return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime);
             }
         }
-        public string? Email
-        {
-            get
-            {
-                return OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.Email)?.Value;
-            }
-        }
-        public string? Name
-        {
-            get
-            {
-                return OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.Name)?.Value;
-            }
-        }
-        public string? FamilyName
-        {
-            get
-            {
-                return OAuthUserClaims.FirstOrDefault(c => c.Name == JwtRegisteredClaimNames.FamilyName)?.Value;
-            }
-        }
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
         public ICollection<UserExternalAuthProvider> ExternalAuthProviders { get; set; } = new List<UserExternalAuthProvider>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         public ICollection<UserDevice> Devices { get; set; } = new List<UserDevice>();
+
+        #region User claims
+
+        public bool TryGetUserClaim(string key, out object result)
+        {
+            result = null;
+            if (!_userClaims.ContainsKey(key))
+                return false;
+
+            result = _userClaims[key].Value(this);
+            if (result == null)
+                return false;
+
+            return true;
+        }
+
+        #endregion
 
         public void RejectConsent(string consentId)
         {
@@ -79,13 +97,6 @@ namespace SimpleIdServer.IdServer.Domains
             return true;
         }
 
-        public void UpdateClaims(ICollection<UserClaim> claims)
-        {
-            OAuthUserClaims.Clear();
-            foreach (var claim in claims)
-                OAuthUserClaims.Add(claim);
-        }
-
         public void UpdateEmail(string value) => UpdateClaim(JwtRegisteredClaimNames.Email, value);
 
         public void UpdateName(string value) => UpdateClaim(JwtRegisteredClaimNames.Name, value);
@@ -95,6 +106,12 @@ namespace SimpleIdServer.IdServer.Domains
         public void UpdateClaim(string key, string value)
         {
             if (string.IsNullOrWhiteSpace(value)) return;
+            if (_userClaims.ContainsKey(key))
+            {
+                _userClaims[key].Key(this, value);
+                return;
+            }
+
             var claim = OAuthUserClaims.FirstOrDefault(c => c.Name == key);
             if (claim != null)
                 claim.Value = value;
@@ -131,7 +148,8 @@ namespace SimpleIdServer.IdServer.Domains
         {
             return new User
             {
-                Id = sub,
+                Id = Guid.NewGuid().ToString(),
+                Name = sub,
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow
             };

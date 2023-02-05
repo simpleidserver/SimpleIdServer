@@ -117,7 +117,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             return result;
         }
 
-        public static void EnrichWithScopeParameter(Dictionary<string, object> claims, IEnumerable<Scope> scopes, User user, string subject)
+        public static void EnrichWithScopeParameter(Dictionary<string, object> claims, IEnumerable<Scope> scopes, User user, string subject = null)
         {
             if (scopes != null)
             {
@@ -125,8 +125,10 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 {
                     foreach (var scopeClaim in scope.Claims)
                     {
-                        if (scopeClaim.ClaimName == JwtRegisteredClaimNames.Sub)
-                            claims.Add(JwtRegisteredClaimNames.Sub, subject);
+                        if (!string.IsNullOrWhiteSpace(subject) && scopeClaim.ClaimName == JwtRegisteredClaimNames.Sub)
+                            claims.Add(scopeClaim.ClaimName, subject);
+                        else if (user.TryGetUserClaim(scopeClaim.ClaimName, out object r))
+                            claims.Add(scopeClaim.ClaimName, r);
                         else
                         {
                             var userClaims = user.Claims.Where(c => c.Type == scopeClaim.ClaimName);

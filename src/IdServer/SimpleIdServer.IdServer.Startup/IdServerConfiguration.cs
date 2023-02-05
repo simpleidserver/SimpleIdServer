@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").GenerateRandomOTPKey().Build(),
+            UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").GenerateRandomOTPKey().Build(),
             UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 

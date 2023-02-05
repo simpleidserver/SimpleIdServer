@@ -12,8 +12,8 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230202194710_UpdateClientConfiguration")]
-    partial class UpdateClientConfiguration
+    [Migration("20230204213500_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -524,6 +524,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ScopeName")
                         .HasColumnType("nvarchar(450)");
 
@@ -532,6 +535,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -875,6 +879,22 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("DeviceRegistrationToken")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Firstname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Lastname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("OTPCounter")
                         .HasColumnType("int");
 
@@ -908,6 +928,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
@@ -934,6 +955,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
@@ -960,6 +982,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -989,6 +1012,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -1013,6 +1037,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("SessionId");
@@ -1097,10 +1122,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .WithMany("Consents")
                         .HasForeignKey("ScopeName");
 
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("Consents")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaim", b =>
@@ -1155,42 +1183,57 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserClaim", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("OAuthUserClaims")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredential", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("Credentials")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("Devices")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserExternalAuthProvider", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("ExternalAuthProviders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserSession", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.User", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.User", "User")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TranslationUMAResource", b =>

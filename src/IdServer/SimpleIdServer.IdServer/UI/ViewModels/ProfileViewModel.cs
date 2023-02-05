@@ -6,7 +6,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 {
     public class ProfileViewModel
     {
-        public string Id { get; set; }
+        public string Name { get; set; }
         public bool HasOtpKey { get; set; }
         public IEnumerable<ConsentViewModel> Consents { get; set; }
         public IEnumerable<PendingRequestViewModel> PendingRequests { get; set; }

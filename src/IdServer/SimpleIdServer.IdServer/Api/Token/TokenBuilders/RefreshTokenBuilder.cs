@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                         dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.ToJsonString()));
 
             if (handlerContext.User != null)
-                dic.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Id);
+                dic.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
 
             var authorizationCode = string.Empty;
             handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
