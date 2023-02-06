@@ -119,6 +119,7 @@ namespace SimpleIdServer.IdServer.Domains
             {
                 OAuthUserClaims.Add(new UserClaim
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = key,
                     Value = value
                 });
@@ -129,6 +130,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             OAuthUserClaims.Add(new UserClaim
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = key,
                 Value = value
             });

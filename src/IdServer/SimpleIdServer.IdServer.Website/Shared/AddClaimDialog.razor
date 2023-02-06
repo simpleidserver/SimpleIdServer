@@ -1,0 +1,41 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddClientState> addClientState
+@inject IDispatcher dispatcher
+
+<RadzenTemplateForm Submit=@SubmitAddClaim TItem="AddClaim" Data=@addClaim>
+    <!-- Key -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key</RadzenText>
+        <RadzenTextBox Name="Key" @bind-Value="@addClaim.Key" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Key" Text="Key id required"></RadzenRequiredValidator>
+    </div>
+    <!-- Value -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Value</RadzenText>
+        <RadzenTextBox Name="Value" @bind-Value="@addClaim.Value" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Value" Text="Value id required"></RadzenRequiredValidator>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Add"  />
+</RadzenTemplateForm>
+
+@code {
+    AddClaim addClaim = new AddClaim();
+
+    record AddClaim
+    {
+        public string Key { get; set; } = null!;
+        public string Value { get; set; } = null!;
+    }
+
+    void SubmitAddClaim(AddClaim addClaim)
+    {
+        dispatcher.Dispatch(new AddUserClaimAction { Key = addClaim.Key, Value = addClaim.Value });
+        dialogService.Close();
+    }
+}

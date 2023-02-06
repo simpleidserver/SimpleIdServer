@@ -138,6 +138,9 @@
   <data name="UnknownUser" xml:space="preserve">
     <value>The user '{0}' doesn't exist</value>
   </data>
+  <data name="UserClaimsUpdated" xml:space="preserve">
+    <value>User claims has been updated</value>
+  </data>
   <data name="UserConsentRejected" xml:space="preserve">
     <value>User consent has been rejected</value>
   </data>

@@ -7,17 +7,18 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public UserClaim() { }
 
-        public UserClaim(string name, string value)
+        public UserClaim(string id, string name, string value)
         {
             Name = name;
             Value = value;
         }
 
-        public UserClaim(string name, string value, string type) : this(name, value)
+        public UserClaim(string id, string name, string value, string type) : this(id, name, value)
         {
             Type = type;
         }
 
+        public string Id { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string Value { get; set; } = null!;
         public string? Type { get; set; } = null;

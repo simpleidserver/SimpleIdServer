@@ -88,6 +88,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new RevokeUserSessionSuccessAction { SessionId = action.SessionId, UserId = action.UserId });
         }
+
+        [EffectMethod]
+        public async Task Handle(UpdateUserClaimsAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).SingleAsync(a => a.Id == action.UserId);
+            user.OAuthUserClaims.Clear();
+            var fileteredClaims = action.Claims.Where(c => !string.IsNullOrWhiteSpace(c.Value) && !string.IsNullOrWhiteSpace(c.Name));
+            foreach (var cl in fileteredClaims)
+                user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });
+
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateUserClaimsSuccessAction { UserId = action.UserId, Claims = fileteredClaims.ToList() });
+        }
     }
 
     public class SearchUsersAction
@@ -182,5 +195,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         public string UserId { get; set; } = null!;
         public string SessionId { get; set; } = null!;
+    }
+
+    public class UpdateUserClaimsAction
+    {
+        public string UserId { get; set; } = null!;
+        public ICollection<UserClaim> Claims { get; set; } = new List<UserClaim>();
+    }
+
+    public class UpdateUserClaimsSuccessAction
+    {
+        public string UserId { get; set; } = null!;
+        public ICollection<UserClaim> Claims { get; set; } = new List<UserClaim>();
+    }
+
+    public class AddUserClaimAction
+    {
+        public string Key { get; set; } = null!;
+        public string Value { get; set; } = null!;
+    }
+
+    public class RemoveUserClaimAction
+    {
+        public string Id { get; set; } = null!;
     }
 }

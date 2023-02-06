@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using System;
@@ -30,10 +29,6 @@ namespace SimpleIdServer.IdServer.Builders
             });
             result._user.CreateDateTime = DateTime.UtcNow;
             result._user.UpdateDateTime = DateTime.UtcNow;
-            result._user.OAuthUserClaims.Add(new UserClaim { Value = login, Name = JwtRegisteredClaimNames.Sub });
-            if (!string.IsNullOrWhiteSpace(name))
-                result._user.OAuthUserClaims.Add(new UserClaim { Value = name, Name = JwtRegisteredClaimNames.Name });
-
             return result;
         }
 

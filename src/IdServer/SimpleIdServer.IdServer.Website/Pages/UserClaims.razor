@@ -1,0 +1,104 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<UserClaimsState> claimsState
+@inject IDispatcher dispatcher
+@inject IState<UserState> userState
+@inject IState<UpdateUserState> updateUserState
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+
+<p class="text-muted">List of claims of the user.</p>
+
+<RadzenButton class="mb-1" Click="@(args => AddClaim())" Icon="add" Text="Add claim" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@updateUserState.Value.IsUpdating"
+        Count="@claimsState.Value.Count"
+        Data="@claimsState.Value.UserClaims"
+        TItem="SelectableUserClaim" 
+        RowRender="@RowRender"
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Name" Title="Key" Filterable="false" Sortable="true" SortOrder="SortOrder.Ascending" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Value" Title="Value" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenButton class="mt-1" Click="@(args => SaveClaims())" Icon="save" Text="Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateUserClaimsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserClaimsUpdated });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ShowMoreContextMenu(SelectableUserClaim userClaim, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Remove", Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var act = new RemoveUserClaimAction { Id = userClaim.Value.Id };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+
+    }
+
+    void SaveClaims()
+    {
+        var act = new UpdateUserClaimsAction { UserId = UserId, Claims = claimsState.Value.UserClaims.Select(c => c.Value).ToList() };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableUserClaim> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AddClaim()
+    {
+        await dialogService.OpenAsync<AddClaimDialog>("Add claim", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

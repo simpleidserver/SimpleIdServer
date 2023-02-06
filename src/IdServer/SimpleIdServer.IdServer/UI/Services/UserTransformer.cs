@@ -3,6 +3,7 @@
 
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -48,6 +49,7 @@ namespace SimpleIdServer.IdServer.UI.Services
         {
             var claims = principal.Claims.Select(u => new UserClaim
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = u.Type,
                 Value = u.Value
             }).ToList();
