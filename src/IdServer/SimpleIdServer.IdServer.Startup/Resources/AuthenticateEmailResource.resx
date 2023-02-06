@@ -147,6 +147,9 @@
   <data name="missing_return_url" xml:space="preserve">
     <value>Return url is missing</value>
   </data>
+  <data name="no_active_otp" xml:space="preserve">
+    <value>There is no OTP configured</value>
+  </data>
   <data name="policy" xml:space="preserve">
     <value>Policy</value>
   </data>

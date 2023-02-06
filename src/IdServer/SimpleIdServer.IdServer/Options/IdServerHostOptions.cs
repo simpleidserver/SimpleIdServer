@@ -153,10 +153,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public bool GrantManagementActionRequired { get; set; } = false;
         /// <summary>
-        /// Default OTP algorithm used.
-        /// </summary>
-        public OTPAlgs DefaultOTPAlg { get; set; } = OTPAlgs.TOTP;
-        /// <summary>
         /// Get the default token claim format.
         /// </summary>
         public string DefaultClaimTokenFormat { get; set; } = OpenIDClaimTokenFormat.NAME;

@@ -98,10 +98,15 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        public UserBuilder GenerateRandomOTPKey()
+        public UserBuilder GenerateRandomHOTPKey()
         {
-            var key = KeyGeneration.GenerateRandomKey(20);
-            _user.OTPKey = key.ConvertFromBase32();
+            _user.GenerateHOTP();
+            return this;
+        }
+
+        public UserBuilder GenerateRandomTOTPKey()
+        {
+            _user.GenerateTOTP();
             return this;
         }
 

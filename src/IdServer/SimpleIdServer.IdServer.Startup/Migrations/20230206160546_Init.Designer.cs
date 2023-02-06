@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230206150106_Init")]
+    [Migration("20230206160546_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -895,12 +895,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OTPCounter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OTPKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -950,6 +944,15 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("CredentialType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("OTPAlg")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OTPCounter")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()

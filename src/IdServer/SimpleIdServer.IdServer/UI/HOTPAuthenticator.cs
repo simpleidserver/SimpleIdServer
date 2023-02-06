@@ -17,15 +17,15 @@ namespace SimpleIdServer.IdServer.UI
 
         public OTPAlgs Alg => OTPAlgs.HOTP;
 
-        public long GenerateOtp(User user)
+        public long GenerateOtp(UserCredential credential)
         {
-            return GenerateOtp(user.GetOTPKey(), user.OTPCounter);
+            return GenerateOtp(credential.OTPKey, credential.OTPCounter);
         }
 
-        public bool Verify(long otp, User user)
+        public bool Verify(long otp, UserCredential credential)
         {
-            var key = user.GetOTPKey();
-            for(long i = user.OTPCounter - _options.HOTPWindow; i <= user.OTPCounter; i++)
+            var key = credential.OTPKey;
+            for(long i = credential.OTPCounter - _options.HOTPWindow; i <= credential.OTPCounter; i++)
             {
                 if (GenerateOtp(key, i) == otp)
                 {

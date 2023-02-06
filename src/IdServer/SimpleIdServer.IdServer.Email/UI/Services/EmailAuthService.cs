@@ -2,10 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI;
 using System.Net;
@@ -23,37 +21,43 @@ namespace SimpleIdServer.IdServer.Email.UI.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
-        private readonly IdServerHostOptions _options;
         private readonly IdServerEmailOptions _emailOptions;
 
-        public EmailAuthService(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IOptions<IdServerHostOptions> options, IOptions<IdServerEmailOptions> emailOptions)
+        public EmailAuthService(IUserRepository userRepository, IEnumerable<IOTPAuthenticator> otpAuthenticators, IOptions<IdServerEmailOptions> emailOptions)
         {
             _userRepository= userRepository;
             _otpAuthenticators = otpAuthenticators;
-            _options = options.Value;
             _emailOptions = emailOptions.Value;
         }
 
         public async Task<User> Authenticate(string email, long otpCode, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.Email && c.Value == email), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
             if (user == null)
                 throw new BaseUIException("unknown_email");
 
-            var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == _options.DefaultOTPAlg);
-            if(!otpAuthenticator.Verify(otpCode, user))
+            var activeOtp = user.ActiveOTP;
+            if (activeOtp == null)
+                throw new BaseUIException("no_active_otp");
+
+            var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg.Value);
+            if(!otpAuthenticator.Verify(otpCode, activeOtp))
                 throw new BaseUIException("invalid_confirmationcode");
             return user;
         }
 
         public async Task<long> SendCode(string email, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.OAuthUserClaims.Any(c => c.Name == JwtRegisteredClaimNames.Email && c.Value == email), cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
             if (user == null)
                 throw new BaseUIException("unknown_email");
 
-            var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == _options.DefaultOTPAlg);
-            var otpCode = otpAuthenticator.GenerateOtp(user);
+            var activeOtp = user.ActiveOTP;
+            if (activeOtp == null)
+                throw new BaseUIException("no_active_otp");
+
+            var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg.Value);
+            var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
             using (var smtpClient = new SmtpClient())
             {
                 smtpClient.EnableSsl = _emailOptions.SmtpEnableSsl;

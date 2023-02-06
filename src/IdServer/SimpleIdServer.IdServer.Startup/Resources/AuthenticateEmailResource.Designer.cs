@@ -151,6 +151,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no OTP configured.
+        /// </summary>
+        public static string no_active_otp {
+            get {
+                return ResourceManager.GetString("no_active_otp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Policy.
         /// </summary>
         public static string policy {

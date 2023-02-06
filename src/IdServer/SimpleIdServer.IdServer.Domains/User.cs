@@ -34,8 +34,6 @@ namespace SimpleIdServer.IdServer.Domains
         public UserStatus Status { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
-        public string? OTPKey { get; set; }
-        public int OTPCounter { get; set; }
         public ICollection<Claim> Claims
         {
             get
@@ -56,6 +54,13 @@ namespace SimpleIdServer.IdServer.Domains
             get
             {
                 return Sessions.FirstOrDefault(s => s.State == UserSessionStates.Active && DateTime.UtcNow < s.ExpirationDateTime);
+            }
+        }
+        public UserCredential? ActiveOTP
+        {
+            get
+            {
+                return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.OTP && c.IsActive);
             }
         }
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
@@ -143,6 +148,34 @@ namespace SimpleIdServer.IdServer.Domains
                 CreateDateTime = DateTime.UtcNow,
                 Scheme = scheme,
                 Subject = subject
+            });
+        }
+
+        public void GenerateHOTP()
+        {
+            foreach (var cred in Credentials.Where(c => c.CredentialType == UserCredential.OTP))
+                cred.IsActive = false;
+            var key = KeyGeneration.GenerateRandomKey(20);
+            Credentials.Add(new UserCredential
+            {
+                CredentialType = UserCredential.OTP,
+                IsActive = true,
+                OTPAlg = OTPAlgs.HOTP,
+                Value = key.ConvertFromBase32()
+            });
+        }
+
+        public void GenerateTOTP()
+        {
+            foreach (var cred in Credentials.Where(c => c.CredentialType == UserCredential.OTP))
+                cred.IsActive = false;
+            var key = KeyGeneration.GenerateRandomKey(20);
+            Credentials.Add(new UserCredential
+            {
+                CredentialType = UserCredential.OTP,
+                IsActive = true,
+                OTPAlg = OTPAlgs.TOTP,
+                Value = key.ConvertFromBase32()
             });
         }
 

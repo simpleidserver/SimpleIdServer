@@ -9,8 +9,6 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public static class UserExtensions
     {
-        public static byte[] GetOTPKey(this User user) => user.OTPKey.ConvertToBase32();
-
         public static bool HasOpenIDConsent(this User user, string clientId, GrantRequest request, IEnumerable<AuthorizedClaim> claims, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
             return user.GetConsent(clientId, request, claims, claimType) != null;

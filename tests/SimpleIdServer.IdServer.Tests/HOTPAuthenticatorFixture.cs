@@ -26,14 +26,17 @@ namespace SimpleIdServer.IdServer.Tests
         {
             // ACT
             var user = UserBuilder.Create("login", "pwd").Build();
-            user.OTPKey = secret.ConvertFromBase32();
-            user.OTPCounter = counter;
+            user.Credentials.Add(new Domains.UserCredential
+            {
+                Value = secret.ConvertFromBase32(),
+                OTPCounter= counter
+            });
             var options = new IdServerHostOptions();
             var opts = Microsoft.Extensions.Options.Options.Create(options);
             var authenticator = new HOTPAuthenticator(opts);
 
             // ARRANGE
-            var otp = authenticator.GenerateOtp(user);
+            var otp = authenticator.GenerateOtp(user.Credentials.Last());
 
             // ASSERT
             Assert.That(expectedOtp == otp);

@@ -66,7 +66,7 @@ namespace SimpleIdServer.IdServer.UI
             return View(new ProfileViewModel
             {
                 Name = user.Name,
-                HasOtpKey = !string.IsNullOrWhiteSpace(user.OTPKey),
+                HasOtpKey = user.ActiveOTP != null,
                 Consents = consents,
                 PendingRequests = pendingRequests,
                 Profiles = GetProfiles(),
@@ -283,11 +283,11 @@ namespace SimpleIdServer.IdServer.UI
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
-            if (string.IsNullOrWhiteSpace(user.OTPKey)) return new NoContentResult();
+            if (user.ActiveOTP == null) return new NoContentResult();
             var alg = Enum.GetName(typeof(OTPAlgs), _options.OTPAlg).ToLowerInvariant();
-            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={user.OTPKey}&issuer={_options.OTPIssuer}&algorithm=SHA1";
+            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={user.ActiveOTP.Value}&issuer={_options.OTPIssuer}&algorithm=SHA1";
             if (_options.OTPAlg == OTPAlgs.HOTP)
-                url = $"{url}&counter={user.OTPCounter}";
+                url = $"{url}&counter={user.ActiveOTP.OTPCounter}";
             if(_options.OTPAlg == OTPAlgs.TOTP)
             {
                 url = $"{url}&period={_options.TOTPStep}";

@@ -3,7 +3,7 @@
 
 using System.Security.Cryptography;
 
-namespace SimpleIdServer.IdServer
+namespace SimpleIdServer.IdServer.Domains
 {
     public class KeyGeneration
     {

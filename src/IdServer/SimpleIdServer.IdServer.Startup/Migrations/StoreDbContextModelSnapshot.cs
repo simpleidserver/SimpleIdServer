@@ -892,12 +892,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OTPCounter")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OTPKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -947,6 +941,15 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("CredentialType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("OTPAlg")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OTPCounter")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()

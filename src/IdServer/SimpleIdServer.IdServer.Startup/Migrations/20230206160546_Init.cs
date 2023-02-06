@@ -253,9 +253,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     DeviceRegistrationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    OTPKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OTPCounter = table.Column<int>(type: "int", nullable: false)
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -540,6 +538,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CredentialType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OTPAlg = table.Column<int>(type: "int", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    OTPCounter = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>

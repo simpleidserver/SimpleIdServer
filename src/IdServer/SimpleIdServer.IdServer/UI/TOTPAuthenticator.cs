@@ -18,20 +18,20 @@ namespace SimpleIdServer.IdServer.UI
 
         public OTPAlgs Alg => OTPAlgs.TOTP;
 
-        public long GenerateOtp(User oauthUser)
+        public long GenerateOtp(UserCredential credential)
         {
-            return GenerateOtp(oauthUser.GetOTPKey(), CalculateTimeStep(DateTime.UtcNow));
+            return GenerateOtp(credential.OTPKey, CalculateTimeStep(DateTime.UtcNow));
         }
 
-        public long GenerateOtp(User oauthUser, DateTime date)
+        public long GenerateOtp(UserCredential credential, DateTime date)
         {
-            return GenerateOtp(oauthUser.GetOTPKey(), CalculateTimeStep(date));
+            return GenerateOtp(credential.OTPKey, CalculateTimeStep(date));
         }
 
-        public bool Verify(long otp, User user)
+        public bool Verify(long otp, UserCredential credential)
         {
             var currentDateTime = DateTime.UtcNow;
-            var key = user.GetOTPKey();
+            var key = credential.OTPKey;
             for (long offset = -1; offset <= 1; offset++)
             {
                 var step = CalculateTimeStep(currentDateTime) + offset;
