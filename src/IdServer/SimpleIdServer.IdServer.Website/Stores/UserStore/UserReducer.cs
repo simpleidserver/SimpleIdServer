@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
+using User = SimpleIdServer.IdServer.Domains.User;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 {
@@ -120,6 +121,47 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state;
         }
 
+        [ReducerMethod]
+        public static UserState ReduceAddUserCredentialSuccessAction(UserState state, AddUserCredentialSuccessAction act)
+        {
+            var credentials = state.User.Credentials;
+            if (act.Credential.IsActive)
+                foreach (var a in credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
+                    a.IsActive = false;
+            credentials.Add(act.Credential);
+            return state;
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceUpdateUserCredentialSuccessAction(UserState state, UpdateUserCredentialSuccessAction act)
+        {
+            var credentials = state.User.Credentials;
+            var credential = credentials.Single(c => c.Id == act.Credential.Id);
+            credential.Value = act.Credential.Value;
+            credential.OTPAlg = act.Credential.OTPAlg;
+            return state;
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceRemoveUserCredentialSuccessAction(UserState state, RemoveUserCredentialSuccessAction act)
+        {
+            var credentials = state.User.Credentials;
+            var credential = credentials.Single(c => c.Id == act.CredentialId);
+            credentials.Remove(credential);
+            return state;
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceDefaultUserCredentialSuccessAction(UserState state, DefaultUserCredentialSuccessAction act)
+        {
+            var credentials = state.User.Credentials;
+            var credential = credentials.Single(c => c.Id == act.CredentialId);
+            foreach (var cred in credentials.Where(c => c.CredentialType == credential.CredentialType))
+                cred.IsActive = false;
+            credential.IsActive = true;
+            return state;
+        }
+
         #endregion
 
         #region UpdateUserState
@@ -153,6 +195,30 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         [ReducerMethod]
         public static UpdateUserState ReduceRevokeUserSessionSuccessAction(UpdateUserState state, UpdateUserClaimsSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddUserCredentialAction(UpdateUserState state, AddUserCredentialAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceAddUserCredentialSuccessAction(UpdateUserState state, AddUserCredentialSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceUpdateUserCredentialAction(UpdateUserState state, UpdateUserCredentialAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceUpdateUserCredentialSuccessAction(UpdateUserState state, UpdateUserCredentialSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceRemoveUserCredentialAction(UpdateUserState state, RemoveUserCredentialAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceRemoveUserCredentialSuccessAction(UpdateUserState state, RemoveUserCredentialSuccessAction act) => new(false);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceDefaultUserCredentialAction(UpdateUserState state, DefaultUserCredentialAction act) => new(true);
+
+        [ReducerMethod]
+        public static UpdateUserState ReduceDefaultUserCredentialSuccessAction(UpdateUserState state, DefaultUserCredentialSuccessAction act) => new(false);
 
         #endregion
 

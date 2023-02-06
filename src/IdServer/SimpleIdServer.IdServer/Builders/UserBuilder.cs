@@ -24,7 +24,9 @@ namespace SimpleIdServer.IdServer.Builders
             result._user.Name = login;
             result._user.Credentials.Add(new UserCredential
             {
+                Id = Guid.NewGuid().ToString(),
                 CredentialType = "pwd",
+                IsActive = true,
                 Value = PasswordHelper.ComputeHash(password)
             });
             result._user.CreateDateTime = DateTime.UtcNow;

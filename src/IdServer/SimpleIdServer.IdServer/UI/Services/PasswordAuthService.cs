@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 
             var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password);
             var hash = PasswordHelper.ComputeHash(password);
-            if (credential == null || credential.Value != PasswordHelper.ComputeHash(password))
+            if (credential == null || credential.Value != PasswordHelper.ComputeHash(password) && credential.IsActive)
                 throw new BaseUIException(ErrorCodes.INVALID_CREDENTIALS);
 
             return user;

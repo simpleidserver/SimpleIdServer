@@ -63,6 +63,13 @@ namespace SimpleIdServer.IdServer.Domains
                 return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.OTP && c.IsActive);
             }
         }
+        public UserCredential? ActivePassword
+        {
+            get
+            {
+                return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD && c.IsActive);
+            }
+        }
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
@@ -158,6 +165,7 @@ namespace SimpleIdServer.IdServer.Domains
             var key = KeyGeneration.GenerateRandomKey(20);
             Credentials.Add(new UserCredential
             {
+                Id = Guid.NewGuid().ToString(),
                 CredentialType = UserCredential.OTP,
                 IsActive = true,
                 OTPAlg = OTPAlgs.HOTP,
@@ -172,6 +180,7 @@ namespace SimpleIdServer.IdServer.Domains
             var key = KeyGeneration.GenerateRandomKey(20);
             Credentials.Add(new UserCredential
             {
+                Id = Guid.NewGuid().ToString(),
                 CredentialType = UserCredential.OTP,
                 IsActive = true,
                 OTPAlg = OTPAlgs.TOTP,

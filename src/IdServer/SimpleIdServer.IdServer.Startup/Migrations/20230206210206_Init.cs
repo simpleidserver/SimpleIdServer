@@ -534,8 +534,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "UserCredential",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CredentialType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OTPAlg = table.Column<int>(type: "int", nullable: true),

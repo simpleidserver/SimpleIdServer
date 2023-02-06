@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.Sessions).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
             if (user == null) {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
@@ -100,6 +100,51 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateUserClaimsSuccessAction { UserId = action.UserId, Claims = fileteredClaims.ToList() });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddUserCredentialAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            if (action.Credential.IsActive)
+                foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
+                    act.IsActive = false;
+            user.Credentials.Add(action.Credential);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = action.Credential });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateUserCredentialAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            var credential = user.Credentials.Single(c => c.Id == action.Credential.Id);
+            credential.Value = action.Credential.Value;
+            credential.OTPAlg = action.Credential.OTPAlg;
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateUserCredentialSuccessAction { Credential = action.Credential });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveUserCredentialAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
+            user.Credentials.Remove(credential);
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveUserCredentialSuccessAction { CredentialId = action.CredentialId });
+        }
+
+        [EffectMethod]
+        public async Task Handle(DefaultUserCredentialAction action, IDispatcher dispatcher)
+        {
+            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
+            foreach (var cred in user.Credentials.Where(c => c.CredentialType == credential.CredentialType))
+                cred.IsActive = false;
+            credential.IsActive = true;
+            await _userRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new DefaultUserCredentialSuccessAction { CredentialId = action.CredentialId, UserId = action.UserId });
         }
     }
 
@@ -218,5 +263,51 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class RemoveUserClaimAction
     {
         public string Id { get; set; } = null!;
+    }
+
+    public class AddUserCredentialAction
+    {
+        public string UserId { get; set; } = null!;
+        public bool IsDefault { get; set; } = false;
+        public UserCredential Credential { get; set; } = null!;
+    }
+
+    public class AddUserCredentialSuccessAction
+    {
+        public UserCredential Credential { get; set; } = null!;
+    }
+
+    public class UpdateUserCredentialAction
+    {
+        public string UserId { get; set; } = null!;
+        public UserCredential Credential { get; set; } = null!;
+    }
+
+    public class UpdateUserCredentialSuccessAction
+    {
+        public UserCredential Credential { get; set; } = null!;
+    }
+
+    public class RemoveUserCredentialAction
+    {
+        public string UserId { get; set; } = null!;
+        public string CredentialId { get; set; } = null!;
+    }
+
+    public class RemoveUserCredentialSuccessAction
+    {
+        public string CredentialId { get; set; } = null!;
+    }
+
+    public class DefaultUserCredentialAction
+    {
+        public string UserId { get; set; } = null!;
+        public string CredentialId { get; set; } = null!;
+    }
+
+    public class DefaultUserCredentialSuccessAction
+    {
+        public string UserId { get; set; } = null!;
+        public string CredentialId { get; set; } = null!;
     }
 }

@@ -10,8 +10,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
     {
         public void Configure(EntityTypeBuilder<UserCredential> builder)
         {
-            builder.Property<int>("Id").ValueGeneratedOnAdd();
-            builder.HasKey("Id");
+            builder.HasKey(c => c.Id);
         }
     }
 }

@@ -145,7 +145,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         protected virtual void CheckUserCode(User user, string userCode)
         {
             if (string.IsNullOrWhiteSpace(userCode)) return;
-            var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password);
+            var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
             var hash = PasswordHelper.ComputeHash(userCode);
             if (credential == null || credential.Value != PasswordHelper.ComputeHash(userCode))
                 throw new OAuthException(ErrorCodes.INVALID_CREDENTIALS, ErrorMessages.INVALID_USER_CODE);

@@ -28,6 +28,9 @@ else
             <RadzenTabsItem Text="Consents" >
                 <UserConsents User="@userState.Value.User"></UserConsents>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Credentials">
+                <UserCredentials User="@userState.Value.User"></UserCredentials>
+            </RadzenTabsItem>
             <RadzenTabsItem Text="Claims">
                 <UserClaims UserId="@userState.Value.User?.Id"></UserClaims>
             </RadzenTabsItem>
@@ -46,9 +49,10 @@ else
     {
         { "settings", 0 },
         { "consents", 1 },
-        { "claims", 2 },
-        { "sessions", 3 },
-        { "profiles", 4 }
+        { "credentials", 2 },
+        { "claims", 3 },
+        { "sessions", 4 },
+        { "profiles", 5 }
     };
     [Parameter]
     public string id { get; set; } = null!;

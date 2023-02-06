@@ -144,6 +144,15 @@
   <data name="UserConsentRejected" xml:space="preserve">
     <value>User consent has been rejected</value>
   </data>
+  <data name="UserCredentialAdded" xml:space="preserve">
+    <value>User credential has been added</value>
+  </data>
+  <data name="UserCredentialRemoved" xml:space="preserve">
+    <value>User credential is removed</value>
+  </data>
+  <data name="UserCredentialUpdated" xml:space="preserve">
+    <value>User credential is updated</value>
+  </data>
   <data name="UserDetailsUpdated" xml:space="preserve">
     <value>User details have been updated</value>
   </data>

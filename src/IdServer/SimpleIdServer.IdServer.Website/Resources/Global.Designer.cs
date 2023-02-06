@@ -142,6 +142,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à User credential has been added.
+        /// </summary>
+        public static string UserCredentialAdded {
+            get {
+                return ResourceManager.GetString("UserCredentialAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User credential is removed.
+        /// </summary>
+        public static string UserCredentialRemoved {
+            get {
+                return ResourceManager.GetString("UserCredentialRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User credential is updated.
+        /// </summary>
+        public static string UserCredentialUpdated {
+            get {
+                return ResourceManager.GetString("UserCredentialUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User details have been updated.
         /// </summary>
         public static string UserDetailsUpdated {

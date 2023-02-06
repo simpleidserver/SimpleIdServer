@@ -9,6 +9,12 @@ namespace SimpleIdServer.IdServer.Domains
         public const string PWD = "pwd";
         public const string OTP = "otp";
 
+        public UserCredential()
+        {
+
+        }
+
+        public string Id { get; set; } = null!;
         public string CredentialType { get; set; } = null!;
         public string Value { get; set; } = null!;
         public OTPAlgs? OTPAlg { get; set; } = null;
@@ -16,7 +22,7 @@ namespace SimpleIdServer.IdServer.Domains
         public int OTPCounter { get; set; } = 0;
         public User User { get; set; }
 
-        public byte[] OTPKey => Value?.ConvertToBase32();
+        public byte[] OTPKey => CredentialType == PWD ? null : Value?.ConvertToBase32();
 
         public object Clone()
         {
@@ -27,7 +33,7 @@ namespace SimpleIdServer.IdServer.Domains
             };
         }
 
-        public static UserCredential CreatePassword(string pwd) => new UserCredential { CredentialType = "pwd", Value = PasswordHelper.ComputeHash(pwd) };
+        public static UserCredential CreatePassword(string pwd) => new UserCredential { Id = Guid.NewGuid().ToString(), CredentialType = "pwd", Value = PasswordHelper.ComputeHash(pwd) };
     }
 
     public enum OTPAlgs
