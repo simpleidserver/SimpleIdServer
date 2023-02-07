@@ -121,47 +121,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             return state;
         }
 
-        [ReducerMethod]
-        public static UserState ReduceAddUserCredentialSuccessAction(UserState state, AddUserCredentialSuccessAction act)
-        {
-            var credentials = state.User.Credentials;
-            if (act.Credential.IsActive)
-                foreach (var a in credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
-                    a.IsActive = false;
-            credentials.Add(act.Credential);
-            return state;
-        }
-
-        [ReducerMethod]
-        public static UserState ReduceUpdateUserCredentialSuccessAction(UserState state, UpdateUserCredentialSuccessAction act)
-        {
-            var credentials = state.User.Credentials;
-            var credential = credentials.Single(c => c.Id == act.Credential.Id);
-            credential.Value = act.Credential.Value;
-            credential.OTPAlg = act.Credential.OTPAlg;
-            return state;
-        }
-
-        [ReducerMethod]
-        public static UserState ReduceRemoveUserCredentialSuccessAction(UserState state, RemoveUserCredentialSuccessAction act)
-        {
-            var credentials = state.User.Credentials;
-            var credential = credentials.Single(c => c.Id == act.CredentialId);
-            credentials.Remove(credential);
-            return state;
-        }
-
-        [ReducerMethod]
-        public static UserState ReduceDefaultUserCredentialSuccessAction(UserState state, DefaultUserCredentialSuccessAction act)
-        {
-            var credentials = state.User.Credentials;
-            var credential = credentials.Single(c => c.Id == act.CredentialId);
-            foreach (var cred in credentials.Where(c => c.CredentialType == credential.CredentialType))
-                cred.IsActive = false;
-            credential.IsActive = true;
-            return state;
-        }
-
         #endregion
 
         #region UpdateUserState
@@ -267,6 +226,82 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 UserClaims = claims,
                 Count = claims.Count()
+            };
+        }
+
+        #endregion
+
+        #region UserCredentials
+
+        [ReducerMethod]
+        public static UserCredentialsState ReduceGetUserAction(UserCredentialsState state, GetUserAction act) => new(isLoading: true, userCredentials: new List<UserCredential>());
+
+        [ReducerMethod]
+        public static UserCredentialsState ReduceGetUserSuccessAction(UserCredentialsState state, GetUserSuccessAction act)
+        {
+            var claims = act.User.Credentials;
+            return state with
+            {
+                UserCredentials = claims,
+                Count = claims.Count(),
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialsState ReduceAddUserCredentialSuccessAction(UserCredentialsState state, AddUserCredentialSuccessAction act)
+        {
+            var credentials = state.UserCredentials.ToList();
+            if (act.Credential.IsActive)
+                foreach (var a in credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
+                    a.IsActive = false;
+            act.Credential.IsActive = true;
+            credentials.Add(act.Credential);
+            return state with
+            {
+                UserCredentials = credentials,
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialsState ReduceUpdateUserCredentialSuccessAction(UserCredentialsState state, UpdateUserCredentialSuccessAction act)
+        {
+            var credentials = state.UserCredentials.ToList();
+            var credential = credentials.Single(c => c.Id == act.Credential.Id);
+            credential.Value = act.Credential.Value;
+            credential.OTPAlg = act.Credential.OTPAlg;
+            state.UserCredentials = credentials;
+            return state with
+            {
+                UserCredentials = credentials,
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialsState ReduceRemoveUserCredentialSuccessAction(UserCredentialsState state, RemoveUserCredentialSuccessAction act)
+        {
+            var credentials = state.UserCredentials.ToList();
+            var credential = credentials.Single(c => c.Id == act.CredentialId);
+            credentials.Remove(credential);
+            state.UserCredentials = credentials;
+            return state with
+            {
+                UserCredentials = credentials,
+            };
+        }
+
+        [ReducerMethod]
+        public static UserCredentialsState ReduceDefaultUserCredentialSuccessAction(UserCredentialsState state, DefaultUserCredentialSuccessAction act)
+        {
+            var credentials = state.UserCredentials.ToList();
+            var credential = credentials.Single(c => c.Id == act.CredentialId);
+            foreach (var cred in credentials.Where(c => c.CredentialType == credential.CredentialType))
+                cred.IsActive = false;
+            credential.IsActive = true;
+            state.UserCredentials = credentials;
+            return state with
+            {
+                UserCredentials = credentials,
             };
         }
 

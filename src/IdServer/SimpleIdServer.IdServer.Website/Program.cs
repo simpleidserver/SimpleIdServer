@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using SimpleIdServer.IdServer.UI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddStore(o =>
     o.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True");
 });
 
+builder.Services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ContextMenuService>();

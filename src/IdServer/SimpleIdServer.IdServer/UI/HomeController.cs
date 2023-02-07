@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-using QRCoder;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
@@ -18,9 +17,6 @@ using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -36,17 +32,19 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IUmaPendingRequestRepository _pendingRequestRepository;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+        private readonly IOTPQRCodeGenerator _otpQRCodeGenerator;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options, IUserRepository userRepository, IClientRepository clientRepository, 
             IUmaPendingRequestRepository pendingRequestRepository, IAuthenticationSchemeProvider authenticationSchemeProvider,
-            ILogger<HomeController> logger)
+            IOTPQRCodeGenerator otpQRCodeGenerator, ILogger<HomeController> logger)
         {
             _options = options.Value;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
             _pendingRequestRepository = pendingRequestRepository;
             _authenticationSchemeProvider = authenticationSchemeProvider;
+            _otpQRCodeGenerator = otpQRCodeGenerator;
             _logger = logger;
         }
 
@@ -282,39 +280,10 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> GetOTP(CancellationToken cancellationToken)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
             if (user.ActiveOTP == null) return new NoContentResult();
-            var alg = Enum.GetName(typeof(OTPAlgs), _options.OTPAlg).ToLowerInvariant();
-            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={user.ActiveOTP.Value}&issuer={_options.OTPIssuer}&algorithm=SHA1";
-            if (_options.OTPAlg == OTPAlgs.HOTP)
-                url = $"{url}&counter={user.ActiveOTP.OTPCounter}";
-            if(_options.OTPAlg == OTPAlgs.TOTP)
-            {
-                url = $"{url}&period={_options.TOTPStep}";
-            }
-
-            var bitmap = GetQRCode();
-            return GetImage(bitmap);
-
-            Bitmap GetQRCode()
-            {
-                var qrGenerator = new QRCodeGenerator();
-                var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-                var qrCode = new QRCode(qrCodeData);
-                return qrCode.GetGraphic(20);
-            }
-
-            IActionResult GetImage(Bitmap result)
-            {
-                byte[] payload = null;
-                using (var stream = new MemoryStream())
-                {
-                    result.Save(stream, ImageFormat.Png);
-                    payload = stream.ToArray();
-                }
-
-                return File(payload, "image/png");
-            }
+            var payload = _otpQRCodeGenerator.GenerateQRCode(user);
+            return File(payload, "image/png");
         }
 
         [HttpPost]

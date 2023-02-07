@@ -106,9 +106,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public async Task Handle(AddUserCredentialAction action, IDispatcher dispatcher)
         {
             var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
-            if (action.Credential.IsActive)
-                foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
-                    act.IsActive = false;
+            foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
+                act.IsActive = false;
+            action.Credential.IsActive = true;
             user.Credentials.Add(action.Credential);
             await _userRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddUserCredentialSuccessAction { Credential = action.Credential });
