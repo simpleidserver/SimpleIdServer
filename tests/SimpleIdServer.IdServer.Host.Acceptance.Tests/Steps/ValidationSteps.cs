@@ -139,6 +139,24 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
         [Then("JWT has '(.*)'='(.*)'")]
         public void ThenJWTHas(string key, string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == key && c.Value == value) == true);
 
+        [Then("JWT has address street '(.*)'")]
+        public void ThenJWTHasAddressStreet(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["street"].GetValue<string>() == value) == true);
+
+        [Then("JWT has address locality '(.*)'")]
+        public void ThenJWTHasAddressLocality(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["locality"].GetValue<string>() == value) == true);
+
+        [Then("JWT has address region '(.*)'")]
+        public void ThenJWTHasAddressRegion(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["region"].GetValue<string>() == value) == true);
+
+        [Then("JWT has address postal code '(.*)'")]
+        public void ThenJWTHasAddressPostalCode(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["postal_code"].GetValue<string>() == value) == true);
+
+        [Then("JWT has address country '(.*)'")]
+        public void ThenJWTHasAddressCountry(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["country"].GetValue<string>() == value) == true);
+
+        [Then("JWT has formatted address '(.*)'")]
+        public void ThenJWTHasFormattedAddress(string value) => Assert.True(GetJWT().Claims.Any(c => c.Type == "address" && JsonObject.Parse(c.Value)["formatted"].GetValue<string>() == value) == true);
+
         [Then("JWT is encrypted")]
         public void ThenJWTIsEncrypted() => Assert.True(GetJWT().IsEncrypted);
 

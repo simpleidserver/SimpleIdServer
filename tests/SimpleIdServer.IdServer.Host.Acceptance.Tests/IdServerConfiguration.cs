@@ -55,7 +55,7 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
             ClientBuilder.BuildApiClient("elevenClient", "password").AddScope(SecondScope).UseClientSelfSignedAuthentication().AddSelfSignedCertificate("elevelClientKeyId").Build(),
             ClientBuilder.BuildApiClient("twelveClient", "password").AddScope(SecondScope).UseClientTlsAuthentication("cn=selfSigned").Build(),
             ClientBuilder.BuildApiClient("thirteenClient", "password").AddScope(SecondScope).SetTokenExpirationTimeInSeconds(-2).Build(),
-            ClientBuilder.BuildUserAgentClient("fourteenClient", "password", "http://localhost:8080").AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).Build(),
+            ClientBuilder.BuildUserAgentClient("fourteenClient", "password", "http://localhost:8080").AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email, StandardScopes.Address).Build(),
             ClientBuilder.BuildUserAgentClient("fifteenClient", "password", "http://localhost:8080").AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).DisableIdTokenSignature().Build(),
             ClientBuilder.BuildUserAgentClient("sixteenClient", "password", "http://localhost:8080").AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).SetIdTokenSignatureAlg(SecurityAlgorithms.EcdsaSha256).Build(),
             ClientBuilder.BuildUserAgentClient("seventeenClient", "password", "http://localhost:8080").AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).SetIdTokenSignatureAlg(SecurityAlgorithms.EcdsaSha384).Build(),
@@ -102,10 +102,11 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
                 .SetEmail("email@outlook.fr")
                 .AddRole("role1")
                 .AddRole("role2")
+                .SetAddress("street", "locality", "region", "postalcode", "country", "formatted")
                 .AddConsent("thirdClient", "secondScope")
                 .AddConsent("nineClient", "secondScope")
                 .AddConsent("fortyTwoClient", "secondScope")
-                .AddConsent("fourteenClient", "openid", "profile", "role", "email")
+                .AddConsent("fourteenClient", "openid", "profile", "role", "email", "address")
                 .AddConsent("fifteenClient", "openid", "profile", "role", "email")
                 .AddConsent("sixteenClient", "openid", "profile", "role", "email")
                 .AddConsent("seventeenClient", "openid", "profile", "role", "email")

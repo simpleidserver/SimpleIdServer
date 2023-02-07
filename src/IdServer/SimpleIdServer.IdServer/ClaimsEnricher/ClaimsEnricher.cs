@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
@@ -22,9 +21,9 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
         private const string CLAIM_NAMES = "_claim_names";
         private const string CLAIM_SOURCES = "_claim_sources";
         private readonly IClaimProviderRepository _repository;
-        private readonly IEnumerable<IClaimsExtractor> _claimsExtractorLst;
+        private readonly IEnumerable<IRelayClaimsExtractor> _claimsExtractorLst;
 
-        public ClaimsEnricher(IClaimProviderRepository repository, IEnumerable<IClaimsExtractor> claimsSourceLst)
+        public ClaimsEnricher(IClaimProviderRepository repository, IEnumerable<IRelayClaimsExtractor> claimsSourceLst)
         {
             _repository = repository;
             _claimsExtractorLst = claimsSourceLst;

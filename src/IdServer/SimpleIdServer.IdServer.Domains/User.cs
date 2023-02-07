@@ -25,10 +25,15 @@ namespace SimpleIdServer.IdServer.Domains
         }
 
         public string Id { get; set; } = null!;
+        [UserProperty(true)]
         public string Name { get; set; } = null!;
+        [UserProperty(true)]
         public string? Firstname { get; set; } = null;
+        [UserProperty(true)]
         public string? Lastname { get; set; } = null;
+        [UserProperty(true)]
         public string? Email { get; set; } = null;
+        [UserProperty(true)]
         public bool EmailVerified { get; set; } = false;
         public string? DeviceRegistrationToken { get; set; }
         public UserStatus Status { get; set; }

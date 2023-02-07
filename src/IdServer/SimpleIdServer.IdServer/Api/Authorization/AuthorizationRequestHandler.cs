@@ -209,7 +209,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, AuthorizationRequestParameters.ClientId));
             }
 
-            var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.Claims)
+            var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
                 .Include(c => c.SerializedJsonWebKeys)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);

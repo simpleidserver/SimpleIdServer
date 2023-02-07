@@ -597,29 +597,62 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.ToTable("Scopes");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaim", b =>
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaimMapper", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ApplicationScope")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<bool>("IsMultiValued")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ClaimName")
+                    b.Property<int>("MapperType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsExposed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ScopeName")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("TokenClaimJsonType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TokenClaimName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributeCountryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributeFormattedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributeLocalityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributePostalCodeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributeRegionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAttributeStreetName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserPropertyName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ScopeName");
 
-                    b.ToTable("ScopeClaim");
+                    b.ToTable("ScopeClaimMapper");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Token", b =>
@@ -1125,10 +1158,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaim", b =>
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaimMapper", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
-                        .WithMany("Claims")
+                        .WithMany("ClaimMappers")
                         .HasForeignKey("ScopeName");
                 });
 
@@ -1264,7 +1297,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
                 {
-                    b.Navigation("Claims");
+                    b.Navigation("ClaimMappers");
 
                     b.Navigation("Consents");
                 });

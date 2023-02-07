@@ -146,28 +146,29 @@ namespace SimpleIdServer.IdServer
 
         public static class StandardClaims
         {
-            public static ScopeClaim Name = new ScopeClaim(JwtRegisteredClaimNames.Name, true);
-            public static ScopeClaim FamilyName = new ScopeClaim(JwtRegisteredClaimNames.FamilyName, true);
-            public static ScopeClaim UniqueName = new ScopeClaim(JwtRegisteredClaimNames.UniqueName, true);
-            public static ScopeClaim GivenName = new ScopeClaim(JwtRegisteredClaimNames.GivenName, true);
-            public static ScopeClaim MiddleName = new ScopeClaim(UserClaims.MiddleName, true);
-            public static ScopeClaim NickName = new ScopeClaim(UserClaims.NickName, true);
-            public static ScopeClaim PreferredUserName = new ScopeClaim(UserClaims.PreferredUserName, true);
-            public static ScopeClaim Profile = new ScopeClaim(UserClaims.Profile, true);
-            public static ScopeClaim Picture = new ScopeClaim(UserClaims.Picture, true);
-            public static ScopeClaim WebSite = new ScopeClaim(JwtRegisteredClaimNames.Website, true);
-            public static ScopeClaim Gender = new ScopeClaim(JwtRegisteredClaimNames.Gender, true);
-            public static ScopeClaim BirthDate = new ScopeClaim(UserClaims.BirthDate, true);
-            public static ScopeClaim ZoneInfo = new ScopeClaim(UserClaims.ZoneInfo, true);
-            public static ScopeClaim Locale = new ScopeClaim(UserClaims.Locale, true);
-            public static ScopeClaim UpdatedAt = new ScopeClaim(UserClaims.UpdatedAt, true);
-            public static ScopeClaim Email = new ScopeClaim(JwtRegisteredClaimNames.Email, true);
-            public static ScopeClaim EmailVerified = new ScopeClaim(UserClaims.EmailVerified, true);
-            public static ScopeClaim Address = new ScopeClaim(UserClaims.Address, true);
-            public static ScopeClaim PhoneNumber = new ScopeClaim(JwtRegisteredClaimNames.PhoneNumber, true);
-            public static ScopeClaim PhoneNumberVerified = new ScopeClaim(JwtRegisteredClaimNames.PhoneNumberVerified, true);
-            public static ScopeClaim Role = new ScopeClaim(UserClaims.Role, true);
-            public static ScopeClaim Subject = new ScopeClaim(JwtRegisteredClaimNames.Sub, true);
+            public static ScopeClaimMapper Subject = ScopeClaimMapper.CreateOpenIdSubjectClaim();
+            public static ScopeClaimMapper Name = ScopeClaimMapper.CreateOpenIdPropertyClaim(JwtRegisteredClaimNames.Name, JwtRegisteredClaimNames.Name, nameof(User.Firstname));
+            public static ScopeClaimMapper FamilyName = ScopeClaimMapper.CreateOpenIdPropertyClaim(JwtRegisteredClaimNames.FamilyName, JwtRegisteredClaimNames.FamilyName, nameof(User.Lastname));
+            public static ScopeClaimMapper UpdatedAt = ScopeClaimMapper.CreateOpenIdPropertyClaim(UserClaims.UpdatedAt, UserClaims.UpdatedAt, nameof(User.UpdateDateTime), TokenClaimJsonTypes.DATETIME);
+            public static ScopeClaimMapper Email = ScopeClaimMapper.CreateOpenIdPropertyClaim(JwtRegisteredClaimNames.Email, JwtRegisteredClaimNames.Email, nameof(User.Email));
+            public static ScopeClaimMapper EmailVerified = ScopeClaimMapper.CreateOpenIdPropertyClaim(UserClaims.EmailVerified, UserClaims.EmailVerified, nameof(User.EmailVerified), TokenClaimJsonTypes.BOOLEAN);
+            public static ScopeClaimMapper UniqueName = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.UniqueName, JwtRegisteredClaimNames.UniqueName, JwtRegisteredClaimNames.UniqueName);
+            public static ScopeClaimMapper GivenName = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.GivenName, JwtRegisteredClaimNames.GivenName, JwtRegisteredClaimNames.GivenName); 
+            public static ScopeClaimMapper MiddleName = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.MiddleName, UserClaims.MiddleName, UserClaims.MiddleName); 
+            public static ScopeClaimMapper NickName = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.NickName, UserClaims.NickName, UserClaims.NickName); 
+            public static ScopeClaimMapper PreferredUserName = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.PreferredUserName, UserClaims.PreferredUserName, UserClaims.PreferredUserName); 
+            public static ScopeClaimMapper Profile = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.Profile, UserClaims.Profile, UserClaims.Profile); 
+            public static ScopeClaimMapper Picture = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.Picture, UserClaims.Picture, UserClaims.Picture); 
+            public static ScopeClaimMapper WebSite = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.Website, JwtRegisteredClaimNames.Website, JwtRegisteredClaimNames.Website); 
+            public static ScopeClaimMapper Gender = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.Gender, JwtRegisteredClaimNames.Gender, JwtRegisteredClaimNames.Gender);
+            public static ScopeClaimMapper BirthDate = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.Birthdate, JwtRegisteredClaimNames.Birthdate, JwtRegisteredClaimNames.Birthdate);
+            public static ScopeClaimMapper ZoneInfo = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.ZoneInfo, UserClaims.ZoneInfo, UserClaims.ZoneInfo); 
+            public static ScopeClaimMapper Locale = ScopeClaimMapper.CreateOpenIdAttributeClaim(UserClaims.Locale, UserClaims.Locale, UserClaims.Locale);
+            public static ScopeClaimMapper Address = ScopeClaimMapper.CreateOpenIdAddressClaim(UserClaims.Address);
+            public static ScopeClaimMapper PhoneNumber = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumber, JwtRegisteredClaimNames.PhoneNumber);
+            public static ScopeClaimMapper PhoneNumberVerified = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, TokenClaimJsonTypes.BOOLEAN);
+            public static ScopeClaimMapper Role = ScopeClaimMapper.CreateOpenIdAttributeClaimArray(UserClaims.Role, UserClaims.Role, UserClaims.Role);
+            public static ScopeClaimMapper ScimId = ScopeClaimMapper.CreateOpenIdAttributeClaim("scim_id", "scim_id", "scim_id");
         }
 
         public static class StandardScopes
@@ -175,7 +176,7 @@ namespace SimpleIdServer.IdServer
             public static Scope Profile = new Scope
             {
                 Name = "profile",
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Name,
                     StandardClaims.FamilyName,
@@ -201,7 +202,7 @@ namespace SimpleIdServer.IdServer
             public static Scope Email = new Scope
             {
                 Name = "email",
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
@@ -214,7 +215,7 @@ namespace SimpleIdServer.IdServer
             public static Scope Address = new Scope
             {
                 Name = "address",
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Address
                 },
@@ -226,7 +227,7 @@ namespace SimpleIdServer.IdServer
             public static Scope Phone = new Scope
             {
                 Name = "phone",
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
@@ -239,7 +240,7 @@ namespace SimpleIdServer.IdServer
             public static Scope Role = new Scope
             {
                 Name = "role",
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Role
                 },
@@ -251,7 +252,7 @@ namespace SimpleIdServer.IdServer
             public static Scope OpenIdScope = new Scope
             {
                 Name = "openid",
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Subject
                 },
@@ -272,9 +273,9 @@ namespace SimpleIdServer.IdServer
             {
                 Name = "scim",
                 IsExposedInConfigurationEdp = true,
-                Claims = new List<ScopeClaim>
+                ClaimMappers = new List<ScopeClaimMapper>
                 {
-                    new ScopeClaim("scim_id", true)
+                    StandardClaims.ScimId
                 },
                 IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,

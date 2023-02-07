@@ -60,19 +60,22 @@ namespace SimpleIdServer.IdServer.Api
 
         public HandlerContextRequest(string issuerName, string userSubject, JsonObject data) : this(issuerName, userSubject)
         {
-            var allKeys = data.Select(r => r.Key).ToList();
-            foreach (var key in allKeys)
+            if(data != null)
             {
-                var val = data[key] as JsonValue;
-                if(val != null)
+                var allKeys = data.Select(r => r.Key).ToList();
+                foreach (var key in allKeys)
                 {
-                    if (val.TryGetValue<string>(out string v))
-                        data[key] = HttpUtility.UrlDecode(v);
+                    var val = data[key] as JsonValue;
+                    if (val != null)
+                    {
+                        if (val.TryGetValue<string>(out string v))
+                            data[key] = HttpUtility.UrlDecode(v);
+                    }
                 }
-            }
 
-            OriginalRequestData = data;
-            RequestData = data;
+                OriginalRequestData = data;
+                RequestData = data;
+            }
         }
 
         public HandlerContextRequest(string issuerName, string userSubject, JsonObject data, JsonObject httpHeader) : this(issuerName, userSubject, data)

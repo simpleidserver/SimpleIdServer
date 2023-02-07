@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.ClaimsEnricher
 {
-    public interface IClaimsExtractor
+    public interface IRelayClaimsExtractor
     {
         Task<AggregatedClaimsExtractionResult> ExtractAggregatedClaims(User user, string connectionString, CancellationToken cancellationToken);
         Task<DistributedClaimsExtractionResult> ExtractDistributedClaims(User user, string connectionString, CancellationToken cancellationToken);

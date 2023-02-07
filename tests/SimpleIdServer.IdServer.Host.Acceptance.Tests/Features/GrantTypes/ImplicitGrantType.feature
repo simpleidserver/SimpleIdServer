@@ -4,14 +4,14 @@
 Scenario: No access token is issued then resulting claims are returned in the ID Token
 	Given authenticate a user
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value                 |
-	| response_type | id_token              |
-	| client_id     | fourteenClient        |
-	| state         | state                 |
-	| response_mode | query                 |
-	| scope         | openid email role     |
-	| redirect_uri  | http://localhost:8080 |
-	| nonce         | nonce                 |
+	| Key           | Value                      |
+	| response_type | id_token                   |
+	| client_id     | fourteenClient             |
+	| state         | state                      |
+	| response_mode | query                      |
+	| scope         | openid email role address  |
+	| redirect_uri  | http://localhost:8080      |
+	| nonce         | nonce                      |
 	
 	And extract parameter 'id_token' from redirect url
 	And extract payload from JWT '$id_token$'
@@ -27,6 +27,12 @@ Scenario: No access token is issued then resulting claims are returned in the ID
 	Then JWT has 'role'='role1'
 	Then JWT has 'role'='role2'
 	Then JWT has 'nonce'='nonce'
+	Then JWT has address street 'street'
+	Then JWT has address locality 'locality'
+	Then JWT has address region 'region'
+	Then JWT has address postal code 'postalcode'
+	Then JWT has address country 'country'
+	Then JWT has formatted address 'formatted'
 
 Scenario: Display parameter is passed in the redirection url
 	Given authenticate a user

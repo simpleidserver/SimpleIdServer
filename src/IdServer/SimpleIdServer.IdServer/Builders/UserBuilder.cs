@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,17 @@ namespace SimpleIdServer.IdServer.Builders
         public UserBuilder AddRole(string role)
         {
             _user.AddClaim(UserClaims.Role, role);
+            return this;
+        }
+
+        public UserBuilder SetAddress(string street, string locality, string region, string postalCode, string country, string formatted)
+        {
+            _user.UpdateClaim(AddressClaimNames.Street, street);
+            _user.UpdateClaim(AddressClaimNames.Locality, locality);
+            _user.UpdateClaim(AddressClaimNames.Region, region);
+            _user.UpdateClaim(AddressClaimNames.PostalCode, postalCode);
+            _user.UpdateClaim(AddressClaimNames.Country, country);
+            _user.UpdateClaim(AddressClaimNames.Formatted, formatted);
             return this;
         }
 

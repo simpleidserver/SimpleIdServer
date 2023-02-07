@@ -6,12 +6,11 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class ScopeClaimConfiguration : IEntityTypeConfiguration<ScopeClaim>
+    public class ScopeClaimConfiguration : IEntityTypeConfiguration<ScopeClaimMapper>
     {
-        public void Configure(EntityTypeBuilder<ScopeClaim> builder)
+        public void Configure(EntityTypeBuilder<ScopeClaimMapper> builder)
         {
-            builder.Property<int>("Id").ValueGeneratedOnAdd();
-            builder.HasKey("Id");
+            builder.HasKey(c => c.Id);
         }
     }
 }

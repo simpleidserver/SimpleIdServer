@@ -39,12 +39,12 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             var acrLst = await _authenticationContextClassReferenceRepository.Query().AsNoTracking().ToListAsync(cancellationToken);
             var result = await Build(cancellationToken);
             var claims = await _scopeRepository.Query()
-                .Include(s => s.Claims)
+                .Include(s => s.ClaimMappers)
                 .AsNoTracking()
                 .Where(s => s.IsExposedInConfigurationEdp)
-                .SelectMany(s => s.Claims)
-                .Select(c => c.ClaimName)
+                .SelectMany(s => s.ClaimMappers)
                 .ToListAsync(cancellationToken);
+
             result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{Constants.EndPoints.UserInfo}");
             result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{Constants.EndPoints.CheckSession}");
             result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{Constants.EndPoints.EndSession}");
@@ -62,7 +62,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.UserInfoSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
             result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
-            result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims));
+            result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims.DistinctBy(c => c.TokenClaimName).Select(c => c.TokenClaimName)));
             result.Add(OpenIDConfigurationNames.ClaimsParameterSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelTokenDeliveryModesSupported, JsonSerializer.SerializeToNode(Constants.AllStandardNotificationModes));
             result.Add(OpenIDConfigurationNames.BackchannelAuthenticationRequestSigningAlgValues, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));

@@ -56,7 +56,6 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         public virtual async Task Enrich(JsonObject jObj, string issuer, CancellationToken cancellationToken)
         {
             var scopes = await _scopeRepository.Query()
-                .Include(s => s.Claims)
                 .AsNoTracking()
                 .Where(s => s.IsExposedInConfigurationEdp)
                 .Select(s => s.Name)

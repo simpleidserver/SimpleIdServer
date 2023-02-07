@@ -9,7 +9,6 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,24 +26,24 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
         private readonly IdServerHostOptions _options;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IClaimsEnricher _claimsEnricher;
-        private readonly IEnumerable<ISubjectTypeBuilder> _subjectTypeBuilders;
         private readonly IAmrHelper _amrHelper;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
+        private readonly IClaimsExtractor _claimsExtractor;
 
         public IdTokenBuilder(
             IOptions<IdServerHostOptions> options,
             IJwtBuilder jwtBuilder,
             IClaimsEnricher claimsEnricher,
-            IEnumerable<ISubjectTypeBuilder> subjectTypeBuilders,
             IAmrHelper amrHelper,
-            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher)
+            IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
+            IClaimsExtractor claimsExtractor)
         {
             _options = options.Value;
             _jwtBuilder = jwtBuilder;
             _claimsEnricher = claimsEnricher;
-            _subjectTypeBuilders = subjectTypeBuilders;
             _amrHelper = amrHelper;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
+            _claimsExtractor = claimsExtractor;
         }
 
         public string Name => TokenResponseParameters.IdToken;
@@ -72,8 +71,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             var maxAge = queryParameters.GetMaxAgeFromAuthorizationRequest();
             var nonce = queryParameters.GetNonceFromAuthorizationRequest();
             var acrValues = queryParameters.GetAcrValuesFromAuthorizationRequest();
-            var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(openidClient.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : openidClient.SubjectType));
-            var subject = await subjectTypeBuilder.Build(currentContext, cancellationToken);
             string accessToken, code;
             if (currentContext.Response.TryGet(AuthorizationResponseParameters.AccessToken, out accessToken))
                 claims.Add(JwtRegisteredClaimNames.AtHash, ComputeHash(accessToken));
@@ -103,7 +100,15 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (activeSession != null)
                 claims.Add(JwtRegisteredClaimNames.Sid, activeSession.SessionId);
 
-            EnrichWithScopeParameter(claims, scopes, currentContext.User, subject);
+            var claimsDic = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
+            {
+                ApplicationScope = MapperApplicationScopes.IDTOKEN,
+                Context = currentContext,
+                Scopes = scopes
+            });
+            foreach (var claim in claimsDic)
+                claims.Add(claim.Key, claim.Value);
+
             _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(claims, requestedClaims, currentContext.User, activeSession?.AuthenticationDateTime);
             await _claimsEnricher.Enrich(currentContext.User, claims, openidClient, cancellationToken);
 
@@ -115,29 +120,6 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 Claims = claims
             };
             return result;
-        }
-
-        public static void EnrichWithScopeParameter(Dictionary<string, object> claims, IEnumerable<Scope> scopes, User user, string subject = null)
-        {
-            if (scopes != null)
-            {
-                foreach (var scope in scopes)
-                {
-                    foreach (var scopeClaim in scope.Claims)
-                    {
-                        if (!string.IsNullOrWhiteSpace(subject) && scopeClaim.ClaimName == JwtRegisteredClaimNames.Sub)
-                            claims.Add(scopeClaim.ClaimName, subject);
-                        else if (user.TryGetUserClaim(scopeClaim.ClaimName, out object r))
-                            claims.Add(scopeClaim.ClaimName, r);
-                        else
-                        {
-                            var userClaims = user.Claims.Where(c => c.Type == scopeClaim.ClaimName);
-                            if (userClaims.Count() == 1) claims.Add(userClaims.First().Type, userClaims.First().Value);
-                            else if (userClaims.Count() > 1) claims.Add(userClaims.First().Type, userClaims.Select(c => c.Value));
-                        }
-                    }
-                }
-            }
         }
 
         private static string ComputeHash(string str)

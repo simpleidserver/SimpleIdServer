@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
     /// <summary>
     /// https://openid.net/specs/openid-connect-core-1_0.html#AggregatedDistributedClaims
     /// </summary>
-    public class HttpClaimsExtractor : IClaimsExtractor
+    public class HttpClaimsExtractor : IRelayClaimsExtractor
     {
         private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
 

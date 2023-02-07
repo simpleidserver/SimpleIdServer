@@ -396,20 +396,31 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ScopeClaim",
+                name: "ScopeClaimMapper",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClaimName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsExposed = table.Column<bool>(type: "bit", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MapperType = table.Column<int>(type: "int", nullable: false),
+                    UserAttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAttributeStreetName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAttributeLocalityName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAttributeRegionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAttributePostalCodeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAttributeCountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserAttributeFormattedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserPropertyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TokenClaimName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
+                    ApplicationScope = table.Column<int>(type: "int", nullable: false),
+                    IsMultiValued = table.Column<bool>(type: "bit", nullable: false),
                     ScopeName = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ScopeClaim", x => x.Id);
+                    table.PrimaryKey("PK_ScopeClaimMapper", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ScopeClaim_Scopes_ScopeName",
+                        name: "FK_ScopeClaimMapper_Scopes_ScopeName",
                         column: x => x.ScopeName,
                         principalTable: "Scopes",
                         principalColumn: "Name");
@@ -699,8 +710,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ScopeClaim_ScopeName",
-                table: "ScopeClaim",
+                name: "IX_ScopeClaimMapper_ScopeName",
+                table: "ScopeClaimMapper",
                 column: "ScopeName");
 
             migrationBuilder.CreateIndex(
@@ -796,7 +807,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Consent");
 
             migrationBuilder.DropTable(
-                name: "ScopeClaim");
+                name: "ScopeClaimMapper");
 
             migrationBuilder.DropTable(
                 name: "Tokens");

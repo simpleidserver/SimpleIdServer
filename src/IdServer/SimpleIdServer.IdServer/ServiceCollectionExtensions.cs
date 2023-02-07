@@ -181,7 +181,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddClaimsEnricher(this IServiceCollection services)
         {
-            services.AddTransient<IClaimsExtractor, HttpClaimsExtractor>();
+            services.AddTransient<IRelayClaimsExtractor, HttpClaimsExtractor>();
             services.AddTransient<IClaimsEnricher, ClaimsEnricher>();
             return services;
         }
@@ -220,6 +220,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimTokenFormat, OpenIDClaimTokenFormat>();
             services.AddTransient<IUmaTicketGrantTypeValidator, UmaTicketGrantTypeValidator>();
             services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
+            services.AddTransient<IClaimsExtractor, ClaimsExtractor>();
+            services.AddTransient<IMapperClaimsExtractor, UserAttributeClaimsExtractor>();
+            services.AddTransient<IMapperClaimsExtractor, UserPropertyClaimsExtractor>();
+            services.AddTransient<IMapperClaimsExtractor, UserAddressClaimsExtractor>();
+            services.AddTransient<IMapperClaimsExtractor, UserSubClaimsExtractor>();
             return services;
         }
 

@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
         private readonly ITokenRepository _tokenRepository;
         private readonly IClaimsEnricher _claimsEnricher;
         private readonly IClaimsJwsPayloadEnricher _claimsJwsPayloadEnricher;
+        private readonly IClaimsExtractor _claimsExtractor;
         private readonly ILogger<UserInfoController> _logger;
 
         public UserInfoController(
@@ -46,6 +47,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             ITokenRepository tokenRepository,
             IClaimsEnricher claimsEnricher,
             IClaimsJwsPayloadEnricher claimsJwsPayloadEnricher,
+            IClaimsExtractor claimsExtractor,
             ILogger<UserInfoController> logger)
         {
             _jwtBuilder = jwtBuilder;
@@ -55,6 +57,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             _claimsEnricher = claimsEnricher;
             _tokenRepository = tokenRepository;
             _claimsJwsPayloadEnricher = claimsJwsPayloadEnricher;
+            _claimsExtractor = claimsExtractor;
             _logger = logger;
         }
 
@@ -119,9 +122,15 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
                 }
 
-                var oauthScopes = await _scopeRepository.Query().Include(s => s.Claims).AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
-                var payload = new Dictionary<string, object>();
-                IdTokenBuilder.EnrichWithScopeParameter(payload, oauthScopes, user, subject);
+                var oauthScopes = await _scopeRepository.Query().Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null));
+                context.SetUser(user);
+                var payload = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
+                {
+                    ApplicationScope = MapperApplicationScopes.USERINFO,
+                    Context = context,
+                    Scopes = oauthScopes
+                });
                 _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationClaimTypes.UserInfo);
                 await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);
                 string contentType = "application/json";

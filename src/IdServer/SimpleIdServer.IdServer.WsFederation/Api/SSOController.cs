@@ -8,12 +8,12 @@ using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml;
 using Microsoft.IdentityModel.Tokens.Saml2;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extensions;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Stores;
@@ -30,14 +30,23 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
         private readonly IUserRepository _userRepository;
         private readonly IUserTransformer _userTransformer;
         private readonly IDataProtector _dataProtector;
+        private readonly IClaimsExtractor _claimsExtractor;
         private readonly IdServerHostOptions _options;
 
-        public SSOController(IClientRepository clientRepository, IUserRepository userRepository, IUserTransformer userTransformer, IDataProtectionProvider dataProtectionProvider, IOptions<IdServerHostOptions> opts, IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore) : base(options, keyStore)
+        public SSOController(IClientRepository clientRepository, 
+            IUserRepository userRepository,
+            IUserTransformer userTransformer,
+            IDataProtectionProvider dataProtectionProvider, 
+            IClaimsExtractor claimsExtractor,
+            IOptions<IdServerHostOptions> opts, 
+            IOptions<IdServerWsFederationOptions> options, 
+            IKeyStore keyStore) : base(options, keyStore)
         {
             _clientRepository = clientRepository;
             _userRepository = userRepository;
             _userTransformer = userTransformer;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
+            _claimsExtractor = claimsExtractor;
             _options = opts.Value;
         }
 
@@ -68,12 +77,12 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             var tokenType = GetTokenType(client);
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
-            var subject = BuildSubject();
+            var subject = await BuildSubject();
             return BuildResponse();
 
             async Task<Domains.Client> Validate()
             {
-                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.Claims).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm, cancellationToken);
+                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm, cancellationToken);
                 if (client == null)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.UNKNOWN_RP);
 
@@ -99,10 +108,16 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 return Redirect(url);
             }
 
-            ClaimsIdentity BuildSubject()
+            async Task<ClaimsIdentity> BuildSubject()
             {
-                var claims = new Dictionary<string, object>();
-                IdTokenBuilder.EnrichWithScopeParameter(claims, client.Scopes, user);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null));
+                context.SetUser(user);
+                var claims = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
+                {
+                    ApplicationScope = MapperApplicationScopes.WSFEDERATION,
+                    Context = context,
+                    Scopes = client.Scopes
+                });
                 var transformedClaims = _userTransformer.ConvertToIdentityClaims(claims).ToList();
                 if (transformedClaims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);

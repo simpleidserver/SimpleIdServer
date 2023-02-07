@@ -97,11 +97,15 @@ void RunSqlServerIdServer(IServiceCollection services)
 {
     services.AddSIDIdentityServer(o =>
     {
-        o.IsEmailUsedDuringAuthentication = true;
+        // o.IsEmailUsedDuringAuthentication = true;
     })
         .UseEFStore(o =>
         {
-            o.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True", o => o.MigrationsAssembly("SimpleIdServer.IdServer.Startup"));
+            o.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True", o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.Startup");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
         })
         .AddDeveloperSigningCredentials()
         .AddWsFederationSigningCredentials()
