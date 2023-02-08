@@ -16,7 +16,8 @@ namespace SimpleIdServer.IdServer.Domains
         }
 
         public string Name { get; set; } = null!;
-        public bool IsStandardScope { get; set; }
+        public ScopeTypes Type { get; set; } = ScopeTypes.IDENTITY;
+        public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; }
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
@@ -63,5 +64,11 @@ namespace SimpleIdServer.IdServer.Domains
         {
             return Name.GetHashCode();
         }
+    }
+
+    public enum ScopeTypes
+    {
+        IDENTITY = 0,
+        APIRESOURCE = 1
     }
 }

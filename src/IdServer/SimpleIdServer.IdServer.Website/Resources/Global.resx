@@ -132,8 +132,17 @@
   <data name="RedirectUriContainsFragment" xml:space="preserve">
     <value>Redirection url '{0}' cannot contains fragment (#)</value>
   </data>
+  <data name="ResourceAdded" xml:space="preserve">
+    <value>Resource '{0}' is added</value>
+  </data>
+  <data name="ResourceAlreadyExists" xml:space="preserve">
+    <value>Resource with the name '{0}' already exists</value>
+  </data>
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
+  </data>
+  <data name="SelectedResourcesRemoved" xml:space="preserve">
+    <value>Selected resources have been removed</value>
   </data>
   <data name="UnknownUser" xml:space="preserve">
     <value>The user '{0}' doesn't exist</value>

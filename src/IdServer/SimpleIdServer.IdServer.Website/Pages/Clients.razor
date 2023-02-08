@@ -74,7 +74,6 @@
             if (a.Value.Equals(1))
             {
                 var clientIds = clientState.Value.Clients?.Where(c => c.IsSelected).Select(c => c.Value.ClientId)?.ToList();
-                if (clientIds == null) return;
                 if (!clientIds.Contains(client.Value.ClientId)) clientIds.Add(client.Value.ClientId);
                 var act = new RemoveSelectedClientsAction { ClientIds = clientIds };
                 dispatcher.Dispatch(act);

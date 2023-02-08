@@ -106,11 +106,38 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource &apos;{0}&apos; is added.
+        /// </summary>
+        public static string ResourceAdded {
+            get {
+                return ResourceManager.GetString("ResourceAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource with the name &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string ResourceAlreadyExists {
+            get {
+                return ResourceManager.GetString("ResourceAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected clients have been removed.
         /// </summary>
         public static string SelectedClientsRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected resources have been removed.
+        /// </summary>
+        public static string SelectedResourcesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedResourcesRemoved", resourceCulture);
             }
         }
         

@@ -1,0 +1,130 @@
+﻿@page "/resources"
+@inject IState<SearchResourcesState> resourcesState
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService 
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+
+<RadzenButton class="mb-1" Click="@(args => AddResource())" Icon="add" Text="Add resource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid AllowFiltering="true" 
+        AllowColumnResize="true"
+        AllowAlternatingRows="false" 
+        AllowSorting="true" 
+        PageSize="5" 
+        AllowPaging="true" 
+        PagerHorizontalAlign="HorizontalAlign.Left" 
+        ShowPagingSummary="true"
+        IsLoading="@resourcesState.Value.IsLoading"
+        Count="@resourcesState.Value.Count"
+        Data="@resourcesState.Value.Scopes"
+        LoadData="@LoadData"
+        RowRender="@RowRender"
+        TItem="SelectableResource" 
+        ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableResource" Property="Value.Name" Filterable="false" Sortable="false" Title="Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" Title="Type" Width="80px">
+            <Template Context="data">
+                @if(data.Value.Type == ScopeTypes.IDENTITY)
+                {
+                    <RadzenBadge Text="Identity Resource" IsPill="true" />
+                }
+                else
+                {
+                    <RadzenBadge Text="API Resource" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableResource" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">                
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+            SubscribeToAction<RemoveSelectedResourcesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedResourcesRemoved });
+                StateHasChanged();
+            });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchResourcesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }    
+
+    void ShowMoreContextMenu(SelectableResource resource, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) => {
+            if (a.Value.Equals(1)) {
+                var resourceNames = resourcesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
+                if (!resourceNames.Contains(resource.Value.Name)) resourceNames.Add(resource.Value.Name);
+                var act = new RemoveSelectedResourcesAction { ResourceNames = resourceNames };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+    });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableResource resource)
+    {
+        var act = new ToggleResourceSelectionAction { IsSelected = isSelected, ResourceName = resource.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllResourceSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableResource> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AddResource()
+    {
+        await dialogService.OpenAsync<AddResourceDialog>("Add resource", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

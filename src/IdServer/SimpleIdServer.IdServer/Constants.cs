@@ -194,8 +194,8 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Locale,
                     StandardClaims.UpdatedAt
                 },
+                Type = ScopeTypes.IDENTITY,
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -207,8 +207,8 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
                 },
+                Type = ScopeTypes.IDENTITY,
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -219,8 +219,8 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.Address
                 },
+                Type = ScopeTypes.IDENTITY,
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -232,8 +232,8 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
                 },
+                Type = ScopeTypes.IDENTITY,
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -244,8 +244,8 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.Role
                 },
+                Type = ScopeTypes.IDENTITY,
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -256,49 +256,50 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.Subject
                 },
+                Type = ScopeTypes.IDENTITY,
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
             public static Scope OfflineAccessScope = new Scope
             {
+                Type = ScopeTypes.IDENTITY,
                 Name = "offline_access",
                 IsExposedInConfigurationEdp = true,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
             public static Scope ScimScope = new Scope
             {
+                Type = ScopeTypes.IDENTITY,
                 Name = "scim",
                 IsExposedInConfigurationEdp = true,
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.ScimId
                 },
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
             public static Scope GrantManagementQuery = new Scope
             {
+                Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_query",
                 IsExposedInConfigurationEdp = false,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
             public static Scope GrantManagementRevoke = new Scope
             {
+                Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_revoke",
                 IsExposedInConfigurationEdp = false,
-                IsStandardScope = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
             public static Scope UmaProtection = new Scope
             {
+                Type = ScopeTypes.IDENTITY,
                 Name = "uma_protection",
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,

@@ -1,0 +1,124 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddResourceState> addResourceState
+@inject IDispatcher dispatcher
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Resource type">
+            <div class="row gy-4">
+                @foreach (var resType in ResourceTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectResource(resType)" class="@(SelectedResourceType != null && SelectedResourceType.Name == resType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@resType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@resType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(resType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+
+            <hr class="hr" />
+
+            @if (SelectedResourceType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedResourceType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedResourceType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedResourceType == null)">
+            @if (SelectedResourceType != null)
+            {
+                switch (SelectedResourceType.Type)
+                {
+                    // Identity Resource
+                    case ScopeTypes.IDENTITY:
+                        <RadzenTemplateForm Submit=@AddIdentityResource TItem="IdentityResource" Data=@identityResource>
+                            @if (!addResourceState.Value.IsAdding && !string.IsNullOrWhiteSpace(addResourceState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addResourceState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="Name" @bind-Value="@identityResource.Name" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                                <RadzenTextArea Name="Description" @bind-Value="@identityResource.Description" Class="w-100"></RadzenTextArea>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Is exposed ?</RadzenText>
+                                <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityResource.IsExposedInConfigrationEdp"></RadzenCheckBox>
+                                <p class="text-muted">
+                                    Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+                                </p>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addResourceState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addResourceState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                }
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    record ResourceType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public ScopeTypes Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record IdentityResource
+    {
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public bool IsExposedInConfigrationEdp { get; set; } = false;
+    }
+
+    IdentityResource identityResource = new IdentityResource();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<AddResourceSuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ResourceAdded, act.Name) });
+            StateHasChanged();
+        });
+    }
+
+    ICollection<ResourceType> ResourceTypes { get; set; } = new List<ResourceType>
+    {
+        new ResourceType { Name = "Identity Resource", ShortDescription = "Access to the claims of the authenticated user", Description = "Clients authorized to access to the Identity Resource have access to specific claims. <br/> Standard Identity Resources are defined by the OPENID standard (profile, email etc...). <br/> For more information please refer to the documentation <a href='https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims</a>", Type = ScopeTypes.IDENTITY, PictureUrl = "images/IdentityResource.png" }
+    };
+
+    ResourceType? SelectedResourceType { get; set; } = null;
+
+    void SelectResource(ResourceType resourceType)
+    {
+        SelectedResourceType = resourceType;
+    }
+
+    void AddIdentityResource(IdentityResource identityResource)
+    {
+        dispatcher.Dispatch(new AddIdentityResourceAction { Name = identityResource.Name, Description = identityResource.Description, IsExposedInConfigurationEdp = identityResource.IsExposedInConfigrationEdp });
+    }
+}
