@@ -65,6 +65,29 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
             await _scopeRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddResourceSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp });
         }
+
+        [EffectMethod]
+        public async Task Handle(GetResourceAction action, IDispatcher dispatcher)
+        {
+            var scope = await _scopeRepository.Query().AsNoTracking().SingleOrDefaultAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            if (scope == null)
+            {
+                dispatcher.Dispatch(new GetResourceFailureAction { ResourceName = action.ResourceName, ErrorMessage = string.Format(Global.UnknownResource, action.ResourceName) });
+                return;
+            }
+
+            dispatcher.Dispatch(new GetResourceSuccessAction { Resource = scope });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateResourceAction action, IDispatcher dispatcher)
+        {
+            var scope = await _scopeRepository.Query().SingleAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            scope.Description = action.Description;
+            scope.IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp;
+            await _scopeRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateResourceSuccessAction { Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, ResourceName = action.ResourceName });
+        }
     }
 
     public class SearchResourcesAction
@@ -119,5 +142,35 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
     {
         public string Name { get; set; } = null!;
         public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class GetResourceAction
+    {
+        public string ResourceName { get; set; } = null!;
+    }
+
+    public class GetResourceSuccessAction
+    {
+        public Scope Resource { get; set; } = null!;
+    }
+
+    public class GetResourceFailureAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class UpdateResourceAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public string? Description { get; set; } = null;
+        public bool IsExposedInConfigurationEdp { get; set; } = false;
+    }
+
+    public class UpdateResourceSuccessAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public string? Description { get; set; } = null;
+        public bool IsExposedInConfigurationEdp { get; set; } = false;
     }
 }

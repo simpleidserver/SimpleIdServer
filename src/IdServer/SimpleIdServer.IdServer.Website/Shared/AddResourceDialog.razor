@@ -60,8 +60,8 @@
                                 <RadzenTextArea Name="Description" @bind-Value="@identityResource.Description" Class="w-100"></RadzenTextArea>
                             </div>
                             <div>
-                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Is exposed ?</RadzenText>
                                 <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityResource.IsExposedInConfigrationEdp"></RadzenCheckBox>
+                                <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
                                 <p class="text-muted">
                                     Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
                                 </p>

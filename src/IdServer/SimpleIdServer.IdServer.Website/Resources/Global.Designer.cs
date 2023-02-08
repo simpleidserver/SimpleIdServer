@@ -124,6 +124,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource details have been updated.
+        /// </summary>
+        public static string ResourceDetailsUpdated {
+            get {
+                return ResourceManager.GetString("ResourceDetailsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected clients have been removed.
         /// </summary>
         public static string SelectedClientsRemoved {
@@ -138,6 +147,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedResourcesRemoved {
             get {
                 return ResourceManager.GetString("SelectedResourcesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The resource &apos;{0}&apos; doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownResource {
+            get {
+                return ResourceManager.GetString("UnknownResource", resourceCulture);
             }
         }
         

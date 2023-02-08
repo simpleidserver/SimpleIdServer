@@ -138,11 +138,17 @@
   <data name="ResourceAlreadyExists" xml:space="preserve">
     <value>Resource with the name '{0}' already exists</value>
   </data>
+  <data name="ResourceDetailsUpdated" xml:space="preserve">
+    <value>Resource details have been updated</value>
+  </data>
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
   </data>
   <data name="SelectedResourcesRemoved" xml:space="preserve">
     <value>Selected resources have been removed</value>
+  </data>
+  <data name="UnknownResource" xml:space="preserve">
+    <value>The resource '{0}' doesn't exist</value>
   </data>
   <data name="UnknownUser" xml:space="preserve">
     <value>The user '{0}' doesn't exist</value>

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using SimpleIdServer.IdServer.Domains;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
 {
@@ -113,6 +111,59 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         public static AddResourceState ReduceAddResourceSuccessAction(AddResourceState state, AddResourceSuccessAction act) => state with
         {
             IsAdding = false
+        };
+
+        #endregion
+
+        #region ResourceState
+
+        [ReducerMethod]
+        public static ResourceState ReduceGetResourceAction(ResourceState state, GetResourceAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static ResourceState ReduceGetResourceSuccessAction(ResourceState state, GetResourceSuccessAction act) => state with
+        {
+            IsLoading = false,
+            Resource = act.Resource
+        };
+
+        [ReducerMethod]
+        public static ResourceState ReduceGetResourceFailureAction(ResourceState state, GetResourceFailureAction act) => state with
+        {
+            IsLoading = false
+        };
+
+        [ReducerMethod]
+        public static ResourceState ReduceUpdateResourceSuccessAction(ResourceState state, UpdateResourceSuccessAction act)
+        {
+            var resource = state.Resource;
+            resource.UpdateDateTime = DateTime.UtcNow;
+            resource.Description = act.Description;
+            resource.IsExposedInConfigurationEdp = act.IsExposedInConfigurationEdp;
+            return state with
+            {
+                Resource = resource
+            };
+        }
+
+        #endregion
+
+        #region UpdateResourceState
+
+        [ReducerMethod]
+        public static UpdateResourceState ReduceUpdateResourceAction(UpdateResourceState state, UpdateResourceAction act) => state with
+        {
+            IsUpdating = true
+        };
+
+
+        [ReducerMethod]
+        public static UpdateResourceState ReduceUpdateResourceSuccessAction(UpdateResourceState state, UpdateResourceSuccessAction act) => state with
+        {
+            IsUpdating = false
         };
 
         #endregion
