@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
@@ -58,6 +59,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             int totalResults = 0;
             var collection = _scimDbContext.SCIMRepresentationLst;
             var queryableRepresentations = collection.AsQueryable().Where(s => s.ResourceType == parameter.ResourceType);
+            if(parameter.SortBy == null)
+                queryableRepresentations = queryableRepresentations.OrderBy(s => s.Id);
+
             if (parameter.Filter != null)
             {
                 var evaluatedExpression = parameter.Filter.Evaluate(queryableRepresentations);
@@ -71,6 +75,14 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 totalResults = queryableRepresentations.Count();
                 var representations = queryableRepresentations.Skip(parameter.StartIndex <= 1 ? 0 : parameter.StartIndex - 1).Take(parameter.Count);
                 result = representations.ToList().Cast<SCIMRepresentation>();
+            }
+
+            if (parameter.SortBy != null)
+            {
+                var evaluatedExpression = parameter.SortBy.EvaluateOrderBy(
+                    queryableRepresentations,
+                    parameter.SortOrder ?? SearchSCIMRepresentationOrders.Descending);
+                result = (IEnumerable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
             }
 
             result.FilterAttributes(parameter.IncludedAttributes, parameter.ExcludedAttributes);
