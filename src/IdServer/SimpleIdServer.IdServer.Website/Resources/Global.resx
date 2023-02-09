@@ -144,6 +144,9 @@
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
   </data>
+  <data name="SelectedResourceMappersRemoved" xml:space="preserve">
+    <value>Resource mappers have been removed</value>
+  </data>
   <data name="SelectedResourcesRemoved" xml:space="preserve">
     <value>Selected resources have been removed</value>
   </data>

@@ -1,0 +1,137 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
+@inject IState<ResourceMappersState> resourceMappersState
+@inject NotificationService notificationService
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="false"
+                Count="@resourceMappersState.Value.Count"
+                Data="@resourceMappersState.Value.Mappers"
+                TItem="SelectableResourceMapper"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableResourceMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableResourceMapper" Property="Value.Name" Title="Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending" />
+        <RadzenDataGridColumn TItem="SelectableResourceMapper" Title="Type" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @switch(data.Value.MapperType)
+                {
+                        case ScopeClaimMapperTypes.USERATTRIBUTE:
+                            <span>User attribute</span>
+                        break;
+                        case ScopeClaimMapperTypes.USERPROPERTY:
+                            <span>User property</span>
+                            break;
+                        case ScopeClaimMapperTypes.ADDRESS:
+                            <span>Address</span>
+                            break;
+                        case ScopeClaimMapperTypes.SUBJECT:
+                            <span>Subject</span>
+                            break;
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableResourceMapper" Title="Scope" Filterable="false" Sortable="false" Width="80px">
+            <Template Context="data">
+                @{
+                    var scopes = GetScopes(data);
+                    foreach(var scope in scopes)
+                    {
+                        <RadzenBadge Text="@scope" IsPill=true />
+                    }
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableResourceMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+    bool selectAll = false;
+
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Scope Resource { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+            SubscribeToAction<RemoveSelectedResourceMappersSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedResourceMappersRemoved });
+                StateHasChanged();
+            });
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    void ToggleChanged(bool isSelected, SelectableResourceMapper resourceMapper)
+    {
+        var act = new ToggleResourceMapperSelectionAction { IsSelected = isSelected, ResourceMapperId = resourceMapper.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllResourceMapperSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    IEnumerable<string> GetScopes(SelectableResourceMapper resourceMapper)
+    {
+        var lst = new List<string>();
+        var applicationScope = resourceMapper.Value.ApplicationScope;
+        if (applicationScope.HasFlag(MapperApplicationScopes.IDTOKEN))
+            lst.Add("Identity Token");
+        if (applicationScope.HasFlag(MapperApplicationScopes.WSFEDERATION))
+            lst.Add("WS Federation");
+        if (applicationScope.HasFlag(MapperApplicationScopes.USERINFO))
+            lst.Add("User Information");
+        if(applicationScope.HasFlag(MapperApplicationScopes.TOKEN))
+            lst.Add("Access Token");
+        return lst;
+    }
+
+    void ShowMoreContextMenu(SelectableResourceMapper mapper, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) => {
+            if (a.Value.Equals(1))
+            {
+                var mapperIds = resourceMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
+                var act = new RemoveSelectedResourceMappersAction { ResourceMapperIds = mapperIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+}

@@ -142,6 +142,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource mappers have been removed.
+        /// </summary>
+        public static string SelectedResourceMappersRemoved {
+            get {
+                return ResourceManager.GetString("SelectedResourceMappersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected resources have been removed.
         /// </summary>
         public static string SelectedResourcesRemoved {

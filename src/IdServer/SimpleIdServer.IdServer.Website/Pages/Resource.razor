@@ -37,6 +37,9 @@ else
             <RadzenTabsItem Text="Details">
                 <ResourceSettings Resource="@resourceState.Value.Resource"></ResourceSettings>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Mappers">
+                <ResourceMappers Resource="@resourceState.Value.Resource"></ResourceMappers>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 }
@@ -44,7 +47,8 @@ else
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
-        { "settings", 0 }
+        { "settings", 0 },
+        { "mappers", 1 }
     };
     [Parameter]
     public string id { get; set; } = null!;

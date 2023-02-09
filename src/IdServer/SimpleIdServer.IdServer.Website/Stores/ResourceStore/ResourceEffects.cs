@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         [EffectMethod]
         public async Task Handle(GetResourceAction action, IDispatcher dispatcher)
         {
-            var scope = await _scopeRepository.Query().AsNoTracking().SingleOrDefaultAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            var scope = await _scopeRepository.Query().Include(s => s.ClaimMappers).AsNoTracking().SingleOrDefaultAsync(s => s.Name == action.ResourceName, CancellationToken.None);
             if (scope == null)
             {
                 dispatcher.Dispatch(new GetResourceFailureAction { ResourceName = action.ResourceName, ErrorMessage = string.Format(Global.UnknownResource, action.ResourceName) });
@@ -87,6 +87,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
             scope.IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp;
             await _scopeRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateResourceSuccessAction { Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, ResourceName = action.ResourceName });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedResourceMappersAction action, IDispatcher dispatcher)
+        {
+            var scope = await _scopeRepository.Query().Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            scope.ClaimMappers = scope.ClaimMappers.Where(m => !action.ResourceMapperIds.Contains(m.Id)).ToList();
+            await _scopeRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedResourceMappersSuccessAction { ResourceMapperIds = action.ResourceMapperIds, ResourceName = action.ResourceName });
         }
     }
 
@@ -172,5 +181,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         public string ResourceName { get; set; } = null!;
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; } = false;
+    }
+
+    public class ToggleResourceMapperSelectionAction
+    {
+        public bool IsSelected { get; set; }
+        public string ResourceMapperId { get; set; } = null!;
+    }
+
+    public class ToggleAllResourceMapperSelectionAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedResourceMappersAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public ICollection<string> ResourceMapperIds { get; set; } = new List<string>();
+    }
+
+    public class RemoveSelectedResourceMappersSuccessAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public ICollection<string> ResourceMapperIds { get; set; } = new List<string>();
     }
 }

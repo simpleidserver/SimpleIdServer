@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using System.Data;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
 {
@@ -159,12 +160,74 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
             IsUpdating = true
         };
 
-
         [ReducerMethod]
         public static UpdateResourceState ReduceUpdateResourceSuccessAction(UpdateResourceState state, UpdateResourceSuccessAction act) => state with
         {
             IsUpdating = false
         };
+
+        #endregion
+
+        #region ResourceMappersState
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceGetResourceAction(ResourceMappersState state, GetResourceAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceGetResourceSuccessAction(ResourceMappersState state, GetResourceSuccessAction act) => state with
+        {
+            IsLoading = false,
+            Mappers = act.Resource.ClaimMappers.Select(m => new SelectableResourceMapper(m)),
+            Count = act.Resource.ClaimMappers.Count()
+        };
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceToggleResourceMapperSelectionAction(ResourceMappersState state, ToggleResourceMapperSelectionAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            var mapper = mappers.Single(m => m.Value.Id == act.ResourceMapperId);
+            mapper.IsSelected = act.IsSelected;
+            return state with
+            {
+                Mappers = mappers
+            };
+        }
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceToggleAllResourceMapperSelectionAction(ResourceMappersState state, ToggleAllResourceMapperSelectionAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            foreach (var mapper in mappers) mapper.IsSelected = act.IsSelected;
+            return state with
+            {
+                Mappers = mappers
+            };
+        }
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceRemoveSelectedResourceMappersAction(ResourceMappersState state, RemoveSelectedResourceMappersAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceRemoveSelectedResourceMappersSuccessAction(ResourceMappersState state, RemoveSelectedResourceMappersSuccessAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            var filteredMappers = mappers.Where(m => act.ResourceMapperIds.Contains(m.Value.Id)).ToList();
+            return state with
+            {
+                Mappers = filteredMappers,
+                IsLoading = false,
+                Count = filteredMappers.Count
+            };
+        }
 
         #endregion
     }

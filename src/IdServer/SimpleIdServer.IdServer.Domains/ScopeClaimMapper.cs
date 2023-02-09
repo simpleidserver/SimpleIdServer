@@ -7,10 +7,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public class ScopeClaimMapper
     {
-        public ScopeClaimMapper()
-        {
-
-        }
+        public ScopeClaimMapper() { }
 
         public string Id { get; set; } = null!;
         public string Name { get; set; } = null!;
