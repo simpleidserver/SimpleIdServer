@@ -168,6 +168,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
 
         #endregion
 
+        #region UpdateResourceMapperState
+
+        [ReducerMethod]
+        public static UpdateResourceMapperState ReduceAddResourceClaimMapperAction(UpdateResourceMapperState state, AddResourceClaimMapperAction act) => state with
+        {
+            IsUpdating = true
+        };
+
+        [ReducerMethod]
+        public static UpdateResourceMapperState ReduceAddResourceClaimMapperSuccessAction(UpdateResourceMapperState state, AddResourceClaimMapperSuccessAction act) => state with
+        {
+            IsUpdating = false
+        };
+
+        #endregion
+
         #region ResourceMappersState
 
         [ReducerMethod]
@@ -220,12 +236,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         public static ResourceMappersState ReduceRemoveSelectedResourceMappersSuccessAction(ResourceMappersState state, RemoveSelectedResourceMappersSuccessAction act)
         {
             var mappers = state.Mappers.ToList();
-            var filteredMappers = mappers.Where(m => act.ResourceMapperIds.Contains(m.Value.Id)).ToList();
+            var filteredMappers = mappers.Where(m => !act.ResourceMapperIds.Contains(m.Value.Id)).ToList();
             return state with
             {
                 Mappers = filteredMappers,
                 IsLoading = false,
                 Count = filteredMappers.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static ResourceMappersState ReduceAddResourceClaimMapperSuccessAction(ResourceMappersState state, AddResourceClaimMapperSuccessAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            mappers.Add(new SelectableResourceMapper(act.ClaimMapper) { IsNew = true });
+            return state with
+            {
+                Mappers = mappers,
+                IsLoading = false,
+                Count = mappers.Count
             };
         }
 

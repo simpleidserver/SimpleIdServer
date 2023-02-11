@@ -1,0 +1,67 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.UI;
+@using SimpleIdServer.IdServer.Website.Models;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject IState<UpdateResourceMapperState> updateResourceMapperState
+@inject IDispatcher dispatcher
+
+<!-- Name -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+    <RadzenTextBox Name="Name" @bind-Value="@UserScopeMapperForm.Name" Class="w-100"></RadzenTextBox>
+    <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+</div>
+<!-- Token Claim Name -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
+    <RadzenTextBox Name="TokenClaimName" @bind-Value="@UserScopeMapperForm.TokenClaimName" Class="w-100"></RadzenTextBox>
+    <RadzenRequiredValidator Component="TokenClaimName" Text="Token claim is required"></RadzenRequiredValidator>
+    <p class="text-muted">Name of the claim to insert into the token</p>
+</div>
+<!-- Claim JSON Type -->
+<div>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Claim JSON Type</RadzenText>
+    <RadzenDropDown Name="ClaimJsonType" Class="w-100"
+                    Data=@jsonTypeInfos
+                    TValue="TokenClaimJsonTypes"
+                    @bind-Value=@UserScopeMapperForm.ClaimJsonType
+                    TextProperty="Name" ValueProperty="Type" />
+    <RadzenRequiredValidator Component="ClaimJsonType" Text="Claim JSON Type is required"></RadzenRequiredValidator>
+</div>
+<!-- OPENID connect  -->
+<div class="mt-1">
+    <RadzenSwitch @bind-Value=@UserScopeMapperForm.IsOpenIdProtocolEnabled Name="IsOpenIdProtocolEnabled" TValue="bool" />
+    <RadzenLabel Text="OPENID protocol" Component="IsOpenIdProtocolEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+    <p class="text-muted">Add the claim into the Identity Token</p>
+</div>
+<!-- WS-Federation  -->
+<div class="mt-1">
+    <RadzenSwitch @bind-Value=@UserScopeMapperForm.IsWsFederationProtocolEnabled Name="IsWsFederationProtocolEnabled" TValue="bool" />
+    <RadzenLabel Text="WS-Federation" Component="IsWsFederationProtocolEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+    <p class="text-muted">Add the claim into the SAML assertion</p>
+</div>
+
+@code {
+    [Parameter]
+    public BaseUserScopeMapperForm UserScopeMapperForm { get; set; } = null!;
+
+    record ClaimJSONTypeInfo
+    {
+        public string Name { get; set; } = null!;
+        public TokenClaimJsonTypes Type { get; set; }
+    }
+
+    List<ClaimJSONTypeInfo> jsonTypeInfos = new List<ClaimJSONTypeInfo>
+    {
+        new ClaimJSONTypeInfo { Type = TokenClaimJsonTypes.STRING, Name = "String" },
+        new ClaimJSONTypeInfo { Type = TokenClaimJsonTypes.BOOLEAN, Name = "Boolean" },
+        new ClaimJSONTypeInfo { Type = TokenClaimJsonTypes.INT, Name = "Integer" },
+        new ClaimJSONTypeInfo { Type = TokenClaimJsonTypes.LONG, Name = "Long" },
+        new ClaimJSONTypeInfo { Type = TokenClaimJsonTypes.DATETIME, Name = "DateTime" },
+        new ClaimJSONTypeInfo { Type = TokenClaimJsonTypes.JSON, Name = "JSON" }
+    };
+}

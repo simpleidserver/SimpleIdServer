@@ -124,6 +124,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Claim mapper has been added.
+        /// </summary>
+        public static string ResourceClaimMapperAdded {
+            get {
+                return ResourceManager.GetString("ResourceClaimMapperAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Resource details have been updated.
         /// </summary>
         public static string ResourceDetailsUpdated {

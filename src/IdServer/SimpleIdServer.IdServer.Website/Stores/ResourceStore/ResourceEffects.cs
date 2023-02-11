@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
             await _scopeRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new RemoveSelectedResourceMappersSuccessAction { ResourceMapperIds = action.ResourceMapperIds, ResourceName = action.ResourceName });
         }
+
+        [EffectMethod]
+        public async Task Handle(AddResourceClaimMapperAction action, IDispatcher dispatcher)
+        {
+            var scope = await _scopeRepository.Query().Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            scope.ClaimMappers.Add(action.ClaimMapper);
+            await _scopeRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddResourceClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ResourceName = action.ResourceName });
+        }
     }
 
     public class SearchResourcesAction
@@ -204,5 +213,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
     {
         public string ResourceName { get; set; } = null!;
         public ICollection<string> ResourceMapperIds { get; set; } = new List<string>();
+    }
+
+    public class AddResourceClaimMapperAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public ScopeClaimMapper ClaimMapper { get; set; } = null!;
+    }
+
+    public class AddResourceClaimMapperSuccessAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public ScopeClaimMapper ClaimMapper { get; set; } = null!;
     }
 }

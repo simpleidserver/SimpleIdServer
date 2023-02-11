@@ -1,0 +1,104 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddResourceState> addResourceState
+@inject IDispatcher dispatcher
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Mapper type">
+            <div class="row gy-4">
+                @foreach (var mapperType in MapperTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectMapper(mapperType)" class="@(SelectedMapperType != null && SelectedMapperType.Name == mapperType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@mapperType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@mapperType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(mapperType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+
+            <hr class="hr" />
+
+            @if (SelectedMapperType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedMapperType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedMapperType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedMapperType == null)">
+            @switch(SelectedMapperType.Type)
+            {
+                case ScopeClaimMapperTypes.USERATTRIBUTE:
+                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper"></UserAttributeScopeMapper>
+                    break;
+                case ScopeClaimMapperTypes.USERPROPERTY:
+                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper"></UserPropertyScopeMapper>
+                    break;
+                case ScopeClaimMapperTypes.ADDRESS:
+                    <UserAddressScopeMapper ScopeMapperSaved="AddScopeMapper"></UserAddressScopeMapper>
+                    break;
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    [Parameter]
+    public string ResourceName { get; set; } = null!;
+
+    record MapperType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public ScopeClaimMapperTypes Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<AddResourceClaimMapperSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ResourceClaimMapperAdded });
+                dialogService.Close();
+                StateHasChanged();
+            });
+        }
+    }
+
+    ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>
+    {
+        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one user attribute to one claim", Type = ScopeClaimMapperTypes.USERATTRIBUTE, PictureUrl = "images/UserAttribute.png" },
+        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one user property to one claim", Type = ScopeClaimMapperTypes.USERPROPERTY, PictureUrl = "images/UserProperty.png" },
+        new MapperType { Name = "Address", ShortDescription = "User address", Description = "Build an address according to the format defined by the OPENID standard <a href='https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim'>https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim</a>", Type = ScopeClaimMapperTypes.ADDRESS, PictureUrl = "images/UserAddress.png" }
+    };
+
+    MapperType? SelectedMapperType { get; set; } = null;
+
+    void SelectMapper(MapperType mapperType)
+    {
+        SelectedMapperType = mapperType;
+    }
+
+    void AddScopeMapper(ScopeClaimMapper claimMapper)
+    {
+        claimMapper.Id = Guid.NewGuid().ToString();
+        dispatcher.Dispatch(new AddResourceClaimMapperAction { ClaimMapper = claimMapper, ResourceName = ResourceName });
+    }
+}

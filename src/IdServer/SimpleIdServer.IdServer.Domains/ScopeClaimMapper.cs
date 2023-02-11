@@ -62,6 +62,7 @@ namespace SimpleIdServer.IdServer.Domains
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
                 MapperType = ScopeClaimMapperTypes.USERATTRIBUTE,
+                ApplicationScope = MapperApplicationScopes.IDTOKEN | MapperApplicationScopes.USERINFO,
                 UserAttributeName = userAttributeName,
                 TokenClaimName = tokenClaimName,
                 TokenClaimJsonType = claimJsonType

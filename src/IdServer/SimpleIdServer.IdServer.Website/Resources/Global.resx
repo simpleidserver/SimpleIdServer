@@ -138,6 +138,9 @@
   <data name="ResourceAlreadyExists" xml:space="preserve">
     <value>Resource with the name '{0}' already exists</value>
   </data>
+  <data name="ResourceClaimMapperAdded" xml:space="preserve">
+    <value>Claim mapper has been added</value>
+  </data>
   <data name="ResourceDetailsUpdated" xml:space="preserve">
     <value>Resource details have been updated</value>
   </data>
