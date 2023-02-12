@@ -16,7 +16,7 @@
         <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateResourceMapperState.Value.ErrorMessage</RadzenAlert>
     }
 
-    <UserScopeMapper UserScopeMapperForm="@scopeMapperFom" Scope="@Scope"></UserScopeMapper>
+    <UserScopeMapper UserScopeMapperForm="@scopeMapperFom" Scope="@Scope" IsEditModeEnabled="@IsEditModeEnabled"></UserScopeMapper>
     <!-- Property -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
@@ -36,6 +36,8 @@
     public ScopeClaimMapper ClaimMapper { get; set; } = null!;
     [Parameter]
     public Scope Scope { get; set; } = null!;
+    [Parameter]
+    public bool IsEditModeEnabled { get; set; } = false;
 
     IEnumerable<string> userProperties = new List<string>();
 

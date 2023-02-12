@@ -12,7 +12,7 @@
 <!-- Name -->
 <div>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
-    <RadzenTextBox Name="Name" @bind-Value="@UserScopeMapperForm.Name" Class="w-100"></RadzenTextBox>
+    <RadzenTextBox Name="Name" @bind-Value="@UserScopeMapperForm.Name" Class="w-100" Disabled="@IsEditModeEnabled"></RadzenTextBox>
     <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
 </div>
 @if(Scope.Protocol == ScopeProtocols.OPENID)
@@ -51,6 +51,8 @@ else
     public BaseUserScopeMapperForm UserScopeMapperForm { get; set; } = null!;
     [Parameter]
     public Scope Scope { get; set; } = null!;
+    [Parameter]
+    public bool IsEditModeEnabled { get; set; } = false;
 
     record ClaimJSONTypeInfo
     {

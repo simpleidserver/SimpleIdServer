@@ -416,7 +416,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     SAMLAttributeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
                     IsMultiValued = table.Column<bool>(type: "bit", nullable: false),
-                    ScopeName = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ScopeName = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -425,7 +425,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         name: "FK_ScopeClaimMapper_Scopes_ScopeName",
                         column: x => x.ScopeName,
                         principalTable: "Scopes",
-                        principalColumn: "Name");
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

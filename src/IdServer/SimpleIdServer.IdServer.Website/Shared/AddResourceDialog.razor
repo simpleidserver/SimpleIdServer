@@ -68,13 +68,16 @@
                                     TextProperty="Name" ValueProperty="Protocol" />
                                 <RadzenRequiredValidator Component="Protocol" Text="Protocol is required"></RadzenRequiredValidator>
                             </div>
-                            <div>
-                                <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityResource.IsExposedInConfigrationEdp"></RadzenCheckBox>
-                                <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
-                                <p class="text-muted">
-                                    Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
-                                </p>
-                            </div>
+                            @if(identityResource.Protocol == ScopeProtocols.OPENID)
+                            {
+                                <div>
+                                    <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityResource.IsExposedInConfigrationEdp"></RadzenCheckBox>
+                                    <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+                                    <p class="text-muted">
+                                        Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+                                    </p>
+                                </div>
+                            }
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addResourceState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addResourceState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;

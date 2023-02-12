@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230212135053_Init")]
+    [Migration("20230212201821_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -625,6 +625,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ScopeName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("TokenClaimJsonType")
@@ -1169,9 +1170,13 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaimMapper", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Scope", "Scope")
                         .WithMany("ClaimMappers")
-                        .HasForeignKey("ScopeName");
+                        .HasForeignKey("ScopeName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Scope");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Translation", b =>

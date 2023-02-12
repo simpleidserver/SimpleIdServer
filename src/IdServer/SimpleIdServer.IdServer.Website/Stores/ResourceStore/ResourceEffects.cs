@@ -109,15 +109,54 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
                 return;
             }
 
-            if (scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName))
+            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TokenClaimName) && scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName))
             {
                 dispatcher.Dispatch(new AddResourceClaimMapperFailureAction { ResourceName = action.ResourceName, ErrorMessage = Global.ResourceClaimMapperTokenClaimNameMustBeUnique });
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == action.ClaimMapper.SAMLAttributeName))
+            {
+                dispatcher.Dispatch(new AddResourceClaimMapperFailureAction { ResourceName = action.ResourceName, ErrorMessage = Global.ResourceClaimMapperSAMLAttributeNameMustBeUnique });
                 return;
             }
 
             scope.ClaimMappers.Add(action.ClaimMapper);
             await _scopeRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddResourceClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ResourceName = action.ResourceName });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateResourceClaimMapperAction action, IDispatcher dispatcher)
+        {
+            var scope = await _scopeRepository.Query().Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.TokenClaimName) && scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName && m.Name != action.ClaimMapper.Name))
+            {
+                dispatcher.Dispatch(new UpdateResourceClaimMapperFailureAction { ResourceName = action.ResourceName, ErrorMessage = Global.ResourceClaimMapperTokenClaimNameMustBeUnique });
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(action.ClaimMapper.SAMLAttributeName) && scope.ClaimMappers.Any(m => m.SAMLAttributeName == action.ClaimMapper.SAMLAttributeName && m.Name != action.ClaimMapper.Name))
+            {
+                dispatcher.Dispatch(new UpdateResourceClaimMapperFailureAction { ResourceName = action.ResourceName, ErrorMessage = Global.ResourceClaimMapperSAMLAttributeNameMustBeUnique });
+                return;
+            }
+
+            var mapper = scope.ClaimMappers.Single(m => m.Name == action.ClaimMapper.Name);
+            mapper.UserAttributeName = action.ClaimMapper.UserAttributeName;
+            mapper.UserAttributeStreetName = action.ClaimMapper.UserAttributeStreetName;
+            mapper.UserAttributeLocalityName = action.ClaimMapper.UserAttributeLocalityName;
+            mapper.UserAttributeRegionName = action.ClaimMapper.UserAttributeRegionName;
+            mapper.UserAttributePostalCodeName = action.ClaimMapper.UserAttributePostalCodeName;
+            mapper.UserAttributeCountryName = action.ClaimMapper.UserAttributeCountryName;
+            mapper.UserAttributeFormattedName = action.ClaimMapper.UserAttributeFormattedName;
+            mapper.UserPropertyName = action.ClaimMapper.UserPropertyName;
+            mapper.TokenClaimName = action.ClaimMapper.TokenClaimName;
+            mapper.SAMLAttributeName = action.ClaimMapper.SAMLAttributeName;
+            mapper.TokenClaimJsonType = action.ClaimMapper.TokenClaimJsonType;
+            mapper.IsMultiValued = action.ClaimMapper.IsMultiValued;
+            await _scopeRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateResourceClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ResourceName = action.ResourceName });
         }
     }
 
@@ -243,6 +282,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
     }
 
     public class AddResourceClaimMapperFailureAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class UpdateResourceClaimMapperAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public ScopeClaimMapper ClaimMapper { get; set; } = null!;
+    }
+
+    public class UpdateResourceClaimMapperSuccessAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public ScopeClaimMapper ClaimMapper { get; set; } = null!;
+    }
+
+    public class UpdateResourceClaimMapperFailureAction
     {
         public string ResourceName { get; set; } = null!;
         public string ErrorMessage { get; set; } = null!;

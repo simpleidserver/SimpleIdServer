@@ -59,6 +59,8 @@ namespace SimpleIdServer.IdServer.Domains
         public TokenClaimJsonTypes? TokenClaimJsonType { get; set; } = null;
         public bool IsMultiValued { get; set; } = false;
 
+        public Scope Scope { get; set; }
+
         public static ScopeClaimMapper CreateOpenIdAttributeClaim(string name, string tokenClaimName, string userAttributeName, TokenClaimJsonTypes claimJsonType = TokenClaimJsonTypes.STRING)
         {
             return new ScopeClaimMapper

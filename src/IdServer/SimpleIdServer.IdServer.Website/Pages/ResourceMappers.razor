@@ -33,7 +33,11 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableResourceMapper" Property="Value.Name" Title="Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending" />
+        <RadzenDataGridColumn TItem="SelectableResourceMapper" Title="Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.Name" Path="@($"/resources/{Resource.Name}/mappers/" + data.Value.Name)" />
+            </Template>        
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableResourceMapper" Title="Type" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
                 @switch(data.Value.MapperType)

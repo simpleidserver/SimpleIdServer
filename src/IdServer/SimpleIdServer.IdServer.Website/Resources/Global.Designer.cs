@@ -142,11 +142,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à SAML Attribute Name must be unique.
+        /// </summary>
+        public static string ResourceClaimMapperSAMLAttributeNameMustBeUnique {
+            get {
+                return ResourceManager.GetString("ResourceClaimMapperSAMLAttributeNameMustBeUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Token Claim Name must be unique.
         /// </summary>
         public static string ResourceClaimMapperTokenClaimNameMustBeUnique {
             get {
                 return ResourceManager.GetString("ResourceClaimMapperTokenClaimNameMustBeUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resource Claim Mapper has been updated.
+        /// </summary>
+        public static string ResourceClaimMapperUpdated {
+            get {
+                return ResourceManager.GetString("ResourceClaimMapperUpdated", resourceCulture);
             }
         }
         

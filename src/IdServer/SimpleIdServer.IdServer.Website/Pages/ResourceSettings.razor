@@ -23,14 +23,17 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
         <RadzenTextArea Name="Description" @bind-Value="@updateResourceSettings.Description" Class="w-100"></RadzenTextArea>
     </div>
-    <!-- IsExposedInConfigrationEdp -->
-    <div>
-        <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@updateResourceSettings.IsExposedInConfigrationEdp"></RadzenCheckBox>
-        <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
-        <p class="text-muted">
-            Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
-        </p>
-    </div>
+    @if(Resource.Protocol == ScopeProtocols.OPENID)
+    {        
+        <!-- IsExposedInConfigrationEdp -->
+        <div>
+            <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@updateResourceSettings.IsExposedInConfigrationEdp"></RadzenCheckBox>
+            <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+            <p class="text-muted">
+                Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+            </p>
+        </div>
+    }
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateResourceState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateResourceState.Value.IsUpdating />
 </RadzenTemplateForm>
 @code {

@@ -151,6 +151,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
             };
         }
 
+        [ReducerMethod]
+        public static ResourceState ReduceAddResourceClaimMapperSuccessAction(ResourceState state, AddResourceClaimMapperSuccessAction act)
+        {
+            var resource = state.Resource;
+            var claimMappers = resource.ClaimMappers.ToList();
+            claimMappers.Add(act.ClaimMapper);
+            resource.ClaimMappers = claimMappers;
+            return state with
+            {
+                Resource = resource
+            };
+        }
+
+        [ReducerMethod]
+        public static ResourceState ReduceUpdateResourceClaimMapperSuccessAction(ResourceState state, UpdateResourceClaimMapperSuccessAction act)
+        {
+            var resource = state.Resource;
+            var claimMappers = resource.ClaimMappers.ToList();
+            var claimMapper = claimMappers.Single(m => m.Name == act.ClaimMapper.Name);
+            claimMappers.Remove(claimMapper);
+            claimMappers.Add(act.ClaimMapper);
+            resource.ClaimMappers = claimMappers;
+            return state with
+            {
+                Resource = resource
+            };
+        }
+
         #endregion
 
         #region UpdateResourceState
@@ -185,6 +213,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
 
         [ReducerMethod]
         public static UpdateResourceMapperState ReduceAddResourceClaimMapperFailureAction(UpdateResourceMapperState state, AddResourceClaimMapperFailureAction act) => state with
+        {
+            IsUpdating = false,
+            ErrorMessage = act.ErrorMessage
+        };
+
+        [ReducerMethod]
+        public static UpdateResourceMapperState ReduceUpdateResourceClaimMapperAction(UpdateResourceMapperState state, UpdateResourceClaimMapperAction act) => state with
+        {
+            IsUpdating = true
+        };
+
+        [ReducerMethod]
+        public static UpdateResourceMapperState ReduceUpdateResourceClaimMapperSuccessAction(UpdateResourceMapperState state, UpdateResourceClaimMapperSuccessAction act) => state with
+        {
+            IsUpdating = false
+        };
+
+        [ReducerMethod]
+        public static UpdateResourceMapperState ReduceUpdateResourceClaimMapperFailureAction(UpdateResourceMapperState state, UpdateResourceClaimMapperFailureAction act) => state with
         {
             IsUpdating = false,
             ErrorMessage = act.ErrorMessage

@@ -17,6 +17,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         }
 
         public Scope? Resource { get; set; } = new Scope();
-        public bool IsLoading { get; set; } = false;
+        public bool IsLoading { get; set; } = true;
     }
 }

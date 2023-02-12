@@ -144,8 +144,14 @@
   <data name="ResourceClaimMapperNameMustBeUnique" xml:space="preserve">
     <value>Name must be unique</value>
   </data>
+  <data name="ResourceClaimMapperSAMLAttributeNameMustBeUnique" xml:space="preserve">
+    <value>SAML Attribute Name must be unique</value>
+  </data>
   <data name="ResourceClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
     <value>Token Claim Name must be unique</value>
+  </data>
+  <data name="ResourceClaimMapperUpdated" xml:space="preserve">
+    <value>Resource Claim Mapper has been updated</value>
   </data>
   <data name="ResourceDetailsUpdated" xml:space="preserve">
     <value>Resource details have been updated</value>

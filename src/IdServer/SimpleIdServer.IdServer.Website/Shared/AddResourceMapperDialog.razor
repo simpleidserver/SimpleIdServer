@@ -42,13 +42,13 @@
             @switch(SelectedMapperType.Type)
             {
                 case ScopeClaimMapperTypes.USERATTRIBUTE:
-                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope"></UserAttributeScopeMapper>
+                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserAttributeScopeMapper>
                     break;
                 case ScopeClaimMapperTypes.USERPROPERTY:
-                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope"></UserPropertyScopeMapper>
+                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserPropertyScopeMapper>
                     break;
                 case ScopeClaimMapperTypes.ADDRESS:
-                    <UserAddressScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope"></UserAddressScopeMapper>
+                    <UserAddressScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserAddressScopeMapper>
                     break;
             }
         </RadzenStepsItem>
