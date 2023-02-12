@@ -112,30 +112,29 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             {
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null));
                 context.SetUser(user);
-                var claims = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
+                var claims = (await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
                 {
-                    ApplicationScope = MapperApplicationScopes.WSFEDERATION,
+                    Protocol = ScopeProtocols.SAML,
                     Context = context,
                     Scopes = client.Scopes
-                });
-                var transformedClaims = _userTransformer.ConvertToIdentityClaims(claims).ToList();
-                if (transformedClaims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
+                })).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();
+                if (claims.Count(t => t.Type == ClaimTypes.NameIdentifier) == 0)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.NO_CLAIM);
 
-                if (!transformedClaims.Any(c => c.Type == ClaimTypes.NameIdentifier))
-                    transformedClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));
+                if (!claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));
 
                 var format = Microsoft.IdentityModel.Tokens.Saml2.ClaimProperties.SamlNameIdentifierFormat;
                 if (tokenType == WsFederationConstants.TokenTypes.Saml11TokenProfile11)
                     format = Microsoft.IdentityModel.Tokens.Saml.ClaimProperties.SamlNameIdentifierFormat;
 
-                foreach (var cl in transformedClaims)
+                foreach (var cl in claims)
                 {
                     if (cl.Type == ClaimTypes.NameIdentifier)
                         cl.Properties[format] = Options.DefaultNameIdentifierFormat;
                 }
 
-                return new ClaimsIdentity(transformedClaims, "idserver");
+                return new ClaimsIdentity(claims, "idserver");
             }
 
             IActionResult BuildResponse()

@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
     {
         public ScopeClaimMapperTypes Type => ScopeClaimMapperTypes.ADDRESS;
 
-        public Task<KeyValuePair<string, object>?> Extract(ClaimsExtractionParameter parameter, ScopeClaimMapper mapper)
+        public Task<object> Extract(ClaimsExtractionParameter parameter, ScopeClaimMapper mapper)
         {
             var values = new Dictionary<string, object>();
             TryAddClaim(mapper.UserAttributeStreetName);
@@ -20,8 +20,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             TryAddClaim(mapper.UserAttributePostalCodeName);
             TryAddClaim(mapper.UserAttributeCountryName);
             TryAddClaim(mapper.UserAttributeFormattedName);
-            KeyValuePair<string, object>? result = new KeyValuePair<string, object>(mapper.TokenClaimName, values);
-            return Task.FromResult(result);
+            return Task.FromResult((object)values);
 
             void TryAddClaim(string name)
             {

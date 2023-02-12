@@ -17,6 +17,7 @@ namespace SimpleIdServer.IdServer.Domains
 
         public string Name { get; set; } = null!;
         public ScopeTypes Type { get; set; } = ScopeTypes.IDENTITY;
+        public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; }
         public DateTime CreateDateTime { get; set; }
@@ -70,5 +71,11 @@ namespace SimpleIdServer.IdServer.Domains
     {
         IDENTITY = 0,
         APIRESOURCE = 1
+    }
+
+    public enum ScopeProtocols
+    {
+        OPENID = 0,
+        SAML = 1
     }
 }

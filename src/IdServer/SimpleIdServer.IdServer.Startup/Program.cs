@@ -41,14 +41,13 @@ void RunInMemoryIdServer(IServiceCollection services)
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
-            /*
             a.AddWsAuthentication(o =>
             {
                 o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
-            */
+            /*
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";
@@ -115,14 +114,13 @@ void RunSqlServerIdServer(IServiceCollection services)
         // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
-            /*
             a.AddWsAuthentication(o =>
             {
                 o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
-            */
+            /*
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:60001";

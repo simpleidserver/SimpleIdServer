@@ -141,6 +141,12 @@
   <data name="ResourceClaimMapperAdded" xml:space="preserve">
     <value>Claim mapper has been added</value>
   </data>
+  <data name="ResourceClaimMapperNameMustBeUnique" xml:space="preserve">
+    <value>Name must be unique</value>
+  </data>
+  <data name="ResourceClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
+    <value>Token Claim Name must be unique</value>
+  </data>
   <data name="ResourceDetailsUpdated" xml:space="preserve">
     <value>Resource details have been updated</value>
   </data>

@@ -586,6 +586,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<bool>("IsExposedInConfigurationEdp")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Protocol")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -605,9 +608,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ApplicationScope")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsMultiValued")
                         .HasColumnType("bit");
 
@@ -616,6 +616,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SAMLAttributeName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ScopeName")

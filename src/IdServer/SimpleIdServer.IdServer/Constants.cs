@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer
 {
@@ -169,6 +170,8 @@ namespace SimpleIdServer.IdServer
             public static ScopeClaimMapper PhoneNumberVerified = ScopeClaimMapper.CreateOpenIdAttributeClaim(JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, JwtRegisteredClaimNames.PhoneNumberVerified, TokenClaimJsonTypes.BOOLEAN);
             public static ScopeClaimMapper Role = ScopeClaimMapper.CreateOpenIdAttributeClaimArray(UserClaims.Role, UserClaims.Role, UserClaims.Role);
             public static ScopeClaimMapper ScimId = ScopeClaimMapper.CreateOpenIdAttributeClaim("scim_id", "scim_id", "scim_id");
+            public static ScopeClaimMapper SAMLNameIdentifier = ScopeClaimMapper.CreateSAMLNameIdentifierClaim();
+            public static ScopeClaimMapper SAMLName = ScopeClaimMapper.CreateSAMLPropertyClaim("name", ClaimTypes.Name, nameof(User.Firstname));
         }
 
         public static class StandardScopes
@@ -195,6 +198,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.UpdatedAt
                 },
                 Type = ScopeTypes.IDENTITY,
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -208,6 +212,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.EmailVerified
                 },
                 Type = ScopeTypes.IDENTITY,
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -220,6 +225,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Address
                 },
                 Type = ScopeTypes.IDENTITY,
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -233,6 +239,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.PhoneNumberVerified
                 },
                 Type = ScopeTypes.IDENTITY,
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -245,6 +252,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Role
                 },
                 Type = ScopeTypes.IDENTITY,
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -257,6 +265,7 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Subject
                 },
                 Type = ScopeTypes.IDENTITY,
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -278,6 +287,7 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.ScimId
                 },
+                Protocol = ScopeProtocols.OPENID,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -285,6 +295,7 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_query",
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = false,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -293,6 +304,7 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_revoke",
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = false,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -301,7 +313,22 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "uma_protection",
+                Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope SAMLProfile = new Scope
+            {
+                Type = ScopeTypes.IDENTITY,
+                Name = "saml_profile",
+                Protocol = ScopeProtocols.SAML,
+                IsExposedInConfigurationEdp = false,
+                ClaimMappers = new List<ScopeClaimMapper>
+                {
+                    StandardClaims.SAMLNameIdentifier,
+                    StandardClaims.SAMLName
+                },
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };

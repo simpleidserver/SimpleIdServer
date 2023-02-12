@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Domains
 {
@@ -49,10 +50,13 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         public string? TokenClaimName { get; set; } = null;
         /// <summary>
+        /// SAML Attribute name.
+        /// </summary>
+        public string? SAMLAttributeName { get; set; } = null;
+        /// <summary>
         /// JSON type of the claim.
         /// </summary>
         public TokenClaimJsonTypes? TokenClaimJsonType { get; set; } = null;
-        public MapperApplicationScopes ApplicationScope { get; set; } = MapperApplicationScopes.IDTOKEN;
         public bool IsMultiValued { get; set; } = false;
 
         public static ScopeClaimMapper CreateOpenIdAttributeClaim(string name, string tokenClaimName, string userAttributeName, TokenClaimJsonTypes claimJsonType = TokenClaimJsonTypes.STRING)
@@ -62,7 +66,6 @@ namespace SimpleIdServer.IdServer.Domains
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
                 MapperType = ScopeClaimMapperTypes.USERATTRIBUTE,
-                ApplicationScope = MapperApplicationScopes.IDTOKEN | MapperApplicationScopes.USERINFO,
                 UserAttributeName = userAttributeName,
                 TokenClaimName = tokenClaimName,
                 TokenClaimJsonType = claimJsonType
@@ -76,7 +79,6 @@ namespace SimpleIdServer.IdServer.Domains
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
                 MapperType = ScopeClaimMapperTypes.ADDRESS,
-                ApplicationScope = MapperApplicationScopes.IDTOKEN | MapperApplicationScopes.USERINFO,
                 TokenClaimName = name,
                 TokenClaimJsonType = TokenClaimJsonTypes.JSON,
                 UserAttributeStreetName = AddressClaimNames.Street,
@@ -95,7 +97,6 @@ namespace SimpleIdServer.IdServer.Domains
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
                 MapperType = ScopeClaimMapperTypes.USERATTRIBUTE,
-                ApplicationScope = MapperApplicationScopes.IDTOKEN | MapperApplicationScopes.USERINFO,
                 UserAttributeName = userAttributeName,
                 TokenClaimName = tokenClaimName,
                 TokenClaimJsonType = claimJsonType,
@@ -110,7 +111,6 @@ namespace SimpleIdServer.IdServer.Domains
                 Id = Guid.NewGuid().ToString(),
                 Name = name,
                 MapperType = ScopeClaimMapperTypes.USERPROPERTY,
-                ApplicationScope = MapperApplicationScopes.IDTOKEN | MapperApplicationScopes.USERINFO,
                 UserPropertyName = userPropertyName,
                 TokenClaimName = tokenClaimName,
                 TokenClaimJsonType = claimJsonType
@@ -125,7 +125,31 @@ namespace SimpleIdServer.IdServer.Domains
                 Name = "sub",
                 TokenClaimName = "sub",
                 MapperType = ScopeClaimMapperTypes.SUBJECT,
-                ApplicationScope = MapperApplicationScopes.IDTOKEN | MapperApplicationScopes.USERINFO
+            };
+        }
+
+        public static ScopeClaimMapper CreateSAMLNameIdentifierClaim()
+        {
+            return new ScopeClaimMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "nameidentifier",
+                TokenClaimName = "sub",
+                MapperType = ScopeClaimMapperTypes.SUBJECT,
+                SAMLAttributeName = ClaimTypes.NameIdentifier
+            };
+        }
+
+        public static ScopeClaimMapper CreateSAMLPropertyClaim(string name, string samlClaimName, string userPropertyName, TokenClaimJsonTypes claimJsonType = TokenClaimJsonTypes.STRING)
+        {
+            return new ScopeClaimMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = name,
+                MapperType = ScopeClaimMapperTypes.USERPROPERTY,
+                UserPropertyName = userPropertyName,
+                SAMLAttributeName = samlClaimName,
+                TokenClaimJsonType = claimJsonType
             };
         }
     }
@@ -146,14 +170,5 @@ namespace SimpleIdServer.IdServer.Domains
         BOOLEAN = 3,
         JSON = 4,
         DATETIME = 5
-    }
-
-    [Flags]
-    public enum MapperApplicationScopes
-    {
-        IDTOKEN = 1,
-        TOKEN = 2,
-        USERINFO = 4,
-        WSFEDERATION = 8
     }
 }

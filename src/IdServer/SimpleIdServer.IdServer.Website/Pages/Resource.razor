@@ -30,6 +30,15 @@ else
         {
             <RadzenBadge Text="API Resource" IsPill="true" />
         }
+
+        @if (resourceState.Value.Resource.Protocol == ScopeProtocols.OPENID)
+        {
+            <RadzenBadge Text="OPENID" IsPill="true" />
+        }
+        else if (resourceState.Value.Resource.Protocol == ScopeProtocols.SAML)
+        {
+            <RadzenBadge Text="SAML" IsPill="true" />
+        }
     </div>
 
     <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">

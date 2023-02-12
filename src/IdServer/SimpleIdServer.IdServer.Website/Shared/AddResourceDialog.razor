@@ -60,6 +60,15 @@
                                 <RadzenTextArea Name="Description" @bind-Value="@identityResource.Description" Class="w-100"></RadzenTextArea>
                             </div>
                             <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Protocol</RadzenText>
+                                <RadzenDropDown Name="Protocol" Class="w-100"
+                                    Data=@resourceProtocols
+                                    TValue="ScopeProtocols"
+                                    @bind-Value=@identityResource.Protocol
+                                    TextProperty="Name" ValueProperty="Protocol" />
+                                <RadzenRequiredValidator Component="Protocol" Text="Protocol is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
                                 <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityResource.IsExposedInConfigrationEdp"></RadzenCheckBox>
                                 <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
                                 <p class="text-muted">
@@ -90,7 +99,20 @@
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public bool IsExposedInConfigrationEdp { get; set; } = false;
+        public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;
     }
+
+    record IdentityResourceProtocolInfo
+    {
+        public string Name { get; set; }
+        public ScopeProtocols Protocol { get; set; }
+    }
+
+    List<IdentityResourceProtocolInfo> resourceProtocols = new List<IdentityResourceProtocolInfo>
+    {
+        new IdentityResourceProtocolInfo { Protocol = ScopeProtocols.OPENID, Name = "OPENID" },
+        new IdentityResourceProtocolInfo { Protocol = ScopeProtocols.SAML, Name = "SAML" }
+    };
 
     IdentityResource identityResource = new IdentityResource();
 
@@ -119,6 +141,6 @@
 
     void AddIdentityResource(IdentityResource identityResource)
     {
-        dispatcher.Dispatch(new AddIdentityResourceAction { Name = identityResource.Name, Description = identityResource.Description, IsExposedInConfigurationEdp = identityResource.IsExposedInConfigrationEdp });
+        dispatcher.Dispatch(new AddIdentityResourceAction { Name = identityResource.Name, Description = identityResource.Description, IsExposedInConfigurationEdp = identityResource.IsExposedInConfigrationEdp, Protocol = identityResource.Protocol });
     }
 }

@@ -21,12 +21,12 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public ScopeClaimMapperTypes Type => ScopeClaimMapperTypes.SUBJECT;
 
-        public async Task<KeyValuePair<string, object>?> Extract(ClaimsExtractionParameter parameter, ScopeClaimMapper mapper)
+        public async Task<object> Extract(ClaimsExtractionParameter parameter, ScopeClaimMapper mapper)
         {
             var client = parameter.Context.Client;
             var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(client?.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : client.SubjectType));
             var subject = await subjectTypeBuilder.Build(parameter.Context, CancellationToken.None);
-            return new KeyValuePair<string, object>(JwtRegisteredClaimNames.Sub, subject);
+            return subject;
         }
     }
 }

@@ -53,17 +53,6 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableResourceMapper" Title="Scope" Filterable="false" Sortable="false" Width="80px">
-            <Template Context="data">
-                @{
-                    var scopes = GetScopes(data);
-                    foreach(var scope in scopes)
-                    {
-                        <RadzenBadge Text="@scope" IsPill=true />
-                    }
-                }
-            </Template>
-        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableResourceMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
@@ -107,27 +96,22 @@
         dispatcher.Dispatch(act);
     }
 
-    IEnumerable<string> GetScopes(SelectableResourceMapper resourceMapper)
-    {
-        var lst = new List<string>();
-        var applicationScope = resourceMapper.Value.ApplicationScope;
-        if (applicationScope.HasFlag(MapperApplicationScopes.IDTOKEN))
-            lst.Add("OpenID");
-        if (applicationScope.HasFlag(MapperApplicationScopes.WSFEDERATION))
-            lst.Add("WS Federation");
-        return lst;
-    }
-
     void ShowMoreContextMenu(SelectableResourceMapper mapper, MouseEventArgs args)
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
             new ContextMenuItem { Text = "Delete", Value = 1 }
-        }, (a) => {
+        }, async (a) => {
         if (a.Value.Equals(1))
         {
             var mapperIds = resourceMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
             if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
+            if (resourceMappersState.Value.Mappers.Any(r => mapperIds.Contains(r.Value.Id) && r.Value.MapperType == ScopeClaimMapperTypes.SUBJECT))
+            {
+                var isConfirmed = await dialogService.Confirm("Are you sure?", "Remove subject claim mapper", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+                if (isConfirmed == null || !isConfirmed.Value) return;
+            }
+
             var act = new RemoveSelectedResourceMappersAction { ResourceMapperIds = mapperIds, ResourceName = Resource.Name };
             dispatcher.Dispatch(act);
             contextMenuService.Close();
@@ -150,7 +134,7 @@
     {
         await dialogService.OpenAsync<AddResourceMapperDialog>("Add mapper", new Dictionary<string, object>
         {
-            { "ResourceName", Resource.Name }
+            { "Scope", Resource }
         }, new DialogOptions
         {
             Width = "700px",

@@ -58,12 +58,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
                 Name = action.Name,
                 Description = action.Description,
                 IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp,
+                Protocol = action.Protocol,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
             _scopeRepository.Add(newScope);
             await _scopeRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddResourceSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp });
+            dispatcher.Dispatch(new AddResourceSuccessAction { Name = action.Name, Description = action.Description, IsExposedInConfigurationEdp = action.IsExposedInConfigurationEdp, Protocol = action.Protocol });
         }
 
         [EffectMethod]
@@ -102,6 +103,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         public async Task Handle(AddResourceClaimMapperAction action, IDispatcher dispatcher)
         {
             var scope = await _scopeRepository.Query().Include(s => s.ClaimMappers).SingleAsync(s => s.Name == action.ResourceName, CancellationToken.None);
+            if (scope.ClaimMappers.Any(m => m.Name == action.ClaimMapper.Name))
+            {
+                dispatcher.Dispatch(new AddResourceClaimMapperFailureAction { ResourceName = action.ResourceName, ErrorMessage = Global.ResourceClaimMapperNameMustBeUnique });
+                return;
+            }
+
+            if (scope.ClaimMappers.Any(m => m.TokenClaimName == action.ClaimMapper.TokenClaimName))
+            {
+                dispatcher.Dispatch(new AddResourceClaimMapperFailureAction { ResourceName = action.ResourceName, ErrorMessage = Global.ResourceClaimMapperTokenClaimNameMustBeUnique });
+                return;
+            }
+
             scope.ClaimMappers.Add(action.ClaimMapper);
             await _scopeRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddResourceClaimMapperSuccessAction { ClaimMapper = action.ClaimMapper, ResourceName = action.ResourceName });
@@ -146,6 +159,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
     {
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;
+        public ScopeProtocols Protocol { get; set; }
         public bool IsExposedInConfigurationEdp { get; set; }
     }
 
@@ -154,6 +168,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;
         public bool IsExposedInConfigurationEdp { get; set; }
+        public ScopeProtocols Protocol { get; set; }
     }
 
     public class AddResourceFailureAction
@@ -225,5 +240,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
     {
         public string ResourceName { get; set; } = null!;
         public ScopeClaimMapper ClaimMapper { get; set; } = null!;
+    }
+
+    public class AddResourceClaimMapperFailureAction
+    {
+        public string ResourceName { get; set; } = null!;
+        public string ErrorMessage { get; set; } = null!;
     }
 }

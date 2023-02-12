@@ -15,39 +15,42 @@
     <RadzenTextBox Name="Name" @bind-Value="@UserScopeMapperForm.Name" Class="w-100"></RadzenTextBox>
     <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
 </div>
-<!-- Token Claim Name -->
-<div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
-    <RadzenTextBox Name="TokenClaimName" @bind-Value="@UserScopeMapperForm.TokenClaimName" Class="w-100"></RadzenTextBox>
-    <RadzenRequiredValidator Component="TokenClaimName" Text="Token claim is required"></RadzenRequiredValidator>
-    <p class="text-muted">Name of the claim to insert into the token</p>
-</div>
-<!-- Claim JSON Type -->
-<div>
-    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Claim JSON Type</RadzenText>
-    <RadzenDropDown Name="ClaimJsonType" Class="w-100"
+@if(Scope.Protocol == ScopeProtocols.OPENID)
+{
+    <!-- Token Claim Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Token Claim Name</RadzenText>
+        <RadzenTextBox Name="TokenClaimName" @bind-Value="@UserScopeMapperForm.TokenClaimName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="TokenClaimName" Text="Token claim is required"></RadzenRequiredValidator>
+        <p class="text-muted">Name of the claim to insert into the token</p>
+    </div>
+    <!-- Claim JSON Type -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Claim JSON Type</RadzenText>
+        <RadzenDropDown Name="ClaimJsonType" Class="w-100"
                     Data=@jsonTypeInfos
                     TValue="TokenClaimJsonTypes"
                     @bind-Value=@UserScopeMapperForm.ClaimJsonType
                     TextProperty="Name" ValueProperty="Type" />
-    <RadzenRequiredValidator Component="ClaimJsonType" Text="Claim JSON Type is required"></RadzenRequiredValidator>
-</div>
-<!-- OPENID connect  -->
-<div class="mt-1">
-    <RadzenSwitch @bind-Value=@UserScopeMapperForm.IsOpenIdProtocolEnabled Name="IsOpenIdProtocolEnabled" TValue="bool" />
-    <RadzenLabel Text="OPENID protocol" Component="IsOpenIdProtocolEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-    <p class="text-muted">Add the claim into the Identity Token</p>
-</div>
-<!-- WS-Federation  -->
-<div class="mt-1">
-    <RadzenSwitch @bind-Value=@UserScopeMapperForm.IsWsFederationProtocolEnabled Name="IsWsFederationProtocolEnabled" TValue="bool" />
-    <RadzenLabel Text="WS-Federation" Component="IsWsFederationProtocolEnabled" Style="margin-left: 8px; vertical-align: middle;" />
-    <p class="text-muted">Add the claim into the SAML assertion</p>
-</div>
+        <RadzenRequiredValidator Component="ClaimJsonType" Text="Claim JSON Type is required"></RadzenRequiredValidator>
+    </div>
+}
+else
+{
+    <!-- Token Claim Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">SAML Attribute Name</RadzenText>
+        <RadzenTextBox Name="SAMLAttributeName" @bind-Value="@UserScopeMapperForm.SAMLAttributeName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="SAMLAttributeName" Text="SAML Attribute Name is required"></RadzenRequiredValidator>
+        <p class="text-muted">SAML Attribute Name</p>
+    </div>
+}
 
 @code {
     [Parameter]
     public BaseUserScopeMapperForm UserScopeMapperForm { get; set; } = null!;
+    [Parameter]
+    public Scope Scope { get; set; } = null!;
 
     record ClaimJSONTypeInfo
     {

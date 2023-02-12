@@ -15,5 +15,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         }
 
         public bool IsUpdating { get; set; } = false;
+        public string? ErrorMessage { get; set; } = null;
     }
 }

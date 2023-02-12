@@ -102,7 +102,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var claimsDic = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
             {
-                ApplicationScope = MapperApplicationScopes.IDTOKEN,
+                Protocol = ScopeProtocols.OPENID,
                 Context = currentContext,
                 Scopes = scopes
             });

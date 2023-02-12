@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
     {
         public ScopeClaimMapperTypes Type => ScopeClaimMapperTypes.USERPROPERTY;
 
-        public Task<KeyValuePair<string, object>?> Extract(ClaimsExtractionParameter parameter, ScopeClaimMapper mapper)
+        public Task<object> Extract(ClaimsExtractionParameter parameter, ScopeClaimMapper mapper)
         {
             var user = parameter.Context.User;
             var property = mapper.UserPropertyName;
@@ -24,11 +23,10 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 });
 
             var visibleAttribute = visibleAttributes.SingleOrDefault(a => a.Name == mapper.UserPropertyName);
-            if (visibleAttribute == null) return Task.FromResult((KeyValuePair<string, object>?)null);
+            if (visibleAttribute == null) return Task.FromResult((object)null);
             var value = visibleAttribute.GetValue(user)?.ToString();
-            if (value == null) return Task.FromResult((KeyValuePair<string, object>?)null);
-            KeyValuePair<string, object>? result = new KeyValuePair<string, object>(mapper.TokenClaimName, Convert(value, mapper));
-            return Task.FromResult(result);
+            if (value == null) return Task.FromResult((object)null);
+            return Task.FromResult(Convert(value, mapper));
         }
     }
 }

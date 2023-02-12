@@ -127,7 +127,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 context.SetUser(user);
                 var payload = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
                 {
-                    ApplicationScope = MapperApplicationScopes.USERINFO,
+                    Protocol = ScopeProtocols.OPENID,
                     Context = context,
                     Scopes = oauthScopes
                 });

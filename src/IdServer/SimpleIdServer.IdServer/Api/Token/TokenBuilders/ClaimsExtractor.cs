@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
     public class ClaimsExtractionParameter
     {
         public HandlerContext Context { get; set; }
-        public MapperApplicationScopes ApplicationScope { get; set; }
+        public ScopeProtocols Protocol { get; set; }
         public IEnumerable<Scope> Scopes { get; set; }
     }
 
@@ -33,12 +33,23 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             var result = new Dictionary<string, object>();
             foreach(var scope in parameter.Scopes)
             {
+                if (scope.Protocol != parameter.Protocol) continue;
                 foreach(var mapper in scope.ClaimMappers)
                 {
-                    if (!mapper.ApplicationScope.HasFlag(parameter.ApplicationScope)) continue;
                     var extractor = _mapperClaimsExtractors.Single(m => m.Type == mapper.MapperType);
                     var extractionResult = await extractor.Extract(parameter, mapper);
-                    if (extractionResult != null) result.Add(extractionResult.Value.Key, extractionResult.Value.Value);
+                    if (extractionResult != null)
+                    {
+                        switch(scope.Protocol)
+                        {
+                            case ScopeProtocols.OPENID:
+                                result.Add(mapper.TokenClaimName, extractionResult);
+                                break;
+                            case ScopeProtocols.SAML:
+                                result.Add(mapper.SAMLAttributeName, extractionResult);
+                                break;
+                        }
+                    }
                 }
             }
 

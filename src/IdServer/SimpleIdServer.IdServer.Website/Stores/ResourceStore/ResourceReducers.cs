@@ -78,6 +78,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
             {
                 Name = act.Name,
                 Description = act.Description,
+                Protocol = act.Protocol,
                 IsExposedInConfigurationEdp = act.IsExposedInConfigurationEdp,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -180,6 +181,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
         public static UpdateResourceMapperState ReduceAddResourceClaimMapperSuccessAction(UpdateResourceMapperState state, AddResourceClaimMapperSuccessAction act) => state with
         {
             IsUpdating = false
+        };
+
+        [ReducerMethod]
+        public static UpdateResourceMapperState ReduceAddResourceClaimMapperFailureAction(UpdateResourceMapperState state, AddResourceClaimMapperFailureAction act) => state with
+        {
+            IsUpdating = false,
+            ErrorMessage = act.ErrorMessage
         };
 
         #endregion

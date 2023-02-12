@@ -12,7 +12,7 @@
     <Steps>
         <RadzenStepsItem Text="Mapper type">
             <div class="row gy-4">
-                @foreach (var mapperType in MapperTypes)
+                @foreach (var mapperType in MapperTypes.Where(m => (Scope.Protocol == ScopeProtocols.OPENID) || (Scope.Protocol == ScopeProtocols.SAML && m.IsSAMLSupported)))
                 {
                     <div class="col-md-6">
                         <RadzenCard @onclick="() => SelectMapper(mapperType)" class="@(SelectedMapperType != null && SelectedMapperType.Name == mapperType.Name ? "selected selectable" : "selectable")">
@@ -42,13 +42,13 @@
             @switch(SelectedMapperType.Type)
             {
                 case ScopeClaimMapperTypes.USERATTRIBUTE:
-                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper"></UserAttributeScopeMapper>
+                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope"></UserAttributeScopeMapper>
                     break;
                 case ScopeClaimMapperTypes.USERPROPERTY:
-                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper"></UserPropertyScopeMapper>
+                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope"></UserPropertyScopeMapper>
                     break;
                 case ScopeClaimMapperTypes.ADDRESS:
-                    <UserAddressScopeMapper ScopeMapperSaved="AddScopeMapper"></UserAddressScopeMapper>
+                    <UserAddressScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope"></UserAddressScopeMapper>
                     break;
             }
         </RadzenStepsItem>
@@ -57,7 +57,7 @@
 
 @code {
     [Parameter]
-    public string ResourceName { get; set; } = null!;
+    public Scope Scope { get; set; } = null!;
 
     record MapperType
     {
@@ -66,6 +66,7 @@
         public string Description { get; set; } = null!;
         public ScopeClaimMapperTypes Type { get; set; }
         public string PictureUrl { get; set; } = null!;
+        public bool IsSAMLSupported { get; set; } = true;
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -86,7 +87,7 @@
     {
         new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one user attribute to one claim", Type = ScopeClaimMapperTypes.USERATTRIBUTE, PictureUrl = "images/UserAttribute.png" },
         new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one user property to one claim", Type = ScopeClaimMapperTypes.USERPROPERTY, PictureUrl = "images/UserProperty.png" },
-        new MapperType { Name = "Address", ShortDescription = "User address", Description = "Build an address according to the format defined by the OPENID standard <a href='https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim'>https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim</a>", Type = ScopeClaimMapperTypes.ADDRESS, PictureUrl = "images/UserAddress.png" }
+        new MapperType { Name = "Address", ShortDescription = "User address", Description = "Build an address according to the format defined by the OPENID standard <a href='https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim'>https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim</a>", IsSAMLSupported = false, Type = ScopeClaimMapperTypes.ADDRESS, PictureUrl = "images/UserAddress.png" }
     };
 
     MapperType? SelectedMapperType { get; set; } = null;
@@ -99,6 +100,6 @@
     void AddScopeMapper(ScopeClaimMapper claimMapper)
     {
         claimMapper.Id = Guid.NewGuid().ToString();
-        dispatcher.Dispatch(new AddResourceClaimMapperAction { ClaimMapper = claimMapper, ResourceName = ResourceName });
+        dispatcher.Dispatch(new AddResourceClaimMapperAction { ClaimMapper = claimMapper, ResourceName = Scope.Name });
     }
 }
