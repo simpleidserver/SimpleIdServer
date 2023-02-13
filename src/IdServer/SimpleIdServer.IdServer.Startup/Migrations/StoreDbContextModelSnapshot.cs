@@ -57,8 +57,14 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDateTime")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Name");
 

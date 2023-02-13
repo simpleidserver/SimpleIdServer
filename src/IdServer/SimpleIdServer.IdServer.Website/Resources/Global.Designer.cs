@@ -61,6 +61,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à API Resource with the name &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string ApiResourceAlreadyExists {
+            get {
+                return ResourceManager.GetString("ApiResourceAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The client &apos;{0}&apos; has successfully been added.
         /// </summary>
         public static string ClientAdded {
@@ -174,6 +183,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ScopeDetailsUpdated {
             get {
                 return ResourceManager.GetString("ScopeDetailsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scope resource is added.
+        /// </summary>
+        public static string ScopeResourceAdded {
+            get {
+                return ResourceManager.GetString("ScopeResourceAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scope Resources have been updated.
+        /// </summary>
+        public static string ScopeResourcesUpdated {
+            get {
+                return ResourceManager.GetString("ScopeResourcesUpdated", resourceCulture);
             }
         }
         

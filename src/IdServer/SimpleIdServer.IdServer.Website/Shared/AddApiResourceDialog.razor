@@ -1,0 +1,56 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ApiResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddApiResourceState> addApiResourceState
+@inject IDispatcher dispatcher
+
+<RadzenTemplateForm Submit=@SubmitAddApiResource TItem="AddApiResource" Data=@addApiResource>
+    @if(!addApiResourceState.Value.IsAdding && !string.IsNullOrWhiteSpace(addApiResourceState.Value.ErrorMessage))
+    {
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addApiResourceState.Value.ErrorMessage</RadzenAlert>
+    }
+
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Key" @bind-Value="@addApiResource.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Key" Text="Name id required"></RadzenRequiredValidator>
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Value</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@addApiResource.Description" Class="w-100"></RadzenTextArea>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Add"  />
+</RadzenTemplateForm>
+
+@code {
+    AddApiResource addApiResource = new AddApiResource();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<AddApiResourceSuccessAction>((act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourceAdded });
+            StateHasChanged();
+        });
+    }
+
+    record AddApiResource
+    {
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null;
+    }
+
+    void SubmitAddApiResource(AddApiResource addApiResource)
+    {
+        dispatcher.Dispatch(new AddApiResourceAction { Name = addApiResource.Name, Description = addApiResource.Description });
+    }
+}

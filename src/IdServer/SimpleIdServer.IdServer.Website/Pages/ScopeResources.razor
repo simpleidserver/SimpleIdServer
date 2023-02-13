@@ -1,0 +1,118 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ApiResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject IDispatcher dispatcher
+@inject IState<SearchApiResourcesState> searchApiResourcesState
+@inject NotificationService notificationService
+
+<div class="mb-1">
+    <RadzenButton Click="@(args => AddResource())" Icon="add" Text="Add API resource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton Click="@(args => UpdateResource())" Icon="save" Text="Update" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+</div>
+
+<p class="text-muted">
+    Select one or more <b>API resources</b> active for the scope.<br />
+    The <b>aud</b> claim is filled-in with the appropriate <b>API resources</b>. The claim is used by the API during the authorization process.
+</p>
+
+<RadzenDataGrid @ref="grid" 
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="false"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                Count="@searchApiResourcesState.Value.Count"
+                Data="@searchApiResourcesState.Value.ApiResources"
+                TItem="SelectableApiResource"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Name" Title="Name" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll = false;
+    RadzenDataGrid<SelectableApiResource> grid;
+
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Scope Scope { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {            
+            SubscribeToAction<UpdateApiScopeResourcesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesUpdated });
+                StateHasChanged();
+            });
+            grid.Reload();
+        }
+    }
+
+    void ToggleChanged(bool isSelected, SelectableApiResource apiResource)
+    {
+        var act = new ToggleApiResourceSelectionAction { IsSelected = isSelected, ResourceName = apiResource.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllApiResourceSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableApiResource> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchApiResourcesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, ScopeName = Scope.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    async void AddResource() 
+    {
+        await dialogService.OpenAsync<AddApiResourceDialog>("Add API resource", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height ="512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+
+    async void UpdateResource()
+    {
+        var selectedApiResources = searchApiResourcesState.Value.ApiResources.Where(r => r.IsSelected).Select(r => r.Value.Name);
+        dispatcher.Dispatch(new UpdateApiScopeResourcesAction { Name = Scope.Name, Resources = selectedApiResources });
+    }
+}

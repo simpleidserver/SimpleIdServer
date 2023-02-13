@@ -50,19 +50,30 @@ else
             <RadzenTabsItem Text="Details">
                 <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
             </RadzenTabsItem>
-            <RadzenTabsItem Text="Mappers">
-                <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
-            </RadzenTabsItem>
+            @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
+            {
+                <RadzenTabsItem Text="Mappers">
+                    <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
+                </RadzenTabsItem>
+            }
+            else if(scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
+            {
+                <RadzenTabsItem Text="API Resources">
+                    <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
+                </RadzenTabsItem>
+            }
         </Tabs>
     </RadzenTabs>
 }
 
 @code {
-    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    Dictionary<string, (int, IEnumerable<ScopeTypes>)> mappingActionNameToIndex = new Dictionary<string, (int, IEnumerable<ScopeTypes>)>
     {
-        { "settings", 0 },
-        { "mappers", 1 }
+        { "settings", (0, new List<ScopeTypes> { ScopeTypes.IDENTITY, ScopeTypes.APIRESOURCE })},
+        { "mappers", (1, new List<ScopeTypes> { ScopeTypes.IDENTITY })},
+        { "resources", (1, new List<ScopeTypes> { ScopeTypes.APIRESOURCE })}
     };
+
     [Parameter]
     public string id { get; set; } = null!;
 
@@ -76,7 +87,7 @@ else
         base.OnParametersSet();
         if (string.IsNullOrWhiteSpace(id)) return;
         if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
-            selectedIndex = mappingActionNameToIndex[action];
+            selectedIndex = mappingActionNameToIndex[action].Item1;
         SubscribeToAction<GetScopeFailureAction>((act) =>
         {
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
@@ -87,7 +98,7 @@ else
 
     void OnChange(int index)
     {
-        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value.Item1 == index && kvp.Value.Item2.Contains(scopeState.Value.Scope.Type));
         navigationManager.NavigateTo($"/scopes/{id}/{rec.Key}");
     }
 }

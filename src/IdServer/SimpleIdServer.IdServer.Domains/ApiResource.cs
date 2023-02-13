@@ -9,6 +9,8 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;
+        public DateTime CreateDateTime { get; set; }
+        public DateTime UpdateDateTime { get; set; }
         public ICollection<Scope> Scopes { get; set; } = new List<Scope>();
     }
 }

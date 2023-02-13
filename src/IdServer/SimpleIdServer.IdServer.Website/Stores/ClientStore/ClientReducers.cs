@@ -39,7 +39,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             clients.Add(new SelectableClient(newClient) { IsNew = true });            
             return state with
             {
-                Clients = clients
+                Clients = clients,
+                Count = clients.Count()
             };
         }
 
