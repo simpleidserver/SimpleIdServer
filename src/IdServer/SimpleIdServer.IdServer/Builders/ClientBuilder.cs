@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
+using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 ClientId = clientId,
                 ClientSecret = clientSecret,
+                ClientType = ClientTypes.MACHINE,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
@@ -45,6 +47,7 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 ClientId = clientId,
                 ClientSecret = clientSecret,
+                ClientType = ClientTypes.WEBSITE,
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
@@ -69,8 +72,10 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
+                ClientType = ClientTypes.SPA,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD,
                 ResponseTypes = new List<string> { IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);

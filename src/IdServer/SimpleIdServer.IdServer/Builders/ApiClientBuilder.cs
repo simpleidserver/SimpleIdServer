@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -65,6 +66,29 @@ namespace SimpleIdServer.IdServer.Builders
         {
             _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             _client.RefreshTokenExpirationTimeInSeconds = refreshTokenExpirationTimeInSeconds;
+            return this;
+        }
+
+        #endregion
+
+        #region Translations
+
+        /// <summary>
+        /// Set client name.
+        /// </summary>
+        /// <param name="clientName"></param>
+        /// <returns></returns>
+        public ApiClientBuilder SetClientName(string clientName, string language = null)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+
+            _client.Translations.Add(new Translation
+            {
+                Key = "client_name",
+                Value = clientName,
+                Language = language
+            });
             return this;
         }
 

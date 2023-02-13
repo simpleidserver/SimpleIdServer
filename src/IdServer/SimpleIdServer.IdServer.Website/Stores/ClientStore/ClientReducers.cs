@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var clients = state.Clients?.ToList();
             if (clients == null) return state;
-            var newClient = new Client { ClientId = act.ClientId, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
+            var newClient = new Client { ClientId = act.ClientId, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, ClientType = act.ClientType };
             if(!string.IsNullOrWhiteSpace(act.ClientName))
                 newClient.Translations.Add(new Translation
                 {

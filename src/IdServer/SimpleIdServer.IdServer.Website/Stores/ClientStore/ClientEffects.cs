@@ -50,7 +50,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var newClient = newClientBuilder.Build();
             _clientRepository.Add(newClient);
             await _clientRepository.SaveChanges(CancellationToken.None);
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language });
+            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.SPA });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddMachineClientApplication action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret);
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            _clientRepository.Add(newClient);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MACHINE });
         }
 
         [EffectMethod]
@@ -122,6 +135,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? ClientName { get; set; } = null;
     }
 
+    public class AddMachineClientApplication
+    {
+        public string ClientId { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+    }
+
     public class AddClientFailureAction
     {
         public string ClientId { get; set; } = null!;
@@ -133,6 +153,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientId { get; set; } = null!;
         public string? ClientName { get; set; } = null;
         public string? Language { get; set; } = null;
+        public ClientTypes ClientType { get; set; }
     }
 
     public class RemoveSelectedClientsAction 

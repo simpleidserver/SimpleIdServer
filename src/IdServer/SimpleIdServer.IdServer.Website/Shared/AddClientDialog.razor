@@ -43,7 +43,7 @@
                 switch(SelectedApplicationType.Type)
                 {
                     // SPA application
-                    case AppTypes.SPA:
+                    case ClientTypes.SPA:
                         <RadzenTemplateForm Submit=@AddSpaApplication TItem="SpaApplication" Data=@spaApplication>
                             @if(!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
                             {
@@ -70,6 +70,29 @@
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
+                    case ClientTypes.MACHINE:
+                        <RadzenTemplateForm Submit=@AddMachineApplication TItem="MachineApplication" Data=@machineApplication>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@machineApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Secret</RadzenText>
+                                <RadzenPassword Name="ClientSecret" @bind-Value="@machineApplication.ClientSecret" Class="w-100"></RadzenPassword>
+                                <RadzenRequiredValidator Component="ClientSecret" Text="Secret is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@machineApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
                 }
             }
         </RadzenStepsItem>
@@ -82,7 +105,7 @@
         public string Name { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public AppTypes Type { get; set; }
+        public ClientTypes Type { get; set; }
         public string PictureUrl { get; set; } = null!;
     }
 
@@ -93,12 +116,15 @@
         public string RedirectionUris { get; set; } = null!;
     }
 
-    SpaApplication spaApplication = new SpaApplication();
-
-    enum AppTypes
+    record MachineApplication
     {
-        SPA = 0
+        public string ClientName { get; set;} = null!;
+        public string ClientSecret { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
     }
+
+    SpaApplication spaApplication = new SpaApplication();
+    MachineApplication machineApplication = new MachineApplication();
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,7 +139,8 @@
 
     ICollection<ApplicationType> ApplicationTypes { get; set; } = new List<ApplicationType>
     {
-        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser. <br/> Client secret and/or refresh tokens cannot be stored by these applications because <b>there is a security risk</b>. <br/> <b>Examples</b> of User-Agent-Based application : Angular, EmberJS, VueJS.", Type = AppTypes.SPA, PictureUrl = "images/angular.png" }
+        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser. <br/> Client secret and/or refresh tokens cannot be stored by these applications because <b>there is a security risk</b>. <br/> <b>Examples</b> of User-Agent-Based application : Angular, EmberJS, VueJS.", Type = ClientTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "Machine", ShortDescription = "Client credentials", Description = "Machine-to-machine (M2M) applications, such as CLIs, daemons, or services running on your back-end, the system authenticates and authorizes the app rather than a user.", Type = ClientTypes.MACHINE, PictureUrl = "images/MachineClient.png" },
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;
@@ -126,5 +153,10 @@
     void AddSpaApplication(SpaApplication spaApplication)
     {
         dispatcher.Dispatch(new AddSpaClientAction { ClientId = spaApplication.ClientIdentifier, ClientName = spaApplication.ClientName, RedirectionUrls = spaApplication.RedirectionUris.Split(';') });
+    }
+
+    void AddMachineApplication(MachineApplication machineApplication)
+    {
+        dispatcher.Dispatch(new AddMachineClientApplication { ClientId = machineApplication.ClientIdentifier, ClientName = machineApplication.ClientName, ClientSecret = machineApplication.ClientSecret });
     }
 }

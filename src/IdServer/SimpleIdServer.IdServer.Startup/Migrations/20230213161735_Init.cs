@@ -152,6 +152,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     IsConsentDisabled = table.Column<bool>(type: "bit", nullable: false),
                     IsResourceParameterRequired = table.Column<bool>(type: "bit", nullable: false),
                     AuthReqIdExpirationTimeInSeconds = table.Column<int>(type: "int", nullable: false),
+                    ClientType = table.Column<int>(type: "int", nullable: true),
                     SerializedParameters = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DefaultAcrValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BCIntervalSeconds = table.Column<int>(type: "int", nullable: false)

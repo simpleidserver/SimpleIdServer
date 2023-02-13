@@ -300,6 +300,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
 
+                    b.Property<int?>("ClientType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Contacts")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")

@@ -419,6 +419,8 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonIgnore]
+        public ClientTypes? ClientType { get; set; } = null;
+        [JsonIgnore]
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
         [JsonIgnore]
         public Dictionary<string, string> Parameters
@@ -503,5 +505,12 @@ namespace SimpleIdServer.IdServer.Domains
             result.Add(OAuthClientParameters.RegistrationClientUri, $"{baseUrl}/{ClientId}");
             return result;
         }
+    }
+
+    public enum ClientTypes
+    {
+        SPA = 0,
+        MACHINE = 1,
+        WEBSITE = 2
     }
 }
