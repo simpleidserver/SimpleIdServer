@@ -106,74 +106,74 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Resource &apos;{0}&apos; is added.
+        ///   Recherche une chaîne localisée semblable à Scope &apos;{0}&apos; is added.
         /// </summary>
-        public static string ResourceAdded {
+        public static string ScopeAdded {
             get {
-                return ResourceManager.GetString("ResourceAdded", resourceCulture);
+                return ResourceManager.GetString("ScopeAdded", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Resource with the name &apos;{0}&apos; already exists.
         /// </summary>
-        public static string ResourceAlreadyExists {
+        public static string ScopeAlreadyExists {
             get {
-                return ResourceManager.GetString("ResourceAlreadyExists", resourceCulture);
+                return ResourceManager.GetString("ScopeAlreadyExists", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Claim mapper has been added.
         /// </summary>
-        public static string ResourceClaimMapperAdded {
+        public static string ScopeClaimMapperAdded {
             get {
-                return ResourceManager.GetString("ResourceClaimMapperAdded", resourceCulture);
+                return ResourceManager.GetString("ScopeClaimMapperAdded", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Name must be unique.
         /// </summary>
-        public static string ResourceClaimMapperNameMustBeUnique {
+        public static string ScopeClaimMapperNameMustBeUnique {
             get {
-                return ResourceManager.GetString("ResourceClaimMapperNameMustBeUnique", resourceCulture);
+                return ResourceManager.GetString("ScopeClaimMapperNameMustBeUnique", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à SAML Attribute Name must be unique.
         /// </summary>
-        public static string ResourceClaimMapperSAMLAttributeNameMustBeUnique {
+        public static string ScopeClaimMapperSAMLAttributeNameMustBeUnique {
             get {
-                return ResourceManager.GetString("ResourceClaimMapperSAMLAttributeNameMustBeUnique", resourceCulture);
+                return ResourceManager.GetString("ScopeClaimMapperSAMLAttributeNameMustBeUnique", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Token Claim Name must be unique.
         /// </summary>
-        public static string ResourceClaimMapperTokenClaimNameMustBeUnique {
+        public static string ScopeClaimMapperTokenClaimNameMustBeUnique {
             get {
-                return ResourceManager.GetString("ResourceClaimMapperTokenClaimNameMustBeUnique", resourceCulture);
+                return ResourceManager.GetString("ScopeClaimMapperTokenClaimNameMustBeUnique", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Resource Claim Mapper has been updated.
+        ///   Recherche une chaîne localisée semblable à Scope Claim Mapper has been updated.
         /// </summary>
-        public static string ResourceClaimMapperUpdated {
+        public static string ScopeClaimMapperUpdated {
             get {
-                return ResourceManager.GetString("ResourceClaimMapperUpdated", resourceCulture);
+                return ResourceManager.GetString("ScopeClaimMapperUpdated", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Resource details have been updated.
+        ///   Recherche une chaîne localisée semblable à Scope details have been updated.
         /// </summary>
-        public static string ResourceDetailsUpdated {
+        public static string ScopeDetailsUpdated {
             get {
-                return ResourceManager.GetString("ResourceDetailsUpdated", resourceCulture);
+                return ResourceManager.GetString("ScopeDetailsUpdated", resourceCulture);
             }
         }
         
@@ -187,20 +187,20 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Resource mappers have been removed.
+        ///   Recherche une chaîne localisée semblable à Scope mappers have been removed.
         /// </summary>
-        public static string SelectedResourceMappersRemoved {
+        public static string SelectedScopesMappersRemoved {
             get {
-                return ResourceManager.GetString("SelectedResourceMappersRemoved", resourceCulture);
+                return ResourceManager.GetString("SelectedScopesMappersRemoved", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Selected resources have been removed.
+        ///   Recherche une chaîne localisée semblable à Selected scopes have been removed.
         /// </summary>
-        public static string SelectedResourcesRemoved {
+        public static string SelectedScopesRemoved {
             get {
-                return ResourceManager.GetString("SelectedResourcesRemoved", resourceCulture);
+                return ResourceManager.GetString("SelectedScopesRemoved", resourceCulture);
             }
         }
         

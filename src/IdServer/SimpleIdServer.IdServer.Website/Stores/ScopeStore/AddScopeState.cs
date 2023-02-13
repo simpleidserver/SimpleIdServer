@@ -2,14 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 
-namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
+namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 {
     [FeatureState]
-    public record AddResourceState
+    public record AddScopeState
     {
-        public AddResourceState() { }
+        public AddScopeState() { }
 
-        public AddResourceState(bool isAdding, string? errorMessage)
+        public AddScopeState(bool isAdding, string? errorMessage)
         {
             IsAdding = isAdding;
             ErrorMessage = errorMessage;

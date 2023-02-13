@@ -3,20 +3,20 @@
 using Fluxor;
 using SimpleIdServer.IdServer.Domains;
 
-namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
+namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 {
     [FeatureState]
-    public record ResourceState
+    public record ScopeState
     {
-        public ResourceState() { }
+        public ScopeState() { }
 
-        public ResourceState(bool isLoading, Scope? resource)
+        public ScopeState(bool isLoading, Scope? scope)
         {
             IsLoading = isLoading;
-            Resource = resource;
+            Scope = scope;
         }
 
-        public Scope? Resource { get; set; } = new Scope();
+        public Scope? Scope { get; set; } = new Scope();
         public bool IsLoading { get; set; } = true;
     }
 }

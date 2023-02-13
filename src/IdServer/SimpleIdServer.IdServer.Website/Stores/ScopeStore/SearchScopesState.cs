@@ -3,28 +3,28 @@
 using Fluxor;
 using SimpleIdServer.IdServer.Domains;
 
-namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
+namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 {
     [FeatureState]
-    public record SearchResourcesState
+    public record SearchScopesState
     {
-        public SearchResourcesState() { }
+        public SearchScopesState() { }
 
-        public SearchResourcesState(bool isLoading, IEnumerable<Scope> scopes)
+        public SearchScopesState(bool isLoading, IEnumerable<Scope> scopes)
         {
-            Scopes = scopes.Select(c => new SelectableResource(c));
+            Scopes = scopes.Select(c => new SelectableScope(c));
             Count = scopes.Count();
             IsLoading = isLoading;
         }
 
-        public IEnumerable<SelectableResource>? Scopes { get; set; } = null;
+        public IEnumerable<SelectableScope>? Scopes { get; set; } = null;
         public int Count { get; set; } = 0;
         public bool IsLoading { get; set; } = false;
     }
 
-    public class SelectableResource
+    public class SelectableScope
     {
-        public SelectableResource(Scope scope)
+        public SelectableScope(Scope scope)
         {
             Value = scope;
         }

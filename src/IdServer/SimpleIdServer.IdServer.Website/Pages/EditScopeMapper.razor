@@ -1,24 +1,24 @@
-﻿@page "/resources/{id}/mappers/{name}"
+﻿@page "/scopes/{id}/mappers/{name}"
 @using SimpleIdServer.IdServer.Website.Resources;
-@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @layout MainLayout
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inject IDispatcher dispatcher
-@inject IState<ResourceState> resourceState
+@inject IState<ScopeState> scopeState
 @inject NotificationService notificationService
 
-@if(resourceState.Value.IsLoading || string.IsNullOrWhiteSpace(name))
+@if (scopeState.Value.IsLoading || string.IsNullOrWhiteSpace(name))
 {
     <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
 }
 else
 {
     <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/resources" Text="Resources" />
-        <RadzenBreadCrumbItem Path=@("/resources/" + id + "/mappers") Text="Resource details" />
+        <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
+        <RadzenBreadCrumbItem Path=@("/scopes/" + id + "/mappers") Text="Scope details" />
         <RadzenBreadCrumbItem Text="Mapper details" />
     </RadzenBreadCrumb>
 
@@ -26,13 +26,13 @@ else
         @switch (mapper.MapperType)
         {
             case ScopeClaimMapperTypes.USERATTRIBUTE:
-                <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@resourceState.Value.Resource" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAttributeScopeMapper>
+                <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAttributeScopeMapper>
                 break;
             case ScopeClaimMapperTypes.USERPROPERTY:
-                <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@resourceState.Value.Resource" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserPropertyScopeMapper>
+                <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserPropertyScopeMapper>
                 break;
             case ScopeClaimMapperTypes.ADDRESS:
-                <UserAddressScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@resourceState.Value.Resource" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAddressScopeMapper>
+                <UserAddressScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAddressScopeMapper>
                 break;
             case ScopeClaimMapperTypes.SUBJECT:
                 <!-- Name -->
@@ -40,7 +40,7 @@ else
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
                     <RadzenTextBox Name="Name" @bind-Value="@mapper.Name" Class="w-100" Disabled="true"></RadzenTextBox>
                 </div>
-                @if (resourceState.Value.Resource.Protocol == ScopeProtocols.OPENID)
+                @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
                 {
                     <!-- Token Claim Name -->
                     <div>
@@ -69,17 +69,17 @@ else
     public string id { get; set; } = null!;
     [Parameter]
     public string name { get; set; } = null!;
-    ScopeClaimMapper mapper => resourceState.Value.Resource.ClaimMappers.Single(m => m.Name == name);
+    ScopeClaimMapper mapper => scopeState.Value.Scope.ClaimMappers.Single(m => m.Name == name);
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            dispatcher.Dispatch(new GetResourceAction { ResourceName = id });
-            SubscribeToAction<UpdateResourceClaimMapperSuccessAction>((act) =>
+            dispatcher.Dispatch(new GetScopeAction { ScopeName = id });
+            SubscribeToAction<UpdateScopeClaimMapperSuccessAction>((act) =>
             {
-                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ResourceClaimMapperUpdated });
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeClaimMapperUpdated });
                 StateHasChanged();
             });
         }
@@ -93,6 +93,6 @@ else
     void UpdateScopeMapper(ScopeClaimMapper claimMapper)
     {
         claimMapper.Id = Guid.NewGuid().ToString();
-        dispatcher.Dispatch(new UpdateResourceClaimMapperAction { ClaimMapper = claimMapper, ResourceName = id });
+        dispatcher.Dispatch(new UpdateScopeClaimMapperAction { ClaimMapper = claimMapper, ScopeName = id });
     }
 }

@@ -132,38 +132,38 @@
   <data name="RedirectUriContainsFragment" xml:space="preserve">
     <value>Redirection url '{0}' cannot contains fragment (#)</value>
   </data>
-  <data name="ResourceAdded" xml:space="preserve">
-    <value>Resource '{0}' is added</value>
+  <data name="ScopeAdded" xml:space="preserve">
+    <value>Scope '{0}' is added</value>
   </data>
-  <data name="ResourceAlreadyExists" xml:space="preserve">
+  <data name="ScopeAlreadyExists" xml:space="preserve">
     <value>Resource with the name '{0}' already exists</value>
   </data>
-  <data name="ResourceClaimMapperAdded" xml:space="preserve">
+  <data name="ScopeClaimMapperAdded" xml:space="preserve">
     <value>Claim mapper has been added</value>
   </data>
-  <data name="ResourceClaimMapperNameMustBeUnique" xml:space="preserve">
+  <data name="ScopeClaimMapperNameMustBeUnique" xml:space="preserve">
     <value>Name must be unique</value>
   </data>
-  <data name="ResourceClaimMapperSAMLAttributeNameMustBeUnique" xml:space="preserve">
+  <data name="ScopeClaimMapperSAMLAttributeNameMustBeUnique" xml:space="preserve">
     <value>SAML Attribute Name must be unique</value>
   </data>
-  <data name="ResourceClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
+  <data name="ScopeClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
     <value>Token Claim Name must be unique</value>
   </data>
-  <data name="ResourceClaimMapperUpdated" xml:space="preserve">
-    <value>Resource Claim Mapper has been updated</value>
+  <data name="ScopeClaimMapperUpdated" xml:space="preserve">
+    <value>Scope Claim Mapper has been updated</value>
   </data>
-  <data name="ResourceDetailsUpdated" xml:space="preserve">
-    <value>Resource details have been updated</value>
+  <data name="ScopeDetailsUpdated" xml:space="preserve">
+    <value>Scope details have been updated</value>
   </data>
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
   </data>
-  <data name="SelectedResourceMappersRemoved" xml:space="preserve">
-    <value>Resource mappers have been removed</value>
+  <data name="SelectedScopesMappersRemoved" xml:space="preserve">
+    <value>Scope mappers have been removed</value>
   </data>
-  <data name="SelectedResourcesRemoved" xml:space="preserve">
-    <value>Selected resources have been removed</value>
+  <data name="SelectedScopesRemoved" xml:space="preserve">
+    <value>Selected scopes have been removed</value>
   </data>
   <data name="UnknownResource" xml:space="preserve">
     <value>The resource '{0}' doesn't exist</value>

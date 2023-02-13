@@ -3,17 +3,17 @@
 @using SimpleIdServer.IdServer.Website.Models;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
-@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @using System.Reflection;
 @inherits FluxorComponent
-@inject IState<UpdateResourceMapperState> updateResourceMapperState
+@inject IState<UpdateScopeMapperState> updateScopeMapperState
 @inject IDispatcher dispatcher
 
 <RadzenTemplateForm Submit=@SubmitScopeMapper TItem="UserPropertyScopeMapperForm" Data=@scopeMapperFom>
-    @if (!updateResourceMapperState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateResourceMapperState.Value.ErrorMessage))
+    @if (!updateScopeMapperState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateScopeMapperState.Value.ErrorMessage))
     {
-        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateResourceMapperState.Value.ErrorMessage</RadzenAlert>
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateScopeMapperState.Value.ErrorMessage</RadzenAlert>
     }
 
     <UserScopeMapper UserScopeMapperForm="@scopeMapperFom" Scope="@Scope" IsEditModeEnabled="@IsEditModeEnabled"></UserScopeMapper>
@@ -27,7 +27,7 @@
         <p class="text-muted">Name of the property</p>
         <RadzenRequiredValidator Component="UserPropertyName" Text="Property is required"></RadzenRequiredValidator>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateResourceMapperState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateResourceMapperState.Value.IsUpdating)" />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
 </RadzenTemplateForm>
 @code {
     [Parameter]

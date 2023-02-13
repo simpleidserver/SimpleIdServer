@@ -2,14 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 
-namespace SimpleIdServer.IdServer.Website.Stores.ResourceStore
+namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 {
     [FeatureState]
-    public record UpdateResourceMapperState
+    public record UpdateScopeMapperState
     {
-        public UpdateResourceMapperState() { }
+        public UpdateScopeMapperState() { }
 
-        public UpdateResourceMapperState(bool isUpdating)
+        public UpdateScopeMapperState(bool isUpdating)
         {
             IsUpdating = isUpdating;
         }

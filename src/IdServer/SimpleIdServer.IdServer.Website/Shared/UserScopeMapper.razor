@@ -3,10 +3,10 @@
 @using SimpleIdServer.IdServer.Website.Models;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
-@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits FluxorComponent
-@inject IState<UpdateResourceMapperState> updateResourceMapperState
+@inject IState<UpdateScopeMapperState> updateScopeMapperState
 @inject IDispatcher dispatcher
 
 <!-- Name -->

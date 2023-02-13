@@ -1,0 +1,84 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject IState<ScopeState> resourceState
+@inject IState<UpdateScopeState> updateScopeState
+@inject NotificationService notificationService
+
+<RadzenTemplateForm Submit=@UpdateScopeSettings TItem="UpdateScopeSettingsParameter" Data=@updateScopeSettings>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Id" @bind-Value="@updateScopeSettings.Name" Class="w-100" Disabled=true></RadzenTextBox>
+    </div>
+    <!-- Updated at -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Updated at</RadzenText>
+        <RadzenDatePicker @bind-Value=@updateScopeSettings.UpdateDateTime DateFormat="d" Class="w-100" Disabled=true />
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@updateScopeSettings.Description" Class="w-100"></RadzenTextArea>
+    </div>
+    @if(Scope.Protocol == ScopeProtocols.OPENID)
+    {        
+        <!-- IsExposedInConfigrationEdp -->
+        <div>
+            <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@updateScopeSettings.IsExposedInConfigrationEdp"></RadzenCheckBox>
+            <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+            <p class="text-muted">
+                Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+            </p>
+        </div>
+    }
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeState.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateScopeState.Value.IsUpdating />
+</RadzenTemplateForm>
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Scope Scope { get; set; }
+
+    UpdateScopeSettingsParameter updateScopeSettings = new UpdateScopeSettingsParameter();
+
+    class UpdateScopeSettingsParameter
+    {
+        public string Name { get; set; } = null!;
+        public DateTime UpdateDateTime { get; set; }
+        public string? Description { get; set; } = null;
+        public bool IsExposedInConfigrationEdp { get; set;}
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {            
+            SubscribeToAction<UpdateScopeSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeDetailsUpdated });
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (this.Scope == null) return;
+        updateScopeSettings = new UpdateScopeSettingsParameter
+        {
+            Name = this.Scope.Name,
+            UpdateDateTime = this.Scope.CreateDateTime,
+            Description = this.Scope.Description,
+            IsExposedInConfigrationEdp = this.Scope.IsExposedInConfigurationEdp
+        };
+    }
+
+    void UpdateScopeSettings(UpdateScopeSettingsParameter parameter)
+    {
+        var act = new UpdateScopeAction { Description = parameter.Description, IsExposedInConfigurationEdp = parameter.IsExposedInConfigrationEdp, ScopeName = parameter.Name };
+        dispatcher.Dispatch(act);
+    }
+}

@@ -1,14 +1,14 @@
-﻿@page "/resources"
-@inject IState<SearchResourcesState> resourcesState
+﻿@page "/scopes"
+@inject IState<SearchScopesState> scopesState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService 
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
-@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 
-<RadzenButton class="mb-1" Click="@(args => AddResource())" Icon="add" Text="Add resource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add scope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
 <RadzenDataGrid AllowFiltering="true" 
         AllowColumnResize="true"
@@ -18,15 +18,15 @@
         AllowPaging="true" 
         PagerHorizontalAlign="HorizontalAlign.Left" 
         ShowPagingSummary="true"
-        IsLoading="@resourcesState.Value.IsLoading"
-        Count="@resourcesState.Value.Count"
-        Data="@resourcesState.Value.Scopes"
+        IsLoading="@scopesState.Value.IsLoading"
+        Count="@scopesState.Value.Count"
+        Data="@scopesState.Value.Scopes"
         LoadData="@LoadData"
         RowRender="@RowRender"
-        TItem="SelectableResource" 
+        TItem="SelectableScope" 
         ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
                 <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
             </HeaderTemplate>
@@ -34,12 +34,12 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" Title="Name" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/resources/{data.Value.Name}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" Title="Type" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
             <Template Context="data">
                 @if(data.Value.Type == ScopeTypes.IDENTITY)
                 {
@@ -51,7 +51,7 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" Title="Protocol" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="Protocol" Width="80px">
             <Template Context="data">
                 @if (data.Value.Protocol == ScopeProtocols.OPENID)
                 {
@@ -61,11 +61,15 @@
                 {
                     <RadzenBadge Text="SAML" IsPill="true" />
                 }
+                else if (data.Value.Protocol == ScopeProtocols.OAUTH)
+                {
+                    <RadzenBadge Text="OAUTH" IsPill="true" />
+                }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableResource" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableResource" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableResource" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableScope" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">                
                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
             </Template>
@@ -80,49 +84,49 @@
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
-            SubscribeToAction<RemoveSelectedResourcesSuccessAction>((act) =>
+            SubscribeToAction<RemoveSelectedScopesSuccessAction>((act) =>
             {
-                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedResourcesRemoved });
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedScopesRemoved });
                 StateHasChanged();
             });
     }
 
     void LoadData(LoadDataArgs args)
     {
-        var act = new SearchResourcesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        var act = new SearchScopesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
         dispatcher.Dispatch(act);
     }    
 
-    void ShowMoreContextMenu(SelectableResource resource, MouseEventArgs args)
+    void ShowMoreContextMenu(SelectableScope scope, MouseEventArgs args)
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) => {
             if (a.Value.Equals(1)) {
-                var resourceNames = resourcesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
-                if (!resourceNames.Contains(resource.Value.Name)) resourceNames.Add(resource.Value.Name);
-                var act = new RemoveSelectedResourcesAction { ResourceNames = resourceNames };
+                var resourceNames = scopesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
+                if (!resourceNames.Contains(scope.Value.Name)) resourceNames.Add(scope.Value.Name);
+                var act = new RemoveSelectedScopesAction { ScopeNames = resourceNames };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
             }
     });
     }
 
-    void ToggleChanged(bool isSelected, SelectableResource resource)
+    void ToggleChanged(bool isSelected, SelectableScope scope)
     {
-        var act = new ToggleResourceSelectionAction { IsSelected = isSelected, ResourceName = resource.Value.Name };
+        var act = new ToggleScopeSelectionAction { IsSelected = isSelected, ScopeName = scope.Value.Name };
         dispatcher.Dispatch(act);
     }
 
 
     void ToggleAll(bool isSelected)
     {
-        var act = new ToggleAllResourceSelectionAction { IsSelected = isSelected };
+        var act = new ToggleAllScopeSelectionAction { IsSelected = isSelected };
         dispatcher.Dispatch(act);
     }
 
-    void RowRender(RowRenderEventArgs<SelectableResource> row)
+    void RowRender(RowRenderEventArgs<SelectableScope> row)
     {
         const string className = "class";
         if (row.Data.IsNew)
@@ -133,9 +137,9 @@
             row.Attributes.Remove(className);
     }
 
-    async void AddResource()
+    async void AddScope()
     {
-        await dialogService.OpenAsync<AddResourceDialog>("Add resource", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddScopeDialog>("Add scope", new Dictionary<string, object>(), new DialogOptions
         {
             Width = "700px",
             Height = "512px",

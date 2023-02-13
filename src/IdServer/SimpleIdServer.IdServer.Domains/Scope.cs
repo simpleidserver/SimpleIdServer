@@ -26,9 +26,9 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of strings that specifies the claims.
         /// </summary>
         public ICollection<ScopeClaimMapper> ClaimMappers { get; set; }= new List<ScopeClaimMapper>();
+        public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
         public ICollection<Consent> Consents { get; set; } = new List<Consent>();
         public ICollection<Client> Clients { get; set; } = new List<Client>();
-        public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
 
         public static Scope Create(string scopeName)
         {
@@ -76,6 +76,7 @@ namespace SimpleIdServer.IdServer.Domains
     public enum ScopeProtocols
     {
         OPENID = 0,
-        SAML = 1
+        SAML = 1,
+        OAUTH = 2
     }
 }

@@ -1,53 +1,57 @@
-﻿@page "/resources/{id}/{action}"
-@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+﻿@page "/scopes/{id}/{action}"
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
 @layout MainLayout
-@inject IState<ResourceState> resourceState
+@inject IState<ScopeState> scopeState
 @inject IDispatcher dispatcher
 
-@if (resourceState.Value.IsLoading)
+@if (scopeState.Value.IsLoading)
 {    
     <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
 }
 else
 {
     <RadzenBreadCrumb>
-        <RadzenBreadCrumbItem Path="/resources" Text="Resources" />
-        <RadzenBreadCrumbItem Text="Resource details" />
+        <RadzenBreadCrumbItem Path="/scopes" Text="Scopes" />
+        <RadzenBreadCrumbItem Text="Scope details" />
     </RadzenBreadCrumb>
 
-    <RadzenText class="mt-3 mb-3" Text="@resourceState.Value.Resource?.Name" TextStyle="TextStyle.DisplayH6" />
+    <RadzenText class="mt-3 mb-3" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH6" />
 
     <div class="mb-1">
-        @if (resourceState.Value.Resource.Type == ScopeTypes.IDENTITY)
+        @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
         {
-            <RadzenBadge Text="Identity Resource" IsPill="true" />
+            <RadzenBadge Text="Identity Scope" IsPill="true" />
         }
         else
         {
-            <RadzenBadge Text="API Resource" IsPill="true" />
+            <RadzenBadge Text="API Scope" IsPill="true" />
         }
 
-        @if (resourceState.Value.Resource.Protocol == ScopeProtocols.OPENID)
+        @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
         {
             <RadzenBadge Text="OPENID" IsPill="true" />
         }
-        else if (resourceState.Value.Resource.Protocol == ScopeProtocols.SAML)
+        else if (scopeState.Value.Scope.Protocol == ScopeProtocols.SAML)
         {
             <RadzenBadge Text="SAML" IsPill="true" />
+        }
+        else if (scopeState.Value.Scope.Protocol == ScopeProtocols.OAUTH)
+        {
+            <RadzenBadge Text="OAUTH" IsPill="true" />
         }
     </div>
 
     <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
         <Tabs>
             <RadzenTabsItem Text="Details">
-                <ResourceSettings Resource="@resourceState.Value.Resource"></ResourceSettings>
+                <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Mappers">
-                <ResourceMappers Resource="@resourceState.Value.Resource"></ResourceMappers>
+                <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
@@ -73,17 +77,17 @@ else
         if (string.IsNullOrWhiteSpace(id)) return;
         if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
             selectedIndex = mappingActionNameToIndex[action];
-        SubscribeToAction<GetResourceFailureAction>((act) =>
+        SubscribeToAction<GetScopeFailureAction>((act) =>
         {
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
             StateHasChanged();
         });
-        dispatcher.Dispatch(new GetResourceAction { ResourceName = id });
+        dispatcher.Dispatch(new GetScopeAction { ScopeName = id });
     }
 
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/resources/{id}/{rec.Key}");
+        navigationManager.NavigateTo($"/scopes/{id}/{rec.Key}");
     }
 }

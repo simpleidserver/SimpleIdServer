@@ -1,0 +1,188 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddScopeState> addScopeState
+@inject IDispatcher dispatcher
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Resource type">
+            <div class="row gy-4">
+                @foreach (var scopType in ScopeTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectResource(scopType)" class="@(SelectedScopeType != null && SelectedScopeType.Name == scopType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@scopType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@scopType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(scopType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+
+            <hr class="hr" />
+
+            @if (SelectedScopeType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedScopeType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedScopeType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedScopeType == null)">
+            @if (SelectedScopeType != null)
+            {
+                switch (SelectedScopeType.Type)
+                {
+                    // Identity Scope
+                    case Domains.ScopeTypes.IDENTITY:
+                        <RadzenTemplateForm Submit=@AddIdentityResource TItem="IdentityScope" Data=@identityScope>
+                            @if (!addScopeState.Value.IsAdding && !string.IsNullOrWhiteSpace(addScopeState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addScopeState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="Name" @bind-Value="@identityScope.Name" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                                <RadzenTextArea Name="Description" @bind-Value="@identityScope.Description" Class="w-100"></RadzenTextArea>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Protocol</RadzenText>
+                                <RadzenDropDown Name="Protocol" Class="w-100"
+                                    Data=@scopeProtocols
+                                    TValue="ScopeProtocols"
+                                    @bind-Value=@identityScope.Protocol
+                                    TextProperty="Name" ValueProperty="Protocol" />
+                                <RadzenRequiredValidator Component="Protocol" Text="Protocol is required"></RadzenRequiredValidator>
+                            </div>
+                            @if (identityScope.Protocol == ScopeProtocols.OPENID)
+                            {
+                                <div>
+                                    <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@identityScope.IsExposedInConfigrationEdp"></RadzenCheckBox>
+                                    <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+                                    <p class="text-muted">
+                                        Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+                                    </p>
+                                </div>
+                            }
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addScopeState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                    case Domains.ScopeTypes.APIRESOURCE:
+                        <RadzenTemplateForm Submit=@AddApiResource TItem="ApiScope" Data=@apiScope>
+                            @if (!addScopeState.Value.IsAdding && !string.IsNullOrWhiteSpace(addScopeState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addScopeState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="Name" @bind-Value="@apiScope.Name" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                                <RadzenTextArea Name="Description" @bind-Value="@apiScope.Description" Class="w-100"></RadzenTextArea>
+                            </div>
+                            <div>
+                                <RadzenCheckBox Name="IsExposedInConfigrationEdp" @bind-Value="@apiScope.IsExposedInConfigrationEdp"></RadzenCheckBox>
+                                <RadzenLabel Text="Is exposed ?" Component="IsExposedInConfigrationEdp" Style="margin-left: 8px; vertical-align: middle;" />
+                                <p class="text-muted">
+                                    Scope can be exposed by the configuration endpoint <i>@SimpleIdServer.IdServer.Constants.EndPoints.OpenIDConfiguration</i>
+                                </p>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addScopeState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addScopeState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                }
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    record ScopeType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public ScopeTypes Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record IdentityScope
+    {
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public bool IsExposedInConfigrationEdp { get; set; } = false;
+        public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;
+    }
+
+    record ApiScope
+    {
+        public string Name { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public bool IsExposedInConfigrationEdp { get; set; } = false;
+    }
+
+    record IdentityScopeProtocolInfo
+    {
+        public string Name { get; set; }
+        public ScopeProtocols Protocol { get; set; }
+    }
+
+    List<IdentityScopeProtocolInfo> scopeProtocols = new List<IdentityScopeProtocolInfo>
+        {
+            new IdentityScopeProtocolInfo { Protocol = ScopeProtocols.OPENID, Name = "OPENID" },
+            new IdentityScopeProtocolInfo { Protocol = ScopeProtocols.SAML, Name = "SAML" }
+        };
+
+    IdentityScope identityScope = new IdentityScope();
+    ApiScope apiScope = new ApiScope();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<AddScopeSuccessAction>((act) =>
+        {
+        dialogService.Close();
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.ScopeAdded, act.Name) });
+        StateHasChanged();
+        });
+    }
+
+    ICollection<ScopeType> ScopeTypes { get; set; } = new List<ScopeType>
+    {
+        new ScopeType { Name = "Identity Scope", ShortDescription = "Access to the claims of the authenticated user", Description = "Clients authorized to access to the Identity Scope have access to specific claims. <br/> Standard Identity Resources are defined by the OPENID standard (profile, email etc...). <br/> For more information please refer to the documentation <a href='https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims</a>", Type = Domains.ScopeTypes.IDENTITY, PictureUrl = "images/IdentityResource.png" },
+        new ScopeType { Name = "API Scope", ShortDescription = "Access to one or more API resources", Description = "Clients authorized to access to an API resource have access to one or more scopes, for example a <i>Client API</i> can have those scopes <i>read,delete,update</i><br/> For more information please refer to the documentation <a href='https://www.rfc-editor.org/rfc/rfc8707.pdf' target='_blank'>https://www.rfc-editor.org/rfc/rfc8707.pdf</a>", Type = Domains.ScopeTypes.APIRESOURCE, PictureUrl = "images/ApiResource.png" }
+    };
+
+    ScopeType? SelectedScopeType { get; set; } = null;
+
+    void SelectResource(ScopeType resourceType)
+    {
+        SelectedScopeType = resourceType;
+    }
+
+    void AddIdentityResource(IdentityScope identityResource)
+    {
+        dispatcher.Dispatch(new AddIdentityScopeAction { Name = identityResource.Name, Description = identityResource.Description, IsExposedInConfigurationEdp = identityResource.IsExposedInConfigrationEdp, Protocol = identityResource.Protocol });
+    }
+
+    void AddApiResource(ApiScope apiResource)
+    {
+        dispatcher.Dispatch(new AddApiScopeAction { Name = apiResource.Name, Description = apiResource.Description, IsExposedInConfigurationEdp = apiResource.IsExposedInConfigrationEdp });
+    }
+}

@@ -1,11 +1,11 @@
 ﻿@using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
-@using SimpleIdServer.IdServer.Website.Stores.ResourceStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @inherits FluxorComponent
 @inject Radzen.DialogService dialogService
 @inject NotificationService notificationService
-@inject IState<AddResourceState> addResourceState
+@inject IState<AddScopeState> addScopeState
 @inject IDispatcher dispatcher
 
 <RadzenSteps>
@@ -74,9 +74,9 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            SubscribeToAction<AddResourceClaimMapperSuccessAction>((act) =>
+            SubscribeToAction<AddScopeClaimMapperSuccessAction>((act) =>
             {
-                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ResourceClaimMapperAdded });
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeClaimMapperAdded });
                 dialogService.Close();
                 StateHasChanged();
             });
@@ -100,6 +100,6 @@
     void AddScopeMapper(ScopeClaimMapper claimMapper)
     {
         claimMapper.Id = Guid.NewGuid().ToString();
-        dispatcher.Dispatch(new AddResourceClaimMapperAction { ClaimMapper = claimMapper, ResourceName = Scope.Name });
+        dispatcher.Dispatch(new AddScopeClaimMapperAction { ClaimMapper = claimMapper, ScopeName = Scope.Name });
     }
 }
