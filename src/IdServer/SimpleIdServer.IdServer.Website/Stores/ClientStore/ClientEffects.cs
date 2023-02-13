@@ -75,6 +75,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             dispatcher.Dispatch(new RemoveSelectedClientsSuccessAction { ClientIds = action.ClientIds });
         }
 
+        [EffectMethod]
+        public async Task Handle(GetClientAction action, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId, CancellationToken.None);
+            if(client == null)
+            {
+                dispatcher.Dispatch(new GetClientFailureAction { ErrorMessage = string.Format(Global.UnknownClient, action.ClientId) });
+                return;
+            }
+
+            dispatcher.Dispatch(new GetClientSuccessAction { Client = client });
+        }
+
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
             var errors = new List<string>();
@@ -175,5 +188,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class ToggleAllClientSelectionAction
     {
         public bool IsSelected { get; set; } = false;
+    }
+
+    public class GetClientAction
+    {
+        public string ClientId { get; set; } = null!;
+    }
+
+    public class GetClientFailureAction
+    {
+        public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class GetClientSuccessAction
+    {
+        public Client Client { get; set; } = null!;
     }
 }

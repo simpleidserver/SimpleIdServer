@@ -102,5 +102,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public static AddClientState ReduceAddClientFailureAction(AddClientState state, AddClientFailureAction act) => new(isAdding: false, errorMessage: act.ErrorMessage);
 
         #endregion
+
+        #region ClientState
+
+        [ReducerMethod]
+        public static ClientState ReduceGetScopeAction(ClientState state, GetClientAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static ClientState ReduceGetClientSuccessAction(ClientState state, GetClientSuccessAction act) => state with
+        {
+            IsLoading = false,
+            Client = act.Client
+        };
+
+        #endregion
     }
 }

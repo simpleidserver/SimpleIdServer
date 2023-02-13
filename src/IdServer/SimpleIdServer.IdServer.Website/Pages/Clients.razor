@@ -34,7 +34,11 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientId" Filterable="false" Sortable="true" Title="Identifier" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="true" Title="Identifier" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.ClientId" Path="@($"/clients/{data.Value.ClientId}/settings")" />
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="Name" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Title="Type" Width="80px">
             <Template Context="data">

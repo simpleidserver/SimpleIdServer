@@ -26,6 +26,7 @@ builder.Services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ContextMenuService>();
+builder.Services.AddScoped<TooltipService>();
 
 var app = builder.Build();
 

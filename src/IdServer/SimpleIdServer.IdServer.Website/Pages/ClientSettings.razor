@@ -1,0 +1,185 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject TooltipService tooltipService
+@inject NotificationService notificationService
+
+
+
+<RadzenTemplateForm Submit=@SubmitUpdateClient TItem="UpdateClient" Data=@updateClient>
+    <RadzenAccordion Multiple=true>    
+        <Items>
+            <RadzenAccordionItem Text="General settings" Selected=true>
+                <!-- Client ID -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Client ID</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenTextBox Name="ClientId" @bind-Value="@updateClient.ClientId" Class="w-100" Disabled=true></RadzenTextBox>
+                    </div>
+                </div>
+                <!-- Name -->
+                <div class="row mt-1">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenTextBox Name="ClientId" @bind-Value="@updateClient.ClientName" Class="w-100"></RadzenTextBox>
+                    </div>
+                </div>
+            </RadzenAccordionItem>
+            @if(Client.ClientType != ClientTypes.MACHINE)
+            {
+                <RadzenAccordionItem Text="Access settings" Selected=true>
+                    <!-- Redirect URIs -->
+                    <div class="row">
+                        <div class="col-md-1">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                                Valid redirect URIs
+                                <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Valid URI pattern a browser can redirect to after a successful login. <br /> Redirection URLs must be passed as a list of URL separated by ;"))" />
+                            </RadzenText>
+                        </div>
+                        <div class="col">
+                            <RadzenTextBox Name="RedirectionUris" @bind-Value="@updateClient.RedirectionUrls" Class="w-100"></RadzenTextBox>
+                        </div>
+                    </div>
+                    <!-- Post logout redirect URIs -->
+                    <div class="row">
+                        <div class="col-md-1">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                                Valid post logout redirect URIs
+                                <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, "Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed. <br /> Post Logout URLs must be passed as a list of URL separated by ;"))" />
+                            </RadzenText>
+                            </div>
+                            <div class="col">
+                                <RadzenTextBox Name="PostLogoutRedirectUris" @bind-Value="@updateClient.PostLogoutRedirectUris" Class="w-100"></RadzenTextBox>
+                            </div>
+                    </div>
+                </RadzenAccordionItem>
+            }
+            <RadzenAccordionItem Text="Capability config" Selected=true>
+                <!-- Authentication flow -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                            Authentication flow
+                        </RadzenText>
+                    </div>
+                    <div class="col">
+
+                    </div>
+                </div>
+            </RadzenAccordionItem>
+            <RadzenAccordionItem Text="Login settings" Selected=true>
+                <!-- Consent required -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                            Consent required
+                        </RadzenText>
+                    </div>
+                    <div class="col">
+                    </div>
+                </div>
+            </RadzenAccordionItem>
+            <RadzenAccordionItem Text="Logout settings" Selected=true>
+                <!-- Front-channel logout -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                            Front-channel logout
+                        </RadzenText>
+                    </div>
+                    <div class="col">
+
+                    </div>
+                </div>
+                <!-- Front-channel logout URL -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                            Front-channel logout URL
+                        </RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenTextBox Name="FrontChannelLogoutUri" @bind-Value="@updateClient.FrontChannelLogoutUri" Class="w-100"></RadzenTextBox>
+                    </div>
+                </div>
+                <!-- Back-channel logout URL -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                            Backchannel logout URL
+                        </RadzenText>
+                    </div>
+                    <div class="col">
+                        <RadzenTextBox Name="BackChannelLogoutUri" @bind-Value="@updateClient.BackChannelLogoutUri" Class="w-100"></RadzenTextBox>
+                    </div>
+                </div>
+                <!-- Backchannel logout session required  -->
+                <div class="row">
+                    <div class="col-md-1">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
+                            Backchannel logout session required
+                        </RadzenText>
+                    </div>
+                    <div class="col">
+
+                    </div>
+                </div>
+            </RadzenAccordionItem>
+        </Items>
+    </RadzenAccordion>
+
+    <RadzenButton class="mt-1" Icon="save" Text="Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+</RadzenTemplateForm>
+
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    record UpdateClient
+    {
+        public string ClientId { get; set; }
+        public string ClientName { get; set; }
+        public string RedirectionUrls { get; set; }
+        public string PostLogoutRedirectUris { get; set; }
+        public bool FrontChannelLogoutSessionRequired { get; set; }
+        public string FrontChannelLogoutUri { get; set; }
+        public string BackChannelLogoutUri { get; set; }
+        public bool BackChannelLogoutSessionRequired { get; set; }
+    }
+
+    UpdateClient updateClient = new UpdateClient();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (this.Client == null) return;
+        updateClient = new UpdateClient
+        {
+            ClientId = this.Client.ClientId,
+            ClientName = this.Client.ClientName,
+            RedirectionUrls = string.Join(';', this.Client.RedirectionUrls),
+            PostLogoutRedirectUris = string.Join(';', this.Client.PostLogoutRedirectUris),
+            FrontChannelLogoutUri = this.Client.FrontChannelLogoutUri,
+            BackChannelLogoutUri = this.Client.BackChannelLogoutUri,
+            FrontChannelLogoutSessionRequired = this.Client.FrontChannelLogoutSessionRequired,
+            BackChannelLogoutSessionRequired = this.Client.BackChannelLogoutSessionRequired
+        };
+    }
+
+    void SubmitUpdateClient(UpdateClient client)
+    {
+
+    }
+
+    void ShowTooltip(ElementReference eltRef, string msg)
+    {
+        tooltipService.Open(eltRef, msg, null);
+    }
+}

@@ -232,6 +232,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The client &apos;{0}&apos; doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownClient {
+            get {
+                return ResourceManager.GetString("UnknownClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The resource &apos;{0}&apos; doesn&apos;t exist.
         /// </summary>
         public static string UnknownResource {
