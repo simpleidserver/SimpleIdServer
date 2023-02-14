@@ -126,6 +126,9 @@
   <data name="ClientAlreadyExists" xml:space="preserve">
     <value>Client cannot be added because an another client exists with the same name</value>
   </data>
+  <data name="ClientSettingsUpdated" xml:space="preserve">
+    <value>Client settings have been updated</value>
+  </data>
   <data name="ExternalAuthProviderUnlinked" xml:space="preserve">
     <value>External authentication provider has been unlinked</value>
   </data>

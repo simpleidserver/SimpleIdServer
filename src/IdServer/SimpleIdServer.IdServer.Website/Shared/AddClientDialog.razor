@@ -70,6 +70,7 @@
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
+                    // Machine application
                     case ClientTypes.MACHINE:
                         <RadzenTemplateForm Submit=@AddMachineApplication TItem="MachineApplication" Data=@machineApplication>
                             @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
@@ -93,6 +94,109 @@
                             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
                         </RadzenTemplateForm>
                         break;
+                    // Website application.
+                    case ClientTypes.WEBSITE:
+                        <RadzenTemplateForm Submit=@AddWebsiteApplication TItem="WebsiteApplication" Data=@websiteApplication>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@websiteApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@websiteApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenTextBox Name="RedirectionUris" @bind-Value="@websiteApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">
+                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
+                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                </p>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                    // Mobile application.
+                    case ClientTypes.MOBILE:
+                        <RadzenTemplateForm Submit=@AddMobileApplication TItem="MobileApplication" Data=@mobileApplication>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@mobileApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@mobileApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenTextBox Name="RedirectionUris" @bind-Value="@mobileApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">
+                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
+                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                </p>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                    // Ws-Federation
+                    case SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE:
+                        <RadzenTemplateForm Submit=@AddWsFederationApplication TItem="WsFederationApplication" Data=@wsFederationApplication>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@wsFederationApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@wsFederationApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
+                    // Device
+                    case ClientTypes.EXTERNAL:
+                        <RadzenTemplateForm Submit=@AddDeviceApplication TItem="DeviceApplication" Data=@deviceApplication>
+                            @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
+                            {
+                                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addClientState.Value.ErrorMessage</RadzenAlert>
+                            }
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                                <RadzenTextBox Name="ClientIdentifier" @bind-Value="@deviceApplication.ClientIdentifier" Class="w-100"></RadzenTextBox>
+                                <RadzenRequiredValidator Component="ClientIdentifier" Text="Identifier is required"></RadzenRequiredValidator>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                                <RadzenTextBox Name="ClientName" @bind-Value="@deviceApplication.ClientName" Class="w-100"></RadzenTextBox>
+                            </div>
+                            <div>
+                                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Redirection URLs</RadzenText>
+                                <RadzenTextBox Name="RedirectionUris" @bind-Value="@deviceApplication.RedirectionUris" Class="w-100"></RadzenTextBox>
+                                <p class="text-muted">
+                                    Redirection URLs must be passed as a list of URL separated by <b>;</b>. <br />
+                                    URL must be valid and must not contain fragment for example (http://localhost#fragment)
+                                </p>
+                                <RadzenRequiredValidator Component="RedirectionUris" Text="At leat one redirection URL must be specified"></RadzenRequiredValidator>
+                            </div>
+                            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addClientState.Value.IsAdding ? "Adding..." : "Save")" Disabled="@(addClientState.Value.IsAdding)" />
+                        </RadzenTemplateForm>
+                        break;
                 }
             }
         </RadzenStepsItem>
@@ -105,11 +209,18 @@
         public string Name { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public ClientTypes Type { get; set; }
+        public string Type { get; set; }
         public string PictureUrl { get; set; } = null!;
     }
 
     record SpaApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+        public string RedirectionUris { get; set; } = null!;
+    }
+
+    record WebsiteApplication
     {
         public string ClientName { get; set; } = null!;
         public string ClientIdentifier { get; set; } = null!;
@@ -123,8 +234,32 @@
         public string ClientIdentifier { get; set; } = null!;
     }
 
+    record MobileApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+        public string RedirectionUris { get; set; } = null!;
+    }
+
+    record DeviceApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+        public string RedirectionUris { get; set; } = null!;
+    }
+
+    record WsFederationApplication
+    {
+        public string ClientName { get; set; } = null!;
+        public string ClientIdentifier { get; set; } = null!;
+    }
+
     SpaApplication spaApplication = new SpaApplication();
     MachineApplication machineApplication = new MachineApplication();
+    WebsiteApplication websiteApplication = new WebsiteApplication();
+    MobileApplication mobileApplication = new MobileApplication();
+    WsFederationApplication wsFederationApplication = new WsFederationApplication();
+    DeviceApplication deviceApplication = new DeviceApplication();
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,8 +274,12 @@
 
     ICollection<ApplicationType> ApplicationTypes { get; set; } = new List<ApplicationType>
     {
-        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser. <br/> Client secret and/or refresh tokens cannot be stored by these applications because <b>there is a security risk</b>. <br/> <b>Examples</b> of User-Agent-Based application : Angular, EmberJS, VueJS.", Type = ClientTypes.SPA, PictureUrl = "images/angular.png" },
+        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser (Angular, EmberJS, VueJS etc...). <br/> Client secret and/or refresh tokens cannot be stored by these applications because there is a security risk.", Type = ClientTypes.SPA, PictureUrl = "images/angular.png" },
         new ApplicationType { Name = "Machine", ShortDescription = "Client credentials", Description = "Machine-to-machine (M2M) applications, such as CLIs, daemons, or services running on your back-end, the system authenticates and authorizes the app rather than a user.", Type = ClientTypes.MACHINE, PictureUrl = "images/MachineClient.png" },
+        new ApplicationType { Name = "Web application", ShortDescription = "Authorization code + PKCE", Description = "Web application executed on server (ASP.NET CORE, SPRING etc...)", Type = ClientTypes.WEBSITE, PictureUrl = "images/WebsiteClient.png" },
+        new ApplicationType { Name = "Mobile", ShortDescription = "Authorization code + PKCE", Description = "A desktop or mobile application running on a user's device", Type = ClientTypes.MOBILE, PictureUrl = "images/MobileClient.png" },
+        new ApplicationType { Name = "WS-Fed Relying Party",  ShortDescription = "WS-Federation application", Description = "A WS-Federation relying party commonly used by older Microsoft applications", Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "images/WsFedClient.png" },
+        new ApplicationType { Name = "Device",  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "images/DeviceClient.png" }
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;
@@ -157,6 +296,26 @@
 
     void AddMachineApplication(MachineApplication machineApplication)
     {
-        dispatcher.Dispatch(new AddMachineClientApplication { ClientId = machineApplication.ClientIdentifier, ClientName = machineApplication.ClientName, ClientSecret = machineApplication.ClientSecret });
+        dispatcher.Dispatch(new AddMachineClientApplicationAction { ClientId = machineApplication.ClientIdentifier, ClientName = machineApplication.ClientName, ClientSecret = machineApplication.ClientSecret });
+    }
+
+    void AddWebsiteApplication(WebsiteApplication websiteApplication)
+    {
+        dispatcher.Dispatch(new AddWebsiteApplicationAction { ClientId = websiteApplication.ClientIdentifier, ClientName = websiteApplication.ClientName, RedirectionUrls = websiteApplication.RedirectionUris.Split(';') });
+    }
+
+    void AddMobileApplication(MobileApplication mobileApplication)
+    {
+        dispatcher.Dispatch(new AddMobileApplicationAction { ClientId = mobileApplication.ClientIdentifier, ClientName = mobileApplication.ClientName, RedirectionUrls = mobileApplication.RedirectionUris.Split(';') });
+    }
+
+    void AddWsFederationApplication(WsFederationApplication wsFederationApplication)
+    {
+        dispatcher.Dispatch(new AddWsFederationApplicationAction { ClientId = wsFederationApplication.ClientIdentifier, ClientName = wsFederationApplication.ClientName });
+    }
+
+    void AddDeviceApplication(DeviceApplication deviceApplication)
+    {
+        dispatcher.Dispatch(new AddDeviceApplicationAction { ClientId = deviceApplication.ClientIdentifier, ClientName = deviceApplication.ClientName, RedirectionUrls = deviceApplication.RedirectionUris.Split(';') });
     }
 }

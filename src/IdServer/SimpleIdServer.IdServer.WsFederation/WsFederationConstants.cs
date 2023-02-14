@@ -5,6 +5,8 @@ namespace SimpleIdServer.IdServer.WsFederation
 {
     public class WsFederationConstants
     {
+        public const string CLIENT_TYPE = "WSFEDERATION";
+
         public static class EndPoints
         {
             public const string FederationMetadata = "FederationMetadata/2007-06/FederationMetadata.xml";

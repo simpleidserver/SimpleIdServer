@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230213161735_Init")]
+    [Migration("20230214124808_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -303,8 +303,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
 
-                    b.Property<int?>("ClientType")
-                        .HasColumnType("int");
+                    b.Property<string>("ClientType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Contacts")
                         .IsRequired()

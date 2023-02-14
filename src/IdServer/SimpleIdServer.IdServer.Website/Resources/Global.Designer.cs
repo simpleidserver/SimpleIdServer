@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client settings have been updated.
+        /// </summary>
+        public static string ClientSettingsUpdated {
+            get {
+                return ResourceManager.GetString("ClientSettingsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à External authentication provider has been unlinked.
         /// </summary>
         public static string ExternalAuthProviderUnlinked {

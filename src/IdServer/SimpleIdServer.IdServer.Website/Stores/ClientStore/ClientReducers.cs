@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
@@ -96,10 +97,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public static AddClientState ReduceAddSpaClientAction(AddClientState state, AddSpaClientAction act) => new(isAdding: true, errorMessage: null);
 
         [ReducerMethod]
+        public static AddClientState ReduceAddWebsiteApplicationAction(AddClientState state, AddWebsiteApplicationAction act) => new(isAdding: true, errorMessage: null);
+
+        [ReducerMethod]
+        public static AddClientState ReduceAddMobileApplicationAction(AddClientState state, AddMobileApplicationAction act) => new(isAdding: true, errorMessage: null);
+
+        [ReducerMethod]
+        public static AddClientState ReduceAddWsFederationApplicationAction(AddClientState state, AddWsFederationApplicationAction act) => new(isAdding: true, errorMessage: null);
+
+        [ReducerMethod]
+        public static AddClientState ReduceAddDeviceApplicationAction(AddClientState state, AddDeviceApplicationAction act) => new(isAdding: true, errorMessage: null);
+
+        [ReducerMethod]
         public static AddClientState ReduceAddClientSuccessAction(AddClientState state, AddClientSuccessAction act) => new(isAdding: false, errorMessage: null);
 
         [ReducerMethod]
         public static AddClientState ReduceAddClientFailureAction(AddClientState state, AddClientFailureAction act) => new(isAdding: false, errorMessage: act.ErrorMessage);
+
+        #endregion
+
+        #region UpdateClientState
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientDetailsAction(UpdateClientState state, UpdateClientDetailsAction act) => new(isUpdating: true);
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientDetailsSuccessAction(UpdateClientState state, UpdateClientDetailsSuccessAction act) => new(isUpdating: false);
 
         #endregion
 
@@ -117,6 +140,38 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             IsLoading = false,
             Client = act.Client
         };
+
+        [ReducerMethod]
+        public static ClientState ReduceUpdateClientDetailsSuccessAction(ClientState state, UpdateClientDetailsSuccessAction act)
+        {
+            var client = state.Client;
+            client.RedirectionUrls = act.RedirectionUrls.Split(';');
+            client.UpdateClientName(act.ClientName);
+            client.PostLogoutRedirectUris = act.PostLogoutRedirectUris.Split(';');
+            client.FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired;
+            client.FrontChannelLogoutUri = act.FrontChannelLogoutUri;
+            client.BackChannelLogoutUri = act.BackChannelLogoutUri;
+            client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
+            var grantTypes = new List<string>();
+            if (act.IsClientCredentialsGrantTypeEnabled)
+                grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+            if (act.IsPasswordGrantTypeEnabled)
+                grantTypes.Add(PasswordHandler.GRANT_TYPE);
+            if (act.IsRefreshTokenGrantTypeEnabled)
+                grantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
+            if (act.IsAuthorizationCodeGrantTypeEnabled)
+                grantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+            if (act.IsCIBAGrantTypeEnabled)
+                grantTypes.Add(CIBAHandler.GRANT_TYPE);
+            if (act.IsUMAGrantTypeEnabled)
+                grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+            client.GrantTypes = grantTypes;
+            client.IsConsentDisabled = !act.IsConsentEnabled;
+            return state with
+            {
+                Client = client
+            };
+        }
 
         #endregion
     }

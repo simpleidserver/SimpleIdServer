@@ -13,6 +13,7 @@
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.7.*" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />
       <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
     </ItemGroup>
     <ItemGroup>

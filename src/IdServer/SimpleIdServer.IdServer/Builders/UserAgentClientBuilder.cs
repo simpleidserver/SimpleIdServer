@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Domains;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -18,6 +20,21 @@ namespace SimpleIdServer.IdServer.Builders
             foreach (var scope in scopes) _client.Scopes.Add(scope);
             return this;
         }
+
+        #region Response types
+
+        /// <summary>
+        /// Use implicit flow.
+        /// Return id_token and token.
+        /// </summary>
+        /// <returns></returns>
+        public UserAgentClientBuilder UseImplicitFlow()
+        {
+            _client.ResponseTypes = new List<string> { IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE };
+            return this;
+        }
+
+        #endregion
 
         #region Translations
 
@@ -41,6 +58,8 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         #endregion
+
+        #region Encryption and signature keys
 
         public UserAgentClientBuilder DisableIdTokenSignature()
         {
@@ -70,6 +89,8 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         public UserAgentClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc));
+
+        #endregion
 
         public Client Build() => _client;
     }

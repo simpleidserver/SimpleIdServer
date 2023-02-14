@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Builders
 
         /// <summary>
         /// Build client for traditional website like ASP.NET CORE.
-        /// By default authorization_code grant-type is used by confidential and public clients to exchange an authorization code for an access token.
+        /// By default authorization_code grant-type PKCE is used by confidential and public clients to exchange an authorization code for an access token.
         /// </summary>
         /// <param name="clientId"></param>
         /// <param name="clientSecret"></param>
@@ -54,12 +54,65 @@ namespace SimpleIdServer.IdServer.Builders
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new TraditionalWebsiteClientBuilder(client);
         }
 
         /// <summary>
+        /// Build external authentication device client.
+        /// CIBA is enabled.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clietnSecret"></param>
+        /// <param name="redirectUrls"></param>
+        /// <returns></returns>
+        public static TraditionalWebsiteClientBuilder BuildExternalAuthDeviceClient(string clientId, string clientSecret, params string[] redirectUrls)
+        {
+            var client = new Client
+            {
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientType = ClientTypes.EXTERNAL,
+                RedirectionUrls = redirectUrls,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+            };
+            client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
+            var result = new TraditionalWebsiteClientBuilder(client);
+            result.EnableCIBAGrantType();
+            return result;
+        }
+
+        /// <summary>
+        /// Build mobile application.
+        /// Authorization code + PKCE.
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="clientSecret"></param>
+        /// <param name="redirectUrls"></param>
+        /// <returns></returns>
+        public static MobileClientBuilder BuildMobileApplication(string clientId, string clientSecret, params string[] redirectUrls)
+        {
+            var client = new Client
+            {
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientType = ClientTypes.MOBILE,
+                RedirectionUrls = redirectUrls,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+            };
+            client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
+            return new MobileClientBuilder(client);
+        }
+
+        /// <summary>
         /// Build client for user-agent based application for example : SPA, angular etc...
-        /// By default implicit grant-type is used.
+        /// Authorization code + PKCE.
         /// </summary>
         /// <param name="clientId"></param>
         /// <param name="clientSecret"></param>
@@ -75,11 +128,10 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientType = ClientTypes.SPA,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD,
-                ResponseTypes = new List<string> { IdTokenResponseTypeHandler.RESPONSE_TYPE, TokenResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
-            client.GrantTypes.Add("implicit");
+            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new UserAgentClientBuilder(client);
         }
     }

@@ -3,10 +3,12 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.WsFederation;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
@@ -54,7 +56,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
-        public async Task Handle(AddMachineClientApplication action, IDispatcher dispatcher)
+        public async Task Handle(AddMachineClientApplicationAction action, IDispatcher dispatcher)
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
             var newClientBuilder = ClientBuilder.BuildApiClient(action.ClientId, action.ClientSecret);
@@ -64,6 +66,67 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             _clientRepository.Add(newClient);
             await _clientRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MACHINE });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddWebsiteApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            var scopes = await _scopeRepository.Query().Where(s => s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name).ToListAsync(CancellationToken.None);
+            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, Guid.NewGuid().ToString(), action.RedirectionUrls.ToArray())
+                .AddScope(scopes.ToArray());
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            _clientRepository.Add(newClient);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.WEBSITE });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddMobileApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            var scopes = await _scopeRepository.Query().Where(s => s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name).ToListAsync(CancellationToken.None);
+            var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), action.RedirectionUrls.ToArray())
+                .AddScope(scopes.ToArray());
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            _clientRepository.Add(newClient);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.MOBILE });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            var scopes = await _scopeRepository.Query().Where(s => s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name).ToListAsync(CancellationToken.None);
+            var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, Guid.NewGuid().ToString(), action.RedirectionUrls.ToArray())
+                .AddScope(scopes.ToArray());
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            _clientRepository.Add(newClient);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = ClientTypes.EXTERNAL });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddWsFederationApplicationAction action, IDispatcher dispatcher)
+        {
+            if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
+            var newClientBuilder = WsClientBuilder.BuildWsFederationClient(action.ClientId);
+            if (!string.IsNullOrWhiteSpace(action.ClientName))
+                newClientBuilder.SetClientName(action.ClientName);
+            var newClient = newClientBuilder.Build();
+            var scopeNames = newClient.Scopes.Select(s => s.Name);
+            var scopes = await _scopeRepository.Query().Where(s => scopeNames.Contains(s.Name)).ToListAsync(CancellationToken.None);
+            newClient.Scopes = scopes;
+            _clientRepository.Add(newClient);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = action.ClientId, ClientName = action.ClientName, Language = newClient.Translations.FirstOrDefault()?.Language, ClientType = WsFederationConstants.CLIENT_TYPE });
         }
 
         [EffectMethod]
@@ -86,6 +149,53 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             }
 
             dispatcher.Dispatch(new GetClientSuccessAction { Client = client });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateClientDetailsAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.Translations).SingleOrDefaultAsync(c => c.ClientId == act.ClientId, CancellationToken.None);
+            client.RedirectionUrls = act.RedirectionUrls.Split(';');
+            client.UpdateClientName(act.ClientName);
+            client.PostLogoutRedirectUris = act.PostLogoutRedirectUris.Split(';');
+            client.FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired;
+            client.FrontChannelLogoutUri = act.FrontChannelLogoutUri;
+            client.BackChannelLogoutUri = act.BackChannelLogoutUri;
+            client.BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired;
+            var grantTypes = new List<string>();
+            if (act.IsClientCredentialsGrantTypeEnabled)
+                grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+            if (act.IsPasswordGrantTypeEnabled)
+                grantTypes.Add(PasswordHandler.GRANT_TYPE);
+            if (act.IsRefreshTokenGrantTypeEnabled)
+                grantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
+            if (act.IsAuthorizationCodeGrantTypeEnabled)
+                grantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
+            if (act.IsCIBAGrantTypeEnabled)
+                grantTypes.Add(CIBAHandler.GRANT_TYPE);
+            if (act.IsUMAGrantTypeEnabled)
+                grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
+            client.GrantTypes = grantTypes;
+            client.IsConsentDisabled = !act.IsConsentEnabled;
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateClientDetailsSuccessAction
+            {
+                ClientId = act.ClientId,
+                ClientName = act.ClientName,
+                RedirectionUrls = act.RedirectionUrls,
+                PostLogoutRedirectUris = act.PostLogoutRedirectUris,
+                FrontChannelLogoutSessionRequired = act.FrontChannelLogoutSessionRequired,
+                FrontChannelLogoutUri = act.FrontChannelLogoutUri,
+                BackChannelLogoutUri = act.BackChannelLogoutUri,
+                BackChannelLogoutSessionRequired = act.BackChannelLogoutSessionRequired,
+                IsClientCredentialsGrantTypeEnabled = act.IsClientCredentialsGrantTypeEnabled,
+                IsPasswordGrantTypeEnabled = act.IsPasswordGrantTypeEnabled,
+                IsRefreshTokenGrantTypeEnabled = act.IsRefreshTokenGrantTypeEnabled,
+                IsAuthorizationCodeGrantTypeEnabled = act.IsAuthorizationCodeGrantTypeEnabled,
+                IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
+                IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
+                IsConsentEnabled = act.IsConsentEnabled
+            });
         }
 
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
@@ -148,7 +258,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string? ClientName { get; set; } = null;
     }
 
-    public class AddMachineClientApplication
+    public class AddWebsiteApplicationAction
+    {
+        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+    }
+
+    public class AddMobileApplicationAction
+    {
+        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+    }
+
+    public class AddDeviceApplicationAction
+    {
+        public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+    }
+
+    public class AddWsFederationApplicationAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+    }
+
+    public class AddMachineClientApplicationAction
     {
         public string ClientId { get; set; } = null!;
         public string ClientSecret { get; set; } = null!;
@@ -166,7 +303,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientId { get; set; } = null!;
         public string? ClientName { get; set; } = null;
         public string? Language { get; set; } = null;
-        public ClientTypes ClientType { get; set; }
+        public string ClientType { get; set; }
     }
 
     public class RemoveSelectedClientsAction 
@@ -203,5 +340,43 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     public class GetClientSuccessAction
     {
         public Client Client { get; set; } = null!;
+    }
+
+    public class UpdateClientDetailsAction
+    {
+        public string ClientId { get; set; }
+        public string ClientName { get; set; }
+        public string RedirectionUrls { get; set; }
+        public string PostLogoutRedirectUris { get; set; }
+        public bool FrontChannelLogoutSessionRequired { get; set; }
+        public string FrontChannelLogoutUri { get; set; }
+        public string BackChannelLogoutUri { get; set; }
+        public bool BackChannelLogoutSessionRequired { get; set; }
+        public bool IsClientCredentialsGrantTypeEnabled { get; set; }
+        public bool IsPasswordGrantTypeEnabled { get; set; }
+        public bool IsRefreshTokenGrantTypeEnabled { get; set; }
+        public bool IsAuthorizationCodeGrantTypeEnabled { get; set; }
+        public bool IsCIBAGrantTypeEnabled { get; set; }
+        public bool IsUMAGrantTypeEnabled { get; set; }
+        public bool IsConsentEnabled { get; set; }
+    }
+
+    public class UpdateClientDetailsSuccessAction
+    {
+        public string ClientId { get; set; }
+        public string ClientName { get; set; }
+        public string RedirectionUrls { get; set; }
+        public string PostLogoutRedirectUris { get; set; }
+        public bool FrontChannelLogoutSessionRequired { get; set; }
+        public string FrontChannelLogoutUri { get; set; }
+        public string BackChannelLogoutUri { get; set; }
+        public bool BackChannelLogoutSessionRequired { get; set; }
+        public bool IsClientCredentialsGrantTypeEnabled { get; set; }
+        public bool IsPasswordGrantTypeEnabled { get; set; }
+        public bool IsRefreshTokenGrantTypeEnabled { get; set; }
+        public bool IsAuthorizationCodeGrantTypeEnabled { get; set; }
+        public bool IsCIBAGrantTypeEnabled { get; set; }
+        public bool IsUMAGrantTypeEnabled { get; set; }
+        public bool IsConsentEnabled { get; set; }
     }
 }

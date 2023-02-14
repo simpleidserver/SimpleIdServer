@@ -42,7 +42,7 @@
         <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="Name" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Title="Type" Width="80px">
             <Template Context="data">
-                <RadzenBadge Text="@(Enum.GetName(typeof(ClientTypes), data.Value.ClientType))" IsPill="true" />
+                <RadzenBadge Text="@data.Value.ClientType" IsPill="true" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClient" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />

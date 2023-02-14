@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.Domains
 {
@@ -419,7 +420,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonIgnore]
-        public ClientTypes? ClientType { get; set; } = null;
+        public string? ClientType { get; set; } = null;
         [JsonIgnore]
         public ICollection<Translation> Translations { get; set; } = new List<Translation>();
         [JsonIgnore]
@@ -465,6 +466,16 @@ namespace SimpleIdServer.IdServer.Domains
 
         public string GetStringParameter(string name) => Parameters[name];
 
+        public void UpdateClientName(string clientName)
+        {
+            var language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            var translation = Translations.FirstOrDefault(tr => tr.Key == "client_name" && tr.Language == language);
+            if (translation == null)
+                Translations.Add(new Translation { Language = language, Key = "client_name", Value = clientName });
+            else
+                translation.Value = clientName;
+        }
+
         public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].Split(',');
 
         private string? Translate(string key)
@@ -507,10 +518,12 @@ namespace SimpleIdServer.IdServer.Domains
         }
     }
 
-    public enum ClientTypes
+    public class ClientTypes
     {
-        SPA = 0,
-        MACHINE = 1,
-        WEBSITE = 2
+        public const string SPA = "SPA";
+        public const string MACHINE = "MACHINE";
+        public const string WEBSITE = "WEBSITE";
+        public const string MOBILE = "MOBILE";
+        public const string EXTERNAL = "EXTERNALDEVICE";
     }
 }
