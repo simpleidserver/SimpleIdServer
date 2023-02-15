@@ -58,8 +58,24 @@ namespace SimpleIdServer.Scim.Persistence.EF
                     .Include(r => r.IndirectReferences)
                     .Where(r => filter.Contains(r.Id));
                 if (!string.IsNullOrWhiteSpace(resourceType))
-                    result = result.Where(r => r.ResourceType == resourceType);
-                yield return (result, filter);
+                    yield return (result.Where(r => r.ResourceType == resourceType), filter);
+                else yield return (result, filter);
+            }
+        }
+
+        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds,  string valueStr, string schemaAttributeId, int nbRecords = 10)
+        {
+            var nb = representationIds.Count();
+            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
+            for (var i = 0; i < nbPages; i++)
+            {
+                var filter = representationIds.Skip(i * nbRecords).Take(nb);
+                var parentIds = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                    .Where(a => a.SchemaAttributeId == schemaAttributeId && filter.Contains(a.RepresentationId) && a.ValueString == valueStr)
+                    .Select(r => r.ParentAttributeId).ToList();
+                var result = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
+                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
+                yield return result;
             }
         }
 
@@ -121,9 +137,14 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.CompletedTask;
         }
 
-        public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
-            await _scimDbContext.BulkInsertOrUpdateAsync(scimRepresentationAttributes.ToList());
+            return _scimDbContext.BulkInsertOrUpdateAsync(scimRepresentationAttributes.ToList());
+        }
+
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            return _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList());
         }
     }
 }

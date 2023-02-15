@@ -11,10 +11,12 @@ namespace SimpleIdServer.Scim.Persistence
         Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds);
         Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType);
         IEnumerable<(IEnumerable<SCIMRepresentation>, IEnumerable<string>)> FindPaginatedSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType = null, int nbRecords = 50);
+        IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 10);
         Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, string value, string endpoint = null);
         Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string attributeId, int value, string endpoint = null);
         Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationsByAttributeFullPath(string fullPath, IEnumerable<string> values, string resourceType);
         Task BulkUpdate(IEnumerable<SCIMRepresentation> scimRepresentations);
         Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes);
+        Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes);
     }
 }

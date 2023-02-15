@@ -42,7 +42,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await _scimRepresentationCommandRepository.Delete(representation);
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkUpdate(reference.Representations);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.AddedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
                     await Notify(reference);
                 }
 

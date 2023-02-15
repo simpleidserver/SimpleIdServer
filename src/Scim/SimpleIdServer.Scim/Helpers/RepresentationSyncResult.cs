@@ -23,6 +23,7 @@ namespace SimpleIdServer.Scim.Helpers
         public ICollection<RepresentationReferenceAttributeAddedEvent> AddAttrEvts { get; set; } = new List<RepresentationReferenceAttributeAddedEvent>();
         public ICollection<RepresentationReferenceAttributeUpdatedEvent> UpdateAttrEvts { get; set; } = new List<RepresentationReferenceAttributeUpdatedEvent>();
         public List<SCIMRepresentationAttribute> AddedRepresentationAttributes { get; set; } = new List<SCIMRepresentationAttribute>();
+        public List<SCIMRepresentationAttribute> RemovedRepresentationAttributes { get; set; } = new List<SCIMRepresentationAttribute>();
 
         public void AddReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {
@@ -34,7 +35,9 @@ namespace SimpleIdServer.Scim.Helpers
             if (Representations.Any(r => r.Id == representation.Id)) Representations.Add(representation);
         }
 
-        public void AddReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attr) => AddedRepresentationAttributes.AddRange(attr);
+        public void AddReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs) => AddedRepresentationAttributes.AddRange(attrs);
+
+        public void RemoveReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs) => RemovedRepresentationAttributes.AddRange(attrs);
 
         public void RemoveReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {

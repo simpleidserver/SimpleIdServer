@@ -79,5 +79,15 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
             throw new System.NotImplementedException();
         }
+
+        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 10)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
