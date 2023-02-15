@@ -174,5 +174,57 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         #endregion
+
+        #region ClientScopesState
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceGetClientAction(ClientScopesState state, GetClientAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceGetClientSuccessAction(ClientScopesState state, GetClientSuccessAction act) => state with
+        {
+            IsLoading = false,
+            Count = act.Client.Scopes.Count(),
+            Scopes = act.Client.Scopes.Select(s => new SelectableClientScope(s)).ToList()
+        };
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceToggleAllClientScopeSelectionAction(ClientScopesState state, ToggleAllClientScopeSelectionAction act)
+        {
+            var scopes = state.Scopes.ToList();
+            foreach (var scope in scopes)
+                scope.IsSelected = act.IsSelected;
+            return state with
+            {
+                Scopes = scopes
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceToggleClientScopeSelectionAction(ClientScopesState state, ToggleClientScopeSelectionAction act)
+        {
+            var scopes = state.Scopes.ToList();
+            scopes.First(s => s.Value.Name == act.ScopeName).IsSelected = act.IsSelected;
+            return state with
+            {
+                Scopes = scopes
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceRemoveSelectedClientScopesSuccessAction(ClientScopesState state, RemoveSelectedClientScopesSuccessAction act)
+        {
+            var scopes = state.Scopes.ToList();
+            scopes = scopes.Where(s => !act.ScopeNames.Contains(s.Value.Name)).ToList();
+            return state with
+            {
+                Scopes = scopes
+            };
+        }
+
+        #endregion
     }
 }

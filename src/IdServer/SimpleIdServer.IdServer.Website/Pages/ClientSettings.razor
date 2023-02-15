@@ -199,13 +199,13 @@
 
     record UpdateClient
     {
-        public string ClientId { get; set; }
-        public string ClientName { get; set; }
-        public string RedirectionUrls { get; set; }
-        public string PostLogoutRedirectUris { get; set; }
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+        public string? RedirectionUrls { get; set; } = null;
+        public string? PostLogoutRedirectUris { get; set; } = null;
         public bool FrontChannelLogoutSessionRequired { get; set; }
-        public string FrontChannelLogoutUri { get; set; }
-        public string BackChannelLogoutUri { get; set; }
+        public string? FrontChannelLogoutUri { get; set; } = null;
+        public string? BackChannelLogoutUri { get; set; } = null;
         public bool BackChannelLogoutSessionRequired { get; set; }
         public bool IsClientCredentialsGrantTypeEnabled { get; set; }
         public bool IsPasswordGrantTypeEnabled { get; set; }

@@ -214,6 +214,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected client scopes have been removed.
+        /// </summary>
+        public static string SelectedClientScopesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedClientScopesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected clients have been removed.
         /// </summary>
         public static string SelectedClientsRemoved {

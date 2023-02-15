@@ -141,7 +141,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(GetClientAction action, IDispatcher dispatcher)
         {
-            var client = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId, CancellationToken.None);
+            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId, CancellationToken.None);
             if(client == null)
             {
                 dispatcher.Dispatch(new GetClientFailureAction { ErrorMessage = string.Format(Global.UnknownClient, action.ClientId) });
@@ -154,7 +154,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(UpdateClientDetailsAction act, IDispatcher dispatcher)
         {
-            var client = await _clientRepository.Query().Include(c => c.Translations).SingleOrDefaultAsync(c => c.ClientId == act.ClientId, CancellationToken.None);
+            var client = await _clientRepository.Query().Include(c => c.Translations).SingleAsync(c => c.ClientId == act.ClientId, CancellationToken.None);
             client.RedirectionUrls = act.RedirectionUrls.Split(';');
             client.UpdateClientName(act.ClientName);
             client.PostLogoutRedirectUris = act.PostLogoutRedirectUris.Split(';');
@@ -195,6 +195,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 IsCIBAGrantTypeEnabled = act.IsCIBAGrantTypeEnabled,
                 IsUMAGrantTypeEnabled = act.IsUMAGrantTypeEnabled,
                 IsConsentEnabled = act.IsConsentEnabled
+            });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedClientScopesAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId, CancellationToken.None);
+            client.Scopes = client.Scopes.Where(s => !act.ScopeNames.Contains(s.Name)).ToList();
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedClientScopesSuccessAction
+            {
+                ClientId = act.ClientId,
+                ScopeNames = act.ScopeNames
             });
         }
 
@@ -344,13 +357,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
     public class UpdateClientDetailsAction
     {
-        public string ClientId { get; set; }
-        public string ClientName { get; set; }
-        public string RedirectionUrls { get; set; }
-        public string PostLogoutRedirectUris { get; set; }
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+        public string? RedirectionUrls { get; set; } = null;
+        public string? PostLogoutRedirectUris { get; set; } = null;
         public bool FrontChannelLogoutSessionRequired { get; set; }
-        public string FrontChannelLogoutUri { get; set; }
-        public string BackChannelLogoutUri { get; set; }
+        public string? FrontChannelLogoutUri { get; set; } = null;
+        public string? BackChannelLogoutUri { get; set; } = null;
         public bool BackChannelLogoutSessionRequired { get; set; }
         public bool IsClientCredentialsGrantTypeEnabled { get; set; }
         public bool IsPasswordGrantTypeEnabled { get; set; }
@@ -363,13 +376,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
     public class UpdateClientDetailsSuccessAction
     {
-        public string ClientId { get; set; }
-        public string ClientName { get; set; }
-        public string RedirectionUrls { get; set; }
-        public string PostLogoutRedirectUris { get; set; }
+        public string ClientId { get; set; } = null!;
+        public string? ClientName { get; set; } = null;
+        public string? RedirectionUrls { get; set; } = null;
+        public string? PostLogoutRedirectUris { get; set; } = null;
         public bool FrontChannelLogoutSessionRequired { get; set; }
-        public string FrontChannelLogoutUri { get; set; }
-        public string BackChannelLogoutUri { get; set; }
+        public string? FrontChannelLogoutUri { get; set; } = null;
+        public string? BackChannelLogoutUri { get; set; } = null;
         public bool BackChannelLogoutSessionRequired { get; set; }
         public bool IsClientCredentialsGrantTypeEnabled { get; set; }
         public bool IsPasswordGrantTypeEnabled { get; set; }
@@ -378,5 +391,29 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsCIBAGrantTypeEnabled { get; set; }
         public bool IsUMAGrantTypeEnabled { get; set; }
         public bool IsConsentEnabled { get; set; }
+    }
+
+    public class ToggleAllClientScopeSelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+    }
+
+    public class ToggleClientScopeSelectionAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string ScopeName { get; set; } = null!;
+        public bool IsSelected { get; set; }
+    }
+
+    public class RemoveSelectedClientScopesAction
+    {
+        public string ClientId { get; set; } = null!;
+        public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
+    }
+
+    public class RemoveSelectedClientScopesSuccessAction
+    {
+        public string ClientId { get; set; } = null!;
+        public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
     }
 }

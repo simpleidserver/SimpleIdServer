@@ -168,6 +168,9 @@
   <data name="ScopeResourcesUpdated" xml:space="preserve">
     <value>Scope Resources have been updated</value>
   </data>
+  <data name="SelectedClientScopesRemoved" xml:space="preserve">
+    <value>Selected client scopes have been removed</value>
+  </data>
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
   </data>
