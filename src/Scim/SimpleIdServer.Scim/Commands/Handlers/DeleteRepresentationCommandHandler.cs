@@ -36,19 +36,19 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
             }
 
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, true, true);
+            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, true, true);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 await _scimRepresentationCommandRepository.Delete(representation);
-                foreach (var reference in references.Representations)
+                foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.Update(reference);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.Representations);
+                    await Notify(reference);
                 }
 
                 await transaction.Commit();
             }
 
-            await Notify(references);
             return representation;
         }
     }

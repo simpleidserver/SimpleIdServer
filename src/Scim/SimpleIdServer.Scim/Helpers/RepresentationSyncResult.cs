@@ -15,22 +15,14 @@ namespace SimpleIdServer.Scim.Helpers
 
         public RepresentationSyncResult(IResourceTypeResolver resourceTypeResolver)
         {
-            Representations = new List<SCIMRepresentation>();
-            RemoveAttrEvts = new List<RepresentationReferenceAttributeRemovedEvent>();
-            AddAttrEvts = new List<RepresentationReferenceAttributeAddedEvent>();
-            UpdateAttrEvts = new List<RepresentationReferenceAttributeUpdatedEvent>();
             _resourceTypeResolver = resourceTypeResolver;
         }
 
-        public ICollection<SCIMRepresentation> Representations { get; set; }
-        public ICollection<RepresentationReferenceAttributeRemovedEvent> RemoveAttrEvts { get; set; }
-        public ICollection<RepresentationReferenceAttributeAddedEvent> AddAttrEvts { get; set; }
-        public ICollection<RepresentationReferenceAttributeUpdatedEvent> UpdateAttrEvts { get; set; }
-
-        public void AddRepresentation(SCIMRepresentation representation)
-        {
-            Representations.Add(representation);
-        }
+        public ICollection<SCIMRepresentation> Representations { get; set; } = new List<SCIMRepresentation>();
+        public ICollection<RepresentationReferenceAttributeRemovedEvent> RemoveAttrEvts { get; set; } = new List<RepresentationReferenceAttributeRemovedEvent>();
+        public ICollection<RepresentationReferenceAttributeAddedEvent> AddAttrEvts { get; set; } = new List<RepresentationReferenceAttributeAddedEvent>();
+        public ICollection<RepresentationReferenceAttributeUpdatedEvent> UpdateAttrEvts { get; set; } = new List<RepresentationReferenceAttributeUpdatedEvent>();
+        public List<SCIMRepresentationAttribute> AddedRepresentationAttributes { get; set; } = new List<SCIMRepresentationAttribute>();
 
         public void AddReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {
@@ -39,7 +31,10 @@ namespace SimpleIdServer.Scim.Helpers
             var newEvt = new RepresentationReferenceAttributeAddedEvent(Guid.NewGuid().ToString(), representation.Version, representation.ResourceType, representation.Id, schemaAttributeId, fullPath, obj);
             newEvt.Values.Add(value);
             ProcessReferenceAttr(AddAttrEvts, representation, schemaAttributeId, newEvt, value);
+            if (Representations.Any(r => r.Id == representation.Id)) Representations.Add(representation);
         }
+
+        public void AddReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attr) => AddedRepresentationAttributes.AddRange(attr);
 
         public void RemoveReferenceAttr(SCIMRepresentation representation, string schemaAttributeId, string fullPath, string value, string location)
         {

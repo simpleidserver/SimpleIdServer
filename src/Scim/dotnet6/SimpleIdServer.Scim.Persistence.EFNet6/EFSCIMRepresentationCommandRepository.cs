@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Scim.Domains;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -27,6 +29,15 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return result;
         }
 
+        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds)
+        {
+            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+                .Include(r => r.IndirectReferences)
+                .Where(r => representationIds.Contains(r.Id))
+                .ToListAsync();
+            return result;
+        }
+
         public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
             IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
@@ -34,6 +45,22 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
                 .ToListAsync();
             return result;
+        }
+
+        public IEnumerable<(IEnumerable<SCIMRepresentation>, IEnumerable<string>)> FindPaginatedSCIMRepresentationByIds(IEnumerable<string> representationIds,  string resourceType = null, int nbRecords = 100)
+        {
+            var nb = representationIds.Count();
+            var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
+            for(var i = 0; i< nbPages; i++)
+            {
+                var filter = representationIds.Skip(i * nbRecords).Take(nb);
+                var result = _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+                    .Include(r => r.IndirectReferences)
+                    .Where(r => filter.Contains(r.Id));
+                if (!string.IsNullOrWhiteSpace(resourceType))
+                    result = result.Where(r => r.ResourceType == resourceType);
+                yield return (result, filter);
+            }
         }
 
         public Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
@@ -87,6 +114,16 @@ namespace SimpleIdServer.Scim.Persistence.EF
         {
             _scimDbContext.SCIMRepresentationLst.Update(data);
             return Task.FromResult(true);
+        }
+
+        public Task BulkUpdate(IEnumerable<SCIMRepresentation> scimRepresentations)
+        {
+            return Task.CompletedTask;
+        }
+
+        public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            await _scimDbContext.BulkInsertOrUpdateAsync(scimRepresentationAttributes.ToList());
         }
     }
 }

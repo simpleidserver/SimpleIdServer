@@ -257,23 +257,26 @@ namespace SimpleIdServer.Scim.Domains
             DisplayName = displayName;
         }
 
-        public void AddIndirectReference(string targetReferenceId, string targetAttributeId)
+        public bool AddIndirectReference(string targetReferenceId, string targetAttributeId)
         {
             var reference = IndirectReferences.FirstOrDefault(r => r.TargetReferenceId == targetReferenceId && r.TargetAttributeId == targetAttributeId);
             if(reference == null)
             {
                 reference = new SCIMRepresentationIndirectReference { TargetReferenceId = targetReferenceId, TargetAttributeId = targetAttributeId };
                 IndirectReferences.Add(reference);
+                return true;
             }
 
             reference.NbReferences++;
+            return false;
         }
 
-        public void RemoveIndirectReference(string targetReferenceId, string targetAttributeId)
+        public bool RemoveIndirectReference(string targetReferenceId, string targetAttributeId)
         {
             var reference = IndirectReferences.FirstOrDefault(r => r.TargetReferenceId == targetReferenceId && r.TargetAttributeId == targetAttributeId);
-            if (reference == null) return;
+            if (reference == null) return false;
             reference.NbReferences--;
+            return true;
         }
 
         public void AddStandardAttributes(string location, IEnumerable<string> attributes, bool isIncluded = true, bool ignore = true)

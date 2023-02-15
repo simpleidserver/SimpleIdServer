@@ -55,19 +55,19 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues);
             if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
+            var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                foreach (var reference in references.Representations)
+                foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.Update(reference);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.Representations);
+                    await Notify(reference);
                 }
 
                 await transaction.Commit();
             }
 
-            await Notify(references);
             existingRepresentation.ApplyEmptyArray();
             return PatchRepresentationResult.Ok(existingRepresentation);
         }

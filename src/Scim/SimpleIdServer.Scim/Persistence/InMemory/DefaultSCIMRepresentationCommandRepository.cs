@@ -14,6 +14,12 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         {
         }
 
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds)
+        {
+            IEnumerable<SCIMRepresentation> representations = LstData.AsQueryable().Where(r => representationIds.Contains(r.Id));
+            return Task.FromResult(representations);
+        }
+
         public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
         {
             IEnumerable<SCIMRepresentation> representations = LstData.AsQueryable().Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
@@ -57,6 +63,21 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             LstData.Remove(record);
             LstData.Add((SCIMRepresentation)data.Clone());
             return Task.FromResult(true);
+        }
+
+        public Task BulkUpdate(IEnumerable<SCIMRepresentation> scimRepresentations)
+        {
+            return Task.CompletedTask;
+        }
+
+        public IEnumerable<(IEnumerable<SCIMRepresentation>, IEnumerable<string>)> FindPaginatedSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType = null, int nbRecords = 100)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

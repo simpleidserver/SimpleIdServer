@@ -997,3 +997,45 @@ Scenario: When direct parent's group 'displayName' is updated then user informat
 	And JSON 'groups[1].display'='thirdGroup'
 	And JSON 'groups[2].type'='direct'
 	And JSON 'groups[2].display'='newDisplayName'
+
+Scenario: Add one sub group into a group and check user has an indirect link to the parent group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+	
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                              |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$firstGroup$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '2'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='indirect'
