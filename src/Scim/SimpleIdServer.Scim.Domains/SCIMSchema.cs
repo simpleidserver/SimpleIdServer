@@ -59,6 +59,7 @@ namespace SimpleIdServer.Scim.Domains
 
         public IEnumerable<SCIMSchemaAttribute> GetChildren(SCIMSchemaAttribute schemaAttribute)
         {
+            if (schemaAttribute == null) return new List<SCIMSchemaAttribute>();
             return GetChildren(schemaAttribute.Id);
         }
 

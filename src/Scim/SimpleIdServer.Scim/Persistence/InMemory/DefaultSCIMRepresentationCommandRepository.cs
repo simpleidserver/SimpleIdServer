@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(representations);
         }
 
-        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
+        public Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType, bool ignoreAttributes = false)
         {
             IEnumerable<SCIMRepresentation> representations = LstData.AsQueryable().Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
             return Task.FromResult(representations);
@@ -70,22 +70,27 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.CompletedTask;
         }
 
-        public IEnumerable<(IEnumerable<SCIMRepresentation>, IEnumerable<string>)> FindPaginatedSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType = null, int nbRecords = 100)
+        public IEnumerable<IEnumerable<SCIMRepresentation>> FindPaginatedRepresentations(IEnumerable<string> representationIds, string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
             throw new System.NotImplementedException();
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 10)
+        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
             throw new System.NotImplementedException();
         }
 
         public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
             throw new System.NotImplementedException();
         }

@@ -38,41 +38,44 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return result;
         }
 
-        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType)
+        public async Task<IEnumerable<SCIMRepresentation>> FindSCIMRepresentationByIds(IEnumerable<string> representationIds, string resourceType, bool ignoreAttributes = false)
         {
-            IEnumerable<SCIMRepresentation> result = await _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
+            var result = _scimDbContext.SCIMRepresentationLst
                 .Include(r => r.IndirectReferences)
-                .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id))
-                .ToListAsync();
-            return result;
+                .Where(r => r.ResourceType == resourceType && representationIds.Contains(r.Id));
+            if (!ignoreAttributes)
+                result = result.Include(r => r.FlatAttributes);
+
+            return await result.ToListAsync();
         }
 
-        public IEnumerable<(IEnumerable<SCIMRepresentation>, IEnumerable<string>)> FindPaginatedSCIMRepresentationByIds(IEnumerable<string> representationIds,  string resourceType = null, int nbRecords = 100)
+        public IEnumerable<IEnumerable<SCIMRepresentation>> FindPaginatedRepresentations(IEnumerable<string> representationIds,  string resourceType = null, int nbRecords = 50, bool ignoreAttributes = false)
         {
             var nb = representationIds.Count();
             var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for(var i = 0; i< nbPages; i++)
+            for(var i = 0; i <= nbPages; i++)
             {
-                var filter = representationIds.Skip(i * nbRecords).Take(nb);
+                var filter = representationIds.Skip(i * nbRecords).Take(nbRecords);
                 var result = _scimDbContext.SCIMRepresentationLst.Include(r => r.FlatAttributes)
                     .Include(r => r.IndirectReferences)
                     .Where(r => filter.Contains(r.Id));
                 if (!string.IsNullOrWhiteSpace(resourceType))
-                    yield return (result.Where(r => r.ResourceType == resourceType), filter);
-                else yield return (result, filter);
+                    yield return result.Where(r => r.ResourceType == resourceType);
+                else yield return result;
             }
         }
 
-        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds,  string valueStr, string schemaAttributeId, int nbRecords = 10)
+        public IEnumerable<IEnumerable<SCIMRepresentationAttribute>> FindPaginatedGraphAttributes(IEnumerable<string> representationIds,  string valueStr, string schemaAttributeId, int nbRecords = 50, string sourceRepresentationId = null)
         {
             var nb = representationIds.Count();
             var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
-            for (var i = 0; i < nbPages; i++)
+            for (var i = 0; i <= nbPages; i++)
             {
-                var filter = representationIds.Skip(i * nbRecords).Take(nb);
+                var filter = representationIds.Skip(i * nbRecords).Take(nbRecords);
                 var parentIds = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => a.SchemaAttributeId == schemaAttributeId && filter.Contains(a.RepresentationId) && a.ValueString == valueStr)
-                    .Select(r => r.ParentAttributeId).ToList();
+                    .Where(a => a.SchemaAttributeId == schemaAttributeId && filter.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                    .Select(r => r.ParentAttributeId)
+                    .ToList();
                 var result = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
                     .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
                 yield return result;
@@ -137,14 +140,17 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.CompletedTask;
         }
 
-        public Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
-        {
-            return _scimDbContext.BulkInsertOrUpdateAsync(scimRepresentationAttributes.ToList());
-        }
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkInsertOrUpdateAsync(scimRepresentationAttributes.ToList());
 
-        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList());
+
+        public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
-            return _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList());
+            var bulkConfig = new BulkConfig
+            {
+                PropertiesToInclude = new List<string> { nameof(SCIMRepresentationAttribute.ValueString) }
+            };
+            await _scimDbContext.BulkUpdateAsync(scimRepresentationAttributes.ToList(), bulkConfig);
         }
     }
 }

@@ -79,13 +79,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
-                await _scimRepresentationCommandRepository.Update(existingRepresentation);
                 foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.BulkUpdate(reference.Representations);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes);
                     await Notify(reference);
                 }
 
+                await _scimRepresentationCommandRepository.Update(existingRepresentation);
                 await transaction.Commit();
                 existingRepresentation.ApplyEmptyArray();
                 return existingRepresentation;
