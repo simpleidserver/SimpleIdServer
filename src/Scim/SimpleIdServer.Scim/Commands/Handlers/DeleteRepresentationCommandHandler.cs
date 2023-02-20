@@ -6,7 +6,6 @@ using SimpleIdServer.Scim.Exceptions;
 using SimpleIdServer.Scim.Helpers;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Commands.Handlers
@@ -35,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (representation == null)
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
 
-            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, true, true);
+            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 foreach (var reference in references)

@@ -11,10 +11,10 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
         public void Configure(EntityTypeBuilder<SCIMRepresentationAttribute> builder)
         {
             builder.HasKey(a => a.Id);
-            builder.HasOne(a => a.SchemaAttribute).WithMany().HasForeignKey(a => a.SchemaAttributeId);
+            builder.HasOne(a => a.SchemaAttribute).WithMany().HasForeignKey(a => a.SchemaAttributeId).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(a => a.Children).WithOne().HasForeignKey("ParentAttributeId");
             builder.Ignore(a => a.CachedChildren);
-            builder.Property(r => r.ResourceType).HasMaxLength(255);
+            builder.Property(a => a.ValueString).HasMaxLength(255);
         }
     }
 }

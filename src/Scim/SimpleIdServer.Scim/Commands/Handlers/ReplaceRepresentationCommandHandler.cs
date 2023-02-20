@@ -76,7 +76,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             existingRepresentation.SetExternalId(updatedRepresentation.ExternalId);
             existingRepresentation.SetUpdated(DateTime.UtcNow);
             var isReferenceProperty = await _representationReferenceSync.IsReferenceProperty(replaceRepresentationCommand.Representation.Attributes.GetKeys());
-            var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, !isReferenceProperty);
+            var references = _representationReferenceSync.Sync(updateResult.AttributeMappingLst, replaceRepresentationCommand.ResourceType, oldRepresentation, existingRepresentation, replaceRepresentationCommand.Location, schema, !isReferenceProperty);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 foreach (var reference in references)

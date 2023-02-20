@@ -92,6 +92,7 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
                     opt.AddStringAttribute("value");
                     opt.AddReferenceAttribute("$ref");
                     opt.AddStringAttribute("type");
+                    opt.AddStringAttribute("display");
                 }, multiValued: true)
                 .Build();
             var customUserSchema = SCIMSchemaBuilder.Create("urn:customuser", "CustomUser", "CustomUser", string.Empty, true)

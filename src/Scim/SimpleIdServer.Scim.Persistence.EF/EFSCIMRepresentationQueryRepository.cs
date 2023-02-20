@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Persistence.Filters;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using SimpleIdServer.Scim.Persistence.EF.Extensions;
@@ -20,8 +21,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId)
         {
-            return _scimDbContext.SCIMRepresentationLst.
-                Include(r => r.FlatAttributes)
+            return _scimDbContext.SCIMRepresentationLst
+                .Include(r => r.FlatAttributes)
                 .Include(r => r.Schemas).ThenInclude(s => s.Attributes).FirstOrDefaultAsync(r => r.Id == representationId);
         }
 
@@ -56,12 +57,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
                 queryableRepresentations = (IQueryable<SCIMRepresentation>)evaluatedExpression.Compile().DynamicInvoke(queryableRepresentations);
             }
 
-            if (parameter.SortBy != null)
+            if(parameter.SortBy != null)
             {
                 return await parameter.SortBy.EvaluateOrderBy(
                     _scimDbContext,
                     queryableRepresentations,
-                    parameter.SortOrder.Value,
+                    parameter.SortOrder ?? SearchSCIMRepresentationOrders.Descending,
                     parameter.StartIndex,
                     parameter.Count,
                     parameter.IncludedAttributes,

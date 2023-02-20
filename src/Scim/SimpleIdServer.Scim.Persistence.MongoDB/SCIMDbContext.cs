@@ -9,7 +9,7 @@ using System;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
-    public class SCIMDbContext : IDisposable
+	public class SCIMDbContext : IDisposable
 	{
 		private readonly MongoDbOptions _options;
 
@@ -23,6 +23,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
 		public IMongoCollection<SCIMRepresentationModel> SCIMRepresentationLst =>
 			Database.GetCollection<SCIMRepresentationModel>(_options.CollectionRepresentations);
+
+		public IMongoCollection<SCIMRepresentationAttribute> SCIMRepresentationAttributeLst
+			=> Database.GetCollection<SCIMRepresentationAttribute>(_options.CollectionRepresentationAttributes);
 
 		public IMongoCollection<SCIMSchema> SCIMSchemaLst =>
 			Database.GetCollection<SCIMSchema>(_options.CollectionSchemas);
@@ -45,11 +48,17 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 			{
 				cm.AutoMap();
 			});
-			BsonClassMap.RegisterClassMap<SCIMRepresentation>(cm =>
+			BsonClassMap.RegisterClassMap<SCIMRepresentationAttribute>(cm =>
+			{
+				cm.AutoMap();
+				cm.UnmapMember(c => c.CachedChildren);
+			});
+            BsonClassMap.RegisterClassMap<SCIMRepresentation>(cm =>
 			{
 				cm.AutoMap();
 				cm.SetIsRootClass(true);
 				cm.UnmapMember(c => c.Schemas);
+				cm.UnmapMember(c => c.FlatAttributes);
 				cm.UnmapMember(c => c.HierarchicalAttributes);
 			});
 			BsonClassMap.RegisterClassMap<SCIMRepresentationModel>(cm =>

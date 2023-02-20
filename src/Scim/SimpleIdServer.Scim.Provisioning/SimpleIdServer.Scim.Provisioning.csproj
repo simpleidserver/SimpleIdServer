@@ -23,6 +23,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\OpenID\SimpleIdServer.OpenID\SimpleIdServer.OpenID.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj" />
   </ItemGroup>
 </Project>

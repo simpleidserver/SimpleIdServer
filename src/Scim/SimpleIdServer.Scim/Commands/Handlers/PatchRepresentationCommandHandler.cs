@@ -46,10 +46,10 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
             var existingRepresentation = await _scimRepresentationCommandRepository.Get(patchRepresentationCommand.Id);
             if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
-            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
+            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand, schema);
         }
 
-        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand)
+        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand, SCIMSchema schema)
         {
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
             var oldDisplayName = existingRepresentation.DisplayName;
@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, displayNameDifferent);
+            var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
                 foreach (var reference in references)

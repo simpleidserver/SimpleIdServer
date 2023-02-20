@@ -26,7 +26,6 @@ namespace SimpleIdServer.Scim.Domains
         public string DisplayName { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastModified { get; set; }
-        public ICollection<SCIMRepresentationIndirectReference> IndirectReferences { get; set; } = new List<SCIMRepresentationIndirectReference>();
         public ICollection<SCIMRepresentationAttribute> FlatAttributes { get; set; }
         public ICollection<SCIMSchema> Schemas { get; set; }
         public ICollection<SCIMRepresentationAttribute> LeafAttributes
@@ -257,28 +256,6 @@ namespace SimpleIdServer.Scim.Domains
             DisplayName = displayName;
         }
 
-        public bool AddIndirectReference(string targetReferenceId, string targetAttributeId)
-        {
-            var reference = IndirectReferences.FirstOrDefault(r => r.TargetReferenceId == targetReferenceId && r.TargetAttributeId == targetAttributeId);
-            if(reference == null)
-            {
-                reference = new SCIMRepresentationIndirectReference { TargetReferenceId = targetReferenceId, TargetAttributeId = targetAttributeId };
-                IndirectReferences.Add(reference);
-                return true;
-            }
-
-            reference.NbReferences++;
-            return false;
-        }
-
-        public bool RemoveIndirectReference(string targetReferenceId, string targetAttributeId)
-        {
-            var reference = IndirectReferences.FirstOrDefault(r => r.TargetReferenceId == targetReferenceId && r.TargetAttributeId == targetAttributeId);
-            if (reference == null) return false;
-            reference.NbReferences--;
-            return true;
-        }
-
         public void AddStandardAttributes(string location, IEnumerable<string> attributes, bool isIncluded = true, bool ignore = true)
         {
             var metadata = new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), StandardSchemas.StandardResponseSchemas.GetAttribute(StandardSCIMRepresentationAttributes.Meta), StandardSchemas.ResourceTypeSchema.Id);
@@ -371,8 +348,7 @@ namespace SimpleIdServer.Scim.Domains
                 LastModified = LastModified,
                 DisplayName = DisplayName,
                 FlatAttributes = FlatAttributes.Select(a => (SCIMRepresentationAttribute)a.Clone()).ToList(),
-                Schemas = Schemas.Select(a => (SCIMSchema)a.Clone()).ToList(),
-                IndirectReferences = IndirectReferences.Select(i => (SCIMRepresentationIndirectReference)i.Clone()).ToList()
+                Schemas = Schemas.Select(a => (SCIMSchema)a.Clone()).ToList()
             };
         }
 

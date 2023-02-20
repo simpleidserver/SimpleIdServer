@@ -31,7 +31,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            result.Init(_scimDbContext.Database);
+            result.IncludeAll(_scimDbContext.Database);
             return result;
         }
 
@@ -44,7 +44,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            result.Init(_scimDbContext.Database);
+            result.IncludeAll(_scimDbContext.Database);
             return result;
         }
 

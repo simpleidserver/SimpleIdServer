@@ -571,28 +571,28 @@ Scenario: Remove user from one group and check it has an indirect link to this g
 	And extract 'id' from JSON body into 'userId'
 		
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
-	| Key				| Value                                                                        |
-	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$userId$" } ]					                               |
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| secondGroup												|
+	| members			| [ { "value": "$userId$" } ]					            |
 
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
-	| Key				| Value                                                                        |
-	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| secondGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| secondGroup												|
+	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]	|
 		
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
-	| Key				| Value                                                                        |
-	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| thirdGroup																   |
-	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]					   |
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| thirdGroup												|
+	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]	|
 		
 	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
-	| Key				| Value                                                                        |
-	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
-	| displayName		| thirdGroup																   |
-	| members			| [ { "value": "$firstGroup$" } ]					                           |
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| thirdGroup												|
+	| members			| [ { "value": "$firstGroup$" } ]					        |
 
 	And execute HTTP GET request 'http://localhost/Users/$userId$'	
 	And extract JSON from body
@@ -808,9 +808,9 @@ Scenario: When parent's group 'displayName' is updated then user information mus
 	And JSON 'groups[0].type'='direct'
 	And JSON 'groups[0].display'='firstGroup'
 	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[1].display'='thirdGroup'
+	And JSON 'groups[1].display'='newDisplayName'
 	And JSON 'groups[2].type'='indirect'
-	And JSON 'groups[2].display'='newDisplayName'
+	And JSON 'groups[2].display'='thirdGroup'
 
 Scenario: When parent's group 'displayName' is updated then user information must be updated (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
@@ -870,9 +870,9 @@ Scenario: When parent's group 'displayName' is updated then user information mus
 	And JSON 'groups[0].type'='direct'
 	And JSON 'groups[0].display'='firstGroup'
 	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[1].display'='thirdGroup'
+	And JSON 'groups[1].display'='newDisplayName'
 	And JSON 'groups[2].type'='indirect'
-	And JSON 'groups[2].display'='newDisplayName'
+	And JSON 'groups[2].display'='thirdGroup'
 
 Scenario: When direct parent's group 'displayName' is updated then user information must be updated (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
@@ -928,12 +928,12 @@ Scenario: When direct parent's group 'displayName' is updated then user informat
 	
 	Then HTTP status code equals to '200'
 	And 'groups' length is equals to '3'
-	And JSON 'groups[0].type'='indirect'
-	And JSON 'groups[0].display'='secondGroup'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[0].display'='newDisplayName'
 	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[1].display'='thirdGroup'
-	And JSON 'groups[2].type'='direct'
-	And JSON 'groups[2].display'='newDisplayName'
+	And JSON 'groups[1].display'='secondGroup'
+	And JSON 'groups[2].type'='indirect'
+	And JSON 'groups[2].display'='thirdGroup'
 
 Scenario: When direct parent's group 'displayName' is updated then user information must be updated (HTTP PUT)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
@@ -991,12 +991,12 @@ Scenario: When direct parent's group 'displayName' is updated then user informat
 	
 	Then HTTP status code equals to '200'
 	And 'groups' length is equals to '3'
-	And JSON 'groups[0].type'='indirect'
-	And JSON 'groups[0].display'='secondGroup'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[0].display'='newDisplayName'
 	And JSON 'groups[1].type'='indirect'
-	And JSON 'groups[1].display'='thirdGroup'
-	And JSON 'groups[2].type'='direct'
-	And JSON 'groups[2].display'='newDisplayName'
+	And JSON 'groups[1].display'='secondGroup'
+	And JSON 'groups[2].type'='indirect'
+	And JSON 'groups[2].display'='thirdGroup'
 
 Scenario: Add one sub group into a group and check user has an indirect link to the parent group (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Users'
