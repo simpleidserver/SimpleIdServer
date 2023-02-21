@@ -653,11 +653,11 @@ Scenario: Error is returned when name is empty (HTTP PATCH)
 
 Scenario: Error is returned when Operations is empty
 	When execute HTTP POST JSON request 'http://localhost/Users'
-	| Key              | Value																												|
-	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]		|
-	| userName         | bjen																												|
-	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }								|
-	| employeeNumber   | 100																												|
+	| Key              | Value																											 |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]	 |
+	| userName         | bjen																											 |
+	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }							 |
+	| employeeNumber   | 100																											 |
 
 	And extract JSON from body
 	And extract 'id' from JSON body	
@@ -673,3 +673,26 @@ Scenario: Error is returned when Operations is empty
 	Then JSON 'status'='400'
 	Then JSON 'scimType'='invalidSyntax'
 	Then JSON 'detail'='At least one operation must be passed'
+
+Scenario: Error is returned when required attribute is not passed (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key              | Value																											 |
+	| schemas          | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ]	 |
+	| userName         | bjen																											 |
+	| name             | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }							 |
+	| employeeNumber   | 100																											 |
+
+	And extract JSON from body
+	And extract 'id' from JSON body
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key              | Value                                                 |
+	| schemas          | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]   |
+	| Operations	   | [ { "op": "replace", "path" : "name.givenName" } ]    |
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='400'
+	Then JSON 'scimType'='invalidvalue'
+	Then JSON 'detail'='name.givenName is not a valid string'

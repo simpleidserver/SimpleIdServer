@@ -216,6 +216,9 @@
   <data name="NotValidJSON" xml:space="preserve">
     <value>{0} is not a valid JSON</value>
   </data>
+  <data name="NotValidString" xml:space="preserve">
+    <value>{0} is not a valid string</value>
+  </data>
   <data name="OperationsRequired" xml:space="preserve">
     <value>At least one operation must be passed</value>
   </data>

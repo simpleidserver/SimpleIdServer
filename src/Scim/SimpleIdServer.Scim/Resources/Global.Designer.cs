@@ -358,6 +358,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à {0} is not a valid string.
+        /// </summary>
+        public static string NotValidString {
+            get {
+                return ResourceManager.GetString("NotValidString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à At least one operation must be passed.
         /// </summary>
         public static string OperationsRequired {
