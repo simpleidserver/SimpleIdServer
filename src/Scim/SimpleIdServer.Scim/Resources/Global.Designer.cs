@@ -358,6 +358,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à At least one operation must be passed.
+        /// </summary>
+        public static string OperationsRequired {
+            get {
+                return ResourceManager.GetString("OperationsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à PATCH can be applied only on existing attributes.
         /// </summary>
         public static string PatchMissingAttribute {

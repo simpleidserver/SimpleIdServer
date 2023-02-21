@@ -98,6 +98,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Operations));
             }
+
+            if(!patchRepresentation.Operations.Any())
+            {
+                throw new SCIMBadSyntaxException(Global.OperationsRequired);
+            }
         }
     }
 }

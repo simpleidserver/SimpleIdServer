@@ -216,6 +216,9 @@
   <data name="NotValidJSON" xml:space="preserve">
     <value>{0} is not a valid JSON</value>
   </data>
+  <data name="OperationsRequired" xml:space="preserve">
+    <value>At least one operation must be passed</value>
+  </data>
   <data name="PatchMissingAttribute" xml:space="preserve">
     <value>PATCH can be applied only on existing attributes</value>
   </data>
