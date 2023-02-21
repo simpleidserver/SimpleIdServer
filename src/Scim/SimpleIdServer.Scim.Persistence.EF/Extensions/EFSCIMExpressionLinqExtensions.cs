@@ -24,7 +24,8 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             SCIMDbContext dbContext,
             IEnumerable<SCIMAttributeExpression> includedAttributes,
             IEnumerable<SCIMAttributeExpression> excludedAttributes,
-            string id)
+            string id,
+            string resourceType)
         {
             IQueryable<SCIMRepresentationAttribute> filteredAttrs = null;
             if (includedAttributes != null && includedAttributes.Any())
@@ -40,14 +41,14 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             if (filteredAttrs != null)
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
-                var result = await representations.FirstOrDefaultAsync(r => r.Id == id);
+                var result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
                 var includedFullPathLst = (includedAttributes != null && includedAttributes.Any()) ? includedAttributes.Where(i => i is SCIMComplexAttributeExpression).Select(i => i.GetFullPath()) : new List<string>();
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;
             }
 
             representations = representations.Include(r => r.FlatAttributes).ThenInclude(s => s.SchemaAttribute);
-            return await representations.FirstOrDefaultAsync(r => r.Id == id);
+            return await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType);
         }
 
         public static SearchSCIMRepresentationsResponse BuildResult(
