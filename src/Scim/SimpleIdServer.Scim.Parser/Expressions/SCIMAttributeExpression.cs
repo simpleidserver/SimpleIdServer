@@ -153,7 +153,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
 
         protected virtual object ProtectedClone()
         {
-            return new SCIMAttributeExpression(Name, (SCIMAttributeExpression)Child.Clone());
+            return new SCIMAttributeExpression(Name, (SCIMAttributeExpression)Child?.Clone());
         }
 
         protected void IncrementNbChildren(ref int nbChildren)
