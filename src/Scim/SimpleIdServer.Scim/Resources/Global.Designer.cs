@@ -538,6 +538,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Endpoint not found.
+        /// </summary>
+        public static string UnknownEndpoint {
+            get {
+                return ResourceManager.GetString("UnknownEndpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à path {0} doesn&apos;t exist.
         /// </summary>
         public static string UnknownPath {

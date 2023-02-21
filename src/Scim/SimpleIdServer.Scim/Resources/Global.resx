@@ -276,6 +276,9 @@
   <data name="UnknownBulkId" xml:space="preserve">
     <value>bulkId {0} doesn't exist</value>
   </data>
+  <data name="UnknownEndpoint" xml:space="preserve">
+    <value>Endpoint not found</value>
+  </data>
   <data name="UnknownPath" xml:space="preserve">
     <value>path {0} doesn't exist</value>
   </data>
