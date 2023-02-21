@@ -25,26 +25,18 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             DisplayName = representation.DisplayName;
             FlatAttributes = representation.FlatAttributes;
             SchemaRefs = representation.Schemas.Select(s => new MongoDBRef(schemaCollectionName, s.Id)).ToList();
-            AttributeRefs = representation.FlatAttributes.Select(a => new MongoDBRef(attributesCollectionName, a.Id)).ToList();
         }
 
         public ICollection<MongoDBRef> SchemaRefs { get; set; }
-        public ICollection<MongoDBRef> AttributeRefs { get; set; }
 
         public void IncludeAll(IMongoDatabase database)
         {
             IncludeSchemas(database);
-            IncludeAttributes(database);
         }
 
         public void IncludeSchemas(IMongoDatabase database)
         {
             Schemas = MongoDBEntity.GetReferences<SCIMSchema>(SchemaRefs, database);
-        }
-
-        public void IncludeAttributes(IMongoDatabase database)
-        {
-            FlatAttributes = MongoDBEntity.GetReferences<SCIMRepresentationAttribute>(AttributeRefs, database);
         }
     }
 }

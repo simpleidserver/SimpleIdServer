@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using SimpleIdServer.Jwt;
@@ -52,7 +53,10 @@ namespace SimpleIdServer.Scim.SqlServer.Startup
                 o.EnableEndpointRouting = false;
                 o.AddSCIMValueProviders();
             }).AddNewtonsoftJson(o => { });
-            services.AddLogging();
+            services.AddLogging(o =>
+            {
+                o.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            });
             // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
             services.AddAuthorization(opts =>
             {

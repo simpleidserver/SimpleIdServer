@@ -48,10 +48,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
                 var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
                 foreach (var representation in result)
-                {
                     representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
-                    representation.IncludeAttributes(_scimDbContext.Database);
-                }
             }
 
             return result;
@@ -68,14 +65,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                     .Where(r => filter.Contains(r.Id));
                 if (!string.IsNullOrWhiteSpace(resourceType))
                     query = query.Where(r => r.ResourceType == resourceType);
-                var result = query.ToList();
+                var result = query.ToMongoListAsync().Result;
                 var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
                 var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
                 foreach(var representation in result)
-                {
                     representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
-                    representation.IncludeAttributes(_scimDbContext.Database);
-                }
 
                 yield return result;
             }
@@ -91,9 +85,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var nbPages = Math.Ceiling((decimal)(nb / nbRecords));
             for (var i = 0; i <= nbPages; i++)
             {
-                var parentIds = query.Skip(i * nbRecords).Take(nbRecords);
+                var parentIds = query.Skip(i * nbRecords).Take(nbRecords).ToMongoListAsync().Result;
                 var result = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
+                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                    .ToMongoListAsync().Result;
                 yield return result;
             }
         }
@@ -108,17 +103,22 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var parentIds = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
                     .Where(a => a.SchemaAttributeId == schemaAttributeId && filter.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                     .Select(r => r.ParentAttributeId)
-                    .ToList();
+                    .ToMongoListAsync().Result;
                 var result = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
+                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                    .ToMongoListAsync().Result;
                 yield return result;
             }
         }
 
         public async Task<SCIMRepresentation> FindSCIMRepresentationByAttribute(string schemaAttributeId, string value, string endpoint = null)
         {
+            var flatAttr = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && a.ValueString == value)
+                .ToMongoFirstAsync();
+            if (flatAttr == null) return null;
             var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
-                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.FlatAttributes.Any(a => a.SchemaAttribute.Id == schemaAttributeId && a.ValueString == value))
+                .Where(r => (endpoint == null || endpoint == r.ResourceType) && r.Id == flatAttr.RepresentationId)
                 .ToMongoFirstAsync();
             if (result == null)
                 return null;
@@ -157,10 +157,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var references = result.SelectMany(r => r.SchemaRefs).Distinct().ToList();
                 var schemas = MongoDBEntity.GetReferences<SCIMSchema>(references, _scimDbContext.Database);
                 foreach (var representation in result)
-                {
                     representation.Schemas = schemas.Where(s => representation.SchemaRefs.Any(r => r.Id == s.Id)).ToList();
-                    representation.IncludeAttributes(_scimDbContext.Database);
-                }
             }
 
             return result;
@@ -217,19 +214,17 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         public async Task<bool> Update(SCIMRepresentation data, CancellationToken token)
         {
             var record = new SCIMRepresentationModel(data, _options.CollectionSchemas, _options.CollectionRepresentationAttributes);
-            var updated = new List<WriteModel<SCIMRepresentationAttribute>>();
-            foreach(var attr in data.FlatAttributes)
-                updated.Add(new ReplaceOneModel<SCIMRepresentationAttribute>(attr.Id, attr));
-
             if (_session != null)
             {
                 await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == data.Id, record);
-                await _scimDbContext.SCIMRepresentationAttributeLst.BulkWriteAsync(_session, updated, cancellationToken: token);
+                foreach (var attr in data.FlatAttributes)
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr);
             }
             else
             {
                 await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == data.Id, record);
-                await _scimDbContext.SCIMRepresentationAttributeLst.BulkWriteAsync(updated, cancellationToken: token);
+                foreach(var attr in data.FlatAttributes)
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr);
             }
 
             return true;
@@ -237,34 +232,90 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public async Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
+            if (!scimRepresentationAttributes.Any()) return;
+            var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
+            var representations = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
             if (_session != null)
+            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(_session, scimRepresentationAttributes);
+                foreach (var representation in representations)
+                {
+                    var attrs = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).ToList();
+                    foreach (var attr in attrs) representation.FlatAttributes.Add(attr);
+                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == representation.Id, representation);
+                }
+            }
             else
+            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.InsertManyAsync(scimRepresentationAttributes);
+                foreach (var representation in representations)
+                {
+                    var attrs = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).ToList();
+                    foreach (var attr in attrs) representation.FlatAttributes.Add(attr);
+                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
+                }
+            }
         }
 
         public async Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
+            if (!scimRepresentationAttributes.Any()) return;
+            var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
             var attributeIds = scimRepresentationAttributes.Select(a => a.Id);
             var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.Id, attributeIds);
             if (_session != null)
+            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(_session, filter);
+                foreach (var representation in result)
+                {
+                    var removedAttributeIds = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).Select(r => r.Id);
+                    representation.FlatAttributes = representation.FlatAttributes.Where(r => !removedAttributeIds.Contains(r.Id)).ToList();
+                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == representation.Id, representation);
+                }
+            }
             else
+            {
                 await _scimDbContext.SCIMRepresentationAttributeLst.DeleteManyAsync(filter);
+                foreach (var representation in result)
+                {
+                    var removedAttributeIds = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id).Select(r => r.Id);
+                    representation.FlatAttributes = representation.FlatAttributes.Where(r => !removedAttributeIds.Contains(r.Id)).ToList();
+                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
+                }
+            }
         }
 
         public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
         {
-            var updated = new List<WriteModel<SCIMRepresentationAttribute>>();
-            foreach (var attr in scimRepresentationAttributes)
-                updated.Add(new ReplaceOneModel<SCIMRepresentationAttribute>(attr.Id, attr));
+            if (!scimRepresentationAttributes.Any()) return;
+            var representationIds = scimRepresentationAttributes.Select(r => r.RepresentationId).Distinct();
+            var result = await _scimDbContext.SCIMRepresentationLst.AsQueryable().Where(r => representationIds.Contains(r.Id)).ToMongoListAsync();
             if (_session != null)
             {
-                await _scimDbContext.SCIMRepresentationAttributeLst.BulkWriteAsync(_session, updated);
+                foreach(var attr in scimRepresentationAttributes)
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(_session, s => s.Id == attr.Id, attr);
+                foreach (var representation in result)
+                {
+                    var updatedAttributes = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id);
+                    representation.FlatAttributes = representation.FlatAttributes.Where(a => !updatedAttributes.Any(at => at.Id == a.Id)).ToList();
+                    foreach (var attr in updatedAttributes)
+                        representation.FlatAttributes.Add(attr);
+                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(_session, s => s.Id == representation.Id, representation);
+                }
             }
             else
             {
-                await _scimDbContext.SCIMRepresentationAttributeLst.BulkWriteAsync(updated);
+                foreach (var attr in scimRepresentationAttributes)
+                    await _scimDbContext.SCIMRepresentationAttributeLst.ReplaceOneAsync(s => s.Id == attr.Id, attr);
+                foreach (var representation in result)
+                {
+                    var updatedAttributes = scimRepresentationAttributes.Where(r => r.RepresentationId == representation.Id);
+                    representation.FlatAttributes = representation.FlatAttributes.Where(a => !updatedAttributes.Any(at => at.Id == a.Id)).ToList();
+                    foreach (var attr in updatedAttributes)
+                        representation.FlatAttributes.Add(attr);
+                    await _scimDbContext.SCIMRepresentationLst.ReplaceOneAsync(s => s.Id == representation.Id, representation);
+                }
             }
         }
     }

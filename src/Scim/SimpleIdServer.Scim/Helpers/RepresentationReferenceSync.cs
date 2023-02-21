@@ -248,6 +248,8 @@ namespace SimpleIdServer.Scim.Helpers
                 var removedIndirectChildrenIds = allRemoved.Where(r => !r.IsDirect).Select(r => r.Id);
 
                 IEnumerable<SCIMRepresentation> allParents = null;
+                var sw = new Stopwatch();
+                sw.Start();
                 // Update displayName.
                 if(updateAllReference)
                 {
@@ -263,6 +265,9 @@ namespace SimpleIdServer.Scim.Helpers
                     yield return result;
                 }
 
+                Console.WriteLine($"update display name {sw.ElapsedMilliseconds}");
+                sw.Restart();
+
                 // Add indirect reference to the parent.
                 if (addedDirectChildrenIds.Any())
                 {
@@ -275,6 +280,9 @@ namespace SimpleIdServer.Scim.Helpers
 
                     yield return result;
                 }
+
+                Console.WriteLine($"add indirect reference to the parent {sw.ElapsedMilliseconds}");
+                sw.Restart();
 
                 // If at least one parent has a reference to the child then add indirect reference to the child.
                 if (removedDirectChildrenIds.Any())
@@ -292,9 +300,13 @@ namespace SimpleIdServer.Scim.Helpers
                     yield return result;
                 }
 
+                Console.WriteLine($"removedDirectChildrenIds {sw.ElapsedMilliseconds}");
+                sw.Restart();
+
                 // Populate the children.
                 if (addedIndirectChildrenIds.Any() || removedIndirectChildrenIds.Any())
                 {
+                    // Refactor this part in order to improve the performance.
                     result = new RepresentationSyncResult();
                     var fullPath = $"{selfReferenceAttribute.SourceAttributeSelector}.{SCIMConstants.StandardSCIMReferenceProperties.Value}";
                     var childrenIds = newSourceScimRepresentation.FlatAttributes.Where(f => f.FullPath == fullPath).Select(f => f.ValueString);
@@ -306,6 +318,7 @@ namespace SimpleIdServer.Scim.Helpers
                     var notRemoved = _scimRepresentationCommandRepository.FindSCIMRepresentationByIds(notRemovedChildrenIds).Result;
                     var notRemovedChildren = notRemoved.SelectMany(r => ResolveChildren(r, selfReferenceAttribute).ToList());
                     var notRemovedChldIds = notRemovedChildren.Select(r => r.Id);
+
                     foreach (var indirectChild in indirectChildren)
                     {
                         var allChld = ResolveChildren(indirectChild, selfReferenceAttribute);
@@ -353,6 +366,9 @@ namespace SimpleIdServer.Scim.Helpers
 
                     yield return result;
                 }
+
+                Console.WriteLine($"addedIndirectChildrenIds {sw.ElapsedMilliseconds}");
+                sw.Restart();
             }
         }
 

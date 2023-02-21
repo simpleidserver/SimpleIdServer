@@ -80,7 +80,8 @@ namespace SimpleIdServer.Scim.Persistence.EF
                     .Select(r => r.ParentAttributeId)
                     .ToList();
                 var result = _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId));
+                    .Where(a => parentIds.Contains(a.Id) || parentIds.Contains(a.ParentAttributeId))
+                    .ToList();
                 yield return result;
             }
         }
