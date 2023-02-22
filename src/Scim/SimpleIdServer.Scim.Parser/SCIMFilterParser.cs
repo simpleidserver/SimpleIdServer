@@ -434,10 +434,8 @@ namespace SimpleIdServer.Scim.Parser
 
         private static string CleanFilter(string filter)
         {
-            if(filter.StartsWith("(") && filter.EndsWith(")"))
-                return filter.TrimStart('(').TrimEnd(')');
-            if (filter == ")") return null;
-            return filter;
+            if (filter.StartsWith("not")) return filter;
+            return filter.TrimStart('(').TrimEnd(')');
         }
 
         private static bool IsStandardOperand(string str)
