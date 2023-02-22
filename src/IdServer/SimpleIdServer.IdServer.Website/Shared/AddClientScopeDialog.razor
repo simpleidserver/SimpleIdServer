@@ -1,0 +1,123 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@inherits FluxorComponent
+@inject IState<ClientScopesState> clientScopesState
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<UpdateClientState> updateClientState
+@inject IDispatcher dispatcher
+
+<RadzenDataGrid @ref="grid" 
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@clientScopesState.Value.IsEditableScopesLoading"
+                Count="@clientScopesState.Value.EditableScopesCount"
+                Data="@clientScopesState.Value.EditableScopes"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="EditableClientScope"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                @if(!data.IsPresent)
+                {
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="Name" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="EditableClientScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
+            <Template Context="data">
+                @if (data.Value.Type == ScopeTypes.IDENTITY)
+                {
+                    <RadzenBadge Text="Identity Resource" IsPill="true" />
+                }
+                else
+                {
+                    <RadzenBadge Text="API Resource" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="EditableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenButton Click="@(args => UpdateClientScopes())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateClientState.Value.IsUpdating)" />
+
+@code {
+    RadzenDataGrid<EditableClientScope> grid;
+    bool selectAll = false;
+    [Parameter]
+    public Client Client { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<AddClientScopesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ClientScopesAdded });
+                dialogService.Close();
+                StateHasChanged();
+            });
+            grid.Reload();
+        }
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchScopesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, ClientType = Client.ClientType };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, EditableClientScope scope)
+    {
+        var act = new ToggleScopeSelectionAction { IsSelected = isSelected, ScopeName = scope.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllScopeSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<EditableClientScope> row)
+    {
+        const string className = "class";
+        if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Data.IsPresent)
+            row.Attributes.Add(className, "disabled");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void UpdateClientScopes()
+    {
+        var act = new AddClientScopesAction { ClientId = Client.ClientId, ScopeNames = clientScopesState.Value.EditableScopes.Where(s => !s.IsPresent && s.IsSelected).Select(s => s.Value.Name) };
+        dispatcher.Dispatch(act);
+    }
+}

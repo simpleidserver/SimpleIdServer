@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client scopes have been added.
+        /// </summary>
+        public static string ClientScopesAdded {
+            get {
+                return ResourceManager.GetString("ClientScopesAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client settings have been updated.
         /// </summary>
         public static string ClientSettingsUpdated {
@@ -124,7 +133,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scope &apos;{0}&apos; is added.
+        ///   Recherche une chaîne localisée semblable à Value &apos;{0}&apos; is added.
         /// </summary>
         public static string ScopeAdded {
             get {
@@ -178,7 +187,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scope Claim Mapper has been updated.
+        ///   Recherche une chaîne localisée semblable à Value Claim Mapper has been updated.
         /// </summary>
         public static string ScopeClaimMapperUpdated {
             get {
@@ -187,7 +196,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scope details have been updated.
+        ///   Recherche une chaîne localisée semblable à Value details have been updated.
         /// </summary>
         public static string ScopeDetailsUpdated {
             get {
@@ -196,7 +205,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scope resource is added.
+        ///   Recherche une chaîne localisée semblable à Value resource is added.
         /// </summary>
         public static string ScopeResourceAdded {
             get {
@@ -205,7 +214,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scope Resources have been updated.
+        ///   Recherche une chaîne localisée semblable à Value Resources have been updated.
         /// </summary>
         public static string ScopeResourcesUpdated {
             get {
@@ -232,7 +241,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Scope mappers have been removed.
+        ///   Recherche une chaîne localisée semblable à Value mappers have been removed.
         /// </summary>
         public static string SelectedScopesMappersRemoved {
             get {

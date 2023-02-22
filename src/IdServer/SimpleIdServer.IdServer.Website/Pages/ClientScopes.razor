@@ -7,6 +7,7 @@
 @using SimpleIdServer.IdServer.WsFederation.Extensions;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
+@inject DialogService dialogService
 @inject IState<ClientScopesState> clientScopesState
 @inject ContextMenuService contextMenuService
 @inject TooltipService tooltipService
@@ -37,7 +38,23 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Name" Filterable="false" Sortable="true" Title="Name" Width="80px" SortOrder="SortOrder.Ascending" />
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="Name" Width="80px" SortOrder="SortOrder.Ascending">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Name}/settings")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="Type" Width="80px">
+            <Template Context="data">
+                @if (data.Value.Type == ScopeTypes.IDENTITY)
+                {
+                    <RadzenBadge Text="Identity Resource" IsPill="true" />
+                }
+                else
+                {
+                    <RadzenBadge Text="API Resource" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="Description" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
@@ -86,9 +103,18 @@
             row.Attributes.Remove(className);
     }
 
-    void AddScope()
+    async void AddScope()
     {
-
+        await dialogService.OpenAsync<AddClientScopeDialog>("Add scopes", new Dictionary<string, object>
+        {
+            { "Client", Client }
+        }, new DialogOptions
+        {
+            Width = "900px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
     }
 
     void ShowMoreContextMenu(SelectableClientScope scope, MouseEventArgs args)

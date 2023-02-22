@@ -211,6 +211,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             });
         }
 
+        [EffectMethod]
+        public async Task Handle(AddClientScopesAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.Scopes).SingleAsync(c => c.ClientId == act.ClientId, CancellationToken.None);
+            var newScopes = await _scopeRepository.Query().Where(s => act.ScopeNames.Contains(s.Name)).ToListAsync();
+            foreach (var newScope in newScopes)
+                client.Scopes.Add(newScope);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddClientScopesSuccessAction
+            {
+                ClientId = act.ClientId,
+                Scopes = newScopes
+            });
+        }
+
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
         {
             var errors = new List<string>();
@@ -415,5 +430,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
         public string ClientId { get; set; } = null!;
         public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
+    }
+
+    public class ToggleEditableClientScopeSelectionAction
+    {
+        public bool IsSelected { get; set; }
+        public string ScopeName { get; set; } = null!;
+    }
+
+    public class ToggleAllEditableClientScopeSelectionAction
+    {
+        public bool IsSelected { get; set; }
+    }
+
+    public class AddClientScopesAction
+    {
+        public string ClientId { get; set; } = null!;
+        public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
+    }
+
+    public class AddClientScopesSuccessAction
+    {
+        public string ClientId { get; set; } = null!;
+        public IEnumerable<Scope> Scopes { get; set; } = new List<Scope>();
     }
 }

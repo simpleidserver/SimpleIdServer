@@ -29,6 +29,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             if (!string.IsNullOrWhiteSpace(action.OrderBy))
                 query = query.OrderBy(SanitizeExpression(action.OrderBy));
 
+            if (!string.IsNullOrWhiteSpace(action.ClientType))
+            {
+                if (action.ClientType == SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE)
+                    query = query.Where(q => q.Protocol == ScopeProtocols.SAML);
+                else
+                    query = query.Where(q => q.Protocol == ScopeProtocols.OAUTH || q.Protocol == ScopeProtocols.OPENID);
+            }
+
             var scopes = await query.Skip(action.Skip.Value).Take(action.Take.Value).ToListAsync(CancellationToken.None);
             dispatcher.Dispatch(new SearchScopesSuccessAction { Scopes = scopes });
 
@@ -191,6 +199,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         public string? OrderBy { get; set; } = null;
         public int? Skip { get; set; } = null;
         public int? Take { get; set; } = null;
+        public string? ClientType { get; set; } = null;
     }
 
     public class SearchScopesSuccessAction

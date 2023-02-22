@@ -3,6 +3,7 @@
 using Fluxor;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
@@ -11,7 +12,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         #region SearchClientsState
 
         [ReducerMethod]
-        public static SearchClientsState ReduceSearchClientsAction(SearchClientsState state, SearchClientsAction act) => new(isLoading: true, clients: new List<Client>());
+        public static SearchClientsState ReduceSearchClientsAction(SearchClientsState state, SearchClientsAction act) => new(isLoading: true, clients: new List<Domains.Client>());
 
         [ReducerMethod]
         public static SearchClientsState ReduceSearchClientsSuccessAction(SearchClientsState state, SearchClientsSuccessAction act)
@@ -29,7 +30,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var clients = state.Clients?.ToList();
             if (clients == null) return state;
-            var newClient = new Client { ClientId = act.ClientId, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, ClientType = act.ClientType };
+            var newClient = new Domains.Client { ClientId = act.ClientId, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, ClientType = act.ClientType };
             if(!string.IsNullOrWhiteSpace(act.ClientName))
                 newClient.Translations.Add(new Translation
                 {
@@ -123,6 +124,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
         [ReducerMethod]
         public static UpdateClientState ReduceUpdateClientDetailsSuccessAction(UpdateClientState state, UpdateClientDetailsSuccessAction act) => new(isUpdating: false);
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceAddClientScopesAction(UpdateClientState state, AddClientScopesAction act) => new(isUpdating: true);
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceAddClientScopesSuccessAction(UpdateClientState state, AddClientScopesSuccessAction act) => new(isUpdating: false);
 
         #endregion
 
@@ -222,6 +229,68 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             return state with
             {
                 Scopes = scopes
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceSearchScopesAction(ClientScopesState state, SearchScopesAction act) => state with
+        {
+            IsEditableScopesLoading = true
+        };
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceSearchScopesSuccessAction(ClientScopesState state, SearchScopesSuccessAction act)
+        {
+            var result = act.Scopes.OrderBy(s => s.Name).Select(s => new EditableClientScope(s)
+            {
+                IsPresent = state.Scopes.Any(sc => sc.Value.Name == s.Name)
+            }).ToList();
+            return state with
+            {
+                EditableScopes = result,
+                EditableScopesCount = result.Count,
+                IsEditableScopesLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceAddClientScopesSuccessAction(ClientScopesState state, AddClientScopesSuccessAction act)
+        {
+            var scopes = state.Scopes.ToList();
+            var newScopes = act.Scopes.ToList().Select(s => new SelectableClientScope(s)
+            {
+                IsNew = true
+            });
+            foreach (var newScope in newScopes)
+                scopes.Add(newScope);
+            return state with
+            {
+                Scopes = scopes,
+                Count = scopes.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceToggleEditableClientScopeSelectionAction(ClientScopesState state, ToggleEditableClientScopeSelectionAction act)
+        {
+            var lst = state.EditableScopes.ToList();
+            var scope = lst.Single(s => s.Value.Name == act.ScopeName);
+            scope.IsSelected = act.IsSelected;
+            return state with
+            {
+                EditableScopes = lst
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientScopesState ReduceToggleAllEditableClientScopeSelectionAction(ClientScopesState state, ToggleAllEditableClientScopeSelectionAction act)
+        {
+            var lst = state.EditableScopes.ToList();
+            foreach (var record in lst)
+                record.IsSelected = act.IsSelected;
+            return state with
+            {
+                EditableScopes = lst
             };
         }
 

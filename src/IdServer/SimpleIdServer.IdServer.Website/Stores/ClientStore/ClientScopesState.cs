@@ -20,6 +20,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public IEnumerable<SelectableClientScope>? Scopes { get; set; } = new List<SelectableClientScope>();
         public int Count { get; set; } = 0;
         public bool IsLoading { get; set; } = false;
+        public IEnumerable<EditableClientScope>? EditableScopes { get; set; } = new List<EditableClientScope>();
+        public int EditableScopesCount { get; set; } = 0;
+        public bool IsEditableScopesLoading { get; set; } = false;
     }
 
     public class SelectableClientScope
@@ -32,5 +35,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public bool IsSelected { get; set; } = false;
         public bool IsNew { get; set; } = false;
         public Scope Value { get; set; }
+    }
+
+    public class EditableClientScope
+    {
+        public EditableClientScope(Domains.Scope scope)
+        {
+            Value = scope;
+        }
+
+        public bool IsPresent { get; set; }
+        public bool IsSelected { get; set; }
+        public Domains.Scope Value { get; set; }
     }
 }
