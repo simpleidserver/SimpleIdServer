@@ -80,15 +80,15 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        public UserAgentClientBuilder AddEncryptedKey(EncryptingCredentials credentials)
+        public UserAgentClientBuilder AddEncryptedKey(EncryptingCredentials credentials, SecurityKeyTypes keyType)
         {
             var jsonWebKey = credentials.SerializePublicJWK();
             jsonWebKey.Alg = credentials.Alg;
-            _client.Add(credentials.Key.KeyId, jsonWebKey);
+            _client.Add(credentials.Key.KeyId, jsonWebKey, Constants.JWKUsages.Enc, keyType);
             return this;
         }
 
-        public UserAgentClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc));
+        public UserAgentClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc, SecurityKeyTypes keyType) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc), SecurityKeyTypes.RSA);
 
         #endregion
 

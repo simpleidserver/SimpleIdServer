@@ -6,7 +6,6 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -21,6 +20,32 @@ namespace SimpleIdServer.IdServer.Builders
         {
             _client = client;
         }
+
+        #region Signing Key
+
+        /// <summary>
+        /// Add signing key used to check the 'request' parameter.
+        /// </summary>
+        /// <param name="signingCredentials"></param>
+        /// <param name="alg"></param>
+        /// <returns></returns>
+        public ApiClientBuilder AddSigningKey(SigningCredentials signingCredentials, string alg, SecurityKeyTypes securityKey)
+        {
+            var jsonWebKey = signingCredentials.SerializePublicJWK();
+            jsonWebKey.Alg = alg;
+            _client.Add(signingCredentials.Kid, jsonWebKey, Constants.JWKUsages.Sig, securityKey);
+            return this;
+        }
+
+        public ApiClientBuilder AddSigningKey(RsaSecurityKey securityKey, string alg = SecurityAlgorithms.RsaSha256) => AddSigningKey(new SigningCredentials(securityKey, alg), alg, SecurityKeyTypes.RSA);
+
+        public ApiClientBuilder GenerateRSASigningKey(string keyid, string alg = SecurityAlgorithms.RsaSha256)
+        {
+            var sigKey = ClientKeyGenerator.GenerateRSASignatureKey(keyid, alg);
+            return AddSigningKey(sigKey, alg, SecurityKeyTypes.RSA);
+        }
+
+        #endregion
 
         #region Grant-types
 
@@ -101,19 +126,9 @@ namespace SimpleIdServer.IdServer.Builders
         /// For more information : https://oauth.net/private-key-jwt/
         /// </summary>
         /// <returns></returns>
-        public ApiClientBuilder UsePrivateKeyJwtAuthentication(params JsonWebKey[] jsonWebKeys)
+        public ApiClientBuilder UsePrivateKeyJwtAuthentication()
         {
             _client.TokenEndPointAuthMethod = OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD;
-            if (jsonWebKeys != null)
-            {
-                foreach (var jsonWebKey in jsonWebKeys.Select(j => new ClientJsonWebKey
-                {
-                    Kid = j.Kid,
-                    SerializedJsonWebKey = JsonExtensions.SerializeToJson(j)
-                }))
-                    _client.SerializedJsonWebKeys.Add(jsonWebKey);
-            }
-
             return this;
         }
 
@@ -123,20 +138,9 @@ namespace SimpleIdServer.IdServer.Builders
         /// </summary>
         /// <param name="jsonWebKeys"></param>
         /// <returns></returns>
-        public ApiClientBuilder UseClientSecretJwtAuthentication(params JsonWebKey[] jsonWebKeys)
+        public ApiClientBuilder UseClientSecretJwtAuthentication()
         {
-            // TODO : Check the password !!!
             _client.TokenEndPointAuthMethod = OAuthClientSecretJwtAuthenticationHandler.AUTH_METHOD;
-            if (jsonWebKeys != null)
-            {
-                foreach(var jsonWebKey in jsonWebKeys.Select(j => new ClientJsonWebKey
-                {
-                    Kid = j.Kid,
-                    SerializedJsonWebKey = JsonExtensions.SerializeToJson(j)
-                }))
-                    _client.SerializedJsonWebKeys.Add(jsonWebKey);
-            }
-
             return this;
         }
 
@@ -202,6 +206,9 @@ namespace SimpleIdServer.IdServer.Builders
             _client.SerializedJsonWebKeys.Add(new ClientJsonWebKey
             {
                 Kid = keyId,
+                Usage = Constants.JWKUsages.Sig,
+                Alg = SecurityAlgorithms.RsaSha256,
+                KeyType = SecurityKeyTypes.CERTIFICATE,
                 SerializedJsonWebKey = JsonExtensions.SerializeToJson(jwk)
             });
             return this;

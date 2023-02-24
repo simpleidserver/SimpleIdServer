@@ -295,6 +295,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Kid = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Alg = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Usage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    KeyType = table.Column<int>(type: "int", nullable: true),
                     SerializedJsonWebKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },

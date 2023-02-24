@@ -12,6 +12,12 @@ namespace SimpleIdServer.IdServer
 {
     public static class Constants
     {
+        public static class JWKUsages
+        {
+            public const string Enc = "enc";
+            public const string Sig = "sig";
+        }
+
         public static class EndPoints
         {
             public const string Token = "token";

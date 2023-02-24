@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Builders;
@@ -141,7 +142,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         [EffectMethod]
         public async Task Handle(GetClientAction action, IDispatcher dispatcher)
         {
-            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId, CancellationToken.None);
+            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == action.ClientId, CancellationToken.None);
             if(client == null)
             {
                 dispatcher.Dispatch(new GetClientFailureAction { ErrorMessage = string.Format(Global.UnknownClient, action.ClientId) });
@@ -224,6 +225,53 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 ClientId = act.ClientId,
                 Scopes = newScopes
             });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GenerateSigKeyAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
+            if(client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
+            {
+                dispatcher.Dispatch(new GenerateSigKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
+                return;
+            }
+
+            SigningCredentials sigCredentials = null;
+            switch(act.KeyType)
+            {
+                case SecurityKeyTypes.RSA:
+                    sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(act.KeyId, act.Alg);
+                    break;
+                case SecurityKeyTypes.CERTIFICATE:
+                    sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(act.KeyId, act.Alg);
+                    break;
+                case SecurityKeyTypes.ECDSA:
+                    sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(act.KeyId, act.Alg);
+                    break;
+            }
+
+            var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
+            dispatcher.Dispatch(new GenerateSigKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = sigCredentials, Pem = pemResult, KeyType = act.KeyType });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddSigKeyAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
+            var jsonWebKey = act.Credentials.SerializePublicJWK();
+            client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Sig, act.KeyType);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddSigKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
+            client.SerializedJsonWebKeys = client.SerializedJsonWebKeys.Where(j => !act.KeyIds.Contains(j.Kid)).ToList();
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedClientKeysSuccessAction { ClientId = act.ClientId, KeyIds = act.KeyIds });
         }
 
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
@@ -453,5 +501,68 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
         public string ClientId { get; set; } = null!;
         public IEnumerable<Scope> Scopes { get; set; } = new List<Scope>();
+    }
+
+    public class GenerateSigKeyAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public string Alg { get; set; } = null!;
+    }
+
+    public class GenerateSigKeySuccessAction
+    {
+        public string KeyId { get; set; } = null!;
+        public string Alg { get; set; } = null!;
+        public SigningCredentials Credentials { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public PemResult Pem { get; set; } = null!;
+    }
+
+    public class GenerateSigKeyFailureAction
+    {
+        public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class AddSigKeyAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
+        public string Alg { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public SigningCredentials Credentials { get; set; } = null!;
+    }
+
+    public class AddSigKeySuccessAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
+        public string Alg { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public SigningCredentials Credentials { get; set; } = null!;
+    }
+
+    public class ToggleAllClientKeySelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+    }
+
+    public class ToggleClientKeySelectionAction
+    {
+        public bool IsSelected { get; set; } = false;
+        public string KeyId { get; set; } = null!;
+    }
+
+    public class RemoveSelectedClientKeysAction
+    {
+        public string ClientId { get; set; } = null!;
+        public IEnumerable<string> KeyIds { get; set; } = new List<string>();
+    }
+
+    public class RemoveSelectedClientKeysSuccessAction
+    {
+        public string ClientId { get; set; } = null!;
+        public IEnumerable<string> KeyIds { get; set; } = new List<string>();
     }
 }

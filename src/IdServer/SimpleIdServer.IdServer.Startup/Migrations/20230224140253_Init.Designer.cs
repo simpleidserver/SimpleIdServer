@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230214124808_Init")]
+    [Migration("20230224140253_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -502,14 +502,25 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Alg")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ClientId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("KeyType")
+                        .HasColumnType("int");
 
                     b.Property<string>("Kid")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SerializedJsonWebKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Usage")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

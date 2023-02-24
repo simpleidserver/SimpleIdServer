@@ -114,29 +114,29 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="signingCredentials"></param>
         /// <param name="alg"></param>
         /// <returns></returns>
-        public MobileClientBuilder AddSigningKey(SigningCredentials signingCredentials, string alg)
+        public MobileClientBuilder AddSigningKey(SigningCredentials signingCredentials, string alg, SecurityKeyTypes keyType)
         {
             var jsonWebKey = signingCredentials.SerializePublicJWK();
             jsonWebKey.Alg = alg;
-            _client.Add(signingCredentials.Kid, jsonWebKey);
+            _client.Add(signingCredentials.Kid, jsonWebKey, Constants.JWKUsages.Sig, keyType);
             return this;
         }
 
-        public MobileClientBuilder AddSigningKey(RsaSecurityKey securityKey, string alg = SecurityAlgorithms.RsaSha256) => AddSigningKey(new SigningCredentials(securityKey, alg), alg);
+        public MobileClientBuilder AddSigningKey(RsaSecurityKey securityKey, string alg = SecurityAlgorithms.RsaSha256) => AddSigningKey(new SigningCredentials(securityKey, alg), alg, SecurityKeyTypes.RSA);
 
         #endregion
 
         #region Encryption Key
 
-        public MobileClientBuilder AddEncryptedKey(EncryptingCredentials credentials)
+        public MobileClientBuilder AddEncryptedKey(EncryptingCredentials credentials, SecurityKeyTypes keyType)
         {
             var jsonWebKey = credentials.SerializePublicJWK();
             jsonWebKey.Alg = credentials.Alg;
-            _client.Add(credentials.Key.KeyId, jsonWebKey);
+            _client.Add(credentials.Key.KeyId, jsonWebKey, Constants.JWKUsages.Enc, keyType);
             return this;
         }
 
-        public MobileClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc));
+        public MobileClientBuilder AddRSAEncryptedKey(RsaSecurityKey rsa, string alg, string enc) => AddEncryptedKey(new EncryptingCredentials(rsa, alg, enc), SecurityKeyTypes.RSA);
 
         #endregion
 

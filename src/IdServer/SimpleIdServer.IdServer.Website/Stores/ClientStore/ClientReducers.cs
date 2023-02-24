@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
@@ -130,6 +132,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
         [ReducerMethod]
         public static UpdateClientState ReduceAddClientScopesSuccessAction(UpdateClientState state, AddClientScopesSuccessAction act) => new(isUpdating: false);
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceGenerateSigKeySuccessAction(UpdateClientState state, GenerateSigKeySuccessAction act) => state with
+        {
+            ErrorMessage = null
+        };
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceGenerateSigKeyFailureAction(UpdateClientState state, GenerateSigKeyFailureAction act) => state with
+        {
+            ErrorMessage = act.ErrorMessage
+        };
 
         #endregion
 
@@ -291,6 +305,90 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             return state with
             {
                 EditableScopes = lst
+            };
+        }
+
+        #endregion
+
+        #region ClientKeysState
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceGetClientAction(ClientKeysState state, GetClientAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceGetClientSuccessAction(ClientKeysState state, GetClientSuccessAction act) => state with
+        {
+            IsLoading = false,
+            Count = act.Client.SerializedJsonWebKeys.Count(),
+            Keys = act.Client.SerializedJsonWebKeys.Select(s => new SelectableClientKey(s)).ToList()
+        };
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceToggleAllClientKeySelectionAction(ClientKeysState state, ToggleAllClientKeySelectionAction act)
+        {
+            var scopes = state.Keys.ToList();
+            foreach (var scope in scopes)
+                scope.IsSelected = act.IsSelected;
+            return state with
+            {
+                Keys = scopes
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceToggleClientKeySelectionAction(ClientKeysState state, ToggleClientKeySelectionAction act)
+        {
+            var keys = state.Keys.ToList();
+            keys.First(s => s.Value.Kid == act.KeyId).IsSelected = act.IsSelected;
+            return state with
+            {
+                Keys = keys
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceAddSigKeySuccessAction(ClientKeysState state, AddSigKeySuccessAction act)
+        {
+            var keys = state.Keys.ToList();
+            var jsonWebKey = act.Credentials.SerializePublicJWK();
+            var newKey = new ClientJsonWebKey
+            {
+                Alg = act.Alg,
+                Kid = act.KeyId,
+                KeyType = act.KeyType,
+                Usage = Constants.JWKUsages.Sig,
+                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
+            };
+            keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });
+            return state with
+            {
+                Keys = keys,
+                Count = keys.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceRemoveSelectedClientKeysAction(ClientKeysState state, RemoveSelectedClientKeysAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceRemoveSelectedClientKeysSuccessAction(ClientKeysState state, RemoveSelectedClientKeysSuccessAction act)
+        {
+            var keys = state.Keys.ToList();
+            keys = keys.Where(j => !act.KeyIds.Contains(j.Value.Kid)).ToList();
+            return state with
+            {
+                Keys = keys,
+                Count = keys.Count,
+                IsLoading = false
             };
         }
 

@@ -1,0 +1,130 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject NotificationService notificationService
+@inject NavigationManager navigationManager
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@layout MainLayout
+@inject IState<ClientKeysState> clientKeysState
+@inject IDispatcher dispatcher
+
+<!-- TODO : Display missing keys. For example, if "request" object is specified and the sig alg is not specified then display warning message -->
+
+<RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="Generate new key" />
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@clientKeysState.Value.IsLoading"
+                Count="@clientKeysState.Value.Count"
+                Data="@clientKeysState.Value.Keys"
+                RowRender="@RowRender"
+                TItem="SelectableClientKey"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Kid" Filterable="false" Sortable="true" SortOrder=SortOrder.Ascending Title="Identifier" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Alg" Filterable="false" Title="Algorithm" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Title="Usage" Width="80px">
+            <Template Context="data">
+                <RadzenBadge Text="@data.Value.Usage" IsPill="true" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll;
+
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<RemoveSelectedClientKeysSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientKeysRemoved });
+                StateHasChanged();
+            });
+        }
+    }
+
+
+    void ShowMoreContextMenu(SelectableClientKey scope, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+    {
+        if (a.Value.Equals(1))
+        {
+            var keyIds = clientKeysState.Value.Keys.Where(s => s.IsSelected).Select(s => s.Value.Kid).ToList();
+            if (!keyIds.Contains(scope.Value.Kid)) keyIds.Add(scope.Value.Kid);
+            var act = new RemoveSelectedClientKeysAction { KeyIds = keyIds, ClientId = Client.ClientId };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableClientKey key)
+    {
+        var act = new ToggleClientKeySelectionAction { IsSelected = isSelected, KeyId = key.Value.Kid };
+        dispatcher.Dispatch(act);
+    }
+
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllClientKeySelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableClientKey> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void GenerateKey()
+    {
+        await dialogService.OpenAsync<GenerateKeyDialog>("Generate key", new Dictionary<string, object>
+        {
+            { "Client", Client }
+        }, new DialogOptions
+        {
+            Width = "900px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

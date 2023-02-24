@@ -133,7 +133,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Value &apos;{0}&apos; is added.
+        ///   Recherche une chaîne localisée semblable à Scope &apos;{0}&apos; is added.
         /// </summary>
         public static string ScopeAdded {
             get {
@@ -187,7 +187,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Value Claim Mapper has been updated.
+        ///   Recherche une chaîne localisée semblable à Scope Claim Mapper has been updated.
         /// </summary>
         public static string ScopeClaimMapperUpdated {
             get {
@@ -196,7 +196,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Value details have been updated.
+        ///   Recherche une chaîne localisée semblable à Scope details have been updated.
         /// </summary>
         public static string ScopeDetailsUpdated {
             get {
@@ -205,7 +205,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Value resource is added.
+        ///   Recherche une chaîne localisée semblable à Scope resource is added.
         /// </summary>
         public static string ScopeResourceAdded {
             get {
@@ -214,11 +214,20 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Value Resources have been updated.
+        ///   Recherche une chaîne localisée semblable à Scope Resources have been updated.
         /// </summary>
         public static string ScopeResourcesUpdated {
             get {
                 return ResourceManager.GetString("ScopeResourcesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected client keys have been removed.
+        /// </summary>
+        public static string SelectedClientKeysRemoved {
+            get {
+                return ResourceManager.GetString("SelectedClientKeysRemoved", resourceCulture);
             }
         }
         
@@ -241,7 +250,7 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Value mappers have been removed.
+        ///   Recherche une chaîne localisée semblable à Scope mappers have been removed.
         /// </summary>
         public static string SelectedScopesMappersRemoved {
             get {
@@ -255,6 +264,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedScopesRemoved {
             get {
                 return ResourceManager.GetString("SelectedScopesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Signature key has been added.
+        /// </summary>
+        public static string SigKeyAdded {
+            get {
+                return ResourceManager.GetString("SigKeyAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Signature key &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string SigKeyAlreadyExists {
+            get {
+                return ResourceManager.GetString("SigKeyAlreadyExists", resourceCulture);
             }
         }
         

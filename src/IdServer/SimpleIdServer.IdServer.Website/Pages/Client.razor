@@ -33,6 +33,9 @@ else
             <RadzenTabsItem Text="Client scopes">
                 <ClientScopes Client="@clientState.Value.Client"></ClientScopes>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Keys">
+                <ClientKeys Client="@clientState.Value.Client"></ClientKeys>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 }
@@ -41,7 +44,8 @@ else
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
         { "settings", 0 },
-        { "scopes", 1 }
+        { "scopes", 1 },
+        { "keys", 2 }
     };
 
     [Parameter]

@@ -171,6 +171,9 @@
   <data name="ScopeResourcesUpdated" xml:space="preserve">
     <value>Scope Resources have been updated</value>
   </data>
+  <data name="SelectedClientKeysRemoved" xml:space="preserve">
+    <value>Selected client keys have been removed</value>
+  </data>
   <data name="SelectedClientScopesRemoved" xml:space="preserve">
     <value>Selected client scopes have been removed</value>
   </data>
@@ -182,6 +185,12 @@
   </data>
   <data name="SelectedScopesRemoved" xml:space="preserve">
     <value>Selected scopes have been removed</value>
+  </data>
+  <data name="SigKeyAdded" xml:space="preserve">
+    <value>Signature key has been added</value>
+  </data>
+  <data name="SigKeyAlreadyExists" xml:space="preserve">
+    <value>Signature key '{0}' already exists</value>
   </data>
   <data name="UnknownClient" xml:space="preserve">
     <value>The client '{0}' doesn't exist</value>

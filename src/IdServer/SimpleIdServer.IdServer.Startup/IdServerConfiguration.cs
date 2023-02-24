@@ -12,7 +12,6 @@ namespace SimpleIdServer.IdServer.Startup
 {
     public class IdServerConfiguration
     {
-
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             Constants.StandardScopes.OpenIdScope,

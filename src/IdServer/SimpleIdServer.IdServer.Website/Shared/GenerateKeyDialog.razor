@@ -1,0 +1,215 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using Microsoft.IdentityModel.Tokens;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@inherits FluxorComponent
+@inject IState<UpdateClientState> updateClientState
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IDispatcher dispatcher
+
+<!-- TODO : choose between encryption key and signature key -->
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Key">
+            <div class="row gy-4">
+                @foreach (var key in KeyTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectKey(key)" class="@(SelectedKeyType != null && SelectedKeyType.Name == key.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@key.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@key.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(key.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+
+            <hr class="hr" />
+
+            @if (SelectedKeyType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedKeyType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedKeyType.Description))</p>
+            }
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Generate" Disabled="@(SelectedKeyType == null)">
+            @switch(SelectedKeyType.Usage)
+            {
+                case SimpleIdServer.IdServer.Constants.JWKUsages.Sig:
+                    <!-- TODO : Display form to generate an encryption key -->
+                    <RadzenTemplateForm Submit=@GenerateSigKey TItem="SigKeyGenerationForm" Data=@sigKeyGeneration>
+                        @if (!updateClientState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateClientState.Value.ErrorMessage))
+                        {
+                            <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateClientState.Value.ErrorMessage</RadzenAlert>
+                        }
+
+                        <!-- Key Identifier -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                            <RadzenTextBox Name="KeyId" @bind-Value="@sigKeyGeneration.KeyId" Class="w-100"></RadzenTextBox>
+                            <RadzenRequiredValidator Component="KeyId" Text="Identifier is required"></RadzenRequiredValidator>
+                        </div>
+                        <!-- Key Type -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                            <RadzenDropDown Name="KeyType" Class="w-100"
+                                    Data=@sigKeyTypes
+                                    TValue="SecurityKeyTypes"
+                                    Change="@OnSecurityKeyTypeChange"
+                                    @bind-Value=@sigKeyGeneration.KeyType
+                                    TextProperty="Name" ValueProperty="KeyType" />
+                            <RadzenRequiredValidator Component="KeyType" Text="Key type is required"></RadzenRequiredValidator>
+                        </div>
+                        <!-- Alg -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                            <RadzenDropDown Name="Alg" Class="w-100"
+                                            Data=@signingKeys
+                                            TValue="string"
+                                            @bind-Value=@sigKeyGeneration.Alg />
+                            <RadzenRequiredValidator Component="Alg" Text="Algorithm is required"></RadzenRequiredValidator>
+                        </div>
+                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Generate" />
+                    </RadzenTemplateForm>
+                    break;
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Summary" Disabled="@(generatedSigKey == null)">
+            <!-- Key Identifier -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                <RadzenTextBox Name="KeyId" @bind-Value="@generatedSigKey.KeyId" Disabled=true Class="w-100"></RadzenTextBox>
+            </div>
+            <!-- Key Type -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                <RadzenDropDown Name="KeyType" Class="w-100"
+                                Data=@sigKeyTypes
+                                TValue="SecurityKeyTypes"
+                                @bind-Value=@generatedSigKey.KeyType
+                                TextProperty="Name" ValueProperty="KeyType"
+                                Disabled=true/>
+            </div>
+            <!-- Alg -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                <RadzenDropDown Name="Alg" Class="w-100"
+                                Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                                TValue="string"
+                                Disabled=true
+                                @bind-Value=@generatedSigKey.Alg />
+            </div>
+            <!-- Public Pem -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+                <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PublicKey Disabled=true></RadzenTextArea>
+            </div>
+            <!-- Private Pem -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+                <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
+            </div>
+            <RadzenButton Click="@(args => SaveSigKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    [Parameter]
+    public Client Client { get; set; }
+
+    static Dictionary<SecurityKeyTypes, IEnumerable<string>> mappingSecurityKeyToAlg = new Dictionary<SecurityKeyTypes, IEnumerable<string>>
+    {
+        { SecurityKeyTypes.CERTIFICATE, new List<string> { SecurityAlgorithms.RsaSha256, SecurityAlgorithms.RsaSha384, SecurityAlgorithms.RsaSha512  } },
+        { SecurityKeyTypes.RSA, new List<string> { SecurityAlgorithms.RsaSha256, SecurityAlgorithms.RsaSha384, SecurityAlgorithms.RsaSha512  } },
+        { SecurityKeyTypes.ECDSA, new List<string> { SecurityAlgorithms.EcdsaSha256, SecurityAlgorithms.EcdsaSha384, SecurityAlgorithms.EcdsaSha512  } }
+    };
+
+    record SigKeyGenerationForm
+    {
+        public string KeyId { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; } = SecurityKeyTypes.RSA;
+        public string Alg { get; set; } = SecurityAlgorithms.RsaSha256;
+    }
+
+    record KeyType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public string Usage { get; set; } = null!;
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record KeyTypeInfo
+    {
+        public string Name { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+    }
+
+    bool isKeyGenerated { get; set; } = false;
+    GenerateSigKeySuccessAction generatedSigKey { get; set; } = null;
+    IEnumerable<string> signingKeys { get; set; } = mappingSecurityKeyToAlg[SecurityKeyTypes.RSA];
+
+    List<KeyTypeInfo> sigKeyTypes = new List<KeyTypeInfo>
+    {
+        new KeyTypeInfo { KeyType = SecurityKeyTypes.RSA, Name = "RSA" },
+        new KeyTypeInfo { KeyType = SecurityKeyTypes.CERTIFICATE, Name = "CERTIFICATE" },
+        new KeyTypeInfo { KeyType = SecurityKeyTypes.ECDSA, Name = "ECDSA" }
+    };
+
+    ICollection<KeyType> KeyTypes { get; set;} = new List<KeyType>
+    {
+        new KeyType { Name = "Signature Key", ShortDescription = "request object, private_key_jwt and client_secret_jwt", Description = "Generate signature key. <br/> Check JWT request object <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests</a>. <br/> Used in <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a>", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "images/SigKey.png" }
+    };
+
+    KeyType? SelectedKeyType { get; set; } = null;
+    SigKeyGenerationForm sigKeyGeneration = new SigKeyGenerationForm();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<GenerateSigKeySuccessAction>((act) =>
+        {
+            generatedSigKey = act;
+            StateHasChanged();
+        });
+        SubscribeToAction<AddSigKeySuccessAction>((act) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SigKeyAdded });
+            dialogService.Close();
+            StateHasChanged();
+        });
+    }
+
+    void SelectKey(KeyType keyType)
+    {
+        SelectedKeyType = keyType;
+    }
+
+    void OnSecurityKeyTypeChange(object securityKeyType)
+    {
+        var st = (SecurityKeyTypes)securityKeyType;
+        signingKeys = mappingSecurityKeyToAlg[st];
+        sigKeyGeneration.Alg = signingKeys.ElementAt(0);
+        StateHasChanged();
+    }
+
+    void GenerateSigKey(SigKeyGenerationForm form)
+    {
+        dispatcher.Dispatch(new GenerateSigKeyAction { Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType });
+    }
+
+    void SaveSigKey()
+    {
+        dispatcher.Dispatch(new AddSigKeyAction { Alg = generatedSigKey.Alg, ClientId = Client.ClientId, Credentials = generatedSigKey.Credentials, KeyId = generatedSigKey.KeyId, KeyType = generatedSigKey.KeyType });
+    }
+}

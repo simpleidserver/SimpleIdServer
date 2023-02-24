@@ -455,12 +455,15 @@ namespace SimpleIdServer.IdServer.Domains
             return null;
         }
 
-        public void Add(string keyId, JsonWebKey jsonWebKey)
+        public void Add(string keyId, JsonWebKey jsonWebKey, string usage, SecurityKeyTypes keyType)
         {
             SerializedJsonWebKeys.Add(new ClientJsonWebKey
             {
                 Kid = keyId,
-                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
+                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey),
+                Alg = jsonWebKey.Alg,
+                KeyType = keyType,
+                Usage = usage
             });
         }
 
