@@ -1,7 +1,0 @@
-<mat-form-field class="full-width" appearance="outline" floatLabel="always">
-  <mat-label>{{ getTranslations(option.translations) | translateenum }}</mat-label>
-  <input matInput [formControl]="control" [type]="getType()" />
-  <mat-error *ngFor="let error of errors">
-    {{ 'HUMANTASK.EDITOR.ERRORS.' + error | translate }}
-  </mat-error>
-</mat-form-field>

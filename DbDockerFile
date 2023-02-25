@@ -1,9 +1,0 @@
-FROM mcr.microsoft.com/mssql/server
-
-ENV ACCEPT_EULA=Y
-ENV SA_PASSWORD=D54DE7hHpkG9
-
-COPY ./conf/docker/db/ /
-
-ENTRYPOINT [ "/bin/bash", "entrypoint.sh" ]
-CMD [ "/opt/mssql/bin/sqlservr" ]
