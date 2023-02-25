@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using SimpleIdServer.Common.ExternalEvents;
-using System.Collections.Generic;
+﻿using SimpleIdServer.Scim.Domains;
 
 namespace SimpleIdServer.Scim.ExternalEvents
 {
@@ -11,26 +9,11 @@ namespace SimpleIdServer.Scim.ExternalEvents
 
         }
 
-        public BaseReferenceAttributeEvent(string id, int version, string resourceType, string representationAggregateId, string schemaAttributeId, string attributeFullPath, JObject representation) : base(id, version, resourceType)
+        public BaseReferenceAttributeEvent(SCIMRepresentationAttribute attribute)
         {
-            RepresentationAggregateId = representationAggregateId;
-            SchemaAttributeId = schemaAttributeId;
-            AttributeFullPath = attributeFullPath;
-            Values = new List<string>();
-            RepresentationSerialized = representation?.ToString();
+            Attribute = attribute;
         }
 
-        public string RepresentationAggregateId { get; set; }
-        public string SchemaAttributeId { get; set; }
-        public string AttributeFullPath { get; set; }
-        public ICollection<string> Values { get; set; }
-        public string RepresentationSerialized { get; set; }
-        public JObject Representation
-        {
-            get
-            {
-                return string.IsNullOrWhiteSpace(RepresentationSerialized) ? null : JObject.Parse(RepresentationSerialized);
-            }
-        }
+        public SCIMRepresentationAttribute Attribute { get; set; }
     }
 }

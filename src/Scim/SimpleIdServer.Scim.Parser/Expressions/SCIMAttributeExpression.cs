@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Scim.Domains;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,6 +22,34 @@ namespace SimpleIdServer.Scim.Parser.Expressions
         public string Name { get; private set; }
         public SCIMAttributeExpression Child { get; set;}
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
+
+        public override ICollection<SCIMRepresentationAttribute> BuildEmptyAttributes() => InternalBuildEmptyAttributes();
+
+        protected virtual ICollection<SCIMRepresentationAttribute> InternalBuildEmptyAttributes()
+        {
+            if (SchemaAttribute == null) return new List<SCIMRepresentationAttribute>();
+            var result = new SCIMRepresentationAttribute
+            {
+                SchemaAttribute = SchemaAttribute,
+                FullPath = SchemaAttribute.FullPath,
+                Namespace = SchemaAttribute.SchemaId,
+                Id = Guid.NewGuid().ToString(),
+                AttributeId = Guid.NewGuid().ToString()
+            };
+            if (Child != null)
+            {
+                var children = Child.BuildEmptyAttributes();
+                foreach (var child in children)
+                {
+                    child.ParentAttributeId = result.Id;
+                    result.Children.Add(child);
+                }
+
+                result.CachedChildren = result.Children;
+            }
+
+            return new List<SCIMRepresentationAttribute> { result };
+        }
 
         public bool TryContainsGroupingExpression(out SCIMComplexAttributeExpression result)
         {
@@ -124,7 +153,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
 
         protected virtual object ProtectedClone()
         {
-            return new SCIMAttributeExpression(Name, (SCIMAttributeExpression)Child.Clone());
+            return new SCIMAttributeExpression(Name, (SCIMAttributeExpression)Child?.Clone());
         }
 
         protected void IncrementNbChildren(ref int nbChildren)

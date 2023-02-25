@@ -10,5 +10,6 @@ namespace SimpleIdServer.Scim.Persistence
         Task<SearchSCIMRepresentationsResponse> FindSCIMRepresentations(SearchSCIMRepresentationsParameter parameter);
         Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId);
         Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType);
+        Task<SCIMRepresentation> FindSCIMRepresentationById(string representationId, string resourceType, GetSCIMResourceParameter parameter);
     }
 }

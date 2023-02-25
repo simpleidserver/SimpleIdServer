@@ -2,8 +2,6 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/shtqlxhbda6gtdag?svg=true)](https://ci.appveyor.com/project/simpleidserver/simpleidserver)
 [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenID.svg)](http://myget.org/gallery/advance-ict)
-[![Documentation Status](https://readthedocs.org/projects/simpleidserver/badge/?version=latest)](https://simpleidserver.readthedocs.io/en/latest/)
-[![Download android application](https://img.shields.io/badge/download-android-green.svg)](https://appcenter.ms/users/agentsimpleidserver-gmail.com/apps/SimpleIdServer/distribute/releases/1)
 
 SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0, UMA2.0, FAPI and CIBA. It streamlines development, configuration and deployment of custom access control servers. 
 Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more.
@@ -26,6 +24,24 @@ For project documentation, please visit [docs](https://simpleidserver.github.io/
 | `SimpleIdServer.Saml.Idp`									| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Saml.Idp.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Saml.Idp) 											| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Saml.Idp.svg)](https://nuget.org/packages/SimpleIdServer.Saml.Idp)									| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.SimpleIdServer.Saml.Idp.svg)](https://nuget.org/packages/SimpleIdServer.Saml.Idp)					|
 | `SimpleIdServer.Saml.Sp`									| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Saml.Sp.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Saml.Sp) 												| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Saml.Sp.svg)](https://nuget.org/packages/SimpleIdServer.Sp.Idp)										| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.SimpleIdServer.Saml.Sp.svg)](https://nuget.org/packages/SimpleIdServer.Sp.Idp)						|
 | `SimpleIdServer.Templates` 			 						| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Templates.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Templates)												| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Templates.svg)](https://nuget.org/packages/SimpleIdServer.Templates) 										| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Templates.svg)](https://nuget.org/packages/SimpleIdServer.Templates) 										|
+
+## Getting started
+
+### Install IdServer
+
+TODO
+Install the template
+Create INMEMORY server
+
+### Install website
+
+TODO
+Install the template
+Execute ... to build website
+
+### Docker
+
+TODO
 
 ## Contributing
 

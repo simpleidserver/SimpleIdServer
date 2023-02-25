@@ -203,6 +203,11 @@ namespace SimpleIdServer.Scim.Domains
             return FlatAttributes.Where(a => a.ParentAttributeId == attr.Id);
         }
 
+        public IEnumerable<SCIMRepresentationAttribute> GetChildren(string id)
+        {
+            return FlatAttributes.Where(a => a.ParentAttributeId == id);
+        }
+
         public IEnumerable<SCIMRepresentationAttribute> GetFlatHierarchicalChildren(SCIMRepresentationAttribute attr)
         {
             var result = new List<SCIMRepresentationAttribute>();

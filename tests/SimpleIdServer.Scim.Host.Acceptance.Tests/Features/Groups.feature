@@ -180,3 +180,862 @@ Scenario: Check group can be updated with multiple users
 	Then HTTP status code equals to '200'
 	Then JSON exists 'members[0].value'
 	Then JSON exists 'members[1].value'
+
+Scenario: Add a user to a sub group and check user belongs to two groups (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'groups[0].type'='direct'
+	Then JSON 'groups[1].type'='indirect'
+
+Scenario: Add a user to two sub groups and check the user belongs to three groups (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='indirect'
+	And JSON 'groups[2].type'='indirect'
+
+Scenario: Add one user into two groups
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '2'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='indirect'
+	
+Scenario: Remove user from one group and check it has an indirect link to this group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$thirdGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$thirdGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "remove", "path": "members[value eq $userId$]" } ]				    |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='direct'
+	And JSON 'groups[2].type'='indirect'
+
+Scenario: Remove all relationships and check user belongs to two groups (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$userId$" } ] } ] |
+
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "remove", "path": "members[value eq $firstGroup$]" } ]				|
+
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$thirdGroup$'
+	| Key        | Value                                                                        |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                          |
+	| Operations | [ { "op": "remove", "path": "members[value eq $firstGroup$]" } ]				|
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '1'
+	And JSON 'groups[0].type'='direct'
+
+Scenario: Add a user to a sub group and check user belongs to two groups (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]				                             	   |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then JSON 'groups[0].type'='direct'
+	Then JSON 'groups[1].type'='indirect'
+
+
+Scenario: Add a user to two sub groups and check the user belongs to three groups (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]												   |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='indirect'
+	And JSON 'groups[2].type'='indirect'
+
+Scenario: Remove user from one group and check it has an indirect link to this group (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| secondGroup												|
+	| members			| [ { "value": "$userId$" } ]					            |
+
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| secondGroup												|
+	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]	|
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| thirdGroup												|
+	| members			| [ { "value": "$firstGroup$" }, { "value": "$userId$" } ]	|
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
+	| Key				| Value                                                     |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]         |
+	| displayName		| thirdGroup												|
+	| members			| [ { "value": "$firstGroup$" } ]					        |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='direct'
+	And JSON 'groups[2].type'='indirect'	
+
+Scenario: Remove all relationships and check user belongs to one direct group (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]					                               |
+
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| secondGroup																   |
+	| members			| [ ]												                           |
+
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$thirdGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| thirdGroup																   |
+	| members			| [ ]												                           |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '1'
+	And JSON 'groups[0].type'='direct'	
+
+Scenario: Remove the nested group from the parent group and check user only has one group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                   |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]     |
+	| Operations | [ { "op": "remove", "path": "members" } ]               |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '1'
+	And JSON 'groups[0].type'='direct'	
+
+Scenario: Remove the nested group from the parent group and check user only has one group (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+	
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ ]                                               |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '1'
+	And JSON 'groups[0].type'='direct'	
+
+Scenario: When parent's group 'displayName' is updated then user information must be updated (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]												   |	
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                                     |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                       |
+	| Operations | [ { "op": "replace", "path": "displayName", "value": "newDisplayName" } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[0].display'='firstGroup'
+	And JSON 'groups[1].type'='indirect'
+	And JSON 'groups[1].display'='newDisplayName'
+	And JSON 'groups[2].type'='indirect'
+	And JSON 'groups[2].display'='thirdGroup'
+
+Scenario: When parent's group 'displayName' is updated then user information must be updated (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]												   |		
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key				| Value                                                |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]    |
+	| members           | [ { "value": "$firstGroup$" } ]                      |
+	| displayName       | newDisplayName                                       |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[0].display'='firstGroup'
+	And JSON 'groups[1].type'='indirect'
+	And JSON 'groups[1].display'='newDisplayName'
+	And JSON 'groups[2].type'='indirect'
+	And JSON 'groups[2].display'='thirdGroup'
+
+Scenario: When direct parent's group 'displayName' is updated then user information must be updated (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]												   |	
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                     |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                       |
+	| Operations | [ { "op": "replace", "path": "displayName", "value": "newDisplayName" } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[0].display'='newDisplayName'
+	And JSON 'groups[1].type'='indirect'
+	And JSON 'groups[1].display'='secondGroup'
+	And JSON 'groups[2].type'='indirect'
+	And JSON 'groups[2].display'='thirdGroup'
+
+Scenario: When direct parent's group 'displayName' is updated then user information must be updated (HTTP PUT)
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | thirdGroup                                        |
+	| members     | [ { "value": "$firstGroup$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                                        |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                            |
+	| displayName		| firstGroup																   |
+	| members			| [ { "value": "$userId$" } ]												   |
+	
+		
+	And execute HTTP PUT JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key				| Value                                                |
+	| schemas			| [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]    |
+	| members			| [ { "value": "$userId$" } ]					       |
+	| displayName       | newDisplayName                                       |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '3'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[0].display'='newDisplayName'
+	And JSON 'groups[1].type'='indirect'
+	And JSON 'groups[1].display'='secondGroup'
+	And JSON 'groups[2].type'='indirect'
+	And JSON 'groups[2].display'='thirdGroup'
+
+Scenario: Add one sub group into a group and check user has an indirect link to the parent group (HTTP PATCH)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'userId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | firstGroup                                        |
+	| members     | [ { "value": "$userId$" } ]                       |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+	
+	When execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| displayName | secondGroup                                       |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroup'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroup$'
+	| Key        | Value                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                              |
+	| Operations | [ { "op": "add", "path": "members", "value": [ { "value": "$firstGroup$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/Users/$userId$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	And 'groups' length is equals to '2'
+	And JSON 'groups[0].type'='direct'
+	And JSON 'groups[1].type'='indirect'

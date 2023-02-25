@@ -117,9 +117,9 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("{id}")]
         [Authorize("QueryScimResource")]
-        public virtual Task<IActionResult> Get(string id)
+        public virtual Task<IActionResult> Get(string id, [FromQuery] GetSCIMResourceRequest parameter)
         {
-            return InternalGet(id);
+            return InternalGet(id, parameter);
         }
 
         /// <summary>
@@ -136,11 +136,11 @@ namespace SimpleIdServer.Scim.Api
         [ProducesResponseType(404)]
         [HttpGet("Me")]
         [Authorize("UserAuthenticated")]
-        public virtual Task<IActionResult> GetMe(string id)
+        public virtual Task<IActionResult> GetMe(string id, [FromQuery] GetSCIMResourceRequest parameter)
         {
             return ExecuteActionIfAuthenticated(() =>
             {
-                return InternalGet(id);
+                return InternalGet(id, parameter);
             });
         }
 
@@ -432,22 +432,32 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
-        protected async Task<IActionResult> InternalGet(string id)
+        protected async Task<IActionResult> InternalGet(string id, GetSCIMResourceRequest parameter)
         {
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
                 var schema = await _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(_resourceType);
                 if (schema == null) return new NotFoundResult();
-                var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType);
+                var schemaIds = new List<string> { schema.Id };
+                schemaIds.AddRange(schema.SchemaExtensions.Select(s => s.Schema));
+                var schemas = (await _scimSchemaQueryRepository.FindSCIMSchemaByIdentifiers(schemaIds)).ToList();
+                var standardSchemas = new List<SCIMSchema>
+                {
+                    StandardSchemas.StandardResponseSchemas
+                };
+                standardSchemas.AddRange(schemas);
+                var includedAttributes = parameter.Attributes == null ? new List<SCIMAttributeExpression>() : parameter.Attributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
+                var excludedAttributes = parameter.ExcludedAttributes == null ? new List<SCIMAttributeExpression>() : parameter.ExcludedAttributes.Select(a => SCIMFilterParser.Parse(a, standardSchemas)).Cast<SCIMAttributeExpression>().ToList();
+                var representation = await _scimRepresentationQueryRepository.FindSCIMRepresentationById(id, _resourceType, new GetSCIMResourceParameter { ExcludedAttributes = excludedAttributes, IncludedAttributes = includedAttributes });
                 if (representation == null)
                 {
                     _logger.LogError(string.Format(Global.ResourceNotFound, id));
-                    return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id));
+                    return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.ResourceNotFound, id), SCIMConstants.ErrorSCIMTypes.Unknown);
                 }
 
                 representation.ApplyEmptyArray();
@@ -457,7 +467,7 @@ namespace SimpleIdServer.Scim.Api
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -497,7 +507,7 @@ namespace SimpleIdServer.Scim.Api
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -523,7 +533,7 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
@@ -576,12 +586,17 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 
         protected async Task<IActionResult> InternalPatch(string id, PatchRepresentationParameter patchRepresentation)
         {
+            if (patchRepresentation == null)
+            {
+                return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPatchNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
+            }
+
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
             try
             {
@@ -602,6 +617,11 @@ namespace SimpleIdServer.Scim.Api
             {
                 _logger.LogError(ex, ex.Message);
                 return this.BuildError(HttpStatusCode.Conflict, ex.Message, SCIMConstants.ErrorSCIMTypes.Uniqueness);
+            }
+            catch (SCIMSchemaViolatedException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return this.BuildError(HttpStatusCode.BadRequest, ex.Message, SCIMConstants.ErrorSCIMTypes.InvalidValue);
             }
             catch (SCIMFilterException ex)
             {
@@ -629,7 +649,7 @@ namespace SimpleIdServer.Scim.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return this.BuildError(HttpStatusCode.InternalServerError, ex.ToString(), SCIMConstants.ErrorSCIMTypes.InternalServerError);
+                return this.BuildError(HttpStatusCode.InternalServerError, ex.Message, SCIMConstants.ErrorSCIMTypes.InternalServerError);
             }
         }
 

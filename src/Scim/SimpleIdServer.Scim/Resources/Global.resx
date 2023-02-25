@@ -165,6 +165,9 @@
   <data name="GreaterThanOrEqualNotSupported" xml:space="preserve">
     <value>greater than or equal cannot be applied on '{0}' type</value>
   </data>
+  <data name="HttpPatchNotWellFormatted" xml:space="preserve">
+    <value>HTTP PATCH request is not well formatted</value>
+  </data>
   <data name="HttpPostNotWellFormatted" xml:space="preserve">
     <value>HTTP POST request is not well formatted</value>
   </data>
@@ -193,25 +196,31 @@
     <value>no identifier has been returned from the bulk operation {0}</value>
   </data>
   <data name="NotValidBase64" xml:space="preserve">
-    <value>'{0}' are not valid Base64String</value>
+    <value>'{0}' not valid Base64String</value>
   </data>
   <data name="NotValidBoolean" xml:space="preserve">
-    <value>'{0}' are not valid boolean</value>
+    <value>'{0}' not valid boolean</value>
   </data>
   <data name="NotValidCanonicalValue" xml:space="preserve">
     <value>property {0} is not a valid canonical value</value>
   </data>
   <data name="NotValidDateTime" xml:space="preserve">
-    <value>'{0}' are not valid DateTime</value>
+    <value>'{0}' not valid DateTime</value>
   </data>
   <data name="NotValidDecimal" xml:space="preserve">
-    <value>'{0}' are not valid decimal</value>
+    <value>'{0}' not valid decimal</value>
   </data>
   <data name="NotValidInteger" xml:space="preserve">
-    <value>'{0}' are not valid integer</value>
+    <value>'{0}' not valid integer</value>
   </data>
   <data name="NotValidJSON" xml:space="preserve">
     <value>{0} is not a valid JSON</value>
+  </data>
+  <data name="NotValidString" xml:space="preserve">
+    <value>{0} is not a valid string</value>
+  </data>
+  <data name="OperationsRequired" xml:space="preserve">
+    <value>At least one operation must be passed</value>
   </data>
   <data name="PatchMissingAttribute" xml:space="preserve">
     <value>PATCH can be applied only on existing attributes</value>
@@ -272,6 +281,9 @@
   </data>
   <data name="UnknownBulkId" xml:space="preserve">
     <value>bulkId {0} doesn't exist</value>
+  </data>
+  <data name="UnknownEndpoint" xml:space="preserve">
+    <value>Endpoint not found</value>
   </data>
   <data name="UnknownPath" xml:space="preserve">
     <value>path {0} doesn't exist</value>

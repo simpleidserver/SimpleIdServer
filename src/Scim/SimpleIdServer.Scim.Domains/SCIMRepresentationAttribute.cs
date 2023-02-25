@@ -149,6 +149,12 @@ namespace SimpleIdServer.Scim.Domains
             return FullPath.Split('.').Length;
         }
 
+        public string GetParentFullPath()
+        {
+            if (IsLeaf()) return null;
+            return string.Join(".", FullPath.Split('.').Take(GetLevel() - 1));
+        }
+
         public List<SCIMRepresentationAttribute> ToFlat()
         {
             var result = new List<SCIMRepresentationAttribute>

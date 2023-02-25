@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.Scim.Domains.Builders
 {
@@ -102,9 +103,19 @@ namespace SimpleIdServer.Scim.Domains.Builders
         public SCIMSchemaAttributeBuilder AddStringAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
             SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
             SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
-            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, string description = null, bool multiValued = false)
+            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE, 
+            string description = null, bool multiValued = false)
         {
             return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.STRING, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued);
+        }
+
+        public SCIMSchemaAttributeBuilder AddStringAttribute(string name, List<string> canonicalValues, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,
+            SCIMSchemaAttributeMutabilities mutability = SCIMSchemaAttributeMutabilities.READWRITE,
+            SCIMSchemaAttributeReturned returned = SCIMSchemaAttributeReturned.DEFAULT,
+            SCIMSchemaAttributeUniqueness uniqueness = SCIMSchemaAttributeUniqueness.NONE,
+            string description = null, bool multiValued = false)
+        {
+            return AddAttribute(_schema, name, SCIMSchemaAttributeTypes.STRING, callback, caseExact, required, mutability, returned, uniqueness, description, multiValued, canonicalValues);
         }
 
         public SCIMSchemaAttributeBuilder AddReferenceAttribute(string name, Action<SCIMSchemaAttributeBuilder> callback = null, bool caseExact = false, bool required = false,

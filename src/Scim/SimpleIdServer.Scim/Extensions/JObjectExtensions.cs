@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.Extensions
             return jObj.Properties().Select(p => p.Name).ToList();
         }
 
-        public static bool HasNotEmptyElement(this JObject jObj, string name, string schema)
+        public static bool HasElement(this JObject jObj, string name, string schema)
         {
             if (jObj.ContainsKey(name) || jObj.ContainsKey($"{schema}:{name}"))
             {
@@ -32,7 +32,7 @@ namespace SimpleIdServer.Scim.Extensions
                     value = jObj[$"{schema}:{name}"].ToString();
                 }
 
-                return !string.IsNullOrEmpty(value);
+                return !string.IsNullOrWhiteSpace(value);
             }
 
             if (!jObj.ContainsKey(schema))

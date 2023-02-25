@@ -186,7 +186,7 @@ namespace SimpleIdServer.Scim.Parser
                     continue;
                 }
 
-                rootExpression = new SCIMLogicalExpression(SCIMLogicalOperators.AND, (SCIMLogicalExpression)rootExpression.Clone(), Parse(rightExpression));
+                rootExpression = new SCIMLogicalExpression((SCIMLogicalOperators)Enum.Parse(typeof(SCIMLogicalOperators), logicalOperator, true), (SCIMLogicalExpression)rootExpression.Clone(), Parse(rightExpression));
             }
 
             return rootExpression;
@@ -384,7 +384,10 @@ namespace SimpleIdServer.Scim.Parser
                     || i == filterString.Count() - 1)
                 {
                     var record = filterBuilder.ToString();
-                    result.Add(CleanFilter(filterBuilder.ToString()));
+                    record = CleanFilter(filterBuilder.ToString());
+                    if(!string.IsNullOrWhiteSpace(record))
+                        result.Add(record);
+
                     filterBuilder.Clear();
                     groupingIsClosed = false;
                     isTokenSeparatorDetected = false;
@@ -431,12 +434,8 @@ namespace SimpleIdServer.Scim.Parser
 
         private static string CleanFilter(string filter)
         {
-            if (filter.StartsWith("(") && filter.EndsWith(")"))
-            {
-                return filter.TrimStart('(').TrimEnd(')');
-            }
-
-            return filter;
+            if (filter.StartsWith("not")) return filter;
+            return filter.TrimStart('(').TrimEnd(')');
         }
 
         private static bool IsStandardOperand(string str)

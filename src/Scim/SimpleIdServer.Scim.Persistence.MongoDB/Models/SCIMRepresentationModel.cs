@@ -14,7 +14,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             SchemaRefs = new List<MongoDBRef>();
         }
 
-        public SCIMRepresentationModel(SCIMRepresentation representation, string schemaCollectionName) : this()
+        public SCIMRepresentationModel(SCIMRepresentation representation, string schemaCollectionName, string attributesCollectionName) : this()
         {
             Id = representation.Id;
             ExternalId = representation.ExternalId;
@@ -29,7 +29,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
 
         public ICollection<MongoDBRef> SchemaRefs { get; set; }
 
-        public void Init(IMongoDatabase database)
+        public void IncludeAll(IMongoDatabase database)
+        {
+            IncludeSchemas(database);
+        }
+
+        public void IncludeSchemas(IMongoDatabase database)
         {
             Schemas = MongoDBEntity.GetReferences<SCIMSchema>(SchemaRefs, database);
         }

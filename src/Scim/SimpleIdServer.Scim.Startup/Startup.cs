@@ -6,10 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using SimpleIdServer.Jwt;
-using SimpleIdServer.Jwt.Extensions;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
 using SimpleIdServer.Scim.Startup.Consumers;
@@ -19,7 +15,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 
 namespace SimpleIdServer.Scim.Startup
 {
@@ -34,14 +29,6 @@ namespace SimpleIdServer.Scim.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var json = File.ReadAllText("oauth_puk.txt");
-            var dic = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            var rsaParameters = new RSAParameters
-            {
-                Modulus = dic.TryGet(RSAFields.Modulus),
-                Exponent = dic.TryGet(RSAFields.Exponent)
-            };
-            var oauthRsaSecurityKey = new RsaSecurityKey(rsaParameters);
             services.AddMvc(o =>
             {
                 o.EnableEndpointRouting = false;
@@ -65,20 +52,6 @@ namespace SimpleIdServer.Scim.Startup
                 opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
                 opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
             });
-            services.AddAuthentication(SCIMConstants.AuthenticationScheme)
-                .AddJwtBearer(SCIMConstants.AuthenticationScheme, cfg =>
-                {
-                    cfg.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidIssuer = "https://localhost:60000",
-                        ValidAudiences = new List<string>
-                        {
-                            "scimClient", "gatewayClient"
-                        },
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = oauthRsaSecurityKey
-                    };
-                });
             var basePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Schemas");
             var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
             var enterpriseUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUserSchema.json"), SCIMResourceTypes.User);
@@ -155,7 +128,8 @@ namespace SimpleIdServer.Scim.Startup
                     SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
                     SourceAttributeSelector = "members",
                     TargetResourceType = StandardSchemas.UserSchema.ResourceType,
-                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id
+                    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+                    Mode = Mode.PROPAGATE_INHERITANCE
                 },
                 new SCIMAttributeMapping
                 {

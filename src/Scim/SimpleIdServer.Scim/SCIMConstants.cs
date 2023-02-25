@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.Common;
 using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
@@ -15,9 +14,16 @@ namespace SimpleIdServer.Scim
 
         public static Dictionary<string, string> MappingScimResourceTypeToCommonType = new Dictionary<string, string>
         {
-            { SCIMResourceTypes.User, CommonConstants.ResourceTypes.ScimUser },
-            { SCIMResourceTypes.Group, CommonConstants.ResourceTypes.ScimGroup },
+            { SCIMResourceTypes.User, ResourceTypes.ScimUser },
+            { SCIMResourceTypes.Group, ResourceTypes.ScimGroup },
         };
+
+        public static class ResourceTypes
+        {
+            public const string ScimUser = "ScimUser";
+            public const string ScimGroup = "ScimGroup";
+            public const string OpenIdUser = "OpenIdUser";
+        }
 
         public static class ErrorSCIMTypes
         {

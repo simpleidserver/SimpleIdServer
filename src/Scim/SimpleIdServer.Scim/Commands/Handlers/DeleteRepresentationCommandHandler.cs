@@ -32,23 +32,22 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var representation = await _scimRepresentationCommandRepository.Get(request.Id);
             if (representation == null)
-            {
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, request.Id));
-            }
 
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, true, true);
+            var references = _representationReferenceSync.Sync(request.ResourceType, representation, representation, request.Location, schema, true, true);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
-                await _scimRepresentationCommandRepository.Delete(representation);
-                foreach (var reference in references.Representations)
+                foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.Update(reference);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
+                    await Notify(reference);
                 }
 
+                await _scimRepresentationCommandRepository.Delete(representation);
                 await transaction.Commit();
             }
 
-            await Notify(references);
             return representation;
         }
     }

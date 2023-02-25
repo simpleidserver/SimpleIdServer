@@ -10,7 +10,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 			ConnectionString = "mongodb://localhost:27017";
 			Database = "scim";
 			CollectionRepresentations = "representations";
-			CollectionSchemas = "schemas";
+			CollectionRepresentationAttributes = "representationAttributes";
+            CollectionSchemas = "schemas";
 			CollectionMappings = "mappings";
 			CollectionProvisioningLst = "provisioningLst";
 			SupportTransaction = true;
@@ -19,6 +20,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		public string ConnectionString { get; set; }
 		public string Database { get; set; }
 		public string CollectionRepresentations { get; set; }
+		public string CollectionRepresentationAttributes { get; set; }
 		public string CollectionSchemas { get; set; }
 		public string CollectionMappings { get; set; }
 		public string CollectionProvisioningLst { get; set; }

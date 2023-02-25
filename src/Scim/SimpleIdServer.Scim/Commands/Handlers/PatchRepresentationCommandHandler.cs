@@ -46,28 +46,32 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             CheckParameter(patchRepresentationCommand.PatchRepresentation);
             var existingRepresentation = await _scimRepresentationCommandRepository.Get(patchRepresentationCommand.Id);
             if (existingRepresentation == null) throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, patchRepresentationCommand.Id));
-            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand);
+            return await UpdateRepresentation(existingRepresentation, patchRepresentationCommand, schema);
         }
 
-        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand)
+        private async Task<PatchRepresentationResult> UpdateRepresentation(SCIMRepresentation existingRepresentation, PatchRepresentationCommand patchRepresentationCommand, SCIMSchema schema)
         {
             var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(existingRepresentation.ResourceType);
+            var oldDisplayName = existingRepresentation.DisplayName;
             var patchResult = existingRepresentation.ApplyPatches(patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues);
+            var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Any()) return PatchRepresentationResult.NoPatch();
             existingRepresentation.SetUpdated(DateTime.UtcNow);
-            var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location);
+            var references = _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResult, patchRepresentationCommand.Location, schema, displayNameDifferent);
             using (var transaction = await _scimRepresentationCommandRepository.StartTransaction())
             {
-                await _scimRepresentationCommandRepository.Update(existingRepresentation);
-                foreach (var reference in references.Representations)
+                foreach (var reference in references)
                 {
-                    await _scimRepresentationCommandRepository.Update(reference);
+                    await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkUpdate(reference.UpdatedRepresentationAttributes);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes);
+                    await Notify(reference);
                 }
 
+                await _scimRepresentationCommandRepository.Update(existingRepresentation);
                 await transaction.Commit();
             }
 
-            await Notify(references);
             existingRepresentation.ApplyEmptyArray();
             return PatchRepresentationResult.Ok(existingRepresentation);
         }
@@ -93,6 +97,11 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (patchRepresentation.Operations == null)
             {
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Operations));
+            }
+
+            if(!patchRepresentation.Operations.Any())
+            {
+                throw new SCIMBadSyntaxException(Global.OperationsRequired);
             }
         }
     }

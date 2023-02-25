@@ -12,7 +12,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
   </ItemGroup>

@@ -10,7 +10,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
     {
         public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions) : base(dbContextOptions)
         {
-
         }
 
         public DbSet<SCIMAttributeMapping> SCIMAttributeMappingLst { get; set; }

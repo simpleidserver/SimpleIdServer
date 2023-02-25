@@ -12,7 +12,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
   </ItemGroup>

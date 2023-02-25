@@ -17,6 +17,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
             _scimDbContext = scimDbContext;
         }
 
+        public async Task<IEnumerable<SCIMAttributeMapping>> GetAll()
+        {
+            var result = await _scimDbContext.SCIMAttributeMappingLst.ToListAsync();
+            return result;
+        }
+
         public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
         {
             var result = await _scimDbContext.SCIMAttributeMappingLst.Where(a => sourceAttributes.Contains(a.SourceAttributeSelector)).ToListAsync();
@@ -26,12 +32,6 @@ namespace SimpleIdServer.Scim.Persistence.EF
         public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceResourceType(string sourceResourceType)
         {
             var result = await _scimDbContext.SCIMAttributeMappingLst.Where(a => a.SourceResourceType == sourceResourceType).ToListAsync();
-            return result;
-        }
-
-        public async Task<IEnumerable<SCIMAttributeMapping>> GetAll()
-        {
-            var result = await _scimDbContext.SCIMAttributeMappingLst.ToListAsync();
             return result;
         }
     }

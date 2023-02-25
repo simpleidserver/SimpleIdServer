@@ -18,6 +18,12 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             _scimDbContext = scimDbContext;
         }
 
+        public async Task<IEnumerable<SCIMAttributeMapping>> GetAll()
+        {
+            var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
+            return await attributeMappings.AsQueryable().ToMongoListAsync();
+        }
+
         public async Task<IEnumerable<SCIMAttributeMapping>> GetBySourceAttributes(IEnumerable<string> sourceAttributes)
         {
             var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
@@ -28,12 +34,6 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
         {
             var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
             return await attributeMappings.AsQueryable().Where(a => a.SourceResourceType == sourceResourceType).ToMongoListAsync();
-        }
-
-        public async Task<IEnumerable<SCIMAttributeMapping>> GetAll()
-        {
-            var attributeMappings = _scimDbContext.SCIMAttributeMappingLst;
-            return await attributeMappings.AsQueryable().ToMongoListAsync();
         }
     }
 }

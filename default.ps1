@@ -17,22 +17,14 @@ task default -depends local
 task local -depends compile, test
 task ci -depends clean, release, local, pack
 
-task publishDocker -depends clean {
-	exec { dotnet publish $source_dir\OpenID\SimpleIdServer.OpenID.SqlServer.Startup\SimpleIdServer.OpenID.SqlServer.Startup.csproj -c $config -o $result_dir\docker\OpenID }
-	exec { dotnet publish $source_dir\Website\SimpleIdServer.Gateway.Host\SimpleIdServer.Gateway.Host.csproj -c $config -o $result_dir\docker\Gateway }
-	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj -c $config -o $result_dir\docker\Scim }
-	exec { npm run docker --prefix $source_dir\Website\SimpleIdServer.Website }
-	exec { dotnet publish $source_dir\CaseManagement\CaseManagement.BPMN.Host\CaseManagement.BPMN.Host.csproj -c $config -o $result_dir\docker\Bpmn }
-	exec { dotnet publish $source_dir\CaseManagement\CaseManagement.HumanTask.Host\CaseManagement.HumanTask.Host.csproj -c $config -o $result_dir\docker\HumanTask }
-	exec { dotnet publish $source_dir\Saml\SimpleIdServer.Saml.Idp.EF.Startup\SimpleIdServer.Saml.Idp.EF.Startup.csproj -c $config -o $result_dir\docker\SamlIdp }
-	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Provisioning\SimpleIdServer.Scim.Provisioning.csproj -c $config -o $result_dir\docker\Provisioning }
-	exec { docker-compose build }
-	exec { docker-compose push }
-}
-
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
 	rd "$base_dir\build" -recurse -force  -ErrorAction SilentlyContinue | out-null
+}
+
+task publishDocker -depends clean {
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\docker\IdServer }
+	exec { docker-compose build }
 }
 
 task release {
@@ -49,7 +41,6 @@ task compile -depends clean {
 
 	exec { msbuild -version }
 	
-    # exec { msbuild .\SimpleIdServer.Mobile.sln /p:Configuration=$config /p:VersionSuffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.IdServer.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
 }
@@ -64,10 +55,16 @@ task pack -depends release, compile {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj -c $config --no-build $versionSuffix --output $result_dir }	
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
 task test {
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Jwt.Tests
+    Push-Location -Path $base_dir\tests\SimpleIdServer.IdServer.Host.Acceptance.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }
@@ -75,23 +72,7 @@ task test {
         Pop-Location
     }
 
-    Push-Location -Path $base_dir\tests\SimpleIdServer.OAuth.Host.Acceptance.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.OpenID.Host.Acceptance.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Scim.Tests
+    Push-Location -Path $base_dir\tests\SimpleIdServer.IdServer.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }
@@ -107,60 +88,11 @@ task test {
         Pop-Location
     }
 
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Uma.Host.Acceptance.Tests
+    Push-Location -Path $base_dir\tests\SimpleIdServer.Scim.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }
     } finally {
         Pop-Location
     }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.OpenID.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.OpenBankingApi.Host.Acceptance.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Saml.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Saml.Acceptance.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-}
-
-task publishWebsite {
-	exec { git checkout gh-pages }
-	exec { git rm -r . }
-	exec { git checkout HEAD -- .gitignore }
-	exec { git add . }
-	exec { git commit -m "Remove" }
-	exec { git checkout master }
-	exec { docfx ./docs/docfx.json }
-	exec { Copy-item -Force -Recurse -Verbose "./docs/_site/*" -Destination "." }
-	exec { git checkout gh-pages --merge }
-	exec { git add . }
-	exec { git commit -m "Update Documentation" }
-	exec { git rebase -i HEAD~2 }
-	exec { git push origin gh-pages }
-	exec { git checkout master }
 }
