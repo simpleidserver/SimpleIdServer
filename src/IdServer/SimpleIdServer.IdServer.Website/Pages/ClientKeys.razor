@@ -10,53 +10,77 @@
 @inject IState<ClientKeysState> clientKeysState
 @inject IDispatcher dispatcher
 
-<!-- TODO : Display missing keys. For example, if "request" object is specified and the sig alg is not specified then display warning message -->
+<div>
+    <p class="text-muted">If "Use JWKS URL" switch is on, you need to fill a valid JWKS URL. After saving, admin can download keys from the JWKS URL.</p>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Use JWKS URL</RadzenText>
+    <RadzenSwitch Change="HandleUseJWKSUrl" @bind-Value=@isJWKSUrlUsed></RadzenSwitch>
+    <RadzenTemplateForm Submit=@UpdateJWKSUrl TItem="UpdateJWKSUrlForm" Data=@updateJWKSUrl>
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">URL</RadzenText>
+            <RadzenTextBox Name="JWKSUrl" @bind-Value="@updateJWKSUrl.Url" Disabled=@(!isJWKSUrlUsed) Class="w-100"></RadzenTextBox>
+            <RadzenRequiredValidator Component="JWKSUrl" Text="URL is required"></RadzenRequiredValidator>
+        </div>
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Update" Disabled=@(!isJWKSUrlUsed) />
+    </RadzenTemplateForm>
+</div>
 
-<RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="Generate new key" />
+<hr />
 
-<RadzenDataGrid AllowFiltering="true"
-                AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                AllowSorting="true"
-                PageSize="30"
-                AllowPaging="true"
-                PagerHorizontalAlign="HorizontalAlign.Left"
-                ShowPagingSummary="true"
-                IsLoading="@clientKeysState.Value.IsLoading"
-                Count="@clientKeysState.Value.Count"
-                Data="@clientKeysState.Value.Keys"
-                RowRender="@RowRender"
-                TItem="SelectableClientKey"
-                ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Kid" Filterable="false" Sortable="true" SortOrder=SortOrder.Ascending Title="Identifier" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Alg" Filterable="false" Title="Algorithm" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Title="Usage" Width="80px">
-            <Template Context="data">
-                <RadzenBadge Text="@data.Value.Usage" IsPill="true" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+<div>
+    <RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="Generate new key" />
+
+    <RadzenDataGrid AllowFiltering="true"
+                    AllowColumnResize="true"
+                    AllowAlternatingRows="false"
+                    AllowSorting="true"
+                    PageSize="30"
+                    AllowPaging="true"
+                    PagerHorizontalAlign="HorizontalAlign.Left"
+                    ShowPagingSummary="true"
+                    IsLoading="@clientKeysState.Value.IsLoading"
+                    Count="@clientKeysState.Value.Count"
+                    Data="@clientKeysState.Value.Keys"
+                    RowRender="@RowRender"
+                    TItem="SelectableClientKey"
+                    ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Kid" Filterable="false" Sortable="true" SortOrder=SortOrder.Ascending Title="Identifier" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableClientKey" Property="Value.Alg" Filterable="false" Title="Algorithm" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Title="Usage" Width="80px">
+                <Template Context="data">
+                    <RadzenBadge Text="@data.Value.Usage" IsPill="true" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</div>
 
 @code {
     bool selectAll;
+    bool isJWKSUrlUsed { get; set; } = false;
 
     [Parameter]
     public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    record UpdateJWKSUrlForm
+    {
+        public string? Url { get; set; } = null;
+    }
+
+    UpdateJWKSUrlForm updateJWKSUrl = new UpdateJWKSUrlForm();
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -68,7 +92,20 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientKeysRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<UpdateJWKSUrlSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.JWKSUrlUpdated });
+                StateHasChanged();
+            });
         }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Client == null) return;
+        isJWKSUrlUsed = !string.IsNullOrWhiteSpace(Client.JwksUri);
+        updateJWKSUrl.Url = Client.JwksUri;
     }
 
 
@@ -79,14 +116,14 @@
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) =>
     {
-        if (a.Value.Equals(1))
-        {
-            var keyIds = clientKeysState.Value.Keys.Where(s => s.IsSelected).Select(s => s.Value.Kid).ToList();
-            if (!keyIds.Contains(scope.Value.Kid)) keyIds.Add(scope.Value.Kid);
-            var act = new RemoveSelectedClientKeysAction { KeyIds = keyIds, ClientId = Client.ClientId };
-            dispatcher.Dispatch(act);
-            contextMenuService.Close();
-        }
+    if (a.Value.Equals(1))
+    {
+        var keyIds = clientKeysState.Value.Keys.Where(s => s.IsSelected).Select(s => s.Value.Kid).ToList();
+        if (!keyIds.Contains(scope.Value.Kid)) keyIds.Add(scope.Value.Kid);
+        var act = new RemoveSelectedClientKeysAction { KeyIds = keyIds, ClientId = Client.ClientId };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
     });
     }
 
@@ -126,5 +163,15 @@
             Resizable = true,
             Draggable = true
         });
+    }
+
+    void UpdateJWKSUrl(UpdateJWKSUrlForm form)
+    {
+        dispatcher.Dispatch(new UpdateJWKSUrlAction { ClientId = Client.ClientId, JWKSUrl = form.Url });
+    }
+
+    void HandleUseJWKSUrl(bool isEnabled)
+    {
+        
     }
 }

@@ -132,11 +132,17 @@
   <data name="ClientSettingsUpdated" xml:space="preserve">
     <value>Client settings have been updated</value>
   </data>
+  <data name="EncKeyAdded" xml:space="preserve">
+    <value>Encryption key has been added</value>
+  </data>
   <data name="ExternalAuthProviderUnlinked" xml:space="preserve">
     <value>External authentication provider has been unlinked</value>
   </data>
   <data name="InvalidRedirectUrl" xml:space="preserve">
     <value>Redirection url '{0}' is not valid</value>
+  </data>
+  <data name="JWKSUrlUpdated" xml:space="preserve">
+    <value>JWKS Url has been updated</value>
   </data>
   <data name="RedirectUriContainsFragment" xml:space="preserve">
     <value>Redirection url '{0}' cannot contains fragment (#)</value>

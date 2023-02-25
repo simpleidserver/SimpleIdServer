@@ -8,8 +8,6 @@
 @inject NotificationService notificationService
 @inject IDispatcher dispatcher
 
-<!-- TODO : choose between encryption key and signature key -->
-
 <RadzenSteps>
     <Steps>
         <RadzenStepsItem Text="Key">
@@ -41,10 +39,19 @@
             </div>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Generate" Disabled="@(SelectedKeyType == null)">
+            @if (!updateClientState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateClientState.Value.ErrorMessage))
+            {
+                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateClientState.Value.ErrorMessage</RadzenAlert>
+            }
+
+            @if (keyIsGenerated)
+            {
+                <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Success" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">Key has been generated !</RadzenAlert>
+            }
+
             @switch(SelectedKeyType.Usage)
             {
                 case SimpleIdServer.IdServer.Constants.JWKUsages.Sig:
-                    <!-- TODO : Display form to generate an encryption key -->
                     <RadzenTemplateForm Submit=@GenerateSigKey TItem="SigKeyGenerationForm" Data=@sigKeyGeneration>
                         @if (!updateClientState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateClientState.Value.ErrorMessage))
                         {
@@ -61,9 +68,9 @@
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
                             <RadzenDropDown Name="KeyType" Class="w-100"
-                                    Data=@sigKeyTypes
+                                    Data=@keyTypes
                                     TValue="SecurityKeyTypes"
-                                    Change="@OnSecurityKeyTypeChange"
+                                    Change="@OnSigSecurityKeyTypeChange"
                                     @bind-Value=@sigKeyGeneration.KeyType
                                     TextProperty="Name" ValueProperty="KeyType" />
                             <RadzenRequiredValidator Component="KeyType" Text="Key type is required"></RadzenRequiredValidator>
@@ -72,7 +79,7 @@
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
                             <RadzenDropDown Name="Alg" Class="w-100"
-                                            Data=@signingKeys
+                                            Data=@signingAlgs
                                             TValue="string"
                                             @bind-Value=@sigKeyGeneration.Alg />
                             <RadzenRequiredValidator Component="Alg" Text="Algorithm is required"></RadzenRequiredValidator>
@@ -80,44 +87,134 @@
                         <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Generate" />
                     </RadzenTemplateForm>
                     break;
+                case SimpleIdServer.IdServer.Constants.JWKUsages.Enc:
+                    <RadzenTemplateForm Submit=@GenerateEncKey TItem="EncKeyGenerationForm" Data=@encKeyGeneration>
+                        <!-- Key Identifier -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                            <RadzenTextBox Name="KeyId" @bind-Value="@encKeyGeneration.KeyId" Class="w-100"></RadzenTextBox>
+                            <RadzenRequiredValidator Component="KeyId" Text="Identifier is required"></RadzenRequiredValidator>
+                        </div>
+                        <!-- Key Type -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                            <RadzenDropDown Name="KeyType" Class="w-100"
+                                    Data=@keyTypes
+                                    TValue="SecurityKeyTypes"
+                                    Change="@OnEncSecurityKeyTypeChange"
+                                    @bind-Value=@encKeyGeneration.KeyType
+                                    TextProperty="Name" ValueProperty="KeyType" />
+                            <RadzenRequiredValidator Component="KeyType" Text="Key type is required"></RadzenRequiredValidator>
+                        </div>
+                        <!-- Alg -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                            <RadzenDropDown Name="Alg" Class="w-100"
+                                    Data=@encryptionAlgs
+                                    TValue="string"
+                                    @bind-Value=@encKeyGeneration.Alg />
+                            <RadzenRequiredValidator Component="Alg" Text="Algorithm is required"></RadzenRequiredValidator>
+                        </div>
+                        <!-- Enc -->
+                        <div>
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Encryption</RadzenText>
+                            <RadzenDropDown Name="Enc" Class="w-100"
+                                    Data=@SimpleIdServer.IdServer.Constants.AllEncryptions
+                                    TValue="string"
+                                    @bind-Value=@encKeyGeneration.Enc />
+                            <RadzenRequiredValidator Component="Enc" Text="Encryption is required"></RadzenRequiredValidator>
+                        </div>
+                        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Generate" />
+                    </RadzenTemplateForm>
+                    break;
             }
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Summary" Disabled="@(generatedSigKey == null)">
-            <!-- Key Identifier -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
-                <RadzenTextBox Name="KeyId" @bind-Value="@generatedSigKey.KeyId" Disabled=true Class="w-100"></RadzenTextBox>
-            </div>
-            <!-- Key Type -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
-                <RadzenDropDown Name="KeyType" Class="w-100"
-                                Data=@sigKeyTypes
-                                TValue="SecurityKeyTypes"
-                                @bind-Value=@generatedSigKey.KeyType
-                                TextProperty="Name" ValueProperty="KeyType"
-                                Disabled=true/>
-            </div>
-            <!-- Alg -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
-                <RadzenDropDown Name="Alg" Class="w-100"
-                                Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+        <RadzenStepsItem Text="Summary" Disabled="@(generatedSigKey == null && generatedEncKey == null)">
+            @if(generatedSigKey != null)
+            {                
+                <!-- Key Identifier -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                    <RadzenTextBox Name="KeyId" @bind-Value="@generatedSigKey.KeyId" Disabled=true Class="w-100"></RadzenTextBox>
+                </div>
+                <!-- Key Type -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                    <RadzenDropDown Name="KeyType" Class="w-100"
+                                    Data=@keyTypes
+                                    TValue="SecurityKeyTypes"
+                                    @bind-Value=@generatedSigKey.KeyType
+                                    TextProperty="Name" ValueProperty="KeyType"
+                                    Disabled=true/>
+                </div>
+                <!-- Alg -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                    <RadzenDropDown Name="Alg" Class="w-100"
+                                    Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                                    TValue="string"
+                                    Disabled=true
+                                    @bind-Value=@generatedSigKey.Alg />
+                </div>
+                <!-- Public Pem -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+                    <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PublicKey Disabled=true></RadzenTextArea>
+                </div>
+                <!-- Private Pem -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+                    <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
+                </div>
+                <RadzenButton Click="@(args => SaveSigKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />
+            }
+            else
+            {
+                <!-- Key Identifier -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Identifier</RadzenText>
+                    <RadzenTextBox Name="KeyId" @bind-Value="@generatedEncKey.KeyId" Disabled=true Class="w-100"></RadzenTextBox>
+                </div>
+                <!-- Key Type -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
+                    <RadzenDropDown Name="KeyType" Class="w-100"
+                                    Data=@keyTypes
+                                    TValue="SecurityKeyTypes"
+                                @bind-Value=@generatedEncKey.KeyType
+                                    TextProperty="Name" ValueProperty="KeyType"
+                                    Disabled=true/>
+                </div>
+                <!-- Alg -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Algorithm</RadzenText>
+                    <RadzenDropDown Name="Alg" Class="w-100"
+                                    Data=@SimpleIdServer.IdServer.Constants.AllEncAlgs
+                                    TValue="string"
+                                    Disabled=true
+                                @bind-Value=@generatedEncKey.Alg />
+                </div>
+                <!-- Enc -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Encryption</RadzenText>
+                    <RadzenDropDown Name="Alg" Class="w-100"
+                                Data=@SimpleIdServer.IdServer.Constants.AllEncryptions
                                 TValue="string"
                                 Disabled=true
-                                @bind-Value=@generatedSigKey.Alg />
-            </div>
-            <!-- Public Pem -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
-                <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PublicKey Disabled=true></RadzenTextArea>
-            </div>
-            <!-- Private Pem -->
-            <div>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
-                <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
-            </div>
-            <RadzenButton Click="@(args => SaveSigKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />
+                                @bind-Value=@generatedEncKey.Enc />
+                </div>
+                <!-- Public Pem -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
+                    <RadzenTextArea Class="w-100" Value=@generatedEncKey.Pem.PublicKey Disabled=true></RadzenTextArea>
+                </div>
+                <!-- Private Pem -->
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
+                    <RadzenTextArea Class="w-100" Value=@generatedEncKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
+                </div>
+                <RadzenButton Click="@(args => SaveEncKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />                
+            }
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
@@ -126,11 +223,20 @@
     [Parameter]
     public Client Client { get; set; }
 
-    static Dictionary<SecurityKeyTypes, IEnumerable<string>> mappingSecurityKeyToAlg = new Dictionary<SecurityKeyTypes, IEnumerable<string>>
+    bool keyIsGenerated { get; set; } = false;
+
+    static Dictionary<SecurityKeyTypes, IEnumerable<string>> mappingSecurityKeyToSigAlg = new Dictionary<SecurityKeyTypes, IEnumerable<string>>
     {
         { SecurityKeyTypes.CERTIFICATE, new List<string> { SecurityAlgorithms.RsaSha256, SecurityAlgorithms.RsaSha384, SecurityAlgorithms.RsaSha512  } },
         { SecurityKeyTypes.RSA, new List<string> { SecurityAlgorithms.RsaSha256, SecurityAlgorithms.RsaSha384, SecurityAlgorithms.RsaSha512  } },
         { SecurityKeyTypes.ECDSA, new List<string> { SecurityAlgorithms.EcdsaSha256, SecurityAlgorithms.EcdsaSha384, SecurityAlgorithms.EcdsaSha512  } }
+    };
+
+    static Dictionary<SecurityKeyTypes, IEnumerable<string>> mappingSecurityKeyToEncAlg = new Dictionary<SecurityKeyTypes, IEnumerable<string>>
+    {
+        { SecurityKeyTypes.CERTIFICATE, new List<string> { SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.RsaOAEP } },
+        { SecurityKeyTypes.RSA, new List<string> { SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.RsaOAEP } },
+        { SecurityKeyTypes.ECDSA, new List<string> { SecurityAlgorithms.EcdhEs, SecurityAlgorithms.EcdhEsA128kw, SecurityAlgorithms.EcdhEsA192kw, SecurityAlgorithms.EcdhEsA256kw  } }
     };
 
     record SigKeyGenerationForm
@@ -138,6 +244,14 @@
         public string KeyId { get; set; } = null!;
         public SecurityKeyTypes KeyType { get; set; } = SecurityKeyTypes.RSA;
         public string Alg { get; set; } = SecurityAlgorithms.RsaSha256;
+    }
+
+    record EncKeyGenerationForm
+    {
+        public string KeyId { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; } = SecurityKeyTypes.RSA;
+        public string Alg { get; set; } = SecurityAlgorithms.RsaPKCS1;
+        public string Enc { get; set; } = SecurityAlgorithms.Aes128CbcHmacSha256;
     }
 
     record KeyType
@@ -157,9 +271,11 @@
 
     bool isKeyGenerated { get; set; } = false;
     GenerateSigKeySuccessAction generatedSigKey { get; set; } = null;
-    IEnumerable<string> signingKeys { get; set; } = mappingSecurityKeyToAlg[SecurityKeyTypes.RSA];
+    GenerateEncKeySuccessAction generatedEncKey { get; set; } = null;
+    IEnumerable<string> signingAlgs { get; set; } = mappingSecurityKeyToSigAlg[SecurityKeyTypes.RSA];
+    IEnumerable<string> encryptionAlgs { get; set; } = mappingSecurityKeyToEncAlg[SecurityKeyTypes.RSA];
 
-    List<KeyTypeInfo> sigKeyTypes = new List<KeyTypeInfo>
+    List<KeyTypeInfo> keyTypes = new List<KeyTypeInfo>
     {
         new KeyTypeInfo { KeyType = SecurityKeyTypes.RSA, Name = "RSA" },
         new KeyTypeInfo { KeyType = SecurityKeyTypes.CERTIFICATE, Name = "CERTIFICATE" },
@@ -168,23 +284,40 @@
 
     ICollection<KeyType> KeyTypes { get; set;} = new List<KeyType>
     {
-        new KeyType { Name = "Signature Key", ShortDescription = "request object, private_key_jwt and client_secret_jwt", Description = "Generate signature key. <br/> Check JWT request object <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests</a>. <br/> Used in <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a>", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "images/SigKey.png" }
+        new KeyType { Name = "Signature Key", ShortDescription = "request object, private_key_jwt and client_secret_jwt", Description = "Generate signature key. <br/> Check JWT request object <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests</a>. <br/> Used in <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a>", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "images/SigKey.png" },
+        new KeyType { Name = "Encryption Key", ShortDescription = "JWE", Description = "Generate JSON Web Encryption (JWE) <a href='https://www.rfc-editor.org/rfc/rfc7516' target='_blank'>https://www.rfc-editor.org/rfc/rfc7516</a>", PictureUrl = "images/EncKey.png", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Enc }
     };
 
     KeyType? SelectedKeyType { get; set; } = null;
     SigKeyGenerationForm sigKeyGeneration = new SigKeyGenerationForm();
+    EncKeyGenerationForm encKeyGeneration = new EncKeyGenerationForm();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         SubscribeToAction<GenerateSigKeySuccessAction>((act) =>
         {
+            keyIsGenerated = true;
             generatedSigKey = act;
+            generatedEncKey = null;
+            StateHasChanged();
+        });
+        SubscribeToAction<GenerateEncKeySuccessAction>((act) =>
+        {
+            keyIsGenerated = true;
+            generatedEncKey = act;
+            generatedSigKey = null;
             StateHasChanged();
         });
         SubscribeToAction<AddSigKeySuccessAction>((act) =>
         {
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SigKeyAdded });
+            dialogService.Close();
+            StateHasChanged();
+        });
+        SubscribeToAction<AddEncKeySuccessAction>((act) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.EncKeyAdded });
             dialogService.Close();
             StateHasChanged();
         });
@@ -195,21 +328,41 @@
         SelectedKeyType = keyType;
     }
 
-    void OnSecurityKeyTypeChange(object securityKeyType)
+    void OnSigSecurityKeyTypeChange(object securityKeyType)
     {
         var st = (SecurityKeyTypes)securityKeyType;
-        signingKeys = mappingSecurityKeyToAlg[st];
-        sigKeyGeneration.Alg = signingKeys.ElementAt(0);
+        signingAlgs = mappingSecurityKeyToSigAlg[st];
+        sigKeyGeneration.Alg = signingAlgs.ElementAt(0);
+        StateHasChanged();
+    }
+
+    void OnEncSecurityKeyTypeChange(object securityKeyType)
+    {
+        var st = (SecurityKeyTypes)securityKeyType;
+        encryptionAlgs = mappingSecurityKeyToEncAlg[st];
+        encKeyGeneration.Alg = encryptionAlgs.ElementAt(0);
         StateHasChanged();
     }
 
     void GenerateSigKey(SigKeyGenerationForm form)
     {
+        keyIsGenerated = false;
         dispatcher.Dispatch(new GenerateSigKeyAction { Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType });
+    }
+
+    void GenerateEncKey(EncKeyGenerationForm form)
+    {
+        keyIsGenerated = false;
+        dispatcher.Dispatch(new GenerateEncKeyAction { Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType, Enc = form.Enc });
     }
 
     void SaveSigKey()
     {
         dispatcher.Dispatch(new AddSigKeyAction { Alg = generatedSigKey.Alg, ClientId = Client.ClientId, Credentials = generatedSigKey.Credentials, KeyId = generatedSigKey.KeyId, KeyType = generatedSigKey.KeyType });
+    }
+
+    void SaveEncKey()
+    {
+        dispatcher.Dispatch(new AddEncKeyAction { Alg = generatedEncKey.Alg, ClientId = Client.ClientId, Credentials = generatedEncKey.Credentials, KeyId = generatedEncKey.KeyId, KeyType = generatedEncKey.KeyType, Enc = generatedEncKey.Enc });
     }
 }

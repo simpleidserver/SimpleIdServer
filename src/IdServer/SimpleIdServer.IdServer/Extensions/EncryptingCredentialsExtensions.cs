@@ -11,6 +11,7 @@ namespace Microsoft.IdentityModel.Tokens
         {
             var result = JsonWebKeyConverter.ConvertFromSecurityKey(credentials.Key);
             result.Use = Constants.JWKUsages.Enc;
+            result.Alg = credentials.Alg;
             return result;
         }
     }

@@ -140,7 +140,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         };
 
         [ReducerMethod]
-        public static UpdateClientState ReduceGenerateSigKeyFailureAction(UpdateClientState state, GenerateSigKeyFailureAction act) => state with
+        public static UpdateClientState ReduceGenerateEncKeySuccessAction(UpdateClientState state, GenerateEncKeySuccessAction act) => state with
+        {
+            ErrorMessage = null
+        };
+
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceGenerateSigKeyFailureAction(UpdateClientState state, GenerateKeyFailureAction act) => state with
         {
             ErrorMessage = act.ErrorMessage
         };
@@ -188,6 +195,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 grantTypes.Add(UmaTicketHandler.GRANT_TYPE);
             client.GrantTypes = grantTypes;
             client.IsConsentDisabled = !act.IsConsentEnabled;
+            return state with
+            {
+                Client = client
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientState ReduceUpdateJWKSUrlSuccessAction(ClientState state, UpdateJWKSUrlSuccessAction act)
+        {
+            var client = state.Client;
+            client.JwksUri = act.JWKSUrl;
             return state with
             {
                 Client = client
@@ -360,6 +378,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Kid = act.KeyId,
                 KeyType = act.KeyType,
                 Usage = Constants.JWKUsages.Sig,
+                SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
+            };
+            keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });
+            return state with
+            {
+                Keys = keys,
+                Count = keys.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientKeysState ReduceAddEncKeySuccessAction(ClientKeysState state, AddEncKeySuccessAction act)
+        {
+            var keys = state.Keys.ToList();
+            var jsonWebKey = act.Credentials.SerializePublicJWK();
+            var newKey = new ClientJsonWebKey
+            {
+                Alg = act.Alg,
+                Kid = act.KeyId,
+                KeyType = act.KeyType,
+                Usage = Constants.JWKUsages.Enc,
                 SerializedJsonWebKey = JsonExtensions.SerializeToJson(jsonWebKey)
             };
             keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });

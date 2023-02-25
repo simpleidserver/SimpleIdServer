@@ -233,7 +233,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             var client = await _clientRepository.Query().AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
             if(client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
             {
-                dispatcher.Dispatch(new GenerateSigKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
+                dispatcher.Dispatch(new GenerateKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
                 return;
             }
 
@@ -256,6 +256,34 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [EffectMethod]
+        public async Task Handle(GenerateEncKeyAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().AsNoTracking().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
+            if (client.JsonWebKeys.Any(j => j.KeyId == act.KeyId))
+            {
+                dispatcher.Dispatch(new GenerateKeyFailureAction { ErrorMessage = string.Format(Global.SigKeyAlreadyExists, act.KeyId) });
+                return;
+            }
+
+            EncryptingCredentials encCredentials = null;
+            switch (act.KeyType)
+            {
+                case SecurityKeyTypes.RSA:
+                    encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(act.KeyId, act.Alg, act.Enc);
+                    break;
+                case SecurityKeyTypes.CERTIFICATE:
+                    encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(act.KeyId, act.Alg, act.Enc);
+                    break;
+                case SecurityKeyTypes.ECDSA:
+                    encCredentials = ClientKeyGenerator.GenerateECDsaEncryptionKey(act.KeyId, act.Alg, act.Enc);
+                    break;
+            }
+
+            var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
+            dispatcher.Dispatch(new GenerateEncKeySuccessAction { Alg = act.Alg, KeyId = act.KeyId, Credentials = encCredentials, Pem = pemResult, KeyType = act.KeyType, Enc = act.Enc });
+        }
+
+        [EffectMethod]
         public async Task Handle(AddSigKeyAction act, IDispatcher dispatcher)
         {
             var client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
@@ -265,6 +293,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             dispatcher.Dispatch(new AddSigKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType });
         }
 
+
+        [EffectMethod]
+        public async Task Handle(AddEncKeyAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).SingleAsync(c => c.ClientId == act.ClientId);
+            var jsonWebKey = act.Credentials.SerializePublicJWK();
+            client.Add(act.KeyId, jsonWebKey, Constants.JWKUsages.Enc, act.KeyType);
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddEncKeySuccessAction { Alg = act.Alg, ClientId = act.ClientId, Credentials = act.Credentials, KeyId = act.KeyId, KeyType = act.KeyType, Enc = act.Enc  });
+        }
+
         [EffectMethod]
         public async Task Handle(RemoveSelectedClientKeysAction act, IDispatcher dispatcher)
         {
@@ -272,6 +311,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.SerializedJsonWebKeys = client.SerializedJsonWebKeys.Where(j => !act.KeyIds.Contains(j.Kid)).ToList();
             await _clientRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new RemoveSelectedClientKeysSuccessAction { ClientId = act.ClientId, KeyIds = act.KeyIds });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateJWKSUrlAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().SingleAsync(c => c.ClientId == act.ClientId);
+            client.JwksUri = act.JWKSUrl;
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateJWKSUrlSuccessAction { ClientId = act.ClientId, JWKSUrl = act.JWKSUrl });
         }
 
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
@@ -520,7 +568,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public PemResult Pem { get; set; } = null!;
     }
 
-    public class GenerateSigKeyFailureAction
+    public class GenerateEncKeySuccessAction
+    {
+        public string KeyId { get; set; } = null!;
+        public string Alg { get; set; } = null!;
+        public string Enc { get; set; } = null!;
+        public EncryptingCredentials Credentials { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public PemResult Pem { get; set; } = null!;
+    }
+
+    public class GenerateEncKeyAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public string Alg { get; set; } = null!;
+        public string Enc { get; set; } = null!;
+    }
+
+    public class GenerateKeyFailureAction
     {
         public string ErrorMessage { get; set; } = null!;
     }
@@ -534,6 +601,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public SigningCredentials Credentials { get; set; } = null!;
     }
 
+    public class AddEncKeyAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
+        public string Alg { get; set; } = null!;
+        public string Enc { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public EncryptingCredentials Credentials { get; set; } = null!;
+    }
+
     public class AddSigKeySuccessAction
     {
         public string ClientId { get; set; } = null!;
@@ -541,6 +618,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string Alg { get; set; } = null!;
         public SecurityKeyTypes KeyType { get; set; }
         public SigningCredentials Credentials { get; set; } = null!;
+    }
+
+    public class AddEncKeySuccessAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string KeyId { get; set; } = null!;
+        public string Alg { get; set; } = null!;
+        public string Enc { get; set; } = null!;
+        public SecurityKeyTypes KeyType { get; set; }
+        public EncryptingCredentials Credentials { get; set; } = null!;
     }
 
     public class ToggleAllClientKeySelectionAction
@@ -564,5 +651,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
         public string ClientId { get; set; } = null!;
         public IEnumerable<string> KeyIds { get; set; } = new List<string>();
+    }
+
+    public class UpdateJWKSUrlAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string JWKSUrl { get; set; } = null!;
+    }
+
+    public class UpdateJWKSUrlSuccessAction
+    {
+        public string ClientId { get; set; } = null!;
+        public string JWKSUrl { get; set; } = null!;
     }
 }

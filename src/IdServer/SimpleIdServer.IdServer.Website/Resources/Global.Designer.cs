@@ -106,6 +106,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Encryption key has been added.
+        /// </summary>
+        public static string EncKeyAdded {
+            get {
+                return ResourceManager.GetString("EncKeyAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à External authentication provider has been unlinked.
         /// </summary>
         public static string ExternalAuthProviderUnlinked {
@@ -120,6 +129,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string InvalidRedirectUrl {
             get {
                 return ResourceManager.GetString("InvalidRedirectUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à JWKS Url has been updated.
+        /// </summary>
+        public static string JWKSUrlUpdated {
+            get {
+                return ResourceManager.GetString("JWKSUrlUpdated", resourceCulture);
             }
         }
         
