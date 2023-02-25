@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
-		<Description>Identity server project with OPENID and OAUTH2.0 support.</Description>
+		<Description>Identity server project with OPENID, OAUTH2.0, UMA2.0 and CIBA support.</Description>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="QRCoder" Version="1.4.1" />

@@ -1,18 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
-		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<IsPackable>true</IsPackable>
+		<Description>Identity server website</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.*" />
 		<PackageReference Include="Radzen.Blazor" Version="4.6.*" />
 		<PackageReference Include="Fluxor" Version="5.7.*" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.*" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="5.7.*" />
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="5.7.*" />
+	</ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />

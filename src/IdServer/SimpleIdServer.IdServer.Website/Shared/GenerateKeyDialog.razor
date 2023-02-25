@@ -28,15 +28,17 @@
                         </RadzenCard>
                     </div>
                 }
+            </div>
 
-            <hr class="hr" />
+            <hr />
 
             @if (SelectedKeyType != null)
             {
-                <h5><RadzenIcon Icon="info" /> @SelectedKeyType.Name</h5>
-                <p class="text-muted">@(new MarkupString(SelectedKeyType.Description))</p>
+                <div>
+                    <h5><RadzenIcon Icon="info" /> @SelectedKeyType.Name</h5>
+                    <p class="text-muted">@(new MarkupString(SelectedKeyType.Description))</p>
+                </div>
             }
-            </div>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Generate" Disabled="@(SelectedKeyType == null)">
             @if (!updateClientState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateClientState.Value.ErrorMessage))
@@ -284,8 +286,8 @@
 
     ICollection<KeyType> KeyTypes { get; set;} = new List<KeyType>
     {
-        new KeyType { Name = "Signature Key", ShortDescription = "request object, private_key_jwt and client_secret_jwt", Description = "Generate signature key. <br/> Check JWT request object <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests</a>. <br/> Used in <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a>", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "images/SigKey.png" },
-        new KeyType { Name = "Encryption Key", ShortDescription = "JWE", Description = "Generate JSON Web Encryption (JWE) <a href='https://www.rfc-editor.org/rfc/rfc7516' target='_blank'>https://www.rfc-editor.org/rfc/rfc7516</a>", PictureUrl = "images/EncKey.png", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Enc }
+        new KeyType { Name = "Signature Key", ShortDescription = "request object, private_key_jwt and client_secret_jwt", Description = "Generate signature key. <br/> Check JWT request object <a href='https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests</a>. <br/> Used in <i>private_key_jwt</i> and <i>client_secret_jwt</i> authentication flows <a href='https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication' target='_blank'>https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication</a>", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SigKey.png" },
+        new KeyType { Name = "Encryption Key", ShortDescription = "JWE", Description = "Generate JSON Web Encryption (JWE) <a href='https://www.rfc-editor.org/rfc/rfc7516' target='_blank'>https://www.rfc-editor.org/rfc/rfc7516</a>", PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/EncKey.png", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Enc }
     };
 
     KeyType? SelectedKeyType { get; set; } = null;

@@ -85,9 +85,9 @@
 
     ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>
     {
-        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one user attribute to one claim", Type = ScopeClaimMapperTypes.USERATTRIBUTE, PictureUrl = "images/UserAttribute.png" },
-        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one user property to one claim", Type = ScopeClaimMapperTypes.USERPROPERTY, PictureUrl = "images/UserProperty.png" },
-        new MapperType { Name = "Address", ShortDescription = "User address", Description = "Build an address according to the format defined by the OPENID standard <a href='https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim'>https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim</a>", IsSAMLSupported = false, Type = ScopeClaimMapperTypes.ADDRESS, PictureUrl = "images/UserAddress.png" }
+        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one user attribute to one claim", Type = ScopeClaimMapperTypes.USERATTRIBUTE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
+        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one user property to one claim", Type = ScopeClaimMapperTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" },
+        new MapperType { Name = "Address", ShortDescription = "User address", Description = "Build an address according to the format defined by the OPENID standard <a href='https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim'>https://openid.net/specs/openid-connect-core-1_0.html#AddressClaim</a>", IsSAMLSupported = false, Type = ScopeClaimMapperTypes.ADDRESS, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAddress.png" }
     };
 
     MapperType? SelectedMapperType { get; set; } = null;

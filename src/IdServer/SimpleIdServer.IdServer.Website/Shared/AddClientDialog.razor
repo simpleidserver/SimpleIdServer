@@ -29,7 +29,7 @@
                 }
             </div>
 
-            <hr class="hr" />
+            <hr />
 
             @if (SelectedApplicationType != null)
             {
@@ -274,12 +274,12 @@
 
     ICollection<ApplicationType> ApplicationTypes { get; set; } = new List<ApplicationType>
     {
-        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser (Angular, EmberJS, VueJS etc...). <br/> Client secret and/or refresh tokens cannot be stored by these applications because there is a security risk.", Type = ClientTypes.SPA, PictureUrl = "images/angular.png" },
-        new ApplicationType { Name = "Machine", ShortDescription = "Client credentials", Description = "Machine-to-machine (M2M) applications, such as CLIs, daemons, or services running on your back-end, the system authenticates and authorizes the app rather than a user.", Type = ClientTypes.MACHINE, PictureUrl = "images/MachineClient.png" },
-        new ApplicationType { Name = "Web application", ShortDescription = "Authorization code + PKCE", Description = "Web application executed on server (ASP.NET CORE, SPRING etc...)", Type = ClientTypes.WEBSITE, PictureUrl = "images/WebsiteClient.png" },
-        new ApplicationType { Name = "Mobile", ShortDescription = "Authorization code + PKCE", Description = "A desktop or mobile application running on a user's device", Type = ClientTypes.MOBILE, PictureUrl = "images/MobileClient.png" },
-        new ApplicationType { Name = "WS-Fed Relying Party",  ShortDescription = "WS-Federation application", Description = "A WS-Federation relying party commonly used by older Microsoft applications", Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "images/WsFedClient.png" },
-        new ApplicationType { Name = "Device",  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "images/DeviceClient.png" }
+        new ApplicationType { Name = "User Agent Based application", ShortDescription = "Authorization code + PKCE", Description = "A client-side application running in a browser (Angular, EmberJS, VueJS etc...). <br/> Client secret and/or refresh tokens cannot be stored by these applications because there is a security risk.", Type = ClientTypes.SPA, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/angular.png" },
+        new ApplicationType { Name = "Machine", ShortDescription = "Client credentials", Description = "Machine-to-machine (M2M) applications, such as CLIs, daemons, or services running on your back-end, the system authenticates and authorizes the app rather than a user.", Type = ClientTypes.MACHINE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MachineClient.png" },
+        new ApplicationType { Name = "Web application", ShortDescription = "Authorization code + PKCE", Description = "Web application executed on server (ASP.NET CORE, SPRING etc...)", Type = ClientTypes.WEBSITE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png" },
+        new ApplicationType { Name = "Mobile", ShortDescription = "Authorization code + PKCE", Description = "A desktop or mobile application running on a user's device", Type = ClientTypes.MOBILE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MobileClient.png" },
+        new ApplicationType { Name = "WS-Fed Relying Party",  ShortDescription = "WS-Federation application", Description = "A WS-Federation relying party commonly used by older Microsoft applications", Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
+        new ApplicationType { Name = "Device",  ShortDescription = "Client Initiated Backchannel Authentication (CIBA) flow", Description = "Authentication is performed via an Authentication Device by the user who also consents (if required) to the request.", Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" }
     };
 
     ApplicationType? SelectedApplicationType { get; set; } = null;

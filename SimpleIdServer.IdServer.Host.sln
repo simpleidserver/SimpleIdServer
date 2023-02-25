@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Website", "src\IdServer\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj", "{83A19793-668C-46B6-B1D7-134DFED8B430}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Website.Startup", "src\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj", "{75CB19CC-AD5A-47B8-8337-FB11B15D660A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{83A19793-668C-46B6-B1D7-134DFED8B430}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83A19793-668C-46B6-B1D7-134DFED8B430}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83A19793-668C-46B6-B1D7-134DFED8B430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75CB19CC-AD5A-47B8-8337-FB11B15D660A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75CB19CC-AD5A-47B8-8337-FB11B15D660A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75CB19CC-AD5A-47B8-8337-FB11B15D660A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75CB19CC-AD5A-47B8-8337-FB11B15D660A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,7 +105,8 @@ Global
 		{15CD3447-BC21-4D46-AD8A-E76685376077} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{25E98779-29F9-4C74-A935-15D20D9F0E0E} = {15CD3447-BC21-4D46-AD8A-E76685376077}
 		{EA9F6F0A-5F8A-454D-A682-7CADD6704C44} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
-		{83A19793-668C-46B6-B1D7-134DFED8B430} = {68306EFF-55D9-497B-9482-FEB81C485914}
+		{83A19793-668C-46B6-B1D7-134DFED8B430} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
+		{75CB19CC-AD5A-47B8-8337-FB11B15D660A} = {68306EFF-55D9-497B-9482-FEB81C485914}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

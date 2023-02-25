@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
         {
             var src = logoUri;
             if (string.IsNullOrWhiteSpace(logoUri))
-                src = "/images/DefaultClient.png";
+                src = "_content/SimpleIdServer.IdServer.Website/images/DefaultClient.png";
 
             return new HtmlString($"<img class='img-thumbnail' src='{src}' />");
         }

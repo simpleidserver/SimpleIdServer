@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
     {
         public static IHtmlContent UserPicture(this IHtmlHelper htmlHelper, ClaimsPrincipal claimsPrincipal)
         {
-            var src = "/images/DefaultUser.png";
+            var src = "_content/SimpleIdServer.IdServer.Website/images/DefaultUser.png";
             var cl = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == SimpleIdServer.IdServer.Constants.UserClaims.Profile);
             if (cl != null)
                 src = cl.Value;
