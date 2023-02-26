@@ -1,0 +1,29 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "OpenId",
+    "Oauth",
+	"Uma",
+	"Ciba"
+  ],
+  "name": "Identity Server",
+  "identity": "SimpleIdServer.IdServer.Startup",
+  "groupIdentity": "SimpleIdServer.IdServer.Startup",
+  "shortName": "idserver",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+	  "connectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "isRequired": true,
+		  "description": "Connection string"
+	  }
+  },
+  "sourceName": "SimpleIdServer.IdServer.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.IdServer.Startup.csproj" } ]
+}

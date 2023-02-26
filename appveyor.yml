@@ -17,14 +17,6 @@ artifacts:
   name: NuGet
 deploy:
 - provider: NuGet
-  server: https://www.myget.org/F/advance-ict/api/v2/package
-  api_key:
-    secure: zs1JVjFHRdvB36fGq2rN8MR7QeJnCVkt7VTG4ZHT5OYDNpuh2AlGHqK+rseevn8l
-  skip_symbols: true
-  artifact: /.*\.nupkg/
-  on:
-    branch: master
-- provider: NuGet
   name: production
   artifact: /.*\.nupkg/
   api_key:

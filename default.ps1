@@ -12,6 +12,20 @@ properties {
     $versionSuffix = @{ $true = "--version-suffix=$($suffix)"; $false = ""}[$suffix -ne ""]
 }
 
+function CopyFolder{
+	param(
+		$SourceFolderPath,
+		$TargetFolderPath
+	)
+	
+	if (Test-Path $TargetFolderPath) {	
+		Remove-Item $TargetFolderPath -recurse -force
+	}
+	
+	New-Item $TargetFolderPath -Type Directory
+	
+	Copy-Item $SourceFolderPath/* $TargetFolderPath -recurse -force
+}
 
 task default -depends local
 task local -depends compile, test
@@ -43,9 +57,42 @@ task compile -depends clean {
 	
     exec { dotnet build .\SimpleIdServer.IdServer.Host.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
+	exec { dotnet build "$source_dir/Templates/SimpleIdServer.Templates.csproj" -c $config --version-suffix=$buildSuffix }
+}
+
+task buildTemplate {
+	$AreasPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Areas"
+	$AreasPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Areas"
+	$HelpersPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Helpers"
+	$HelpersPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Helpers"
+	$MigrationsPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Migrations"
+	$MigrationsPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Migrations"
+	$ResourcesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Resources"
+	$ResourcesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Resources"
+	$ViewsPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Views"
+	$ViewsPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Views"
+	$ConvertersPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Converters"
+	$ConvertersPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Converters"
+	$ImagesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/wwwroot/images"
+	$ImagesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/wwwroot/images"
+	$StylesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/wwwroot/styles"
+	$StylesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/wwwroot/styles"	
+	$PagesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup/Pages"
+	$PagesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup/Pages"
+	
+	
+	CopyFolder $AreasPathSource $AreasPathTarget
+	CopyFolder $HelpersPathSource $HelpersPathTarget
+	CopyFolder $MigrationsPathSource $MigrationsPathTarget
+	CopyFolder $ResourcesPathSource $ResourcesPathTarget
+	CopyFolder $ViewsPathSource $ViewsPathTarget
+	CopyFolder $ImagesPathSource $ImagesPathTarget
+	CopyFolder $StylesPathSource $StylesPathTarget
+	CopyFolder $ConvertersPathSource $ConvertersPathTarget
+	CopyFolder $PagesPathSource $PagesPathTarget
 }
  
-task pack -depends release, compile {
+task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -61,6 +108,7 @@ task pack -depends release, compile {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
 task test {

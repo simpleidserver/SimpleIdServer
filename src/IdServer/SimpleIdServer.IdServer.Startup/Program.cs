@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
@@ -9,8 +10,11 @@ using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
 using System.Linq;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables();
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 // RunInMemoryIdServer(builder.Services);
@@ -94,15 +98,16 @@ void RunInMemoryIdServer(IServiceCollection services)
 
 void RunSqlServerIdServer(IServiceCollection services)
 {
+    var name = Assembly.GetExecutingAssembly().GetName().Name;
     services.AddSIDIdentityServer(o =>
     {
         // o.IsEmailUsedDuringAuthentication = true;
     })
         .UseEFStore(o =>
         {
-            o.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True", o =>
+            o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
             {
-                o.MigrationsAssembly("SimpleIdServer.IdServer.Startup");
+                o.MigrationsAssembly(name);
                 o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
         })
