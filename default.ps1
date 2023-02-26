@@ -79,6 +79,8 @@ task buildTemplate {
 	$StylesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/wwwroot/styles"	
 	$PagesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup/Pages"
 	$PagesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup/Pages"
+	$PropertiesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup/Properties"
+	$PropertiesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup/Properties"
 	
 	
 	CopyFolder $AreasPathSource $AreasPathTarget
@@ -90,6 +92,7 @@ task buildTemplate {
 	CopyFolder $StylesPathSource $StylesPathTarget
 	CopyFolder $ConvertersPathSource $ConvertersPathTarget
 	CopyFolder $PagesPathSource $PagesPathTarget
+	CopyFolder $PropertiesPathSource $PropertiesPathTarget
 }
  
 task pack -depends release, compile, buildTemplate {

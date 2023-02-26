@@ -13,5 +13,4 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj" />
 	</ItemGroup>
-
 </Project>
