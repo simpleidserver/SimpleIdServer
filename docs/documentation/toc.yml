@@ -1,46 +1,21 @@
-- name: Big Picture
-  href: bigpicture/index.md
 - name: Getting Started
   href: gettingstarted/index.md
-- name: Authorization Server
+- name: Identity Server
   items:
-   - name: OpenId   
-     items:
-      - name: Installation
-        href: openid/installation.md
-      - name: Authentication methods
-        href: openid/authentication.md
-      - name: Persistence
-        href: openid/persistence.md
-      - name: Scenarios
-        items:
-         - name: Protect application from undesirable users
-           href: openid/protectappsusers.md
-         - name: Protect REST.API from undesirable clients
-           href: openid/protectapiclients.md
-         - name: Protect REST.API from undesirable users
-           href: openid/protectapiusers.md
-   - name: UMA2.0
-     items:
-      - name: Definition
-        href: uma20/definition.md
-      - name: Installation
-        href: uma20/installation.md
-      - name: Persistence
-        href: uma20/persistence.md
-      - name: Scenarios
-        items:
-          - name: Protect user's resource
-            href: uma20/protectresource.md   
+   - name: Persistence
+     href: idserver/persistence.md
+   - name: Authentication
+     href: idserver/authentication.md
+   - name: Protect SPA
+   - name: Protect Server-Side application
+     href: idserver/protectserversideapp.md
+   - name: Protect REST.API
+   - name: Protect user's resources
 - name: SCIM2.0
   items:
-   - name: Installation
-     href: scim20/installation.md
-   - name: Persistence
-     href: scim20/persistence.md
-   - name: Swagger
-     href: scim20/swagger.md
-- name: Provisioning
-  href: provisioning/index.md
+    - name: Persistence
+      href: scim20/persistence.md
+    - name: Swagger
+      href: scim20/swagger.md
 - name: Certifications
   href: certifications/index.md

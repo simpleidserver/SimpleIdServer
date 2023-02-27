@@ -1,32 +1,93 @@
-# Before you start
+# Preparation
 
-Make sure you have Docker installed.
-
-# Start SimpleIdServer
-
-Download the [docker-compose.yml](https://raw.githubusercontent.com/simpleidserver/SimpleIdServer/master/docker-compose.yml) file and execute the command line `docker-compose up`. 
-
-This will start [SimpleIdServer](http://localhost:4200) exposed on the port 4200. It will also create an initial admin user with username `administrator` and password `password`. 
-
-# Template
-
-Install SimpleIdServer template :
+Install SimpleIdServer templates.
 
 ```
 dotnet new --install SimpleIdServer.Templates
 ```
 
-| Command line                 | Description                                                               |
-| ---------------------------- | ------------------------------------------------------------------------- |
-| dotnet new openidef          | OPENID server with Entity Framework store                                 |
-| dotnet new openidinmem       | OPENID server with InMemory store                                         |
-| dotnet new openidemail       | OPENID server with Email authentication                                   |
-| dotnet new openidsms         | OPENID server with SMS authentication                                     |
-| dotnet new openidfull        | OPENID server with Email, SMS and Login password authentication           |
-| dotnet new openidumafull     | UMA and OPENID server with Email, SMS and Login password authentication   |
-| dotnet new scimef            | SCIM2.0 server with EF store                                              |
-| dotnet new sciminmem         | SCIM2.0 server with InMemory store                                        |
-| dotnet new scimongodb        | SCIM2.0 server with MongoDB store                                         |
-| dotnet new scimswagger       | SCIM2.0 server with Swagger support                                       |
-| dotnet new umainmem	       | UMA2.0 server with InMemory store						                   |
-| dotnet new umaef             | UMA2.0 server with Entity Framework store			                       |
+This will add the following templates
+
+| Command line                 | Description                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------- |
+| dotnet new idserver          | Create Identity Server. By default, Entity Framework is configured to use SQLServer         |
+| dotnet new idserverwebsite   | Create Identity Server website. By default, Entity Framework is configured to use SQLServer |
+
+## Create Visual Studio Solution
+
+Open a command prompt, run the following commands to create the directory structure for the solution.
+
+```
+mkdir Quickstart
+cd Quickstart
+mkdir src
+dotnet new sln -n Quickstart
+```
+
+## Create IdentityServer project
+
+Create a web project named `IdServer` with the `SimpleIdServer.IdServer` package installed and Entity Framework (EF) configured to use SQLServer.
+
+```
+cd src
+dotnet new idserver -n IdServer --connectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+```
+
+The following files will be created within a new `src/IdServer` directory :
+
+* `IdServer.csproj` : Project file with the SimpleIdServer.IdServer nuget package added.
+* `appsettings.json` : Contains the ConnectionString.
+* `Program.cs` : Main application entry point.
+* `IdServerConfiguration.cs` : Contains the `Clients`, `Resources`.
+
+Next, add the `IdServer` project into the Visual Studio Solution
+
+```
+cd ..
+dotnet sln add ./src/IdServer/IdServer.csproj
+```
+
+Run the `IdServer` project, it must listens on the url `http://localhost:5001`.
+
+```
+cd src/IdServer
+dotnet run --urls=http://localhost:5001
+```
+
+The IdentityServer is now ready to be used. 
+
+By default, there is one administrator account configured. It is possible to access to his profile by navigating to the url `http://localhost:5001` and authenticate with the following credentials :
+* Login : administrator
+* Password : password
+
+## IdentityServer UI preview
+
+The IdentityServer UI uses Bootstrap 5.
+
+![IdentityServer](images/IdentityServer-1.png)
+
+## Create IdentityServer website project
+
+Create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.Website` package installed and Entity Framework (EF) configured to use SQLServer.
+
+```
+cd src
+dotnet new idserverwebsite -n IdServerWebsite --connectionString "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+```
+
+Run the `IdServerWebsite` project, it must listens on the url `http://localhost:5002`.
+
+```
+cd src/IdServerWebsite
+dotnet run --urls=http://localhost:5002
+```
+
+The IdentityServer website is now ready to be used.
+
+Using the website, you can perform configurations of users and clients.
+
+## Identity Server website UI preview
+
+The IdentityServer website UI uses Radzen.
+
+![IdentityServerWebsite](images/IdentityServerWebsite-2.png)

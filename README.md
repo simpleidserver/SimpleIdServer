@@ -9,36 +9,68 @@ For project documentation, please visit [docs](https://simpleidserver.github.io/
 
 ## Packages
 
-|                         			 						|      																															  																					|																																								|																																								|
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SimpleIdServer.OpenID` 			 						| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenID.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenID)												| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenID.svg)](https://nuget.org/packages/SimpleIdServer.OpenID) 										| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenID.svg)](https://nuget.org/packages/SimpleIdServer.OpenID) 										|
-| `SimpleIdServer.OAuth`  			 						| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OAuth.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OAuth) 													| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OAuth.svg)](https://nuget.org/packages/SimpleIdServer.OAuth) 											| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OAuth.svg)](https://nuget.org/packages/SimpleIdServer.OAuth) 										|
-| `SimpleIdServer.Scim`   			 						| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Scim.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Scim) 													| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.svg)](https://nuget.org/packages/SimpleIdServer.Scim) 											| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.svg)](https://nuget.org/packages/SimpleIdServer.Scim) 											|
-| `SimpleIdServer.Scim.Persistence.EF`   		 			| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Scim.Persistence.EF.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Scim.Persistence.EF) 						| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.Persistence.EF.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.EF) 				| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.Persistence.EF.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.EF)				|
-| `SimpleIdServer.Scim.Persistence.MongoDB`   				| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Scim.Persistence.MongoDB.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Scim.Persistence.MongoDB) 			| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.Persistence.MongoDB.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.MongoDB) 	| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.Persistence.MongoDB.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.MongoDB)	|
-| `SimpleIdServer.Scim.SqlServer`			   				| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Scim.SqlServer.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Scim.SqlServer) 								| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.SqlServer.svg)](https://nuget.org/packages/SimpleIdServer.Scim.SqlServer) 						| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.SqlServer.svg)](https://nuget.org/packages/SimpleIdServer.Scim.SqlServer)						|
-| `SimpleIdServer.Scim.Swashbuckle`			   				| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Scim.Swashbuckle.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Scim.Swashbuckle) 							| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.Swashbuckle.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Swashbuckle) 					| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.Swashbuckle.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Swashbuckle)					|
-| `SimpleIdServer.OpenBankingApi`							| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenBankingApi.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenBankingApi) 								| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenBankingApi.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi) 						| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenBankingApi.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi)						|
-| `SimpleIdServer.OpenBankingApi.Domains`					| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.OpenBankingApi.Domains.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.OpenBankingApi.Domains) 				| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.OpenBankingApi.Domains.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi.Domains)		| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.OpenBankingApi.Domains.svg)](https://nuget.org/packages/SimpleIdServer.OpenBankingApi.Domains)		|
-| `SimpleIdServer.Saml.Idp`									| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Saml.Idp.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Saml.Idp) 											| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Saml.Idp.svg)](https://nuget.org/packages/SimpleIdServer.Saml.Idp)									| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.SimpleIdServer.Saml.Idp.svg)](https://nuget.org/packages/SimpleIdServer.Saml.Idp)					|
-| `SimpleIdServer.Saml.Sp`									| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Saml.Sp.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Saml.Sp) 												| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Saml.Sp.svg)](https://nuget.org/packages/SimpleIdServer.Sp.Idp)										| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.SimpleIdServer.Saml.Sp.svg)](https://nuget.org/packages/SimpleIdServer.Sp.Idp)						|
-| `SimpleIdServer.Templates` 			 					| [![MyGet (dev)](https://img.shields.io/myget/advance-ict/v/SimpleIdServer.Templates.svg)](https://www.myget.org/feed/advance-ict/package/nuget/SimpleIdServer.Templates)												| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Templates.svg)](https://nuget.org/packages/SimpleIdServer.Templates) 										| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Templates.svg)](https://nuget.org/packages/SimpleIdServer.Templates) 										|
+|                         			 						|																																								|																																								|
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SimpleIdServer.IdServer` 			 					| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.IdServer.svg)](https://nuget.org/packages/SimpleIdServer.IdServer) 									| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.IdServer.svg)](https://nuget.org/packages/SimpleIdServer.IdServer)									|
+| `SimpleIdServer.IdServer.Email` 			 				| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.IdServer.Email.svg)](https://nuget.org/packages/SimpleIdServer.IdServer.Email) 						| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.IdServer.Email.svg)](https://nuget.org/packages/SimpleIdServer.IdServer.Email) 						|
+| `SimpleIdServer.IdServer.Sms` 			 				| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.IdServer.Sms.svg)](https://nuget.org/packages/SimpleIdServer.IdServer.Sms) 							| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.IdServer.Sms.svg)](https://nuget.org/packages/SimpleIdServer.IdServer.Sms) 							|
+| `SimpleIdServer.IdServer.WsFederation`	 				| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.IdServer.WsFederation.svg)](https://nuget.org/packages/SimpleIdServer.IdServer.WsFederation) 			| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.IdServer.WsFederation.svg)](https://nuget.org/packages/SimpleIdServer.IdServer.WsFederation) 		|
+| `SimpleIdServer.Templates` 			 					| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Templates.svg)](https://nuget.org/packages/SimpleIdServer.Templates) 									| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Templates.svg)](https://nuget.org/packages/SimpleIdServer.Templates) 								|
+| `SimpleIdServer.Scim` 			 						| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.svg)](https://nuget.org/packages/SimpleIdServer.Scim) 											| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.svg)](https://nuget.org/packages/SimpleIdServer.Scim) 											|
+| `SimpleIdServer.Scim.Persistence.EF` 			 			| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.Persistence.EF.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.EF) 				| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.Persistence.EF.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.EF) 			|
+| `SimpleIdServer.Scim.Persistence.MongoDB`		 			| [![NuGet](https://img.shields.io/nuget/v/SimpleIdServer.Scim.Persistence.MongoDB.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.MongoDB) 	| [![NuGet](https://img.shields.io/nuget/dt/SimpleIdServer.Scim.Persistence.MongoDB.svg)](https://nuget.org/packages/SimpleIdServer.Scim.Persistence.MongoDB) 	|
 
-## Getting started
+## Installation via dotnet new template
 
-### Install IdServer
+Install the dotnet new template :
+
+```
+dotnet new -i SimpleIdServer.Templates
+```
+
+### Create new IdServer project
+
+By default Entity Framework is configured to use SQLServer database.
+
+```
+dotnet new idserver --name IdServer --connectionString "<<ENTER>>"
+```
+
+### Launch IdServer project
+
+```
+cd IdServer
+dotnet run --urls=http://localhost:5001
+```
+
+### Create new IdServer website project
+
+```
+dotnet new idserverwebsite --name IdServerWebsite --connectionString "<<ENTER>>"
+```
+
+### Launch IdServer website project
+
+```
+cd IdServerWebsite
+dotnet run --urls=http://localhost:5002
+```
+
+## IdServer website preview
+
+The website uses Radzen.
 
 TODO
-Install the template
-Create INMEMORY server
 
-### Install website
+## IdServer preview
+
+The website uses Bootstrap 5.
 
 TODO
-Install the template
-Execute ... to build website
 
-### Docker
+### Running via Docker
+
+It is possible to run IdServer through the Docker.
 
 TODO
 
