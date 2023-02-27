@@ -4,7 +4,7 @@ $paramsRootCertificate = @{
   KeyAlgorithm = 'RSA'
   HashAlgorithm = 'SHA256'
   KeyExportPolicy = 'Exportable'
-  NotAfter = (Get-Date).AddYears(5)
+  NotAfter = (Get-Date).AddYears(200)
   KeyUsage = 'CertSign','CRLSign'
 }
 $rootCA = New-SelfSignedCertificate @paramsRootCertificate
@@ -18,7 +18,7 @@ $paramsFirstMtlsClient = @{
   KeyAlgorithm = 'RSA'
   HashAlgorithm = 'SHA256'
   KeyExportPolicy = 'Exportable'
-  NotAfter = (Get-date).AddYears(2)
+  NotAfter = (Get-date).AddYears(200)
 }
 $firstMtlsClient = New-SelfSignedCertificate @paramsFirstMtlsClient
 Export-Certificate -Cert $firstMtlsClient -FilePath "firstMtlsClient.crt"
@@ -30,7 +30,7 @@ $paramsSecondMtlsClient = @{
   KeyAlgorithm = 'RSA'
   HashAlgorithm = 'SHA256'
   KeyExportPolicy = 'Exportable'
-  NotAfter = (Get-date).AddYears(2)
+  NotAfter = (Get-date).AddYears(200)
 }
 $secondMtlsClient = New-SelfSignedCertificate @paramsSecondMtlsClient
 Export-Certificate -Cert $secondMtlsClient -FilePath "secondMtlsClient.crt"

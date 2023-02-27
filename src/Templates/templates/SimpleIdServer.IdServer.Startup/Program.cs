@@ -14,12 +14,16 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
+builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()));
 RunSqlServerIdServer(builder.Services);
 
 var app = builder.Build();
 builder.Configuration.AddJsonFile("appsettings.json")
     .AddEnvironmentVariables();
 SeedData(app);
+app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
 app.Run();

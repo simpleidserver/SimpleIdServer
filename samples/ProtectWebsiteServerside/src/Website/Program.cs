@@ -15,10 +15,11 @@ builder.Services.AddAuthentication(options =>
     {
         options.SignInScheme = "Cookies";
         options.ResponseType = "code";
-        options.UsePkce = true;
         options.Authority = "http://localhost:5001";
         options.RequireHttpsMetadata = false;
         options.ClientId = "protectedServersideApp";
+        options.ClientSecret = "password";
+        options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
     });
 

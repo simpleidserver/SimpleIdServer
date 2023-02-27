@@ -74,7 +74,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             if (!await ValidateAddClient(action.ClientId, new List<string>(), dispatcher)) return;
             var scopes = await _scopeRepository.Query().Where(s => s.Name == Constants.StandardScopes.OpenIdScope.Name || s.Name == Constants.StandardScopes.Profile.Name).ToListAsync(CancellationToken.None);
-            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, Guid.NewGuid().ToString(), action.RedirectionUrls.ToArray())
+            var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, action.RedirectionUrls.ToArray())
                 .AddScope(scopes.ToArray());
             if (!string.IsNullOrWhiteSpace(action.ClientName))
                 newClientBuilder.SetClientName(action.ClientName);
@@ -386,6 +386,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
         public IEnumerable<string> RedirectionUrls { get; set; } = new List<string>();
         public string ClientId { get; set; } = null!;
+        public string ClientSecret { get; set; } = null!;
         public string? ClientName { get; set; } = null;
     }
 

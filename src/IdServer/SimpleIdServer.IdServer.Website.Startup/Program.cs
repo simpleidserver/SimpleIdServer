@@ -9,7 +9,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSIDWebsite(o =>
 {
-    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"));
+    o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"),  o =>
+    {
+        o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+    });
 });
 
 var app = builder.Build();

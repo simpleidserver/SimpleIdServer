@@ -6,11 +6,14 @@
      href: idserver/persistence.md
    - name: Authentication
      href: idserver/authentication.md
-   - name: Protect SPA
-   - name: Protect Server-Side application
+   - name: Protect SPA using angular
+     href: idserver/protectspa.md
+   - name: Protect Server-Side application using ASP.NET CORE
      href: idserver/protectserversideapp.md
-   - name: Protect REST.API
-   - name: Protect user's resources
+   - name: Protect REST.API using ASP.NET CORE
+     href: idserver/protectrestapi.md
+   - name: Requesting token
+   - name: idserver/requestingtoken.md
 - name: SCIM2.0
   items:
     - name: Persistence

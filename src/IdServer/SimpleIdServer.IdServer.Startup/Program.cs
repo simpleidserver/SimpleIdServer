@@ -15,6 +15,9 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.json")
     .AddEnvironmentVariables();
+builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()));
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 // RunInMemoryIdServer(builder.Services);
@@ -22,6 +25,7 @@ RunSqlServerIdServer(builder.Services);
 
 var app = builder.Build();
 SeedData(app);
+app.UseCors("AllowAll");
 app.UseSID()
     .UseWsFederation();
 app.Run();
@@ -47,18 +51,17 @@ void RunInMemoryIdServer(IServiceCollection services)
         {
             a.AddWsAuthentication(o =>
             {
-                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.MetadataAddress = "http://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
             /*
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "http://localhost:60001";
+                opts.Authority = "http://localhost:5001";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
-                opts.UsePkce = true;
                 opts.ResponseMode = "query";
                 opts.SaveTokens = true;
                 opts.GetClaimsFromUserInfoEndpoint = true;
@@ -122,18 +125,17 @@ void RunSqlServerIdServer(IServiceCollection services)
             /*
             a.AddWsAuthentication(o =>
             {
-                o.MetadataAddress = "http://localhost:60001/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.MetadataAddress = "http://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
             */
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "http://localhost:60001";
+                opts.Authority = "http://localhost:5001";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
-                opts.UsePkce = true;
                 opts.ResponseMode = "query";
                 opts.SaveTokens = true;
                 opts.GetClaimsFromUserInfoEndpoint = true;

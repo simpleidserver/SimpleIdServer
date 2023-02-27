@@ -19,7 +19,7 @@ The first step consists to configure the OPENID client.
 
 ![Choose client](images/protectserversideapp-1.png)
 
-* Fill-in the form like this and click on the `Save` button to confirm the creation.
+* Fill-in the form like this and click on the `Save` button to confirm the creation. The secret must be equals to `password`.
 
 ![Confirm](images/protectserversideapp-2.png)
 
@@ -66,10 +66,11 @@ builder.Services.AddAuthentication(options =>
     {
         options.SignInScheme = "Cookies";
         options.ResponseType = "code";
-        options.UsePkce = true;
         options.Authority = "http://localhost:5001";
         options.RequireHttpsMetadata = false;
         options.ClientId = "protectedServersideApp";
+        options.ClientSecret = "password";
+        options.GetClaimsFromUserInfoEndpoint = true;
         options.SaveTokens = true;
     });
 ...
