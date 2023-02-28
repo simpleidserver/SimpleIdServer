@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Before you start </title>
+    <title>Preparation </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Before you start ">
-    <meta name="generator" content="docfx 2.58.3.0">
+    <meta name="title" content="Preparation ">
+    <meta name="generator" content="docfx 2.59.2.0">
     
     <link rel="shortcut icon" href="../../favicon.ico">
     <link rel="stylesheet" href="../../styles/docfx.vendor.css">
@@ -67,16 +67,12 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="before-you-start">Before you start</h1>
+<h1 id="preparation">Preparation</h1>
 
-<p>Make sure you have Docker installed.</p>
-<h1 id="start-simpleidserver">Start SimpleIdServer</h1>
-<p>Download the <a href="https://raw.githubusercontent.com/simpleidserver/SimpleIdServer/master/docker-compose.yml">docker-compose.yml</a> file and execute the command line <code>docker-compose up</code>.</p>
-<p>This will start <a href="http://localhost:4200">SimpleIdServer</a> exposed on the port 4200. It will also create an initial admin user with username <code>administrator</code> and password <code>password</code>.</p>
-<h1 id="template">Template</h1>
-<p>Install SimpleIdServer template :</p>
+<p>Install SimpleIdServer templates.</p>
 <pre><code>dotnet new --install SimpleIdServer.Templates
 </code></pre>
+<p>This will add the following templates</p>
 <table>
 <thead>
 <tr>
@@ -86,55 +82,106 @@
 </thead>
 <tbody>
 <tr>
-<td>dotnet new openidef</td>
-<td>OPENID server with Entity Framework store</td>
+<td>dotnet new idserver</td>
+<td>Create Identity Server. By default, Entity Framework is configured to use SQLServer</td>
 </tr>
 <tr>
-<td>dotnet new openidinmem</td>
-<td>OPENID server with InMemory store</td>
-</tr>
-<tr>
-<td>dotnet new openidemail</td>
-<td>OPENID server with Email authentication</td>
-</tr>
-<tr>
-<td>dotnet new openidsms</td>
-<td>OPENID server with SMS authentication</td>
-</tr>
-<tr>
-<td>dotnet new openidfull</td>
-<td>OPENID server with Email, SMS and Login password authentication</td>
-</tr>
-<tr>
-<td>dotnet new openidumafull</td>
-<td>UMA and OPENID server with Email, SMS and Login password authentication</td>
+<td>dotnet new idserverwebsite</td>
+<td>Create Identity Server website. By default, Entity Framework is configured to use SQLServer</td>
 </tr>
 <tr>
 <td>dotnet new scimef</td>
-<td>SCIM2.0 server with EF store</td>
-</tr>
-<tr>
-<td>dotnet new sciminmem</td>
-<td>SCIM2.0 server with InMemory store</td>
+<td>Create SCIM Server with EF support. By default, Entity Framework is configured to use SQLServer</td>
 </tr>
 <tr>
 <td>dotnet new scimongodb</td>
-<td>SCIM2.0 server with MongoDB store</td>
-</tr>
-<tr>
-<td>dotnet new scimswagger</td>
-<td>SCIM2.0 server with Swagger support</td>
-</tr>
-<tr>
-<td>dotnet new umainmem</td>
-<td>UMA2.0 server with InMemory store</td>
-</tr>
-<tr>
-<td>dotnet new umaef</td>
-<td>UMA2.0 server with Entity Framework store</td>
+<td>Create SCIM Server with MongoDB support</td>
 </tr>
 </tbody>
 </table>
+<h2 id="create-visual-studio-solution">Create Visual Studio Solution</h2>
+<p>Open a command prompt, run the following commands to create the directory structure for the solution.</p>
+<pre><code>mkdir Quickstart
+cd Quickstart
+mkdir src
+dotnet new sln -n Quickstart
+</code></pre>
+<h2 id="create-identityserver-project">Create IdentityServer project</h2>
+<p>Create a web project named <code>IdServer</code> with the <code>SimpleIdServer.IdServer</code> package installed and Entity Framework (EF) configured to use SQLServer.</p>
+<pre><code>cd src
+dotnet new idserver -n IdServer --connectionString &quot;Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True&quot;
+</code></pre>
+<p>The following files will be created within a new <code>src/IdServer</code> directory :</p>
+<ul>
+<li><code>IdServer.csproj</code> : Project file with the SimpleIdServer.IdServer nuget package added.</li>
+<li><code>appsettings.json</code> : Contains the ConnectionString.</li>
+<li><code>Program.cs</code> : Main application entry point.</li>
+<li><code>IdServerConfiguration.cs</code> : Contains the <code>Clients</code>, <code>Resources</code>.</li>
+</ul>
+<p>Next, add the <code>IdServer</code> project into the Visual Studio Solution</p>
+<pre><code>cd ..
+dotnet sln add ./src/IdServer/IdServer.csproj
+</code></pre>
+<p>Run the <code>IdServer</code> project, it must listens on the url <code>http://localhost:5001</code>.</p>
+<pre><code>cd src/IdServer
+dotnet run --urls=http://localhost:5001
+</code></pre>
+<p>The IdentityServer is now ready to be used.</p>
+<p>By default, there is one administrator account configured. It is possible to access to his profile by navigating to the url <code>http://localhost:5001</code> and authenticate with the following credentials :</p>
+<ul>
+<li>Login : administrator</li>
+<li>Password : password</li>
+</ul>
+<h2 id="identityserver-ui-preview">IdentityServer UI preview</h2>
+<p>The IdentityServer UI uses Bootstrap 5.</p>
+<p><img src="images/IdentityServer-1.png" alt="IdentityServer"></p>
+<h2 id="create-identityserver-website-project">Create IdentityServer website project</h2>
+<p>Create a web project named <code>IdServerWebsite</code> with the <code>SimpleIdServer.IdServer.Website</code> package installed and Entity Framework (EF) configured to use SQLServer.</p>
+<pre><code>cd src
+dotnet new idserverwebsite -n IdServerWebsite --connectionString &quot;Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True&quot;
+</code></pre>
+<p>Run the <code>IdServerWebsite</code> project, it must listens on the url <code>http://localhost:5002</code>.</p>
+<pre><code>cd src/IdServerWebsite
+dotnet run --urls=http://localhost:5002
+</code></pre>
+<p>The IdentityServer website is now ready to be used.</p>
+<p>Using the website, you can perform configurations of users and clients.</p>
+<h2 id="identity-server-website-ui-preview">Identity Server website UI preview</h2>
+<p>The IdentityServer website UI uses Radzen.</p>
+<p><img src="images/IdentityServerWebsite-2.png" alt="IdentityServerWebsite"></p>
+<h2 id="create-scim-project-with-ef-support">Create SCIM project with EF support</h2>
+<p>Create a web project named <code>ScimEF</code> with the <code>SimpleIdServer.Scim.Persistence.EF</code> package installed and Entity Framework (EF) configured to use SQLServer.</p>
+<pre><code>cd src
+dotnet new scimef -n ScimEF --connectionString &quot;Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True&quot;
+</code></pre>
+<p>Next, add the <code>ScimEF</code> project into the Visual Studio Solution</p>
+<pre><code>cd ..
+dotnet sln add ./src/ScimEF/ScimEF.csproj
+</code></pre>
+<p>Run the <code>SCIMEF</code> project, it must listens on the url <code>http://localhost:5003</code>.</p>
+<pre><code>cd src/SCIMEF
+dotnet run --urls=http://localhost:5003
+</code></pre>
+<p>Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].</p>
+<h2 id="create-scim-project-with-mongodb-support">Create SCIM project with MongoDB support</h2>
+<p>Create a web project named <code>ScimMongoDB</code> with the <code>SimpleIdServer.Scim.Persistence.MongoDB</code> package installed and with MongoDB support.</p>
+<pre><code>cd src
+dotnet new scimongodb -n ScimMongoDB --connectionString &quot;mongodb://localhost:27017&quot;
+</code></pre>
+<p>Next, add the <code>ScimMongoDB</code> project into the Visual Studio Solution</p>
+<pre><code>cd ..
+dotnet sln add ./src/ScimMongoDB/ScimMongoDB.csproj
+</code></pre>
+<p>Run the <code>ScimMongoDB</code> project, it must listens on the url <code>http://localhost:5003</code>.</p>
+<pre><code>cd src/ScimMongoDB
+dotnet run --urls=http://localhost:5003
+</code></pre>
+<p>Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].</p>
+<h1 id="running-with-docker">Running with docker</h1>
+<p>To execute all the projects in Docker, execute the following commands :</p>
+<pre><code>psake dockerBuild
+psake dockerUp
+</code></pre>
 </article>
           </div>
           

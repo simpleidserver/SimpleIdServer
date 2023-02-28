@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Protect server-side application using ASP.NET CORE </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Protect server-side application using ASP.NET CORE ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="protect-server-side-application-using-aspnet-core">Protect server-side application using ASP.NET CORE</h1>
+
+<p>Server-Side application must use <strong>authorization code</strong> grant-type.</p>
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer and IdentityServer website</a>.</p>
+</div>
+<h2 id="source-code">Source Code</h2>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/ProtectWebsiteServerside">here</a>.</p>
+<h2 id="add-a-client">Add a client</h2>
+<p>The first step consists to configure the OPENID client.</p>
+<ul>
+<li>Open the IdentityServer website <a href="http://localhost:5002">http://localhost:5002</a>.</li>
+<li>In the Clients screen, click on <code>Add client</code> button.</li>
+<li>Select <code>web application</code> and click on next.</li>
+</ul>
+<p><img src="images/protectserversideapp-1.png" alt="Choose client"></p>
+<ul>
+<li>Fill-in the form like this and click on the <code>Save</code> button to confirm the creation. The secret must be equals to <code>password</code>.</li>
+</ul>
+<p><img src="images/protectserversideapp-2.png" alt="Confirm"></p>
+<h3 id="create-aspnet-core-application">Create ASP.NET CORE application</h3>
+<p>The last step consists to create and configure an ASP.NET CORE project.</p>
+<ul>
+<li>Open a command prompt, run the following commands to create the directory structure for the solution.</li>
+</ul>
+<pre><code>mkdir ProtectWebsiteServerside
+cd ProtectWebsiteServerside
+mkdir src
+dotnet new sln -n ProtectWebsiteServerside
+</code></pre>
+<ul>
+<li>Create a web project named <code>Website</code> and install the <code>Microsoft.AspNetCore.Authentication.OpenIdConnect</code> nuget package.</li>
+</ul>
+<pre><code>cd src
+dotnet new mvc -n Website
+cd Website
+dotnet add package Microsoft.AspNetCore.Authentication.OpenIdConnect
+</code></pre>
+<ul>
+<li>Add the <code>Website</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..\..
+dotnet sln add ./src/Website/Website.csproj
+</code></pre>
+<ul>
+<li>Edit the <code>Program.cs</code> file and configure the OpenId authentication.</li>
+</ul>
+<pre><code>builder.Services.AddAuthentication(options =&gt;
+{
+    options.DefaultScheme = &quot;Cookies&quot;;
+    options.DefaultChallengeScheme = &quot;sid&quot;;
+})
+    .AddCookie(&quot;Cookies&quot;)
+    .AddOpenIdConnect(&quot;sid&quot;, options =&gt;
+    {
+        options.SignInScheme = &quot;Cookies&quot;;
+        options.ResponseType = &quot;code&quot;;
+        options.Authority = &quot;http://localhost:5001&quot;;
+        options.RequireHttpsMetadata = false;
+        options.ClientId = &quot;protectedServersideApp&quot;;
+        options.ClientSecret = &quot;password&quot;;
+        options.GetClaimsFromUserInfoEndpoint = true;
+        options.SaveTokens = true;
+    });
+...
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    Secure = CookieSecurePolicy.Always
+});
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthorization();
+...
+</code></pre>
+<ul>
+<li>Add a <code>ClaimsController</code> controller with one protected operation.</li>
+</ul>
+<pre><code>public class ClaimsController : Controller
+{
+    [Authorize]
+    public IActionResult Index()
+    {
+        return View();
+    }
+}
+</code></pre>
+<ul>
+<li>Create a view <code>Views\Claims\Index.cshtml</code> with the following content. It will display all the claims of the authenticated user.</li>
+</ul>
+<pre><code>&lt;ul&gt;
+    @foreach (var claim in User.Claims)
+    {
+        &lt;li&gt;@claim.Type : @claim.Value&lt;/li&gt;
+    }
+&lt;/ul&gt;
+</code></pre>
+<ul>
+<li>In a command prompt, navigate to the directory <code>src\Website</code> and launch the application.</li>
+</ul>
+<pre><code>dotnet run --urls=http://localhost:7000
+</code></pre>
+<ul>
+<li>Browse this URL <a href="http://localhost:7000/claims">http://localhost:7000/claims</a>, the User-Agent is automatically redirected to the OPENID server.
+Submit the credentials - login : <code>administrator</code>, password : <code>password</code> and confirm the consent. You'll be redirected to the following screen where your claims will be displayed.</li>
+</ul>
+<p><img src="images/protectserversideapp-3.png" alt="Claims"></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/idserver/protectserversideapp.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

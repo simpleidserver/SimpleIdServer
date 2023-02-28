@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Protect REST.API using ASP.NET CORE </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Protect REST.API using ASP.NET CORE ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="protect-restapi-using-aspnet-core">Protect REST.API using ASP.NET CORE</h1>
+
+<div class="WARNING">
+<h5>Warning</h5>
+<p>Before you start, Make sure you have an <a href="/documentation/gettingstarted/index.html">up and running IdentityServer and IdentityServer website</a>.</p>
+</div>
+<h2 id="validate-jwt-token">Validate JWT Token</h2>
+<p>In this tutorial, we are going to explain how to protect a REST.API using ASP.NET CORE.</p>
+<p>The JWT Token passed in the <code>Authorization</code> header must be valided.</p>
+<h3 id="source-code">Source Code</h3>
+<p>The source code of this project can be found <a href="https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/ProtectRESTApiJWT">here</a>.</p>
+<h3 id="add-a-scope">Add a scope</h3>
+<p>The first step consists to configure a <code>read</code> scope associates with one API resource named <code>shopapi</code>.</p>
+<ul>
+<li>Open the IdentityServer website <a href="http://localhost:5002">http://localhost:5002</a>.</li>
+<li>In the Scopes screen, click on <code>Add scope</code> button.</li>
+<li>Select <code>API value</code> and click on next.</li>
+</ul>
+<p><img src="images/protectrestapi-1.png" alt="Choose scope"></p>
+<ul>
+<li>Fill-in the form like this and click on the <code>Save</code> button to confirm the creation.</li>
+</ul>
+<p><img src="images/protectrestapi-2.png" alt="Confirm"></p>
+<ul>
+<li>Click on the new scope, select the <code>API Resources</code> tab and click on the <code>Add API resource</code> button.</li>
+<li>Fill-in the form like this and click on the <code>Add</code> button to confirm the creation.</li>
+</ul>
+<p><img src="images/protectrestapi-3.png" alt="Add resource"></p>
+<ul>
+<li>In the table, select the <code>shopapi</code> resource and click on the <code>Update</code> button.</li>
+</ul>
+<p><img src="images/protectrestapi-4.png" alt="Select resource"></p>
+<h3 id="create-restapi">Create REST.API</h3>
+<p>The last step consists to create and configure a REST.API project.</p>
+<ul>
+<li>Open a command prompt, run the following commands to create the directory structure for the solution.</li>
+</ul>
+<pre><code>mkdir ProtectRESTApiJWT
+cd ProtectRESTApiJWT
+mkdir src
+dotnet new sln -n ProtectRESTApiJWT
+</code></pre>
+<ul>
+<li>Create a REST.API project and install the <code>Microsoft.AspNetCore.Authentication.JwtBearer</code> Nuget Package</li>
+</ul>
+<pre><code>cd src
+dotnet new webapi -n ShopApi
+cd ShopApi
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+</code></pre>
+<ul>
+<li>Add the <code>ShopApi</code> project into your Visual Studio solution.</li>
+</ul>
+<pre><code>cd ..\..
+dotnet sln add ./src/ShopApi/ShopApi.csproj
+</code></pre>
+<ul>
+<li>Edit the file <code>ShopApi\Program.cs</code>, configure the JWT authentication and add an Authorization policy named <code>read</code>, it checks if the scope is equals to <code>read</code>.</li>
+</ul>
+<pre><code>builder.Services.AddAuthentication(options =&gt;
+{
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =&gt;
+    {
+        options.Authority = &quot;http://localhost:5001&quot;;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidAudiences = new List&lt;string&gt;
+            {
+                &quot;shopapi&quot;
+            },
+            ValidIssuers = new List&lt;string&gt;
+            {
+                &quot;http://localhost:5001&quot;
+            }
+        };
+    });
+builder.Services.AddAuthorization(b =&gt;
+{
+    b.AddPolicy(&quot;read&quot;, p =&gt; p.RequireClaim(&quot;scope&quot;, &quot;read&quot;));
+});
+</code></pre>
+<p>Now your REST.API is configured, the controller or action can be decorate by the <code>AuthorizeAttribute</code> with the appropriate authorization policy.</p>
+<p>For example, the attribute <code>[Authorization[&quot;read&quot;]</code> checks if the JWT contains a scope equals to <code>read</code>.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/simpleidserver/SimpleIdServer/blob/master/docs/documentation/idserver/protectrestapi.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>
