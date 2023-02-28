@@ -18,13 +18,15 @@ function CopyFolder{
 		$TargetFolderPath
 	)
 	
+	$Excluded = (".template.config", "template.json", "*.csproj")
+	
 	if (Test-Path $TargetFolderPath) {	
-		Remove-Item $TargetFolderPath -recurse -force
+		Get-ChildItem -Path $TargetFolderPath -Recurse -Exclude $Excluded | Remove-Item -recurse -force
+	} else {		
+		New-Item $TargetFolderPath -Type Directory
 	}
 	
-	New-Item $TargetFolderPath -Type Directory
-	
-	Copy-Item $SourceFolderPath/* $TargetFolderPath -recurse -force
+	Copy-Item -Path $SourceFolderPath/* -Destination $TargetFolderPath -Exclude *.csproj -recurse -force
 }
 
 task default -depends local
@@ -61,38 +63,20 @@ task compile -depends clean {
 }
 
 task buildTemplate {
-	$AreasPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Areas"
-	$AreasPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Areas"
-	$HelpersPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Helpers"
-	$HelpersPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Helpers"
-	$MigrationsPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Migrations"
-	$MigrationsPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Migrations"
-	$ResourcesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Resources"
-	$ResourcesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Resources"
-	$ViewsPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Views"
-	$ViewsPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Views"
-	$ConvertersPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/Converters"
-	$ConvertersPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/Converters"
-	$ImagesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/wwwroot/images"
-	$ImagesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/wwwroot/images"
-	$StylesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup/wwwroot/styles"
-	$StylesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup/wwwroot/styles"	
-	$PagesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup/Pages"
-	$PagesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup/Pages"
-	$PropertiesPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup/Properties"
-	$PropertiesPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup/Properties"
+	$IdServerPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup"
+	$IdServerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup"
+	$IdServerWebsitePathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup"
+	$IdServerWebsitePathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup"
+	$ScimSQLServerPathSource = "$source_dir/Scim/SimpleIdServer.Scim.SqlServer.Startup"
+	$ScimSQLServerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.SqlServer.Startup"
+	$ScimMongoDBPathSource = "$source_dir/Scim/SimpleIdServer.Scim.MongoDb.Startup"
+	$ScimMongoDBPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.MongoDb.Startup"
 	
 	
-	CopyFolder $AreasPathSource $AreasPathTarget
-	CopyFolder $HelpersPathSource $HelpersPathTarget
-	CopyFolder $MigrationsPathSource $MigrationsPathTarget
-	CopyFolder $ResourcesPathSource $ResourcesPathTarget
-	CopyFolder $ViewsPathSource $ViewsPathTarget
-	CopyFolder $ImagesPathSource $ImagesPathTarget
-	CopyFolder $StylesPathSource $StylesPathTarget
-	CopyFolder $ConvertersPathSource $ConvertersPathTarget
-	CopyFolder $PagesPathSource $PagesPathTarget
-	CopyFolder $PropertiesPathSource $PropertiesPathTarget
+	CopyFolder $IdServerPathSource $IdServerPathTarget
+	CopyFolder $IdServerWebsitePathSource $IdServerWebsitePathTarget
+	CopyFolder $ScimSQLServerPathSource $ScimSQLServerPathTarget
+	CopyFolder $ScimMongoDBPathSource $ScimMongoDBPathTarget
 }
  
 task pack -depends release, compile, buildTemplate {

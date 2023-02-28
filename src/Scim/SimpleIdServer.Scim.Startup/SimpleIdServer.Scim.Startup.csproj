@@ -12,14 +12,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.0 " />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OAuth\SimpleIdServer.Jwt\SimpleIdServer.Jwt.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj" />
     <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="oauth_puk.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties schemas_4enterpriseuserschema_1json__JsonSchema="https://carafe.fm/schema/draft-02/bundle.schema.json" /></VisualStudio></ProjectExtensions>
 </Project>

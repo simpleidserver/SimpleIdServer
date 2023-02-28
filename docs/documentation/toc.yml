@@ -13,12 +13,6 @@
    - name: Protect REST.API using ASP.NET CORE
      href: idserver/protectrestapi.md
    - name: Requesting token
-   - name: idserver/requestingtoken.md
-- name: SCIM2.0
-  items:
-    - name: Persistence
-      href: scim20/persistence.md
-    - name: Swagger
-      href: scim20/swagger.md
+     href: idserver/requestingtoken.md
 - name: Certifications
   href: certifications/index.md

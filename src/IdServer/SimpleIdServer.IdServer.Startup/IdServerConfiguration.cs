@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Constants = SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Startup
 {

@@ -1,0 +1,26 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SCIM"
+  ],
+  "name": "SCIM Server",
+  "identity": "SimpleIdServer.Scim.SqlServer.Startup",
+  "groupIdentity": "SimpleIdServer.Scim.SqlServer.Startup",
+  "shortName": "scimef",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+	  "connectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "Data Source=.;Initial Catalog=SCIM;Integrated Security=True;TrustServerCertificate=True",
+		  "isRequired": true,
+		  "description": "Connection string"
+	  }
+  },
+  "sourceName": "SimpleIdServer.Scim.SqlServer.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.Scim.SqlServer.Startup.csproj" } ]
+}

@@ -1,11 +1,11 @@
 {
   "profiles": {
-    "SimpleIdServer.OAuth.Startup": {
+    "SimpleIdServer.Scim.MongoDb.Startup": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5001/"
+      "applicationUrl": "http://localhost:56145/"
     }
   }
 }

@@ -3,11 +3,11 @@
 using Microsoft.AspNetCore.Authentication.Facebook;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Constants = SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Startup
 {
@@ -30,7 +30,8 @@ namespace SimpleIdServer.IdServer.Startup
         {
             ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:5001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
             ClientBuilder.BuildExternalAuthDeviceClient("bankWebsite", "password", "http://localhost:5001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
-            WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("Name").Build()
+            WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("Name").Build(),
+            ClientBuilder.BuildUserAgentClient("oauth", "password", "https://oauth.tools/callback/code").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build()
         };
 
         public static ICollection<UMAResource> Resources = new List<UMAResource>

@@ -12,16 +12,16 @@ using System.Linq;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddRazorPages()
-    .AddRazorRuntimeCompilation();
+builder.Configuration.AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables();
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
+builder.Services.AddRazorPages()
+    .AddRazorRuntimeCompilation();
 RunSqlServerIdServer(builder.Services);
 
 var app = builder.Build();
-builder.Configuration.AddJsonFile("appsettings.json")
-    .AddEnvironmentVariables();
 SeedData(app);
 app.UseCors("AllowAll");
 app.UseSID()
@@ -45,24 +45,14 @@ void RunSqlServerIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
-        // .EnableConfigurableAuthentication(IdServerConfiguration.Providers)
         .AddAuthentication(callback: (a) =>
         {
-            /*
-            a.AddWsAuthentication(o =>
-            {
-                o.MetadataAddress = "http://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
-                o.Wtrealm = "urn:website";
-                o.RequireHttpsMetadata = false;
-            });
-            */
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:5001";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
-                opts.UsePkce = true;
                 opts.ResponseMode = "query";
                 opts.SaveTokens = true;
                 opts.GetClaimsFromUserInfoEndpoint = true;

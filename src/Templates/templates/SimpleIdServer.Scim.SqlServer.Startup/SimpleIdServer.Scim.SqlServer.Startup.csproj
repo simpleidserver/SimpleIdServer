@@ -12,11 +12,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
-    <ProjectReference Include="..\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj" />
+	<PackageReference Include="SimpleIdServer.Scim" Version="3.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="3.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.SwashbuckleV6" Version="3.0.*-*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\" />
