@@ -70,7 +70,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public IdServerBuilder AddDeveloperSigningCredentials()
         {
-            var key = new RsaSecurityKey(new RSACryptoServiceProvider(2048))
+            var rsa = RSA.Create();
+            var key = new RsaSecurityKey(rsa)
             {
                 KeyId = "keyid"
             };

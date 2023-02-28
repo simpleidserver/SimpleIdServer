@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Claims = new Dictionary<string, object>(),
-                SigningCredentials = new SigningCredentials(new RsaSecurityKey(new RSACryptoServiceProvider(2048))
+                SigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create())
                 {
                     KeyId = Guid.NewGuid().ToString()
                 }, SecurityAlgorithms.RsaSha256)

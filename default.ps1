@@ -38,9 +38,16 @@ task clean {
 	rd "$base_dir\build" -recurse -force  -ErrorAction SilentlyContinue | out-null
 }
 
-task publishDocker -depends clean {
+task dockerBuild -depends clean {
+	$Env:TAG = $suffix
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\docker\IdServer }
+	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\docker\IdServerWebsite }
 	exec { docker-compose build }
+}
+
+task dockerUp {
+	$Env:TAG = $suffix
+	exec { docker-compose up }
 }
 
 task release {

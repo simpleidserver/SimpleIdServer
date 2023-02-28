@@ -17,7 +17,8 @@ namespace SimpleIdServer.IdServer
         /// <returns></returns>
         public static EncryptingCredentials GenerateRSAEncryptionKey(string keyId, string alg = SecurityAlgorithms.RsaPKCS1, string enc = SecurityAlgorithms.Aes128CbcHmacSha256)
         {
-            var securityKey = new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = keyId };
+            var rsa = RSA.Create();
+            var securityKey = new RsaSecurityKey(rsa) { KeyId = keyId };
             var credentials = new EncryptingCredentials(securityKey, alg, enc);
             return credentials;
         }
@@ -44,7 +45,8 @@ namespace SimpleIdServer.IdServer
         /// <param name="alg"></param>
         public static SigningCredentials GenerateRSASignatureKey(string keyId, string alg = SecurityAlgorithms.RsaSha256)
         {
-            var securityKey = new RsaSecurityKey(new RSACryptoServiceProvider(2048)) { KeyId = keyId };
+            var rsa = RSA.Create();
+            var securityKey = new RsaSecurityKey(rsa) { KeyId = keyId };
             return new SigningCredentials(securityKey, alg);
         }
 

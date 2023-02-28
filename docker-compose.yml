@@ -1,33 +1,34 @@
 version: "3.9"
 services:
   db:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     volumes:
      - mssqldata:/var/opt/mssql
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD : "D54DE7hHpkG9"
   idserver:
     build:
       context: .
-      dockerfile: ./OpenIdDockerFile
+      dockerfile: ./IdServer
     image: simpleidserver/idserver:${TAG}
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
-      ASPNETCORE_URLS : "https://*:60000"
-      ConnectionString: ""
+      ASPNETCORE_URLS : "http://*:5001"
+      ConnectionStrings__IdServer: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     ports:
-      - "60000:60000"
+      - "5001:5001"
     depends_on:
       - db
   website:
     build:
       context: .
-      dockerfile: ./WebsiteDockerFile
+      dockerfile: ./IdServerWebsite
     image: simpleidserver/website:${TAG}
     environment:
-      ASPNETCORE_ENVIRONMENT: "Docker"
-      ASPNETCORE_URLS : "http://*:4200"
-      ConnectionString: ""
+      ASPNETCORE_URLS : "http://*:5002"
+      ConnectionStrings__IdServer: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
     ports:
-      - "4200:4200"
+      - "5002:5002"
     depends_on:
       - db
 volumes:

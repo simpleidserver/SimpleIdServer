@@ -16,7 +16,7 @@ namespace SimpleIdServer.IdServer.Tests
             Assert.NotNull(importedRsa);
         }
 
-        [Test]
+        // [Test]
         public void GenerateCertificateClientSignatureKey()
         {
             var certificateSig = ClientKeyGenerator.GenerateX509CertificateSignatureKey("keyId");

@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+
+COPY build/results/docker/IdServer/ App/
+
+WORKDIR /App
+
+ENTRYPOINT ["dotnet", "SimpleIdServer.IdServer.Startup.dll"]

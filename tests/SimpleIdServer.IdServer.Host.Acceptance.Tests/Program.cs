@@ -43,7 +43,7 @@ builder.Services.AddSIDIdentityServer()
 var app = builder.Build().UseSID();
 app.Run();
 
-static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(new RSACryptoServiceProvider(2048))
+static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())
 {
     KeyId = keyid
 };

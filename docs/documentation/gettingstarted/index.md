@@ -143,3 +143,12 @@ dotnet run --urls=http://localhost:5003
 ```
 
 Now the SCIM server is running, you can check its Schemas endpoint on [http://localhost:5003/Schemas][http://localhost:5003/Schemas].
+
+# Running with docker
+
+To execute all the projects in Docker, execute the following commands :
+
+```
+psake dockerBuild
+psake dockerUp
+```
