@@ -70,7 +70,7 @@
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
                             <RadzenDropDown Name="KeyType" Class="w-100"
-                                    Data=@keyTypes
+                                    Data=@sigKeyTypes
                                     TValue="SecurityKeyTypes"
                                     Change="@OnSigSecurityKeyTypeChange"
                                     @bind-Value=@sigKeyGeneration.KeyType
@@ -101,7 +101,7 @@
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
                             <RadzenDropDown Name="KeyType" Class="w-100"
-                                    Data=@keyTypes
+                                    Data=@encKeyTypes
                                     TValue="SecurityKeyTypes"
                                     Change="@OnEncSecurityKeyTypeChange"
                                     @bind-Value=@encKeyGeneration.KeyType
@@ -143,7 +143,7 @@
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
                     <RadzenDropDown Name="KeyType" Class="w-100"
-                                    Data=@keyTypes
+                                Data=@sigKeyTypes
                                     TValue="SecurityKeyTypes"
                                     @bind-Value=@generatedSigKey.KeyType
                                     TextProperty="Name" ValueProperty="KeyType"
@@ -161,12 +161,12 @@
                 <!-- Public Pem -->
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
-                    <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PublicKey Disabled=true></RadzenTextArea>
+                    <RadzenTextArea Class="w-100" Rows=10 Value=@generatedSigKey.Pem.PublicKey Disabled=true></RadzenTextArea>
                 </div>
                 <!-- Private Pem -->
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
-                    <RadzenTextArea Class="w-100" Value=@generatedSigKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
+                    <RadzenTextArea Class="w-100" Rows=10 Value=@generatedSigKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
                 </div>
                 <RadzenButton Click="@(args => SaveSigKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />
             }
@@ -181,7 +181,7 @@
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Key type</RadzenText>
                     <RadzenDropDown Name="KeyType" Class="w-100"
-                                    Data=@keyTypes
+                                    Data=@encKeyTypes
                                     TValue="SecurityKeyTypes"
                                 @bind-Value=@generatedEncKey.KeyType
                                     TextProperty="Name" ValueProperty="KeyType"
@@ -208,12 +208,12 @@
                 <!-- Public Pem -->
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Public Key</RadzenText>
-                    <RadzenTextArea Class="w-100" Value=@generatedEncKey.Pem.PublicKey Disabled=true></RadzenTextArea>
+                    <RadzenTextArea Class="w-100" Rows=10 Value=@generatedEncKey.Pem.PublicKey Disabled=true></RadzenTextArea>
                 </div>
                 <!-- Private Pem -->
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Private Key</RadzenText>
-                    <RadzenTextArea Class="w-100" Value=@generatedEncKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
+                    <RadzenTextArea Class="w-100" Rows=10 Value=@generatedEncKey.Pem.PrivateKey Disabled=true></RadzenTextArea>
                 </div>
                 <RadzenButton Click="@(args => SaveEncKey())" class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Confirm" />                
             }
@@ -237,8 +237,7 @@
     static Dictionary<SecurityKeyTypes, IEnumerable<string>> mappingSecurityKeyToEncAlg = new Dictionary<SecurityKeyTypes, IEnumerable<string>>
     {
         { SecurityKeyTypes.CERTIFICATE, new List<string> { SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.RsaOAEP } },
-        { SecurityKeyTypes.RSA, new List<string> { SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.RsaOAEP } },
-        { SecurityKeyTypes.ECDSA, new List<string> { SecurityAlgorithms.EcdhEs, SecurityAlgorithms.EcdhEsA128kw, SecurityAlgorithms.EcdhEsA192kw, SecurityAlgorithms.EcdhEsA256kw  } }
+        { SecurityKeyTypes.RSA, new List<string> { SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.RsaOAEP } }
     };
 
     record SigKeyGenerationForm
@@ -277,11 +276,17 @@
     IEnumerable<string> signingAlgs { get; set; } = mappingSecurityKeyToSigAlg[SecurityKeyTypes.RSA];
     IEnumerable<string> encryptionAlgs { get; set; } = mappingSecurityKeyToEncAlg[SecurityKeyTypes.RSA];
 
-    List<KeyTypeInfo> keyTypes = new List<KeyTypeInfo>
+    List<KeyTypeInfo> sigKeyTypes = new List<KeyTypeInfo>
     {
         new KeyTypeInfo { KeyType = SecurityKeyTypes.RSA, Name = "RSA" },
         new KeyTypeInfo { KeyType = SecurityKeyTypes.CERTIFICATE, Name = "CERTIFICATE" },
         new KeyTypeInfo { KeyType = SecurityKeyTypes.ECDSA, Name = "ECDSA" }
+    };
+
+    List<KeyTypeInfo> encKeyTypes = new List<KeyTypeInfo>
+    {
+        new KeyTypeInfo { KeyType = SecurityKeyTypes.RSA, Name = "RSA" },
+        new KeyTypeInfo { KeyType = SecurityKeyTypes.CERTIFICATE, Name = "CERTIFICATE" }
     };
 
     ICollection<KeyType> KeyTypes { get; set;} = new List<KeyType>

@@ -26,8 +26,8 @@ namespace SimpleIdServer.IdServer
         public static RsaSecurityKey ImportRSA(PemResult content, string keyId)
         {
             var rsa = RSA.Create();
-            rsa.ImportFromPem(content.PrivateKey);
             rsa.ImportFromPem(content.PublicKey);
+            rsa.ImportFromPem(content.PrivateKey);
             return new RsaSecurityKey(rsa)
             {
                 KeyId = keyId

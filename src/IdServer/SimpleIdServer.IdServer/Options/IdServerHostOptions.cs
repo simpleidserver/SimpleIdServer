@@ -86,7 +86,7 @@ namespace SimpleIdServer.IdServer.Options
         /// <summary>
         /// Default encryption alg (JWE).
         /// </summary>
-        public string DefaultTokenEncrypteAlg { get; set; } = SecurityAlgorithms.Aes128KW;
+        public string DefaultTokenEncrypteAlg { get; set; } = SecurityAlgorithms.RsaPKCS1;
         /// <summary>
         /// Default encryption enc (JWE).
         /// </summary>

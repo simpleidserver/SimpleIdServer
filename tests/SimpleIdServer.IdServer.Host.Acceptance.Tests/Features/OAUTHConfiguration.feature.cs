@@ -208,43 +208,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[6]\'=\'self_signed_tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 42
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[0]\'=\'ES256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 43
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[1]\'=\'ES384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 44
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[2]\'=\'ES512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 45
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[3]\'=\'HS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 46
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[4]\'=\'HS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 47
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[5]\'=\'HS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 48
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[6]\'=\'PS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 49
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[7]\'=\'PS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 50
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[8]\'=\'PS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 51
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[9]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 52
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[10]\'=\'RS384\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 53
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[11]\'=\'RS512\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 54
- testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[12]\'=\'none\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[0]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

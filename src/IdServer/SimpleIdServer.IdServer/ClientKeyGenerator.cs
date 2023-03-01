@@ -29,15 +29,6 @@ namespace SimpleIdServer.IdServer
             return new EncryptingCredentials(x509SecurityKey, alg, enc);
         }
 
-        public static EncryptingCredentials GenerateECDsaEncryptionKey(string keyId, string alg = SecurityAlgorithms.EcdhEs, string enc = SecurityAlgorithms.Aes128CbcHmacSha256)
-        {
-            if (alg != SecurityAlgorithms.EcdhEs && alg != SecurityAlgorithms.EcdhEsA128kw && alg != SecurityAlgorithms.EcdhEsA192kw && alg != SecurityAlgorithms.EcdhEsA256kw)
-                throw new NotSupportedException($"algorithm '{alg}' is not supported");
-
-            var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create()) { KeyId = keyId }; ;
-            return new EncryptingCredentials(ecdsaSecurityKey, alg, enc);
-        }
-
         /// <summary>
         /// Generate signature key used to check 'request' object and used during the 'private_key_jwt' & 'client_secret_jwt' authentication flows.
         /// </summary>

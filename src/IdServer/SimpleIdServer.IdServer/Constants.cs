@@ -94,18 +94,18 @@ namespace SimpleIdServer.IdServer
 
         public static ICollection<string> AllSigningAlgs = new List<string>
         {
-            SecurityAlgorithms.EcdsaSha256,
-            SecurityAlgorithms.EcdsaSha384,
-            SecurityAlgorithms.EcdsaSha512,
-            SecurityAlgorithms.HmacSha256,
-            SecurityAlgorithms.HmacSha384,
-            SecurityAlgorithms.HmacSha512,
-            SecurityAlgorithms.RsaSsaPssSha256,
-            SecurityAlgorithms.RsaSsaPssSha384,
-            SecurityAlgorithms.RsaSsaPssSha512,
+            // SecurityAlgorithms.HmacSha256,
+            // SecurityAlgorithms.HmacSha384,
+            // SecurityAlgorithms.HmacSha512,
+            // SecurityAlgorithms.RsaSsaPssSha256,
+            // SecurityAlgorithms.RsaSsaPssSha384,
+            // SecurityAlgorithms.RsaSsaPssSha512,
             SecurityAlgorithms.RsaSha256,
             SecurityAlgorithms.RsaSha384,
             SecurityAlgorithms.RsaSha512,
+            SecurityAlgorithms.EcdsaSha256,
+            SecurityAlgorithms.EcdsaSha384,
+            SecurityAlgorithms.EcdsaSha512,
             SecurityAlgorithms.None
         };
 
@@ -113,13 +113,13 @@ namespace SimpleIdServer.IdServer
         {
             SecurityAlgorithms.RsaPKCS1,
             SecurityAlgorithms.RsaOAEP,
-            SecurityAlgorithms.Aes128KW,
-            SecurityAlgorithms.Aes192KW,
-            SecurityAlgorithms.Aes256KW,
-            SecurityAlgorithms.EcdhEs,
-            SecurityAlgorithms.EcdhEsA128kw,
-            SecurityAlgorithms.EcdhEsA192kw,
-            SecurityAlgorithms.EcdhEsA256kw
+            // SecurityAlgorithms.Aes128KW,
+            // SecurityAlgorithms.Aes192KW,
+            // SecurityAlgorithms.Aes256KW,
+            // SecurityAlgorithms.EcdhEs,
+            // SecurityAlgorithms.EcdhEsA128kw,
+            // SecurityAlgorithms.EcdhEsA192kw,
+            // SecurityAlgorithms.EcdhEsA256kw
         };
 
         public static ICollection<string> AllEncryptions = new List<string>
@@ -127,9 +127,9 @@ namespace SimpleIdServer.IdServer
             SecurityAlgorithms.Aes128CbcHmacSha256,
             SecurityAlgorithms.Aes192CbcHmacSha384,
             SecurityAlgorithms.Aes256CbcHmacSha512,
-            SecurityAlgorithms.Aes128Gcm,
-            SecurityAlgorithms.Aes192Gcm,
-            SecurityAlgorithms.Aes256Gcm
+            // SecurityAlgorithms.Aes128Gcm,
+            // SecurityAlgorithms.Aes192Gcm,
+            // SecurityAlgorithms.Aes256Gcm
         };
 
         public static class UserClaims

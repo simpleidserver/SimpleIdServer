@@ -275,9 +275,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 case SecurityKeyTypes.CERTIFICATE:
                     encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(act.KeyId, act.Alg, act.Enc);
                     break;
-                case SecurityKeyTypes.ECDSA:
-                    encCredentials = ClientKeyGenerator.GenerateECDsaEncryptionKey(act.KeyId, act.Alg, act.Enc);
-                    break;
             }
 
             var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
