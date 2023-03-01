@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow
             };
             client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
+            client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             return new ApiClientBuilder(client);
         }
 

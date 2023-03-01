@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client credentials are updated.
+        /// </summary>
+        public static string ClientCredentialsUpdated {
+            get {
+                return ResourceManager.GetString("ClientCredentialsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client scopes have been added.
         /// </summary>
         public static string ClientScopesAdded {

@@ -126,6 +126,9 @@
   <data name="ClientAlreadyExists" xml:space="preserve">
     <value>Client cannot be added because an another client exists with the same name</value>
   </data>
+  <data name="ClientCredentialsUpdated" xml:space="preserve">
+    <value>Client credentials are updated</value>
+  </data>
   <data name="ClientScopesAdded" xml:space="preserve">
     <value>Client scopes have been added</value>
   </data>

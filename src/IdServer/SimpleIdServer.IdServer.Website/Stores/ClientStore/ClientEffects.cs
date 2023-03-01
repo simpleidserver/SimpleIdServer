@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
+using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
@@ -320,6 +321,35 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.JwksUri = act.JWKSUrl;
             await _clientRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateJWKSUrlSuccessAction { ClientId = act.ClientId, JWKSUrl = act.JWKSUrl });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateClientCredentialsAction act, IDispatcher dispatcher)
+        {
+            var client = await _clientRepository.Query().SingleAsync(c => c.ClientId == act.ClientId);
+            client.TokenEndPointAuthMethod = act.AuthMethod;
+            if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
+                client.ClientSecret = act.ClientSecret;
+            else if(client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
+            {
+                client.TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN;
+                client.TlsClientAuthSanDNS = act.TlsClientAuthSanDNS;
+                client.TlsClientAuthSanEmail = act.TlsClientAuthSanEmail;
+                client.TlsClientAuthSanIP = act.TlsClientAuthSanIP;
+            }
+
+            client.UpdateDateTime = DateTime.UtcNow;
+            await _clientRepository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateClientCredentialsSuccessAction 
+            {
+                AuthMethod = act.AuthMethod, 
+                ClientId = act.ClientId,
+                ClientSecret = act.ClientSecret,
+                TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
+                TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
+                TlsClientAuthSanIP = act.TlsClientAuthSanIP
+            });
         }
 
         private async Task<bool> ValidateAddClient(string clientId, IEnumerable<string> redirectionUrls, IDispatcher dispatcher)
@@ -664,5 +694,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
         public string ClientId { get; set; } = null!;
         public string JWKSUrl { get; set; } = null!;
+    }
+
+    public class UpdateClientCredentialsAction
+    {
+        public string ClientId { get; set; }
+        public string AuthMethod { get; set; } = null!;
+        public string? ClientSecret { get; set; } = null;
+        public string? TlsClientAuthSubjectDN { get; set; } = null;
+        public string? TlsClientAuthSanDNS { get; set; } = null;
+        public string? TlsClientAuthSanEmail { get; set; } = null;
+        public string? TlsClientAuthSanIP { get; set; } = null;
+    }
+
+    public class UpdateClientCredentialsSuccessAction
+    {
+        public string ClientId { get; set; }
+        public string AuthMethod { get; set; } = null!;
+        public string? ClientSecret { get; set; } = null;
+        public string? TlsClientAuthSubjectDN { get; set; } = null;
+        public string? TlsClientAuthSanDNS { get; set; } = null;
+        public string? TlsClientAuthSanEmail { get; set; } = null;
+        public string? TlsClientAuthSanIP { get; set; } = null;
     }
 }

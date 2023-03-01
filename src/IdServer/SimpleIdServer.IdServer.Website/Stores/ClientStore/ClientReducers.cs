@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
+using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 using System.IdentityModel.Tokens.Jwt;
@@ -152,6 +153,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             ErrorMessage = act.ErrorMessage
         };
 
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientCredentialsAction(UpdateClientState state, UpdateClientCredentialsAction act) => state with
+        {
+            IsUpdating = true
+        };
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientCredentialsSuccessAction(UpdateClientState state, UpdateClientCredentialsSuccessAction act) => state with
+        {
+            IsUpdating = false
+        };
+
         #endregion
 
         #region ClientState
@@ -206,6 +219,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var client = state.Client;
             client.JwksUri = act.JWKSUrl;
+            return state with
+            {
+                Client = client
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientState ReduceUpdateClientCredentialsSuccessAction(ClientState state, UpdateClientCredentialsSuccessAction act)
+        {
+            var client = state.Client;
+            client.TokenEndPointAuthMethod = act.AuthMethod;
+            if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
+                client.ClientSecret = act.ClientSecret;
+            else if (client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
+            {
+                client.TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN;
+                client.TlsClientAuthSanDNS = act.TlsClientAuthSanDNS;
+                client.TlsClientAuthSanEmail = act.TlsClientAuthSanEmail;
+                client.TlsClientAuthSanIP = act.TlsClientAuthSanIP;
+            }
+
+            client.UpdateDateTime = DateTime.UtcNow;
             return state with
             {
                 Client = client
