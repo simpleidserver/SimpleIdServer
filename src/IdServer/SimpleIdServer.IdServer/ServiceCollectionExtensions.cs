@@ -85,7 +85,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure<AuthorizationOptions>(o =>
             {
                 o.AddPolicy(Constants.Policies.Register, p => p.RequireAssertion(a => true));
-                o.AddPolicy(Constants.Policies.AuthSchemeProvider, p => p.RequireAssertion(a => true));
                 o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
             });
             var authBuilder = services

@@ -64,22 +64,6 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Update" });
 
-            webApplication.MapControllerRoute("authSchemeProviderGet",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}",
-                defaults: new { controller = "AuthSchemeProviders", action = "Get" });
-            webApplication.MapControllerRoute("authSchemeProviderGetAll",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders,
-                defaults: new { controller = "AuthSchemeProviders", action = "GetAll" });
-            webApplication.MapControllerRoute("authSchemeProviderEnable",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}/enable",
-                defaults: new { controller = "AuthSchemeProviders", action = "Enable" });
-            webApplication.MapControllerRoute("authSchemeProviderDisable",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}/disable",
-                defaults: new { controller = "AuthSchemeProviders", action = "Disable" });
-            webApplication.MapControllerRoute("authSchemeProviderUpdate",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthSchemeProviders + "/{id}",
-                defaults: new { controller = "AuthSchemeProviders", action = "UpdateOptions" });
-
             webApplication.MapControllerRoute("userInfoGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
                 defaults: new { controller = "UserInfo", action = "Get" });

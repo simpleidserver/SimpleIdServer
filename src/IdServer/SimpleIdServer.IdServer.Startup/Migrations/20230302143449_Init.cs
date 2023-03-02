@@ -39,22 +39,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthenticationSchemeProviders",
+                name: "AuthenticationSchemeProviderDefinitions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HandlerFullQualifiedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OptionsFullQualifiedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SerializedOptions = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    OptionsFullQualifiedName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthenticationSchemeProviders", x => x.Id);
+                    table.PrimaryKey("PK_AuthenticationSchemeProviderDefinitions", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -263,6 +258,50 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AuthenticationSchemeProviderDefinitionProperty",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PropertyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SchemeProviderDefName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationSchemeProviderDefinitionProperty", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AuthenticationSchemeProviderDefinitionProperty_AuthenticationSchemeProviderDefinitions_SchemeProviderDefName",
+                        column: x => x.SchemeProviderDefName,
+                        principalTable: "AuthenticationSchemeProviderDefinitions",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AuthenticationSchemeProviders",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AuthSchemeProviderDefinitionName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationSchemeProviders", x => x.Name);
+                    table.ForeignKey(
+                        name: "FK_AuthenticationSchemeProviders_AuthenticationSchemeProviderDefinitions_AuthSchemeProviderDefinitionName",
+                        column: x => x.AuthSchemeProviderDefinitionName,
+                        principalTable: "AuthenticationSchemeProviderDefinitions",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -637,6 +676,27 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuthenticationSchemeProviderProperty",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PropertyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SchemeProviderName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationSchemeProviderProperty", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AuthenticationSchemeProviderProperty_AuthenticationSchemeProviders_SchemeProviderName",
+                        column: x => x.SchemeProviderName,
+                        principalTable: "AuthenticationSchemeProviders",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TranslationUMAResource",
                 columns: table => new
                 {
@@ -687,6 +747,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "IX_ApiResourceScope_ScopesName",
                 table: "ApiResourceScope",
                 column: "ScopesName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthenticationSchemeProviderDefinitionProperty_SchemeProviderDefName",
+                table: "AuthenticationSchemeProviderDefinitionProperty",
+                column: "SchemeProviderDefName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthenticationSchemeProviderProperty_SchemeProviderName",
+                table: "AuthenticationSchemeProviderProperty",
+                column: "SchemeProviderName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthenticationSchemeProviders_AuthSchemeProviderDefinitionName",
+                table: "AuthenticationSchemeProviders",
+                column: "AuthSchemeProviderDefinitionName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuthorizedScope_GrantId",
@@ -795,7 +870,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ApiResourceScope");
 
             migrationBuilder.DropTable(
-                name: "AuthenticationSchemeProviders");
+                name: "AuthenticationSchemeProviderDefinitionProperty");
+
+            migrationBuilder.DropTable(
+                name: "AuthenticationSchemeProviderProperty");
 
             migrationBuilder.DropTable(
                 name: "AuthorizedScope");
@@ -852,6 +930,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ApiResources");
 
             migrationBuilder.DropTable(
+                name: "AuthenticationSchemeProviders");
+
+            migrationBuilder.DropTable(
                 name: "Grants");
 
             migrationBuilder.DropTable(
@@ -871,6 +952,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "AuthenticationSchemeProviderDefinitions");
 
             migrationBuilder.DropTable(
                 name: "Clients");

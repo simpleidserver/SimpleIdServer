@@ -1,0 +1,37 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits FluxorComponent
+@inject Radzen.DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<AddClientState> addClientState
+@inject IDispatcher dispatcher
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Identity Provider Type">
+
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    record IdentityProviderType
+    {
+        
+    }
+    AddClaim addClaim = new AddClaim();
+
+    record AddClaim
+    {
+        public string Key { get; set; } = null!;
+        public string Value { get; set; } = null!;
+    }
+
+    void SubmitAddClaim(AddClaim addClaim)
+    {
+        dispatcher.Dispatch(new AddUserClaimAction { Key = addClaim.Key, Value = addClaim.Value });
+        dialogService.Close();
+    }
+}

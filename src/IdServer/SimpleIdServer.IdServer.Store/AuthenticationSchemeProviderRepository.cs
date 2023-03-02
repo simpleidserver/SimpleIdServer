@@ -7,6 +7,8 @@ namespace SimpleIdServer.IdServer.Store
     public interface IAuthenticationSchemeProviderRepository
     {
         IQueryable<AuthenticationSchemeProvider> Query();
+        void Remove(AuthenticationSchemeProvider idProvider);
+        void RemoveRange(IEnumerable<AuthenticationSchemeProvider> idProviders);
         Task<int> SaveChanges(CancellationToken cancellationToken);
     }
 
@@ -19,14 +21,12 @@ namespace SimpleIdServer.IdServer.Store
             _dbContext = dbContext;
         }
 
-        public IQueryable<AuthenticationSchemeProvider> Query()
-        {
-            return _dbContext.AuthenticationSchemeProviders;
-        }
+        public IQueryable<AuthenticationSchemeProvider> Query() => _dbContext.AuthenticationSchemeProviders;
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        public void Remove(AuthenticationSchemeProvider idProvider) => _dbContext.AuthenticationSchemeProviders.Remove(idProvider);
+
+        public void RemoveRange(IEnumerable<AuthenticationSchemeProvider> idProviders) => _dbContext.AuthenticationSchemeProviders.RemoveRange(idProviders);
+
+        public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

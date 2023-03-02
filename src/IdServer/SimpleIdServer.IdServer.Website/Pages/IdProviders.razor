@@ -1,0 +1,109 @@
+﻿@page "/idproviders"
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject IState<SearchIdProvidersState> searchIdProvidersState
+@inject IDispatcher dispatcher
+
+<RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="Add Identity Provider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchIdProvidersState.Value.IsLoading"
+                Count="@searchIdProvidersState.Value.Count"
+                Data="@searchIdProvidersState.Value.IdProviders"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableIdProvider"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="true" Title="Name" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.DisplayName" Path="@($"/idproviders/{data.Value.Name}/details")" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdProvider" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="Update datetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchIdProvidersAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
+        dispatcher.Dispatch(act);
+    }
+
+    bool selectAll = false;
+
+    void RowRender(RowRenderEventArgs<SelectableIdProvider> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void ShowMoreContextMenu(SelectableIdProvider idProvider, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var idProviderIds = searchIdProvidersState.Value.IdProviders?.Where(c => c.IsSelected).Select(c => c.Value.Name)?.ToList();
+                if (!idProviderIds.Contains(idProvider.Value.Name)) idProviderIds.Add(idProvider.Value.Name);
+                var act = new RemoveSelectedIdProvidersAction { Ids = idProviderIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableIdProvider idProvider)
+    {
+        var act = new ToggleIdProviderSelectionAction { IsSelected = isSelected, Id = idProvider.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllIdProvidersSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    async void AddIdProvider()
+    {
+        await dialogService.OpenAsync<AddIdProviderDialog>("Add Identity Provider", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "900px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

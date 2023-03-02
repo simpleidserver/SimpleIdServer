@@ -322,6 +322,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity provider &apos;{0}&apos; doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownIdProvider {
+            get {
+                return ResourceManager.GetString("UnknownIdProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The resource &apos;{0}&apos; doesn&apos;t exist.
         /// </summary>
         public static string UnknownResource {

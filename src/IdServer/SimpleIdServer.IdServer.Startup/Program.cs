@@ -88,6 +88,9 @@ void SeedData(WebApplication application)
             if (!dbContext.UmaResources.Any())
                 dbContext.UmaResources.AddRange(IdServerConfiguration.Resources);
 
+            if (!dbContext.AuthenticationSchemeProviderDefinitions.Any())
+                dbContext.AuthenticationSchemeProviderDefinitions.AddRange(IdServerConfiguration.ProviderDefinitions);
+
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
 

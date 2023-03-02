@@ -16,6 +16,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<Translation> Translations { get; set; }
         public DbSet<Token> Tokens { get; set; }
         public DbSet<AuthenticationContextClassReference> Acrs { get; set; }
+        public DbSet<AuthenticationSchemeProviderDefinition> AuthenticationSchemeProviderDefinitions { get; set; }
         public DbSet<AuthenticationSchemeProvider> AuthenticationSchemeProviders { get; set; }
         public DbSet<ClaimProvider> ClaimProviders { get; set; }
         public DbSet<BCAuthorize> BCAuthorizeLst { get; set; }
@@ -41,6 +42,9 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new TokenConfiguration());
             builder.ApplyConfiguration(new AuthenticationContextClassReferenceConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
+            builder.ApplyConfiguration(new AuthenticationSchemeProviderPropertyConfiguration());
+            builder.ApplyConfiguration(new AuthenticationSchemeProviderDefinitionConfiguration());
+            builder.ApplyConfiguration(new AuthenticationSchemeProviderDefinitionPropertyConfiguration());
             builder.ApplyConfiguration(new ClaimProviderConfiguration());
             builder.ApplyConfiguration(new BCAuthorizeConfiguration());
             builder.ApplyConfiguration(new BCAuthorizeHistoryConfiguration());

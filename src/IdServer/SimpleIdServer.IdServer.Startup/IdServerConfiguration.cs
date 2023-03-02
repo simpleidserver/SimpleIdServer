@@ -7,12 +7,13 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Constants = SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Startup
 {
     public class IdServerConfiguration
     {
+        private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
+
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             Constants.StandardScopes.OpenIdScope,
@@ -44,13 +45,18 @@ namespace SimpleIdServer.IdServer.Startup
             UMAPendingRequestBuilder.Create(Guid.NewGuid().ToString(), "user", "administrator", Resources.First()).Build()
         };
 
+        public static ICollection<AuthenticationSchemeProviderDefinition> ProviderDefinitions => new List<AuthenticationSchemeProviderDefinition>
+        {
+            Facebook
+        };
+
         public static ICollection<AuthenticationSchemeProvider> Providers => new List<AuthenticationSchemeProvider>
         {
-            AuthenticationSchemeProviderBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), new FacebookOptionsLite
-            {
-                AppId = "569242033233529",
-                AppSecret = "12e0f33817634c0a650c0121d05e53eb"
-            }).Build()
+           AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Faceoobk", new FacebookOptionsLite
+           {
+               AppId = "569242033233529",            
+               AppSecret = "12e0f33817634c0a650c0121d05e53eb"
+           }).Build()
         };
     }
 }

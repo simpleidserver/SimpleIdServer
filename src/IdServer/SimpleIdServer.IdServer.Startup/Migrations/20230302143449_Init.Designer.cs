@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230224140253_Init")]
+    [Migration("20230302143449_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -94,36 +94,105 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AuthSchemeProviderDefinitionName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HandlerFullQualifiedName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OptionsFullQualifiedName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SerializedOptions")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("Name");
+
+                    b.HasIndex("AuthSchemeProviderDefinitionName");
 
                     b.ToTable("AuthenticationSchemeProviders");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HandlerFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OptionsFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("AuthenticationSchemeProviderDefinitions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PropertyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SchemeProviderDefName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchemeProviderDefName");
+
+                    b.ToTable("AuthenticationSchemeProviderDefinitionProperty");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PropertyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SchemeProviderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchemeProviderName");
+
+                    b.ToTable("AuthenticationSchemeProviderProperty");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
@@ -1149,6 +1218,39 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "AuthSchemeProviderDefinition")
+                        .WithMany("AuthSchemeProviders")
+                        .HasForeignKey("AuthSchemeProviderDefinitionName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuthSchemeProviderDefinition");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinitionProperty", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", "SchemeProviderDef")
+                        .WithMany("Properties")
+                        .HasForeignKey("SchemeProviderDefName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SchemeProviderDef");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "SchemeProvider")
+                        .WithMany("Properties")
+                        .HasForeignKey("SchemeProviderName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SchemeProvider");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthorizedScope", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Grant", null)
@@ -1310,6 +1412,18 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasForeignKey("UMAResourceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
+                {
+                    b.Navigation("Properties");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
+                {
+                    b.Navigation("AuthSchemeProviders");
+
+                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>

@@ -9,7 +9,6 @@ using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -92,8 +91,8 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                     _nextExpirationTime.Value <= currentDateTime ||
                     _options.CacheExternalAuthProvidersInSeconds == null)
                 {
-                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.Query().ToListAsync(CancellationToken.None);
-                    authenticationSchemeProviders = authenticationSchemeProviders.Where(a => a.IsEnabled);
+                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.Query().Include(c => c.Properties)
+                        .Include(c => c.AuthSchemeProviderDefinition).ThenInclude(c => c.Properties).ToListAsync(CancellationToken.None);
                     if (_options.CacheExternalAuthProvidersInSeconds != null)
                     {
                         _nextExpirationTime = currentDateTime.AddSeconds(_options.CacheExternalAuthProvidersInSeconds.Value);
@@ -107,17 +106,16 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
         private SIDAuthenticationScheme Convert(Domains.AuthenticationSchemeProvider provider)
         {
-            if (string.IsNullOrWhiteSpace(provider.SerializedOptions)) return null;
-            var handlerType = Type.GetType(provider.HandlerFullQualifiedName);
+            var handlerType = Type.GetType(provider.AuthSchemeProviderDefinition.HandlerFullQualifiedName);
             var authenticationHandlerType = GetGenericType(handlerType, typeof(AuthenticationHandler<>));
             if (authenticationHandlerType == null) return null;
-            var liteOptionType = Type.GetType(provider.OptionsFullQualifiedName);
+            var liteOptionType = Type.GetType(provider.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
             if (liteOptionType == null) return null;
 
             var optionType = authenticationHandlerType.GetGenericArguments().First();
             var liteOptionInterface = typeof(IDynamicAuthenticationOptions<>).MakeGenericType(optionType);
             var convert = liteOptionInterface.GetMethod("Convert");
-            var liteOptions = JsonSerializer.Deserialize(provider.SerializedOptions, liteOptionType);
+            var liteOptions = AuthenticationSchemeSerializer.DeserializeOptions(liteOptionType, provider.Properties);
             var options = convert.Invoke(liteOptions, new object[] { });
             PostConfigureOptions(optionType, handlerType, options);
             var optionsMonitorType = typeof(ConcreteOptionsMonitor<>).MakeGenericType(optionType);

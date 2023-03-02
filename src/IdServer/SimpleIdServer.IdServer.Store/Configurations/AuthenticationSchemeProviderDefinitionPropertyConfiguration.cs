@@ -6,12 +6,12 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
-    public class AuthenticationSchemeProviderConfiguration : IEntityTypeConfiguration<AuthenticationSchemeProvider>
+    public class AuthenticationSchemeProviderDefinitionPropertyConfiguration : IEntityTypeConfiguration<AuthenticationSchemeProviderDefinitionProperty>
     {
-        public void Configure(EntityTypeBuilder<AuthenticationSchemeProvider> builder)
+        public void Configure(EntityTypeBuilder<AuthenticationSchemeProviderDefinitionProperty> builder)
         {
-            builder.HasKey(a => a.Name);
-            builder.HasMany(a => a.Properties).WithOne(p => p.SchemeProvider).OnDelete(DeleteBehavior.Cascade);
+            builder.Property<int>("Id").ValueGeneratedOnAdd();
+            builder.HasKey("Id");
         }
     }
 }

@@ -88,7 +88,6 @@ namespace SimpleIdServer.IdServer
         public class Policies
         {
             public const string Register = "register";
-            public const string AuthSchemeProvider = "manage_authschemeprovider";
             public const string Authenticated = "authenticated";
         }
 

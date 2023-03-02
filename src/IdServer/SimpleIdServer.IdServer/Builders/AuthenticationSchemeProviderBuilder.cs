@@ -3,7 +3,7 @@
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
-using System.Text.Json;
+using System.Linq;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -16,19 +16,18 @@ namespace SimpleIdServer.IdServer.Builders
             _provider = provider;
         }
 
-        public static AuthenticationSchemeProviderBuilder Create<TOpts>(string name, string displayName, Type handlerType, IDynamicAuthenticationOptions<TOpts> options) where TOpts : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, new()
+        public static AuthenticationSchemeProviderBuilder Create<TOpts>(AuthenticationSchemeProviderDefinition definition, string name, string displayName, string description, IDynamicAuthenticationOptions<TOpts> options) where TOpts : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, new()
         {
+            var properties = AuthenticationSchemeSerializer.SerializeProperties(options);
             return new AuthenticationSchemeProviderBuilder(new AuthenticationSchemeProvider
             {
-                Id = Guid.NewGuid().ToString(),
                 Name = name,
                 DisplayName = displayName,
+                Description = description,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                IsEnabled = true,
-                HandlerFullQualifiedName = handlerType.AssemblyQualifiedName,
-                OptionsFullQualifiedName = options.GetType().AssemblyQualifiedName,
-                SerializedOptions = JsonSerializer.Serialize(options, options.GetType())
+                Properties = properties.ToList(),
+                AuthSchemeProviderDefinition = definition
             });
         }
 

@@ -204,6 +204,9 @@
   <data name="UnknownClient" xml:space="preserve">
     <value>The client '{0}' doesn't exist</value>
   </data>
+  <data name="UnknownIdProvider" xml:space="preserve">
+    <value>Identity provider '{0}' doesn't exist</value>
+  </data>
   <data name="UnknownResource" xml:space="preserve">
     <value>The resource '{0}' doesn't exist</value>
   </data>

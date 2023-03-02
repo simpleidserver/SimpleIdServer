@@ -110,15 +110,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
-        public IdServerBuilder SetDefaultAuthSchemeAuthorizationPolicy()
-        {
-            _serviceCollection.Configure<AuthorizationOptions>(o =>
-            {
-                o.AddPolicy(Constants.Policies.AuthSchemeProvider, o => o.RequireClaim("scope", Constants.ScopeNames.AuthSchemeProvider));
-            });
-            return this;
-        }
-
         #endregion
 
         #region CIBA

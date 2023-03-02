@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ITranslationRepository, TranslationRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IAuthenticationContextClassReferenceRepository, AuthenticationContextClassReferenceRepository>();
+            services.AddTransient<IAuthenticationSchemeProviderDefinitionRepository, AuthenticationSchemeProviderDefinitionRepository>();
             services.AddTransient<IAuthenticationSchemeProviderRepository, AuthenticationSchemeProviderRepository>();
             services.AddTransient<IClaimProviderRepository, ClaimProviderRepository>();
             services.AddTransient<IBCAuthorizeRepository, BCAuthorizeRepository>();
