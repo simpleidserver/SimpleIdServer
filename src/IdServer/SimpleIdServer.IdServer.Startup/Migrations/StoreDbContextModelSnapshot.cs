@@ -128,6 +128,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Property<string>("HandlerFullQualifiedName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("OptionsFullQualifiedName")
                         .HasColumnType("nvarchar(max)");
 

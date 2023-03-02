@@ -71,7 +71,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         #region IdProviderDefsState
 
         [ReducerMethod]
-        public static IdProviderDefsState ReduceGetIdProviderAction(IdProviderDefsState state, GetIdProviderDefsAction act) => new IdProviderDefsState(null, true);
+        public static IdProviderDefsState ReduceGetIdProviderAction(IdProviderDefsState state, GetIdProviderDefsAction act) => new IdProviderDefsState(new List<AuthenticationSchemeProviderDefinition>(), true);
 
         [ReducerMethod]
         public static IdProviderDefsState ReduceGetIdProviderDefsSuccessAction(IdProviderDefsState state, GetIdProviderDefsSuccessAction act) => new IdProviderDefsState(act.AuthProviderDefinitions.ToList(), false);

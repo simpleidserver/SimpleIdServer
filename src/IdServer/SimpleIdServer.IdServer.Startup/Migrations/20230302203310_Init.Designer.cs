@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230302143449_Init")]
+    [Migration("20230302203310_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -129,6 +129,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HandlerFullQualifiedName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OptionsFullQualifiedName")

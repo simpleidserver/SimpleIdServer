@@ -1,37 +1,72 @@
 ﻿@using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits FluxorComponent
 @inject Radzen.DialogService dialogService
 @inject NotificationService notificationService
-@inject IState<AddClientState> addClientState
+@inject IState<IdProviderDefsState> idProviderDefsState
 @inject IDispatcher dispatcher
 
 <RadzenSteps>
     <Steps>
         <RadzenStepsItem Text="Identity Provider Type">
-
+            <div class="row gy-4">
+                @if (!idProviderDefsState.Value.IsLoading)
+                {
+                    @foreach(var idProviderDef in idProviderDefsState.Value.AuthProviderDefinitions)
+                    {
+                        <div class="col-md-6">
+                            <RadzenCard @onclick="() => SelectIdProvider(idProviderDef)" class="@(SelectedIdProvider != null && SelectedIdProvider.Name == idProviderDef.Name ? "selected selectable" : "selectable")">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        @if(string.IsNullOrWhiteSpace(idProviderDef.Image))
+                                        {
+                                            <RadzenImage Path="_content/SimpleIdServer.IdServer.Website/images/IdProvider.png" Style="width: 60px" />
+                                        }
+                                        else
+                                        {
+                                            <RadzenImage Path="@idProviderDef.Image" Style="width: 60px" />
+                                        }
+                                    </div>
+                                    <div class="col">
+                                        <h5>@idProviderDef.Name</h5>
+                                        <p class="text-muted">@idProviderDef.Description</p>
+                                    </div>
+                                </div>
+                            </RadzenCard>
+                        </div>
+                    }
+                }
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled="@(SelectedIdProvider == null)">
+            <EditIdProvider IdProviderSaved=@SaveIdProvider IdProviderDef=@SelectedIdProvider></EditIdProvider>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
 
 @code {
-    record IdentityProviderType
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            var act = new GetIdProviderDefsAction();
+            dispatcher.Dispatch(act);
+        }
+    }
+
+    AuthenticationSchemeProviderDefinition? SelectedIdProvider { get; set; } = null;
+
+    void SelectIdProvider(AuthenticationSchemeProviderDefinition idProvider)
+    {
+        SelectedIdProvider = idProvider;
+    }
+
+    void SaveIdProvider(IEnumerable<AuthenticationSchemeProviderProperty> properties)
     {
         
-    }
-    AddClaim addClaim = new AddClaim();
-
-    record AddClaim
-    {
-        public string Key { get; set; } = null!;
-        public string Value { get; set; } = null!;
-    }
-
-    void SubmitAddClaim(AddClaim addClaim)
-    {
-        dispatcher.Dispatch(new AddUserClaimAction { Key = addClaim.Key, Value = addClaim.Value });
-        dialogService.Close();
     }
 }

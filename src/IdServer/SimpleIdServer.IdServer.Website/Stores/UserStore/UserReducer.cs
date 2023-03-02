@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using SimpleIdServer.IdServer.Domains;
+using System;
 using User = SimpleIdServer.IdServer.Domains.User;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -119,6 +120,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             var session = state.User.Sessions.Single(s => s.SessionId == act.SessionId);
             session.State = UserSessionStates.Rejected;
             return state;
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceUpdateUserCredentialSuccessAction(UserState state, UpdateUserCredentialSuccessAction act)
+        {
+            var user = state.User;
+            var credential = user.Credentials.Single(c => c.Id == act.Credential.Id);
+            credential.Value = act.Credential.Value;
+            credential.OTPAlg = act.Credential.OTPAlg;
+            return state with
+            {
+                User = user
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceAddUserCredentialSuccessAction(UserState state, AddUserCredentialSuccessAction act)
+        {
+            var user = state.User;
+            if(act.IsDefault)
+            {
+                foreach (var c in user.Credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
+                    c.IsActive = false;
+                act.Credential.IsActive = true;
+            }
+
+            user.Credentials.Add(act.Credential);
+            return state with
+            {
+                User = user
+            };
         }
 
         #endregion
@@ -239,7 +271,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [ReducerMethod]
         public static UserCredentialsState ReduceGetUserSuccessAction(UserCredentialsState state, GetUserSuccessAction act)
         {
-            var claims = act.User.Credentials;
+            var claims = act.User.Credentials.Select(c => new UserCredential
+            {
+                CredentialType = c.CredentialType,
+                IsActive = c.IsActive,
+                Id = c.Id,
+                OTPAlg = c.OTPAlg,
+                OTPCounter = c.OTPCounter,
+                Value = c.Value
+            });
             return state with
             {
                 UserCredentials = claims,
@@ -252,10 +292,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UserCredentialsState ReduceAddUserCredentialSuccessAction(UserCredentialsState state, AddUserCredentialSuccessAction act)
         {
             var credentials = state.UserCredentials.ToList();
-            if (act.Credential.IsActive)
-                foreach (var a in credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
-                    a.IsActive = false;
-            act.Credential.IsActive = true;
+            if(act.IsDefault)
+            {
+                if (act.Credential.IsActive)
+                    foreach (var a in credentials.Where(c => c.CredentialType == act.Credential.CredentialType))
+                        a.IsActive = false;
+                act.Credential.IsActive = true;
+            }
+
             credentials.Add(act.Credential);
             return state with
             {

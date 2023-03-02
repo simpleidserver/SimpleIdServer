@@ -8,6 +8,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     [FeatureState]
     public record IdProviderDefsState
     {
+        public IdProviderDefsState() { }
+
         public IdProviderDefsState(ICollection<AuthenticationSchemeProviderDefinition> authProviderDefinitions, bool isLoading)
         {
             AuthProviderDefinitions = authProviderDefinitions;

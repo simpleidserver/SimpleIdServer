@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;
+        public string? Image { get; set; } = null;
         public string? HandlerFullQualifiedName { get; set; } = null;
         public string? OptionsFullQualifiedName { get; set; } = null;
         public ICollection<AuthenticationSchemeProviderDefinitionProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderDefinitionProperty>();

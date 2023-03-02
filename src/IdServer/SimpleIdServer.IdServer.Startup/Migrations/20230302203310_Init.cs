@@ -44,6 +44,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 {
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HandlerFullQualifiedName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OptionsFullQualifiedName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
