@@ -5,20 +5,20 @@ using Fluxor;
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 {
     [FeatureState]
-    public record AddIdProviderState
+    public record UpdateIdProviderState
     {
-        public AddIdProviderState()
+        public UpdateIdProviderState()
         {
 
         }
 
-        public AddIdProviderState(bool isAdding, string errorMesasge)
+        public UpdateIdProviderState(bool isUpdating, string errorMesasge)
         {
-            IsAdding = isAdding;
+            IsUpdating = isUpdating;
             ErrorMessage = errorMesasge;
         }
 
-        public bool IsAdding { get; set; } = false;
+        public bool IsUpdating { get; set; } = false;
         public string ErrorMessage { get; set; }
     }
 }

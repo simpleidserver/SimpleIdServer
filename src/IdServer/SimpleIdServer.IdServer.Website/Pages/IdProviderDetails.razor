@@ -1,4 +1,72 @@
-﻿@code {
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inherits FluxorComponent
+@inject IState<UpdateIdProviderState> updateIdProvider
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<RadzenTemplateForm Submit=@SubmitUpdateIdProviderDetails TItem="UpdateIdProviderDetails" Data=@updateIdProviderDetails>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@updateIdProviderDetails.Name" Class="w-100" Disabled=true></RadzenTextBox>
+    </div>
+    <!-- Display Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Display Name</RadzenText>
+        <RadzenTextBox Name="DisplayName" @bind-Value="@updateIdProviderDetails.DisplayName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="DisplayName" Text="Display Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@updateIdProviderDetails.Description" Class="w-100"></RadzenTextArea>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProvider.Value.IsUpdating ? "Updating..." : "Update")" Disabled=@updateIdProvider.Value.IsUpdating />
+</RadzenTemplateForm>
+@code {
     [Parameter]
     public AuthenticationSchemeProvider IdProvider { get; set; }
+
+    record UpdateIdProviderDetails
+    {
+        public string Name { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string Description { get; set; }
+    }
+
+    UpdateIdProviderDetails updateIdProviderDetails = new UpdateIdProviderDetails();
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<UpdateIdProviderDetailsSuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderDetailsUpdated });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (IdProvider == null) return;
+        updateIdProviderDetails.Name = IdProvider.Name;
+        updateIdProviderDetails.DisplayName = IdProvider.DisplayName;
+        updateIdProviderDetails.Description = IdProvider.Description;
+    }
+
+    void SubmitUpdateIdProviderDetails(UpdateIdProviderDetails idProviderDetails)
+    {
+        var act = new UpdateIdProviderDetailsAction { Description = idProviderDetails.Description, DisplayName = idProviderDetails.DisplayName, Name = idProviderDetails.Name };
+        dispatcher.Dispatch(act);
+    }
 }

@@ -1,0 +1,36 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inherits FluxorComponent
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+<EditIdProvider IdProviderSaved=@SaveIdProvider IdProvider=@IdProvider IdProviderDef=@IdProvider.AuthSchemeProviderDefinition IsAddForm=false></EditIdProvider>
+
+@code {
+    [Parameter]
+    public AuthenticationSchemeProvider IdProvider { get; set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateAuthenticationSchemeProviderPropertiesSuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderPropertiesUpdated });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    void SaveIdProvider(IEnumerable<AuthenticationSchemeProviderProperty> properties)
+    {
+        var act = new UpdateAuthenticationSchemeProviderPropertiesAction { Name = IdProvider.Name, Properties = properties };
+        dispatcher.Dispatch(act);
+    }
+}

@@ -67,6 +67,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchIdProvidersState ReduceUpdateIdProviderDetailsAction(SearchIdProvidersState state, UpdateIdProviderDetailsAction act)
+        {
+            var idProviders = state.IdProviders.ToList();
+            var idProvider = idProviders.First(i => i.Value.Name == act.Name);
+            idProvider.Value.Description = act.Description;
+            idProvider.Value.DisplayName = act.DisplayName;
+            idProvider.Value.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                IdProviders = idProviders
+            };
+        }
+
         #endregion
 
         #region IdProviderState
@@ -80,6 +94,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [ReducerMethod]
         public static IdProviderState ReduceGetIdProviderSuccessAction(IdProviderState state, GetIdProviderSuccessAction act) => new IdProviderState(isLoading: false, act.IdProvider);
 
+        [ReducerMethod]
+        public static IdProviderState ReduceUpdateIdProviderDetailsAction(IdProviderState state, UpdateIdProviderDetailsAction act)
+        {
+            var provider = state.Provider;
+            provider.DisplayName = act.DisplayName;
+            provider.Description = act.Description;
+            provider.UpdateDateTime = DateTime.UtcNow;
+            return state with
+            {
+                Provider = provider
+            };
+        }
+
+        [ReducerMethod]
+        public static IdProviderState ReduceUpdateAuthenticationSchemeProviderPropertiesAction(IdProviderState state, UpdateAuthenticationSchemeProviderPropertiesAction act)
+        {
+            var provider = state.Provider;
+            provider.UpdateDateTime = DateTime.UtcNow;
+            provider.Properties.Clear();
+            foreach (var property in act.Properties)
+                provider.Properties.Add(new AuthenticationSchemeProviderProperty
+                {
+                    PropertyName = property.PropertyName,
+                    Value = property.Value
+                });
+            return state with
+            {
+                Provider = provider
+            };
+        }
+
         #endregion
 
         #region IdProviderDefsState
@@ -92,17 +137,56 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 
         #endregion
 
-        #region AddIdProviderState
+        #region UpdateIdProviderState
 
         [ReducerMethod]
-        public static AddIdProviderState ReduceAddIdProviderAction(AddIdProviderState state, AddIdProviderAction act) => new AddIdProviderState(true, null);
+        public static UpdateIdProviderState ReduceAddIdProviderAction(UpdateIdProviderState state, AddIdProviderAction act) => new UpdateIdProviderState(true, null);
 
         [ReducerMethod]
-        public static AddIdProviderState ReduceAddIdProviderFailureAction(AddIdProviderState state, AddIdProviderFailureAction act) => new AddIdProviderState(false, act.ErrorMessage);
+        public static UpdateIdProviderState ReduceAddIdProviderFailureAction(UpdateIdProviderState state, AddIdProviderFailureAction act) => new UpdateIdProviderState(false, act.ErrorMessage);
 
         [ReducerMethod]
-        public static AddIdProviderState ReduceAddIdProviderSuccessAction(AddIdProviderState state, AddIdProviderSuccessAction act) => new AddIdProviderState(false, null);
+        public static UpdateIdProviderState ReduceAddIdProviderSuccessAction(UpdateIdProviderState state, AddIdProviderSuccessAction act) => new UpdateIdProviderState(false, null);
 
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceUpdateIdProviderDetailsAction(UpdateIdProviderState state, UpdateIdProviderDetailsAction act)
+        {
+            return state with
+            {
+                IsUpdating = true,
+                ErrorMessage = null
+            };
+        }
+
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceUpdateIdProviderDetailsSuccessAction(UpdateIdProviderState state, UpdateIdProviderDetailsSuccessAction act)
+        {
+            return state with
+            {
+                IsUpdating = false,
+                ErrorMessage = null
+            };
+        }
+
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceUpdateAuthenticationSchemeProviderPropertiesAction(UpdateIdProviderState state, UpdateAuthenticationSchemeProviderPropertiesAction act)
+        {
+            return state with
+            {
+                IsUpdating = true,
+                ErrorMessage = null
+            };
+        }
+
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceUpdateAuthenticationSchemeProviderPropertiesSuccessAction(UpdateIdProviderState state, UpdateAuthenticationSchemeProviderPropertiesSuccessAction act)
+        {
+            return state with
+            {
+                IsUpdating = false,
+                ErrorMessage = null
+            };
+        }
 
         #endregion
     }

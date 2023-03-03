@@ -142,11 +142,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider details have been updated.
+        /// </summary>
+        public static string IdProviderDetailsUpdated {
+            get {
+                return ResourceManager.GetString("IdProviderDetailsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à An Identity Provider named &apos;{0}&apos; already exists.
         /// </summary>
         public static string IdProviderExists {
             get {
                 return ResourceManager.GetString("IdProviderExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider Properties have been updated.
+        /// </summary>
+        public static string IdProviderPropertiesUpdated {
+            get {
+                return ResourceManager.GetString("IdProviderPropertiesUpdated", resourceCulture);
             }
         }
         

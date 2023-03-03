@@ -24,6 +24,12 @@ else
             <RadzenTabsItem Text="Details">
                 <IdProviderDetails IdProvider="@idProviderState.Value.Provider"></IdProviderDetails>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Properties">
+                <IdProviderProperties IdProvider="@idProviderState.Value.Provider"></IdProviderProperties>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Mappers">
+                <IdProviderMappers IdProvider="@idProviderState.Value.Provider"></IdProviderMappers>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 }
@@ -31,7 +37,9 @@ else
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
-        { "details", 0 }
+        { "details", 0 },
+        { "properties", 1 },
+        { "mappers", 2 }
     };
 
     [Parameter]

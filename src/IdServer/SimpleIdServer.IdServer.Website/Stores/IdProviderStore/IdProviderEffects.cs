@@ -48,7 +48,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().Include(i => i.Properties).AsNoTracking().SingleOrDefaultAsync(p => p.Name == action.Id);
+            var idProvider = await _repository.Query().Include(i => i.Properties)
+                .Include(i => i.AuthSchemeProviderDefinition).ThenInclude(d => d.Properties)
+                .Include(i => i.AuthSchemeProviderDefinition).ThenInclude(d => d.AuthSchemeProviders)
+                .SingleOrDefaultAsync(p => p.Name == action.Id);
             if (idProvider == null)
             {
                 dispatcher.Dispatch(new GetIdProviderFailureAction { ErrorMessage = string.Format(Global.UnknownIdProvider, action.Id) });
@@ -68,9 +71,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(AddIdProviderAction action, IDispatcher dispatcher)
         {
-            if(await _repository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
+            if (await _repository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
             {
-                dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = string.Format(Global.IdProviderExists, action.Name ) });
+                dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = string.Format(Global.IdProviderExists, action.Name) });
                 return;
             }
 
@@ -89,6 +92,33 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             _repository.Add(idProvider);
             await _repository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, Properties = action.Properties, DisplayName = action.DisplayName });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateIdProviderDetailsAction action, IDispatcher dispatcher)
+        {
+            var idProvider = await _repository.Query().SingleAsync(a => a.Name == action.Name);
+            idProvider.Description = action.Description;
+            idProvider.DisplayName = action.DisplayName;
+            idProvider.UpdateDateTime = DateTime.UtcNow;
+            await _repository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateIdProviderDetailsSuccessAction { Description = action.Description, DisplayName = action.DisplayName, Name = action.Name });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UpdateAuthenticationSchemeProviderPropertiesAction action, IDispatcher dispatcher)
+        {
+            var idProvider = await _repository.Query().Include(p => p.Properties).SingleAsync(a => a.Name == action.Name);
+            idProvider.Properties.Clear();
+            foreach (var property in action.Properties)
+                idProvider.Properties.Add(new AuthenticationSchemeProviderProperty
+                {
+                    PropertyName = property.PropertyName,
+                    Value = property.Value
+                });
+            idProvider.UpdateDateTime = DateTime.UtcNow;
+            await _repository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderPropertiesSuccessAction { Name = action.Name, Properties = action.Properties });
         }
     }
 
@@ -172,5 +202,31 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public string DisplayName { get; set; } = null!;
         public string? Description { get; set; } = null;
         public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; }
+    }
+
+    public class UpdateIdProviderDetailsAction
+    {
+        public string Name { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string Description { get; set; }
+    }
+
+    public class UpdateIdProviderDetailsSuccessAction
+    {
+        public string Name { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string Description { get; set; }
+    }
+
+    public class UpdateAuthenticationSchemeProviderPropertiesAction
+    {
+        public string Name { get; set; } = null!;
+        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderProperty>();
+    }
+
+    public class UpdateAuthenticationSchemeProviderPropertiesSuccessAction
+    {
+        public string Name { get; set; } = null!;
+        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderProperty>();
     }
 }
