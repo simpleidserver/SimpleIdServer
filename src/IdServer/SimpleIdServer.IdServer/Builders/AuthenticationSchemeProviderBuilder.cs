@@ -27,6 +27,7 @@ namespace SimpleIdServer.IdServer.Builders
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
                 Properties = properties.ToList(),
+                Mappers = Constants.GetDefaultIdProviderMappers(),
                 AuthSchemeProviderDefinition = definition
             });
         }

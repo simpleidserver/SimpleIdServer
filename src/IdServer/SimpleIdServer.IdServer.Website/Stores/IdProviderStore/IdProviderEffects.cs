@@ -48,8 +48,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().Include(i=> i.Properties).AsNoTracking().SingleOrDefaultAsync(p => p.Name == action.Id);
-            if(idProvider == null)
+            var idProvider = await _repository.Query().Include(i => i.Properties).AsNoTracking().SingleOrDefaultAsync(p => p.Name == action.Id);
+            if (idProvider == null)
             {
                 dispatcher.Dispatch(new GetIdProviderFailureAction { ErrorMessage = string.Format(Global.UnknownIdProvider, action.Id) });
                 return;
@@ -63,6 +63,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         {
             var idProviderDefs = await _repositoryDef.Query().Include(d => d.Properties).AsNoTracking().ToListAsync();
             dispatcher.Dispatch(new GetIdProviderDefsSuccessAction { AuthProviderDefinitions = idProviderDefs });
+        }
+
+        [EffectMethod]
+        public async Task Handle(AddIdProviderAction action, IDispatcher dispatcher)
+        {
+            if(await _repository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
+            {
+                dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = string.Format(Global.IdProviderExists, action.Name ) });
+                return;
+            }
+
+            var idProviderDef = await _repositoryDef.Query().SingleAsync(d => d.Name == action.IdProviderTypeName);
+            var idProvider = new AuthenticationSchemeProvider
+            {
+                Name = action.Name,
+                Description = action.Description,
+                DisplayName = action.DisplayName,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                Properties = action.Properties.ToList(),
+                AuthSchemeProviderDefinition = idProviderDef,
+                Mappers = Constants.GetDefaultIdProviderMappers()
+            };
+            _repository.Add(idProvider);
+            await _repository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, Properties = action.Properties, DisplayName = action.DisplayName });
         }
     }
 
@@ -124,5 +150,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     public class GetIdProviderDefsSuccessAction
     {
         public IEnumerable<AuthenticationSchemeProviderDefinition> AuthProviderDefinitions { get; set; }
+    }
+
+    public class AddIdProviderAction
+    {
+        public string Name { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string IdProviderTypeName { get; set; } = null!;
+        public string? Description { get; set; } = null;
+        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; }
+    }
+
+    public class AddIdProviderFailureAction
+    {
+        public string ErrorMessage { get; set; } = null!;
+    }
+
+    public class AddIdProviderSuccessAction
+    {
+        public string Name { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string? Description { get; set; } = null;
+        public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; }
     }
 }

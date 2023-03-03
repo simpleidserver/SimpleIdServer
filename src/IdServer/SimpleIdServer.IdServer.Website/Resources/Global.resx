@@ -141,6 +141,12 @@
   <data name="ExternalAuthProviderUnlinked" xml:space="preserve">
     <value>External authentication provider has been unlinked</value>
   </data>
+  <data name="IdProviderAdded" xml:space="preserve">
+    <value>Identity Provider has been added</value>
+  </data>
+  <data name="IdProviderExists" xml:space="preserve">
+    <value>An Identity Provider named '{0}' already exists</value>
+  </data>
   <data name="InvalidRedirectUrl" xml:space="preserve">
     <value>Redirection url '{0}' is not valid</value>
   </data>
@@ -188,6 +194,9 @@
   </data>
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
+  </data>
+  <data name="SelectedIdProvidersRemoved" xml:space="preserve">
+    <value>Selected Identity Providers have been removed</value>
   </data>
   <data name="SelectedScopesMappersRemoved" xml:space="preserve">
     <value>Scope mappers have been removed</value>

@@ -31,7 +31,10 @@ app.Run();
 void RunSqlServerIdServer(IServiceCollection services)
 {
     var name = Assembly.GetExecutingAssembly().GetName().Name;
-    services.AddSIDIdentityServer()
+    services.AddSIDIdentityServer(o =>
+    {
+        o.CacheExternalAuthProvidersInSeconds = null;
+    })
         .UseEFStore(o =>
         {
             o.UseSqlServer(builder.Configuration.GetConnectionString("IdServer"), o =>
@@ -45,6 +48,7 @@ void RunSqlServerIdServer(IServiceCollection services)
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
         .AddSmsAuthentication()
+        .EnableConfigurableAuthentication()
         .AddAuthentication(callback: (a) =>
         {
             a.AddOIDCAuthentication(opts =>

@@ -63,7 +63,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 visibleProperty.SetValue(result, propValue.ConvertFromInvariantString(prop.Value));
             }
 
-            return null;
+            return result;
         }
     }
 }

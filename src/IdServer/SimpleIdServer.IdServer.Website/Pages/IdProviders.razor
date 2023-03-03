@@ -1,8 +1,10 @@
 ﻿@page "/idproviders"
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject NotificationService notificationService
 @inject IState<SearchIdProvidersState> searchIdProvidersState
 @inject IDispatcher dispatcher
 
@@ -47,6 +49,17 @@
 </RadzenDataGrid>
 
 @code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+            SubscribeToAction<RemoveSelectedIdProvidersSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProvidersRemoved });
+                StateHasChanged();
+            });
+    }
+
     void LoadData(LoadDataArgs args)
     {
         var act = new SearchIdProvidersAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };

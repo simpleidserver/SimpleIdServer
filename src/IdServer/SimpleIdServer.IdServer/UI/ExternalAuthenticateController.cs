@@ -31,6 +31,8 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IServiceProvider _serviceProvider;
         private readonly IUserTransformer _userTransformer;
+        private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
+        private readonly IAuthenticationHelper _authenticationHelper;
 
         public ExternalAuthenticateController(
             IOptions<IdServerHostOptions> options,
@@ -41,12 +43,16 @@ namespace SimpleIdServer.IdServer.UI
             ILogger<ExternalAuthenticateController> logger,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IServiceProvider serviceProvider,
-            IUserTransformer userTransformer) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
+            IUserTransformer userTransformer,
+            IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
+            IAuthenticationHelper authenticationHelper) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _serviceProvider = serviceProvider;
             _userTransformer = userTransformer;
+            _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
+            _authenticationHelper = authenticationHelper;
         }
 
         [HttpGet]
@@ -115,10 +121,25 @@ namespace SimpleIdServer.IdServer.UI
             if (user == null)
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");
-                user = _userTransformer.Transform(principal);
-                user.AddExternalAuthProvider(scheme, sub);
-                UserRepository.Add(user);
-                await UserRepository.SaveChanges(cancellationToken);
+                var existingUser = await _authenticationHelper.GetUserByLogin(UserRepository.Query()
+                    .Include(u => u.ExternalAuthProviders)
+                    .Include(u => u.Sessions)
+                    .Include(u => u.OAuthUserClaims), sub, cancellationToken);
+                if(existingUser != null)
+                {
+                    user = existingUser;
+                    user.AddExternalAuthProvider(scheme, sub);
+                    await UserRepository.SaveChanges(cancellationToken);
+                }
+                else
+                {
+                    var idProvider = await _authenticationSchemeProviderRepository.Query().AsNoTracking().Include(p => p.Mappers).SingleAsync(p => p.Name == scheme, cancellationToken);
+                    user = _userTransformer.Transform(principal, idProvider);
+                    user.AddExternalAuthProvider(scheme, sub);
+                    UserRepository.Add(user);
+                    await UserRepository.SaveChanges(cancellationToken);
+                }
+
                 _logger.LogInformation($"Finish to provision the user '{sub}'");
             }
 

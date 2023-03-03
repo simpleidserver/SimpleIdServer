@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Store;
 namespace SimpleIdServer.IdServer.Startup.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20230302203310_Init")]
+    [Migration("20230303135836_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -170,6 +170,38 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.HasIndex("SchemeProviderDefName");
 
                     b.ToTable("AuthenticationSchemeProviderDefinitionProperty");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("IdProviderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("MapperType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceClaimName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetUserAttribute")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TargetUserProperty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdProviderName");
+
+                    b.ToTable("AuthenticationSchemeProviderMapper");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
@@ -1243,6 +1275,17 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     b.Navigation("SchemeProviderDef");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "IdProvider")
+                        .WithMany("Mappers")
+                        .HasForeignKey("IdProviderName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IdProvider");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderProperty", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", "SchemeProvider")
@@ -1419,6 +1462,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
+                    b.Navigation("Mappers");
+
                     b.Navigation("Properties");
                 });
 

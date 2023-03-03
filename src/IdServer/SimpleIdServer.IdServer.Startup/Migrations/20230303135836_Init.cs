@@ -677,6 +677,29 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuthenticationSchemeProviderMapper",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MapperType = table.Column<int>(type: "int", nullable: false),
+                    SourceClaimName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetUserAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TargetUserProperty = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdProviderName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationSchemeProviderMapper", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AuthenticationSchemeProviderMapper_AuthenticationSchemeProviders_IdProviderName",
+                        column: x => x.IdProviderName,
+                        principalTable: "AuthenticationSchemeProviders",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AuthenticationSchemeProviderProperty",
                 columns: table => new
                 {
@@ -753,6 +776,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "IX_AuthenticationSchemeProviderDefinitionProperty_SchemeProviderDefName",
                 table: "AuthenticationSchemeProviderDefinitionProperty",
                 column: "SchemeProviderDefName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthenticationSchemeProviderMapper_IdProviderName",
+                table: "AuthenticationSchemeProviderMapper",
+                column: "IdProviderName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuthenticationSchemeProviderProperty_SchemeProviderName",
@@ -872,6 +900,9 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
 
             migrationBuilder.DropTable(
                 name: "AuthenticationSchemeProviderDefinitionProperty");
+
+            migrationBuilder.DropTable(
+                name: "AuthenticationSchemeProviderMapper");
 
             migrationBuilder.DropTable(
                 name: "AuthenticationSchemeProviderProperty");

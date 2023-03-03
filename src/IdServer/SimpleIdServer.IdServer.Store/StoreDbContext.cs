@@ -42,6 +42,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new TokenConfiguration());
             builder.ApplyConfiguration(new AuthenticationContextClassReferenceConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
+            builder.ApplyConfiguration(new AuthenticationSchemeProviderMapperConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderPropertyConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderDefinitionConfiguration());
             builder.ApplyConfiguration(new AuthenticationSchemeProviderDefinitionPropertyConfiguration());

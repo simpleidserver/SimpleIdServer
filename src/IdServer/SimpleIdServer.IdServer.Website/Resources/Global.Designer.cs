@@ -133,6 +133,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider has been added.
+        /// </summary>
+        public static string IdProviderAdded {
+            get {
+                return ResourceManager.GetString("IdProviderAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à An Identity Provider named &apos;{0}&apos; already exists.
+        /// </summary>
+        public static string IdProviderExists {
+            get {
+                return ResourceManager.GetString("IdProviderExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Redirection url &apos;{0}&apos; is not valid.
         /// </summary>
         public static string InvalidRedirectUrl {
@@ -273,6 +291,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedClientsRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected Identity Providers have been removed.
+        /// </summary>
+        public static string SelectedIdProvidersRemoved {
+            get {
+                return ResourceManager.GetString("SelectedIdProvidersRemoved", resourceCulture);
             }
         }
         

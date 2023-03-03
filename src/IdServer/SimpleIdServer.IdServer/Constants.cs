@@ -179,6 +179,57 @@ namespace SimpleIdServer.IdServer
             public static ScopeClaimMapper SAMLName = ScopeClaimMapper.CreateSAMLPropertyClaim("name", ClaimTypes.Name, nameof(User.Firstname));
         }
 
+        public static ICollection<AuthenticationSchemeProviderMapper> GetDefaultIdProviderMappers() =>new List<AuthenticationSchemeProviderMapper>
+        {
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = AuthenticationSchemeProviderMapperTypes.SUBJECT,
+                Name = "Subject",
+                SourceClaimName = ClaimTypes.NameIdentifier
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY,
+                Name = "Firstname",
+                SourceClaimName = ClaimTypes.Name,
+                TargetUserProperty = nameof(User.Firstname)
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY,
+                Name = "Lastname",
+                SourceClaimName = ClaimTypes.GivenName,
+                TargetUserProperty = nameof(User.Lastname)
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY,
+                Name = "Email",
+                SourceClaimName = ClaimTypes.Email,
+                TargetUserProperty = nameof(User.Email)
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE,
+                Name = "Gender",
+                SourceClaimName = ClaimTypes.Gender,
+                TargetUserAttribute = JwtRegisteredClaimNames.Gender
+            },
+            new AuthenticationSchemeProviderMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                MapperType = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE,
+                Name = "DateOfBirth",
+                SourceClaimName = ClaimTypes.DateOfBirth,
+                TargetUserAttribute = JwtRegisteredClaimNames.Birthdate
+            }
+        };
+
         public static class StandardScopes
         {
             public static Scope Profile = new Scope

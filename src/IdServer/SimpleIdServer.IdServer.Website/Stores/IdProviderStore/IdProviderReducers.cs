@@ -53,6 +53,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchIdProvidersState ReduceAddIdProviderSuccessAction(SearchIdProvidersState state, AddIdProviderSuccessAction act)
+        {
+            var idProviders = state.IdProviders.ToList();
+            idProviders.Add(new SelectableIdProvider(new AuthenticationSchemeProvider { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, Description = act.Description, DisplayName = act.DisplayName, Name = act.Name })
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                IdProviders = idProviders
+            };
+        }
+
         #endregion
 
         #region IdProviderState
@@ -75,6 +89,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
 
         [ReducerMethod]
         public static IdProviderDefsState ReduceGetIdProviderDefsSuccessAction(IdProviderDefsState state, GetIdProviderDefsSuccessAction act) => new IdProviderDefsState(act.AuthProviderDefinitions.ToList(), false);
+
+        #endregion
+
+        #region AddIdProviderState
+
+        [ReducerMethod]
+        public static AddIdProviderState ReduceAddIdProviderAction(AddIdProviderState state, AddIdProviderAction act) => new AddIdProviderState(true, null);
+
+        [ReducerMethod]
+        public static AddIdProviderState ReduceAddIdProviderFailureAction(AddIdProviderState state, AddIdProviderFailureAction act) => new AddIdProviderState(false, act.ErrorMessage);
+
+        [ReducerMethod]
+        public static AddIdProviderState ReduceAddIdProviderSuccessAction(AddIdProviderState state, AddIdProviderSuccessAction act) => new AddIdProviderState(false, null);
+
 
         #endregion
     }

@@ -1,4 +1,14 @@
-﻿@foreach (var property in AuthSchemeProviderProperties)
+﻿@inherits FluxorComponent
+@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inject IState<AddIdProviderState> addIdProviderState
+
+@if(!addIdProviderState.Value.IsAdding && !string.IsNullOrWhiteSpace(addIdProviderState.Value.ErrorMessage))
+{
+    <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addIdProviderState.Value.ErrorMessage</RadzenAlert>
+}
+
+@foreach (var property in AuthSchemeProviderProperties)
 {
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@property.DisplayName</RadzenText>
@@ -6,7 +16,7 @@
         <p class="text-muted">@property.Description</p>
     </div>
 }
-<RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Add" Click="@(args => AddIdProvider())" />
+<RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addIdProviderState.Value.IsAdding ? "Adding..." : "Add")" Disabled=@addIdProviderState.Value.IsAdding Click="@(args => AddIdProvider())" />
 
 @code {
     [Parameter]

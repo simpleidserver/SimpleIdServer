@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         {
             builder.HasKey(a => a.Name);
             builder.HasMany(a => a.Properties).WithOne(p => p.SchemeProvider).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(a => a.Mappers).WithOne(p => p.IdProvider).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

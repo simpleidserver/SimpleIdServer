@@ -41,13 +41,42 @@
                 }
             </div>
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Create" Disabled="@(SelectedIdProvider == null)">
+        <RadzenStepsItem Text="Details" Disabled="@(SelectedIdProvider == null)">
+            <!-- Name -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                <RadzenTextBox Name="Name" @bind-Value="@info.Name" Class="w-100"></RadzenTextBox>
+                <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+            </div>
+            <!-- Display name -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Display name</RadzenText>
+                <RadzenTextBox Name="DisplayName" @bind-Value="@info.DisplayName" Class="w-100"></RadzenTextBox>
+                <RadzenRequiredValidator Component="DisplayName" Text="Display name is required"></RadzenRequiredValidator>
+            </div>
+            <!-- Description -->
+            <div>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                <RadzenTextArea @bind-Value="@info.Description" Class="w-100"></RadzenTextArea>
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Properties" Disabled="@(SelectedIdProvider == null)">
             <EditIdProvider IdProviderSaved=@SaveIdProvider IdProviderDef=@SelectedIdProvider></EditIdProvider>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
 
 @code {
+    record IdProviderInfo
+    {
+        public string Name { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public string? Description { get; set; } = null;
+    }
+
+    IdProviderInfo info = new IdProviderInfo();
+    AuthenticationSchemeProviderDefinition? SelectedIdProvider { get; set; } = null;
+
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
@@ -55,10 +84,13 @@
         {
             var act = new GetIdProviderDefsAction();
             dispatcher.Dispatch(act);
+            SubscribeToAction<AddIdProviderSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderAdded });
+                dialogService.Close();
+            });
         }
     }
-
-    AuthenticationSchemeProviderDefinition? SelectedIdProvider { get; set; } = null;
 
     void SelectIdProvider(AuthenticationSchemeProviderDefinition idProvider)
     {
@@ -67,6 +99,14 @@
 
     void SaveIdProvider(IEnumerable<AuthenticationSchemeProviderProperty> properties)
     {
-        
+        var act = new AddIdProviderAction
+        {
+            Name = info.Name,
+            IdProviderTypeName = SelectedIdProvider.Name,
+            DisplayName = info.DisplayName,
+            Description = info.Description,
+            Properties = properties 
+        };
+        dispatcher.Dispatch(act);
     }
 }

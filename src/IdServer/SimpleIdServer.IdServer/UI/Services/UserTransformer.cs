@@ -1,19 +1,18 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.UI.Services
 {
     public interface IUserTransformer
     {
-        IEnumerable<Claim> ConvertToIdentityClaims(Dictionary<string, object> claims);
-        User Transform(ClaimsPrincipal principal);
+        User Transform(ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
         ICollection<Claim> Transform(User user);
     }
 
@@ -21,55 +20,78 @@ namespace SimpleIdServer.IdServer.UI.Services
     {
         private static Dictionary<string, string> CLAIM_MAPPINGS = new Dictionary<string, string>
         {
-            { ClaimTypes.NameIdentifier, JwtRegisteredClaimNames.Sub },
-            { ClaimTypes.Name, JwtRegisteredClaimNames.Name },
             { ClaimTypes.Email, JwtRegisteredClaimNames.Email },
             { ClaimTypes.DateOfBirth, JwtRegisteredClaimNames.Birthdate },
-            { ClaimTypes.Gender, JwtRegisteredClaimNames.Gender },
-            { ClaimTypes.GivenName, JwtRegisteredClaimNames.GivenName }
+            { ClaimTypes.Gender, JwtRegisteredClaimNames.Gender }
         };
 
-        public IEnumerable<Claim> ConvertToIdentityClaims(Dictionary<string, object> claims)
+        public User Transform(ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
         {
-            var result = new List<Claim>();
-            var values = CLAIM_MAPPINGS.Values;
-            foreach(var cl in claims)
-            {
-                if (!values.Contains(cl.Key))
-                    continue;
-
-                var rec = CLAIM_MAPPINGS.First(kvp => kvp.Value == cl.Key);
-                result.Add(new Claim(rec.Key, cl.Value.ToString()));
-            }
-
-            return result;
-        }
-
-        public User Transform(ClaimsPrincipal principal)
-        {
-            var claims = principal.Claims.Select(u => new UserClaim
+            var user = new User
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = u.Type,
-                Value = u.Value
-            }).ToList();
-            var sub = claims.Single(c => c.Name == ClaimTypes.NameIdentifier);
-            var user = User.Create(sub.Value);
-            foreach(var claim in claims)
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow
+            };
+            foreach(var mapper in idProvider.Mappers)
             {
-                if (CLAIM_MAPPINGS.ContainsKey(claim.Name))
+                switch(mapper.MapperType)
                 {
-                    user.UpdateClaim(CLAIM_MAPPINGS[claim.Name], claim.Value);
+                    case AuthenticationSchemeProviderMapperTypes.SUBJECT:
+                        ExractSubject();
+                        break;
+                    case AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE:
+                        ExtractAttribute(mapper);
+                        break;
+                    case AuthenticationSchemeProviderMapperTypes.USERPROPERTY:
+                        ExtractProperty(mapper);
+                        break;
                 }
             }
 
             return user;
+
+            void ExractSubject()
+            {
+                var sub = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                if (sub == null) return;
+                user.Name = sub.Value;
+            }
+
+            void ExtractProperty(AuthenticationSchemeProviderMapper mapper)
+            {
+                var claim = principal.Claims.SingleOrDefault(c => c.Type == mapper.SourceClaimName);
+                if (claim == null) return;
+                var visibleAttributes = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(p =>
+                    {
+                        var attr = p.GetCustomAttribute<UserPropertyAttribute>();
+                        return attr == null ? false : attr.IsVisible;
+                    });
+                var visibleAttribute = visibleAttributes.SingleOrDefault(a => a.Name == mapper.TargetUserProperty);
+                if (visibleAttribute == null) return;
+                visibleAttribute.SetValue(user, claim.Value);
+            }
+
+            void ExtractAttribute(AuthenticationSchemeProviderMapper mapper)
+            {
+                var claims = principal.Claims.Where(c => c.Type == mapper.SourceClaimName);
+                foreach(var claim in claims)
+                    user.AddClaim(mapper.TargetUserAttribute, claim.Value);
+            }
         }
 
         public ICollection<Claim> Transform(User user)
         {
-            var result = new List<Claim>();
-            foreach(var cl in user.Claims)
+            var result = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Name)
+            };
+            if (!string.IsNullOrWhiteSpace(user.Firstname))
+                result.Add(new Claim(ClaimTypes.Name, user.Firstname));
+            if (!string.IsNullOrWhiteSpace(user.Lastname))
+                result.Add(new Claim(ClaimTypes.GivenName, user.Lastname));
+            foreach (var cl in user.Claims)
             {
                 var cm = CLAIM_MAPPINGS.FirstOrDefault(c => c.Value == cl.Type);
                 if (!cm.Equals(default(KeyValuePair<string, string>)) && cm.Value != null)

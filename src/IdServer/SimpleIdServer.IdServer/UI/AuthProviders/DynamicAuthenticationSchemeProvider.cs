@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -9,6 +11,7 @@ using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,13 +43,16 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IdServerHostOptions _options;
+        private readonly IDataProtectionProvider _dataProtection;
+        private readonly Dictionary<string, IDataProtector> _protections = new Dictionary<string, IDataProtector>();
         private IEnumerable<Domains.AuthenticationSchemeProvider> _cachedAuthenticationProviders;
         private DateTime? _nextExpirationTime;
 
-        public DynamicAuthenticationSchemeProvider(IServiceProvider serviceProvider, IOptions<IdServerHostOptions> opts, IOptions<AuthenticationOptions> options) : base(options)
+        public DynamicAuthenticationSchemeProvider(IServiceProvider serviceProvider, IOptions<IdServerHostOptions> opts, IDataProtectionProvider dataProtection, IOptions<AuthenticationOptions> options) : base(options)
         {
             _serviceProvider = serviceProvider;
             _options = opts.Value;
+            _dataProtection = dataProtection;
         }
 
         public async override Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
@@ -124,15 +130,23 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
             void PostConfigureOptions(Type optionType, Type handlerType, object options)
             {
-                var postConfigureOptionsType = typeof(OAuthPostConfigureOptions<,>).MakeGenericType(optionType, handlerType);
-                var constructor = postConfigureOptionsType.GetConstructors().First();
-                var args = new List<object>();
-                foreach (var parameter in constructor.GetParameters())
-                    args.Add(_serviceProvider.GetRequiredService(parameter.ParameterType));
-
-                var postConfigure = postConfigureOptionsType.GetMethod("PostConfigure", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                var instance = Activator.CreateInstance(postConfigureOptionsType, args.ToArray());
-                postConfigure.Invoke(instance, new object[] { provider.Name, options });
+                var signingSchemeProp = options.GetType().GetProperty("SignInScheme", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if(signingSchemeProp != null)
+                    signingSchemeProp.SetValue(options, Constants.DefaultExternalCookieAuthenticationScheme);
+                var oauthOptions = options as OAuthOptions;
+                if(oauthOptions != null)
+                {
+                    if (!_protections.ContainsKey(handlerType.FullName))
+                        _protections.Add(handlerType.FullName, _dataProtection.CreateProtector(handlerType.FullName));
+                    oauthOptions.DataProtectionProvider = _dataProtection;
+                    oauthOptions.StateDataFormat = new PropertiesDataFormat(_protections[handlerType.FullName]);
+                    if(oauthOptions.Backchannel == null)
+                    {
+                        oauthOptions.Backchannel = new HttpClient(new HttpClientHandler());
+                        oauthOptions.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("Microsoft ASP.NET Core OAuth handler");
+                        oauthOptions.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
+                    }
+                }
             }
         }
 
