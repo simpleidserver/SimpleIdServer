@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.UI
             _extractRequestHelper = extractRequestHelper;
         }
 
-        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index(string returnUrl, bool isProtected = true, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}" });

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -63,6 +64,19 @@ namespace SimpleIdServer.IdServer.UI
             return unprotectedUrl;
         }
 
+        protected bool IsProtected(string returnUrl)
+        {
+            try
+            {
+                WebEncoders.Base64UrlDecode(returnUrl);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         protected void SetSuccessMessage(string msg)
         {
             ViewBag.SuccessMessage = msg;
@@ -70,6 +84,11 @@ namespace SimpleIdServer.IdServer.UI
 
         protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
+            if (!IsProtected(returnUrl))
+            {
+                return await Sign(returnUrl, currentAmr, user, token, rememberLogin);
+            }
+
             var unprotectedUrl = Unprotect(returnUrl);
             var query = ExtractQuery(returnUrl);
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();

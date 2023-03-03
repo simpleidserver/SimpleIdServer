@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -12,6 +13,7 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
@@ -42,18 +44,29 @@ namespace SimpleIdServer.IdServer.UI
             try
             {
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
-                var query = ExtractQuery(returnUrl);
-                var clientId = query.GetClientIdFromAuthorizationRequest();
-                var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
-                var loginHint = query.GetLoginHintFromAuthorizationRequest();
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
+                if (IsProtected(returnUrl))
+                {
+                    var query = ExtractQuery(returnUrl);
+                    var clientId = query.GetClientIdFromAuthorizationRequest();
+                    var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                    var loginHint = query.GetLoginHintFromAuthorizationRequest();
+                    return View(new AuthenticatePasswordViewModel(
+                    loginHint,
+                        returnUrl,
+                        client.ClientName,
+                        client.LogoUri,
+                        client.TosUri,
+                        client.PolicyUri,
+                        externalIdProviders.Select(e => new ExternalIdProvider
+                        {
+                            AuthenticationScheme = e.Name,
+                            DisplayName = e.DisplayName
+                        }).ToList()));
+                }
+
                 return View(new AuthenticatePasswordViewModel(
-                loginHint,
                     returnUrl,
-                    client.ClientName,
-                    client.LogoUri,
-                    client.TosUri,
-                    client.PolicyUri,
                     externalIdProviders.Select(e => new ExternalIdProvider
                     {
                         AuthenticationScheme = e.Name,

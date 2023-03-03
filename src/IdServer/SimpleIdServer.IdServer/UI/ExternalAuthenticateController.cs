@@ -96,7 +96,8 @@ namespace SimpleIdServer.IdServer.UI
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
             {
                 returnUrl = result.Properties.Items[RETURN_URL_NAME];
-                returnUrl = Unprotect(returnUrl);
+                if(IsProtected(returnUrl))
+                    returnUrl = Unprotect(returnUrl);
             }
 
             return await Sign(returnUrl, "externalAuth", user, cancellationToken, true);
