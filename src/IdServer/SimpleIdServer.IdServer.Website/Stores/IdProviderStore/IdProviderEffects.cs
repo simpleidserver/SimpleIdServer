@@ -49,8 +49,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
             var idProvider = await _repository.Query().Include(i => i.Properties)
+                .Include(i => i.Mappers)
                 .Include(i => i.AuthSchemeProviderDefinition).ThenInclude(d => d.Properties)
-                .Include(i => i.AuthSchemeProviderDefinition).ThenInclude(d => d.AuthSchemeProviders)
+                .AsNoTracking()
                 .SingleOrDefaultAsync(p => p.Name == action.Id);
             if (idProvider == null)
             {
@@ -228,5 +229,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     {
         public string Name { get; set; } = null!;
         public IEnumerable<AuthenticationSchemeProviderProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderProperty>();
+    }
+
+    public class RemoveSelectedAuthenticationSchemeProviderMappersAction
+    {
+        public string Name { get; set; } = null!;
+        public IEnumerable<string> MapperIds { get; set; } = new List<string>();
+    }
+
+    public class ToggleAuthenticationSchemeProviderMapperAction
+    {
+        public string MapperId { get; set; }
+        public bool IsSelected { get; set; }
+    }
+
+    public class ToggleAllAuthenticationSchemeProviderSelectionAction
+    {
+        public bool IsSelected { get; set; }
     }
 }

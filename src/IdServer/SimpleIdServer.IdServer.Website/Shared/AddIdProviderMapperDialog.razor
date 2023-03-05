@@ -1,0 +1,63 @@
+﻿<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Mapper Type">
+            <div class="row gy-4">
+                @foreach (var mapperType in MapperTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectMapper(mapperType)" class="@(SelectedMapperType != null && SelectedMapperType.Name == mapperType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@mapperType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@mapperType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(mapperType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Create" Disabled=@(SelectedMapperType == null)>
+            @switch(SelectedMapperType.Type)
+            {
+                case AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE:
+                    <UserAttributeIdProviderMapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
+                    break;
+                case AuthenticationSchemeProviderMapperTypes.USERPROPERTY:
+                    <UserPropertyIdProviderMapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
+                    break;
+            }
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    record MapperType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public AuthenticationSchemeProviderMapperTypes Type { get; set; }
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    ICollection<MapperType> MapperTypes { get; set; } = new List<MapperType>
+    {
+        new MapperType { Name = "Attribute", ShortDescription = "User attribute", Description = "Map one claim to a user attribute", Type = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserAttribute.png" },
+        new MapperType { Name = "Property", ShortDescription = "User property", Description = "Map one claim to a user property", Type = AuthenticationSchemeProviderMapperTypes.USERPROPERTY, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/UserProperty.png" }
+    };
+
+    MapperType? SelectedMapperType { get; set; } = null;
+
+    void SelectMapper(MapperType mapperType)
+    {
+        SelectedMapperType = mapperType;
+    }
+
+    void UpdateAuthProviderMapper(AuthenticationSchemeProviderMapper mapper)
+    {
+    }
+}

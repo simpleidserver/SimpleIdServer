@@ -1,0 +1,36 @@
+﻿@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using System.Reflection;
+@inject IState<UpdateIdProviderState> updateIdProviderState
+
+<RadzenTemplateForm Submit=@SubmitUpdateUserAttributeIdProvider TItem="UserAttributeIdProviderMapperForm" Data=@userAttributeIdProviderMapperForm>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public EventCallback<AuthenticationSchemeProviderMapper> AuthProviderMapperUpdated { get; set; }
+
+    record UserAttributeIdProviderMapperForm
+    {
+        public string Name { get; set; }
+        public string SourceClaimName { get; set; }
+        public string? TargetUserAttribute { get; set; } = null;
+    }
+
+    UserAttributeIdProviderMapperForm userAttributeIdProviderMapperForm = new UserAttributeIdProviderMapperForm();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    async void SubmitUpdateUserAttributeIdProvider(UserAttributeIdProviderMapperForm value)
+    {
+        await AuthProviderMapperUpdated.InvokeAsync(new AuthenticationSchemeProviderMapper
+        {
+            Name = value.Name,
+            SourceClaimName = value.SourceClaimName,
+            TargetUserAttribute = value.TargetUserAttribute,
+            MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY
+        });
+    }
+}

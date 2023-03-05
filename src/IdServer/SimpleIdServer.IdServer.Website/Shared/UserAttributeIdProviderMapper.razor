@@ -1,0 +1,49 @@
+﻿@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inject IState<UpdateIdProviderState> updateIdProviderState
+
+<RadzenTemplateForm Submit=@SubmitUpdateUserAttributeIdProvider TItem="UserAttributeIdProviderMapperForm" Data=@userAttributeIdProviderMapperForm>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@userAttributeIdProviderMapperForm.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Token Claim Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source Claim Name</RadzenText>
+        <RadzenTextBox Name="SourceClaimName" @bind-Value="@userAttributeIdProviderMapperForm.SourceClaimName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="SourceClaimName" Text="Source Claim name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- User attribute -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User Attribute</RadzenText>
+        <RadzenTextBox Name="TargetUserAttribute" @bind-Value="@userAttributeIdProviderMapperForm.TargetUserAttribute" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="TargetUserAttribute" Text="User attribute is required"></RadzenRequiredValidator>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public EventCallback<AuthenticationSchemeProviderMapper> AuthProviderMapperUpdated { get; set; }
+
+    record UserAttributeIdProviderMapperForm
+    {
+        public string Name { get; set; }
+        public string SourceClaimName { get; set; }
+        public string? TargetUserAttribute { get; set; } = null;
+    }
+
+    UserAttributeIdProviderMapperForm userAttributeIdProviderMapperForm = new UserAttributeIdProviderMapperForm();
+
+    async void SubmitUpdateUserAttributeIdProvider(UserAttributeIdProviderMapperForm value)
+    {
+        await AuthProviderMapperUpdated.InvokeAsync(new AuthenticationSchemeProviderMapper
+        {
+            Name = value.Name,
+            SourceClaimName = value.SourceClaimName,
+            TargetUserAttribute = value.TargetUserAttribute,
+            MapperType = AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE
+        });
+    }
+}
