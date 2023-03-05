@@ -248,8 +248,6 @@ namespace SimpleIdServer.Scim.Helpers
                 var removedIndirectChildrenIds = allRemoved.Where(r => !r.IsDirect).Select(r => r.Id);
 
                 IEnumerable<SCIMRepresentation> allParents = null;
-                var sw = new Stopwatch();
-                sw.Start();
                 // Update displayName.
                 if(updateAllReference)
                 {
@@ -265,9 +263,6 @@ namespace SimpleIdServer.Scim.Helpers
                     yield return result;
                 }
 
-                Console.WriteLine($"update display name {sw.ElapsedMilliseconds}");
-                sw.Restart();
-
                 // Add indirect reference to the parent.
                 if (addedDirectChildrenIds.Any())
                 {
@@ -281,10 +276,8 @@ namespace SimpleIdServer.Scim.Helpers
                     yield return result;
                 }
 
-                Console.WriteLine($"add indirect reference to the parent {sw.ElapsedMilliseconds}");
-                sw.Restart();
-
                 // If at least one parent has a reference to the child then add indirect reference to the child.
+                // Otherwise remove all the indirect references.
                 if (removedDirectChildrenIds.Any())
                 {
                     result = new RepresentationSyncResult();
@@ -295,13 +288,18 @@ namespace SimpleIdServer.Scim.Helpers
                     {
                         if(allParents.Any(p => p.FlatAttributes.Any(a => a.SchemaAttributeId == selfValueAttr.Id && a.ValueString == removedDirectChild)) || children.Any(p => p.FlatAttributes.Any(a => a.SchemaAttributeId == selfValueAttr.Id && a.ValueString == removedDirectChild)))
                             result.AddReferenceAttributes(BuildScimRepresentationAttribute(removedDirectChild, propagatedAttribute.TargetAttributeId, newSourceScimRepresentation, Mode.PROPAGATE_INHERITANCE, newSourceScimRepresentation.ResourceType, targetSchema, false));
+                        else
+                        {
+                            foreach(var parent in allParents)
+                            {
+                                foreach (var paginatedResult in _scimRepresentationCommandRepository.FindPaginatedGraphAttributes(new List<string> { removedDirectChild }, parent.Id, valueAttr.Id))
+                                    result.RemoveReferenceAttributes(paginatedResult);
+                            }
+                        }
                     }
 
                     yield return result;
                 }
-
-                Console.WriteLine($"removedDirectChildrenIds {sw.ElapsedMilliseconds}");
-                sw.Restart();
 
                 // Populate the children.
                 if (addedIndirectChildrenIds.Any() || removedIndirectChildrenIds.Any())
@@ -366,9 +364,6 @@ namespace SimpleIdServer.Scim.Helpers
 
                     yield return result;
                 }
-
-                Console.WriteLine($"addedIndirectChildrenIds {sw.ElapsedMilliseconds}");
-                sw.Restart();
             }
         }
 
