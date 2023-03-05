@@ -1,0 +1,44 @@
+{
+  "id": "urn:ietf:params:scim:schemas:extension:eid:2.0:User",
+  "name": "EidUser",
+  "description": "EID User",
+  "attributes": [
+    {
+      "name": "eidCertificate",
+      "type": "binary",
+      "multiValued": false,
+      "description": "Certificate of the EID card.",
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none"
+    },
+    {
+      "name": "validity",
+      "type": "decimal",
+      "multiValued": false,
+      "description": "Validity of the EID card in MS.",
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none"
+    },
+    {
+      "name": "birthDate",
+      "type": "datetime",
+      "multiValued": false,
+      "description": "Birthdate",
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none"
+    }
+  ],
+  "meta": {
+    "resourceType": "Schema",
+    "location": "/v2/Schemas/urn:ietf:params:scim:schemas:extension:eid:2.0:User"
+  }
+}

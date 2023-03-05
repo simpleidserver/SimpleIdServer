@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Persist
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServer.Startup", "src\Scim\SimpleIdServer.Scim.SqlServer.Startup\SimpleIdServer.Scim.SqlServer.Startup.csproj", "{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Postgre.Startup", "src\Scim\SimpleIdServer.Scim.Postgre.Startup\SimpleIdServer.Scim.Postgre.Startup.csproj", "{CD9B7A82-EBE7-48D1-AB24-195217BA4604}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD9B7A82-EBE7-48D1-AB24-195217BA4604}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +127,7 @@ Global
 		{58CB45EB-8FD5-422A-A2AF-7B1C1A60C429} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 		{B6B92BA0-2A6F-40DA-A01A-3FF9887D2A7E} = {E47E7F9F-C5CA-4459-AF46-F320F155B69E}
 		{C35CE988-5C38-4F4A-A0FF-E3213CEAC764} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
+		{CD9B7A82-EBE7-48D1-AB24-195217BA4604} = {011E8E6E-5B36-4E0C-A4AE-FF7B11579380}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

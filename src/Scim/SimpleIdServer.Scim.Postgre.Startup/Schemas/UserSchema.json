@@ -1,0 +1,784 @@
+{
+  "id": "urn:ietf:params:scim:schemas:core:2.0:User",
+  "name": "User",
+  "description": "User Schema",
+  "attributes": [
+    {
+      "name": "userName",
+      "type": "string",
+      "multiValued": false,
+      "required": true,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "server",
+      "description": "Unique identifier for the User, typically used by the user to directly authenticate to the service provider. Each User MUST include a non-empty userName value. This identifier MUST be unique across the service provider's entire set of Users."
+    },
+    {
+      "name": "name",
+      "type": "complex",
+      "multiValued": false,
+      "required": true,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "The components of the user's real name. Providers MAY return just the full name as a single string in the formatted sub-attribute, or they MAY return just the individual component attributes using the other sub-attributes, or they MAY return both.  If both variants are returned, they SHOULD be describing the same name, with the formatted name indicating how the component attributes should be combined.",
+      "subAttributes": [
+        {
+          "name": "formatted",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The full name, including all middle names, titles, and suffixes as appropriate, formatted for display (e.g., 'Ms. Barbara J Jensen, III')."
+        },
+        {
+          "name": "familyName",
+          "type": "string",
+          "multiValued": false,
+          "required": true,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The family name of the User, or last name in most Western languages (e.g., 'Jensen' given the full name 'Ms. Barbara J Jensen, III')."
+        },
+        {
+          "name": "givenName",
+          "type": "string",
+          "multiValued": false,
+          "required": true,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The given name of the User, or first name in most Western languages (e.g., 'Barbara' given the full name 'Ms. Barbara J Jensen, III')."
+        },
+        {
+          "name": "middleName",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The middle name(s) of the User (e.g., 'Jane' given the full name 'Ms. Barbara J Jensen, III')."
+        },
+        {
+          "name": "honorificPrefix",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The honorific prefix(es) of the User, or title in most Western languages (e.g., 'Ms.' given the full name 'Ms. Barbara J Jensen, III')."
+        },
+        {
+          "name": "honorificSuffix",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The honorific suffix(es) of the User, or suffix in most Western languages (e.g., 'III' given the full name 'Ms. Barbara J Jensen, III')."
+        }
+      ]
+    },
+    {
+      "name": "displayName",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "The name of the User, suitable for display to end-users.  The name SHOULD be the full name of the User being described, if known."
+    },
+    {
+      "name": "nickName",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "The casual way to address the user in real life, e.g., 'Bob' or 'Bobby' instead of 'Robert'.  This attribute SHOULD NOT be used to represent a User's username (e.g., 'bjensen' or 'mpepperidge')."
+    },
+    {
+      "name": "profileUrl",
+      "type": "reference",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "referenceTypes": [
+        "external"
+      ],
+      "description": "A fully qualified URL pointing to a page representing the User's online profile."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "The user's title, such as 'Vice President.'"
+    },
+    {
+      "name": "userType",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Used to identify the relationship between the organization and the user. Typical values used might be 'Contractor', 'Employee', 'Intern', 'Temp', 'External', and 'Unknown', but any value may be used."
+    },
+    {
+      "name": "preferredLanguage",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Indicates the User's preferred written or spoken language.  Generally used for selecting a localized user interface; e.g., 'en_US' specifies the language English and country US."
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Used to indicate the User's default location for purposes of localizing items such as currency, date time format, or numerical representations."
+    },
+    {
+      "name": "timezone",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "The User's time zone in the 'Olson' time zone database format, e.g., 'America/Los_Angeles'."
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "multiValued": false,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A Boolean value indicating the User's administrative status."
+    },
+    {
+      "name": "password",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "writeOnly",
+      "returned": "never",
+      "uniqueness": "none",
+      "description": "The User's cleartext password. This attribute is intended to be used as a means to specify an initial password when creating a new User or to reset an existing User's password."
+    },
+    {
+      "name": "emails",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Email addresses for the user. The value SHOULD be canonicalized by the service provider, e.g., 'bjensen@example.com' instead of 'bjensen@EXAMPLE.COM'.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "Email addresses for the user. The value SHOULD be canonicalized by the service provider, e.g., 'bjensen@example.com' instead of 'bjensen@EXAMPLE.COM'."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "work",
+            "home",
+            "other"
+          ],
+          "description": "A label indicating the attribute's function, e.g., 'work' or 'home'."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address.  The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    },
+    {
+      "name": "phoneNumbers",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Phone numbers for the User. The value SHOULD be canonicalized by the service provider according to the format specified in RFC 3966, e.g., 'tel:+1-201-555-0123'.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "Phone number of the User."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "work",
+            "home",
+            "mobile",
+            "fax",
+            "pager",
+            "other"
+          ],
+          "description": "A label indicating the attribute's function, e.g., 'work', 'home', 'mobile'."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address. The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    },
+    {
+      "name": "ims",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "Instant messaging addresses for the User.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "Instant messaging address for the User."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "aim",
+            "gtalk",
+            "icq",
+            "xmpp",
+            "msn",
+            "skype",
+            "qq",
+            "yahoo"
+          ],
+          "description": "A label indicating the attribute's function, e.g., 'aim', 'gtalk', 'xmpp'."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address. The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    },
+    {
+      "name": "photos",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "URLs of photos of the User.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "reference",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "referenceTypes": [
+            "external"
+          ],
+          "description": "URLs of a photo of the User."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "photo",
+            "thumbnail"
+          ],
+          "description": "A label indicating the attribute's function, i.e., 'photo' or 'thumbnail'."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address. The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    },
+    {
+      "name": "addresses",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A physical mailing address for this User.",
+      "subAttributes": [
+        {
+          "name": "formatted",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The full mailing address, formatted for display or use with a mailing label. This attribute MAY contain newlines."
+        },
+        {
+          "name": "streetAddress",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The full street address component, which may include house number, street name, P.O. box, and multi-line extended street address information. This attribute MAY contain newlines."
+        },
+        {
+          "name": "locality",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The city or locality component."
+        },
+        {
+          "name": "region",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The state or region component."
+        },
+        {
+          "name": "postalCode",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The zip code or postal code component."
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The country name component."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "work",
+            "home",
+            "other"
+          ],
+          "description": "A label indicating the attribute's function, e.g., 'work' or 'home'."
+        }
+      ]
+    },
+    {
+      "name": "groups",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readOnly",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A list of groups to which the user belongs, either through direct membership, through nested groups, or dynamically calculated.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readOnly",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The identifier of the User's group."
+        },
+        {
+          "name": "$ref",
+          "type": "reference",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readOnly",
+          "returned": "default",
+          "uniqueness": "none",
+          "referenceTypes": [
+            "Group"
+          ],
+          "description": "The URI of the corresponding 'Group' resource to which the user belongs."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readOnly",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "canonicalValues": [
+            "direct",
+            "indirect"
+          ],
+          "description": "A label indicating the attribute's function, e.g., 'direct' or 'indirect'."
+        }
+      ]
+    },
+    {
+      "name": "entitlements",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A list of entitlements for the User that represent a thing the User has.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The value of an entitlement."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A label indicating the attribute's function."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address. The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    },
+    {
+      "name": "roles",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A list of roles for the User that collectively represent who the User is, e.g., 'Student', 'Faculty'.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The value of a role."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A label indicating the attribute's function."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address. The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    },
+    {
+      "name": "x509Certificates",
+      "type": "complex",
+      "multiValued": true,
+      "required": false,
+      "mutability": "readWrite",
+      "returned": "default",
+      "uniqueness": "none",
+      "description": "A list of certificates issued to the User.",
+      "subAttributes": [
+        {
+          "name": "value",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "The value of an X.509 certificate."
+        },
+        {
+          "name": "display",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A human-readable name, primarily used for display purposes."
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "multiValued": false,
+          "required": false,
+          "caseExact": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A label indicating the attribute's function."
+        },
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address. The primary attribute value 'true' MUST appear no more than once."
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "resourceType": "Schema",
+    "location": "https://wdc.test.host/scim/v2/Schemas/urn:ietf:params:scim:schemas:core:2.0:User"
+  }
+}

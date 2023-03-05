@@ -136,7 +136,7 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.FromResult(true);
         }
 
-        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkInsertOrUpdateAsync(scimRepresentationAttributes.ToList());
+        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList());
 
         public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList());
 

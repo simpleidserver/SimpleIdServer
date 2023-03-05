@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
 {
+    /// <inheritdoc />
     public partial class Init : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -32,7 +34,8 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                     SourceResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SourceAttributeSelector = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TargetResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TargetAttributeId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    TargetAttributeId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Mode = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,7 +48,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResourceType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResourceType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Version = table.Column<int>(type: "int", nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -292,6 +295,7 @@ namespace SimpleIdServer.Scim.SqlServer.Startup.Migrations
                 column: "SCIMSchemaId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
