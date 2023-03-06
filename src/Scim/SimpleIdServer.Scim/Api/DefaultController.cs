@@ -15,5 +15,23 @@ namespace SimpleIdServer.Scim.Api
         {
             return this.BuildError(System.Net.HttpStatusCode.NotFound, Global.UnknownEndpoint);
         }
+
+        [HttpPut]
+        public IActionResult Put()
+        {
+            return this.BuildError(System.Net.HttpStatusCode.NotFound, Global.UnknownEndpoint);
+        }
+
+        [HttpPost]
+        public IActionResult Post()
+        {
+            return this.BuildError(System.Net.HttpStatusCode.NotFound, Global.UnknownEndpoint);
+        }
+
+        [HttpDelete]
+        public IActionResult Delete()
+        {
+            return this.BuildError(System.Net.HttpStatusCode.NotFound, Global.UnknownEndpoint);
+        }
     }
 }
