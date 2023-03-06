@@ -188,6 +188,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
         }
 
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceAddAuthenticationSchemeProviderMapperAction(UpdateIdProviderState state, AddAuthenticationSchemeProviderMapperAction act)
+        {
+            return state with
+            {
+                IsUpdating = true,
+                ErrorMessage = null
+            };
+        }
+
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceAddAuthenticationSchemeProviderMapperSuccessAction(UpdateIdProviderState state, AddAuthenticationSchemeProviderMapperSuccessAction act)
+        {
+            return state with
+            {
+                IsUpdating = false,
+                ErrorMessage = null
+            };
+        }
+
         #endregion
 
         #region IdProviderMappersState
@@ -201,6 +221,74 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             Count = act.IdProvider.Mappers.Count
         };
 
+        [ReducerMethod]
+        public static IdProviderMappersState ReduceAddAuthenticationSchemeProviderMapperSuccessAction(IdProviderMappersState state, AddAuthenticationSchemeProviderMapperSuccessAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            mappers.Add(new SelectableAuthenticationSchemeProviderMapper(new AuthenticationSchemeProviderMapper
+            {
+                Id = act.Id,
+                MapperType = act.MapperType,
+                Name = act.Name,
+                SourceClaimName = act.SourceClaimName,
+                TargetUserAttribute = act.TargetUserAttribute,
+                TargetUserProperty = act.TargetUserProperty
+            })
+            {
+                IsNew = true
+            });
+            return state with
+            {
+                Mappers = mappers,
+                Count = mappers.Count
+            };
+        }
+
+        [ReducerMethod]
+        public static IdProviderMappersState ReduceToggleAuthenticationSchemeProviderMapperAction(IdProviderMappersState state, ToggleAuthenticationSchemeProviderMapperAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            var mapper = mappers.First(m => m.Value.Id == act.MapperId);
+            mapper.IsSelected = act.IsSelected;
+            return state with
+            {
+                Mappers = mappers
+            };
+        }
+
+        [ReducerMethod]
+        public static IdProviderMappersState ReduceToggleAllAuthenticationSchemeProviderSelectionAction(IdProviderMappersState state, ToggleAllAuthenticationSchemeProviderSelectionAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            foreach (var mapper in mappers)
+                mapper.IsSelected = act.IsSelected;
+            return state with
+            {
+                Mappers = mappers
+            };
+        }
+
+        [ReducerMethod]
+        public static IdProviderMappersState ReduceReduceRemoveSelectedAuthenticationSchemeProviderMappersAction(IdProviderMappersState state, RemoveSelectedAuthenticationSchemeProviderMappersAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static IdProviderMappersState ReduceRemoveSelectedAuthenticationSchemeProviderMappersSuccessAction(IdProviderMappersState state, RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction act)
+        {
+            var mappers = state.Mappers.ToList();
+            mappers = mappers.Where(m => !act.MapperIds.Contains(m.Value.Id)).ToList();
+            return state with
+            {
+                Mappers = mappers,
+                Count = mappers.Count,
+                IsLoading = false
+            };
+        }
 
         #endregion
     }

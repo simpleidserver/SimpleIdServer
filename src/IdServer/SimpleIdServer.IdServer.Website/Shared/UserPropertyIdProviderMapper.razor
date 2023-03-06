@@ -2,34 +2,65 @@
 @using System.Reflection;
 @inject IState<UpdateIdProviderState> updateIdProviderState
 
-<RadzenTemplateForm Submit=@SubmitUpdateUserAttributeIdProvider TItem="UserAttributeIdProviderMapperForm" Data=@userAttributeIdProviderMapperForm>
+<RadzenTemplateForm Submit=@SubmitUpdateUserPropertyIdProvider TItem="UserPropertyIdProviderMapperForm" Data=@userPropertyIdProviderMapperForm>
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@userPropertyIdProviderMapperForm.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Token Claim Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Source Claim Name</RadzenText>
+        <RadzenTextBox Name="SourceClaimName" @bind-Value="@userPropertyIdProviderMapperForm.SourceClaimName" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="SourceClaimName" Text="Source Claim name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Property -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">User property</RadzenText>
+        <RadzenDropDown Name="UserPropertyName" Class="w-100"
+                        Data=@userProperties
+                        TValue="String"
+                        @bind-Value=@userPropertyIdProviderMapperForm.TargetUserProperty />
+        <p class="text-muted">Name of the property</p>
+        <RadzenRequiredValidator Component="UserPropertyName" Text="Property is required"></RadzenRequiredValidator>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? "Saving..." : "Save")" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
 </RadzenTemplateForm>
 
 @code {
     [Parameter]
     public EventCallback<AuthenticationSchemeProviderMapper> AuthProviderMapperUpdated { get; set; }
+    IEnumerable<string> userProperties = new List<string>();
 
-    record UserAttributeIdProviderMapperForm
+    record UserPropertyIdProviderMapperForm
     {
         public string Name { get; set; }
         public string SourceClaimName { get; set; }
-        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
     }
 
-    UserAttributeIdProviderMapperForm userAttributeIdProviderMapperForm = new UserAttributeIdProviderMapperForm();
+    UserPropertyIdProviderMapperForm userPropertyIdProviderMapperForm = new UserPropertyIdProviderMapperForm();
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        userProperties = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p =>
+                {
+                    var attr = p.GetCustomAttribute<UserPropertyAttribute>();
+                    return attr == null ? false : attr.IsVisible;
+                })
+                .Select(p => p.Name);
     }
 
-    async void SubmitUpdateUserAttributeIdProvider(UserAttributeIdProviderMapperForm value)
+    async void SubmitUpdateUserPropertyIdProvider(UserPropertyIdProviderMapperForm value)
     {
         await AuthProviderMapperUpdated.InvokeAsync(new AuthenticationSchemeProviderMapper
         {
             Name = value.Name,
             SourceClaimName = value.SourceClaimName,
-            TargetUserAttribute = value.TargetUserAttribute,
+            TargetUserProperty = value.TargetUserProperty,
             MapperType = AuthenticationSchemeProviderMapperTypes.USERPROPERTY
         });
     }

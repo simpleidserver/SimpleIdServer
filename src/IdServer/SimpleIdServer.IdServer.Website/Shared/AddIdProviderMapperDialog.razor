@@ -1,4 +1,11 @@
-﻿<RadzenSteps>
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using SimpleIdServer.IdServer.Website.Resources;
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IDispatcher dispatcher
+
+<RadzenSteps>
     <Steps>
         <RadzenStepsItem Text="Mapper Type">
             <div class="row gy-4">
@@ -35,6 +42,9 @@
 </RadzenSteps>
 
 @code {
+    [Parameter]
+    public string IdProviderName { get; set; }
+
     record MapperType
     {
         public string Name { get; set; } = null!;
@@ -52,6 +62,22 @@
 
     MapperType? SelectedMapperType { get; set; } = null;
 
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<AddAuthenticationSchemeProviderMapperSuccessAction>((act) =>
+            {
+                dialogService.Close();
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderMapperAdded });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
     void SelectMapper(MapperType mapperType)
     {
         SelectedMapperType = mapperType;
@@ -59,5 +85,15 @@
 
     void UpdateAuthProviderMapper(AuthenticationSchemeProviderMapper mapper)
     {
+        var act = new AddAuthenticationSchemeProviderMapperAction
+        {
+            IdProviderName = IdProviderName,
+            MapperType = mapper.MapperType,
+            Name = mapper.Name,
+            SourceClaimName = mapper.SourceClaimName,
+            TargetUserAttribute = mapper.TargetUserAttribute,
+            TargetUserProperty = mapper.TargetUserProperty
+        };
+        dispatcher.Dispatch(act);
     }
 }

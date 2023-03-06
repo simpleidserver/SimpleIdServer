@@ -150,6 +150,9 @@
   <data name="IdProviderExists" xml:space="preserve">
     <value>An Identity Provider named '{0}' already exists</value>
   </data>
+  <data name="IdProviderMapperAdded" xml:space="preserve">
+    <value>Mapper rule has been added</value>
+  </data>
   <data name="IdProviderPropertiesUpdated" xml:space="preserve">
     <value>Identity Provider Properties have been updated</value>
   </data>
@@ -200,6 +203,9 @@
   </data>
   <data name="SelectedClientsRemoved" xml:space="preserve">
     <value>Selected clients have been removed</value>
+  </data>
+  <data name="SelectedIdProviderMappersRemoved" xml:space="preserve">
+    <value>Selected mappers have been removed</value>
   </data>
   <data name="SelectedIdProvidersRemoved" xml:space="preserve">
     <value>Selected Identity Providers have been removed</value>

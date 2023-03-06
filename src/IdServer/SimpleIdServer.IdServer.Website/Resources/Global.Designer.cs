@@ -160,6 +160,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapper rule has been added.
+        /// </summary>
+        public static string IdProviderMapperAdded {
+            get {
+                return ResourceManager.GetString("IdProviderMapperAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Provider Properties have been updated.
         /// </summary>
         public static string IdProviderPropertiesUpdated {
@@ -309,6 +318,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedClientsRemoved {
             get {
                 return ResourceManager.GetString("SelectedClientsRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Selected mappers have been removed.
+        /// </summary>
+        public static string SelectedIdProviderMappersRemoved {
+            get {
+                return ResourceManager.GetString("SelectedIdProviderMappersRemoved", resourceCulture);
             }
         }
         

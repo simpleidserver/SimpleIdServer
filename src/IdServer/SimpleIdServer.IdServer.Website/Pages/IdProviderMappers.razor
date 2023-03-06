@@ -1,8 +1,10 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
+@inject NotificationService notificationService
 @inject IState<IdProviderMappersState> idProviderMappersState
 
 <RadzenButton class="mb-1" Click="@(args => AddIdProviderMapper())" Icon="add" Text="Add Mapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
@@ -49,22 +51,35 @@
     public AuthenticationSchemeProvider IdProvider { get; set; }
     bool selectAll = false;
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProviderMappersRemoved });
+                StateHasChanged();
+            });
+        }
+    }
+
     void ShowMoreContextMenu(SelectableAuthenticationSchemeProviderMapper mapper, MouseEventArgs args)
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
             new ContextMenuItem { Text = "Delete", Value = 1 }
         }, (a) =>
-    {
-    if (a.Value.Equals(1))
-    {
-        var mapperIds = idProviderMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
-        if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
-        var act = new RemoveSelectedAuthenticationSchemeProviderMappersAction { Name = IdProvider.Name, MapperIds = mapperIds };
-        dispatcher.Dispatch(act);
-        contextMenuService.Close();
-    }
-    });
+        {
+            if (a.Value.Equals(1))
+            {
+                var mapperIds = idProviderMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                if (!mapperIds.Contains(mapper.Value.Id)) mapperIds.Add(mapper.Value.Id);
+                var act = new RemoveSelectedAuthenticationSchemeProviderMappersAction { Name = IdProvider.Name, MapperIds = mapperIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
     }
 
     void ToggleChanged(bool isSelected, SelectableAuthenticationSchemeProviderMapper mapper)
@@ -93,7 +108,10 @@
 
     async void AddIdProviderMapper()
     {
-        await dialogService.OpenAsync<AddIdProviderMapperDialog>("Add Mapper", new Dictionary<string, object>(), new DialogOptions
+        await dialogService.OpenAsync<AddIdProviderMapperDialog>("Add Mapper", new Dictionary<string, object>
+        {
+            { "IdProviderName", IdProvider.Name }
+        }, new DialogOptions
         {
             Width = "700px",
             Height = "512px",

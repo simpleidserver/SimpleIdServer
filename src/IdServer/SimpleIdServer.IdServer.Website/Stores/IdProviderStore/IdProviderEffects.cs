@@ -121,6 +121,46 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             await _repository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderPropertiesSuccessAction { Name = action.Name, Properties = action.Properties });
         }
+
+        [EffectMethod]
+        public async Task Handle(AddAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
+        {
+            var idProvider = await _repository.Query().Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName);
+            var id = Guid.NewGuid().ToString();
+            idProvider.Mappers.Add(new AuthenticationSchemeProviderMapper
+            {
+                Id = id,
+                MapperType = action.MapperType,
+                Name = action.Name,
+                SourceClaimName = action.SourceClaimName,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            });
+            await _repository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new AddAuthenticationSchemeProviderMapperSuccessAction
+            {
+                Id = id,
+                IdProviderName= action.IdProviderName,
+                MapperType= action.MapperType,
+                Name= action.Name,
+                SourceClaimName= action.SourceClaimName,
+                TargetUserAttribute= action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            });
+        }
+
+        [EffectMethod]
+        public async Task Handle(RemoveSelectedAuthenticationSchemeProviderMappersAction action, IDispatcher dispatcher)
+        {
+            var idProvider = await _repository.Query().Include(p => p.Mappers).SingleAsync(a => a.Name == action.Name);
+            idProvider.Mappers = idProvider.Mappers.Where(m => !action.MapperIds.Contains(m.Id)).ToList();
+            await _repository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction
+            {
+                Name = action.Name,
+                MapperIds = action.MapperIds
+            });
+        }
     }
 
     public class SearchIdProvidersAction
@@ -237,6 +277,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public IEnumerable<string> MapperIds { get; set; } = new List<string>();
     }
 
+    public class RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction
+    {
+        public string Name { get; set; } = null!;
+        public IEnumerable<string> MapperIds { get; set; } = new List<string>();
+    }
+
     public class ToggleAuthenticationSchemeProviderMapperAction
     {
         public string MapperId { get; set; }
@@ -246,5 +292,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     public class ToggleAllAuthenticationSchemeProviderSelectionAction
     {
         public bool IsSelected { get; set; }
+    }
+
+    public class AddAuthenticationSchemeProviderMapperAction
+    {
+        public string IdProviderName { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public AuthenticationSchemeProviderMapperTypes MapperType { get; set; }
+        public string? SourceClaimName { get; set; } = null;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+    }
+
+    public class AddAuthenticationSchemeProviderMapperSuccessAction
+    {
+        public string IdProviderName { get; set; } = null!;
+        public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public AuthenticationSchemeProviderMapperTypes MapperType { get; set; }
+        public string? SourceClaimName { get; set; } = null;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
     }
 }
