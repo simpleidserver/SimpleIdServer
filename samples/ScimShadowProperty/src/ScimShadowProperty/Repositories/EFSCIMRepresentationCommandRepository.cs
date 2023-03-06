@@ -3,22 +3,26 @@
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Scim.Persistence.EF
+namespace ScimShadowProperty.Repositories
 {
     public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandRepository
     {
         private readonly SCIMDbContext _scimDbContext;
+        private EFTransaction _transaction;
 
         public EFSCIMRepresentationCommandRepository(SCIMDbContext scimDbContext)
         {
             _scimDbContext = scimDbContext;
         }
+
+        protected SCIMDbContext DbContext => _scimDbContext;
 
         public async Task<SCIMRepresentation> Get(string id, CancellationToken token = default)
         {
@@ -117,10 +121,11 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return result;
         }
 
-        public async Task<ITransaction> StartTransaction(CancellationToken token)
+        public async virtual Task<ITransaction> StartTransaction(CancellationToken token)
         {
             var transaction = await _scimDbContext.Database.BeginTransactionAsync(token);
-            return new EFTransaction(_scimDbContext, transaction);
+            _transaction = new EFTransaction(_scimDbContext, transaction);
+            return _transaction;
         }
 
         public Task<bool> Add(SCIMRepresentation data, CancellationToken token)
@@ -141,7 +146,16 @@ namespace SimpleIdServer.Scim.Persistence.EF
             return Task.FromResult(true);
         }
 
-        public Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList());
+        public async Task BulkInsert(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes)
+        {
+            await _scimDbContext.BulkInsertAsync(scimRepresentationAttributes.ToList());
+            foreach (var scimRepresentationAttribute in scimRepresentationAttributes)
+            {
+                DbContext.Entry(scimRepresentationAttribute).State = EntityState.Modified;
+                if(_transaction != null)
+                    _transaction.BulkInsertedIds.Add(scimRepresentationAttribute.Id);
+            }
+        }
 
         public Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes) => _scimDbContext.BulkDeleteAsync(scimRepresentationAttributes.ToList());
 
