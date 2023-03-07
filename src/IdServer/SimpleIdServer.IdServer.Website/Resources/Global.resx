@@ -153,6 +153,9 @@
   <data name="IdProviderMapperAdded" xml:space="preserve">
     <value>Mapper rule has been added</value>
   </data>
+  <data name="IdProviderMapperUpdated" xml:space="preserve">
+    <value>Mapper has been updated</value>
+  </data>
   <data name="IdProviderPropertiesUpdated" xml:space="preserve">
     <value>Identity Provider Properties have been updated</value>
   </data>

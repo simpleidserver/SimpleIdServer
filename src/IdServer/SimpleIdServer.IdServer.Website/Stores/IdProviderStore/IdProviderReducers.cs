@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using Microsoft.AspNetCore.Builder;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
@@ -208,6 +209,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
         }
 
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceUpdateAuthenticationSchemeProviderMapperAction(UpdateIdProviderState state, UpdateAuthenticationSchemeProviderMapperAction act)
+        {
+            return state with
+            {
+                IsUpdating = true,
+                ErrorMessage = null
+            };
+        }
+
+        [ReducerMethod]
+        public static UpdateIdProviderState ReduceUpdateAuthenticationSchemeProviderMapperSuccessAction(UpdateIdProviderState state, UpdateAuthenticationSchemeProviderMapperSuccessAction act)
+        {
+            return state with
+            {
+                IsUpdating = false,
+                ErrorMessage = null
+            };
+        }
+
         #endregion
 
         #region IdProviderMappersState
@@ -286,6 +307,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             {
                 Mappers = mappers,
                 Count = mappers.Count,
+                IsLoading = false
+            };
+        }
+
+        [ReducerMethod]
+        public static IdProviderMappersState ReduceUpdateAuthenticationSchemeProviderMapperSuccessAction(IdProviderMappersState state, UpdateAuthenticationSchemeProviderMapperSuccessAction action)
+        {
+            var mappers = state.Mappers.ToList();
+            var mapper = mappers.First(m => m.Value.Id == action.Id);
+            mapper.Value.Name = action.Name;
+            mapper.Value.SourceClaimName = action.SourceClaimName;
+            mapper.Value.TargetUserAttribute = action.TargetUserAttribute;
+            mapper.Value.TargetUserProperty = action.TargetUserProperty;
+            return state with
+            {
+                Mappers = mappers,
                 IsLoading = false
             };
         }

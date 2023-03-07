@@ -1,0 +1,85 @@
+﻿@page "/idproviders/{id}/mappers/{mapperId}"
+@inherits FluxorComponent
+@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject IState<IdProviderState> idProviderState
+
+@if(idProviderState.Value.IsLoading)
+{
+    <RadzenText class="mt-3 mb-3" Text="Wait..." TextStyle="TextStyle.DisplayH6" />
+}
+else
+{
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="/idproviders" Text="Identity Providers" />
+        <RadzenBreadCrumbItem Path=@($"/idproviders/{id}/mappers") Text="Identity Provider mappers" />
+        <RadzenBreadCrumbItem Text="@(mapper.Name)" />
+    </RadzenBreadCrumb>
+
+    <RadzenText class="mt-3 mb-3" Text="@mapper.Name" TextStyle="TextStyle.DisplayH6" />
+    
+    @switch (mapper.MapperType)
+    {
+        case AuthenticationSchemeProviderMapperTypes.USERATTRIBUTE:
+            <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
+            break;
+        case AuthenticationSchemeProviderMapperTypes.USERPROPERTY:
+            <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
+            break;
+    }
+}
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    [Parameter]
+    public string mapperId { get; set; }
+
+    AuthenticationSchemeProviderMapper mapper
+    {
+        get
+        {
+            return idProviderState.Value.Provider.Mappers.Single(m => m.Id == mapperId);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<UpdateAuthenticationSchemeProviderMapperSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderMapperUpdated });
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(!string.IsNullOrWhiteSpace(id) && !string.IsNullOrWhiteSpace(mapperId))
+        {
+            var act = new GetIdProviderAction { Id = id };
+            dispatcher.Dispatch(act);
+        }
+    }
+
+    void UpdateAuthProviderMapper(AuthenticationSchemeProviderMapper mapper)
+    {
+        var act = new UpdateAuthenticationSchemeProviderMapperAction
+        {
+            Id = mapperId,
+            IdProviderName = id,
+            Name = mapper.Name,
+            SourceClaimName = mapper.SourceClaimName,
+            TargetUserAttribute = mapper.TargetUserAttribute,
+            TargetUserProperty = mapper.TargetUserProperty
+        };
+        dispatcher.Dispatch(act);
+    }
+}

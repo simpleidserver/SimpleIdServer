@@ -31,6 +31,8 @@
 @code {
     [Parameter]
     public EventCallback<AuthenticationSchemeProviderMapper> AuthProviderMapperUpdated { get; set; }
+    [Parameter]
+    public AuthenticationSchemeProviderMapper Mapper { get; set; }
     IEnumerable<string> userProperties = new List<string>();
 
     record UserPropertyIdProviderMapperForm
@@ -52,6 +54,12 @@
                     return attr == null ? false : attr.IsVisible;
                 })
                 .Select(p => p.Name);
+        if (Mapper != null)
+        {
+            userPropertyIdProviderMapperForm.Name = Mapper.Name;
+            userPropertyIdProviderMapperForm.SourceClaimName = Mapper.SourceClaimName;
+            userPropertyIdProviderMapperForm.TargetUserProperty = Mapper.TargetUserProperty;
+        }
     }
 
     async void SubmitUpdateUserPropertyIdProvider(UserPropertyIdProviderMapperForm value)

@@ -26,6 +26,8 @@
 @code {
     [Parameter]
     public EventCallback<AuthenticationSchemeProviderMapper> AuthProviderMapperUpdated { get; set; }
+    [Parameter]
+    public AuthenticationSchemeProviderMapper Mapper { get; set; }
 
     record UserAttributeIdProviderMapperForm
     {
@@ -35,6 +37,17 @@
     }
 
     UserAttributeIdProviderMapperForm userAttributeIdProviderMapperForm = new UserAttributeIdProviderMapperForm();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Mapper != null)
+        {
+            userAttributeIdProviderMapperForm.Name = Mapper.Name;
+            userAttributeIdProviderMapperForm.SourceClaimName = Mapper.SourceClaimName;
+            userAttributeIdProviderMapperForm.TargetUserAttribute = Mapper.TargetUserAttribute;
+        }
+    }
 
     async void SubmitUpdateUserAttributeIdProvider(UserAttributeIdProviderMapperForm value)
     {

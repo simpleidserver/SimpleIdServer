@@ -161,6 +161,27 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
                 MapperIds = action.MapperIds
             });
         }
+
+        [EffectMethod]
+        public async Task Handle(UpdateAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
+        {
+            var idProvider = await _repository.Query().Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName);
+            var mapper = idProvider.Mappers.First(m => m.Id == action.Id);
+            mapper.Name = action.Name;
+            mapper.SourceClaimName = action.SourceClaimName;
+            mapper.TargetUserAttribute = action.TargetUserAttribute;
+            mapper.TargetUserProperty = action.TargetUserProperty;
+            await _repository.SaveChanges(CancellationToken.None);
+            dispatcher.Dispatch(new UpdateAuthenticationSchemeProviderMapperSuccessAction
+            {
+                Id = action.Id,
+                Name = action.Name,
+                IdProviderName = action.IdProviderName,
+                SourceClaimName = action.SourceClaimName,
+                TargetUserAttribute = action.TargetUserAttribute,
+                TargetUserProperty = action.TargetUserProperty
+            });
+        }
     }
 
     public class SearchIdProvidersAction
@@ -310,6 +331,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         public string Id { get; set; } = null!;
         public string Name { get; set; } = null!;
         public AuthenticationSchemeProviderMapperTypes MapperType { get; set; }
+        public string? SourceClaimName { get; set; } = null;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+    }
+
+    public class UpdateAuthenticationSchemeProviderMapperAction
+    {
+        public string IdProviderName { get; set; } = null!;
+        public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string? SourceClaimName { get; set; } = null;
+        public string? TargetUserAttribute { get; set; } = null;
+        public string? TargetUserProperty { get; set; } = null;
+    }
+
+    public class UpdateAuthenticationSchemeProviderMapperSuccessAction
+    {
+        public string IdProviderName { get; set; } = null!;
+        public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string? SourceClaimName { get; set; } = null;
         public string? TargetUserAttribute { get; set; } = null;
         public string? TargetUserProperty { get; set; } = null;

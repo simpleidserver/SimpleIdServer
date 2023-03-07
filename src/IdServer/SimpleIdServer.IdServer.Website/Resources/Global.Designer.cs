@@ -169,6 +169,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Mapper has been updated.
+        /// </summary>
+        public static string IdProviderMapperUpdated {
+            get {
+                return ResourceManager.GetString("IdProviderMapperUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Provider Properties have been updated.
         /// </summary>
         public static string IdProviderPropertiesUpdated {
