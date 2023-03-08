@@ -19,15 +19,17 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
         public MetadataController(IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore) : base(options, keyStore) { }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromRoute] string prefix)
         {
-            var sigKeys = KeyStore.GetAllSigningKeys();
-
+            var sigKeys = KeyStore.GetAllSigningKeys(prefix);
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var tokenEndpoint = $"{issuer}/{WsFederationConstants.EndPoints.SSO}";
+            if (!string.IsNullOrWhiteSpace(prefix))
+                tokenEndpoint = $"{issuer}/{prefix}/{WsFederationConstants.EndPoints.SSO}";
             var configuration = new WsFederationConfiguration
             {
                 Issuer = issuer,
-                TokenEndpoint = $"{issuer}/{WsFederationConstants.EndPoints.SSO}"
+                TokenEndpoint = tokenEndpoint
             };
             foreach (var sigKey in sigKeys)
                 configuration.KeyInfos.Add(new KeyInfo(sigKey.Key));

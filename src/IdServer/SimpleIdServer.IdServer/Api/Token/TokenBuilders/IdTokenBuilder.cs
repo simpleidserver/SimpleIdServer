@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
             var openidClient = context.Client;
             var payload = await BuildIdToken(context, useOriginalRequest ? context.OriginalRequest : context.Request.RequestData, parameter.Scopes, parameter.Claims, cancellationToken);
-            var idToken = await _jwtBuilder.BuildClientToken(context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
+            var idToken = await _jwtBuilder.BuildClientToken(context.Realm, context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
             context.Response.Add(Name, idToken);
         }
 

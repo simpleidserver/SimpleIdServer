@@ -24,6 +24,7 @@ namespace SimpleIdServer.IdServer.Store
         public DbSet<Grant> Grants { get; set; }
         public DbSet<UMAResource> UmaResources { get; set; }
         public DbSet<UMAPendingRequest> UmaPendingRequest { get; set; }
+        public DbSet<Realm> Realms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -59,6 +60,7 @@ namespace SimpleIdServer.IdServer.Store
             builder.ApplyConfiguration(new UmaResourceConfiguration());
             builder.ApplyConfiguration(new UMAResourcePermissionClaimConfiguration());
             builder.ApplyConfiguration(new UMAResourcePermissionConfiguration());
+            builder.ApplyConfiguration(new RealmConfiguration());
         }
     }
 }

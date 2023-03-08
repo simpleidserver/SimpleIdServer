@@ -62,15 +62,15 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
         }
 
         [HttpGet]
-        public Task<IActionResult> Get(CancellationToken token) => Common(null, token);
+        public Task<IActionResult> Get([FromRoute] string prefix, CancellationToken token) => Common(prefix, null, token);
 
         [HttpPost]
-        public async Task<IActionResult> Post(CancellationToken token)
+        public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
             try
             {
                 var jObjBody = Request.Form?.ToJsonObject();
-                return await Common(jObjBody, token);
+                return await Common(prefix,jObjBody, token);
             }
             catch (InvalidOperationException)
             {
@@ -88,12 +88,13 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             }
         }
 
-        private async Task<IActionResult> Common(JsonObject content, CancellationToken cancellationToken)
+        private async Task<IActionResult> Common(string prefix, JsonObject content, CancellationToken cancellationToken)
         {
             try
             {
+                prefix = prefix ?? Constants.DefaultRealm;
                 var accessToken = ExtractAccessToken(content);
-                var jwsPayload = Extract(accessToken);
+                var jwsPayload = Extract(prefix, accessToken);
                 if (jwsPayload == null) throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.BAD_TOKEN);
 
                 var subject = jwsPayload.Subject;
@@ -123,7 +124,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 }
 
                 var oauthScopes = await _scopeRepository.Query().Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null));
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null), prefix ?? Constants.DefaultRealm);
                 context.SetUser(user);
                 var payload = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
                 {
@@ -143,7 +144,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     };
                     securityTokenDescriptor.Issuer = Request.GetAbsoluteUriWithVirtualPath();
                     securityTokenDescriptor.Audience = token.ClientId;
-                    result = await _jwtBuilder.BuildClientToken(oauthClient, securityTokenDescriptor, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
+                    result = await _jwtBuilder.BuildClientToken(prefix, oauthClient, securityTokenDescriptor, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
                     contentType = "application/jwt";
                 }
 
@@ -180,9 +181,9 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             }
         }
 
-        private JsonWebToken Extract(string accessToken)
+        private JsonWebToken Extract(string realm, string accessToken)
         {
-            var result = _jwtBuilder.ReadSelfIssuedJsonWebToken(accessToken);
+            var result = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, accessToken);
             if (result.Error != null) return null;
             return result.Jwt;
         }

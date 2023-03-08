@@ -58,5 +58,10 @@ namespace SimpleIdServer.IdServer.Startup
                AppSecret = "12e0f33817634c0a650c0121d05e53eb"
            }).Build()
         };
+
+        public static ICollection<Realm> Realms = new List<Realm>
+        {
+            RealmBuilder.CreateMaster().Build()
+        };
     }
 }

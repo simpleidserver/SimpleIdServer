@@ -31,44 +31,44 @@ namespace Microsoft.Extensions.DependencyInjection
         public IServiceCollection Services => _serviceCollection;
         public InMemoryKeyStore KeyStore => _keyStore;
 
-        public IdServerBuilder SetSigningKeys(params SigningCredentials[] signingCredentials)
+        public IdServerBuilder SetSigningKeys(string realm, params SigningCredentials[] signingCredentials)
         {
-            return SetSigningKeys((IEnumerable<SigningCredentials>)signingCredentials);
+            return SetSigningKeys(realm ?? Constants.DefaultRealm, (IEnumerable<SigningCredentials>)signingCredentials);
         }
 
-        public IdServerBuilder SetSigningKeys(IEnumerable<SigningCredentials> signingCredentials)
+        public IdServerBuilder SetSigningKeys(string realm, IEnumerable<SigningCredentials> signingCredentials)
         {
-            _keyStore.SetSigningCredentials(signingCredentials);
+            _keyStore.SetSigningCredentials(realm ?? Constants.DefaultRealm, signingCredentials);
             return this;
         }
 
-        public IdServerBuilder SetSigningKey(RsaSecurityKey rsa, string signingAlg = SecurityAlgorithms.RsaSha256)
+        public IdServerBuilder SetSigningKey(string realm, RsaSecurityKey rsa, string signingAlg = SecurityAlgorithms.RsaSha256)
         {
             var signingCredentials = new SigningCredentials(rsa, signingAlg);
-            return SetSigningKeys(new[] { signingCredentials });
+            return SetSigningKeys(realm ?? Constants.DefaultRealm, new[] { signingCredentials });
         }
 
         #region Encryption and signing Keys
 
-        public IdServerBuilder SetSigningKey(ECDsaSecurityKey ecdsa, string signingAlg = SecurityAlgorithms.EcdsaSha256)
+        public IdServerBuilder SetSigningKey(string realm, ECDsaSecurityKey ecdsa, string signingAlg = SecurityAlgorithms.EcdsaSha256)
         {
             var signingCredentials = new SigningCredentials(ecdsa, signingAlg);
-            return SetSigningKeys(new[] { signingCredentials });
+            return SetSigningKeys(realm ?? Constants.DefaultRealm, new[] { signingCredentials });
         }
 
-        public IdServerBuilder SetEncryptedKeys(params EncryptingCredentials[] encryptedCredentials)
+        public IdServerBuilder SetEncryptedKeys(string realm = Constants.DefaultRealm, params EncryptingCredentials[] encryptedCredentials)
         {
-            SetEncryptedKeys((IEnumerable<EncryptingCredentials>)encryptedCredentials);
+            SetEncryptedKeys(realm, (IEnumerable<EncryptingCredentials>)encryptedCredentials);
             return this;
         }
 
-        public IdServerBuilder SetEncryptedKeys(IEnumerable<EncryptingCredentials> encryptedCredentials)
+        public IdServerBuilder SetEncryptedKeys(string realm, IEnumerable<EncryptingCredentials> encryptedCredentials)
         {
-            _keyStore.SetEncryptedCredentials(encryptedCredentials);
+            _keyStore.SetEncryptedCredentials(realm ?? Constants.DefaultRealm, encryptedCredentials);
             return this;
         }
 
-        public IdServerBuilder AddDeveloperSigningCredentials()
+        public IdServerBuilder AddDeveloperSigningCredentials(string realm = Constants.DefaultRealm)
         {
             var rsa = RSA.Create();
             var key = new RsaSecurityKey(rsa)
@@ -76,7 +76,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 KeyId = "keyid"
             };
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
-            SetSigningKeys(new[] { signingCredentials });
+            SetSigningKeys(realm, new[] { signingCredentials });
             return this;
         }
 

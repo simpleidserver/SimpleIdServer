@@ -24,6 +24,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.UseAuthorization();
 
             var usePrefix = opts.UseRealm;
+            if(usePrefix)
+                webApplication.UseMiddleware<RealmMiddleware>();
+
             webApplication.MapControllerRoute("oauthConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
                 defaults: new { controller = "OAuthConfiguration", action = "Get" });

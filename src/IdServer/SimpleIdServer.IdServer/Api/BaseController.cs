@@ -38,10 +38,10 @@ namespace SimpleIdServer.IdServer.Api
             return false;
         }
 
-        protected void CheckHasPAT(IJwtBuilder jwtBuilder)
+        protected void CheckHasPAT(string realm, IJwtBuilder jwtBuilder)
         {
             var bearerToken = ExtractBearerToken();
-            var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(bearerToken);
+            var extractionResult = jwtBuilder.ReadSelfIssuedJsonWebToken(realm, bearerToken);
             if (extractionResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
             if (!extractionResult.Jwt.Claims.Any(c => c.Type == "scope" && c.Value == Constants.StandardScopes.UmaProtection.Name))

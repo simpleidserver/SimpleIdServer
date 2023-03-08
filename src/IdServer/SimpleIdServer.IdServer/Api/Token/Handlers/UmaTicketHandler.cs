@@ -83,7 +83,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.BAD_TOKEN_FORMAT, claimTokenFormat));
                     }
 
-                    claimTokenFormatFetcherResult = await claimTokenFormatFetcher.Fetch(context.Request.RequestData.GetClaimToken(), cancellationToken);
+                    claimTokenFormatFetcherResult = await claimTokenFormatFetcher.Fetch(context.Realm, context.Request.RequestData.GetClaimToken(), cancellationToken);
                 }
 
                 if (claimTokenFormatFetcherResult == null)

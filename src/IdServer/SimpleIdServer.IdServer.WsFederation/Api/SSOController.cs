@@ -50,14 +50,14 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             _options = opts.Value;
         }
 
-        public async Task<IActionResult> Login(CancellationToken cancellationToken)
+        public async Task<IActionResult> Login([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var queryStr = Request.QueryString.Value;
             var federationMessage = WsFederationMessage.FromQueryString(queryStr);
             try
             {
                 if (federationMessage.IsSignInMessage)
-                    return await SignIn(federationMessage, cancellationToken);
+                    return await SignIn(prefix, federationMessage, cancellationToken);
 
                 return RedirectToAction("EndSession", "CheckSession");
             }
@@ -67,7 +67,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             }
         }
 
-        private async Task<IActionResult> SignIn(WsFederationMessage message, CancellationToken cancellationToken)
+        private async Task<IActionResult> SignIn(string realm, WsFederationMessage message, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var client = await Validate();
@@ -77,8 +77,8 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             var tokenType = GetTokenType(client);
             var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().SingleOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
-            var subject = await BuildSubject();
-            return BuildResponse();
+            var subject = await BuildSubject(realm);
+            return BuildResponse(realm);
 
             async Task<Domains.Client> Validate()
             {
@@ -99,6 +99,9 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
             IActionResult RedirectToLoginPage()
             {
                 var queryStr = Request.QueryString.Value;
+                if (!string.IsNullOrEmpty(realm))
+                    issuer = $"{issuer}/{realm}";
+
                 var returnUrl = $"{issuer}/{WsFederationConstants.EndPoints.SSO}{queryStr}&{AuthorizationRequestParameters.ClientId}={message.Wtrealm}";
                 var url = Url.Action("Index", "Authenticate", new
                 {
@@ -108,9 +111,9 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 return Redirect(url);
             }
 
-            async Task<ClaimsIdentity> BuildSubject()
+            async Task<ClaimsIdentity> BuildSubject(string realm)
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null));
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null), realm ?? Constants.DefaultRealm);
                 context.SetUser(user);
                 var claims = (await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter
                 {
@@ -137,7 +140,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                 return new ClaimsIdentity(claims, "idserver");
             }
 
-            IActionResult BuildResponse()
+            IActionResult BuildResponse(string realm)
             {
                 var descriptor = new SecurityTokenDescriptor
                 {
@@ -147,7 +150,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                     Expires = DateTime.UtcNow.AddSeconds(client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds),
                     Subject = subject,
                     Issuer = issuer,
-                    SigningCredentials = GetSigningCredentials()
+                    SigningCredentials = GetSigningCredentials(realm)
                 };
                 SecurityTokenHandler handler;
                 if (tokenType == WsFederationConstants.TokenTypes.Saml2TokenProfile11)

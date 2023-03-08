@@ -28,12 +28,12 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] BCCallbackParameter parameter, CancellationToken cancellationToken)
+        public async Task<IActionResult> Post([FromRoute] string prefix, [FromBody] BCCallbackParameter parameter, CancellationToken cancellationToken)
         {
             try
             {
                 var idToken = ExtractBearerToken();
-                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idToken);
+                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(prefix ?? Constants.DefaultRealm, idToken);
                 if (extractionResult.Error != null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, extractionResult.Error);
                 var userSubject = extractionResult.Jwt.Subject;
                 var bcAuthorize = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(b => b.Id == parameter.AuthReqId, cancellationToken);

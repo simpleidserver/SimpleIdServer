@@ -17,7 +17,7 @@ builder.Services.AddSIDIdentityServer()
         o.AddInMemoryUMAResources(IdServerConfiguration.UmaResources);
     })
     .AddBackChannelAuthentication()
-    .SetSigningKeys(
+    .SetSigningKeys(SimpleIdServer.IdServer.Constants.DefaultRealm,
         new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
         new SigningCredentials(BuildRsaSecurityKey("keyid2"), SecurityAlgorithms.RsaSha384),
         new SigningCredentials(BuildRsaSecurityKey("keyid3"), SecurityAlgorithms.RsaSha512),
@@ -28,7 +28,7 @@ builder.Services.AddSIDIdentityServer()
         new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha384),
         new SigningCredentials(BuildSymmetricSecurityKey(), SecurityAlgorithms.HmacSha512)
     )
-    .SetEncryptedKeys(
+    .SetEncryptedKeys(SimpleIdServer.IdServer.Constants.DefaultRealm,
         new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
     )
     .AddAuthentication(o =>

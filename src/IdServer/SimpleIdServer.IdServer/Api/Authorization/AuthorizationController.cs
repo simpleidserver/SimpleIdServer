@@ -35,12 +35,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         }
 
-        public async Task Get(CancellationToken token)
+        public async Task Get([FromRoute] string prefix, CancellationToken token)
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), new HandlerContextResponse(Response.Cookies));
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies), prefix ?? Constants.DefaultRealm, new HandlerContextResponse(Response.Cookies));
             try
             {
                 var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
@@ -89,6 +89,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 FormatRedirectUrl(parameters);
                 var queryCollection = new QueryBuilder(parameters);
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                if (!string.IsNullOrWhiteSpace(prefix))
+                    issuer = $"{issuer}/{prefix}";
                 var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
                 var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
                 var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new

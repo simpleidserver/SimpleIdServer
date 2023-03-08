@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(ConfirmBCConsentsViewModel confirmConsentsViewModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmBCConsentsViewModel confirmConsentsViewModel, CancellationToken cancellationToken)
         {
             if (!User.Identity.IsAuthenticated)
                 return RedirectToAction("Index", "Errors", new { code = "unauthorized", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
@@ -104,7 +104,7 @@ namespace SimpleIdServer.IdServer.UI
                         { JwtRegisteredClaimNames.Sub, sub },
                     }
                 };
-                var idToken = _jwtBuilder.Sign(tokenDescriptor, SecurityAlgorithms.RsaSha256);
+                var idToken = _jwtBuilder.Sign(prefix, tokenDescriptor, SecurityAlgorithms.RsaSha256);
                 using (var httpClient = _httpClientFactory.GetHttpClient())
                 {
                     var json = JsonSerializer.Serialize(parameter);
@@ -138,8 +138,6 @@ namespace SimpleIdServer.IdServer.UI
                 return View(viewModel);
             }
         }
-
-        private Task<BCConsentsIndexViewModel> BuildViewModel(string returnUrl, CancellationToken cancellationToken) => BuildViewModel(ExtractQuery(returnUrl), returnUrl, cancellationToken);
 
         private async Task<BCConsentsIndexViewModel> BuildViewModel(JsonObject queries, string returnUrl, CancellationToken cancellationToken)
         {

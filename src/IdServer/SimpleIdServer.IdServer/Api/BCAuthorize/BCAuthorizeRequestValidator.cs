@@ -157,7 +157,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             if (string.IsNullOrWhiteSpace(request))
                 return;
 
-            var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(request, context.Client, context.Client.BCAuthenticationRequestSigningAlg, null, cancellationToken);
+            var jsonWebTokenResult = await _jwtBuilder.ReadJsonWebToken(context.Realm, request, context.Client, context.Client.BCAuthenticationRequestSigningAlg, null, cancellationToken);
             if (jsonWebTokenResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, jsonWebTokenResult.Error);
 
@@ -242,7 +242,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idTokenHint);
+                var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(context.Realm, idTokenHint);
                 if (extractionResult.Error != null)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
                 var payload = extractionResult.Jwt;

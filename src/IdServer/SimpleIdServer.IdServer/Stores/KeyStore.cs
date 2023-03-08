@@ -9,25 +9,41 @@ namespace SimpleIdServer.IdServer.Stores
 {
     public interface IKeyStore
     {
-        IEnumerable<SigningCredentials> GetAllSigningKeys();
-        IEnumerable<EncryptingCredentials> GetAllEncryptingKeys();
+        IEnumerable<SigningCredentials> GetAllSigningKeys(string realm);
+        IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm);
     }
 
     public class InMemoryKeyStore : IKeyStore
     {
-        private ConcurrentBag<SigningCredentials> _signingCredentials = new ConcurrentBag<SigningCredentials>();
-        private ConcurrentBag<EncryptingCredentials> _encryptedCredentials = new ConcurrentBag<EncryptingCredentials>();
+        private ConcurrentDictionary<string, ICollection<SigningCredentials>> _signingCredentials = new ConcurrentDictionary<string, ICollection<SigningCredentials>>();
+        private ConcurrentDictionary<string, ICollection<EncryptingCredentials>> _encryptedCredentials = new ConcurrentDictionary<string, ICollection<EncryptingCredentials>>();
 
         public InMemoryKeyStore() { }
 
-        public IEnumerable<SigningCredentials> GetAllSigningKeys() => _signingCredentials.ToList();
+        public IEnumerable<SigningCredentials> GetAllSigningKeys(string realm)
+        {
+            if(!_signingCredentials.ContainsKey(realm))
+                return new List<SigningCredentials>();
+            return _signingCredentials.First(c => c.Key == realm).Value.ToList();
+        }
 
-        public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys() => _encryptedCredentials.ToList();
+        public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm)
+        {
+            if (!_encryptedCredentials.ContainsKey(realm))
+                return new List<EncryptingCredentials>();
+            return _encryptedCredentials.First(c => c.Key == realm).Value.ToList();
+        }
 
-        public void Add(SigningCredentials signingCredentials) => _signingCredentials.Add(signingCredentials);
+        public void Add(string realm, SigningCredentials signingCredentials)
+        {
+            if(!_signingCredentials.ContainsKey(realm))
+                _signingCredentials.AddOrUpdate(realm, new List<SigningCredentials>(), (a,b) => new List<SigningCredentials>());
 
-        internal void SetSigningCredentials(IEnumerable<SigningCredentials> signingCredentials) => _signingCredentials = new ConcurrentBag<SigningCredentials>(signingCredentials);
+            _signingCredentials[realm].Add(signingCredentials);
+        }
 
-        internal void SetEncryptedCredentials(IEnumerable<EncryptingCredentials> encryptedCredentials) => _encryptedCredentials = new ConcurrentBag<EncryptingCredentials>(encryptedCredentials);
+        internal void SetSigningCredentials(string realm, IEnumerable<SigningCredentials> signingCredentials) => _signingCredentials.AddOrUpdate(realm, signingCredentials.ToList(), (a, b) => signingCredentials.ToList());
+
+        internal void SetEncryptedCredentials(string realm, IEnumerable<EncryptingCredentials> encryptedCredentials) => _encryptedCredentials.AddOrUpdate(realm, encryptedCredentials.ToList(), (a, b) => encryptedCredentials.ToList());
     }
 }

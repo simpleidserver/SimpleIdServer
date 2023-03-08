@@ -22,7 +22,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
         protected IKeyStore KeyStore => _keyStore;
         protected IdServerWsFederationOptions Options => _options;
 
-        protected SigningCredentials? GetSigningCredentials() => GetSigningCredentials(_keyStore.GetAllSigningKeys());
+        protected SigningCredentials? GetSigningCredentials(string realm) => GetSigningCredentials(_keyStore.GetAllSigningKeys(realm));
 
         protected SigningCredentials? GetSigningCredentials(IEnumerable<SigningCredentials> sigKeys)
         {

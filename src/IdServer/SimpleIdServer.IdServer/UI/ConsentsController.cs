@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.UI
             _extractRequestHelper = extractRequestHelper;
         }
 
-        public async Task<IActionResult> Index(string returnUrl, bool isProtected = true, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, bool isProtected = true, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}" });
@@ -59,7 +59,7 @@ namespace SimpleIdServer.IdServer.UI
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
                 var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).AsNoTracking().FirstAsync(c => c.ClientId == clientId, cancellationToken);
-                query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+                query = await _extractRequestHelper.Extract(prefix ?? Constants.DefaultRealm, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimDescriptions = new List<string>();
@@ -81,13 +81,13 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task Reject(RejectConsentViewModel viewModel, CancellationToken cancellationToken)
+        public async Task Reject([FromRoute] string prefix, RejectConsentViewModel viewModel, CancellationToken cancellationToken)
         {
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var oauthClient = await _clientRepository.Query().AsNoTracking().FirstAsync(c => c.ClientId == clientId, cancellationToken);
-            query = await _extractRequestHelper.Extract(Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+            query = await _extractRequestHelper.Extract(prefix ?? Constants.DefaultRealm, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var state = query.GetStateFromAuthorizationRequest();
             var jObj = new JsonObject

@@ -36,14 +36,14 @@ namespace SimpleIdServer.IdServer.Api.UMAPermissions
         }
 
         [HttpPost]
-        public Task<IActionResult> Add([FromBody] UMAPermissionRequest request, CancellationToken cancellationToken) => AddList(new List<UMAPermissionRequest> { request }, cancellationToken);
+        public Task<IActionResult> Add([FromRoute] string prefix, [FromBody] UMAPermissionRequest request, CancellationToken cancellationToken) => AddList(prefix, new List<UMAPermissionRequest> { request }, cancellationToken);
 
         [HttpPost]
-        public async Task<IActionResult> AddList([FromBody] IEnumerable<UMAPermissionRequest> requestLst, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddList([FromRoute] string prefix, [FromBody] IEnumerable<UMAPermissionRequest> requestLst, CancellationToken cancellationToken)
         {
             try
             {
-                CheckHasPAT(_jwtBuilder);
+                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
                 var permissionTicket = BuildPermissionTicket(requestLst);
                 await Validate(permissionTicket, cancellationToken);
                 await _umaPermissionTicketHelper.SetTicket(permissionTicket, cancellationToken);

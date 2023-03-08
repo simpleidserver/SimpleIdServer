@@ -115,7 +115,7 @@ namespace SimpleIdServer.IdServer.Jobs
 
             async Task<Dictionary<string, string>> BuildParameters()
             {
-                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, null));
+                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, null), Constants.DefaultRealm);
                 context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
                 context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId));
                 foreach (var tokenBuilder in _tokenBuilders)

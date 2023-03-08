@@ -68,7 +68,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [Authorize(Constants.Policies.Authenticated)]
         [HttpGet]
-        public async Task<IActionResult> EndSession(CancellationToken cancellationToken)
+        public async Task<IActionResult> EndSession([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var url = Constants.EndPoints.EndSessionCallback;
             var jObjBody = Request.Query.ToJObject();
@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.UI
                     };
                 }
 
-                var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
+                var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 if (Request.QueryString.HasValue)
                 {
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
@@ -114,7 +114,7 @@ namespace SimpleIdServer.IdServer.UI
 
         [Authorize(Constants.Policies.Authenticated)]
         [HttpGet]
-        public async Task<IActionResult> EndSessionCallback(CancellationToken cancellationToken)
+        public async Task<IActionResult> EndSessionCallback([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
@@ -123,8 +123,8 @@ namespace SimpleIdServer.IdServer.UI
             try
             {
                 var sessionId = await GetSessionId(cancellationToken);
-                var validationResult = await Validate(postLogoutRedirectUri, idTokenHint, cancellationToken);
-                await SendLogoutToken(validationResult.Client, sessionId, cancellationToken);
+                var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
+                await SendLogoutToken(validationResult.Client, prefix, sessionId, cancellationToken);
                 Response.Cookies.Delete(_options.SessionCookieName);
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        protected async Task SendLogoutToken(Client openIdClient, string sessionId, CancellationToken cancellationToken)
+        protected async Task SendLogoutToken(Client openIdClient, string realm, string sessionId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(openIdClient.BackChannelLogoutUri))
                 return;
@@ -168,7 +168,7 @@ namespace SimpleIdServer.IdServer.UI
                 IssuedAt = currentDateTime,
                 Claims = jwsPayload
             };
-            var logoutToken = _jwtBuilder.Sign(tokenDescriptor, openIdClient.TokenSignedResponseAlg);
+            var logoutToken = _jwtBuilder.Sign(realm, tokenDescriptor, openIdClient.TokenSignedResponseAlg);
             using (var httpClient = _httpClientFactory.GetHttpClient())
             {
                 var body = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
@@ -211,7 +211,7 @@ namespace SimpleIdServer.IdServer.UI
             return url;
         }
 
-        protected virtual async Task<ValidationResult> Validate(string postLogoutRedirectUri, string idTokenHint, CancellationToken cancellationToken)
+        protected virtual async Task<ValidationResult> Validate(string realm, string postLogoutRedirectUri, string idTokenHint, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_POST_LOGOUT_REDIRECT_URI);
@@ -219,7 +219,7 @@ namespace SimpleIdServer.IdServer.UI
             if (string.IsNullOrWhiteSpace(idTokenHint))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.MISSING_ID_TOKEN_HINT);
 
-            var extractionResult = ExtractIdTokenHint(idTokenHint);
+            var extractionResult = ExtractIdTokenHint(realm, idTokenHint);
             var claimName = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             if (claimName != extractionResult.Jwt.Subject)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
@@ -249,13 +249,13 @@ namespace SimpleIdServer.IdServer.UI
             return new ValidationResult(extractionResult.Jwt, openidClient);
         }
 
-        private ReadJsonWebTokenResult ExtractIdTokenHint(string idTokenHint)
+        private ReadJsonWebTokenResult ExtractIdTokenHint(string realm, string idTokenHint)
         {
             var handler = new JsonWebTokenHandler();
             if (!handler.CanReadToken(idTokenHint))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
 
-            var validationResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idTokenHint);
+            var validationResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, idTokenHint);
             if(validationResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_IDTOKENHINT);
             return validationResult;

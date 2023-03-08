@@ -88,7 +88,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
-                var payload = ExtractIdTokenHint(idTokenHint);
+                var payload = ExtractIdTokenHint(context.Realm, idTokenHint);
                 if (context.User.Name != payload.Subject)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_SUBJECT_IDTOKENHINT);
 
@@ -172,9 +172,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             return acr.AuthenticationMethodReferences.First();
         }
 
-        protected JsonWebToken ExtractIdTokenHint(string idTokenHint)
+        protected JsonWebToken ExtractIdTokenHint(string realm, string idTokenHint)
         {
-            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(idTokenHint);
+            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, idTokenHint);
             if (extractionResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
             return extractionResult.Jwt;

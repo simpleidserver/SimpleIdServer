@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             {
                 var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
                 var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
-                var encryptedKey = keyStore.GetAllEncryptingKeys().First(k => k.Key.KeyId == encKeyId);
+                var encryptedKey = keyStore.GetAllEncryptingKeys("master").First(k => k.Key.KeyId == encKeyId);
                 var client = clientRepository.Query().Include(c => c.SerializedJsonWebKeys).First(c => c.ClientId == clientId);
                 var jsonWebKey = client.JsonWebKeys.First(j => j.KeyId == sigKeyId);
                 var handler = new JsonWebTokenHandler();
@@ -127,7 +127,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             using (var scope = _factory.Services.CreateScope())
             {
                 var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
-                var signKey = keyStore.GetAllSigningKeys().First(k => k.Key.KeyId == keyId);
+                var signKey = keyStore.GetAllSigningKeys("master").First(k => k.Key.KeyId == keyId);
                 var handler = new JsonWebTokenHandler();
                 var claims = new Dictionary<string, object>();
                 foreach (var row in table.Rows)
@@ -149,7 +149,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             using (var scope = _factory.Services.CreateScope())
             {
                 var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
-                var signKey = keyStore.GetAllSigningKeys().First(k => k.Key.KeyId == keyId);
+                var signKey = keyStore.GetAllSigningKeys("master").First(k => k.Key.KeyId == keyId);
                 var handler = new JsonWebTokenHandler();
                 var claims = new Dictionary<string, object>();
                 foreach (var row in table.Rows)

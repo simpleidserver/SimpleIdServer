@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
@@ -46,11 +47,19 @@ void RunSqlServerIdServer(IServiceCollection services)
         .AddEmailAuthentication()
         .AddSmsAuthentication()
         .EnableConfigurableAuthentication()
+        .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
+            a.AddWsAuthentication(o =>
+            {
+                o.MetadataAddress = "http://localhost:5001/master/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.Wtrealm = "urn:website";
+                o.RequireHttpsMetadata = false;
+            });
+            /*
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "http://localhost:5001";
+                opts.Authority = "http://localhost:5001/master";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
@@ -64,6 +73,7 @@ void RunSqlServerIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
+            */
         });
 }
 
@@ -94,6 +104,9 @@ void SeedData(WebApplication application)
 
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
+
+            if (!dbContext.Realms.Any())
+                dbContext.Realms.AddRange(IdServerConfiguration.Realms);
 
             if (!dbContext.Acrs.Any())
             {

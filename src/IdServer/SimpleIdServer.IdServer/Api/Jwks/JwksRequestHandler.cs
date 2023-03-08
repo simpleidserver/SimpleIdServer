@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Api.Jwks
 {
     public interface IJwksRequestHandler
     {
-        JwksResult Get();
+        JwksResult Get(string realm);
     }
 
     public class JwksRequestHandler : IJwksRequestHandler
@@ -21,11 +21,12 @@ namespace SimpleIdServer.IdServer.Api.Jwks
             _keyStore = keyStore;
         }
 
-        public JwksResult Get()
+        public JwksResult Get(string realm)
         {
             var result = new JwksResult();
-            var signingKeys = _keyStore.GetAllSigningKeys();
-            var encKeys = _keyStore.GetAllEncryptingKeys();
+            realm = realm ?? Constants.DefaultRealm;
+            var signingKeys = _keyStore.GetAllSigningKeys(realm);
+            var encKeys = _keyStore.GetAllEncryptingKeys(realm);
             // JWT signing keys : Public key pairs for signing issued JWTs that are access tokens, ID Tokens etc... Clients can download them to validate the JWTs.
             foreach(var key in signingKeys)
                 result.JsonWebKeys.Add(ConvertSigningKey(key));

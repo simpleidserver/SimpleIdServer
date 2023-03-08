@@ -23,7 +23,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         }
 
         [HttpPost]
-        public async Task<IActionResult> Introspect(CancellationToken cancellationToken)
+        public async Task<IActionResult> Introspect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier);
@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
             var jObjBody = Request.Form.ToJsonObject();
             try
             {
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate));
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, jObjHeader, Request.Cookies, clientCertificate), prefix);
                 return await _requestHandler.Handle(context, cancellationToken);
             }
             catch (OAuthUnauthorizedException ex)

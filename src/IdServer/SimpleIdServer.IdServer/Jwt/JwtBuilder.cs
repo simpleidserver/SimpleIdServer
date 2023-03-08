@@ -17,15 +17,15 @@ namespace SimpleIdServer.IdServer.Jwt
 {
     public interface IJwtBuilder
     {
-        Task<string> BuildAccessToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken);
-        Task<string> BuildClientToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken);
-        string Sign(SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg);
-        string Encrypt(string jws, string jweAlg, string jweEnc);
+        Task<string> BuildAccessToken(string realm, Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken);
+        Task<string> BuildClientToken(string realm, Client client, SecurityTokenDescriptor securityTokenDescriptor, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken);
+        string Sign(string realm, SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg);
+        string Encrypt(string realm, string jws, string jweAlg, string jweEnc);
         string Encrypt(string jws, EncryptingCredentials encryptionKey);
         string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey);
         string Encrypt(string jws, string jweEnc, JsonWebKey jsonWebKey, string password);
-        ReadJsonWebTokenResult ReadSelfIssuedJsonWebToken(string jwt);
-        Task<ReadJsonWebTokenResult> ReadJsonWebToken(string jwt, Client client, string sigAlg, string encAlg, CancellationToken cancellationToken);
+        ReadJsonWebTokenResult ReadSelfIssuedJsonWebToken(string realm, string jwt);
+        Task<ReadJsonWebTokenResult> ReadJsonWebToken(string realm, string jwt, Client client, string sigAlg, string encAlg, CancellationToken cancellationToken);
     }
 
     public class ReadJsonWebTokenResult
@@ -54,11 +54,11 @@ namespace SimpleIdServer.IdServer.Jwt
             _options = options.Value;
         }
 
-        public Task<string> BuildAccessToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken) => BuildClientToken(client, securityTokenDescriptor, client.TokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg, client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, cancellationToken);
+        public Task<string> BuildAccessToken(string realm, Client client, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken) => BuildClientToken(realm, client, securityTokenDescriptor, client.TokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg, client.TokenEncryptedResponseAlg, client.TokenEncryptedResponseEnc, cancellationToken);
 
-        public async Task<string> BuildClientToken(Client client, SecurityTokenDescriptor securityTokenDescriptor, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken)
+        public async Task<string> BuildClientToken(string realm, Client client, SecurityTokenDescriptor securityTokenDescriptor, string sigAlg, string encAlg, string enc, CancellationToken cancellationToken)
         {
-            var jws = Sign(securityTokenDescriptor, sigAlg);
+            var jws = Sign(realm, securityTokenDescriptor, sigAlg);
             if (string.IsNullOrWhiteSpace(encAlg)) return jws;
             var jsonWebKeys = await _clientHelper.ResolveJsonWebKeys(client, cancellationToken);
             var jsonWebKey = jsonWebKeys.FirstOrDefault(j => j.Use == JsonWebKeyUseNames.Enc && j.Alg == encAlg);
@@ -67,20 +67,20 @@ namespace SimpleIdServer.IdServer.Jwt
             return Encrypt(jws, credentials);
         }
 
-        public string Sign(SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg)
+        public string Sign(string realm, SecurityTokenDescriptor securityTokenDescriptor, string jwsAlg)
         {
             var handler = new JsonWebTokenHandler();
             if (jwsAlg == SecurityAlgorithms.None) return handler.CreateToken(securityTokenDescriptor);
-            var signingKeys = _keyStore.GetAllSigningKeys();
+            var signingKeys = _keyStore.GetAllSigningKeys(realm);
             var signingKey = signingKeys.FirstOrDefault(s => s.Algorithm == jwsAlg);
             if(signingKey == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.NO_JWK_WITH_ALG_SIG, jwsAlg));
             securityTokenDescriptor.SigningCredentials = signingKey;
             return handler.CreateToken(securityTokenDescriptor);
         }
 
-        public string Encrypt(string jws, string jweAlg, string jweEnc)
+        public string Encrypt(string realm, string jws, string jweAlg, string jweEnc)
         {
-            var encryptionKeys = _keyStore.GetAllEncryptingKeys();
+            var encryptionKeys = _keyStore.GetAllEncryptingKeys(realm);
             var encryptionKey = encryptionKeys.First(e => e.Enc == jweEnc && e.Alg == jweAlg);
             return Encrypt(jws, encryptionKey);
         }
@@ -104,7 +104,7 @@ namespace SimpleIdServer.IdServer.Jwt
             return handler.EncryptToken(jws, credentials);
         }
 
-        public ReadJsonWebTokenResult ReadSelfIssuedJsonWebToken(string jwt)
+        public ReadJsonWebTokenResult ReadSelfIssuedJsonWebToken(string realm, string jwt)
         {
             var handler = new JsonWebTokenHandler();
             if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(ErrorMessages.INVALID_JWT);
@@ -112,7 +112,7 @@ namespace SimpleIdServer.IdServer.Jwt
             JsonWebToken encJwt = null;
             if(jsonWebToken.IsEncrypted)
             {
-                var encryptionKeys = _keyStore.GetAllEncryptingKeys();
+                var encryptionKeys = _keyStore.GetAllEncryptingKeys(realm);
                 var encryptionKey = encryptionKeys.FirstOrDefault(e => jsonWebToken.Kid == e.Key.KeyId);
                 if (encryptionKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_DECRYPT, jsonWebToken.Kid));
                 jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
@@ -126,7 +126,7 @@ namespace SimpleIdServer.IdServer.Jwt
                 jsonWebToken = encJwt;
             }
 
-            var signKeys = _keyStore.GetAllSigningKeys();
+            var signKeys = _keyStore.GetAllSigningKeys(realm);
             var sigKey = signKeys.FirstOrDefault(k => k.Kid == jsonWebToken.Kid);
             if (sigKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_CHECK_SIG, jsonWebToken.Kid));
             var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.Jwt
             return ReadJsonWebTokenResult.Ok(jsonWebToken, encJwt);
         }
 
-        public async Task<ReadJsonWebTokenResult> ReadJsonWebToken(string jwt, Client client, string sigAlg, string encAlg, CancellationToken cancellationToken)
+        public async Task<ReadJsonWebTokenResult> ReadJsonWebToken(string realm, string jwt, Client client, string sigAlg, string encAlg, CancellationToken cancellationToken)
         {
             var handler = new JsonWebTokenHandler();
             if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(ErrorMessages.INVALID_JWT);
@@ -178,7 +178,7 @@ namespace SimpleIdServer.IdServer.Jwt
                 // asymmetric key.
                 else
                 {
-                    var encryptedKeys = _keyStore.GetAllEncryptingKeys();
+                    var encryptedKeys = _keyStore.GetAllEncryptingKeys(realm);
                     var encryptedKey = encryptedKeys.FirstOrDefault(k => k.Key.KeyId == jsonWebToken.Kid);
                     if (encryptedKey == null) return ReadJsonWebTokenResult.BuildError(string.Format(ErrorMessages.NO_JWK_FOUND_TO_DECRYPT, jsonWebToken.Kid));
                     try

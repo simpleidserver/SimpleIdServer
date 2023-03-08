@@ -33,11 +33,11 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         }
 
         [HttpGet]
-        public override async Task<IActionResult> Get(CancellationToken cancellationToken)
+        public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var acrLst = await _authenticationContextClassReferenceRepository.Query().AsNoTracking().ToListAsync(cancellationToken);
-            var result = await Build(cancellationToken);
+            var result = await Build(prefix, cancellationToken);
             var claims = await _scopeRepository.Query()
                 .Include(s => s.ClaimMappers)
                 .AsNoTracking()
@@ -45,10 +45,13 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
                 .SelectMany(s => s.ClaimMappers)
                 .ToListAsync(cancellationToken);
 
-            result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{Constants.EndPoints.UserInfo}");
-            result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{Constants.EndPoints.CheckSession}");
-            result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{Constants.EndPoints.EndSession}");
-            result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{Constants.EndPoints.MtlsBCAuthorize}");
+            if (!string.IsNullOrWhiteSpace(prefix))
+                prefix = $"{prefix}/";
+
+            result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UserInfo}");
+            result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{prefix}{Constants.EndPoints.CheckSession}");
+            result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.EndSession}");
+            result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.MtlsBCAuthorize}");
             result.Add(OpenIDConfigurationNames.RequestParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestUriParameterSupported, true);
             result.Add(OpenIDConfigurationNames.RequestObjectSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
@@ -72,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
             result.Add(OpenIDConfigurationNames.BackchannelLogoutSupported, true);
             result.Add(OpenIDConfigurationNames.BackchannelLogoutSessionSupported, true);
             result.Add(OpenIDConfigurationNames.GrantManagementActionRequired, _options.GrantManagementActionRequired);
-            result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{Constants.EndPoints.Grants}");
+            result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.Grants}");
             result.Add(OpenIDConfigurationNames.GrantManagementActionsSupported, JsonSerializer.SerializeToNode(Constants.AllStandardGrantManagementActions));
             return new OkObjectResult(result);
         }

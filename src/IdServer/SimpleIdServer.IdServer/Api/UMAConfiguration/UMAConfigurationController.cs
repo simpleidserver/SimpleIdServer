@@ -17,12 +17,15 @@ namespace SimpleIdServer.IdServer.Api.UMAConfiguration
         }
 
         [HttpGet]
-        public override async Task<IActionResult> Get(CancellationToken cancellationToken)
+        public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var result = await Build(cancellationToken);
-            result.Add(UMAConfigurationNames.PermissionEndpoint, $"{issuer}/{Constants.EndPoints.UMAPermissions}");
-            result.Add(UMAConfigurationNames.ResourceRegistrationEndpoint, $"{issuer}/{Constants.EndPoints.UMAResources}");
+            var result = await Build(prefix, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(prefix))
+                prefix = $"{prefix}/";
+
+            result.Add(UMAConfigurationNames.PermissionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UMAPermissions}");
+            result.Add(UMAConfigurationNames.ResourceRegistrationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UMAResources}");
             return new OkObjectResult(result);
         }
     }

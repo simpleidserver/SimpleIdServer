@@ -23,6 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IGrantRepository, GrantRepository>();
             services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
             services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
+            services.AddTransient<IRealmRepository, RealmRepository>();
             if (action != null) services.AddDbContext<StoreDbContext>(action);
             else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"));
             return services;

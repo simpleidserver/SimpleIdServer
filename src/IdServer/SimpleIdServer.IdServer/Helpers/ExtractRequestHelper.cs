@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public interface IExtractRequestHelper
     {
-        Task<JsonObject> Extract(string issuerName, JsonObject jsonObject, Client oauthClient);
+        Task<JsonObject> Extract(string realm, string issuerName, JsonObject jsonObject, Client oauthClient);
         Task<bool> Extract(HandlerContext context);
     }
 
@@ -31,9 +31,9 @@ namespace SimpleIdServer.IdServer.Helpers
             _jwtBuilder = jwtBuilder;
         }
 
-        public async Task<JsonObject> Extract(string issuerName, JsonObject jsonObject, Client oauthClient)
+        public async Task<JsonObject> Extract(string realm, string issuerName, JsonObject jsonObject, Client oauthClient)
         {
-            var context = new HandlerContext(new HandlerContextRequest(issuerName, null, jsonObject), new HandlerContextResponse());
+            var context = new HandlerContext(new HandlerContextRequest(issuerName, null, jsonObject), realm, new HandlerContextResponse());
             context.SetClient(oauthClient);
             await Extract(context);
             return context.Request.RequestData;
@@ -78,7 +78,7 @@ namespace SimpleIdServer.IdServer.Helpers
         protected virtual async Task<bool> CheckRequest(HandlerContext context, string request)
         {
             var openidClient = context.Client;
-            var res = await _jwtBuilder.ReadJsonWebToken(request, context.Client, context.Client.RequestObjectSigningAlg, context.Client.RequestObjectEncryptionAlg, CancellationToken.None);
+            var res = await _jwtBuilder.ReadJsonWebToken(context.Realm, request, context.Client, context.Client.RequestObjectSigningAlg, context.Client.RequestObjectEncryptionAlg, CancellationToken.None);
             CheckRequestObject(res.Jwt, openidClient, context);
             context.Request.SetRequestData(res.Jwt.GetClaimJson());
             return true;

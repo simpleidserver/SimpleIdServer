@@ -41,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 foreach(var claim in parameter.AdditionalClaims)
                     tokenDescriptor.Claims.Add(claim.Key, claim.Value);
 
-            await SetResponse(parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
+            await SetResponse(handlerContext.Realm, parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
         }
         
         protected virtual SecurityTokenDescriptor BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizedClaim> claims, HandlerContext handlerContext)
@@ -82,13 +82,13 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             return tokenDescriptor;
         }
 
-        protected async Task SetResponse(string grantId, HandlerContext handlerContext, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken)
+        protected async Task SetResponse(string realm, string grantId, HandlerContext handlerContext, SecurityTokenDescriptor securityTokenDescriptor, CancellationToken cancellationToken)
         {
             var authorizationCode = string.Empty;
             if (!handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode))
                 authorizationCode = handlerContext.Request.RequestData.GetAuthorizationCode();
 
-            var accessToken = await _jwtBuilder.BuildAccessToken(handlerContext.Client, securityTokenDescriptor, cancellationToken);
+            var accessToken = await _jwtBuilder.BuildAccessToken(realm, handlerContext.Client, securityTokenDescriptor, cancellationToken);
             await _grantedTokenHelper.AddAccessToken(accessToken, handlerContext.Client.ClientId, authorizationCode, grantId, cancellationToken);
             handlerContext.Response.Add(TokenResponseParameters.AccessToken, accessToken);
         }

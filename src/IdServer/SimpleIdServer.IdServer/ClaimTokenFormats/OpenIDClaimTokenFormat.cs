@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.ClaimTokenFormats
     public interface IClaimTokenFormat
     {
         string Name { get; }
-        Task<ClaimTokenFormatFetcherResult> Fetch(string claimToken, CancellationToken cancellationToken);
+        Task<ClaimTokenFormatFetcherResult> Fetch(string realm, string claimToken, CancellationToken cancellationToken);
     }
 
     public class ClaimTokenFormatFetcherResult
@@ -33,9 +33,9 @@ namespace SimpleIdServer.IdServer.ClaimTokenFormats
         public const string NAME = "http://openid.net/specs/openid-connect-core-1_0.html#IDToken";
         public string Name => NAME;
 
-        public Task<ClaimTokenFormatFetcherResult> Fetch(string claimToken, CancellationToken cancellationToken)
+        public Task<ClaimTokenFormatFetcherResult> Fetch(string realm, string claimToken, CancellationToken cancellationToken)
         {
-            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(claimToken);
+            var extractionResult = _jwtBuilder.ReadSelfIssuedJsonWebToken(realm, claimToken);
             if (extractionResult.Error != null)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, extractionResult.Error);
             return Task.FromResult(new ClaimTokenFormatFetcherResult { UserNameIdentifier = extractionResult.Jwt.Subject, Claims = extractionResult.Jwt.Claims });

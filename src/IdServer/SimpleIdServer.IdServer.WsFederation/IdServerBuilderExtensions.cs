@@ -18,12 +18,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return idServerBuilder;
         }
 
-        public static IdServerBuilder AddWsFederationSigningCredentials(this IdServerBuilder idServerBuilder)
+        public static IdServerBuilder AddWsFederationSigningCredentials(this IdServerBuilder idServerBuilder, string realm = Constants.DefaultRealm)
         {
             var certificate = KeyGenerator.GenerateSelfSignedCertificate();
             var securityKey = new X509SecurityKey(certificate, "wsFedKid");
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
-            idServerBuilder.KeyStore.Add(credentials);
+            idServerBuilder.KeyStore.Add(realm, credentials);
             return idServerBuilder;
         }
     }

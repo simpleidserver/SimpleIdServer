@@ -146,13 +146,14 @@ namespace SimpleIdServer.IdServer.Api
 
     public class HandlerContext
     {
-        public HandlerContext(HandlerContextRequest request)
+        public HandlerContext(HandlerContextRequest request, string realm)
         {
             Request = request;
+            Realm = realm;
             Response = new HandlerContextResponse();
         }
 
-        public HandlerContext(HandlerContextRequest request, HandlerContextResponse response) : this(request)
+        public HandlerContext(HandlerContextRequest request, string realm, HandlerContextResponse response) : this(request, realm)
         {
             Response = response;
         }
@@ -160,6 +161,7 @@ namespace SimpleIdServer.IdServer.Api
         public User User { get; private set; }
         public Client Client { get; private set; }
         public HandlerContextRequest Request { get; private set; }
+        public string Realm { get; private set; }
         public JsonObject OriginalRequest { get; private set; }
         public HandlerContextResponse Response { get; private set; }
         public IUrlHelper UrlHelper { get; private set; }

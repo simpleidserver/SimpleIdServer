@@ -14,9 +14,9 @@ namespace SimpleIdServer.IdServer.Api.Jwks
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromRoute] string prefix)
         {
-            var jwks = _jwksRequestHandler.Get();
+            var jwks = _jwksRequestHandler.Get(prefix);
             return new OkObjectResult(jwks);
         }
     }

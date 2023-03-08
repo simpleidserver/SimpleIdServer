@@ -423,5 +423,6 @@ namespace SimpleIdServer.IdServer
         /// Direct use of a shared symmetric key as the CEK.
         /// </summary>
         public const string AlgDir = "dir";
+        public const string DefaultRealm = "master";
     }
 }
