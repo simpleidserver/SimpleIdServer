@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer.Builders
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            client.Realms.Add(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
             client.Scopes.Add(Constants.StandardScopes.SAMLProfile);
             client.SetWsFederationEnabled(true);
             return new WsFederationClientBuilder(client);

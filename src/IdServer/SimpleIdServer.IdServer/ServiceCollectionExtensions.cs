@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
@@ -92,7 +93,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
                 {
-                    opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+                    var o = services.BuildServiceProvider().GetRequiredService<IOptions<IdServerHostOptions>>().Value;
+                    opts.LoginPath = o.UseRealm ? $"/{Constants.DefaultRealm}/{Constants.Areas.Password}/Authenticate" : $"/{Constants.Areas.Password}/Authenticate";
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {
                         if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)

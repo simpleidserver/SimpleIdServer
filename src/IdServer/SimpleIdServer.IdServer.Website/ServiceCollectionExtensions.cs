@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
-            services.AddStore(action);
+            services.AddStore(action, ServiceLifetime.Transient);
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();

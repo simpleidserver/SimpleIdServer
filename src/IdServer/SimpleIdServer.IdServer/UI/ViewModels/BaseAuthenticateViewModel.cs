@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string TosUri { get; set; }
         public string PolicyUri { get; set; }
         public bool RememberLogin { get; set; }
+        public string Realm { get; set; }
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
     }
 }

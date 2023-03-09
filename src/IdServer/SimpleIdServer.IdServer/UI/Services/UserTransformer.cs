@@ -12,7 +12,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 {
     public interface IUserTransformer
     {
-        User Transform(ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
+        User Transform(Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider);
         ICollection<Claim> Transform(User user);
     }
 
@@ -25,7 +25,7 @@ namespace SimpleIdServer.IdServer.UI.Services
             { ClaimTypes.Gender, JwtRegisteredClaimNames.Gender }
         };
 
-        public User Transform(ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
+        public User Transform(Realm realm, ClaimsPrincipal principal, AuthenticationSchemeProvider idProvider)
         {
             var user = new User
             {
@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.UI.Services
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow
             };
+            user.Realms.Add(realm);
             foreach(var mapper in idProvider.Mappers)
             {
                 switch(mapper.MapperType)

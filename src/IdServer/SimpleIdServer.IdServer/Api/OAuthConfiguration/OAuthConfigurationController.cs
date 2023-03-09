@@ -29,20 +29,21 @@ namespace SimpleIdServer.IdServer.Api.Configuration
 
         protected async Task<JsonObject> Build(string prefix, CancellationToken cancellationToken)
         {
+            var subUrl = string.Empty;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
-                prefix = $"{prefix}/";
+                subUrl = $"{prefix}/";
             var jObj = new JsonObject
             {
-                [OAuthConfigurationNames.Issuer] = issuer ,
-                [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{prefix}{Constants.EndPoints.Authorization}",
-                [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{prefix}{Constants.EndPoints.Registration}",
-                [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{prefix}{Constants.EndPoints.Token}",
-                [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{prefix}{Constants.EndPoints.Token}/revoke",
-                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{prefix}{Constants.EndPoints.Jwks}",
-                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{prefix}{Constants.EndPoints.TokenInfo}"
+                [OAuthConfigurationNames.Issuer] = issuer,
+                [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Authorization}",
+                [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Registration}",
+                [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}",
+                [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}/revoke",
+                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{subUrl}{Constants.EndPoints.Jwks}",
+                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.TokenInfo}"
             };
-            await _configurationRequestHandler.Enrich(jObj, issuer, cancellationToken);
+            await _configurationRequestHandler.Enrich(prefix, jObj, issuer, cancellationToken);
             return jObj;
         }
     }

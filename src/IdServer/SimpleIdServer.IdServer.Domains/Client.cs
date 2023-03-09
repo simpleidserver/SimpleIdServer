@@ -6,7 +6,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using System.Threading;
 
 namespace SimpleIdServer.IdServer.Domains
 {
@@ -447,6 +446,8 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonIgnore]
         public int BCIntervalSeconds { get; set; } = 5;
+        [JsonIgnore]
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
 
         public double? GetDoubleParameter(string name)
         {

@@ -109,13 +109,14 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             if (unsupportedResponseType.Any())
                 throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.MISSING_RESPONSE_TYPES, string.Join(" ", unsupportedResponseType)));
 
-            context.SetClient(await AuthenticateClient(context.Request.RequestData, cancellationToken));
+            context.SetClient(await AuthenticateClient(context.Realm, context.Request.RequestData, cancellationToken));
             var user = await _userRepository.Query()
                 .Include(u => u.Consents)
                 .Include(u => u.Sessions)
+                .Include(u => u.Realms)
                 .Include(u => u.OAuthUserClaims)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject, cancellationToken);
+                .SingleOrDefaultAsync(u => u.Name == context.Request.UserSubject && u.Realms.Any(r => r.Name == context.Realm), cancellationToken);
             context.SetUser(user);
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
@@ -201,7 +202,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
         }
 
-        private async Task<Client> AuthenticateClient(JsonObject jObj, CancellationToken cancellationToken)
+        private async Task<Client> AuthenticateClient(string realm, JsonObject jObj, CancellationToken cancellationToken)
         {
             var clientId = jObj.GetClientIdFromAuthorizationRequest();
             if (string.IsNullOrWhiteSpace(clientId))
@@ -211,8 +212,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
             var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
                 .Include(c => c.SerializedJsonWebKeys)
+                .Include(c => c.Realms)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
             if (client == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));

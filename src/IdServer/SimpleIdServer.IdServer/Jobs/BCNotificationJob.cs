@@ -43,18 +43,23 @@ namespace SimpleIdServer.IdServer.Jobs
             var notificationMethods = GetNotificationMethods();
             var allMethods = notificationMethods.Select(kvp => kvp.Key);
             var bcAuthorizeLst = await _repository.Query().Include(a => a.Histories).Where(a => a.LastStatus == Domains.BCAuthorizeStatus.Confirmed && allMethods.Contains(a.NotificationMode) && DateTime.UtcNow < a.ExpirationDateTime).ToListAsync(CancellationToken.None);
-            var userIds = bcAuthorizeLst.Select(a => a.UserId).Distinct();
-            var clientIds = bcAuthorizeLst.Select(a => a.ClientId).Distinct();
-            var users = await _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking().Where(u => userIds.Contains(u.Id)).ToListAsync();
-            var clients = await _clientRepository.Query()
-                .Include(c => c.SerializedJsonWebKeys)
-                .Include(c => c.Scopes).AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync();
-            var parameter = new NotificationParameter { Clients = clients, Users = users };
-            await Parallel.ForEachAsync(bcAuthorizeLst, async (bc, t) =>
+            foreach(var grp in bcAuthorizeLst.GroupBy(b => b.Realm))
             {
-                var method = notificationMethods[bc.NotificationMode];
-                await method(bc, parameter);
-            });
+                var realmBcAuthorizeLst = grp.Select(g => g);
+                var userIds = realmBcAuthorizeLst.Select(a => a.UserId).Distinct();
+                var clientIds = realmBcAuthorizeLst.Select(a => a.ClientId).Distinct();
+                var users = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).AsNoTracking().Where(u => userIds.Contains(u.Id) && u.Realms.Any(r => r.Name == grp.Key)).ToListAsync();
+                var clients = await _clientRepository.Query()
+                    .Include(c => c.SerializedJsonWebKeys)
+                    .Include(c => c.Realms)
+                    .Include(c => c.Scopes).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == grp.Key)).ToListAsync();
+                var parameter = new NotificationParameter { Clients = clients, Users = users };
+                await Parallel.ForEachAsync(realmBcAuthorizeLst, async (bc, t) =>
+                {
+                    var method = notificationMethods[bc.NotificationMode];
+                    await method(bc, parameter);
+                });
+            }
 
             await _repository.SaveChanges(CancellationToken.None);
         }
@@ -115,9 +120,9 @@ namespace SimpleIdServer.IdServer.Jobs
 
             async Task<Dictionary<string, string>> BuildParameters()
             {
-                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, null), Constants.DefaultRealm);
+                var context = new HandlerContext(new HandlerContextRequest(null, null, new JsonObject(), null, null, null), bcAuthorize.Realm);
                 context.SetUser(parameter.Users.First(u => u.Id == bcAuthorize.UserId));
-                context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId));
+                context.SetClient(parameter.Clients.First(c => c.ClientId == bcAuthorize.ClientId && c.Realms.Any(r => r.Name == bcAuthorize.Realm)));
                 foreach (var tokenBuilder in _tokenBuilders)
                     await tokenBuilder.Build(new BuildTokenParameter { Scopes = bcAuthorize.Scopes }, context, CancellationToken.None);
                 return context.Response.Parameters;

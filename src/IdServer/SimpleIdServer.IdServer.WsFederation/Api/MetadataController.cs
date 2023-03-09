@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
         [HttpGet]
         public async Task<IActionResult> Get([FromRoute] string prefix)
         {
-            var sigKeys = KeyStore.GetAllSigningKeys(prefix);
+            var sigKeys = KeyStore.GetAllSigningKeys(prefix ?? Constants.DefaultRealm);
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var tokenEndpoint = $"{issuer}/{WsFederationConstants.EndPoints.SSO}";
             if (!string.IsNullOrWhiteSpace(prefix))

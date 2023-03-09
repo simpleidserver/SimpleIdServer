@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.UI.Services
 {
     public interface IPasswordAuthService
     {
-        Task<User> Authenticate(string login, string password, CancellationToken cancellationToken);
+        Task<User> Authenticate(string realm, string login, string password, CancellationToken cancellationToken);
     }
 
     public class PasswordAuthService : IPasswordAuthService
@@ -27,9 +27,9 @@ namespace SimpleIdServer.IdServer.UI.Services
             _userHelper = userHelper;
         }
 
-        public virtual async Task<User> Authenticate(string login, string password, CancellationToken cancellationToken)
+        public virtual async Task<User> Authenticate(string realm, string login, string password, CancellationToken cancellationToken)
         {
-            var user = await _userHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Credentials).Include(u => u.OAuthUserClaims), login, cancellationToken);
+            var user = await _userHelper.GetUserByLogin(_userRepository.Query().Include(u => u.Credentials).Include(u => u.Realms).Include(u => u.OAuthUserClaims), login, realm, cancellationToken);
             if (user == null)
                 throw new BaseUIException(ErrorCodes.UNKNOWN_USER);
 

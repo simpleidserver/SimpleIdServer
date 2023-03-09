@@ -8,20 +8,21 @@ namespace SimpleIdServer.IdServer.Builders
     {
         private readonly UMAPendingRequest _pendingRequest;
 
-        private UMAPendingRequestBuilder(string ticketId, string requester, string owner, UMAResource resource)
+        private UMAPendingRequestBuilder(string ticketId, string requester, string owner, UMAResource resource, string realm)
         {
             _pendingRequest= new UMAPendingRequest
             {
                 TicketId = ticketId,
                 Requester = requester,
                 Owner = owner,
-                Resource = resource
+                Resource = resource,
+                Realm = realm
             };
         }
 
         public static UMAPendingRequestBuilder Create(string ticketId, string requester, string owner, UMAResource resource)
         { 
-            var result = new UMAPendingRequestBuilder(ticketId, requester, owner, resource);
+            var result = new UMAPendingRequestBuilder(ticketId, requester, owner, resource, Constants.DefaultRealm);
             return result;
         }
 

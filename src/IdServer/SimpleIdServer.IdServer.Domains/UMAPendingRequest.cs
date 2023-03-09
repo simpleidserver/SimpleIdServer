@@ -14,11 +14,12 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public UMAPendingRequest() { }
 
-        public UMAPendingRequest(string ticketId, string? owner, DateTime createDateTime)
+        public UMAPendingRequest(string ticketId, string? owner, DateTime createDateTime, string realm)
         {
             TicketId = ticketId;
             Owner = owner;
             CreateDateTime = createDateTime;
+            Realm = realm;
             Scopes = new List<string>();
             Status = UMAPendingRequestStatus.TOBECONFIRMED;
         }
@@ -29,6 +30,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         public UMAPendingRequestStatus Status { get; set; }
         public UMAResource Resource { get; set; }
+        public string Realm { get; set; }
         public ICollection<string> Scopes { get; set; } = new List<string>();
 
         public void Confirm()

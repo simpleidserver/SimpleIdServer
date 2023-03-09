@@ -10,9 +10,10 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
     {
         public AuthenticateEmailViewModel() { }
 
-        public AuthenticateEmailViewModel(string returnUrl, string email, string clientName, string logoUri, string tosUri, string policyUri)
+        public AuthenticateEmailViewModel(string returnUrl, string realm, string email, string clientName, string logoUri, string tosUri, string policyUri)
         {
             ReturnUrl = returnUrl;
+            Realm = realm;
             Email = email;
             ClientName = clientName;
             LogoUri = logoUri;

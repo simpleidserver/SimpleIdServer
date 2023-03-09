@@ -37,7 +37,8 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                prefix = prefix ?? Constants.DefaultRealm;
+                CheckHasPAT(prefix, _jwtBuilder);
                 var result = await _umaResourceRepository.Query().AsNoTracking().ToListAsync(cancellationToken);
                 return new OkObjectResult(result.Select(r => r.Id));
             }
@@ -53,7 +54,8 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                prefix = prefix ?? Constants.DefaultRealm;
+                CheckHasPAT(prefix, _jwtBuilder);
                 var result = await _umaResourceRepository.Query().Include(r => r.Translations).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
                 if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, ErrorMessages.UNKNOWN_UMA_RESOURCE);
                 return new OkObjectResult(result);
@@ -70,11 +72,12 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                CheckHasPAT(prefix ?? Constants.DefaultRealm, _jwtBuilder);
+                prefix = prefix ?? Constants.DefaultRealm;
+                CheckHasPAT(prefix, _jwtBuilder);
                 Validate(request);
                 if(string.IsNullOrWhiteSpace(request.Subject))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, UMAResourceNames.Subject));
-                var umaResource = new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow)
+                var umaResource = new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow, prefix)
                 {
                     IconUri = request.IconUri,
                     Scopes = request.Scopes,

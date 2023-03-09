@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.Property(a => a.AuthenticationMethodReferences).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());
+            builder.HasMany(a => a.Realms).WithMany(a => a.AuthenticationContextClassReferences);
         }
     }
 }

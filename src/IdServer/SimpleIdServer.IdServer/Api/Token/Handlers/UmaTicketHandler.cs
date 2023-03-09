@@ -147,7 +147,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     foreach (var umaResource in umaResources)
                     {
                         var permissionTicketRecord = permissionTicket.Records.First(r => r.ResourceId == umaResource.Id);
-                        var umaPendingRequest = new UMAPendingRequest(permissionTicket.Id, umaResource.Subject, DateTime.UtcNow)
+                        var umaPendingRequest = new UMAPendingRequest(permissionTicket.Id, umaResource.Subject, DateTime.UtcNow, context.Realm)
                         {
                             Requester = claimTokenFormatFetcherResult.UserNameIdentifier,
                             Scopes = umaResource.Scopes,

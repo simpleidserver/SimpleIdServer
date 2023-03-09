@@ -82,7 +82,8 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
 
             async Task<Domains.Client> Validate()
             {
-                var client = await _clientRepository.Query().Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm, cancellationToken);
+                var str = realm ?? Constants.DefaultRealm;
+                var client = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == message.Wtrealm && c.Realms.Any(r => r.Name == str), cancellationToken);
                 if (client == null)
                     throw new OAuthException(ErrorCodes.INVALID_RP, ErrorMessages.UNKNOWN_RP);
 
@@ -150,7 +151,7 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                     Expires = DateTime.UtcNow.AddSeconds(client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds),
                     Subject = subject,
                     Issuer = issuer,
-                    SigningCredentials = GetSigningCredentials(realm)
+                    SigningCredentials = GetSigningCredentials(realm ?? Constants.DefaultRealm)
                 };
                 SecurityTokenHandler handler;
                 if (tokenType == WsFederationConstants.TokenTypes.Saml2TokenProfile11)

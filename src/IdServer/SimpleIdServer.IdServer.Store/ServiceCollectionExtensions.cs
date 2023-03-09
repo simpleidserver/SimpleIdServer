@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
+        public static IServiceCollection AddStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
             services.AddTransient<IClientRepository, ClientRepository>();
             services.AddTransient<IScopeRepository, ScopeRepository>();
@@ -24,8 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
             services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
             services.AddTransient<IRealmRepository, RealmRepository>();
-            if (action != null) services.AddDbContext<StoreDbContext>(action);
-            else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"));
+            if (action != null) services.AddDbContext<StoreDbContext>(action, lifetime);
+            else services.AddDbContext<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"), lifetime);
             return services;
         }
     }

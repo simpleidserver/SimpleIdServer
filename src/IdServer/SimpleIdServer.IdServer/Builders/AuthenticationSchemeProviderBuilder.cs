@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleIdServer.IdServer.Builders
@@ -28,7 +29,11 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 Properties = properties.ToList(),
                 Mappers = Constants.GetDefaultIdProviderMappers(),
-                AuthSchemeProviderDefinition = definition
+                AuthSchemeProviderDefinition = definition,
+                Realms = new List<Realm>
+                {
+                    Constants.StandardRealms.Master
+                }
             });
         }
 

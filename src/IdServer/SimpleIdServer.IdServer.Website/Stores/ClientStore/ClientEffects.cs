@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Linq.Dynamic.Core;
 
@@ -19,17 +20,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
     {
         private readonly IClientRepository _clientRepository;
         private readonly IScopeRepository _scopeRepository;
+        private readonly IState<RealmsState> _realmsState;
 
-        public ClientEffects(IClientRepository clientRepository, IScopeRepository scopeRepository)
+        public ClientEffects(IClientRepository clientRepository, IScopeRepository scopeRepository, IState<RealmsState> realmsState)
         {
             _clientRepository = clientRepository;
             _scopeRepository = scopeRepository;
+            _realmsState = realmsState;
         }
 
         [EffectMethod]
         public async Task Handle(SearchClientsAction action, IDispatcher dispatcher)
         {
-            IQueryable<Client> query = _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).AsNoTracking();
+            var realm = _realmsState.Value.ActiveRealm;
+            IQueryable<Client> query = _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Where(c => c.Realms.Any(r => r.Name == realm)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 

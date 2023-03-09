@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Email.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
@@ -44,9 +44,10 @@ namespace SimpleIdServer.IdServer.Email.UI
             {
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
                 return View(new AuthenticateEmailViewModel(returnUrl,
+                    prefix,
                     loginHint,
                     client.ClientName,
                     client.LogoUri,
@@ -61,8 +62,10 @@ namespace SimpleIdServer.IdServer.Email.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(AuthenticateEmailViewModel viewModel, CancellationToken token)
+        public async Task<IActionResult> Index([FromRoute] string prefix, AuthenticateEmailViewModel viewModel, CancellationToken token)
         {
+            viewModel.Realm = prefix;
+            prefix = prefix ?? SimpleIdServer.IdServer.Constants.DefaultRealm;
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
@@ -93,7 +96,7 @@ namespace SimpleIdServer.IdServer.Email.UI
                     try
                     {
                         var user = await _emailAuthService.Authenticate(viewModel.Email, viewModel.OTPCode.Value, token);
-                        return await Authenticate(viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
+                        return await Authenticate(prefix, viewModel.ReturnUrl, Constants.AMR, user, token, viewModel.RememberLogin);
                     }
                     catch (CryptographicException)
                     {

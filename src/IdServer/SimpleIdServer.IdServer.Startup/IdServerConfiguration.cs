@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Realm> Realms = new List<Realm>
         {
-            RealmBuilder.CreateMaster().Build()
+            Constants.StandardRealms.Master
         };
     }
 }

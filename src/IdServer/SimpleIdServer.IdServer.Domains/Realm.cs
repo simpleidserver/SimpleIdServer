@@ -9,5 +9,9 @@ namespace SimpleIdServer.IdServer.Domains
         public string? Description { get; set; } = null;
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        public ICollection<Client> Clients { get; set; } = new List<Client>();
+        public ICollection<User> Users { get; set; } = new List<User>();
+        public ICollection<Scope> Scopes { get; set; } = new List<Scope>();
+        public ICollection<AuthenticationContextClassReference> AuthenticationContextClassReferences { get; set; } = new List<AuthenticationContextClassReference>();
     }
 }

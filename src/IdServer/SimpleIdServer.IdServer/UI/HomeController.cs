@@ -53,8 +53,9 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
-        public async Task<IActionResult> Profile(CancellationToken cancellationToken)
+        public async Task<IActionResult> Profile([FromRoute] string prefix, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.ExternalAuthProviders).Include(u => u.Credentials).FirstOrDefaultAsync(u => u.Name == nameIdentifier, cancellationToken);
@@ -79,7 +80,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var consents = new List<ConsentViewModel>(); 
                 var clientIds = user.Consents.Select(c => c.ClientId);
-                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().Where(c => clientIds.Contains(c.ClientId)).ToListAsync(cancellationToken);
+                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).Include(r => r.Realms).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
                 foreach (var consent in user.Consents)
                 {
                     var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
@@ -96,7 +97,7 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task<List<PendingRequestViewModel>> GetPendingRequest()
             {
-                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => r.Owner == nameIdentifier || r.Requester == nameIdentifier).ToListAsync(cancellationToken);
+                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => (r.Owner == nameIdentifier || r.Requester == nameIdentifier) && r.Realm == prefix).ToListAsync(cancellationToken);
                 var result = new List<PendingRequestViewModel>();
                 foreach(var pendingRequest in pendingRequestLst)
                 {

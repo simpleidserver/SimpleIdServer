@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime UpdateDateTime { get; set; }
         public DateTime? RejectionSentDateTime { get; set; }
         public DateTime? NextFetchTime { get; set; }
+        public string Realm { get; set; } = null!;
         public IEnumerable<string> Scopes { get; set; } = new List<string>();
         public ICollection<BCAuthorizeHistory> Histories { get; set; } = new List<BCAuthorizeHistory>();
 
@@ -72,7 +73,8 @@ namespace SimpleIdServer.IdServer.Domains
             string notificationMode,
             IEnumerable<string> scopes,
             string userId,
-            string notificationToken)
+            string notificationToken,
+            string realm)
         {
             var result = new BCAuthorize
             {
@@ -84,7 +86,8 @@ namespace SimpleIdServer.IdServer.Domains
                 NotificationMode = notificationMode,
                 Scopes = scopes,
                 UserId = userId,
-                NotificationToken = notificationToken
+                NotificationToken = notificationToken,
+                Realm = realm
             };
             result.UpdateStatus(BCAuthorizeStatus.Pending);
             return result;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -15,7 +16,15 @@ namespace SimpleIdServer.IdServer.Builders
 
         public static ScopeBuilder CreateApiScope(string name, bool isExposed = false)
         {
-            return new ScopeBuilder(new Scope { Name = name, IsExposedInConfigurationEdp = isExposed });
+            return new ScopeBuilder(new Scope 
+            { 
+                Name = name, 
+                IsExposedInConfigurationEdp = isExposed,
+                Realms =new List<Realm>
+                {
+                    Constants.StandardRealms.Master
+                }
+            });
         }
 
         public Scope Build() => _scope;

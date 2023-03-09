@@ -7,10 +7,12 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
 <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="Add client" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
-<RadzenDataGrid AllowFiltering="true" 
+<RadzenDataGrid @ref="clientsGrid" 
+        AllowFiltering="true" 
         AllowColumnResize="true"
         AllowAlternatingRows="false" 
         AllowSorting="true" 
@@ -56,16 +58,24 @@
 
 @code {
     bool selectAll = false;
+    RadzenDataGrid<SelectableClient> clientsGrid;
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if(firstRender)
+        {
             SubscribeToAction<RemoveSelectedClientsSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientsRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                clientsGrid.Reload();
+                StateHasChanged();
+            });
+        }
     }
 
     void LoadData(LoadDataArgs args)

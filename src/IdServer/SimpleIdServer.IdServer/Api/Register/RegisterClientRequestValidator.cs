@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Api.Register
 {
     public interface IRegisterClientRequestValidator
     {
-        Task Validate(Client request, CancellationToken cancellationToken);
+        Task Validate(string realm, Client request, CancellationToken cancellationToken);
     }
 
     public class RegisterClientRequestValidator : IRegisterClientRequestValidator
@@ -41,7 +41,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             _subjectTypeBuilders = subjectTypeBuilders;
         }
 
-        public async Task Validate(Client client, CancellationToken cancellationToken)
+        public async Task Validate(string realm, Client client, CancellationToken cancellationToken)
         {
             var authGrantTypes = _responseTypeHandlers.Select(r => r.GrantType);
             var supportedGrantTypes = _grantTypeHandlers.Select(g => g.GrantType).Union(authGrantTypes).Distinct();
@@ -96,7 +96,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (!string.IsNullOrWhiteSpace(client.Scope))
             {
                 var scopes = client.Scope.ToScopes();
-                var existingScopes = await _scopeRepository.Query().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
+                var existingScopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
                 var existingScopeNames = existingScopes.Select(s => s.Name);
                 var unsupportedScopes = scopes.Except(existingScopeNames);
                 if (unsupportedScopes.Any())

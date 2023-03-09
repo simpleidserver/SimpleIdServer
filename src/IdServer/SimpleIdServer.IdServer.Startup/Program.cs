@@ -6,9 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Store;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -52,14 +54,14 @@ void RunSqlServerIdServer(IServiceCollection services)
         {
             a.AddWsAuthentication(o =>
             {
-                o.MetadataAddress = "http://localhost:5001/master/FederationMetadata/2007-06/FederationMetadata.xml";
+                o.MetadataAddress = "http://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
             /*
             a.AddOIDCAuthentication(opts =>
             {
-                opts.Authority = "http://localhost:5001/master";
+                opts.Authority = "http://localhost:5001";
                 opts.ClientId = "website";
                 opts.ClientSecret = "password";
                 opts.ResponseType = "code";
@@ -84,6 +86,9 @@ void SeedData(WebApplication application)
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
             dbContext.Database.Migrate();
+            if (!dbContext.Realms.Any())
+                dbContext.Realms.AddRange(IdServerConfiguration.Realms);
+
             if (!dbContext.Scopes.Any())
                 dbContext.Scopes.AddRange(IdServerConfiguration.Scopes);
 
@@ -105,9 +110,6 @@ void SeedData(WebApplication application)
             if (!dbContext.AuthenticationSchemeProviders.Any())
                 dbContext.AuthenticationSchemeProviders.AddRange(IdServerConfiguration.Providers);
 
-            if (!dbContext.Realms.Any())
-                dbContext.Realms.AddRange(IdServerConfiguration.Realms);
-
             if (!dbContext.Acrs.Any())
             {
                 dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
@@ -115,19 +117,31 @@ void SeedData(WebApplication application)
                 {
                     Name = "email",
                     AuthenticationMethodReferences = new[] { "email" },
-                    DisplayName = "Email authentication"
+                    DisplayName = "Email authentication",
+                    Realms = new List<Realm>
+                    {
+                        SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                    }
                 });
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
                     Name = "sms",
                     AuthenticationMethodReferences = new[] { "sms" },
-                    DisplayName = "Sms authentication"
+                    DisplayName = "Sms authentication",
+                    Realms = new List<Realm>
+                    {
+                        SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                    }
                 });
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
                     Name = "pwd-email",
                     AuthenticationMethodReferences = new[] { "pwd", "email" },
-                    DisplayName = "Password and email authentication"
+                    DisplayName = "Password and email authentication",
+                    Realms = new List<Realm>
+                    {
+                        SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                    }
                 });
             }
 

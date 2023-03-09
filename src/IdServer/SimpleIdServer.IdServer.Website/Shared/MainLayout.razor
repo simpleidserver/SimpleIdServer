@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject IState<RealmsState> state
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
 
 <PageTitle>SimpleIdServer Administration UI</PageTitle>
 
@@ -16,7 +20,8 @@
         </div>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded="@sidebarExpanded">
-        <RadzenPanelMenu>
+        <RadzenPanelMenu Click="@(args => ShowRealms(args))">
+            <RadzenPanelMenuItem Text=@("Active Realm : " + state.Value.ActiveRealm) />
             <RadzenPanelMenuItem Text="Manage" />
             <RadzenPanelMenuItem Text="Clients" Icon="apps" Path="/clients" />
             <RadzenPanelMenuItem Text="Scopes" Icon="visibility" Path="/scopes" />
@@ -40,4 +45,22 @@
 
 @code {
     bool sidebarExpanded = true;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            var act = new GetAllRealmAction();
+            dispatcher.Dispatch(act);
+        }
+    }
+
+    void ShowRealms(MenuItemEventArgs args)
+    {
+        if (state.Value.IsLoading || args.Text != "Active Realm : " + state.Value.ActiveRealm) return;
+        // Display popup
+        var act = new SelectRealmAction { Realm = "test" };
+        dispatcher.Dispatch(act);
+    }
 }

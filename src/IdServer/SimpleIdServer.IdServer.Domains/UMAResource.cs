@@ -11,11 +11,12 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public UMAResource() { }
 
-        public UMAResource(string id, DateTime createDateTime)
+        public UMAResource(string id, DateTime createDateTime, string realm)
         {
             Id = id;
             CreateDateTime = createDateTime;
             UpdateDateTime = createDateTime;
+            Realm = realm;
             Scopes = new List<string>();
         }
 
@@ -53,6 +54,7 @@ namespace SimpleIdServer.IdServer.Domains
                 return Translate("name");
             }
         }
+        public string Realm { get; set; } = null!;
 
         public void UpdateTranslations(IEnumerable<Translation> translations)
         {

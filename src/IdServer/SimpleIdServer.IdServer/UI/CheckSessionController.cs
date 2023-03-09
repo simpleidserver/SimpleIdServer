@@ -94,7 +94,7 @@ namespace SimpleIdServer.IdServer.UI
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
                 }
 
-                var sessionId = await GetSessionId(cancellationToken);
+                var sessionId = await GetSessionId(prefix, cancellationToken);
                 var frontChannelLogout = BuildFrontChannelLogoutUrl(validationResult.Client, sessionId);
                 if (!string.IsNullOrWhiteSpace(frontChannelLogout))
                 {
@@ -122,7 +122,7 @@ namespace SimpleIdServer.IdServer.UI
             var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
-                var sessionId = await GetSessionId(cancellationToken);
+                var sessionId = await GetSessionId(prefix, cancellationToken);
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 await SendLogoutToken(validationResult.Client, prefix, sessionId, cancellationToken);
                 Response.Cookies.Delete(_options.SessionCookieName);
@@ -185,10 +185,10 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        protected async Task<string> GetSessionId(CancellationToken cancellationToken)
+        protected async Task<string> GetSessionId(string realm, CancellationToken cancellationToken)
         {
             var userId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId, cancellationToken);
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).FirstOrDefaultAsync(u => u.Name == userId && u.Realms.Any(r => r.Name == realm), cancellationToken);
             return user.ActiveSession?.SessionId;
         }
 
@@ -227,7 +227,7 @@ namespace SimpleIdServer.IdServer.UI
             if (!extractionResult.Jwt.Audiences.Contains(Request.GetAbsoluteUriWithVirtualPath()))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_AUDIENCE_IDTOKENHINT);
 
-            var clients = await _clientRepository.Query().Where(c => extractionResult.Jwt.Audiences.Contains(c.ClientId)).ToListAsync(cancellationToken);
+            var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => extractionResult.Jwt.Audiences.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
             if (clients == null || !clients.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_CLIENT_IDTOKENHINT);
 

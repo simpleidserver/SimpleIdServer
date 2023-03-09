@@ -85,7 +85,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (!string.IsNullOrWhiteSpace(nonce))
                 claims.Add(JwtRegisteredClaimNames.Nonce, nonce);
 
-            var defaultAcr = await _amrHelper.FetchDefaultAcr(acrValues, requestedClaims, openidClient, cancellationToken);
+            var defaultAcr = await _amrHelper.FetchDefaultAcr(currentContext.Realm, acrValues, requestedClaims, openidClient, cancellationToken);
             if (defaultAcr != null)
             {
                 claims.Add(JwtRegisteredClaimNames.Amr, defaultAcr.AuthenticationMethodReferences);

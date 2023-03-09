@@ -9,16 +9,18 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
     {
         public AuthenticatePasswordViewModel() { }
 
-        public AuthenticatePasswordViewModel(string returnUrl, ICollection<ExternalIdProvider> externalIdProviders)
+        public AuthenticatePasswordViewModel(string returnUrl, string realm, ICollection<ExternalIdProvider> externalIdProviders)
         {
             ReturnUrl = returnUrl;
+            Realm = realm;
             ExternalIdsProviders = externalIdProviders;
         }
 
-        public AuthenticatePasswordViewModel(string login, string returnUrl, string clientName, string logoUri, string tosUri, string policyUri, ICollection<ExternalIdProvider> externalIdProviders)
+        public AuthenticatePasswordViewModel(string login, string returnUrl, string realm, string clientName, string logoUri, string tosUri, string policyUri, ICollection<ExternalIdProvider> externalIdProviders)
         {
             Login = login;
             ReturnUrl = returnUrl;
+            Realm = realm;
             ClientName = clientName;
             LogoUri = logoUri;
             TosUri = tosUri;

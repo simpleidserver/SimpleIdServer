@@ -25,6 +25,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         [HttpPost]
         public async Task<IActionResult> Introspect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             var clientCertificate = await Request.HttpContext.Connection.GetClientCertificateAsync();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier);
             var userSubject = claimName == null ? string.Empty : claimName.Value;

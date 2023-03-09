@@ -69,6 +69,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RejectionSentDateTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NextFetchTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Realm = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -175,22 +176,6 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Realms",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Realms", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Scopes",
                 columns: table => new
                 {
@@ -250,7 +235,8 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     Subject = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Realm = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -524,6 +510,7 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ResourceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Realm = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Scopes = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -737,6 +724,28 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Realms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AuthenticationSchemeProviderName = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Realms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Realms_AuthenticationSchemeProviders_AuthenticationSchemeProviderName",
+                        column: x => x.AuthenticationSchemeProviderName,
+                        principalTable: "AuthenticationSchemeProviders",
+                        principalColumn: "Name");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TranslationUMAResource",
                 columns: table => new
                 {
@@ -783,10 +792,111 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AuthenticationContextClassReferenceRealm",
+                columns: table => new
+                {
+                    AuthenticationContextClassReferencesName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesName, x.RealmsId });
+                    table.ForeignKey(
+                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_AuthenticationContextClassReferencesName",
+                        column: x => x.AuthenticationContextClassReferencesName,
+                        principalTable: "Acrs",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AuthenticationContextClassReferenceRealm_Realms_RealmsId",
+                        column: x => x.RealmsId,
+                        principalTable: "Realms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClientRealm",
+                columns: table => new
+                {
+                    ClientsClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RealmsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientRealm", x => new { x.ClientsClientId, x.RealmsId });
+                    table.ForeignKey(
+                        name: "FK_ClientRealm_Clients_ClientsClientId",
+                        column: x => x.ClientsClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClientRealm_Realms_RealmsId",
+                        column: x => x.RealmsId,
+                        principalTable: "Realms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RealmScope",
+                columns: table => new
+                {
+                    RealmsId = table.Column<int>(type: "int", nullable: false),
+                    ScopesName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RealmScope", x => new { x.RealmsId, x.ScopesName });
+                    table.ForeignKey(
+                        name: "FK_RealmScope_Realms_RealmsId",
+                        column: x => x.RealmsId,
+                        principalTable: "Realms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RealmScope_Scopes_ScopesName",
+                        column: x => x.ScopesName,
+                        principalTable: "Scopes",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RealmUser",
+                columns: table => new
+                {
+                    RealmsId = table.Column<int>(type: "int", nullable: false),
+                    UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RealmUser", x => new { x.RealmsId, x.UsersId });
+                    table.ForeignKey(
+                        name: "FK_RealmUser_Realms_RealmsId",
+                        column: x => x.RealmsId,
+                        principalTable: "Realms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RealmUser_Users_UsersId",
+                        column: x => x.UsersId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiResourceScope_ScopesName",
                 table: "ApiResourceScope",
                 column: "ScopesName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthenticationContextClassReferenceRealm_RealmsId",
+                table: "AuthenticationContextClassReferenceRealm",
+                column: "RealmsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuthenticationSchemeProviderDefinitionProperty_SchemeProviderDefName",
@@ -824,6 +934,11 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ClientRealm_RealmsId",
+                table: "ClientRealm",
+                column: "RealmsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ClientScope_ScopesName",
                 table: "ClientScope",
                 column: "ScopesName");
@@ -837,6 +952,21 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "IX_Consent_UserId",
                 table: "Consent",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Realms_AuthenticationSchemeProviderName",
+                table: "Realms",
+                column: "AuthenticationSchemeProviderName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RealmScope_ScopesName",
+                table: "RealmScope",
+                column: "ScopesName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RealmUser_UsersId",
+                table: "RealmUser",
+                column: "UsersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScopeClaimMapper_ScopeName",
@@ -909,10 +1039,10 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Acrs");
+                name: "ApiResourceScope");
 
             migrationBuilder.DropTable(
-                name: "ApiResourceScope");
+                name: "AuthenticationContextClassReferenceRealm");
 
             migrationBuilder.DropTable(
                 name: "AuthenticationSchemeProviderDefinitionProperty");
@@ -936,13 +1066,19 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ClientJsonWebKey");
 
             migrationBuilder.DropTable(
+                name: "ClientRealm");
+
+            migrationBuilder.DropTable(
                 name: "ClientScope");
 
             migrationBuilder.DropTable(
                 name: "Consent");
 
             migrationBuilder.DropTable(
-                name: "Realms");
+                name: "RealmScope");
+
+            migrationBuilder.DropTable(
+                name: "RealmUser");
 
             migrationBuilder.DropTable(
                 name: "ScopeClaimMapper");
@@ -981,13 +1117,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "ApiResources");
 
             migrationBuilder.DropTable(
-                name: "AuthenticationSchemeProviders");
+                name: "Acrs");
 
             migrationBuilder.DropTable(
                 name: "Grants");
 
             migrationBuilder.DropTable(
                 name: "BCAuthorizeLst");
+
+            migrationBuilder.DropTable(
+                name: "Realms");
 
             migrationBuilder.DropTable(
                 name: "Scopes");
@@ -1005,13 +1144,16 @@ namespace SimpleIdServer.IdServer.Startup.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "AuthenticationSchemeProviderDefinitions");
+                name: "AuthenticationSchemeProviders");
 
             migrationBuilder.DropTable(
                 name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "UmaResources");
+
+            migrationBuilder.DropTable(
+                name: "AuthenticationSchemeProviderDefinitions");
         }
     }
 }

@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer
 {
@@ -46,6 +47,18 @@ namespace SimpleIdServer.IdServer
         {
             _serviceProvider = serviceProvider;
             AddInMemoryAcr(new List<AuthenticationContextClassReference> { Constants.StandardAcrs.FirstLevelAssurance });
+        }
+
+        public IdServerInMemoryStoreBuilder AddInMemoryRealms(ICollection<Domains.Realm> realms)
+        {
+            var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+            if (!storeDbContext.Realms.Any())
+            {
+                storeDbContext.Realms.AddRange(realms);
+                storeDbContext.SaveChanges();
+            }
+
+            return this;
         }
 
         public IdServerInMemoryStoreBuilder AddInMemoryScopes(ICollection<Domains.Scope> scopes)

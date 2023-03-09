@@ -109,7 +109,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                 var user = await _userRepository.Query().Include(u => u.Consents).Include(u => u.OAuthUserClaims).AsNoTracking().FirstOrDefaultAsync(u => u.Name == subject, cancellationToken);
                 if (user == null) return new UnauthorizedResult();
 
-                var oauthClient = await _clientRepository.Query().Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                var oauthClient = await _clientRepository.Query().Include(c => c.Realms).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 if (oauthClient == null)
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
 
@@ -123,7 +123,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
                     throw new OAuthException(ErrorCodes.INVALID_TOKEN, ErrorMessages.ACCESS_TOKEN_REJECTED);
                 }
 
-                var oauthScopes = await _scopeRepository.Query().Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name)).ToListAsync(cancellationToken);
+                var oauthScopes = await _scopeRepository.Query().Include(s => s.Realms).Include(s => s.ClaimMappers).AsNoTracking().Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, null), prefix ?? Constants.DefaultRealm);
                 context.SetUser(user);
                 var payload = await _claimsExtractor.ExtractClaims(new ClaimsExtractionParameter

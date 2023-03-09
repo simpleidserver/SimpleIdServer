@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Api.Token
 {
     public interface IRevokeTokenRequestHandler
     {
-        Task Handle(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken token);
+        Task Handle(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken token);
     }
 
     public class RevokeTokenRequestHandler : IRevokeTokenRequestHandler
@@ -36,11 +36,11 @@ namespace SimpleIdServer.IdServer.Api.Token
             _logger = logger;
         }
 
-        public async Task Handle(JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
+        public async Task Handle(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
         {
             var token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
             var validationResult = _revokeTokenValidator.Validate(jObjBody);
-            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(jObjBody, jObjBody, certificate, issuerName, cancellationToken);
+            var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(realm, jObjBody, jObjBody, certificate, issuerName, cancellationToken);
             bool isAccessTokenRemoved = false, isRefreshTokenRemoved = false;
             if (validationResult.TokenTypeHint == TokenResponseParameters.AccessToken)
             {

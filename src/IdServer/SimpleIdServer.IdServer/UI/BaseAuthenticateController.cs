@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.Services;
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -68,7 +69,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             try
             {
-                WebEncoders.Base64UrlDecode(returnUrl);
+                _dataProtector.Unprotect(returnUrl);
                 return true;
             }
             catch
@@ -82,7 +83,7 @@ namespace SimpleIdServer.IdServer.UI
             ViewBag.SuccessMessage = msg;
         }
 
-        protected async Task<IActionResult> Authenticate(string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool rememberLogin = false)
         {
             if (!IsProtected(returnUrl))
             {
@@ -94,8 +95,9 @@ namespace SimpleIdServer.IdServer.UI
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var clientId = query.GetClientIdFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var client = await _clientRepository.Query().FirstOrDefaultAsync(c => c.ClientId == clientId, token);
-            var acr = await _amrHelper.FetchDefaultAcr(acrValues, requestedClaims, client, token);
+            var str = realm ?? Constants.DefaultRealm;
+            var client = await _clientRepository.Query().Include(c => c.Realms).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == str), token);
+            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, token);
             string amr;
             if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
             {

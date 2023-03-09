@@ -30,6 +30,7 @@ namespace SimpleIdServer.IdServer.Builders
                 IsActive = true,
                 Value = PasswordHelper.ComputeHash(password)
             });
+            result._user.Realms.Add(Constants.StandardRealms.Master);
             result._user.CreateDateTime = DateTime.UtcNow;
             result._user.UpdateDateTime = DateTime.UtcNow;
             return result;

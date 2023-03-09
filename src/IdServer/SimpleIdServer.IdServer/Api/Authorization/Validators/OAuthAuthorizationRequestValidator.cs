@@ -58,12 +58,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (prompt == PromptParameters.None)
                     throw new OAuthException(ErrorCodes.LOGIN_REQUIRED, ErrorMessages.LOGIN_IS_REQUIRED);
 
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
+                throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
             }
 
             var activeSession = context.User.ActiveSession;
             if (activeSession == null)
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken), true);
+                throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken), true);
 
             await _extractRequestHelper.Extract(context);
             await CommonValidate(context, cancellationToken);
@@ -81,10 +81,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (maxAge != null)
             {
                 if (DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(maxAge.Value))
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
+                    throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
             }
             else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(openidClient.DefaultMaxAge.Value))
-                throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
+                throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
@@ -103,7 +103,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             switch (prompt)
             {
                 case PromptParameters.Login:
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(acrValues, claims, openidClient, cancellationToken));
+                    throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
                 case PromptParameters.Consent:
                     RedirectToConsentView(context);
                     break;
@@ -163,9 +163,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(ErrorMessages.BAD_RESPONSE_TYPES_CLIENT, string.Join(",", unsupportedResponseTypes)));
         }
 
-        protected async Task<string> GetFirstAmr(IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)
+        protected async Task<string> GetFirstAmr(string realm, IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)
         {
-            var acr = await _amrHelper.FetchDefaultAcr(acrValues, claims, client, cancellationToken);
+            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, claims, client, cancellationToken);
             if (acr == null)
                 return null;
 

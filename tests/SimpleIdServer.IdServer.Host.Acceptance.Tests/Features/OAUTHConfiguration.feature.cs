@@ -160,10 +160,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'$.response_modes_supported[2]\'=\'form_post\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 26
- testRunner.And("JSON \'$.scopes_supported[0]\'=\'firstScope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.scopes_supported[0]\'=\'secondScope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 27
- testRunner.And("JSON \'$.scopes_supported[1]\'=\'secondScope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.scopes_supported[1]\'=\'firstScope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 28
  testRunner.And("JSON \'$.grant_types_supported[0]\'=\'client_credentials\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

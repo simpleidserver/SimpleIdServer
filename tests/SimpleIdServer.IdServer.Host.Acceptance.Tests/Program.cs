@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSIDIdentityServer()
     .UseInMemoryStore(o =>
     {
+        o.AddInMemoryRealms(IdServerConfiguration.Realms);
         o.AddInMemoryScopes(IdServerConfiguration.Scopes);
         o.AddInMemoryClients(IdServerConfiguration.Clients);
         o.AddInMemoryUsers(IdServerConfiguration.Users);

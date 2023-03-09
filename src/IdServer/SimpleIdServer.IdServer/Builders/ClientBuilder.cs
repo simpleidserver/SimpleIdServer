@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Builders
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            client.Realms.Add(Constants.StandardRealms.Master);
             client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             return new ApiClientBuilder(client);
@@ -54,6 +55,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
+            client.Realms.Add(Constants.StandardRealms.Master);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             return new TraditionalWebsiteClientBuilder(client);
@@ -79,8 +81,9 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
+            client.Realms.Add(Constants.StandardRealms.Master);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
-            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
+            client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             var result = new TraditionalWebsiteClientBuilder(client);
             result.EnableCIBAGrantType();
             return result;
@@ -106,6 +109,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
+            client.Realms.Add(Constants.StandardRealms.Master);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new MobileClientBuilder(client);
@@ -131,6 +135,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
+            client.Realms.Add(Constants.StandardRealms.Master);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new UserAgentClientBuilder(client);

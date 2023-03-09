@@ -253,6 +253,10 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Locale,
                     StandardClaims.UpdatedAt
                 },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Type = ScopeTypes.IDENTITY,
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
@@ -267,6 +271,10 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.Email,
                     StandardClaims.EmailVerified
                 },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Type = ScopeTypes.IDENTITY,
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
@@ -279,6 +287,10 @@ namespace SimpleIdServer.IdServer
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Address
+                },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
                 },
                 Type = ScopeTypes.IDENTITY,
                 Protocol = ScopeProtocols.OPENID,
@@ -294,6 +306,10 @@ namespace SimpleIdServer.IdServer
                     StandardClaims.PhoneNumber,
                     StandardClaims.PhoneNumberVerified
                 },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Type = ScopeTypes.IDENTITY,
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
@@ -307,6 +323,10 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.Role
                 },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Type = ScopeTypes.IDENTITY,
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
@@ -319,6 +339,10 @@ namespace SimpleIdServer.IdServer
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
                     StandardClaims.Subject
+                },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
                 },
                 Type = ScopeTypes.IDENTITY,
                 Protocol = ScopeProtocols.OPENID,
@@ -343,6 +367,10 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardClaims.ScimId
                 },
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Protocol = ScopeProtocols.OPENID,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
@@ -351,6 +379,10 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_query",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = false,
                 CreateDateTime = DateTime.UtcNow,
@@ -360,6 +392,10 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_revoke",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = false,
                 CreateDateTime = DateTime.UtcNow,
@@ -369,6 +405,10 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "uma_protection",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Protocol = ScopeProtocols.OPENID,
                 IsExposedInConfigurationEdp = true,
                 CreateDateTime = DateTime.UtcNow,
@@ -378,6 +418,10 @@ namespace SimpleIdServer.IdServer
             {
                 Type = ScopeTypes.IDENTITY,
                 Name = "saml_profile",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                },
                 Protocol = ScopeProtocols.SAML,
                 IsExposedInConfigurationEdp = false,
                 ClaimMappers = new List<ScopeClaimMapper>
@@ -396,7 +440,22 @@ namespace SimpleIdServer.IdServer
             {
                 AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "sid-load-01",
-                DisplayName = "First level of assurance"
+                DisplayName = "First level of assurance",
+                Realms = new List<Realm>
+                {
+                    StandardRealms.Master
+                }
+            };
+        }
+
+        public static class StandardRealms
+        {
+            public static Realm Master = new Realm
+            {
+                Name = Constants.DefaultRealm,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                Description = Constants.DefaultRealm
             };
         }
 

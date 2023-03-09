@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
@@ -45,8 +45,9 @@ namespace SimpleIdServer.IdServer.Authenticate
             var client = await _clientRepository.Query()
                 .Include(c => c.SerializedJsonWebKeys)
                 .Include(c => c.Scopes)
+                .Include(c=> c.Realms)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == authenticateInstruction.Realm), cancellationToken);
             if (client == null) throw new OAuthException(errorCode, string.Format(ErrorMessages.UNKNOWN_CLIENT, clientId));
             if (isAuthorizationCodeGrantType) return client;
 

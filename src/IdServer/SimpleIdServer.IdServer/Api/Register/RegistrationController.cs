@@ -30,23 +30,26 @@ namespace SimpleIdServer.IdServer.Api.Register
         private readonly IClientRepository _clientRepository;
         private readonly IScopeRepository _scopeRepository;
         private readonly IRegisterClientRequestValidator _validator;
+        private readonly IRealmRepository _realmRepository;
         private readonly IdServerHostOptions _options;
 
-        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IOptions<IdServerHostOptions> options)
+        public RegistrationController(IClientRepository clientRepository, IScopeRepository scopeRepository, IRegisterClientRequestValidator validator, IRealmRepository realmRepository, IOptions<IdServerHostOptions> options)
         {
             _clientRepository = clientRepository;
             _scopeRepository = scopeRepository;
             _validator = validator;
+            _realmRepository = realmRepository;
             _options = options.Value;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
         {
             try
             {
+                prefix = prefix ?? Constants.DefaultRealm;
                 var client = await Build(request, cancellationToken);
-                await _validator.Validate(client, cancellationToken);
+                await _validator.Validate(prefix, client, cancellationToken);
                 _clientRepository.Add(client);
                 await _clientRepository.SaveChanges(cancellationToken);
                 return new ContentResult
@@ -72,6 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 if (_options.ClientSecretExpirationInSeconds != null)
                     expirationDateTime = DateTime.UtcNow.AddSeconds(_options.ClientSecretExpirationInSeconds.Value);
 
+                var realm = await _realmRepository.Query().FirstAsync(r => r.Name == prefix, cancellationToken);
                 var client = new Client
                 {
                     ClientId = Guid.NewGuid().ToString(),
@@ -83,8 +87,9 @@ namespace SimpleIdServer.IdServer.Api.Register
                     PreferredTokenProfile = _options.DefaultTokenProfile,
                     ClientSecret = Guid.NewGuid().ToString(),
                     ClientSecretExpirationTime = expirationDateTime,
-                    Scopes = await GetScopes(request.Scope, cancellationToken)
+                    Scopes = await GetScopes(prefix, request.Scope, cancellationToken)
                 };
+                client.Realms.Add(realm);
                 AddTranslations(client, request, "client_name");
                 AddTranslations(client, request, "logo_uri");
                 AddTranslations(client, request, "client_uri");
@@ -109,17 +114,19 @@ namespace SimpleIdServer.IdServer.Api.Register
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            var res = await GetClient(id, cancellationToken);
+            prefix = prefix ?? Constants.DefaultRealm;
+            var res = await GetClient(prefix, id, cancellationToken);
             if (res.HasError) return res.ErrorResult;
             return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            var res = await GetClient(id, cancellationToken);
+            prefix = prefix ?? Constants.DefaultRealm;
+            var res = await GetClient(prefix, id, cancellationToken);
             if (res.HasError) return res.ErrorResult;
             var client = res.Client;
             _clientRepository.Delete(client);
@@ -128,15 +135,16 @@ namespace SimpleIdServer.IdServer.Api.Register
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(string id, RegisterClientRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Update([FromRoute] string prefix, string id, RegisterClientRequest request, CancellationToken cancellationToken)
         {
-            var res = await GetClient(id, cancellationToken);
+            prefix = prefix ?? Constants.DefaultRealm;
+            var res = await GetClient(prefix, id, cancellationToken);
             if (res.HasError) return res.ErrorResult;
             try
             {
-                res.Client.Scopes = await GetScopes(request.Scope, cancellationToken);
+                res.Client.Scopes = await GetScopes(prefix, request.Scope, cancellationToken);
                 request.Apply(res.Client, _options);
-                await _validator.Validate(res.Client, cancellationToken);
+                await _validator.Validate(prefix, res.Client, cancellationToken);
                 await _clientRepository.SaveChanges(cancellationToken);
                 return new OkObjectResult(res.Client.Serialize(Request.GetAbsoluteUriWithVirtualPath()));
             }
@@ -151,11 +159,11 @@ namespace SimpleIdServer.IdServer.Api.Register
             }
         }
 
-        private async Task<GetClientResult> GetClient(string id, CancellationToken cancellationToken)
+        private async Task<GetClientResult> GetClient(string realm, string id, CancellationToken cancellationToken)
         {
             string accessToken;
             if (!TryExtractAccessToken(out accessToken)) return GetClientResult.Error(Unauthorized());
-            var client = await _clientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == id, cancellationToken);
+            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).FirstOrDefaultAsync(c => c.ClientId == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
             if (client == null) return GetClientResult.Error(NotFound());
             if (client.RegistrationAccessToken != accessToken) return GetClientResult.Error(Unauthorized());
             return GetClientResult.Ok(client);
@@ -172,10 +180,10 @@ namespace SimpleIdServer.IdServer.Api.Register
             return true;
         }
 
-        private async Task<ICollection<Domains.Scope>> GetScopes(string scope, CancellationToken cancellationToken)
+        private async Task<ICollection<Domains.Scope>> GetScopes(string realm, string scope, CancellationToken cancellationToken)
         {
             var scopeNames = string.IsNullOrWhiteSpace(scope) ? _options.DefaultScopes : scope.ToScopes();
-            return await _scopeRepository.Query().AsNoTracking().Where(s => scopeNames.Contains(s.Name)).ToListAsync(cancellationToken);
+            return await _scopeRepository.Query().Include(s => s.Realms).AsNoTracking().Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
         }
 
         private class GetClientResult

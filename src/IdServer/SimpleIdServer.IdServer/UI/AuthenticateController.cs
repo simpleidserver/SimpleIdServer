@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
@@ -13,7 +12,6 @@ using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
-using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
@@ -36,7 +34,7 @@ namespace SimpleIdServer.IdServer.UI
 
 
         [HttpGet]
-        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
@@ -49,11 +47,12 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     var query = ExtractQuery(returnUrl);
                     var clientId = query.GetClientIdFromAuthorizationRequest();
-                    var client = await ClientRepository.Query().Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId, cancellationToken);
+                    var str = prefix ?? Constants.DefaultRealm;
+                    var client = await ClientRepository.Query().Include(c => c.Realms).Include(c => c.Translations).FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name ==  str), cancellationToken);
                     var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                    return View(new AuthenticatePasswordViewModel(
-                    loginHint,
+                    return View(new AuthenticatePasswordViewModel(loginHint,
                         returnUrl,
+                        prefix,
                         client.ClientName,
                         client.LogoUri,
                         client.TosUri,
@@ -67,6 +66,7 @@ namespace SimpleIdServer.IdServer.UI
 
                 return View(new AuthenticatePasswordViewModel(
                     returnUrl,
+                    prefix,
                     externalIdProviders.Select(e => new ExternalIdProvider
                     {
                         AuthenticationScheme = e.Name,
@@ -81,8 +81,9 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(AuthenticatePasswordViewModel viewModel, CancellationToken token)
+        public async Task<IActionResult> Index([FromRoute] string prefix, AuthenticatePasswordViewModel viewModel, CancellationToken token)
         {
+            viewModel.Realm = prefix;
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
@@ -92,8 +93,8 @@ namespace SimpleIdServer.IdServer.UI
 
             try
             {
-                var user = await _passwordAuthService.Authenticate(viewModel.Login, viewModel.Password, token);
-                return await Authenticate(viewModel.ReturnUrl, Constants.Areas.Password, user, token, viewModel.RememberLogin);
+                var user = await _passwordAuthService.Authenticate(prefix, viewModel.Login, viewModel.Password, token);
+                return await Authenticate(prefix, viewModel.ReturnUrl, Constants.Areas.Password, user, token, viewModel.RememberLogin);
             }
             catch (CryptographicException)
             {

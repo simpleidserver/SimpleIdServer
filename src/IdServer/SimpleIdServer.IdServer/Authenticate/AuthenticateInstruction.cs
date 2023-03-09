@@ -15,5 +15,6 @@ namespace SimpleIdServer.IdServer.Authenticate
         public string ClientAssertion { get; set; }
         public JsonObject RequestData { get; set; }
         public X509Certificate2 Certificate { get; set; }
+        public string Realm { get; set; }
     }
 }

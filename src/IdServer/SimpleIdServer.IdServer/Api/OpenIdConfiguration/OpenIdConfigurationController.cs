@@ -36,12 +36,13 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var acrLst = await _authenticationContextClassReferenceRepository.Query().AsNoTracking().ToListAsync(cancellationToken);
+            var acrLst = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).AsNoTracking().Where(a => a.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
             var result = await Build(prefix, cancellationToken);
             var claims = await _scopeRepository.Query()
                 .Include(s => s.ClaimMappers)
+                .Include(s => s.Realms)
                 .AsNoTracking()
-                .Where(s => s.IsExposedInConfigurationEdp)
+                .Where(s => s.IsExposedInConfigurationEdp && s.Realms.Any(r => r.Name == prefix))
                 .SelectMany(s => s.ClaimMappers)
                 .ToListAsync(cancellationToken);
 

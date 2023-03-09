@@ -17,6 +17,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of strings that specifies the authentication methods.
         /// </summary>
         public IEnumerable<string> AuthenticationMethodReferences { get; set; } = new List<string>();
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
 
         public bool Equals(AuthenticationContextClassReference other)
         {

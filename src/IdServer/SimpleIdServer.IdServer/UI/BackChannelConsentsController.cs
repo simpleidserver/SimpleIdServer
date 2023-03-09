@@ -49,7 +49,7 @@ namespace SimpleIdServer.IdServer.UI
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.UI
                     return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = _dataProtector.Protect(returnUrl) });
                 }
 
-                var viewModel = await BuildViewModel(queries, returnUrl, cancellationToken);
+                var viewModel = await BuildViewModel(prefix, queries, returnUrl, cancellationToken);
                 return View(viewModel);
             }
             catch(CryptographicException)
@@ -89,8 +89,11 @@ namespace SimpleIdServer.IdServer.UI
             try
             {
                 var issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{Constants.EndPoints.BCCallback}";
+                if(!string.IsNullOrWhiteSpace(prefix))                
+                    issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{prefix}/{Constants.EndPoints.BCCallback}";
+
                 var queries = ExtractQuery(confirmConsentsViewModel.ReturnUrl);
-                viewModel = await BuildViewModel(queries, viewModel.ReturnUrl, cancellationToken);
+                viewModel = await BuildViewModel(prefix, queries, viewModel.ReturnUrl, cancellationToken);
                 var parameter = new BCCallbackParameter
                 {
                     ActionEnum = confirmConsentsViewModel.IsRejected ? BCCallbackActions.REJECT : BCCallbackActions.CONFIRM,
@@ -104,7 +107,7 @@ namespace SimpleIdServer.IdServer.UI
                         { JwtRegisteredClaimNames.Sub, sub },
                     }
                 };
-                var idToken = _jwtBuilder.Sign(prefix, tokenDescriptor, SecurityAlgorithms.RsaSha256);
+                var idToken = _jwtBuilder.Sign(prefix ?? Constants.DefaultRealm, tokenDescriptor, SecurityAlgorithms.RsaSha256);
                 using (var httpClient = _httpClientFactory.GetHttpClient())
                 {
                     var json = JsonSerializer.Serialize(parameter);
@@ -139,7 +142,7 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        private async Task<BCConsentsIndexViewModel> BuildViewModel(JsonObject queries, string returnUrl, CancellationToken cancellationToken)
+        private async Task<BCConsentsIndexViewModel> BuildViewModel(string realm, JsonObject queries, string returnUrl, CancellationToken cancellationToken)
         {
             var viewModel = new BCConsentsIndexViewModel
             {
@@ -149,7 +152,8 @@ namespace SimpleIdServer.IdServer.UI
                 Scopes = queries.GetScopes(),
                 ReturnUrl = returnUrl
             };
-            var client = await _clientRepository.Query().Include(c => c.Translations).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == viewModel.ClientId, cancellationToken);
+            var str = realm ?? Constants.DefaultRealm;
+            var client = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == viewModel.ClientId && c.Realms.Any(r => r.Name == str), cancellationToken);
             viewModel.ClientName = client.ClientName;
             return viewModel;
         }

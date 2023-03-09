@@ -148,5 +148,10 @@ namespace SimpleIdServer.OAuth.Host.Acceptance.Tests
         {
             UMAResourceBuilder.Create("id", "read", "write").Build()
         };
+
+        public static List<Realm> Realms = new List<Realm>
+        {
+            SimpleIdServer.IdServer.Constants.StandardRealms.Master
+        };
     }
 }

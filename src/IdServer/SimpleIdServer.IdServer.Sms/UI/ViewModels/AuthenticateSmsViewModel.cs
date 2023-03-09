@@ -10,9 +10,10 @@ namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
     {
         public AuthenticateSmsViewModel() { }
 
-        public AuthenticateSmsViewModel(string returnUrl, string phoneNumber, string clientName, string logoUri, string tosUri, string policyUri)
+        public AuthenticateSmsViewModel(string returnUrl, string realm, string phoneNumber, string clientName, string logoUri, string tosUri, string policyUri)
         {
             ReturnUrl = returnUrl;
+            Realm = realm;
             PhoneNumber = phoneNumber;
             ClientName = clientName;
             LogoUri = logoUri;

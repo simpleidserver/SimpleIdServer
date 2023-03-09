@@ -20,7 +20,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
 {
     public interface IOAuthConfigurationRequestHandler
     {
-        Task Enrich(JsonObject jObj, string issuer, CancellationToken cancellationToken);
+        Task Enrich(string prefix, JsonObject jObj, string issuer, CancellationToken cancellationToken);
     }
 
     public class OAuthConfigurationRequestHandler : IOAuthConfigurationRequestHandler
@@ -53,11 +53,13 @@ namespace SimpleIdServer.IdServer.Api.Configuration
 
         protected IOAuthWorkflowConverter WorkflowConverter => _oauthWorkflowConverter;
 
-        public virtual async Task Enrich(JsonObject jObj, string issuer, CancellationToken cancellationToken)
+        public virtual async Task Enrich(string prefix, JsonObject jObj, string issuer, CancellationToken cancellationToken)
         {
+            var realm = prefix ?? Constants.DefaultRealm;
             var scopes = await _scopeRepository.Query()
+                .Include(s => s.Realms)
                 .AsNoTracking()
-                .Where(s => s.IsExposedInConfigurationEdp)
+                .Where(s => s.IsExposedInConfigurationEdp && s.Realms.Any(r => r.Name == realm))
                 .Select(s => s.Name)
                 .ToListAsync(cancellationToken);
             jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);

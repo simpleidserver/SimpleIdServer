@@ -55,11 +55,12 @@ namespace SimpleIdServer.IdServer.UI
 
             try
             {
+                prefix = prefix ?? Constants.DefaultRealm;
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Scopes).AsNoTracking().FirstAsync(c => c.ClientId == clientId, cancellationToken);
-                query = await _extractRequestHelper.Extract(prefix ?? Constants.DefaultRealm, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
                 var scopes = query.GetScopesFromAuthorizationRequest();
                 var claims = query.GetClaimsFromAuthorizationRequest();
                 var claimDescriptions = new List<string>();
@@ -86,7 +87,7 @@ namespace SimpleIdServer.IdServer.UI
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
-            var oauthClient = await _clientRepository.Query().AsNoTracking().FirstAsync(c => c.ClientId == clientId, cancellationToken);
+            var oauthClient = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
             query = await _extractRequestHelper.Extract(prefix ?? Constants.DefaultRealm, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var state = query.GetStateFromAuthorizationRequest();
@@ -108,14 +109,15 @@ namespace SimpleIdServer.IdServer.UI
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(ConfirmConsentsViewModel confirmConsentsViewModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, ConfirmConsentsViewModel confirmConsentsViewModel, CancellationToken cancellationToken)
         {
             try
             {
+                prefix = prefix ?? Constants.DefaultRealm;
                 var unprotectedUrl = _dataProtector.Unprotect(confirmConsentsViewModel.ReturnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var nameIdentifier = GetNameIdentifier();
-                var user = await _userRepository.Query().Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier, cancellationToken);
+                var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).FirstAsync(c => c.Name == nameIdentifier && c.Realms.Any(r => r.Name == prefix), cancellationToken);
                 var consent = _userConsentFetcher.FetchFromAuthorizationRequest(user, query);
                 if (consent == null)
                 {

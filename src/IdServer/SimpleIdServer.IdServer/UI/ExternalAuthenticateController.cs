@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserTransformer _userTransformer;
         private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
+        private readonly IRealmRepository _realmRepository;
 
         public ExternalAuthenticateController(
             IOptions<IdServerHostOptions> options,
@@ -45,7 +46,8 @@ namespace SimpleIdServer.IdServer.UI
             IServiceProvider serviceProvider,
             IUserTransformer userTransformer,
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
-            IAuthenticationHelper authenticationHelper) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
+            IAuthenticationHelper authenticationHelper,
+            IRealmRepository realmRepository) : base(options, dataProtectionProvider, clientRepository, amrHelper, userRepository, userTransformer)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
@@ -53,6 +55,7 @@ namespace SimpleIdServer.IdServer.UI
             _userTransformer = userTransformer;
             _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
             _authenticationHelper = authenticationHelper;
+            _realmRepository = realmRepository;
         }
 
         [HttpGet]
@@ -77,8 +80,9 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        public async Task<IActionResult> Callback(CancellationToken cancellationToken)
+        public async Task<IActionResult> Callback([FromRoute] string prefix, CancellationToken cancellationToken)
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             var result = await HttpContext.AuthenticateAsync(Constants.DefaultExternalCookieAuthenticationScheme);
             if (result == null || !result.Succeeded)
             {
@@ -90,7 +94,7 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, ErrorMessages.BAD_EXTERNAL_AUTHENTICATION);
             }
 
-            var user = await JustInTimeProvision(result, cancellationToken);
+            var user = await JustInTimeProvision(prefix, result, cancellationToken);
             await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
             var returnUrl = "~/";
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
@@ -103,7 +107,7 @@ namespace SimpleIdServer.IdServer.UI
             return await Sign(returnUrl, "externalAuth", user, cancellationToken, true);
         }
 
-        private async Task<User> JustInTimeProvision(AuthenticateResult authResult, CancellationToken cancellationToken)
+        private async Task<User> JustInTimeProvision(string realm, AuthenticateResult authResult, CancellationToken cancellationToken)
         {
             var scheme = authResult.Properties.Items[SCHEME_NAME];
             var principal = authResult.Principal;
@@ -118,14 +122,16 @@ namespace SimpleIdServer.IdServer.UI
                 .Include(u => u.ExternalAuthProviders)
                 .Include(u => u.Sessions)
                 .Include(u => u.OAuthUserClaims)
-                .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub), cancellationToken);
+                .Include(u => u.Realms)
+                .FirstOrDefaultAsync(u => u.ExternalAuthProviders.Any(e => e.Scheme == scheme && e.Subject == sub) && u.Realms.Any(r => r.Name == realm), cancellationToken);
             if (user == null)
             {
                 _logger.LogInformation($"Start to provision the user '{sub}'");
                 var existingUser = await _authenticationHelper.GetUserByLogin(UserRepository.Query()
                     .Include(u => u.ExternalAuthProviders)
                     .Include(u => u.Sessions)
-                    .Include(u => u.OAuthUserClaims), sub, cancellationToken);
+                    .Include(u => u.Realms)
+                    .Include(u => u.OAuthUserClaims), sub, realm, cancellationToken);
                 if(existingUser != null)
                 {
                     user = existingUser;
@@ -134,8 +140,9 @@ namespace SimpleIdServer.IdServer.UI
                 }
                 else
                 {
+                    var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
                     var idProvider = await _authenticationSchemeProviderRepository.Query().AsNoTracking().Include(p => p.Mappers).SingleAsync(p => p.Name == scheme, cancellationToken);
-                    user = _userTransformer.Transform(principal, idProvider);
+                    user = _userTransformer.Transform(r, principal, idProvider);
                     user.AddExternalAuthProvider(scheme, sub);
                     UserRepository.Add(user);
                     await UserRepository.SaveChanges(cancellationToken);

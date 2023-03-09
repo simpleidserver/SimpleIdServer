@@ -17,7 +17,8 @@ namespace SimpleIdServer.IdServer.Builders
             _umaResource = new UMAResource
             {
                 Id = id,
-                Scopes = scopes.ToList()
+                Scopes = scopes.ToList(),
+                Realm = Constants.DefaultRealm
             };
         }
 

@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime UpdateDateTime { get; set; }
         public ICollection<AuthenticationSchemeProviderProperty> Properties { get; set; } = new List<AuthenticationSchemeProviderProperty>();
         public ICollection<AuthenticationSchemeProviderMapper> Mappers { get; set; } = new List<AuthenticationSchemeProviderMapper>();
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         public AuthenticationSchemeProviderDefinition AuthSchemeProviderDefinition { get; set; } = null!;
     }
 }

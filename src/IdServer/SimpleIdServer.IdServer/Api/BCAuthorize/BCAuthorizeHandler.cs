@@ -9,8 +9,8 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             try
             {
-                Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken, ErrorCodes.INVALID_REQUEST);
+                Client oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.Request.IssuerName, cancellationToken, ErrorCodes.INVALID_REQUEST);
                 context.SetClient(oauthClient);
                 var user = await _bcAuthorizeRequestValidator.ValidateCreate(context, cancellationToken);
                 context.SetUser(user);
@@ -66,14 +66,15 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     openidClient.BCTokenDeliveryMode,
                     context.Request.RequestData.GetScopesFromAuthorizationRequest(),
                     context.User.Id,
-                    context.Request.RequestData.GetClientNotificationToken());
+                    context.Request.RequestData.GetClientNotificationToken(),
+                    context.Realm);
                 bcAuthorize.IncrementNextFetchTime();
                 _bcAuthorizeRepository.Add(bcAuthorize);
                 await _bcAuthorizeRepository.SaveChanges(cancellationToken);
 
                 var bindingMessage = context.Request.RequestData.GetBindingMessage();
                 var acrLst = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
-                var acr = await _amrHelper.FetchDefaultAcr(acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
+                var acr = await _amrHelper.FetchDefaultAcr(context.Realm, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
                 var amr = acr.AuthenticationMethodReferences.First();
                 await _bcNotificationService.Notify(context, new BCNotificationMessage 
                 { 

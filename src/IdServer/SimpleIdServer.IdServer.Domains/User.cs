@@ -75,6 +75,7 @@ namespace SimpleIdServer.IdServer.Domains
                 return Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD && c.IsActive);
             }
         }
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
         public ICollection<UserClaim> OAuthUserClaims { get; set; } = new List<UserClaim>();
         public ICollection<UserCredential> Credentials { get; set; } = new List<UserCredential>();
