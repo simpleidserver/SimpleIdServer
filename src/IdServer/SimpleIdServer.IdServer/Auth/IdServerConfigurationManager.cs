@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer
+namespace SimpleIdServer.IdServer.Auth
 {
 
     public class IdServerConfigurationManager : IConfigurationManager<OpenIdConnectConfiguration>
@@ -60,7 +60,6 @@ namespace SimpleIdServer.IdServer
                         record.LastRefresh = now;
                         record.SyncAfter = DateTimeUtil.Add(now.UtcDateTime, AutomaticRefreshInterval);
                         record.Configuration = configuration;
-
                     }
                     catch (Exception ex)
                     {

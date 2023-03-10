@@ -15,6 +15,10 @@ namespace Microsoft.AspNetCore.Builder
         public static WebApplication UseSID(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
         {
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
+            var usePrefix = opts.UseRealm;
+            if (usePrefix)
+                webApplication.UseMiddleware<RealmMiddleware>();
+
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {
                 Secure = Http.CookieSecurePolicy.Always
@@ -22,10 +26,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.UseStaticFiles();
             webApplication.UseAuthentication();
             webApplication.UseAuthorization();
-
-            var usePrefix = opts.UseRealm;
-            if(usePrefix)
-                webApplication.UseMiddleware<RealmMiddleware>();
 
             webApplication.MapControllerRoute("oauthConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,

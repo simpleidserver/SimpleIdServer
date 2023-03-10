@@ -495,5 +495,6 @@ namespace SimpleIdServer.IdServer
         /// </summary>
         public const string AlgDir = "dir";
         public const string DefaultRealm = "master";
+        public const string DefaultRealmCookieName = "CurrentRealm";
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Store;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -45,13 +46,18 @@ namespace SimpleIdServer.IdServer.Middlewares
                     }
 
                     var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
-                    if (routeValues.Any(v => v.Key == Constants.Prefix) && !(await realmRepository.Query().AnyAsync(r => r.Name == prefix)))
+                    if (routeValues.Any(v => v.Key == Constants.Prefix) && (await realmRepository.Query().AnyAsync(r => r.Name == prefix)))
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                        return;
+                        RealmContext.Instance().Realm = prefix;
                     }
-
-                    RealmContext.Instance().Realm = prefix;
+                    else
+                    {
+                        var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == Constants.DefaultRealmCookieName);
+                        if(!realmCookie.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(realmCookie.Value))
+                        {
+                            RealmContext.Instance().Realm = realmCookie.Value;
+                        }
+                    }
                 }
             }
 

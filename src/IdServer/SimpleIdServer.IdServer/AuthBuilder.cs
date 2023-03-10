@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Options;
 using System;
 using System.Threading.Tasks;
@@ -70,18 +69,5 @@ namespace SimpleIdServer.IdServer
         }
 
         public AuthenticationBuilder Builder => _authBuilder;
-    }
-
-    public class ConfigureOpenIdOptions : IPostConfigureOptions<OpenIdConnectOptions>
-    {
-        public void PostConfigure(string name, OpenIdConnectOptions options)
-        {
-            options.ConfigurationManager = new IdServerConfigurationManager(options.Authority, new OpenIdConnectConfigurationRetriever(),
-                new HttpDocumentRetriever(options.Backchannel) { RequireHttps = options.RequireHttpsMetadata })
-            {
-                RefreshInterval = options.RefreshInterval,
-                AutomaticRefreshInterval = options.AutomaticRefreshInterval,
-            };
-        }
     }
 }

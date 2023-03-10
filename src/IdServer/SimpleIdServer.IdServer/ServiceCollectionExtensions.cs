@@ -24,6 +24,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
 using SimpleIdServer.IdServer.Api.TokenIntrospection;
+using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
@@ -89,10 +90,9 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             var authBuilder = services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
+                .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
                 {
-                    var o = services.BuildServiceProvider().GetRequiredService<IOptions<IdServerHostOptions>>().Value;
-                    opts.LoginPath = o.UseRealm ? $"/{Constants.DefaultRealm}/{Constants.Areas.Password}/Authenticate" : $"/{Constants.Areas.Password}/Authenticate";
+                    opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {
                         if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
@@ -102,7 +102,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
                             ctx.Options.CookieManager.AppendResponseCookie(
                                 ctx.HttpContext,
-                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier}",
                                 cookieValue,
                                 ctx.CookieOptions);
                         }
@@ -116,7 +116,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                             ctx.Options.CookieManager.DeleteCookie(
                                 ctx.HttpContext,
-                                $"{ctx.Options.Cookie.Name}-{nameIdentifier}",
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier}",
                                 ctx.CookieOptions);
                             return Task.CompletedTask;
                         }
