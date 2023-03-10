@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
@@ -13,17 +14,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
     {
         private readonly IAuthenticationSchemeProviderRepository _repository;
         private readonly IAuthenticationSchemeProviderDefinitionRepository _repositoryDef;
+        private readonly IRealmRepository _realmRepository;
+        private readonly IState<RealmsState> _realmsState;
 
-        public IdProviderEffects(IAuthenticationSchemeProviderRepository repository, IAuthenticationSchemeProviderDefinitionRepository repositoryDef)
+        public IdProviderEffects(IAuthenticationSchemeProviderRepository repository, IAuthenticationSchemeProviderDefinitionRepository repositoryDef, IRealmRepository realmRepository, IState<RealmsState> realmsState)
         {
             _repository = repository;
             _repositoryDef = repositoryDef;
+            _realmRepository = realmRepository;
+            _realmsState = realmsState;
         }
 
         [EffectMethod]
         public async Task Handle(SearchIdProvidersAction action, IDispatcher dispatcher)
         {
-            IQueryable<AuthenticationSchemeProvider> query = _repository.Query().AsNoTracking();
+            var realm = _realmsState.Value.ActiveRealm;
+            IQueryable<AuthenticationSchemeProvider> query = _repository.Query().Include(p => p.Realms).Where(p => p.Realms.Any(r => r.Name == realm)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 
@@ -39,7 +45,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedIdProvidersAction action, IDispatcher dispatcher)
         {
-            var idProviders = await _repository.Query().Include(p => p.Properties).Where(p => action.Ids.Contains(p.Name)).ToListAsync();
+            var realm = _realmsState.Value.ActiveRealm;
+            var idProviders = await _repository.Query().Include(r => r.Realms).Include(p => p.Properties).Where(p => action.Ids.Contains(p.Name) && p.Realms.Any(r => r.Name == realm)).ToListAsync();
             _repository.RemoveRange(idProviders);
             await _repository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new RemoveSelectedIdProvidersSuccessAction { Ids = action.Ids });
@@ -48,11 +55,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(GetIdProviderAction action, IDispatcher dispatcher)
         {
+            var realm = _realmsState.Value.ActiveRealm;
             var idProvider = await _repository.Query().Include(i => i.Properties)
                 .Include(i => i.Mappers)
+                .Include(i => i.Realms)
                 .Include(i => i.AuthSchemeProviderDefinition).ThenInclude(d => d.Properties)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(p => p.Name == action.Id);
+                .SingleOrDefaultAsync(p => p.Name == action.Id && p.Realms.Any(r => r.Name == realm));
             if (idProvider == null)
             {
                 dispatcher.Dispatch(new GetIdProviderFailureAction { ErrorMessage = string.Format(Global.UnknownIdProvider, action.Id) });
@@ -72,6 +81,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(AddIdProviderAction action, IDispatcher dispatcher)
         {
+            if(string.IsNullOrWhiteSpace(action.Name))
+            {
+                dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = Global.NameIsRequired });
+                return;
+            }
+
             if (await _repository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
             {
                 dispatcher.Dispatch(new AddIdProviderFailureAction { ErrorMessage = string.Format(Global.IdProviderExists, action.Name) });
@@ -79,8 +94,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             }
 
             var idProviderDef = await _repositoryDef.Query().SingleAsync(d => d.Name == action.IdProviderTypeName);
+            var realm = _realmsState.Value.ActiveRealm;
+            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
             var idProvider = new AuthenticationSchemeProvider
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = action.Name,
                 Description = action.Description,
                 DisplayName = action.DisplayName,
@@ -90,6 +108,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
                 AuthSchemeProviderDefinition = idProviderDef,
                 Mappers = Constants.GetDefaultIdProviderMappers()
             };
+            idProvider.Realms.Add(activeRealm);
             _repository.Add(idProvider);
             await _repository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddIdProviderSuccessAction { Name = action.Name, Description = action.Description, Properties = action.Properties, DisplayName = action.DisplayName });
@@ -98,7 +117,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateIdProviderDetailsAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().SingleAsync(a => a.Name == action.Name);
+            var realm = _realmsState.Value.ActiveRealm;
+            var idProvider = await _repository.Query().Include(r => r.Realms).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
             idProvider.Description = action.Description;
             idProvider.DisplayName = action.DisplayName;
             idProvider.UpdateDateTime = DateTime.UtcNow;
@@ -109,7 +129,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderPropertiesAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().Include(p => p.Properties).SingleAsync(a => a.Name == action.Name);
+            var realm = _realmsState.Value.ActiveRealm;
+            var idProvider = await _repository.Query().Include(r => r.Realms).Include(p => p.Properties).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
             idProvider.Properties.Clear();
             foreach (var property in action.Properties)
                 idProvider.Properties.Add(new AuthenticationSchemeProviderProperty
@@ -125,7 +146,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(AddAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName);
+            var realm = _realmsState.Value.ActiveRealm;
+            var idProvider = await _repository.Query().Include(r => r.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName && a.Realms.Any(r => r.Name == realm));
             var id = Guid.NewGuid().ToString();
             idProvider.Mappers.Add(new AuthenticationSchemeProviderMapper
             {
@@ -152,7 +174,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(RemoveSelectedAuthenticationSchemeProviderMappersAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().Include(p => p.Mappers).SingleAsync(a => a.Name == action.Name);
+            var realm = _realmsState.Value.ActiveRealm;
+            var idProvider = await _repository.Query().Include(p => p.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.Name && a.Realms.Any(r => r.Name == realm));
             idProvider.Mappers = idProvider.Mappers.Where(m => !action.MapperIds.Contains(m.Id)).ToList();
             await _repository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction
@@ -165,7 +188,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [EffectMethod]
         public async Task Handle(UpdateAuthenticationSchemeProviderMapperAction action, IDispatcher dispatcher)
         {
-            var idProvider = await _repository.Query().Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName);
+            var realm = _realmsState.Value.ActiveRealm;
+            var idProvider = await _repository.Query().Include(p => p.Realms).Include(p => p.Mappers).SingleAsync(a => a.Name == action.IdProviderName && a.Realms.Any(r => r.Name == realm));
             var mapper = idProvider.Mappers.First(m => m.Id == action.Id);
             mapper.Name = action.Name;
             mapper.SourceClaimName = action.SourceClaimName;

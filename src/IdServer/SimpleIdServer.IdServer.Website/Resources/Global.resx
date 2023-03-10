@@ -165,6 +165,15 @@
   <data name="JWKSUrlUpdated" xml:space="preserve">
     <value>JWKS Url has been updated</value>
   </data>
+  <data name="NameIsRequired" xml:space="preserve">
+    <value>Name is required</value>
+  </data>
+  <data name="RealmAdded" xml:space="preserve">
+    <value>Realms has been added</value>
+  </data>
+  <data name="RealmExists" xml:space="preserve">
+    <value>Realm {0} already exists</value>
+  </data>
   <data name="RedirectUriContainsFragment" xml:space="preserve">
     <value>Redirection url '{0}' cannot contains fragment (#)</value>
   </data>

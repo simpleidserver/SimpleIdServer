@@ -10,9 +10,10 @@ namespace SimpleIdServer.IdServer.Store.Configurations
     {
         public void Configure(EntityTypeBuilder<AuthenticationSchemeProvider> builder)
         {
-            builder.HasKey(a => a.Name);
+            builder.HasKey(a => a.Id);
             builder.HasMany(a => a.Properties).WithOne(p => p.SchemeProvider).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(a => a.Mappers).WithOne(p => p.IdProvider).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.Realms).WithMany(s => s.AuthenticationSchemeProviders);
         }
     }
 }

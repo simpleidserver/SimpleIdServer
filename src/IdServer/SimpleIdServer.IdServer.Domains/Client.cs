@@ -12,6 +12,8 @@ namespace SimpleIdServer.IdServer.Domains
     [JsonConverter(typeof(TranslatableConverter<Client>))]
     public class Client : ITranslatable, IEquatable<Client>
     {
+        [JsonIgnore]
+        public string Id { get; set; }
         /// <summary>
         /// Client identifier.
         /// </summary>

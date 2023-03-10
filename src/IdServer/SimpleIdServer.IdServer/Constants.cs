@@ -234,6 +234,7 @@ namespace SimpleIdServer.IdServer
         {
             public static Scope Profile = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = "profile",
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
@@ -265,6 +266,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope Email = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = "email",
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
@@ -283,6 +285,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope Address = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = "address",
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
@@ -300,6 +303,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope Phone = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = "phone",
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
@@ -318,6 +322,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope Role = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = "role",
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
@@ -335,6 +340,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope OpenIdScope = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = "openid",
                 ClaimMappers = new List<ScopeClaimMapper>
                 {
@@ -352,6 +358,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope OfflineAccessScope = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "offline_access",
                 IsExposedInConfigurationEdp = true,
@@ -360,6 +367,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope ScimScope = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "scim",
                 IsExposedInConfigurationEdp = true,
@@ -377,6 +385,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope GrantManagementQuery = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_query",
                 Realms = new List<Realm>
@@ -390,6 +399,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope GrantManagementRevoke = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "grant_management_revoke",
                 Realms = new List<Realm>
@@ -403,6 +413,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope UmaProtection = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "uma_protection",
                 Realms = new List<Realm>
@@ -416,6 +427,7 @@ namespace SimpleIdServer.IdServer
             };
             public static Scope SAMLProfile = new Scope
             {
+                Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.IDENTITY,
                 Name = "saml_profile",
                 Realms = new List<Realm>

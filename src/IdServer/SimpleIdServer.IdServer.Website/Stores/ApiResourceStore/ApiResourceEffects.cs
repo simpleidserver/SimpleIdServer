@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
@@ -13,17 +14,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         private readonly IApiResourceRepository _apiResourceRepository;
         private readonly IScopeRepository _scopeRepository;
+        private readonly IRealmRepository _realmRepository;
+        private readonly IState<RealmsState> _realmsState;
 
-        public ApiResourceEffects(IApiResourceRepository apiResourceRepository, IScopeRepository scopeRepository)
+        public ApiResourceEffects(IApiResourceRepository apiResourceRepository, IScopeRepository scopeRepository, IRealmRepository realmRepository, IState<RealmsState> realmsState)
         {
             _apiResourceRepository = apiResourceRepository;
             _scopeRepository = scopeRepository;
+            _realmRepository = realmRepository;
+            _realmsState = realmsState;
         }
 
         [EffectMethod]
         public async Task Handle(SearchApiResourcesAction action, IDispatcher dispatcher)
         {
-            IQueryable<ApiResource> query = _apiResourceRepository.Query().AsNoTracking();
+            var realm = _realmsState.Value.ActiveRealm;
+            IQueryable<ApiResource> query = _apiResourceRepository.Query().Include(r => r.Realms).AsNoTracking().Where(r => r.Realms.Any(r => r.Name == realm));
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 
@@ -46,19 +52,23 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         [EffectMethod]
         public async Task Handle(AddApiResourceAction action, IDispatcher dispatcher)
         {
-            if (await _apiResourceRepository.Query().AsNoTracking().AnyAsync(r => r.Name == action.Name))
+            var realm = _realmsState.Value.ActiveRealm;
+            if (await _apiResourceRepository.Query().Include(r =>r.Realms).AsNoTracking().AnyAsync(r => r.Name == action.Name && r.Realms.Any(r => r.Name == realm)))
             {
                 dispatcher.Dispatch(new AddApiResourceFailureAction { Name = action.Name, ErrorMessage = string.Format(Global.ApiResourceAlreadyExists, action.Name) });
                 return;
             }
 
+            var activeRealm = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
             var apiResource = new ApiResource
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = action.Name,
                 Description = action.Description,
                 UpdateDateTime = DateTime.UtcNow,
                 CreateDateTime = DateTime.UtcNow
             };
+            apiResource.Realms.Add(activeRealm);
             _apiResourceRepository.Add(apiResource);
             await _apiResourceRepository.SaveChanges(CancellationToken.None);
             dispatcher.Dispatch(new AddApiResourceSuccessAction { Name = action.Name, Description = action.Description });
@@ -67,7 +77,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         [EffectMethod]
         public async Task Handle(UpdateApiScopeResourcesAction action, IDispatcher dispatcher)
         {
-            var scope = await _scopeRepository.Query().Include(s => s.ApiResources).SingleAsync(s => s.Name == action.Name, CancellationToken.None);
+            var realm = _realmsState.Value.ActiveRealm;
+            var scope = await _scopeRepository.Query().Include(r => r.Realms).Include(s => s.ApiResources).SingleAsync(s => s.Name == action.Name && s.Realms.Any(r => r.Name == realm), CancellationToken.None);
             var apiResources = await _apiResourceRepository.Query().Where(s => action.Resources.Contains(s.Name)).ToListAsync(CancellationToken.None);
             scope.ApiResources = apiResources;
             await _scopeRepository.SaveChanges(CancellationToken.None);

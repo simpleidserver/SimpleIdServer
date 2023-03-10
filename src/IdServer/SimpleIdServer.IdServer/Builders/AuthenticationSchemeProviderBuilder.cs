@@ -22,6 +22,7 @@ namespace SimpleIdServer.IdServer.Builders
             var properties = AuthenticationSchemeSerializer.SerializeProperties(options);
             return new AuthenticationSchemeProviderBuilder(new AuthenticationSchemeProvider
             {
+                Id = Guid.NewGuid().ToString(),
                 Name = name,
                 DisplayName = displayName,
                 Description = description,

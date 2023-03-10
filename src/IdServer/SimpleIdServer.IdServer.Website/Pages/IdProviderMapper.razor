@@ -3,7 +3,9 @@
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inject IDispatcher dispatcher
+@inject NavigationManager navigationManager
 @inject NotificationService notificationService
 @inject IState<IdProviderState> idProviderState
 
@@ -55,6 +57,10 @@ else
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderMapperUpdated });
                 StateHasChanged();
+            });
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                navigationManager.NavigateTo("/idproviders");
             });
         }
     }

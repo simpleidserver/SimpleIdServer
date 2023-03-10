@@ -1,0 +1,44 @@
+﻿@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@inject IState<RealmsState> realmsState
+@inject IDispatcher dispatcher
+@inject NavigationManager navigationManager
+@inject Radzen.DialogService dialogService
+
+<RadzenTemplateForm Submit=@SubmitSelectRealm TItem="RealmForm" Data=@realmForm>
+    <!-- Realm -->
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Realm</RadzenText>
+    <RadzenDropDown Name="Realm" Class="w-100"
+                    Data=@realmsState.Value.Realms
+                    TValue="string"
+                    @bind-Value=@realmForm.Name
+                    TextProperty="Name" ValueProperty="Name"></RadzenDropDown>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Select"  />
+</RadzenTemplateForm>
+
+<RadzenButton class="mt-1 w-100" Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Add Realm" />
+
+@code {
+    record RealmForm
+    {
+        public string Name { get; set; }
+    }
+
+    RealmForm realmForm = new RealmForm();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        realmForm.Name = realmsState.Value.ActiveRealm;
+    }
+
+    void SubmitSelectRealm(RealmForm realm)
+    {
+        dispatcher.Dispatch(new SelectRealmAction { Realm = realm.Name });
+        this.dialogService.Close();
+    }
+
+    void AddRealm()
+    {
+        navigationManager.NavigateTo("/realm/add");
+    }
+}

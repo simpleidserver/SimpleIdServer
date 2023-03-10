@@ -1,5 +1,6 @@
 ﻿@page "/clients/{id}/{action}"
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NotificationService notificationService
@@ -59,6 +60,18 @@ else
     public string? action { get; set; } = null;
 
     int selectedIndex = 0;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                navigationManager.NavigateTo("/clients");
+            });
+        }
+    }
 
     protected override void OnParametersSet()
     {

@@ -3,6 +3,7 @@
 @inject IState<RealmsState> state
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
+@inject DialogService dialogService
 
 <PageTitle>SimpleIdServer Administration UI</PageTitle>
 
@@ -56,11 +57,15 @@
         }
     }
 
-    void ShowRealms(MenuItemEventArgs args)
+    async void ShowRealms(MenuItemEventArgs args)
     {
         if (state.Value.IsLoading || args.Text != "Active Realm : " + state.Value.ActiveRealm) return;
-        // Display popup
-        var act = new SelectRealmAction { Realm = "test" };
-        dispatcher.Dispatch(act);
+        await dialogService.OpenAsync<SelectRealmDialog>("Select Realm", new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
     }
 }

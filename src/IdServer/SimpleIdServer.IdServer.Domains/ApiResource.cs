@@ -4,6 +4,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public class ApiResource
     {
+        public string Id { get; set; }
         /// <summary>
         /// Target service or resource to which access is being requested.
         /// </summary>
@@ -12,5 +13,6 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public ICollection<Scope> Scopes { get; set; } = new List<Scope>();
+        public ICollection<Realm> Realms { get; set; } = new List<Realm>();
     }
 }

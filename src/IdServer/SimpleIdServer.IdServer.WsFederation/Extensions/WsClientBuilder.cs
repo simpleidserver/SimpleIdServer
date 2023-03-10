@@ -8,17 +8,19 @@ namespace SimpleIdServer.IdServer.Builders
 {
     public static class WsClientBuilder
     {
-        public static  WsFederationClientBuilder BuildWsFederationClient(string clientId)
+        public static  WsFederationClientBuilder BuildWsFederationClient(string clientId, Realm realm = null)
         {
             var client = new Client
             {
+                Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = Guid.NewGuid().ToString(),
                 ClientType = WsFederationConstants.CLIENT_TYPE,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            client.Realms.Add(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
             client.Scopes.Add(Constants.StandardScopes.SAMLProfile);
             client.SetWsFederationEnabled(true);
             return new WsFederationClientBuilder(client);

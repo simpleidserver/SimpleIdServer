@@ -6,6 +6,7 @@ using Radzen;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Website.Resources;
+using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Website.Stores.UserStore
@@ -13,16 +14,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class UserEffects
     {
         private readonly IUserRepository _userRepository;
+        private readonly IState<RealmsState> _realmsState;
 
-        public UserEffects(IUserRepository userRepository)
+        public UserEffects(IUserRepository userRepository, IState<RealmsState> realmsState)
         {
             _userRepository = userRepository;
+            _realmsState = realmsState;
         }
 
         [EffectMethod]
         public async Task Handle(SearchUsersAction action, IDispatcher dispatcher)
         {
-            IQueryable<User> query = _userRepository.Query().Include(u => u.OAuthUserClaims).AsNoTracking();
+            var realm = _realmsState.Value.ActiveRealm;
+            IQueryable<User> query = _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Where(u => u.Realms.Any(r => r.Name == realm)).AsNoTracking();
             if (!string.IsNullOrWhiteSpace(action.Filter))
                 query = query.Where(SanitizeExpression(action.Filter));
 
@@ -38,7 +42,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(GetUserAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).Include(u => u.Consents).Include(u => u.Sessions).Include(u => u.Credentials).Include(u => u.ExternalAuthProviders).AsNoTracking().SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             if (user == null) {
                 dispatcher.Dispatch(new GetUserFailureAction { ErrorMessage = string.Format(Global.UnknownUser, action.UserId) });
                 return;
@@ -50,7 +55,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(UpdateUserDetailsAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).SingleOrDefaultAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleOrDefaultAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             user.UpdateEmail(action.Email);
             user.UpdateName(action.Firstname);
             user.UpdateLastname(action.Lastname);
@@ -62,7 +68,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(RevokeUserConsentAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Consents).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Consents).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             var consent = user.Consents.Single(c => c.Id == action.ConsentId);
             user.Consents.Remove(consent);
             await _userRepository.SaveChanges(CancellationToken.None);
@@ -72,7 +79,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(UnlinkExternalAuthProviderAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.ExternalAuthProviders).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             var externalAuthProvider = user.ExternalAuthProviders.Single(c => c.Scheme == action.Scheme && c.Subject == action.Subject) ;
             user.ExternalAuthProviders.Remove(externalAuthProvider);
             await _userRepository.SaveChanges(CancellationToken.None);
@@ -82,7 +90,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(RevokeUserSessionAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Sessions).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Sessions).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             var session = user.Sessions.Single(s => s.SessionId == action.SessionId);
             session.State = UserSessionStates.Rejected;
             await _userRepository.SaveChanges(CancellationToken.None);
@@ -92,7 +101,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(UpdateUserClaimsAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.OAuthUserClaims).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.OAuthUserClaims).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             user.OAuthUserClaims.Clear();
             var fileteredClaims = action.Claims.Where(c => !string.IsNullOrWhiteSpace(c.Value) && !string.IsNullOrWhiteSpace(c.Name));
             foreach (var cl in fileteredClaims)
@@ -105,8 +115,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(AddUserCredentialAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
-            if(action.IsDefault)
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
+            if (action.IsDefault)
             {
                 foreach (var act in user.Credentials.Where(c => c.CredentialType == action.Credential.CredentialType))
                     act.IsActive = false;
@@ -121,7 +132,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(UpdateUserCredentialAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             var credential = user.Credentials.Single(c => c.Id == action.Credential.Id);
             credential.Value = action.Credential.Value;
             credential.OTPAlg = action.Credential.OTPAlg;
@@ -132,7 +144,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(RemoveUserCredentialAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
             user.Credentials.Remove(credential);
             await _userRepository.SaveChanges(CancellationToken.None);
@@ -142,7 +155,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         [EffectMethod]
         public async Task Handle(DefaultUserCredentialAction action, IDispatcher dispatcher)
         {
-            var user = await _userRepository.Query().Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId);
+            var realm = _realmsState.Value.ActiveRealm;
+            var user = await _userRepository.Query().Include(u => u.Realms).Include(u => u.Credentials).SingleAsync(a => a.Id == action.UserId && a.Realms.Any(r => r.Name == realm));
             var credential = user.Credentials.Single(c => c.Id == action.CredentialId);
             foreach (var cred in user.Credentials.Where(c => c.CredentialType == credential.CredentialType))
                 cred.IsActive = false;

@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         public IEnumerable<SelectableUser>? Users { get; set; } = null;
         public int Count { get; set; } = 0;
-        public bool IsLoading { get; set; } = false;
+        public bool IsLoading { get; set; } = true;
         public bool HasLeastOneUserIsSelected
         {
             get

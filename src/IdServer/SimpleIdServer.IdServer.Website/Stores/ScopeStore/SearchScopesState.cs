@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
         public IEnumerable<SelectableScope>? Scopes { get; set; } = null;
         public int Count { get; set; } = 0;
-        public bool IsLoading { get; set; } = false;
+        public bool IsLoading { get; set; } = true;
     }
 
     public class SelectableScope

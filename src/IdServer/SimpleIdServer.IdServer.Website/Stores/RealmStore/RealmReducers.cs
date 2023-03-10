@@ -25,6 +25,37 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
             };
         }
 
+        [ReducerMethod]
+        public static RealmsState ReduceAddRealmSuccessAction(RealmsState state, AddRealmSuccessAction act)
+        {
+            var realms = state.Realms.ToList();
+            realms.Add(new Realm
+            {
+                Name= act.Name,
+                Description = act.Description,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            });
+            return state with
+            {
+                Realms = realms,
+                ActiveRealm = act.Name
+            };
+        }
+
+        #endregion
+
+        #region UpdateRealmState
+
+        [ReducerMethod]
+        public static UpdateRealmState ReduceAddRealmAction(UpdateRealmState state, AddRealmAction act) => new(true, null);
+
+        [ReducerMethod]
+        public static UpdateRealmState ReduceAddRealmSuccessAction(UpdateRealmState state, AddRealmSuccessAction act) => new(false, null);
+
+        [ReducerMethod]
+        public static UpdateRealmState ReduceAddRealmFailureAction(UpdateRealmState state, AddRealmFailureAction act) => new(false, act.ErrorMessage);
+
         #endregion
     }
 }

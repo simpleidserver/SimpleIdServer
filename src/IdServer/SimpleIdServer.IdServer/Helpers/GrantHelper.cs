@@ -5,7 +5,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Store;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ namespace SimpleIdServer.IdServer.Helpers
 {
     public interface IGrantHelper
     {
-        Task<GrantRequest> Extract(IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken);
+        Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken);
     }
 
     public class GrantRequest
@@ -54,7 +53,7 @@ namespace SimpleIdServer.IdServer.Helpers
             _clientRepository = clientRepository;
         }
 
-        public async Task<GrantRequest> Extract(IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)
+        public async Task<GrantRequest> Extract(string realm, IEnumerable<string> scopes, IEnumerable<string> resources, CancellationToken cancellationToken)
         {
             var authResults = new List<AuthorizedScope>();
             if (resources.Any())
@@ -67,7 +66,7 @@ namespace SimpleIdServer.IdServer.Helpers
             async Task<List<AuthorizedScope>> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> scopes, CancellationToken cancellationToken)
             {
                 var authResults = new List<AuthorizedScope>();
-                var apiResources = await _apiResourceRepository.Query().Include(r => r.Scopes).Where(r => resources.Contains(r.Name)).ToListAsync(cancellationToken);
+                var apiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Include(r => r.Scopes).Where(r => resources.Contains(r.Name) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
                 var unsupportedResources = resources.Where(r => !apiResources.Any(a => a.Name == r));
                 if (unsupportedResources.Any())
                     throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(ErrorMessages.UKNOWN_RESOURCE, string.Join(",", unsupportedResources)));

@@ -1,0 +1,57 @@
+﻿@page "/realm/add"
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Resources
+@inject IState<UpdateRealmState> updateRealmState
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject NavigationManager navigationManager
+
+<RadzenTemplateForm Submit=@SubmitAddRealm TItem="AddRealmForm" Data=@addRealmForm>
+    @if (!updateRealmState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateRealmState.Value.ErrorMessage))
+    {
+        <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateRealmState.Value.ErrorMessage</RadzenAlert>
+    }
+
+    <!-- Name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+        <RadzenTextBox Name="Name" @bind-Value="@addRealmForm.Name" Class="w-100"></RadzenTextBox>
+        <RadzenRequiredValidator Component="Name" Text="Name is required"></RadzenRequiredValidator>
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+        <RadzenTextArea Name="Description" @bind-Value="@addRealmForm.Description" Class="w-100"></RadzenTextArea>
+    </div>
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateRealmState.Value.IsUpdating ? "Adding..." : "Add")" Disabled=updateRealmState.Value.IsUpdating />
+</RadzenTemplateForm>
+
+@code {
+    record AddRealmForm
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+
+    AddRealmForm addRealmForm = new AddRealmForm();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<AddRealmSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.RealmAdded });
+                navigationManager.NavigateTo("/clients");
+            });
+        }
+    }
+
+    void SubmitAddRealm(AddRealmForm realmForm)
+    {
+        var act = new AddRealmAction { Name = realmForm.Name, Description = realmForm.Description };
+        dispatcher.Dispatch(act);
+    }
+}

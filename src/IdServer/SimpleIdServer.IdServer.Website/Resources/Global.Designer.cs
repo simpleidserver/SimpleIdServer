@@ -205,6 +205,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name is required.
+        /// </summary>
+        public static string NameIsRequired {
+            get {
+                return ResourceManager.GetString("NameIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Realms has been added.
+        /// </summary>
+        public static string RealmAdded {
+            get {
+                return ResourceManager.GetString("RealmAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Realm {0} already exists.
+        /// </summary>
+        public static string RealmExists {
+            get {
+                return ResourceManager.GetString("RealmExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Redirection url &apos;{0}&apos; cannot contains fragment (#).
         /// </summary>
         public static string RedirectUriContainsFragment {

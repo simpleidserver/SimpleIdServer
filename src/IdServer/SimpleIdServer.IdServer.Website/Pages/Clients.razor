@@ -75,6 +75,8 @@
                 clientsGrid.Reload();
                 StateHasChanged();
             });
+            if (!clientState.Value.IsLoading)
+                clientsGrid.Reload();
         }
     }
 

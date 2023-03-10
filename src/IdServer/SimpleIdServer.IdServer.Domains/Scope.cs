@@ -15,6 +15,7 @@ namespace SimpleIdServer.IdServer.Domains
             Name = name;
         }
 
+        public string Id { get; set; }
         public string Name { get; set; } = null!;
         public ScopeTypes Type { get; set; } = ScopeTypes.IDENTITY;
         public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;

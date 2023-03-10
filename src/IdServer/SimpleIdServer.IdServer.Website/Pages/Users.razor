@@ -6,9 +6,11 @@
 @inject ContextMenuService contextMenuService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 
-<RadzenDataGrid AllowFiltering="true" 
+<RadzenDataGrid @ref=gridUsers
+        AllowFiltering="true"
         AllowColumnResize="true"
         AllowAlternatingRows="false" 
         AllowSorting="true" 
@@ -52,10 +54,26 @@
 
 @code {
     bool selectAll = false;
+    RadzenDataGrid<SelectableUser> gridUsers;
 
     protected async override Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                gridUsers.Reload();
+                StateHasChanged();
+            });
+            if (!userState.Value.IsLoading)
+                gridUsers.Reload();
+        }
     }
 
     void LoadData(LoadDataArgs args)

@@ -1,4 +1,5 @@
 ﻿@page "/scopes/{id}/{action}"
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
@@ -82,17 +83,29 @@ else
 
     int selectedIndex = 0;
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<GetScopeFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                navigationManager.NavigateTo("/scopes");
+            });
+        }
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (string.IsNullOrWhiteSpace(id)) return;
         if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
             selectedIndex = mappingActionNameToIndex[action].Item1;
-        SubscribeToAction<GetScopeFailureAction>((act) =>
-        {
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
-            StateHasChanged();
-        });
         dispatcher.Dispatch(new GetScopeAction { ScopeName = id });
     }
 

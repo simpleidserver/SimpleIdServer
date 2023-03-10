@@ -78,6 +78,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 var realm = await _realmRepository.Query().FirstAsync(r => r.Name == prefix, cancellationToken);
                 var client = new Client
                 {
+                    Id = Guid.NewGuid().ToString(),
                     ClientId = Guid.NewGuid().ToString(),
                     RegistrationAccessToken = Guid.NewGuid().ToString(),
                     CreateDateTime = DateTime.UtcNow,

@@ -120,7 +120,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             context.SetUser(user);
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
-            var grantRequest = await _grantHelper.Extract(scopes, resources, cancellationToken);
+            var grantRequest = await _grantHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
 
             foreach (var validator in _authorizationRequestValidators)
                 await validator.Validate(grantRequest, context, cancellationToken);

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains;
+using System;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -16,7 +17,9 @@ namespace SimpleIdServer.IdServer.Builders
 
         public static ApiResourceBuilder Create(string name, string description, params Scope[] scopes)
         {
-            return new ApiResourceBuilder(new ApiResource { Name = name, Description = description, Scopes = scopes });
+            var record = new ApiResource { Id = Guid.NewGuid().ToString(), Name = name, Description = description, Scopes = scopes };
+            record.Realms.Add(Constants.StandardRealms.Master);
+            return new ApiResourceBuilder(record);
         }
 
         public ApiResource Build() => _apiResource;

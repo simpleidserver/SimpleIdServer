@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Builders
             _user = new User();
         }
 
-        public static UserBuilder Create(string login, string password, string name = null)
+        public static UserBuilder Create(string login, string password, string name = null, Realm realm = null)
         {
             var result = new UserBuilder();
             result._user.Id = Guid.NewGuid().ToString();
@@ -30,7 +30,8 @@ namespace SimpleIdServer.IdServer.Builders
                 IsActive = true,
                 Value = PasswordHelper.ComputeHash(password)
             });
-            result._user.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) result._user.Realms.Add(Constants.StandardRealms.Master);
+            else result._user.Realms.Add(realm);
             result._user.CreateDateTime = DateTime.UtcNow;
             result._user.UpdateDateTime = DateTime.UtcNow;
             return result;

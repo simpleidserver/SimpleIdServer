@@ -1,5 +1,6 @@
 ﻿@page "/idproviders/{id}/{action}"
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<IdProviderState> idProviderState
 @inject NotificationService notificationService
@@ -48,18 +49,29 @@ else
     public string action { get; set; }
     int selectedIndex = 0;
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                navigationManager.NavigateTo("/idproviders");
+            });
+            SubscribeToAction<GetIdProviderFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+        }
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (string.IsNullOrWhiteSpace(id)) return;
         if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
             selectedIndex = mappingActionNameToIndex[action];
-        SubscribeToAction<GetIdProviderFailureAction>((act) =>
-        {
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
-            StateHasChanged();
-        });
-
         dispatcher.Dispatch(new GetIdProviderAction { Id = id });
     }
 

@@ -93,7 +93,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                 var scopes = GetScopes(previousRequest, context);
                 var resources = GetResources(previousRequest, context);
-                var extractionResult = await _audienceHelper.Extract(scopes, resources, cancellationToken);
+                var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, cancellationToken);
                 var result = BuildResult(context, extractionResult.Scopes);
                 await Authenticate(previousRequest, context, cancellationToken);
                 context.SetOriginalRequest(previousRequest);

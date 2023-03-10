@@ -6,11 +6,13 @@
 @inject ContextMenuService contextMenuService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 
 <RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="Add scope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
-<RadzenDataGrid AllowFiltering="true" 
+<RadzenDataGrid @ref=scopesGrid
+        AllowFiltering="true" 
         AllowColumnResize="true"
         AllowAlternatingRows="false" 
         AllowSorting="true" 
@@ -79,16 +81,26 @@
 
 @code {
     bool selectAll = false;
+    RadzenDataGrid<SelectableScope> scopesGrid;
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
+        {
             SubscribeToAction<RemoveSelectedScopesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedScopesRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                scopesGrid.Reload();
+                StateHasChanged();
+            });
+            if (!scopesState.Value.IsLoading)
+                scopesGrid.Reload();
+        }
     }
 
     void LoadData(LoadDataArgs args)

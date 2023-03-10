@@ -29,10 +29,10 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<Client> Clients => new List<Client>
         {
-            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", "http://localhost:5001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
-            ClientBuilder.BuildExternalAuthDeviceClient("bankWebsite", "password", "http://localhost:5001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("website", "password", null, "http://localhost:5001/signin-oidc").SetClientName("Website").SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
+            ClientBuilder.BuildExternalAuthDeviceClient("bankWebsite", "password", null, "http://localhost:5001/signin-oidc").SetClientName("Bank Website").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build(),
             WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("Name").Build(),
-            ClientBuilder.BuildUserAgentClient("oauth", "password", "https://oauth.tools/callback/code").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build()
+            ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code").AddScope(Constants.StandardScopes.OpenIdScope, Constants.StandardScopes.Profile).Build()
         };
 
         public static ICollection<UMAResource> Resources = new List<UMAResource>

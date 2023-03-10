@@ -19,17 +19,19 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientId"></param>
         /// <param name="clientSecret"></param>
         /// <returns></returns>
-        public static ApiClientBuilder BuildApiClient(string clientId, string clientSecret)
+        public static ApiClientBuilder BuildApiClient(string clientId, string clientSecret, Realm realm = null)
         {
             var client = new Client
             {
+                Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 ClientType = ClientTypes.MACHINE,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
             client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             return new ApiClientBuilder(client);
@@ -43,10 +45,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static TraditionalWebsiteClientBuilder BuildTraditionalWebsiteClient(string clientId, string clientSecret, params string[] redirectUrls)
+        public static TraditionalWebsiteClientBuilder BuildTraditionalWebsiteClient(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {
+                Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 ClientType = ClientTypes.WEBSITE,
@@ -55,7 +58,8 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             return new TraditionalWebsiteClientBuilder(client);
@@ -69,10 +73,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clietnSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static TraditionalWebsiteClientBuilder BuildExternalAuthDeviceClient(string clientId, string clientSecret, params string[] redirectUrls)
+        public static TraditionalWebsiteClientBuilder BuildExternalAuthDeviceClient(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {
+                Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 ClientType = ClientTypes.EXTERNAL,
@@ -81,7 +86,8 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             var result = new TraditionalWebsiteClientBuilder(client);
@@ -97,10 +103,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static MobileClientBuilder BuildMobileApplication(string clientId, string clientSecret, params string[] redirectUrls)
+        public static MobileClientBuilder BuildMobileApplication(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {
+                Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 ClientType = ClientTypes.MOBILE,
@@ -109,7 +116,8 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new MobileClientBuilder(client);
@@ -123,10 +131,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="clientSecret"></param>
         /// <param name="redirectUrls"></param>
         /// <returns></returns>
-        public static UserAgentClientBuilder BuildUserAgentClient(string clientId, string clientSecret, params string[] redirectUrls)
+        public static UserAgentClientBuilder BuildUserAgentClient(string clientId, string clientSecret, Realm realm = null, params string[] redirectUrls)
         {
             var client = new Client
             {
+                Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
@@ -135,7 +144,8 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new UserAgentClientBuilder(client);

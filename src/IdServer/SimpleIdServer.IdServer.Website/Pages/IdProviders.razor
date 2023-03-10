@@ -1,6 +1,7 @@
 ﻿@page "/idproviders"
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
@@ -10,7 +11,8 @@
 
 <RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="Add Identity Provider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
-<RadzenDataGrid AllowFiltering="true"
+<RadzenDataGrid @ref=idProvidersGrid
+                AllowFiltering="true"
                 AllowColumnResize="true"
                 AllowAlternatingRows="false"
                 AllowSorting="true"
@@ -49,15 +51,26 @@
 </RadzenDataGrid>
 
 @code {
+    RadzenDataGrid<SelectableIdProvider> idProvidersGrid;
+
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
         if (firstRender)
+        {
             SubscribeToAction<RemoveSelectedIdProvidersSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProvidersRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                idProvidersGrid.Reload();
+                StateHasChanged();
+            });
+            if (!searchIdProvidersState.Value.IsLoading)
+                idProvidersGrid.Reload();
+        }
     }
 
     void LoadData(LoadDataArgs args)

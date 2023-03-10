@@ -1,11 +1,13 @@
 ﻿@page "/scopes/{id}/mappers/{name}"
 @using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @layout MainLayout
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject NavigationManager navigationManager
 @inject IDispatcher dispatcher
 @inject IState<ScopeState> scopeState
 @inject NotificationService notificationService
@@ -81,6 +83,10 @@ else
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeClaimMapperUpdated });
                 StateHasChanged();
+            });
+            SubscribeToAction<SelectRealmAction>((act) =>
+            {
+                navigationManager.NavigateTo("/scopes");
             });
         }
     }

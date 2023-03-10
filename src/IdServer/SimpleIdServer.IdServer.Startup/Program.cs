@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
@@ -52,13 +51,14 @@ void RunSqlServerIdServer(IServiceCollection services)
         .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
+            /*
             a.AddWsAuthentication(o =>
             {
                 o.MetadataAddress = "http://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
                 o.Wtrealm = "urn:website";
                 o.RequireHttpsMetadata = false;
             });
-            /*
+            */
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:5001";
@@ -75,7 +75,6 @@ void RunSqlServerIdServer(IServiceCollection services)
                 };
                 opts.Scope.Add("profile");
             });
-            */
         });
 }
 

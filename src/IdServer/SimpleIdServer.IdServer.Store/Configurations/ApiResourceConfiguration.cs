@@ -10,8 +10,9 @@ namespace SimpleIdServer.IdServer.Store.Configurations
     {
         public void Configure(EntityTypeBuilder<ApiResource> builder)
         {
-            builder.HasKey(a => a.Name);
+            builder.HasKey(a => a.Id);
             builder.HasMany(c => c.Scopes).WithMany(s => s.ApiResources);
+            builder.HasMany(c => c.Realms).WithMany(s => s.ApiResources);
         }
     }
 }
