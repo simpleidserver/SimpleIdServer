@@ -43,6 +43,7 @@ void RunSqlServerIdServer(IServiceCollection services)
             });
         })
         .AddDeveloperSigningCredentials()
+        .AddDeveloperSigningCredentials("test")
         .AddWsFederationSigningCredentials()
         .AddBackChannelAuthentication()
         .AddEmailAuthentication()
@@ -51,14 +52,6 @@ void RunSqlServerIdServer(IServiceCollection services)
         .UseRealm()
         .AddAuthentication(callback: (a) =>
         {
-            /*
-            a.AddWsAuthentication(o =>
-            {
-                o.MetadataAddress = "http://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
-                o.Wtrealm = "urn:website";
-                o.RequireHttpsMetadata = false;
-            });
-            */
             a.AddOIDCAuthentication(opts =>
             {
                 opts.Authority = "http://localhost:5001";

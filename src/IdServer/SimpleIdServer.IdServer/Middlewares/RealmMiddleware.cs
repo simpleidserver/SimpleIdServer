@@ -31,6 +31,7 @@ namespace SimpleIdServer.IdServer.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            RealmContext.Instance().Realm = null;
             if (_options.UseRealm)
             {
                 using (var scope = _serviceProvider.CreateScope())
@@ -43,12 +44,14 @@ namespace SimpleIdServer.IdServer.Middlewares
                         return;
                     }
 
-                    var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value;
+                    var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
                     if (routeValues.Any(v => v.Key == Constants.Prefix) && !(await realmRepository.Query().AnyAsync(r => r.Name == prefix)))
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                         return;
                     }
+
+                    RealmContext.Instance().Realm = prefix;
                 }
             }
 

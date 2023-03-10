@@ -11,6 +11,8 @@ namespace SimpleIdServer.IdServer.Stores
     {
         IEnumerable<SigningCredentials> GetAllSigningKeys(string realm);
         IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm);
+        void Add(string realm, SigningCredentials signingCredentials);
+        void Add(string realm, EncryptingCredentials encryptingCredentials);
     }
 
     public class InMemoryKeyStore : IKeyStore
@@ -40,6 +42,14 @@ namespace SimpleIdServer.IdServer.Stores
                 _signingCredentials.AddOrUpdate(realm, new List<SigningCredentials>(), (a,b) => new List<SigningCredentials>());
 
             _signingCredentials[realm].Add(signingCredentials);
+        }
+
+        public void Add(string realm, EncryptingCredentials encryptingCredentials)
+        {
+            if (!_signingCredentials.ContainsKey(realm))
+                _encryptedCredentials.AddOrUpdate(realm, new List<EncryptingCredentials>(), (a, b) => new List<EncryptingCredentials>());
+
+            _encryptedCredentials[realm].Add(encryptingCredentials);
         }
 
         internal void SetSigningCredentials(string realm, IEnumerable<SigningCredentials> signingCredentials) => _signingCredentials.AddOrUpdate(realm, signingCredentials.ToList(), (a, b) => signingCredentials.ToList());
